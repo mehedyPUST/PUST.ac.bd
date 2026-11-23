@@ -177,6 +177,9 @@ const ZONES: CampusZone[] = [
   'Residential & Wellness',
 ];
 
+const EASE_EDITORIAL = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT_ONCE = { once: true, amount: 0.12 } as const;
+
 export function CampusMapSection() {
   const [selectedZone, setSelectedZone] = useState<CampusZone>('All');
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>(BUILDINGS[0].id);
@@ -203,7 +206,13 @@ export function CampusMapSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={VIEWPORT_ONCE}
+          transition={{ duration: 0.48, ease: EASE_EDITORIAL }}
+          className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5"
+        >
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Rajapur 30-Acre Masterplan · Interactive Campus Directory
@@ -243,12 +252,18 @@ export function CampusMapSection() {
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* 12-Column Interactive Blueprint + Selected Building Detail Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left: Interactive Architectural Blueprint */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.5, delay: 0.06, ease: EASE_EDITORIAL }}
+            className="lg:col-span-7 flex flex-col gap-4"
+          >
             <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-slate-200 overflow-hidden select-none shadow-xs">
               {/* Architectural Blueprint SVG Layer */}
               <svg
@@ -536,75 +551,83 @@ export function CampusMapSection() {
                 })}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right: Active Building Photo & Architectural Dossier */}
-          <motion.article
-            key={activeBuilding.id}
-            initial={{ opacity: 0.4, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18 }}
-            className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between overflow-hidden"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.5, delay: 0.12, ease: EASE_EDITORIAL }}
+            className="lg:col-span-5 flex"
           >
-            <div>
-              <ResilientImage
-                src={activeBuilding.photo}
-                alt={activeBuilding.name}
-                caption={activeBuilding.caption}
-                containerClassName="p-4 pb-0"
-                className="w-full aspect-[4/3] object-cover"
-              />
+            <motion.article
+              key={activeBuilding.id}
+              initial={{ opacity: 0.4, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18 }}
+              className="w-full rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between overflow-hidden"
+            >
+              <div>
+                <ResilientImage
+                  src={activeBuilding.photo}
+                  alt={activeBuilding.name}
+                  caption={activeBuilding.caption}
+                  containerClassName="p-4 pb-0"
+                  className="w-full aspect-[4/3] object-cover"
+                />
 
-              <div className="p-6 space-y-4">
-                <div>
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
-                    {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
-                  </p>
-                  <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
-                    {activeBuilding.name}
-                  </h3>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
+                    </p>
+                    <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                      {activeBuilding.name}
+                    </h3>
+                  </div>
+
+                  <p className="text-sm text-slate-700 leading-relaxed">{activeBuilding.summary}</p>
+
+                  <dl className="divide-y divide-slate-200 border-y border-slate-200 text-xs sm:text-sm">
+                    <div className="py-2.5 space-y-0.5">
+                      <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Offices &amp; Academic Units
+                      </dt>
+                      <dd className="text-slate-800 font-medium text-justify">{activeBuilding.offices}</dd>
+                    </div>
+                    <div className="py-2.5 flex justify-between gap-4">
+                      <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 shrink-0">
+                        Visiting Hours
+                      </dt>
+                      <dd className="font-mono text-xs text-slate-900 text-right tabular-nums">
+                        {activeBuilding.hours}
+                      </dd>
+                    </div>
+                    <div className="py-2.5 space-y-0.5">
+                      <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Key Facilities
+                      </dt>
+                      <dd className="text-slate-700 text-justify">{activeBuilding.facilities}</dd>
+                    </div>
+                  </dl>
                 </div>
-
-                <p className="text-sm text-slate-700 leading-relaxed">{activeBuilding.summary}</p>
-
-                <dl className="divide-y divide-slate-200 border-y border-slate-200 text-xs sm:text-sm">
-                  <div className="py-2.5 space-y-0.5">
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                      Offices &amp; Academic Units
-                    </dt>
-                    <dd className="text-slate-800 font-medium text-justify">{activeBuilding.offices}</dd>
-                  </div>
-                  <div className="py-2.5 flex justify-between gap-4">
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 shrink-0">
-                      Visiting Hours
-                    </dt>
-                    <dd className="font-mono text-xs text-slate-900 text-right tabular-nums">
-                      {activeBuilding.hours}
-                    </dd>
-                  </div>
-                  <div className="py-2.5 space-y-0.5">
-                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                      Key Facilities
-                    </dt>
-                    <dd className="text-slate-700 text-justify">{activeBuilding.facilities}</dd>
-                  </div>
-                </dl>
               </div>
-            </div>
 
-            <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
-              <Link
-                href={activeBuilding.route}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap"
-              >
-                {activeBuilding.routeLabel}
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
-                {BUILDINGS.findIndex((b) => b.id === activeBuilding.id) + 1} / {BUILDINGS.length}
-              </span>
-            </div>
-          </motion.article>
+              <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
+                <Link
+                  href={activeBuilding.route}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap"
+                >
+                  {activeBuilding.routeLabel}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  {BUILDINGS.findIndex((b) => b.id === activeBuilding.id) + 1} / {BUILDINGS.length}
+                </span>
+              </div>
+            </motion.article>
+          </motion.div>
         </div>
       </div>
     </section>

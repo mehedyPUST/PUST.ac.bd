@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -64,6 +64,9 @@ const FACULTIES_OVERVIEW = [
   { code: 'FLES', name: 'Life & Earth Science', depts: '1 Dept · Geography & Environment' },
 ];
 
+const EASE_EDITORIAL = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT_ONCE = { once: true, amount: 0.12 } as const;
+
 export function HomePage({
   heroImage,
   profile,
@@ -109,30 +112,45 @@ export function HomePage({
       <section className="bg-[#F7F7F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="lg:col-span-6 flex flex-col justify-between py-2"
-            >
+            <div className="lg:col-span-6 flex flex-col justify-between py-2">
               <div className="space-y-5">
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                <motion.p
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.42, ease: EASE_EDITORIAL }}
+                  className="font-mono text-xs uppercase tracking-widest text-pust-800"
+                >
                   Rajapur, Pabna-6600 · First Convocation:{' '}
                   {profile?.convocationDate ?? '15 March 2027'}
-                </p>
-                <h1 className="font-serif text-[clamp(2.2rem,3.9vw,3.45rem)] leading-[1.08] font-medium tracking-tight text-slate-900">
+                </motion.p>
+                <motion.h1
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.06, ease: EASE_EDITORIAL }}
+                  className="font-serif text-[clamp(2.2rem,3.9vw,3.45rem)] leading-[1.08] font-medium tracking-tight text-slate-900"
+                >
                   Advancing Science, Engineering &amp; Human Inquiry from Pabna
-                </h1>
-                <p className="text-base sm:text-[17px] leading-relaxed text-slate-600 max-w-xl">
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.12, ease: EASE_EDITORIAL }}
+                  className="text-base sm:text-[17px] leading-relaxed text-slate-600 max-w-xl"
+                >
                   Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna),
                   Pabna University of Science and Technology serves nearly 5,000 scholars and{' '}
                   {profile?.facultyMembersCount ?? 185} faculty members across {profile?.facultiesCount ?? 5}{' '}
                   faculties, {profile?.departmentsCount ?? 21} academic departments, and end-to-end
                   digital workflows.
-                </p>
+                </motion.p>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.48, delay: 0.18, ease: EASE_EDITORIAL }}
+                className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center gap-3"
+              >
                 <Link
                   href="/portal"
                   className="px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
@@ -153,13 +171,13 @@ export function HomePage({
                   Verify Document
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.05 }}
+              initial={{ opacity: 0, y: 16, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.55, delay: 0.1, ease: EASE_EDITORIAL }}
               className="lg:col-span-6"
             >
               <ResilientImage
@@ -174,7 +192,12 @@ export function HomePage({
           </div>
 
           {/* Operational Utility Ribbon */}
-          <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+          <motion.dl
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.24, ease: EASE_EDITORIAL }}
+            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden"
+          >
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
@@ -205,7 +228,7 @@ export function HomePage({
                 Verify Certificates &amp; Receipts →
               </dd>
             </Link>
-          </dl>
+          </motion.dl>
         </div>
       </section>
 
@@ -213,7 +236,13 @@ export function HomePage({
       <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           {/* About PUST Summary */}
-          <div className="lg:col-span-5 space-y-5">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.5, ease: EASE_EDITORIAL }}
+            className="lg:col-span-5 space-y-5"
+          >
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 About PUST
@@ -266,10 +295,16 @@ export function HomePage({
                 Strategic Plans
               </Link>
             </div>
-          </div>
+          </motion.div>
 
           {/* Current Vice-Chancellor + Portrait + Expandable Previous VCs Archive */}
-          <div className="lg:col-span-7 rounded-2xl bg-[#F7F7F5] border border-slate-200 p-6 sm:p-8 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.52, delay: 0.08, ease: EASE_EDITORIAL }}
+            className="lg:col-span-7 rounded-2xl bg-[#F7F7F5] border border-slate-200 p-6 sm:p-8 space-y-6"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start border-b border-slate-200 pb-6">
               <div className="sm:col-span-4">
                 <ResilientImage
@@ -318,37 +353,52 @@ export function HomePage({
               </div>
             </div>
 
-            {showPreviousVcs && (
-              <div className="space-y-3">
-                <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
-                  Former Vice-Chancellors Chronological Archive
-                </p>
-                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden">
-                  {previousVcs.map((vc) => (
-                    <div
-                      key={vc.id}
-                      className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm"
-                    >
-                      <div>
-                        <p className="font-serif font-medium text-slate-900">{vc.name}</p>
-                        <p className="text-xs text-slate-500">{vc.message}</p>
+            <AnimatePresence initial={false}>
+              {showPreviousVcs && (
+                <motion.div
+                  key="previous-vcs-archive"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.24, ease: EASE_EDITORIAL }}
+                  className="space-y-3"
+                >
+                  <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
+                    Former Vice-Chancellors Chronological Archive
+                  </p>
+                  <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                    {previousVcs.map((vc) => (
+                      <div
+                        key={vc.id}
+                        className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm"
+                      >
+                        <div>
+                          <p className="font-serif font-medium text-slate-900">{vc.name}</p>
+                          <p className="text-xs text-slate-500">{vc.message}</p>
+                        </div>
+                        <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
+                          {vc.tenure}
+                        </span>
                       </div>
-                      <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
-                        {vc.tenure}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </section>
 
       {/* Latest Official Bulletins + Institutional Sections Directory */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          <div className="lg:col-span-7 space-y-5">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.5, ease: EASE_EDITORIAL }}
+            className="lg:col-span-7 space-y-5"
+          >
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
@@ -403,8 +453,13 @@ export function HomePage({
                 ) : (
                   <>
                     {leadNotice && (
-                      <button
+                      <motion.button
+                        key={`lead-${noticeCategory}-${leadNotice.id}`}
                         type="button"
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={VIEWPORT_ONCE}
+                        transition={{ duration: 0.4, ease: EASE_EDITORIAL }}
                         onClick={() => onSelectNotice(leadNotice)}
                         className="w-full text-left p-6 bg-pust-50/35 hover:bg-pust-50/70 transition-colors space-y-2 group cursor-pointer"
                       >
@@ -418,13 +473,21 @@ export function HomePage({
                           {leadNotice.title}
                         </h3>
                         <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
-                      </button>
+                      </motion.button>
                     )}
 
-                    {secondaryNotices.map((notice) => (
-                      <button
-                        key={notice.id}
+                    {secondaryNotices.map((notice, idx) => (
+                      <motion.button
+                        key={`${noticeCategory}-${notice.id}`}
                         type="button"
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={VIEWPORT_ONCE}
+                        transition={{
+                          duration: 0.36,
+                          delay: (idx + 1) * 0.05,
+                          ease: EASE_EDITORIAL,
+                        }}
                         onClick={() => onSelectNotice(notice)}
                         className="w-full text-left px-6 py-4 hover:bg-slate-50 transition-colors space-y-1 group cursor-pointer"
                       >
@@ -440,15 +503,21 @@ export function HomePage({
                         <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
                           {notice.summary}
                         </p>
-                      </button>
+                      </motion.button>
                     ))}
                   </>
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-5 space-y-5">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.5, delay: 0.08, ease: EASE_EDITORIAL }}
+            className="lg:col-span-5 space-y-5"
+          >
             <div className="pb-4 border-b border-slate-200">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Digital Services &amp; Directory
@@ -491,10 +560,18 @@ export function HomePage({
                   title: 'Governance & Statutory Offices',
                   desc: 'University Act (Act No. 43 of 2001), Regent Board, Academic Council, VC & Registrar.',
                 },
-              ].map((item) => (
-                <button
+              ].map((item, idx) => (
+                <motion.button
                   key={item.route}
                   type="button"
+                  initial={{ opacity: 0, x: 10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={VIEWPORT_ONCE}
+                  transition={{
+                    duration: 0.36,
+                    delay: idx * 0.045,
+                    ease: EASE_EDITORIAL,
+                  }}
                   onClick={() => onNavigate(item.route)}
                   className="w-full text-left px-5 py-4 hover:bg-pust-50/40 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
                 >
@@ -505,18 +582,24 @@ export function HomePage({
                     <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{item.desc}</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 transition-colors" />
-                </button>
+                </motion.button>
               ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Campus Facilities & Research Infrastructure Showcase */}
       <section className="bg-white border-t border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.48, ease: EASE_EDITORIAL }}
+            className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-5"
+          >
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Research &amp; Residential Campus
@@ -532,10 +615,17 @@ export function HomePage({
               All Campus Facilities
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
+            <motion.article
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT_ONCE}
+              transition={{ duration: 0.46, delay: 0, ease: EASE_EDITORIAL }}
+              whileHover={{ y: -3 }}
+              className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4"
+            >
               <ResilientImage
                 src={LAB_IMAGE}
                 alt="PUST engineering and instrumentation laboratory"
@@ -558,9 +648,16 @@ export function HomePage({
                   Research &amp; Journals →
                 </Link>
               </div>
-            </article>
+            </motion.article>
 
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
+            <motion.article
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT_ONCE}
+              transition={{ duration: 0.46, delay: 0.08, ease: EASE_EDITORIAL }}
+              whileHover={{ y: -3 }}
+              className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4"
+            >
               <ResilientImage
                 src={LIBRARY_IMAGE}
                 alt="PUST Central Library study floor"
@@ -585,9 +682,16 @@ export function HomePage({
                   Library Services →
                 </Link>
               </div>
-            </article>
+            </motion.article>
 
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
+            <motion.article
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT_ONCE}
+              transition={{ duration: 0.46, delay: 0.16, ease: EASE_EDITORIAL }}
+              whileHover={{ y: -3 }}
+              className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4"
+            >
               <ResilientImage
                 src={GROUNDS_IMAGE}
                 alt="PUST Rajapur campus quadrangle and residential halls"
@@ -612,7 +716,7 @@ export function HomePage({
                   Residential Halls →
                 </Link>
               </div>
-            </article>
+            </motion.article>
           </div>
         </div>
       </section>
@@ -623,7 +727,13 @@ export function HomePage({
       {/* Homepage Campus Gallery (Photos & Videos) */}
       <section className="bg-white border-t border-b border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.48, ease: EASE_EDITORIAL }}
+            className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200"
+          >
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Campus Life &amp; Chronicles
@@ -656,15 +766,24 @@ export function HomePage({
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visibleGallery.slice(0, 4).map((item) => (
-              <button
-                key={item.id}
+            {visibleGallery.slice(0, 4).map((item, idx) => (
+              <motion.button
+                key={`${galleryCategory}-${item.id}`}
                 type="button"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={VIEWPORT_ONCE}
+                transition={{
+                  duration: 0.42,
+                  delay: idx * 0.065,
+                  ease: EASE_EDITORIAL,
+                }}
+                whileHover={{ y: -3 }}
                 onClick={() => setActiveMedia(item)}
-                className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-all group cursor-pointer flex flex-col overflow-hidden"
+                className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
               >
                 <div className="relative overflow-hidden bg-slate-900 aspect-[4/3]">
                   <ResilientImage
@@ -687,7 +806,7 @@ export function HomePage({
                   </h3>
                   <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
                 </div>
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -697,7 +816,13 @@ export function HomePage({
       <section className="bg-[#F7F7F5] py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT_ONCE}
+              transition={{ duration: 0.48, ease: EASE_EDITORIAL }}
+              className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4"
+            >
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Academic Architecture
@@ -714,27 +839,46 @@ export function HomePage({
                   PUST Journals →
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {FACULTIES_OVERVIEW.map((f) => (
-                <Link
+              {FACULTIES_OVERVIEW.map((f, idx) => (
+                <motion.div
                   key={f.code}
-                  href="/academics/faculty"
-                  className="rounded-xl bg-white border border-slate-200 hover:border-pust-700/60 transition-colors flex flex-col justify-between p-5 space-y-1.5 group"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VIEWPORT_ONCE}
+                  transition={{
+                    duration: 0.42,
+                    delay: idx * 0.06,
+                    ease: EASE_EDITORIAL,
+                  }}
+                  whileHover={{ y: -3 }}
+                  className="h-full"
                 >
-                  <p className="font-mono text-xs font-semibold text-pust-800">{f.code}</p>
-                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
-                    {f.name}
-                  </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
-                </Link>
+                  <Link
+                    href="/academics/faculty"
+                    className="h-full rounded-xl bg-white border border-slate-200 hover:border-pust-700/60 transition-colors flex flex-col justify-between p-5 space-y-1.5 group"
+                  >
+                    <p className="font-mono text-xs font-semibold text-pust-800">{f.code}</p>
+                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
+                      {f.name}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </div>
 
           {/* Admissions & First Convocation Closing Callout */}
-          <div className="rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white border border-pust-900 shadow-md p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 22, scale: 0.99 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={VIEWPORT_ONCE}
+            transition={{ duration: 0.52, ease: EASE_EDITORIAL }}
+            className="rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white border border-pust-900 shadow-md p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
             <div className="lg:col-span-8 space-y-3">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-200 tabular-nums">
                 Admissions 2026–2027 · First Convocation: {profile?.convocationDate ?? '15 March 2027'}
@@ -761,54 +905,66 @@ export function HomePage({
                 Campus Portal
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Media Preview Modal */}
-      {activeMedia && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
-          onClick={() => setActiveMedia(null)}
-        >
-          <div
-            className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {activeMedia && (
+          <motion.div
+            key="gallery-media-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
+            onClick={() => setActiveMedia(null)}
           >
-            <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
-              <div>
-                <p className="font-mono text-xs text-pust-800 tabular-nums">
-                  {activeMedia.category} · {activeMedia.mediaType.toUpperCase()} ·{' '}
-                  {activeMedia.eventDate}
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
-                  {activeMedia.title}
-                </h3>
+            <motion.div
+              key={activeMedia.id}
+              initial={{ opacity: 0, scale: 0.97, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: 10 }}
+              transition={{ duration: 0.22, ease: EASE_EDITORIAL }}
+              className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
+                <div>
+                  <p className="font-mono text-xs text-pust-800 tabular-nums">
+                    {activeMedia.category} · {activeMedia.mediaType.toUpperCase()} ·{' '}
+                    {activeMedia.eventDate}
+                  </p>
+                  <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                    {activeMedia.title}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveMedia(null)}
+                  aria-label="Close media modal"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveMedia(null)}
-                aria-label="Close media modal"
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              {activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
-                <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
-              ) : (
-                <ResilientImage
-                  src={activeMedia.mediaUrl}
-                  alt={activeMedia.title}
-                  className="w-full aspect-video object-cover"
-                />
-              )}
-              <p className="text-sm text-slate-700 leading-relaxed">{activeMedia.description}</p>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="p-5 space-y-4">
+                {activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
+                  <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
+                ) : (
+                  <ResilientImage
+                    src={activeMedia.mediaUrl}
+                    alt={activeMedia.title}
+                    className="w-full aspect-video object-cover"
+                  />
+                )}
+                <p className="text-sm text-slate-700 leading-relaxed">{activeMedia.description}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
