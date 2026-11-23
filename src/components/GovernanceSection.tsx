@@ -129,7 +129,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
       {/* Header + Sub-Navigation Bar */}
       <div className="border-b border-slate-200 pb-6 space-y-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             Statutory Governance · {activeTab.code}
           </p>
           <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
@@ -153,8 +153,8 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                 }}
                 className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                    ? 'bg-pust-900 text-white'
+                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                 }`}
               >
                 {tab.label}
@@ -210,7 +210,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                     },
                   ].map((item) => (
                     <div key={item.clause} className="p-5 space-y-1.5">
-                      <p className="font-mono text-xs font-semibold text-emerald-800">{item.clause}</p>
+                      <p className="font-mono text-xs font-semibold text-pust-800">{item.clause}</p>
                       <p className="text-sm text-slate-700 leading-relaxed">{item.detail}</p>
                     </div>
                   ))}
@@ -219,7 +219,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
 
               <aside className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div className="p-6 space-y-5">
-                  <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                     Official Bangladesh Laws Citation
                   </p>
                   <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
@@ -252,7 +252,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                     <button
                       type="button"
                       onClick={() => setShowActPreview((prev) => !prev)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
@@ -261,7 +261,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                       href={OFFICIAL_ACT_URL}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
                     >
                       Open Source Page
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -276,14 +276,14 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
               <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
                 <div className="px-5 py-3.5 border-b border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                    <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
                       Official Document Preview · Legislative &amp; Parliamentary Affairs Division
                     </p>
                     <a
                       href={OFFICIAL_ACT_URL}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-mono text-xs text-slate-700 hover:text-emerald-800 underline break-all"
+                      className="font-mono text-xs text-slate-700 hover:text-pust-800 underline break-all"
                     >
                       {OFFICIAL_ACT_URL}
                     </a>
@@ -292,7 +292,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                     <button
                       type="button"
                       onClick={() => setExpandedPreview((prev) => !prev)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
                     >
                       {expandedPreview ? (
                         <>
@@ -310,7 +310,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                       href={OFFICIAL_ACT_URL}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950"
                     >
                       Open in New Tab
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -346,7 +346,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                       key={m.designation}
                       className="px-5 py-4 grid grid-cols-1 sm:grid-cols-12 gap-2 items-baseline text-sm"
                     >
-                      <p className="sm:col-span-4 font-mono text-xs font-semibold text-emerald-800">
+                      <p className="sm:col-span-4 font-mono text-xs font-semibold text-pust-800">
                         {m.seat}
                       </p>
                       <p className="sm:col-span-6 text-slate-800">{m.designation}</p>
@@ -430,7 +430,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
             </div>
 
             <div className="lg:col-span-5 rounded-2xl border border-slate-200 bg-white p-6 space-y-4 shadow-xs">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Council Structure
               </p>
               <dl className="divide-y divide-slate-200 text-sm">
@@ -453,7 +453,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
               </dl>
               <Link
                 href="/academics/deans"
-                className="inline-block text-xs font-semibold text-emerald-800 hover:underline"
+                className="inline-block text-xs font-semibold text-pust-800 hover:underline"
               >
                 View All Faculty Deans &amp; Chairmen →
               </Link>
@@ -497,7 +497,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
             </div>
 
             <div className="lg:col-span-5 bg-[#F7F7F5] rounded-2xl border border-slate-200 p-6 space-y-4">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Committee Leadership
               </p>
               <dl className="divide-y divide-slate-200 text-sm">
@@ -553,7 +553,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                   </div>
                   <div className="p-4 flex justify-between gap-4">
                     <span className="text-slate-600">Exam Clearance Gate</span>
-                    <span className="font-medium text-emerald-800 text-right">
+                    <span className="font-medium text-pust-800 text-right">
                       Hall Dues Clearance Required Before Admit Card
                     </span>
                   </div>
@@ -582,7 +582,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                           <td className="px-4 py-2 font-mono tabular-nums text-slate-700">
                             {row.range}
                           </td>
-                          <td className="px-4 py-2 font-mono font-semibold text-emerald-800">
+                          <td className="px-4 py-2 font-mono font-semibold text-pust-800">
                             {row.letter}
                           </td>
                           <td className="px-4 py-2 font-mono tabular-nums text-slate-900">

@@ -85,7 +85,7 @@ export function AdministrationSection({
       {/* Sub-navigation bar across all Administration office pages */}
       <div className="border-b border-slate-200 pb-6 space-y-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             Administration &amp; Executive Governance
           </p>
           <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
@@ -99,8 +99,8 @@ export function AdministrationSection({
             onClick={() => onNavigate('/administration')}
             className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               route === '/administration'
-                ? 'bg-emerald-900 text-white'
-                : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                ? 'bg-pust-900 text-white'
+                : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
             }`}
           >
             Overview
@@ -112,8 +112,8 @@ export function AdministrationSection({
               onClick={() => onNavigate(item.route)}
               className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 route === item.route
-                  ? 'bg-emerald-900 text-white'
-                  : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                  ? 'bg-pust-900 text-white'
+                  : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
               }`}
             >
               {item.label}
@@ -126,14 +126,14 @@ export function AdministrationSection({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-slate-200">
         <div className="lg:col-span-6 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Current Vice-Chancellor · {currentVc?.tenure}
             </p>
             <button
               type="button"
               onClick={() => setShowPreviousVcs((prev) => !prev)}
               aria-expanded={showPreviousVcs}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Previous Vice-Chancellors ({previousVcs.length})
               <ChevronDown
@@ -178,7 +178,7 @@ export function AdministrationSection({
                       <p className="font-serif font-medium text-slate-900">{vc.name}</p>
                       <p className="text-xs text-slate-500">{vc.message}</p>
                     </div>
-                    <span className="font-mono tabular-nums text-xs text-emerald-800 whitespace-nowrap shrink-0">
+                    <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
                       {vc.tenure}
                     </span>
                   </div>
@@ -210,10 +210,10 @@ export function AdministrationSection({
                 <div
                   key={officer.role}
                   className={`px-6 py-4 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 items-baseline ${
-                    isHighlighted ? 'bg-emerald-50/70' : ''
+                    isHighlighted ? 'bg-pust-50/70' : ''
                   }`}
                 >
-                  <dt className="sm:col-span-4 font-mono text-xs uppercase tracking-wider font-semibold text-emerald-800">
+                  <dt className="sm:col-span-4 font-mono text-xs uppercase tracking-wider font-semibold text-pust-800">
                     {officer.role}
                   </dt>
                   <dd className="sm:col-span-8 space-y-0.5">
@@ -237,27 +237,27 @@ export function AdministrationSection({
             <h2 className="font-serif text-xl font-medium text-slate-900">
               Annual Performance Agreement (APA) &amp; Integrity Benchmarks
             </h2>
-            <span className="font-mono text-xs text-emerald-800 tabular-nums">
+            <span className="font-mono text-xs text-pust-800 tabular-nums">
               FY 2026–2027 · UGC Public Accountability
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
-              <p className="font-mono text-xs text-emerald-800">E-Governance &amp; Service</p>
+              <p className="font-mono text-xs text-pust-800">E-Governance &amp; Service</p>
               <p className="font-serif font-medium text-slate-900">100% Digital Clearance</p>
               <p className="text-xs text-slate-600 leading-relaxed">
                 4-office certificate, hall dues, and library card issuance tracked with timestamps.
               </p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
-              <p className="font-mono text-xs text-emerald-800">Academic Quality (IQAC)</p>
+              <p className="font-mono text-xs text-pust-800">Academic Quality (IQAC)</p>
               <p className="font-serif font-medium text-slate-900">21 OBE Curricula Active</p>
               <p className="text-xs text-slate-600 leading-relaxed">
                 Continuous academic auditing and faculty pedagogy workshops across all 5 faculties.
               </p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
-              <p className="font-mono text-xs text-emerald-800">National Integrity Strategy</p>
+              <p className="font-mono text-xs text-pust-800">National Integrity Strategy</p>
               <p className="font-serif font-medium text-slate-900">Transparent Procurement</p>
               <p className="text-xs text-slate-600 leading-relaxed">
                 e-GP compliance, citizen charter disclosures, and audit committee reporting.
@@ -291,8 +291,8 @@ export function AdministrationSection({
                   onClick={() => setUnitFilter(tab)}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-emerald-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   {tab}
@@ -315,11 +315,11 @@ export function AdministrationSection({
                 key={unit.code}
                 className={`p-5 rounded-xl border space-y-2 transition-colors ${
                   matchesRoute
-                    ? 'border-emerald-700 bg-emerald-50/70'
-                    : 'border-slate-200 bg-white hover:border-emerald-700/40'
+                    ? 'border-pust-700 bg-pust-50/70'
+                    : 'border-slate-200 bg-white hover:border-pust-700/40'
                 }`}
               >
-                <p className="font-mono text-xs text-emerald-800">
+                <p className="font-mono text-xs text-pust-800">
                   {unit.code} · {unit.category}
                 </p>
                 <h3 className="font-serif text-lg font-medium text-slate-900">{unit.name}</h3>

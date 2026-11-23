@@ -40,7 +40,7 @@ export function DepartmentModal({
       >
         <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-slate-200 bg-slate-50">
           <div>
-            <p className="font-mono text-xs tracking-wider uppercase text-emerald-800">
+            <p className="font-mono text-xs tracking-wider uppercase text-pust-800">
               {department.code} · {department.faculty}
             </p>
             <h3
@@ -91,7 +91,7 @@ export function DepartmentModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-2.5">
+              <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800 mb-2.5">
                 Research Priorities
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
@@ -104,7 +104,7 @@ export function DepartmentModal({
             </div>
 
             <div>
-              <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-2.5">
+              <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800 mb-2.5">
                 Academic Laboratories
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
@@ -122,7 +122,7 @@ export function DepartmentModal({
               <button
                 type="button"
                 onClick={() => onToggleBookmark(department)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-emerald-800 text-emerald-900 hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-800 text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                 {isBookmarked ? 'Saved in Portal' : 'Bookmark Department'}
@@ -134,7 +134,7 @@ export function DepartmentModal({
                   onClose();
                   onOpenPortal();
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Bookmark className="w-4 h-4" />
                 Sign in to Bookmark
@@ -144,7 +144,7 @@ export function DepartmentModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-emerald-900 text-white hover:bg-emerald-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Close Prospectus
             </button>

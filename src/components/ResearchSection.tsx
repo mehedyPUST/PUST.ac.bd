@@ -35,7 +35,7 @@ export function ResearchSection({
           <div className="lg:col-span-7 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Faculty Research &amp; Periodicals
                 </p>
                 <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -51,8 +51,8 @@ export function ResearchSection({
                     onClick={() => setSelectedDeptFilter(code)}
                     className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       selectedDeptFilter === code
-                        ? 'bg-emerald-900 text-white'
-                        : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-emerald-900 hover:border-emerald-700/50'
+                        ? 'bg-pust-900 text-white'
+                        : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
                     }`}
                   >
                     {code}
@@ -69,7 +69,7 @@ export function ResearchSection({
               <div className="divide-y divide-slate-200 border-b border-slate-200">
                 {visiblePubs.map((pub) => (
                   <article key={pub.id} className="py-4 space-y-1.5">
-                    <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
                       {pub.departmentCode} · {pub.domain} · {pub.year}
                     </p>
                     <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
@@ -85,7 +85,7 @@ export function ResearchSection({
           <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div className="p-6 sm:p-7 space-y-5">
               <div className="border-b border-slate-200 pb-4">
-                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   University Periodicals
                 </p>
                 <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -101,7 +101,7 @@ export function ResearchSection({
                       {journal.title}
                     </h4>
                     <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
-                    <p className="text-xs font-semibold text-emerald-800">{journal.currentIssue}</p>
+                    <p className="text-xs font-semibold text-pust-800">{journal.currentIssue}</p>
                   </div>
                 ))}
               </div>
@@ -113,7 +113,7 @@ export function ResearchSection({
         <div id="campus" className="pt-12 border-t border-slate-200 space-y-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Research Infrastructure
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -130,7 +130,7 @@ export function ResearchSection({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
               <ResilientImage
                 src={labImage}
                 alt="Students collaborating in a PUST engineering and instrumentation laboratory"
@@ -138,7 +138,7 @@ export function ResearchSection({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div>
-                <p className="font-mono text-xs text-emerald-800">
+                <p className="font-mono text-xs text-pust-800">
                   IIED &amp; Research Cell · 30+ Departmental Labs
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
@@ -151,7 +151,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
               <ResilientImage
                 src={libraryImage}
                 alt="PUST Central Library study hall and digital archive"
@@ -159,7 +159,7 @@ export function ResearchSection({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div>
-                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                <p className="font-mono text-xs text-pust-800 tabular-nums">
                   Central Library · Sun–Thu 08:30–21:00 BST
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
@@ -172,7 +172,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
               <ResilientImage
                 src={groundsImage}
                 alt="PUST Rajapur campus courtyard and residential halls at golden hour"
@@ -180,7 +180,7 @@ export function ResearchSection({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div>
-                <p className="font-mono text-xs text-emerald-800">
+                <p className="font-mono text-xs text-pust-800">
                   July 06 Hall · Medical Unit · Transport Pool
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">

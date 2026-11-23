@@ -4,6 +4,19 @@
   --font-serif: var(--font-fraunces), Georgia, Cambria, "Times New Roman", serif;
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+
+  /* Official PUST Logo Primary Palette (extracted from crest shield & ribbon #6A0000) */
+  --color-pust-50: #FDF3F3;
+  --color-pust-100: #FAE3E3;
+  --color-pust-200: #F4C4C4;
+  --color-pust-300: #E89A9A;
+  --color-pust-400: #D46565;
+  --color-pust-500: #B52F2F;
+  --color-pust-600: #941717;
+  --color-pust-700: #7E0808;
+  --color-pust-800: #6A0000;
+  --color-pust-900: #520000;
+  --color-pust-950: #380000;
 }
 
 @layer base {

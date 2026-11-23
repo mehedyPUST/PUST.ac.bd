@@ -116,7 +116,7 @@ export function HomePage({
               className="lg:col-span-6 flex flex-col justify-between py-2"
             >
               <div className="space-y-5">
-                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Rajapur, Pabna-6600 · First Convocation:{' '}
                   {profile?.convocationDate ?? '15 March 2027'}
                 </p>
@@ -133,19 +133,19 @@ export function HomePage({
               <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center gap-3">
                 <Link
                   href="/portal"
-                  className="px-5 py-3 rounded-lg text-sm font-semibold bg-emerald-900 text-white hover:bg-emerald-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   Open Digital Campus Portal
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0"
+                  className="px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
                 >
                   Explore 21 Departments
                 </Link>
                 <Link
                   href="/verify"
-                  className="inline-flex items-center gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-emerald-900 hover:bg-emerald-50 transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   Verify Document
@@ -193,9 +193,9 @@ export function HomePage({
             </div>
             <Link
               href="/verify"
-              className="px-5 py-4 bg-emerald-950 hover:bg-emerald-900 text-white transition-colors block"
+              className="px-5 py-4 bg-pust-950 hover:bg-pust-900 text-white transition-colors block"
             >
-              <dt className="text-xs uppercase tracking-wider text-emerald-300 flex items-center justify-between">
+              <dt className="text-xs uppercase tracking-wider text-pust-200 flex items-center justify-between">
                 <span>Public Registry</span>
                 <FileCheck2 className="w-3.5 h-3.5" />
               </dt>
@@ -213,7 +213,7 @@ export function HomePage({
           {/* About PUST Summary */}
           <div className="lg:col-span-5 space-y-5">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 About PUST
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -221,7 +221,7 @@ export function HomePage({
               </h2>
             </div>
             {ourUniversity ? (
-              <p className="text-[15px] leading-relaxed text-slate-700 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-emerald-800">
+              <p className="text-[15px] leading-relaxed text-slate-700 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
                 {ourUniversity.body}
               </p>
             ) : (
@@ -240,26 +240,26 @@ export function HomePage({
             <div className="flex flex-wrap gap-4 pt-2 text-sm font-medium">
               <Link
                 href="/about/our-university"
-                className="text-emerald-900 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
+                className="text-pust-900 hover:underline inline-flex items-center gap-1 whitespace-nowrap"
               >
                 University Overview
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link
                 href="/about/history"
-                className="text-slate-700 hover:text-emerald-900 whitespace-nowrap"
+                className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
               >
                 History
               </Link>
               <Link
                 href="/about/mission-vision"
-                className="text-slate-700 hover:text-emerald-900 whitespace-nowrap"
+                className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
               >
                 Mission &amp; Vision
               </Link>
               <Link
                 href="/about/plans"
-                className="text-slate-700 hover:text-emerald-900 whitespace-nowrap"
+                className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
               >
                 Strategic Plans
               </Link>
@@ -279,7 +279,7 @@ export function HomePage({
 
               <div className="sm:col-span-8 flex flex-col justify-between space-y-4">
                 <div>
-                  <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                     Current Vice-Chancellor · {currentVc?.tenure}
                   </p>
                   <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -297,7 +297,7 @@ export function HomePage({
                     type="button"
                     onClick={() => setShowPreviousVcs((prev) => !prev)}
                     aria-expanded={showPreviousVcs}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Previous Vice-Chancellors ({previousVcs.length})
                     <ChevronDown
@@ -308,7 +308,7 @@ export function HomePage({
                   </button>
                   <Link
                     href="/administration/vc-office"
-                    className="text-xs font-medium text-emerald-900 hover:underline whitespace-nowrap"
+                    className="text-xs font-medium text-pust-900 hover:underline whitespace-nowrap"
                   >
                     VC Office Directory →
                   </Link>
@@ -331,7 +331,7 @@ export function HomePage({
                         <p className="font-serif font-medium text-slate-900">{vc.name}</p>
                         <p className="text-xs text-slate-500">{vc.message}</p>
                       </div>
-                      <span className="font-mono tabular-nums text-xs text-emerald-800 whitespace-nowrap shrink-0">
+                      <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
                         {vc.tenure}
                       </span>
                     </div>
@@ -349,7 +349,7 @@ export function HomePage({
           <div className="lg:col-span-7 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Latest Bulletins
                 </p>
                 <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -358,7 +358,7 @@ export function HomePage({
               </div>
               <Link
                 href="/notices"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-900 hover:underline whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
               >
                 All Notices
                 <ArrowRight className="w-4 h-4" />
@@ -373,8 +373,8 @@ export function HomePage({
                   onClick={() => setNoticeCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     noticeCategory === cat
-                      ? 'bg-emerald-900 text-white border-emerald-900'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-700 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white border-pust-900'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   {cat}
@@ -393,7 +393,7 @@ export function HomePage({
                     <button
                       type="button"
                       onClick={() => setNoticeCategory('All')}
-                      className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-emerald-900 hover:border-emerald-800 transition-colors cursor-pointer"
+                      className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                     >
                       Show All Circulars
                     </button>
@@ -404,15 +404,15 @@ export function HomePage({
                       <button
                         type="button"
                         onClick={() => onSelectNotice(leadNotice)}
-                        className="w-full text-left p-6 bg-emerald-50/35 hover:bg-emerald-50/70 transition-colors space-y-2 group cursor-pointer"
+                        className="w-full text-left p-6 bg-pust-50/35 hover:bg-pust-50/70 transition-colors space-y-2 group cursor-pointer"
                       >
                         <p className="font-mono text-xs text-slate-500 tabular-nums">
                           {leadNotice.publishedAt} ·{' '}
-                          <span className="font-semibold text-emerald-800">{leadNotice.category}</span> ·{' '}
+                          <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
                           {leadNotice.referenceNo}
                           {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
                         </p>
-                        <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
+                        <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                           {leadNotice.title}
                         </h3>
                         <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
@@ -428,11 +428,11 @@ export function HomePage({
                       >
                         <p className="font-mono text-xs text-slate-500 tabular-nums">
                           {notice.publishedAt} ·{' '}
-                          <span className="font-semibold text-emerald-800">{notice.category}</span> ·{' '}
+                          <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
                           {notice.referenceNo}
                           {notice.visibility === 'registered' && ' · Campus Members Only'}
                         </p>
-                        <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
+                        <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                           {notice.title}
                         </h3>
                         <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
@@ -448,7 +448,7 @@ export function HomePage({
 
           <div className="lg:col-span-5 space-y-5">
             <div className="pb-4 border-b border-slate-200">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Digital Services &amp; Directory
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -494,15 +494,15 @@ export function HomePage({
                   key={item.route}
                   type="button"
                   onClick={() => onNavigate(item.route)}
-                  className="w-full text-left px-5 py-4 hover:bg-emerald-50/40 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+                  className="w-full text-left px-5 py-4 hover:bg-pust-50/40 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
                 >
                   <div>
-                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
+                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{item.desc}</p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-800 shrink-0 transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 transition-colors" />
                 </button>
               ))}
               </div>
@@ -516,7 +516,7 @@ export function HomePage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Research &amp; Residential Campus
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -525,7 +525,7 @@ export function HomePage({
             </div>
             <Link
               href="/facilities"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-900 hover:underline whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
             >
               All Campus Facilities
               <ArrowRight className="w-4 h-4" />
@@ -533,7 +533,7 @@ export function HomePage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-emerald-700/60 transition-colors space-y-4">
+            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
               <ResilientImage
                 src={LAB_IMAGE}
                 alt="PUST engineering and instrumentation laboratory"
@@ -541,7 +541,7 @@ export function HomePage({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div className="space-y-1.5">
-                <p className="font-mono text-xs text-emerald-800">IIED &amp; RTTC · 30+ Labs</p>
+                <p className="font-mono text-xs text-pust-800">IIED &amp; RTTC · 30+ Labs</p>
                 <h3 className="font-serif text-xl font-medium text-slate-900">
                   Engineering &amp; Science Labs
                 </h3>
@@ -551,14 +551,14 @@ export function HomePage({
                 </p>
                 <Link
                   href="/academics/journals"
-                  className="inline-block text-xs font-semibold text-emerald-900 hover:underline pt-1"
+                  className="inline-block text-xs font-semibold text-pust-900 hover:underline pt-1"
                 >
                   Research &amp; Journals →
                 </Link>
               </div>
             </article>
 
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-emerald-700/60 transition-colors space-y-4">
+            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
               <ResilientImage
                 src={LIBRARY_IMAGE}
                 alt="PUST Central Library study floor"
@@ -566,7 +566,7 @@ export function HomePage({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div className="space-y-1.5">
-                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                <p className="font-mono text-xs text-pust-800 tabular-nums">
                   Central Library · Sun–Thu 08:30–21:00
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900">
@@ -578,14 +578,14 @@ export function HomePage({
                 </p>
                 <Link
                   href="/facilities/library"
-                  className="inline-block text-xs font-semibold text-emerald-900 hover:underline pt-1"
+                  className="inline-block text-xs font-semibold text-pust-900 hover:underline pt-1"
                 >
                   Library Services →
                 </Link>
               </div>
             </article>
 
-            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-emerald-700/60 transition-colors space-y-4">
+            <article className="rounded-2xl bg-[#F7F7F5] border border-slate-200 p-5 hover:border-pust-700/60 transition-colors space-y-4">
               <ResilientImage
                 src={GROUNDS_IMAGE}
                 alt="PUST Rajapur campus quadrangle and residential halls"
@@ -593,7 +593,7 @@ export function HomePage({
                 className="w-full aspect-[4/3] object-cover"
               />
               <div className="space-y-1.5">
-                <p className="font-mono text-xs text-emerald-800">
+                <p className="font-mono text-xs text-pust-800">
                   July 06 Hall · 5 Halls · Medical &amp; Bus Pool
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900">
@@ -605,7 +605,7 @@ export function HomePage({
                 </p>
                 <Link
                   href="/facilities/residence"
-                  className="inline-block text-xs font-semibold text-emerald-900 hover:underline pt-1"
+                  className="inline-block text-xs font-semibold text-pust-900 hover:underline pt-1"
                 >
                   Residential Halls →
                 </Link>
@@ -623,7 +623,7 @@ export function HomePage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Campus Life &amp; Chronicles
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -639,8 +639,8 @@ export function HomePage({
                   onClick={() => setGalleryCategory(cat)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     galleryCategory === cat
-                      ? 'bg-emerald-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-900'
                   }`}
                 >
                   {cat}
@@ -648,7 +648,7 @@ export function HomePage({
               ))}
               <Link
                 href="/gallery"
-                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-900 hover:underline whitespace-nowrap shrink-0"
+                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
               >
                 Full Archive
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -662,7 +662,7 @@ export function HomePage({
                 key={item.id}
                 type="button"
                 onClick={() => setActiveMedia(item)}
-                className="text-left rounded-2xl border border-slate-200 bg-white hover:border-emerald-700/60 transition-all group cursor-pointer flex flex-col overflow-hidden"
+                className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-all group cursor-pointer flex flex-col overflow-hidden"
               >
                 <div className="relative overflow-hidden bg-slate-900 aspect-[4/3]">
                   <ResilientImage
@@ -677,10 +677,10 @@ export function HomePage({
                   )}
                 </div>
                 <div className="p-4 space-y-1 flex-1">
-                  <p className="font-mono text-[11px] text-emerald-800 tabular-nums">
+                  <p className="font-mono text-[11px] text-pust-800 tabular-nums">
                     {item.category} · {item.mediaType.toUpperCase()} · {item.eventDate}
                   </p>
-                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900">
+                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
                     {item.title}
                   </h3>
                   <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
@@ -697,7 +697,7 @@ export function HomePage({
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Academic Architecture
                 </p>
                 <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -705,10 +705,10 @@ export function HomePage({
                 </h2>
               </div>
               <div className="flex flex-wrap gap-4 text-xs font-medium">
-                <Link href="/academics/faculty" className="text-emerald-900 hover:underline whitespace-nowrap">
+                <Link href="/academics/faculty" className="text-pust-900 hover:underline whitespace-nowrap">
                   Explore 5 Faculties →
                 </Link>
-                <Link href="/academics/journals" className="text-emerald-900 hover:underline whitespace-nowrap">
+                <Link href="/academics/journals" className="text-pust-900 hover:underline whitespace-nowrap">
                   PUST Journals →
                 </Link>
               </div>
@@ -719,10 +719,10 @@ export function HomePage({
                 <Link
                   key={f.code}
                   href="/academics/faculty"
-                  className="rounded-xl bg-white border border-slate-200 hover:border-emerald-700/60 transition-colors flex flex-col justify-between p-5 space-y-1.5 group"
+                  className="rounded-xl bg-white border border-slate-200 hover:border-pust-700/60 transition-colors flex flex-col justify-between p-5 space-y-1.5 group"
                 >
-                  <p className="font-mono text-xs font-semibold text-emerald-800">{f.code}</p>
-                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900">
+                  <p className="font-mono text-xs font-semibold text-pust-800">{f.code}</p>
+                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
                     {f.name}
                   </h3>
                   <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
@@ -732,15 +732,15 @@ export function HomePage({
           </div>
 
           {/* Admissions & First Convocation Closing Callout */}
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white border border-emerald-900 shadow-md p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white border border-pust-900 shadow-md p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-300 tabular-nums">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-200 tabular-nums">
                 Admissions 2026–2027 · First Convocation: {profile?.convocationDate ?? '15 March 2027'}
               </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-white leading-snug">
                 Join 5,000+ Scholars Across Engineering, Science, Business &amp; Humanities
               </h2>
-              <p className="text-sm text-emerald-100/90 leading-relaxed max-w-2xl">
+              <p className="text-sm text-pust-100/90 leading-relaxed max-w-2xl">
                 Explore GST integrated undergraduate tracks, track inquiries online, and complete
                 digital onboarding via departmental signup tokens.
               </p>
@@ -748,13 +748,13 @@ export function HomePage({
             <div className="lg:col-span-4 flex flex-wrap lg:justify-end gap-3">
               <Link
                 href="/admissions"
-                className="px-5 py-3 rounded-lg text-sm font-medium bg-white text-emerald-950 hover:bg-emerald-50 transition-colors whitespace-nowrap shrink-0"
+                className="px-5 py-3 rounded-lg text-sm font-medium bg-white text-pust-950 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
               >
                 Admissions &amp; Tracker
               </Link>
               <Link
                 href="/portal"
-                className="px-5 py-3 rounded-lg text-sm font-medium border border-emerald-400 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap shrink-0"
+                className="px-5 py-3 rounded-lg text-sm font-medium border border-pust-300 text-white hover:bg-pust-900 transition-colors whitespace-nowrap shrink-0"
               >
                 Campus Portal
               </Link>
@@ -775,7 +775,7 @@ export function HomePage({
           >
             <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
               <div>
-                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                <p className="font-mono text-xs text-pust-800 tabular-nums">
                   {activeMedia.category} · {activeMedia.mediaType.toUpperCase()} ·{' '}
                   {activeMedia.eventDate}
                 </p>

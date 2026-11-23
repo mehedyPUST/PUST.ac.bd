@@ -233,7 +233,7 @@ export function HallPanel({ user }: HallPanelProps) {
       {/* Role-Specific Header */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             {user.role === 'student'
               ? `Residential Affiliation · ${user.hallAffiliation}`
               : 'Residential Hall Administration & Financial Clearance'}
@@ -274,7 +274,7 @@ export function HallPanel({ user }: HallPanelProps) {
             <select
               value={hallName}
               onChange={(e) => setHallName(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             >
               {HALL_NAMES.map((h) => (
                 <option key={h} value={h}>
@@ -288,7 +288,7 @@ export function HallPanel({ user }: HallPanelProps) {
               value={circTitle}
               onChange={(e) => setCircTitle(e.target.value)}
               placeholder="Circular Title"
-              className="sm:col-span-2 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="sm:col-span-2 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             />
             <input
               type="number"
@@ -297,7 +297,7 @@ export function HallPanel({ user }: HallPanelProps) {
               value={vacantSeats}
               onChange={(e) => setVacantSeats(Number(e.target.value))}
               placeholder="Vacant Seats"
-              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -306,7 +306,7 @@ export function HallPanel({ user }: HallPanelProps) {
               required
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             />
             <input
               type="text"
@@ -314,12 +314,12 @@ export function HallPanel({ user }: HallPanelProps) {
               value={circDesc}
               onChange={(e) => setCircDesc(e.target.value)}
               placeholder="Eligibility criteria and allotment note..."
-              className="sm:col-span-3 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="sm:col-span-3 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             />
           </div>
           <button
             type="submit"
-            className="px-5 py-2 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white cursor-pointer"
+            className="px-5 py-2 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white cursor-pointer"
           >
             Publish Hall Circular
           </button>
@@ -337,7 +337,7 @@ export function HallPanel({ user }: HallPanelProps) {
           <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
             {circulars.map((c) => (
               <div key={c.id} className="p-4 space-y-1 hover:bg-[#F7F7F5]/60 transition-colors">
-                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                <p className="font-mono text-xs text-pust-800 tabular-nums">
                   {c.hallName} · {c.vacantSeats} Vacant Seats · Deadline {c.deadline}
                 </p>
                 <p className="font-serif text-base font-medium text-slate-900">{c.title}</p>
@@ -356,7 +356,7 @@ export function HallPanel({ user }: HallPanelProps) {
               <select
                 value={applyCircularId}
                 onChange={(e) => setApplyCircularId(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               >
                 {circulars.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -370,12 +370,12 @@ export function HallPanel({ user }: HallPanelProps) {
                 value={applyStatement}
                 onChange={(e) => setApplyStatement(e.target.value)}
                 placeholder="State residential need, permanent district, and semester standing..."
-                className="sm:col-span-2 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="sm:col-span-2 px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white cursor-pointer"
+              className="px-5 py-2 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white cursor-pointer"
             >
               Submit Hall Seat Application
             </button>
@@ -404,7 +404,7 @@ export function HallPanel({ user }: HallPanelProps) {
                         {app.studentName} · <span className="font-mono">{app.academicId}</span> (
                         {app.departmentCode})
                       </p>
-                      <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
                         {app.hallName} · Status: {app.status.toUpperCase()}
                         {app.assignedSeat ? ` · Current Seat: ${app.assignedSeat}` : ''}
                       </p>
@@ -437,7 +437,7 @@ export function HallPanel({ user }: HallPanelProps) {
                           }))
                         }
                         placeholder="Room & Bed (e.g. Room 304 · Bed B)"
-                        className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                        className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                       />
                       <input
                         type="text"
@@ -449,14 +449,14 @@ export function HallPanel({ user }: HallPanelProps) {
                           }))
                         }
                         placeholder="Allotment / Reassignment Note"
-                        className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                        className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                       />
                       {app.status === 'pending' ? (
                         <div className="flex gap-2 md:col-span-2">
                           <button
                             type="button"
                             onClick={() => handleReviewHallApp(app, 'accepted')}
-                            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                           >
                             Approve &amp; Allot Seat
                           </button>
@@ -472,7 +472,7 @@ export function HallPanel({ user }: HallPanelProps) {
                         <button
                           type="button"
                           onClick={() => handleReassignSeat(app)}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-emerald-800 text-emerald-800 hover:bg-emerald-900 hover:text-white cursor-pointer whitespace-nowrap"
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-pust-800 text-pust-800 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
                         >
                           Update / Reassign Seat
                         </button>
@@ -510,12 +510,12 @@ export function HallPanel({ user }: HallPanelProps) {
               value={dueAcademicId}
               onChange={(e) => setDueAcademicId(e.target.value)}
               placeholder="Academic ID"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-pust-800 focus:outline-none"
             />
             <select
               value={dueHallName}
               onChange={(e) => setDueHallName(e.target.value)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-pust-800 focus:outline-none"
             >
               {HALL_NAMES.map((h) => (
                 <option key={h} value={h}>
@@ -529,7 +529,7 @@ export function HallPanel({ user }: HallPanelProps) {
               value={dueFeeTitle}
               onChange={(e) => setDueFeeTitle(e.target.value)}
               placeholder="Fee Title"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-pust-800 focus:outline-none"
             />
             <input
               type="number"
@@ -537,11 +537,11 @@ export function HallPanel({ user }: HallPanelProps) {
               required
               value={dueAmount}
               onChange={(e) => setDueAmount(Number(e.target.value))}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-emerald-800 focus:outline-none"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-pust-800 focus:outline-none"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
             >
               Issue Hall Due
             </button>
@@ -566,7 +566,7 @@ export function HallPanel({ user }: HallPanelProps) {
                       <span
                         className={`font-semibold ${
                           d.status === 'Cleared'
-                            ? 'text-emerald-800'
+                            ? 'text-pust-800'
                             : d.status === 'Payment Submitted'
                             ? 'text-amber-700'
                             : 'text-red-700'
@@ -592,7 +592,7 @@ export function HallPanel({ user }: HallPanelProps) {
                             amountBdt: d.amountBdt,
                           })
                         }
-                        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
                         Pay Online (৳{d.amountBdt.toLocaleString()})
@@ -603,7 +603,7 @@ export function HallPanel({ user }: HallPanelProps) {
                       <button
                         type="button"
                         onClick={() => handleClearDue(d)}
-                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                       >
                         Confirm &amp; Issue Clearance
                       </button>
@@ -613,7 +613,7 @@ export function HallPanel({ user }: HallPanelProps) {
                       <button
                         type="button"
                         onClick={() => openClearanceModal(d)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
                       >
                         <Printer className="w-3.5 h-3.5" />
                         Print Hall Clearance

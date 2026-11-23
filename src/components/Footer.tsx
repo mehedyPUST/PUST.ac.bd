@@ -10,14 +10,14 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 print:hidden">
+    <footer className="bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
         <div className="lg:col-span-4 space-y-3">
           <div className="flex items-center gap-3">
             <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
                 Est. 2008 · Rajapur, Pabna
               </p>
               <h2 className="font-serif text-lg font-medium text-white">
@@ -25,16 +25,16 @@ export function Footer({ onNavigate }: FooterProps) {
               </h2>
             </div>
           </div>
-          <p className="text-sm text-slate-400 leading-relaxed">
+          <p className="text-sm text-slate-300 leading-relaxed">
             A public university in Bangladesh advancing engineering, pure and applied sciences,
             business, and humanities across 5 faculties and 21 academic departments.
           </p>
-          <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-400">
+          <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
             <a
               href="https://pust.ac.bd/"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-amber-300 transition-colors"
             >
               Official Site
             </a>
@@ -42,7 +42,7 @@ export function Footer({ onNavigate }: FooterProps) {
               href="https://www.facebook.com/pust.ac.bd"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-amber-300 transition-colors"
             >
               Facebook
             </a>
@@ -50,7 +50,7 @@ export function Footer({ onNavigate }: FooterProps) {
               href="https://www.youtube.com"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-amber-300 transition-colors"
             >
               YouTube
             </a>
@@ -58,7 +58,7 @@ export function Footer({ onNavigate }: FooterProps) {
               href="https://www.linkedin.com"
               target="_blank"
               rel="noreferrer"
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-amber-300 transition-colors"
             >
               LinkedIn
             </a>
@@ -67,7 +67,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Quick Links & About */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Quick Links
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -94,7 +94,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Administration & Governance */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Governance &amp; Admin
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -121,7 +121,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Academic & Student Services */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Digital Services
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -147,8 +147,8 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
 
         {/* Contact Information */}
-        <div className="lg:col-span-2 space-y-2 text-xs text-slate-400">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
+        <div className="lg:col-span-2 space-y-2 text-xs text-slate-300">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Contact
           </p>
           <p className="leading-relaxed text-slate-300">
@@ -169,8 +169,8 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-800 bg-black/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+      <div className="border-t border-pust-900 bg-black/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-300">
           <p>© 2026 Pabna University of Science and Technology (PUST). All rights reserved.</p>
           <p className="font-mono tabular-nums">First Convocation: 15 March 2027 · Rajapur Campus</p>
         </div>

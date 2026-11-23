@@ -75,7 +75,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
       <header className="border-b border-slate-200 pb-8 print:hidden">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-800">
           Public Authenticity Registry
         </p>
         <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
@@ -98,13 +98,13 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter serial (e.g. PUST-CERT-CSE-2026A1 or PUST-RCPT-2026-091)"
-              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:font-sans placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:font-sans placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-900 text-white text-sm font-semibold hover:bg-emerald-950 disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-900 text-white text-sm font-semibold hover:bg-pust-950 disabled:opacity-50 whitespace-nowrap shrink-0"
           >
             <ShieldCheck className="w-4 h-4" />
             {loading ? 'Verifying...' : 'Verify Serial'}
@@ -124,10 +124,10 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                   setQuery(item.code);
                   runVerification(item.code);
                 }}
-                className="text-left px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-emerald-700 hover:bg-emerald-50/50 transition-colors"
+                className="text-left px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-pust-700 hover:bg-pust-50/50 transition-colors"
               >
                 <span className="block text-[11px] text-slate-500">{item.label}</span>
-                <span className="font-mono text-xs font-medium text-emerald-900">{item.code}</span>
+                <span className="font-mono text-xs font-medium text-pust-900">{item.code}</span>
               </button>
             ))}
           </div>
@@ -150,12 +150,12 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       )}
 
       {result && (
-        <article className="print-only-document bg-white rounded-2xl border border-emerald-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 bg-emerald-950 text-white flex flex-wrap items-center justify-between gap-3">
+        <article className="print-only-document bg-white rounded-2xl border border-pust-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 bg-pust-950 text-white flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-200">
+                <p className="text-xs font-semibold uppercase tracking-wider text-pust-200">
                   Cryptographically Verified Record
                 </p>
                 <p className="text-sm font-medium">
@@ -177,7 +177,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               <div className="flex items-start gap-4">
                 <PustCrest size={52} className="shrink-0" />
                 <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-pust-800">
                     {result.documentType}
                   </span>
                   <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -194,7 +194,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                   seed={`${result.serialCode}:${result.verificationHash}`}
                   size={84}
                 />
-                <span className="font-mono text-xs font-semibold text-emerald-900">
+                <span className="font-mono text-xs font-semibold text-pust-900">
                   {result.serialCode}
                 </span>
               </div>
@@ -236,7 +236,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               ))}
               <div className="px-4 py-3 flex items-center justify-between gap-4 text-xs bg-slate-50">
                 <span className="text-slate-500">Integrity Digest</span>
-                <span className="font-mono text-emerald-900 font-medium">
+                <span className="font-mono text-pust-900 font-medium">
                   {result.verificationHash}
                 </span>
               </div>
@@ -249,7 +249,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       {!result && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden">
           <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2">
-            <FileCheck2 className="w-5 h-5 text-emerald-800" />
+            <FileCheck2 className="w-5 h-5 text-pust-800" />
             <h3 className="font-serif text-lg font-medium text-slate-900">
               For Employers & External Institutions
             </h3>
@@ -272,7 +272,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               <button
                 type="button"
                 onClick={() => onNavigate('/portal')}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-900 hover:underline self-start"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-900 hover:underline self-start"
               >
                 Open Campus Portal <ArrowRight className="w-3.5 h-3.5" />
               </button>

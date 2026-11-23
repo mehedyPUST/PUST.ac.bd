@@ -60,7 +60,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             setHoveredGroup(null);
             setMobileMenuOpen(false);
           }}
-          className="inline-flex items-center gap-2.5 font-serif text-sm sm:text-base font-semibold tracking-tight text-slate-900 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0"
+          className="inline-flex items-center gap-2.5 font-serif text-sm sm:text-base font-semibold tracking-tight text-slate-900 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
         >
           <PustCrest size={34} className="shrink-0" />
           <span className="hidden md:inline">Pabna University of Science &amp; Technology</span>
@@ -83,8 +83,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               onClick={() => setHoveredGroup(null)}
               className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
                 route.startsWith('/about') || route === '/gallery'
-                  ? 'text-emerald-900 font-semibold'
-                  : 'hover:text-emerald-900'
+                  ? 'text-pust-900 font-semibold'
+                  : 'hover:text-pust-900'
               }`}
             >
               About
@@ -99,8 +99,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                       onClick={() => setHoveredGroup(null)}
                       className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                         route === item.route
-                          ? 'bg-emerald-50 text-emerald-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-900'
+                          ? 'bg-pust-50 text-pust-900 font-semibold'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
                       }`}
                     >
                       {item.label}
@@ -111,8 +111,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                     onClick={() => setHoveredGroup(null)}
                     className={`block rounded-lg px-3 py-2 text-xs transition-colors border-t border-slate-100 mt-1 pt-2 ${
                       route === '/gallery'
-                        ? 'bg-emerald-50 text-emerald-900 font-semibold'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-900'
+                        ? 'bg-pust-50 text-pust-900 font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
                     }`}
                   >
                     Campus Photo &amp; Video Gallery
@@ -133,8 +133,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               onClick={() => setHoveredGroup(null)}
               className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
                 route.startsWith('/academics')
-                  ? 'text-emerald-900 font-semibold'
-                  : 'hover:text-emerald-900'
+                  ? 'text-pust-900 font-semibold'
+                  : 'hover:text-pust-900'
               }`}
             >
               Academics
@@ -149,8 +149,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                       onClick={() => setHoveredGroup(null)}
                       className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                         route === item.route
-                          ? 'bg-emerald-50 text-emerald-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-900'
+                          ? 'bg-pust-50 text-pust-900 font-semibold'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
                       }`}
                     >
                       {item.label}
@@ -172,8 +172,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               onClick={() => setHoveredGroup(null)}
               className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
                 route.startsWith('/admissions')
-                  ? 'text-emerald-900 font-semibold'
-                  : 'hover:text-emerald-900'
+                  ? 'text-pust-900 font-semibold'
+                  : 'hover:text-pust-900'
               }`}
             >
               Admissions
@@ -188,8 +188,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                       onClick={() => setHoveredGroup(null)}
                       className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                         route === item.route
-                          ? 'bg-emerald-50 text-emerald-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-900'
+                          ? 'bg-pust-50 text-pust-900 font-semibold'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
                       }`}
                     >
                       {item.label}
@@ -211,8 +211,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               onClick={() => setHoveredGroup(null)}
               className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
                 isCampusActive
-                  ? 'text-emerald-900 font-semibold'
-                  : 'hover:text-emerald-900'
+                  ? 'text-pust-900 font-semibold'
+                  : 'hover:text-pust-900'
               }`}
             >
               Campus &amp; Admin
@@ -221,7 +221,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               <div className="absolute left-1/2 -translate-x-1/2 top-full pt-1.5 w-[540px] z-50">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-3 grid grid-cols-3 gap-3">
                   <div>
-                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-pust-800">
                       Governance
                     </p>
                     {governanceGroup.items.map((item) => (
@@ -231,7 +231,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                         onClick={() => setHoveredGroup(null)}
                         className={`block rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
                           route === item.route
-                            ? 'bg-emerald-50 text-emerald-900 font-semibold'
+                            ? 'bg-pust-50 text-pust-900 font-semibold'
                             : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
@@ -240,7 +240,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                     ))}
                   </div>
                   <div>
-                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-pust-800">
                       Administration
                     </p>
                     {adminGroup.items.slice(0, 6).map((item) => (
@@ -250,7 +250,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                         onClick={() => setHoveredGroup(null)}
                         className={`block rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
                           route === item.route
-                            ? 'bg-emerald-50 text-emerald-900 font-semibold'
+                            ? 'bg-pust-50 text-pust-900 font-semibold'
                             : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
@@ -260,13 +260,13 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                     <Link
                       href="/administration/all-office"
                       onClick={() => setHoveredGroup(null)}
-                      className="block rounded-lg px-2.5 py-1.5 text-xs text-emerald-800 font-medium hover:bg-emerald-50"
+                      className="block rounded-lg px-2.5 py-1.5 text-xs text-pust-800 font-medium hover:bg-pust-50"
                     >
                       All Offices &amp; APA
                     </Link>
                   </div>
                   <div>
-                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+                    <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-pust-800">
                       Facilities
                     </p>
                     {facilitiesGroup.items.map((item) => (
@@ -276,7 +276,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                         onClick={() => setHoveredGroup(null)}
                         className={`block rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
                           route === item.route
-                            ? 'bg-emerald-50 text-emerald-900 font-semibold'
+                            ? 'bg-pust-50 text-pust-900 font-semibold'
                             : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
@@ -293,8 +293,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             href="/notices"
             className={`py-2 transition-colors whitespace-nowrap shrink-0 ${
               route === '/notices'
-                ? 'text-emerald-900 font-semibold'
-                : 'hover:text-emerald-900'
+                ? 'text-pust-900 font-semibold'
+                : 'hover:text-pust-900'
             }`}
           >
             Notices
@@ -304,11 +304,11 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             href="/verify"
             className={`inline-flex items-center gap-1.5 py-2 transition-colors whitespace-nowrap shrink-0 ${
               route === '/verify'
-                ? 'text-emerald-900 font-semibold'
-                : 'hover:text-emerald-900'
+                ? 'text-pust-900 font-semibold'
+                : 'hover:text-pust-900'
             }`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+            <ShieldCheck className="w-3.5 h-3.5 text-pust-700" />
             <span>Verify</span>
           </Link>
         </nav>
@@ -321,7 +321,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               setHoveredGroup(null);
               setMobileMenuOpen(false);
             }}
-            className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+            className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
           >
             {route === '/portal'
               ? 'Public Website'
@@ -334,7 +334,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation menu"
-            className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-emerald-900 cursor-pointer"
+            className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-pust-900 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -348,7 +348,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             type="button"
             onClick={() => go('/')}
             className={`w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium ${
-              route === '/' ? 'text-emerald-900' : 'text-slate-800'
+              route === '/' ? 'text-pust-900' : 'text-slate-800'
             }`}
           >
             Home
@@ -362,7 +362,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                   <button
                     type="button"
                     onClick={() => go(group.defaultRoute)}
-                    className="flex-1 text-left py-2.5 px-2 font-medium text-slate-800 hover:text-emerald-900"
+                    className="flex-1 text-left py-2.5 px-2 font-medium text-slate-800 hover:text-pust-900"
                   >
                     {group.label}
                   </button>
@@ -370,7 +370,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                     type="button"
                     aria-label={`Toggle ${group.label} subtopics`}
                     onClick={() => setMobileExpanded(expanded ? null : group.id)}
-                    className="p-2 text-slate-500 hover:text-emerald-900"
+                    className="p-2 text-slate-500 hover:text-pust-900"
                   >
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
@@ -386,8 +386,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                         onClick={() => go(item.route)}
                         className={`block w-full text-left py-1.5 px-2 text-xs rounded-md ${
                           route === item.route
-                            ? 'text-emerald-900 font-semibold bg-emerald-50'
-                            : 'text-slate-700 hover:text-emerald-900'
+                            ? 'text-pust-900 font-semibold bg-pust-50'
+                            : 'text-slate-700 hover:text-pust-900'
                         }`}
                       >
                         {item.label}
@@ -409,7 +409,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
           <button
             type="button"
             onClick={() => go('/verify')}
-            className="w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium text-emerald-900"
+            className="w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium text-pust-900"
           >
             Verify Digital Documents
           </button>

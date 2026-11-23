@@ -461,7 +461,7 @@ export function AdminCmsPanel({
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
               {headerMeta.kicker}
             </p>
             <h2 className="font-serif text-2xl font-medium text-slate-900">{headerMeta.title}</h2>
@@ -479,7 +479,7 @@ export function AdminCmsPanel({
                 <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                   Active Tokens
                 </span>
-                <span className="text-base font-semibold text-emerald-800">
+                <span className="text-base font-semibold text-pust-800">
                   {tokens.filter((t) => !t.used).length}
                 </span>
               </div>
@@ -499,8 +499,8 @@ export function AdminCmsPanel({
                   onClick={() => setActiveSubTab(tab.id)}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'border-emerald-900 bg-emerald-900 text-white'
-                      : 'border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700 hover:text-emerald-900'
+                      ? 'border-pust-900 bg-pust-900 text-white'
+                      : 'border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   {tab.label}
@@ -525,7 +525,7 @@ export function AdminCmsPanel({
       {user.role === 'teacher' && (
         <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
           <div className="flex items-center gap-2.5">
-            <BookOpen className="w-4 h-4 text-emerald-800 shrink-0" />
+            <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
             <div>
               <p className="font-semibold text-slate-900">Your Assigned Teaching Scope</p>
               <p className="font-mono text-slate-600 mt-0.5">
@@ -574,12 +574,12 @@ export function AdminCmsPanel({
               value={noticeRef}
               onChange={(e) => setNoticeRef(e.target.value)}
               placeholder="Memo Ref (PUST/2026/...)"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
             />
             <select
               value={noticeScope}
               onChange={(e) => setNoticeScope(e.target.value as NoticeBoardScope)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
             >
               {['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(user.role) && (
                 <option value="central">Central Notice Board</option>
@@ -594,7 +594,7 @@ export function AdminCmsPanel({
             <select
               value={noticeVisibility}
               onChange={(e) => setNoticeVisibility(e.target.value as NoticeVisibility)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
             >
               <option value="public">Public (Everyone)</option>
               <option value="registered">Registered Members Only</option>
@@ -602,7 +602,7 @@ export function AdminCmsPanel({
             <select
               value={noticeCat}
               onChange={(e) => setNoticeCat(e.target.value as NoticeCategory)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
             >
               {(
                 [
@@ -629,7 +629,7 @@ export function AdminCmsPanel({
               value={noticeTitle}
               onChange={(e) => setNoticeTitle(e.target.value)}
               placeholder="Circular Title"
-              className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+              className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
             />
             <input
               type="text"
@@ -638,7 +638,7 @@ export function AdminCmsPanel({
               value={noticeDept}
               onChange={(e) => setNoticeDept(e.target.value)}
               placeholder="Unit / Dept Code"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:outline-none focus:border-emerald-800"
+              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:outline-none focus:border-pust-800"
             />
           </div>
           {(noticeScope === 'department' || noticeScope === 'course') && (
@@ -648,7 +648,7 @@ export function AdminCmsPanel({
                 value={noticeTargetSession}
                 onChange={(e) => setNoticeTargetSession(e.target.value)}
                 placeholder="Optional Target Session (e.g. 2022-23)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="text"
@@ -656,7 +656,7 @@ export function AdminCmsPanel({
                 value={noticeTargetCourse}
                 onChange={(e) => setNoticeTargetCourse(e.target.value)}
                 placeholder="Target Course Code (required for Course scope)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
             </div>
           )}
@@ -666,14 +666,14 @@ export function AdminCmsPanel({
             value={noticeSummary}
             onChange={(e) => setNoticeSummary(e.target.value)}
             placeholder="One-line executive summary"
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
           />
           <input
             type="text"
             value={noticeAttachment}
             onChange={(e) => setNoticeAttachment(e.target.value)}
             placeholder="Optional Attachment Name (e.g. Exam-Schedule-2026.pdf)"
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
           />
           <textarea
             rows={3}
@@ -681,11 +681,11 @@ export function AdminCmsPanel({
             value={noticeBody}
             onChange={(e) => setNoticeBody(e.target.value)}
             placeholder="Full circular details..."
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
           />
           <button
             type="submit"
-            className="px-5 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+            className="px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
           >
             Publish Official Circular
           </button>
@@ -711,7 +711,7 @@ export function AdminCmsPanel({
                 value={tokName}
                 onChange={(e) => setTokName(e.target.value)}
                 placeholder="Admitted Student Name"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="email"
@@ -719,7 +719,7 @@ export function AdminCmsPanel({
                 value={tokEmail}
                 onChange={(e) => setTokEmail(e.target.value)}
                 placeholder="Student Email"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="tel"
@@ -727,7 +727,7 @@ export function AdminCmsPanel({
                 value={tokPhone}
                 onChange={(e) => setTokPhone(e.target.value)}
                 placeholder="Phone (+880...)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="text"
@@ -735,13 +735,13 @@ export function AdminCmsPanel({
                 value={tokAcademicId}
                 onChange={(e) => setTokAcademicId(e.target.value)}
                 placeholder="Academic ID (e.g. 250112)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <select
                 value={tokDept}
                 disabled={user.role === 'chairman'}
                 onChange={(e) => setTokDept(e.target.value)}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:outline-none focus:border-pust-800"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.code}>
@@ -755,12 +755,12 @@ export function AdminCmsPanel({
                 value={tokSession}
                 onChange={(e) => setTokSession(e.target.value)}
                 placeholder="Session (e.g. 2025-26)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <select
                 value={tokHall}
                 onChange={(e) => setTokHall(e.target.value)}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
               >
                 {HALL_OPTIONS.map((h) => (
                   <option key={h} value={h}>
@@ -770,7 +770,7 @@ export function AdminCmsPanel({
               </select>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Generate Signup Token
               </button>
@@ -784,17 +784,17 @@ export function AdminCmsPanel({
                     className="p-3 flex flex-wrap items-center justify-between gap-2 bg-[#F7F7F5]/60"
                   >
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono font-semibold text-emerald-800 tabular-nums">
+                      <span className="font-mono font-semibold text-pust-800 tabular-nums">
                         {t.token}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyToken(t.id, t.token)}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-md border border-slate-300 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-md border border-slate-300 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 transition-colors cursor-pointer whitespace-nowrap shrink-0"
                       >
                         {copiedTokenId === t.id ? (
                           <>
-                            <Check className="w-3 h-3 text-emerald-700" />
+                            <Check className="w-3 h-3 text-pust-700" />
                             Copied
                           </>
                         ) : (
@@ -810,7 +810,7 @@ export function AdminCmsPanel({
                     </div>
                     <p className="font-mono text-slate-500">
                       <span
-                        className={t.used ? 'text-slate-500' : 'text-emerald-800 font-semibold'}
+                        className={t.used ? 'text-slate-500' : 'text-pust-800 font-semibold'}
                       >
                         {t.used ? 'USED' : 'ACTIVE'}
                       </span>{' '}
@@ -846,8 +846,8 @@ export function AdminCmsPanel({
                     onClick={() => setApprovalFilter(tab.id)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
                       approvalFilter === tab.id
-                        ? 'border-emerald-900 bg-emerald-900 text-white'
-                        : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700'
+                        ? 'border-pust-900 bg-pust-900 text-white'
+                        : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-700'
                     }`}
                   >
                     {tab.label}
@@ -876,14 +876,14 @@ export function AdminCmsPanel({
                         <div>
                           <p className="font-medium text-sm text-slate-900">
                             {u.name} ·{' '}
-                            <span className="font-mono text-emerald-800 uppercase">{u.role}</span>
+                            <span className="font-mono text-pust-800 uppercase">{u.role}</span>
                           </p>
                           <p className="font-mono text-slate-500 tabular-nums">
                             {u.email} · {u.departmentCode} · ID {u.academicId} ·{' '}
                             <span
                               className={`font-semibold uppercase ${
                                 u.approvalStatus === 'approved'
-                                  ? 'text-emerald-800'
+                                  ? 'text-pust-800'
                                   : u.approvalStatus === 'rejected'
                                   ? 'text-red-700'
                                   : 'text-amber-800'
@@ -899,7 +899,7 @@ export function AdminCmsPanel({
                             <button
                               type="button"
                               onClick={() => handleUserApproval(u.id, 'approved')}
-                              className="px-3 py-1.5 font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                              className="px-3 py-1.5 font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
                             >
                               Approve
                             </button>
@@ -926,7 +926,7 @@ export function AdminCmsPanel({
                               }))
                             }
                             placeholder="Courses (comma-separated, e.g. CSE-3201, CSE-3203)"
-                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] flex-1 min-w-[200px] focus:bg-white focus:outline-none focus:border-emerald-800"
+                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] flex-1 min-w-[200px] focus:bg-white focus:outline-none focus:border-pust-800"
                           />
                           <input
                             type="text"
@@ -938,12 +938,12 @@ export function AdminCmsPanel({
                               }))
                             }
                             placeholder="Sessions (e.g. 2022-23, 2023-24)"
-                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] w-52 focus:bg-white focus:outline-none focus:border-emerald-800"
+                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] w-52 focus:bg-white focus:outline-none focus:border-pust-800"
                           />
                           <button
                             type="button"
                             onClick={() => handleSaveTeacherAssign(u.id)}
-                            className="px-3 py-1.5 rounded-lg border border-emerald-800 bg-white text-emerald-800 hover:bg-emerald-900 hover:text-white cursor-pointer whitespace-nowrap shrink-0"
+                            className="px-3 py-1.5 rounded-lg border border-pust-800 bg-white text-pust-800 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap shrink-0"
                           >
                             Assign Courses/Sessions
                           </button>
@@ -980,7 +980,7 @@ export function AdminCmsPanel({
                     setAboutBody(found.body);
                   }
                 }}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
               >
                 <option value="our-university">Our University</option>
                 <option value="history">History</option>
@@ -992,18 +992,18 @@ export function AdminCmsPanel({
                 required
                 value={aboutTitle}
                 onChange={(e) => setAboutTitle(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <textarea
                 rows={4}
                 required
                 value={aboutBody}
                 onChange={(e) => setAboutBody(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Save About Section
               </button>
@@ -1023,7 +1023,7 @@ export function AdminCmsPanel({
                   value={vcName}
                   onChange={(e) => setVcName(e.target.value)}
                   placeholder="VC Name"
-                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="text"
@@ -1031,21 +1031,21 @@ export function AdminCmsPanel({
                   value={vcTenure}
                   onChange={(e) => setVcTenure(e.target.value)}
                   placeholder="Tenure"
-                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="email"
                   required
                   value={vcEmail}
                   onChange={(e) => setVcEmail(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="text"
                   required
                   value={vcPhone}
                   onChange={(e) => setVcPhone(e.target.value)}
-                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <textarea
@@ -1053,7 +1053,7 @@ export function AdminCmsPanel({
                 required
                 value={vcMsg}
                 onChange={(e) => setVcMsg(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
                 <input
@@ -1065,7 +1065,7 @@ export function AdminCmsPanel({
               </label>
               <button
                 type="submit"
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Update Vice-Chancellor Record
               </button>
@@ -1084,12 +1084,12 @@ export function AdminCmsPanel({
                   value={galTitle}
                   onChange={(e) => setGalTitle(e.target.value)}
                   placeholder="Event / Media Title"
-                  className="sm:col-span-2 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="sm:col-span-2 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <select
                   value={galCat}
                   onChange={(e) => setGalCat(e.target.value as GalleryItemRecord['category'])}
-                  className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+                  className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                 >
                   <option value="Festival">Festival</option>
                   <option value="Academic Event">Academic Event</option>
@@ -1100,7 +1100,7 @@ export function AdminCmsPanel({
                   <select
                     value={galType}
                     onChange={(e) => setGalType(e.target.value as GalleryItemRecord['mediaType'])}
-                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                   >
                     <option value="photo">Photo</option>
                     <option value="video">Video</option>
@@ -1109,7 +1109,7 @@ export function AdminCmsPanel({
                     type="date"
                     value={galDate}
                     onChange={(e) => setGalDate(e.target.value)}
-                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-800"
+                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                   />
                 </div>
               </div>
@@ -1120,7 +1120,7 @@ export function AdminCmsPanel({
                   value={galUrl}
                   onChange={(e) => setGalUrl(e.target.value)}
                   placeholder="Image / Video Asset URL"
-                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="text"
@@ -1128,12 +1128,12 @@ export function AdminCmsPanel({
                   value={galDesc}
                   onChange={(e) => setGalDesc(e.target.value)}
                   placeholder="Description"
-                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Add Gallery Item
               </button>
@@ -1191,7 +1191,7 @@ export function AdminCmsPanel({
                   onClick={() => handleToggleGateway(g)}
                   className={`px-3.5 py-1.5 font-medium rounded-lg cursor-pointer whitespace-nowrap shrink-0 ${
                     g.enabled
-                      ? 'bg-emerald-900 text-white hover:bg-emerald-950'
+                      ? 'bg-pust-900 text-white hover:bg-pust-950'
                       : 'bg-[#F7F7F5] border border-slate-300 text-slate-700 hover:border-slate-400'
                   }`}
                 >
@@ -1213,7 +1213,7 @@ export function AdminCmsPanel({
                     certificateFeeBdt: Number(e.target.value),
                   }))
                 }
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums focus:bg-white focus:outline-none focus:border-pust-800"
               />
             </div>
             <div>
@@ -1227,12 +1227,12 @@ export function AdminCmsPanel({
                     defaultExamFeeBdt: Number(e.target.value),
                   }))
                 }
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums focus:bg-white focus:outline-none focus:border-emerald-800"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums focus:bg-white focus:outline-none focus:border-pust-800"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2 font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
             >
               Save Fee Configuration
             </button>
@@ -1264,8 +1264,8 @@ export function AdminCmsPanel({
                         onClick={() => setInquiryFilter(tab.id)}
                         className={`px-2.5 py-1 text-[11px] font-medium rounded-lg border cursor-pointer whitespace-nowrap shrink-0 ${
                           inquiryFilter === tab.id
-                            ? 'border-emerald-900 bg-emerald-900 text-white'
-                            : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700'
+                            ? 'border-pust-900 bg-pust-900 text-white'
+                            : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-700'
                         }`}
                       >
                         {tab.label}
@@ -1294,7 +1294,7 @@ export function AdminCmsPanel({
                             className={
                               inq.status === 'Received'
                                 ? 'text-amber-800 font-semibold'
-                                : 'text-emerald-800 font-semibold'
+                                : 'text-pust-800 font-semibold'
                             }
                           >
                             {inq.status}
@@ -1323,12 +1323,12 @@ export function AdminCmsPanel({
                                 }))
                               }
                               placeholder="Official response / applicant guidance..."
-                              className="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                              className="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                             />
                             <button
                               type="button"
                               onClick={() => handleReviewInquiry(inq)}
-                              className="px-3 py-1.5 rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 font-medium"
+                              className="px-3 py-1.5 rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 font-medium"
                             >
                               Mark Reviewed &amp; Save Response
                             </button>
@@ -1354,7 +1354,7 @@ export function AdminCmsPanel({
               <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-96 overflow-y-auto">
                 {auditLogs.map((log) => (
                   <div key={log.id} className="p-3 font-mono bg-white">
-                    <span className="text-emerald-800 font-semibold">{log.action}</span> —{' '}
+                    <span className="text-pust-800 font-semibold">{log.action}</span> —{' '}
                     {log.target}
                     <span className="block text-slate-500 tabular-nums mt-0.5">
                       {log.actorName} ({log.actorRole}) ·{' '}

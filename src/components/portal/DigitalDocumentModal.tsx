@@ -141,13 +141,14 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
       )
       .join('');
 
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const tableHtml =
       doc.tableHeaders && doc.tableRows
         ? `<table style="width:100%;border-collapse:collapse;margin-top:18px;">
             <thead><tr>${doc.tableHeaders
               .map(
                 (h) =>
-                  `<th style="text-align:left;padding:8px 10px;border:1px solid #cbd5e1;background:#064e3b;color:#ffffff;font-size:11px;text-transform:uppercase;">${escapeHtml(
+                  `<th style="text-align:left;padding:8px 10px;border:1px solid #cbd5e1;background:#6A0000;color:#ffffff;font-size:11px;text-transform:uppercase;">${escapeHtml(
                     h
                   )}</th>`
               )
@@ -175,15 +176,18 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
   <title>${escapeHtml(doc.serialCode)} — ${escapeHtml(doc.title)}</title>
 </head>
 <body style="font-family:Georgia,serif;background:#f7f7f5;padding:32px;color:#0f172a;">
-  <div style="max-width:780px;margin:0 auto;background:#ffffff;border:2px solid #064e3b;padding:36px;">
-    <div style="border-bottom:2px solid #e2e8f0;padding-bottom:18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="font-family:sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#065f46;font-weight:700;">Pabna University of Science and Technology</div>
-        <h1 style="margin:6px 0 4px;font-size:24px;color:#0f172a;">${escapeHtml(doc.title)}</h1>
-        <p style="margin:0;font-family:sans-serif;font-size:13px;color:#475569;">${escapeHtml(doc.subtitle)}</p>
+  <div style="max-width:780px;margin:0 auto;background:#ffffff;border:2px solid #6A0000;padding:36px;">
+    <div style="border-bottom:2px solid #e2e8f0;padding-bottom:18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <img src="${origin}/assets/pust-logo.png" alt="PUST Official Logo" style="height:56px;width:auto;object-fit:contain;" />
+        <div>
+          <div style="font-family:sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6A0000;font-weight:700;">Pabna University of Science and Technology</div>
+          <h1 style="margin:6px 0 4px;font-size:24px;color:#0f172a;">${escapeHtml(doc.title)}</h1>
+          <p style="margin:0;font-family:sans-serif;font-size:13px;color:#475569;">${escapeHtml(doc.subtitle)}</p>
+        </div>
       </div>
       <div style="text-align:right;font-family:monospace;font-size:12px;">
-        <div style="font-weight:700;color:#064e3b;">${escapeHtml(doc.serialCode)}</div>
+        <div style="font-weight:700;color:#6A0000;">${escapeHtml(doc.serialCode)}</div>
         <div style="color:#64748b;margin-top:4px;">${escapeHtml(doc.statusLabel)}</div>
       </div>
     </div>
@@ -218,10 +222,10 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
       aria-modal="true"
       aria-labelledby="digital-doc-title"
     >
-      <div className="print-only-document bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-emerald-900 print:rounded-none">
+      <div className="print-only-document bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none">
         {/* Toolbar hidden when printing */}
         <div className="print:hidden px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs font-medium text-emerald-900">
+          <div className="flex items-center gap-2 text-xs font-medium text-pust-900">
             <ShieldCheck className="w-4 h-4" />
             <span>Official Verified Digital Record</span>
           </div>
@@ -236,7 +240,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
             <button
               type="button"
               onClick={handleDownloadHtml}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap"
             >
               <Download className="w-3.5 h-3.5" /> Download Copy
             </button>
@@ -257,7 +261,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
             <div className="flex items-start gap-3.5">
               <PustCrest size={48} className="shrink-0 mt-0.5" />
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
                   Pabna University of Science and Technology
                 </p>
                 <h2
@@ -275,13 +279,13 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                 <button
                   type="button"
                   onClick={handleCopySerial}
-                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-emerald-900 hover:underline"
+                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-pust-900 hover:underline"
                   title="Copy serial code"
                 >
                   {doc.serialCode}
-                  {copied && <Check className="w-3 h-3 text-emerald-700" />}
+                  {copied && <Check className="w-3 h-3 text-pust-700" />}
                 </button>
-                <p className="text-[11px] font-medium text-emerald-800 mt-0.5 text-left sm:text-right">
+                <p className="text-[11px] font-medium text-pust-800 mt-0.5 text-left sm:text-right">
                   {doc.statusLabel}
                 </p>
               </div>
@@ -363,7 +367,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                   onClose();
                   onOpenVerify(doc.serialCode);
                 }}
-                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950 whitespace-nowrap"
+                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:text-pust-950 whitespace-nowrap"
               >
                 Verify Publicly <ExternalLink className="w-3.5 h-3.5" />
               </button>

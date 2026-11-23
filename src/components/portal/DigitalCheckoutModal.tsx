@@ -112,7 +112,7 @@ export function DigitalCheckoutModal({
       <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto">
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-emerald-800" />
+            <Lock className="w-4 h-4 text-pust-800" />
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-700">
               PUST Digital Payment Checkout
             </span>
@@ -133,10 +133,10 @@ export function DigitalCheckoutModal({
               <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-sm text-emerald-950">
+                  <h3 className="font-semibold text-sm text-pust-950">
                     Payment Verified & Settled
                   </h3>
-                  <p className="text-xs text-emerald-800 mt-0.5">
+                  <p className="text-xs text-pust-800 mt-0.5">
                     Your digital receipt has been recorded in the PUST Finance ledger.
                   </p>
                 </div>
@@ -145,7 +145,7 @@ export function DigitalCheckoutModal({
               <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
                 <div className="px-4 py-2.5 flex justify-between">
                   <span className="text-slate-500">Receipt No.</span>
-                  <span className="font-mono font-semibold text-emerald-900">
+                  <span className="font-mono font-semibold text-pust-900">
                     {receipt.receiptNo}
                   </span>
                 </div>
@@ -168,7 +168,7 @@ export function DigitalCheckoutModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2.5 rounded-lg bg-emerald-900 text-white text-xs font-semibold hover:bg-emerald-950"
+                className="w-full py-2.5 rounded-lg bg-pust-900 text-white text-xs font-semibold hover:bg-pust-950"
               >
                 Done & Return to Portal
               </button>
@@ -190,7 +190,7 @@ export function DigitalCheckoutModal({
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-[11px] uppercase tracking-wider text-slate-500">Payable</p>
-                  <p className="font-mono text-lg font-semibold text-emerald-900 tabular-nums">
+                  <p className="font-mono text-lg font-semibold text-pust-900 tabular-nums">
                     ৳{target.amountBdt.toLocaleString()}
                   </p>
                 </div>
@@ -217,13 +217,13 @@ export function DigitalCheckoutModal({
                             onClick={() => setSelectedCode(gw.code)}
                             className={`text-left p-3 rounded-xl border transition-colors flex items-start gap-3 ${
                               active
-                                ? 'border-emerald-700 bg-emerald-50/70'
+                                ? 'border-pust-700 bg-pust-50/70'
                                 : 'border-slate-200 hover:border-slate-300 bg-white'
                             }`}
                           >
                             <Icon
                               className={`w-4 h-4 mt-0.5 shrink-0 ${
-                                active ? 'text-emerald-800' : 'text-slate-500'
+                                active ? 'text-pust-800' : 'text-slate-500'
                               }`}
                             />
                             <div>
@@ -249,7 +249,7 @@ export function DigitalCheckoutModal({
                         <p className="text-slate-600">
                           Merchant ID: <span className="font-mono">PUST.GOV.BD.FIN</span>
                         </p>
-                        <p className="text-[11px] text-emerald-800">
+                        <p className="text-[11px] text-pust-800">
                           Click &ldquo;Pay & Generate Receipt&rdquo; after confirming in your app.
                         </p>
                       </div>
@@ -266,7 +266,7 @@ export function DigitalCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setUseManualRef(!useManualRef)}
-                        className="text-[11px] font-medium text-emerald-800 hover:underline"
+                        className="text-[11px] font-medium text-pust-800 hover:underline"
                       >
                         {useManualRef ? 'Use Instant Checkout' : 'Have Existing TXN Ref?'}
                       </button>
@@ -278,7 +278,7 @@ export function DigitalCheckoutModal({
                         onChange={(e) => setManualRef(e.target.value)}
                         placeholder="e.g. TXN-902184 or Bank Scroll Ref"
                         required
-                        className="w-full px-3.5 py-2.5 text-sm font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                        className="w-full px-3.5 py-2.5 text-sm font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
                       />
                     ) : (
                       <input
@@ -289,7 +289,7 @@ export function DigitalCheckoutModal({
                             ? 'Wallet e.g. 017••••1234'
                             : 'Card / Account last 4 digits (optional)'
                         }
-                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
                       />
                     )}
                   </div>
@@ -313,7 +313,7 @@ export function DigitalCheckoutModal({
                 <button
                   type="submit"
                   disabled={processing || enabledGateways.length === 0}
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50"
                 >
                   {processing ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -451,7 +451,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       {/* Role-Specific Module Header */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
             {user.role === 'student'
               ? 'Controller of Examinations · Student Desk'
               : user.role === 'teacher'
@@ -479,7 +479,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                   Pending Results
                 </span>
-                <span className="text-base font-semibold text-emerald-900">
+                <span className="text-base font-semibold text-pust-900">
                   {pendingResults.length}
                 </span>
               </div>
@@ -490,7 +490,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                 Dept Courses
               </span>
-              <span className="text-base font-semibold text-emerald-900">{deptCourses.length}</span>
+              <span className="text-base font-semibold text-pust-900">{deptCourses.length}</span>
             </div>
           )}
           {user.role === 'student' && (
@@ -498,7 +498,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                 Forms · Results
               </span>
-              <span className="text-base font-semibold text-emerald-900">
+              <span className="text-base font-semibold text-pust-900">
                 {applications.length} · {publishedResults.length}
               </span>
             </div>
@@ -534,7 +534,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                     className="p-3.5 flex items-center justify-between gap-2 bg-white hover:bg-[#F7F7F5] transition-colors"
                   >
                     <div>
-                      <p className="font-mono text-xs font-semibold text-emerald-800">
+                      <p className="font-mono text-xs font-semibold text-pust-800">
                         {c.code} · Sem {c.semester} ({c.session})
                       </p>
                       <p className="font-medium text-slate-900">{c.title}</p>
@@ -558,7 +558,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm">
                 {circulars.map((c) => (
                   <div key={c.id} className="p-3.5 space-y-1 bg-white">
-                    <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
                       {c.departmentCode} · Sem {c.semester} ({c.session}) · Deadline {c.deadline}
                     </p>
                     <p className="font-medium text-slate-900">{c.title}</p>
@@ -609,7 +609,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   value={activeCircular.id}
                   onChange={(e) => handleSelectCircular(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                 >
                   {circulars.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -633,7 +633,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                         key={code}
                         className={`flex items-start gap-2.5 p-3 rounded-xl border text-sm cursor-pointer transition-colors ${
                           checked
-                            ? 'border-emerald-800 bg-emerald-50/50'
+                            ? 'border-pust-800 bg-pust-50/50'
                             : 'border-slate-200 bg-[#F7F7F5]'
                         }`}
                       >
@@ -641,10 +641,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleStudentCourse(code)}
-                          className="mt-1 accent-emerald-800"
+                          className="mt-1 accent-pust-800"
                         />
                         <div>
-                          <p className="font-mono text-xs font-semibold text-emerald-800">
+                          <p className="font-mono text-xs font-semibold text-pust-800">
                             {code} · {courseInfo?.credits ?? 3} Credits
                           </p>
                           <p className="text-slate-900">
@@ -660,7 +660,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <button
                 type="submit"
                 disabled={hallBlocked || selectedCourses.length === 0}
-                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Submit Exam Registration Form
               </button>
@@ -686,7 +686,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
                 placeholder="Code (e.g. CSE-4101)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
               <input
                 type="number"
@@ -696,7 +696,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 required
                 value={courseCredits}
                 onChange={(e) => setCourseCredits(Number(e.target.value))}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none tabular-nums"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
               />
             </div>
             <input
@@ -705,7 +705,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               value={courseTitle}
               onChange={(e) => setCourseTitle(e.target.value)}
               placeholder="Course Title"
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             />
             <div className="grid grid-cols-3 gap-2">
               <select
@@ -738,7 +738,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </div>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
             >
               Save Course
             </button>
@@ -758,7 +758,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={circTitle}
                 onChange={(e) => setCircTitle(e.target.value)}
                 placeholder="Exam Circular Title"
-                className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
               <select
                 value={circDept}
@@ -819,8 +819,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       onClick={() => toggleCircularCourse(c.code)}
                       className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                         active
-                          ? 'bg-emerald-900 text-white border-emerald-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-emerald-700'
+                          ? 'bg-pust-900 text-white border-pust-900'
+                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
                       }`}
                     >
                       {c.code}
@@ -832,7 +832,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             <button
               type="submit"
               disabled={circCourseCodes.length === 0}
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
               Publish Exam Circular
             </button>
@@ -896,7 +896,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                               amountBdt: app.feeBdt,
                             })
                           }
-                          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
                           Pay Online (৳{app.feeBdt.toLocaleString()})
@@ -907,7 +907,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                         <button
                           type="button"
                           onClick={() => openAdmitCardDocument(app)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           View Digital Admit Card ({app.admitCardNo})
@@ -923,7 +923,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                         <button
                           type="button"
                           onClick={() => handleVerifyExam(app, 'Approved', true)}
-                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
                         >
                           Verify Payment &amp; Issue Digital Admit Card
                         </button>
@@ -951,7 +951,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         >
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
             <div>
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-pust-800">
                 {user.role === 'teacher'
                   ? 'Step 1 · Teacher Marksheet Preparation'
                   : 'Direct Result Entry & Publication'}
@@ -969,7 +969,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <span className="block text-[10px] uppercase tracking-wider text-slate-500">
                 Live Estimated SGPA
               </span>
-              <span className="text-lg font-semibold text-emerald-900">
+              <span className="text-lg font-semibold text-pust-900">
                 {estimatedSgpa.toFixed(2)}{' '}
                 <span className="text-xs font-normal text-slate-500">
                   ({totalGradebookCredits} Cr)
@@ -989,7 +989,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={resAcademicId}
                 onChange={(e) => setResAcademicId(e.target.value)}
                 placeholder="e.g. 220101"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
             </div>
             <div>
@@ -1040,8 +1040,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       onClick={() => addCatalogCourseRow(c)}
                       className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                         already
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 opacity-70 cursor-default'
-                          : 'bg-[#F7F7F5] border-slate-200 text-slate-700 hover:border-emerald-700'
+                          ? 'bg-pust-50 border-pust-300 text-pust-900 opacity-70 cursor-default'
+                          : 'bg-[#F7F7F5] border-slate-200 text-slate-700 hover:border-pust-700'
                       }`}
                     >
                       {already ? '✓ ' : '+ '}
@@ -1078,7 +1078,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                           value={row.code}
                           onChange={(e) => updateCourseRow(row.key, { code: e.target.value })}
                           placeholder="CSE-3201"
-                          className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                          className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                         />
                       </td>
                       <td className="p-2">
@@ -1088,7 +1088,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                           value={row.title}
                           onChange={(e) => updateCourseRow(row.key, { title: e.target.value })}
                           placeholder="Course Title"
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                         />
                       </td>
                       <td className="p-2">
@@ -1121,7 +1121,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       <td className="px-3 py-2 font-mono font-semibold tabular-nums whitespace-nowrap">
                         <span
                           className={
-                            letter === 'F' ? 'text-red-700' : 'text-emerald-800'
+                            letter === 'F' ? 'text-red-700' : 'text-pust-800'
                           }
                         >
                           {letter} · {gp.toFixed(2)}
@@ -1149,14 +1149,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             <button
               type="button"
               onClick={addBlankCourseRow}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700 hover:text-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-700 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Custom Course Row
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
             >
               {user.role === 'teacher'
                 ? 'Submit Marksheet for Chairman Review'
@@ -1215,7 +1215,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       <button
                         type="button"
                         onClick={() => handleApprovePendingResult(r)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         <FileCheck2 className="w-3.5 h-3.5" />
                         Verify &amp; Publish Result
@@ -1266,13 +1266,13 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 shrink-0">
-                    <span className="font-mono text-xs font-semibold text-emerald-800 tabular-nums">
+                    <span className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                       SGPA {r.sgpa.toFixed(2)} · {r.promotionStatus}
                     </span>
                     <button
                       type="button"
                       onClick={() => openGradeSheetDocument(r)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
                     >
                       <Printer className="w-3.5 h-3.5" />
                       View Official Grade Sheet

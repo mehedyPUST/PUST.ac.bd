@@ -192,7 +192,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Role-Specific Module Header */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             {user.role === 'student'
               ? 'Central Library Membership & Books'
               : user.role === 'chairman'
@@ -253,7 +253,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                           : 'border-slate-200 bg-[#F7F7F5]'
                       }`}
                     >
-                      <div className="flex items-center gap-1.5 font-mono font-semibold text-[11px] text-emerald-900">
+                      <div className="flex items-center gap-1.5 font-mono font-semibold text-[11px] text-pust-900">
                         {done ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                         ) : (
@@ -270,7 +270,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
 
               {latestApp && latestApp.status !== 'rejected' && (
                 <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-2 text-sm">
-                  <p className="font-mono text-xs text-emerald-800 uppercase font-semibold">
+                  <p className="font-mono text-xs text-pust-800 uppercase font-semibold">
                     Current Stage: {latestApp.status.replace(/_/g, ' ')}
                   </p>
                   {latestApp.chairmanSeal && (
@@ -289,7 +289,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 <button
                   type="button"
                   onClick={handleApplyLibrary}
-                  className="px-5 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs transition-all cursor-pointer"
+                  className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-all cursor-pointer"
                 >
                   Apply for Central Library Membership
                 </button>
@@ -310,24 +310,24 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
               cards.map((card) => (
                 <div
                   key={card.id}
-                  className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white rounded-2xl p-6 space-y-3.5 shadow-sm"
+                  className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-2xl p-6 space-y-3.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2.5">
-                    <p className="font-mono text-[11px] uppercase tracking-widest text-emerald-200 flex items-center gap-1.5">
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200 flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5" />
                       PUST Central Library
                     </p>
-                    <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-100">
+                    <p className="font-mono text-[11px] uppercase tracking-wider text-pust-100">
                       {card.status}
                     </p>
                   </div>
                   <p className="font-mono text-xl font-semibold text-white tabular-nums tracking-wide">
                     {card.digitalCardNo}
                   </p>
-                  <p className="text-sm text-emerald-50">
+                  <p className="text-sm text-pust-50">
                     {card.studentName} · ID {card.academicId} · {card.departmentCode} ({card.session})
                   </p>
-                  <p className="font-mono text-xs text-emerald-200 tabular-nums">
+                  <p className="font-mono text-xs text-pust-200 tabular-nums">
                     Valid Until: {card.validUntil}
                     {card.physicalCardRef ? ` · Physical Ref: ${card.physicalCardRef}` : ''}
                   </p>
@@ -335,7 +335,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                     <button
                       type="button"
                       onClick={() => openCardModal(card)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white text-emerald-950 hover:bg-emerald-50 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white text-pust-950 hover:bg-pust-50 cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       View Digital Card &amp; QR
@@ -385,7 +385,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                           </p>
                           <p className="font-mono text-xs text-slate-500 tabular-nums">
                             Session {app.session} · Status:{' '}
-                            <span className="text-emerald-800 font-semibold">
+                            <span className="text-pust-800 font-semibold">
                               {app.status.replace(/_/g, ' ')}
                             </span>
                           </p>
@@ -409,7 +409,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                               }))
                             }
                             placeholder="Official Chairman Seal"
-                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                           />
                           <input
                             type="text"
@@ -421,13 +421,13 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                               }))
                             }
                             placeholder="Digital Signature"
-                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                           />
                           <div className="flex gap-2">
                             <button
                               type="button"
                               onClick={() => handleChairmanSeal(app, 'forward')}
-                              className="px-3.5 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                              className="px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                             >
                               Seal JSON &amp; Forward
                             </button>
@@ -464,13 +464,13 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                       {c.studentName} · <span className="font-mono">{c.academicId}</span>
                     </p>
                     <div className="flex items-center gap-3">
-                      <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
                         {c.digitalCardNo} · Valid {c.validUntil}
                       </p>
                       <button
                         type="button"
                         onClick={() => openCardModal(c)}
-                        className="px-2.5 py-1 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
                       >
                         View Card
                       </button>
@@ -504,7 +504,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                           {app.studentName} · <span className="font-mono">{app.academicId}</span> (
                           {app.departmentCode})
                         </p>
-                        <p className="font-mono text-xs text-emerald-800">
+                        <p className="font-mono text-xs text-pust-800">
                           Status: {app.status.replace(/_/g, ' ')}
                         </p>
                       </div>
@@ -525,12 +525,12 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                             setPhysicalRefs((prev) => ({ ...prev, [app.id]: e.target.value }))
                           }
                           placeholder="Optional Physical Card Ref (e.g. PHY-2026-042)"
-                          className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none w-72"
+                          className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none w-72"
                         />
                         <button
                           type="button"
                           onClick={() => handleLibraryVerify(app, 'approve')}
-                          className="px-4 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                          className="px-4 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                         >
                           Verify Seal &amp; Issue Card
                         </button>
@@ -562,11 +562,11 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                       <span className="font-mono text-slate-600">{c.academicId}</span> ({c.departmentCode})
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-emerald-800 font-semibold">{c.digitalCardNo}</span>
+                      <span className="font-mono text-pust-800 font-semibold">{c.digitalCardNo}</span>
                       <button
                         type="button"
                         onClick={() => openCardModal(c)}
-                        className="px-2.5 py-1 rounded-lg border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
                       >
                         View Card &amp; QR
                       </button>
@@ -591,7 +591,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowAcademicId}
                 onChange={(e) => setBorrowAcademicId(e.target.value)}
                 placeholder="Student Academic ID"
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
               <input
                 type="text"
@@ -599,7 +599,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowTitle}
                 onChange={(e) => setBorrowTitle(e.target.value)}
                 placeholder="Book Title"
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
               <input
                 type="text"
@@ -607,19 +607,19 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowIsbn}
                 onChange={(e) => setBorrowIsbn(e.target.value)}
                 placeholder="ISBN / Call No."
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
               <input
                 type="date"
                 required
                 value={borrowDue}
                 onChange={(e) => setBorrowDue(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white cursor-pointer"
+              className="px-5 py-2 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white cursor-pointer"
             >
               Checkout Book
             </button>
@@ -648,14 +648,14 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                     <p className="font-medium text-slate-900">{b.bookTitle}</p>
                     <p className="font-mono text-xs text-slate-500 tabular-nums">
                       {b.academicId} · ISBN {b.isbn} · Borrowed {b.borrowedAt} · Due {b.dueAt} ·{' '}
-                      <span className="text-emerald-800 font-semibold">{b.status}</span>
+                      <span className="text-pust-800 font-semibold">{b.status}</span>
                     </p>
                   </div>
                   {(user.role === 'library' || user.role === 'admin') && b.status === 'Borrowed' && (
                     <button
                       type="button"
                       onClick={() => handleReturnBook(b.id)}
-                      className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-emerald-800 text-emerald-800 hover:bg-emerald-900 hover:text-white cursor-pointer whitespace-nowrap"
+                      className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-pust-800 text-pust-800 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
                     >
                       Mark Returned
                     </button>

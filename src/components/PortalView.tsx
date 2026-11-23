@@ -496,7 +496,7 @@ export function PortalView({
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               PUST Integrated Digital University Platform
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
@@ -507,14 +507,14 @@ export function PortalView({
             <button
               type="button"
               onClick={() => navigateTo('/verify')}
-              className="text-sm font-medium text-slate-700 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+              className="text-sm font-medium text-slate-700 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
             >
               Verify Documents →
             </button>
             <button
               type="button"
               onClick={onBackToSite}
-              className="text-sm font-medium text-emerald-800 hover:text-emerald-950 whitespace-nowrap shrink-0 cursor-pointer"
+              className="text-sm font-medium text-pust-800 hover:text-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
             >
               ← Public Website
             </button>
@@ -524,12 +524,12 @@ export function PortalView({
         {/* Split Institutional Auth Studio Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           {/* Left Column: Deep Emerald Sidebar */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-8">
+          <div className="lg:col-span-5 bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-8">
             <div className="space-y-6">
               <div className="flex items-center gap-3.5">
                 <PustCrest variant="light" size={44} className="shrink-0" />
                 <div>
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-emerald-200">
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
                     Rajapur Campus · Pabna
                   </p>
                   <p className="font-serif text-base font-medium text-white">
@@ -539,35 +539,35 @@ export function PortalView({
               </div>
 
               <div className="space-y-2.5">
-                <p className="font-mono text-[11px] uppercase tracking-widest text-emerald-300">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
                   {currentMeta.eyebrow}
                 </p>
                 <h2 className="font-serif text-2xl font-medium text-white leading-snug">
                   {currentMeta.title}
                 </h2>
-                <p className="text-sm text-emerald-100/90 leading-relaxed">
+                <p className="text-sm text-pust-100/90 leading-relaxed">
                   {currentMeta.summary}
                 </p>
               </div>
 
               <div className="space-y-3 pt-1">
                 <div className="bg-white/10 rounded-xl border border-white/15 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200 flex items-center gap-1.5">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     Role-Verified Governance
                   </p>
-                  <p className="text-xs text-emerald-50/90 leading-relaxed">
+                  <p className="text-xs text-pust-50/90 leading-relaxed">
                     Strict separation across Student, Teacher, Chairman, Library, Hall, Proctor,
                     Registrar, VC, and Admin Office permissions.
                   </p>
                 </div>
 
                 <div className="bg-white/10 rounded-xl border border-white/15 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200 flex items-center gap-1.5">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5">
                     <KeyRound className="w-3.5 h-3.5" />
                     Paperless Checkout &amp; Verification
                   </p>
-                  <p className="text-xs text-emerald-50/90 leading-relaxed">
+                  <p className="text-xs text-pust-50/90 leading-relaxed">
                     SSLCommerz, Bangla QR &amp; MFS checkouts, QR-sealed Admit Cards, Library Cards,
                     Hall Clearances, and 4-Office Certificates.
                   </p>
@@ -575,7 +575,7 @@ export function PortalView({
               </div>
             </div>
 
-            <div className="pt-4 border-t border-white/15 flex items-center justify-between gap-2 font-mono text-[11px] text-emerald-200">
+            <div className="pt-4 border-t border-white/15 flex items-center justify-between gap-2 font-mono text-[11px] text-pust-200">
               <span>
                 Storage:{' '}
                 {bootstrapStatus.storageBackend === 'mongodb'
@@ -599,8 +599,8 @@ export function PortalView({
                 }}
                 className={`px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                   authMode === 'login'
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                    ? 'bg-pust-900 text-white'
+                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                 }`}
               >
                 Member Sign In
@@ -614,8 +614,8 @@ export function PortalView({
                 }}
                 className={`px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                   authMode === 'student-token'
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                    ? 'bg-pust-900 text-white'
+                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                 }`}
               >
                 Student Token Signup
@@ -629,8 +629,8 @@ export function PortalView({
                 }}
                 className={`px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                   authMode === 'officer'
-                    ? 'bg-emerald-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                    ? 'bg-pust-900 text-white'
+                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                 }`}
               >
                 Officer / Teacher Signup
@@ -645,8 +645,8 @@ export function PortalView({
                   }}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                     authMode === 'admin-claim'
-                      ? 'bg-emerald-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   Claim Admin Office
@@ -662,8 +662,8 @@ export function PortalView({
                   }}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                     authMode === 'admin-passcode'
-                      ? 'bg-emerald-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   Admin Passcode
@@ -698,7 +698,7 @@ export function PortalView({
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
                         placeholder="member@pust.ac.bd"
-                        className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white transition-colors"
+                        className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -715,13 +715,13 @@ export function PortalView({
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
                         placeholder="Enter your password"
-                        className="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white transition-colors"
+                        className="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white transition-colors"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-800 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-pust-800 cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -733,14 +733,14 @@ export function PortalView({
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs disabled:opacity-60 transition-all cursor-pointer"
+                    className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs disabled:opacity-60 transition-all cursor-pointer"
                   >
                     {submitting ? 'Signing In...' : 'Sign In to Campus Portal'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setAuthMode('student-token')}
-                    className="text-xs font-medium text-emerald-800 hover:underline cursor-pointer"
+                    className="text-xs font-medium text-pust-800 hover:underline cursor-pointer"
                   >
                     Have an admission token? Activate account →
                   </button>
@@ -767,7 +767,7 @@ export function PortalView({
                       value={stuToken}
                       onChange={(e) => setStuToken(e.target.value)}
                       placeholder="PUST-CSE-..."
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                   <div>
@@ -780,7 +780,7 @@ export function PortalView({
                       value={stuName}
                       onChange={(e) => setStuName(e.target.value)}
                       placeholder="Full name as on SSC/HSC"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                   <div>
@@ -793,7 +793,7 @@ export function PortalView({
                       value={stuEmail}
                       onChange={(e) => setStuEmail(e.target.value)}
                       placeholder="student@pust.ac.bd"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                   <div>
@@ -808,13 +808,13 @@ export function PortalView({
                         value={stuPassword}
                         onChange={(e) => setStuPassword(e.target.value)}
                         placeholder="Minimum 8 characters"
-                        className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                        className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-800 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-pust-800 cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -827,8 +827,8 @@ export function PortalView({
                   <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-600">
                     Digital Admission Documents Upload
                   </label>
-                  <label className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl border border-dashed border-slate-300 bg-[#F7F7F5] hover:border-emerald-700 hover:bg-emerald-50/30 transition-colors cursor-pointer text-center">
-                    <Upload className="w-5 h-5 text-emerald-800" />
+                  <label className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl border border-dashed border-slate-300 bg-[#F7F7F5] hover:border-pust-700 hover:bg-pust-50/30 transition-colors cursor-pointer text-center">
+                    <Upload className="w-5 h-5 text-pust-800" />
                     <span className="text-xs font-medium text-slate-800">
                       Attach Digital Copies (PDF, JPG, PNG — hashed &amp; verified automatically)
                     </span>
@@ -852,7 +852,7 @@ export function PortalView({
                           className="px-3.5 py-2 flex items-center justify-between gap-2 text-xs"
                         >
                           <div className="flex items-center gap-2 min-w-0">
-                            <FileText className="w-3.5 h-3.5 text-emerald-800 shrink-0" />
+                            <FileText className="w-3.5 h-3.5 text-pust-800 shrink-0" />
                             <span className="font-medium text-slate-800 truncate">{doc.fileName}</span>
                             <span className="font-mono text-[11px] text-slate-500 shrink-0">
                               {doc.sizeLabel} · {doc.verifiedHash}
@@ -888,8 +888,8 @@ export function PortalView({
                           onClick={() => toggleAdmissionDoc(docLabel)}
                           className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg border transition-colors cursor-pointer ${
                             active
-                              ? 'bg-emerald-900 text-white border-emerald-900'
-                              : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-emerald-700'
+                              ? 'bg-pust-900 text-white border-pust-900'
+                              : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
                           }`}
                         >
                           {active && <Check className="w-3 h-3" />}
@@ -903,14 +903,14 @@ export function PortalView({
                     required
                     value={stuDocs}
                     onChange={(e) => setStuDocs(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-emerald-700 focus:bg-white"
+                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-pust-700 focus:bg-white"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
+                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? 'Submitting Registration...' : 'Submit for Chairman Approval'}
                 </button>
@@ -921,7 +921,7 @@ export function PortalView({
             {authMode === 'officer' && (
               <form onSubmit={handleOfficerSignup} className="space-y-4">
                 <div className="p-3.5 rounded-xl bg-[#F7F7F5] border border-slate-200 flex items-start gap-2.5 text-xs text-slate-700">
-                  <UserCheck className="w-4 h-4 text-emerald-800 shrink-0 mt-0.5" />
+                  <UserCheck className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
                   <span>
                     {offRole === 'teacher'
                       ? `Teachers in ${offDept} are approved directly by the ${offDept} Department Chairman.`
@@ -940,7 +940,7 @@ export function PortalView({
                       value={offName}
                       onChange={(e) => setOffName(e.target.value)}
                       placeholder="Dr. / Mr. / Ms. Full Name"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                   <div>
@@ -952,7 +952,7 @@ export function PortalView({
                       onChange={(e) =>
                         setOffRole(e.target.value as Exclude<UserRole, 'admin' | 'student'>)
                       }
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     >
                       <option value="teacher">Teacher (Chairman Approval)</option>
                       <option value="chairman">Department Chairman (Admin Approval)</option>
@@ -973,7 +973,7 @@ export function PortalView({
                       value={offEmail}
                       onChange={(e) => setOffEmail(e.target.value)}
                       placeholder="name@pust.ac.bd"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                   <div>
@@ -988,13 +988,13 @@ export function PortalView({
                         value={offPassword}
                         onChange={(e) => setOffPassword(e.target.value)}
                         placeholder="Minimum 8 characters"
-                        className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                        className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-800 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-pust-800 cursor-pointer"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -1007,7 +1007,7 @@ export function PortalView({
                     <select
                       value={offDept}
                       onChange={(e) => setOffDept(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     >
                       {departments.map((d) => (
                         <option key={d.id} value={d.code}>
@@ -1030,7 +1030,7 @@ export function PortalView({
                       value={offAcademicId}
                       onChange={(e) => setOffAcademicId(e.target.value)}
                       placeholder="PUST-FAC-104"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
                 </div>
@@ -1038,7 +1038,7 @@ export function PortalView({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
+                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? 'Submitting Application...' : 'Submit Officer / Teacher Application'}
                 </button>
@@ -1062,7 +1062,7 @@ export function PortalView({
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
                     placeholder="Admin Officer Name"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -1075,7 +1075,7 @@ export function PortalView({
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
                     placeholder="admin@pust.ac.bd"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -1090,13 +1090,13 @@ export function PortalView({
                       value={adminPassword}
                       onChange={(e) => setAdminPassword(e.target.value)}
                       placeholder="Strong Password (8+ chars)"
-                      className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-800 cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-pust-800 cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1105,7 +1105,7 @@ export function PortalView({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
+                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? 'Claiming Admin Account...' : 'Claim Admin Office Account'}
                 </button>
@@ -1125,7 +1125,7 @@ export function PortalView({
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
                     placeholder="admin@pust.ac.bd"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -1139,13 +1139,13 @@ export function PortalView({
                       value={adminPasscode}
                       onChange={(e) => setAdminPasscode(e.target.value)}
                       placeholder="Enter ADMIN_PASSCODE"
-                      className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                      className="w-full pr-10 px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((p) => !p)}
                       aria-label={showPassword ? 'Hide passcode' : 'Show passcode'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-emerald-800 cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-pust-800 cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1154,7 +1154,7 @@ export function PortalView({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
+                  className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? 'Verifying Passcode...' : 'Sign In as Admin'}
                 </button>
@@ -1175,12 +1175,12 @@ export function PortalView({
                   value={statusQuery}
                   onChange={(e) => setStatusQuery(e.target.value)}
                   placeholder="Registered email or PUST-INQ-2026-101"
-                  className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-700 focus:outline-none"
+                  className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={statusLoading}
-                  className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {statusLoading ? 'Checking...' : 'Check Status'}
                 </button>
@@ -1196,7 +1196,7 @@ export function PortalView({
               {statusResult && (
                 <div className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-1.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono font-semibold text-emerald-900">
+                    <span className="font-mono font-semibold text-pust-900">
                       {statusResult.reference}
                     </span>
                     <span className="inline-flex items-center gap-1 font-mono font-semibold text-slate-800">
@@ -1342,17 +1342,17 @@ export function PortalView({
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* 264px Role-Criteria Workspace Sidebar */}
         <aside className="w-full lg:w-68 shrink-0 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden lg:sticky lg:top-24">
-          <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white p-5 space-y-2">
+          <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-5 space-y-2">
             <div className="flex items-center gap-2.5">
               <PustCrest variant="light" size={30} className="shrink-0" />
-              <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200 truncate">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 truncate">
                 {ROLE_LABELS[user.role]}
               </p>
             </div>
             <p className="font-serif text-lg font-medium text-white leading-snug">
               {user.name}
             </p>
-            <p className="font-mono text-xs text-emerald-100/90 tabular-nums">
+            <p className="font-mono text-xs text-pust-100/90 tabular-nums">
               {user.departmentCode} · ID {user.academicId}
               {user.session ? ` · ${user.session}` : ''}
             </p>
@@ -1369,8 +1369,8 @@ export function PortalView({
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left rounded-xl transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-900 text-white shadow-xs'
-                      : 'text-slate-700 hover:bg-[#F7F7F5] hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-[#F7F7F5] hover:text-pust-900'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -1380,7 +1380,7 @@ export function PortalView({
                     </span>
                     <span
                       className={`block text-[11px] truncate ${
-                        isActive ? 'text-emerald-100/85' : 'text-slate-500'
+                        isActive ? 'text-pust-100/85' : 'text-slate-500'
                       }`}
                     >
                       {tab.desc}
@@ -1395,14 +1395,14 @@ export function PortalView({
             <button
               type="button"
               onClick={() => navigateTo('/verify')}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
             >
               Public Document Verification
             </button>
             <button
               type="button"
               onClick={onBackToSite}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
             >
               Public University Website
             </button>
@@ -1424,7 +1424,7 @@ export function PortalView({
             <div>
               <p className="font-mono text-xs text-slate-500">
                 Digital Campus / {ROLE_LABELS[user.role]} /{' '}
-                <span className="text-emerald-800 font-semibold">{activeTabMeta.label}</span>
+                <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
               </p>
               <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-0.5">
                 {activeTabMeta.label}
@@ -1440,14 +1440,14 @@ export function PortalView({
             <div className="space-y-6">
               {/* Role-Specific 4-Card KPI Strip */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white rounded-2xl p-5 space-y-1 shadow-xs">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200">
+                <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-2xl p-5 space-y-1 shadow-xs">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200">
                     Active Role Criteria
                   </p>
                   <p className="font-serif text-xl font-medium text-white">
                     {ROLE_LABELS[user.role]}
                   </p>
-                  <p className="font-mono text-xs text-emerald-100/90 tabular-nums">
+                  <p className="font-mono text-xs text-pust-100/90 tabular-nums">
                     {user.departmentCode} · ID {user.academicId}
                   </p>
                 </div>
@@ -1550,7 +1550,7 @@ export function PortalView({
               <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-widest text-emerald-800">
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
                       Personalized Role Workspace
                     </p>
                     <h2 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
@@ -1574,20 +1574,20 @@ export function PortalView({
                           key={tab.id}
                           type="button"
                           onClick={() => setActiveTab(tab.id)}
-                          className="text-left p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] hover:bg-white hover:border-emerald-800 transition-all flex items-start justify-between gap-3 group cursor-pointer"
+                          className="text-left p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] hover:bg-white hover:border-pust-800 transition-all flex items-start justify-between gap-3 group cursor-pointer"
                         >
                           <div className="flex items-start gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-white border border-slate-200 text-emerald-800 group-hover:bg-emerald-900 group-hover:text-white transition-colors shrink-0">
+                            <div className="p-2 rounded-lg bg-white border border-slate-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white transition-colors shrink-0">
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900 truncate">
+                              <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 truncate">
                                 {tab.label}
                               </p>
                               <p className="text-xs text-slate-600 mt-0.5 truncate">{tab.desc}</p>
                             </div>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-800 shrink-0 mt-1 transition-colors" />
+                          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 mt-1 transition-colors" />
                         </button>
                       );
                     })}
@@ -1599,7 +1599,7 @@ export function PortalView({
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
                     <div className="flex items-center gap-2">
-                      <Receipt className="w-4 h-4 text-emerald-800" />
+                      <Receipt className="w-4 h-4 text-pust-800" />
                       <h2 className="font-serif text-xl font-medium text-slate-900">
                         Verified Digital Payment Receipts ({receipts.length})
                       </h2>
@@ -1607,7 +1607,7 @@ export function PortalView({
                     <button
                       type="button"
                       onClick={() => navigateTo('/verify')}
-                      className="text-xs font-medium text-emerald-800 hover:underline cursor-pointer"
+                      className="text-xs font-medium text-pust-800 hover:underline cursor-pointer"
                     >
                       Verify on Public Registry →
                     </button>
@@ -1622,7 +1622,7 @@ export function PortalView({
                           <p className="font-medium text-sm text-slate-900">{r.title}</p>
                           <p className="font-mono text-slate-500 tabular-nums mt-0.5">
                             {r.receiptNo} · {r.gatewayName} ({r.transactionId}) · Paid{' '}
-                            <span className="font-semibold text-emerald-900">
+                            <span className="font-semibold text-pust-900">
                               BDT {r.amountBdt.toLocaleString()}
                             </span>{' '}
                             on {r.paidAt}
@@ -1631,7 +1631,7 @@ export function PortalView({
                         <button
                           type="button"
                           onClick={() => openReceiptModal(r)}
-                          className="px-3 py-1.5 font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer whitespace-nowrap"
+                          className="px-3 py-1.5 font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
                         >
                           View Official Receipt
                         </button>
@@ -1646,7 +1646,7 @@ export function PortalView({
                 <div className="xl:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
                     <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-emerald-800" />
+                      <Bell className="w-4 h-4 text-pust-800" />
                       <h2 className="font-serif text-xl font-medium text-slate-900">
                         Targeted Circulars &amp; Notices
                       </h2>
@@ -1664,7 +1664,7 @@ export function PortalView({
                     <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
                       {targetedNotifications.map((n) => (
                         <div key={n.id} className="p-3.5 space-y-1 text-sm hover:bg-[#F7F7F5] transition-colors">
-                          <p className="font-mono text-[11px] text-emerald-800 tabular-nums">
+                          <p className="font-mono text-[11px] text-pust-800 tabular-nums">
                             {n.publishedAt} · {n.category} · {n.departmentCode}
                             {n.targetSession ? ` · Session ${n.targetSession}` : ''}
                             {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
@@ -1715,7 +1715,7 @@ export function PortalView({
 
                   {user.role === 'teacher' && (
                     <div className="p-4 rounded-xl border border-emerald-200 bg-[#F7F7F5] text-xs space-y-1.5 font-mono">
-                      <p className="font-semibold text-emerald-900 uppercase tracking-wider">
+                      <p className="font-semibold text-pust-900 uppercase tracking-wider">
                         Chairman Course Assignment
                       </p>
                       <p className="text-slate-700">
@@ -1740,7 +1740,7 @@ export function PortalView({
                 <>
                   <div className="border-b border-slate-200 pb-4 flex flex-wrap items-end justify-between gap-3">
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                      <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                         Verified Institutional Record
                       </p>
                       <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -1748,7 +1748,7 @@ export function PortalView({
                       </h2>
                     </div>
                     {studentSelf && (
-                      <span className="font-mono text-xs text-emerald-800 font-semibold tabular-nums">
+                      <span className="font-mono text-xs text-pust-800 font-semibold tabular-nums">
                         Status: {studentSelf.approvalStatus.toUpperCase()} · {studentSelf.disciplinaryStatus}
                       </span>
                     )}
@@ -1779,7 +1779,7 @@ export function PortalView({
                           <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                             Cumulative Standing
                           </dt>
-                          <dd className="font-mono text-base font-semibold text-emerald-800 mt-1 tabular-nums">
+                          <dd className="font-mono text-base font-semibold text-pust-800 mt-1 tabular-nums">
                             CGPA {studentSelf.cgpa.toFixed(2)} / 4.00
                           </dd>
                           <dd className="text-xs text-slate-600 mt-0.5 tabular-nums">
@@ -1814,7 +1814,7 @@ export function PortalView({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="p-5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                          <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
                             Chairman &amp; Admin Remarks
                           </p>
                           <p className="text-sm text-slate-700">
@@ -1832,7 +1832,7 @@ export function PortalView({
                         </div>
 
                         <div className="p-5 rounded-xl border border-slate-200 bg-white space-y-2">
-                          <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
                             Verified Admission Documents
                           </p>
                           <p className="text-sm text-slate-700 leading-relaxed">
@@ -1848,7 +1848,7 @@ export function PortalView({
                                   className="px-3 py-1.5 rounded-lg bg-[#F7F7F5] border border-slate-200 text-[11px] font-mono text-slate-700 flex items-center justify-between gap-2"
                                 >
                                   <span className="truncate">{dd.fileName}</span>
-                                  <span className="text-emerald-800 shrink-0">
+                                  <span className="text-pust-800 shrink-0">
                                     {dd.sizeLabel} · {dd.verifiedHash}
                                   </span>
                                 </div>
@@ -1867,7 +1867,7 @@ export function PortalView({
                 <>
                   <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-4">
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                      <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                         {user.role === 'chairman' || user.role === 'teacher'
                           ? `Department of ${user.departmentCode} Scope`
                           : user.role === 'hall'
@@ -1923,7 +1923,7 @@ export function PortalView({
                           value={stuSearch}
                           onChange={(e) => setStuSearch(e.target.value)}
                           placeholder="Name or ID..."
-                          className="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                          className="pl-8 pr-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1950,7 +1950,7 @@ export function PortalView({
                             setStuSessionFilter('ALL');
                             setStuSearch('');
                           }}
-                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-emerald-900 hover:border-emerald-800 cursor-pointer"
+                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800 cursor-pointer"
                         >
                           Reset Filters
                         </button>
@@ -1967,7 +1967,7 @@ export function PortalView({
                                 <p className="font-medium text-slate-900">
                                   {stu.name} · <span className="font-mono">{stu.academicId}</span>
                                 </p>
-                                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                                <p className="font-mono text-xs text-pust-800 tabular-nums">
                                   {stu.departmentCode} · Session {stu.session} · Sem{' '}
                                   {stu.currentSemester} (Completed {stu.completedSemesters}/8) · CGPA{' '}
                                   {stu.cgpa.toFixed(2)}
@@ -1982,7 +1982,7 @@ export function PortalView({
                                   {stu.adminNotes || '—'}
                                 </p>
                                 {stu.digitalDocuments && stu.digitalDocuments.length > 0 && (
-                                  <p className="font-mono text-[11px] text-emerald-800 mt-1">
+                                  <p className="font-mono text-[11px] text-pust-800 mt-1">
                                     Uploaded Files: {stu.digitalDocuments.map((d) => d.fileName).join(', ')}
                                   </p>
                                 )}
@@ -2002,7 +2002,7 @@ export function PortalView({
                                       }))
                                     }
                                     placeholder="Update Chairman note..."
-                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                                   />
                                 )}
                                 {user.role === 'admin' && (
@@ -2016,7 +2016,7 @@ export function PortalView({
                                       }))
                                     }
                                     placeholder="Update Admin note..."
-                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                                   />
                                 )}
                                 {user.role === 'proctor' && (
@@ -2049,14 +2049,14 @@ export function PortalView({
                                         }))
                                       }
                                       placeholder="Disciplinary remarks..."
-                                      className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                      className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                                     />
                                   </>
                                 )}
                                 <button
                                   type="button"
                                   onClick={() => handleSaveStudentRecord(stu)}
-                                  className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap"
+                                  className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                                 >
                                   Save Record Note
                                 </button>

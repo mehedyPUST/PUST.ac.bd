@@ -42,7 +42,7 @@ export function NoticeModal({
       >
         <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-slate-200 bg-slate-50">
           <div>
-            <p className="font-mono text-xs tracking-wider uppercase text-emerald-800 tabular-nums">
+            <p className="font-mono text-xs tracking-wider uppercase text-pust-800 tabular-nums">
               {notice.referenceNo} · {notice.category} · {notice.publishedAt}
             </p>
             <h3
@@ -77,7 +77,7 @@ export function NoticeModal({
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-800 hover:underline cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-pust-800 hover:underline cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               Print Circular
@@ -100,7 +100,7 @@ export function NoticeModal({
                 <button
                   type="button"
                   onClick={() => onToggleBookmark(notice)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-emerald-800 text-emerald-900 hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-800 text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                   {isBookmarked ? 'Saved' : 'Save Circular'}
@@ -112,7 +112,7 @@ export function NoticeModal({
                     onClose();
                     onOpenPortal();
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Bookmark className="w-4 h-4" />
                   Sign in to Save
@@ -134,7 +134,7 @@ export function NoticeModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-emerald-900 text-white hover:bg-emerald-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Done Reading
             </button>

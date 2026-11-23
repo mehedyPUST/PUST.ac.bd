@@ -205,7 +205,7 @@ export function CampusMapSection() {
         {/* Section Header + Zone Filter */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Rajapur 30-Acre Masterplan · Interactive Campus Directory
             </p>
             <h2
@@ -234,8 +234,8 @@ export function CampusMapSection() {
                   onClick={() => handleZoneChange(zone)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-emerald-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-900'
                   }`}
                 >
                   {zone === 'All' ? 'All Precincts' : zone}
@@ -330,7 +330,7 @@ export function CampusMapSection() {
                   x="144"
                   y="346"
                   textAnchor="middle"
-                  className="fill-emerald-900/60 font-mono text-[10px]"
+                  className="fill-pust-900/60 font-mono text-[10px]"
                 >
                   Central Playground
                 </text>
@@ -465,7 +465,7 @@ export function CampusMapSection() {
 
               {/* Top-Right Compass / Scale Overlay */}
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 absolute top-3 right-3 font-mono text-[10px] text-slate-600">
-                <Compass className="w-3.5 h-3.5 text-emerald-800" />
+                <Compass className="w-3.5 h-3.5 text-pust-800" />
                 <span>N ↑ · 24.0130° N, 89.2797° E</span>
               </div>
 
@@ -485,17 +485,17 @@ export function CampusMapSection() {
                       left: `${b.xPercent}%`,
                       top: `${b.yPercent}%`,
                     }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 ${
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                       isSelected
-                        ? 'z-20 bg-emerald-900 text-white border-emerald-950 shadow-md scale-[1.03]'
+                        ? 'z-20 bg-pust-900 text-white border-pust-950 shadow-md scale-[1.03]'
                         : isInZone
-                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-emerald-700 hover:text-emerald-900'
+                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-pust-700 hover:text-pust-900'
                         : 'z-0 bg-white/60 text-slate-400 border-slate-200 hover:bg-white hover:text-slate-700'
                     }`}
                   >
                     <MapPin
                       className={`w-3 h-3 shrink-0 ${
-                        isSelected ? 'text-emerald-200' : 'text-emerald-800'
+                        isSelected ? 'text-pust-200' : 'text-pust-800'
                       }`}
                     />
                     <span>{b.shortName}</span>
@@ -519,14 +519,14 @@ export function CampusMapSection() {
                       onClick={() => setSelectedBuildingId(b.id)}
                       className={`px-3 py-2.5 rounded-lg text-left border transition-colors flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-900 text-white border-emerald-950'
-                          : 'bg-slate-50 text-slate-800 border-slate-200 hover:border-emerald-700 hover:bg-emerald-50/40'
+                          ? 'bg-pust-900 text-white border-pust-950'
+                          : 'bg-slate-50 text-slate-800 border-slate-200 hover:border-pust-700 hover:bg-pust-50/40'
                       }`}
                     >
                       <span className="text-xs font-medium truncate">{b.name}</span>
                       <span
                         className={`font-mono text-[10px] shrink-0 tabular-nums ${
-                          isSelected ? 'text-emerald-200' : 'text-slate-500'
+                          isSelected ? 'text-pust-200' : 'text-slate-500'
                         }`}
                       >
                         {b.code}
@@ -557,7 +557,7 @@ export function CampusMapSection() {
 
               <div className="p-6 space-y-4">
                 <div>
-                  <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                  <p className="font-mono text-xs text-pust-800 tabular-nums">
                     {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
                   </p>
                   <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -595,7 +595,7 @@ export function CampusMapSection() {
             <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
               <Link
                 href={activeBuilding.route}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-emerald-900 text-white hover:bg-emerald-950 transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap"
               >
                 {activeBuilding.routeLabel}
                 <ArrowRight className="w-3.5 h-3.5" />
