@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Eye, Maximize2, Minimize2 } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+
+const OFFICIAL_ACT_URL = 'https://bdlaws.minlaw.gov.bd/act-details-872.html';
 
 interface GovernanceSectionProps {
   route: AppRoute;
@@ -110,6 +113,9 @@ const GRADING_ORDINANCE = [
 ];
 
 export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps) {
+  const [showActPreview, setShowActPreview] = useState(true);
+  const [expandedPreview, setExpandedPreview] = useState(false);
+
   const activeRoute =
     route === '/governance' || route === '/governance/pust-act'
       ? '/governance/university-act'
@@ -159,98 +165,160 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
 
       {/* Content by Governance Sub-Page */}
       {activeRoute === '/governance/university-act' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-7 space-y-5">
-            <h2 className="font-serif text-2xl font-medium text-slate-900">
-              Statutory Mandate Under the University Act (Act No. 43 of 2001)
-            </h2>
-            <p className="text-base leading-[1.8] text-slate-700">
-              Pabna University of Science and Technology operates as a public statutory university
-              under the Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001),
-              passed by the Parliament of Bangladesh on 15 July 2001 and brought into force by
-              Government Gazette notification on 12 October 2008. Under Section 3 of the Act, the
-              university is constituted as a body corporate comprising the Chancellor,
-              Vice-Chancellor, Treasurer, Regent Board, and Academic Council.
-            </p>
-            <div className="divide-y divide-stone-200 border border-stone-200 bg-[#FAF8F4]">
-              {[
-                {
-                  clause: 'Section 3 · Incorporation & Statutory Constitution',
-                  detail:
-                    'Establishes Pabna University of Science and Technology as a statutory body corporate with perpetual succession, common seal, and academic seat in Pabna.',
-                },
-                {
-                  clause: 'Officers of the University',
-                  detail:
-                    'Defines the statutory powers and duties of the Chancellor, Vice-Chancellor, Pro-Vice-Chancellor, Treasurer, Registrar, Deans, Chairmen, Proctor, Librarian, and Controller of Examinations.',
-                },
-                {
-                  clause: 'Authorities of the University',
-                  detail:
-                    'Constitutes the Regent Board, Academic Council, Finance Committee, Planning & Development Committee, Faculties, and Selection Boards with statutory quorum rules.',
-                },
-                {
-                  clause: 'Statutes, Ordinances & Regulations',
-                  detail:
-                    'Empowers the Regent Board and Academic Council to promulgate university statutes, semester academic ordinances, hall codes, and examination regulations.',
-                },
-              ].map((item) => (
-                <div key={item.clause} className="p-5 space-y-1.5">
-                  <p className="font-mono text-xs font-semibold text-emerald-800">{item.clause}</p>
-                  <p className="text-sm text-slate-700 leading-relaxed">{item.detail}</p>
-                </div>
-              ))}
+        <div className="space-y-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="lg:col-span-7 space-y-5">
+              <h2 className="font-serif text-2xl font-medium text-slate-900">
+                Statutory Mandate Under the University Act (Act No. 43 of 2001)
+              </h2>
+              <p className="text-base leading-[1.8] text-slate-700">
+                Pabna University of Science and Technology operates as a public statutory university
+                under the Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001),
+                passed by the Parliament of Bangladesh on 15 July 2001 and brought into force by
+                Government Gazette notification on 12 October 2008. Under Section 3 of the Act, the
+                university is constituted as a body corporate comprising the Chancellor,
+                Vice-Chancellor, Treasurer, Regent Board, and Academic Council.
+              </p>
+              <div className="divide-y divide-stone-200 border border-stone-200 bg-[#FAF8F4]">
+                {[
+                  {
+                    clause: 'Section 3 · Incorporation & Statutory Constitution',
+                    detail:
+                      'Establishes Pabna University of Science and Technology as a statutory body corporate with perpetual succession, common seal, and academic seat in Pabna.',
+                  },
+                  {
+                    clause: 'Officers of the University',
+                    detail:
+                      'Defines the statutory powers and duties of the Chancellor, Vice-Chancellor, Pro-Vice-Chancellor, Treasurer, Registrar, Deans, Chairmen, Proctor, Librarian, and Controller of Examinations.',
+                  },
+                  {
+                    clause: 'Authorities of the University',
+                    detail:
+                      'Constitutes the Regent Board, Academic Council, Finance Committee, Planning & Development Committee, Faculties, and Selection Boards with statutory quorum rules.',
+                  },
+                  {
+                    clause: 'Statutes, Ordinances & Regulations',
+                    detail:
+                      'Empowers the Regent Board and Academic Council to promulgate university statutes, semester academic ordinances, hall codes, and examination regulations.',
+                  },
+                ].map((item) => (
+                  <div key={item.clause} className="p-5 space-y-1.5">
+                    <p className="font-mono text-xs font-semibold text-emerald-800">{item.clause}</p>
+                    <p className="text-sm text-slate-700 leading-relaxed">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            <aside className="lg:col-span-5 bg-[#FAF8F4] border border-stone-200 p-6 space-y-5">
+              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                Official Bangladesh Laws Citation
+              </p>
+              <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
+                <div className="py-3 flex justify-between gap-4">
+                  <dt className="text-slate-600">Enabling Legislation</dt>
+                  <dd className="font-mono font-medium text-slate-900">Act No. 43 of 2001</dd>
+                </div>
+                <div className="py-3 flex justify-between gap-4">
+                  <dt className="text-slate-600">Date Passed</dt>
+                  <dd className="font-mono font-medium text-slate-900">15 July 2001</dd>
+                </div>
+                <div className="py-3 flex justify-between gap-4">
+                  <dt className="text-slate-600">Gazette Effective Date</dt>
+                  <dd className="font-mono font-medium text-slate-900">12 October 2008</dd>
+                </div>
+                <div className="py-3 flex justify-between gap-4">
+                  <dt className="text-slate-600">Chancellor</dt>
+                  <dd className="font-medium text-slate-900 text-right">
+                    Hon’ble President of Bangladesh
+                  </dd>
+                </div>
+                <div className="py-3 flex justify-between gap-4">
+                  <dt className="text-slate-600">Regulatory Liaison</dt>
+                  <dd className="font-medium text-slate-900 text-right">
+                    UGC of Bangladesh
+                  </dd>
+                </div>
+              </dl>
+              <div className="flex flex-wrap gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowActPreview((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
+                </button>
+                <a
+                  href={OFFICIAL_ACT_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 transition-colors"
+                >
+                  Open Source Page
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </aside>
           </div>
 
-          <aside className="lg:col-span-5 bg-[#FAF8F4] border border-stone-200 p-6 space-y-5">
-            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
-              Official Bangladesh Laws Citation
-            </p>
-            <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
-              <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Enabling Legislation</dt>
-                <dd className="font-mono font-medium text-slate-900">Act No. 43 of 2001</dd>
+          {/* Live Embedded Preview of Official Bangladesh Laws Page */}
+          {showActPreview && (
+            <div className="border border-stone-200 bg-white">
+              <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF8F4] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                    Official Document Preview · Legislative &amp; Parliamentary Affairs Division
+                  </p>
+                  <a
+                    href={OFFICIAL_ACT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-xs text-slate-700 hover:text-emerald-800 underline break-all"
+                  >
+                    {OFFICIAL_ACT_URL}
+                  </a>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedPreview((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-emerald-800 hover:text-emerald-800 cursor-pointer"
+                  >
+                    {expandedPreview ? (
+                      <>
+                        <Minimize2 className="w-3.5 h-3.5" />
+                        Standard Height
+                      </>
+                    ) : (
+                      <>
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        Expand View
+                      </>
+                    )}
+                  </button>
+                  <a
+                    href={OFFICIAL_ACT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900"
+                  >
+                    Open in New Tab
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </div>
-              <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Date Passed</dt>
-                <dd className="font-mono font-medium text-slate-900">15 July 2001</dd>
-              </div>
-              <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Gazette Effective Date</dt>
-                <dd className="font-mono font-medium text-slate-900">12 October 2008</dd>
-              </div>
-              <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Chancellor</dt>
-                <dd className="font-medium text-slate-900 text-right">
-                  Hon’ble President of Bangladesh
-                </dd>
-              </div>
-              <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Regulatory Liaison</dt>
-                <dd className="font-medium text-slate-900 text-right">
-                  UGC of Bangladesh
-                </dd>
-              </div>
-            </dl>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <a
-                href="https://bdlaws.minlaw.gov.bd/act-details-872.html"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors"
-              >
-                Read Official Act (Laws of Bangladesh)
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-              <Link
-                href="/governance/regent-board"
-                className="px-4 py-2 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 transition-colors"
-              >
-                Regent Board →
-              </Link>
+
+              <iframe
+                src={OFFICIAL_ACT_URL}
+                title="Pabna University of Science and Technology Act, 2001 — Laws of Bangladesh"
+                referrerPolicy="no-referrer"
+                className={`w-full bg-white border-0 transition-all ${
+                  expandedPreview ? 'h-[780px]' : 'h-[520px]'
+                }`}
+              />
             </div>
-          </aside>
+          )}
         </div>
       )}
 
