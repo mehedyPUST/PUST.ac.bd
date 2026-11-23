@@ -279,7 +279,7 @@ export function PublicSubPages({
               <dl className="border border-slate-200 bg-slate-50 divide-y divide-slate-200 text-sm">
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Established</dt>
-                  <dd className="font-mono font-medium">2008 (Act No. 12)</dd>
+                  <dd className="font-mono font-medium">2008 (Act No. 43 of 2001)</dd>
                 </div>
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Campus Area</dt>

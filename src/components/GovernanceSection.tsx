@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 
 interface GovernanceSectionProps {
@@ -16,12 +17,12 @@ const GOVERNANCE_TABS: Array<{
   subtitle: string;
 }> = [
   {
-    route: '/governance/pust-act',
-    label: 'PUST Act',
-    code: 'ACT NO. 12 · 2001 / EST. 2008',
-    heading: 'Pabna University of Science and Technology Act',
+    route: '/governance/university-act',
+    label: 'University Act',
+    code: 'ACT NO. 43 OF 2001 · PASSED 15 JULY 2001 · EFFECTIVE 12 OCT 2008',
+    heading: 'Pabna University of Science and Technology Act, 2001',
     subtitle:
-      'Statutory charter enacted by the Parliament of Bangladesh establishing PUST as a specialized public university for science, engineering, technology, and regional scholarship.',
+      'Statutory charter enacted by the Parliament of Bangladesh (Act No. 43 of 2001, passed 15 July 2001 and operationalized via Gazette notification on 12 October 2008) establishing PUST as a public university for science and technology.',
   },
   {
     route: '/governance/regent-board',
@@ -109,7 +110,10 @@ const GRADING_ORDINANCE = [
 ];
 
 export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps) {
-  const activeRoute = route === '/governance' ? '/governance/pust-act' : route;
+  const activeRoute =
+    route === '/governance' || route === '/governance/pust-act'
+      ? '/governance/university-act'
+      : route;
   const activeTab =
     GOVERNANCE_TABS.find((t) => t.route === activeRoute) || GOVERNANCE_TABS[0];
 
@@ -154,40 +158,41 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
       </div>
 
       {/* Content by Governance Sub-Page */}
-      {activeRoute === '/governance/pust-act' && (
+      {activeRoute === '/governance/university-act' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <div className="lg:col-span-7 space-y-5">
             <h2 className="font-serif text-2xl font-medium text-slate-900">
-              Statutory Mandate Under the PUST Act
+              Statutory Mandate Under the University Act (Act No. 43 of 2001)
             </h2>
             <p className="text-base leading-[1.8] text-slate-700">
               Pabna University of Science and Technology operates as a public statutory university
-              under the Pabna University of Science and Technology Act, 2001 (Act No. 12 of 2001),
-              operationalized through Government Gazette notification in 2008. The Act vests
-              governance in statutory authorities ensuring academic autonomy, public accountability,
-              and transparent degree conferral.
+              under the Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001),
+              passed by the Parliament of Bangladesh on 15 July 2001 and brought into force by
+              Government Gazette notification on 12 October 2008. Under Section 3 of the Act, the
+              university is constituted as a body corporate comprising the Chancellor,
+              Vice-Chancellor, Treasurer, Regent Board, and Academic Council.
             </p>
             <div className="divide-y divide-stone-200 border border-stone-200 bg-[#FAF8F4]">
               {[
                 {
-                  clause: 'Chapter I–II · Incorporation & Jurisdiction',
+                  clause: 'Section 3 · Incorporation & Statutory Constitution',
                   detail:
-                    'Establishes the university as a body corporate headquartered in Rajapur, Pabna with perpetual succession, common seal, and power to confer degrees across engineering, science, business, and humanities.',
+                    'Establishes Pabna University of Science and Technology as a statutory body corporate with perpetual succession, common seal, and academic seat in Pabna.',
                 },
                 {
-                  clause: 'Chapter III · Officers of the University',
+                  clause: 'Officers of the University',
                   detail:
-                    'Defines the roles and statutory responsibilities of the Chancellor, Vice-Chancellor, Pro-Vice-Chancellor, Treasurer, Registrar, Deans, Chairmen, Librarian, Proctor, and Controller of Examinations.',
+                    'Defines the statutory powers and duties of the Chancellor, Vice-Chancellor, Pro-Vice-Chancellor, Treasurer, Registrar, Deans, Chairmen, Proctor, Librarian, and Controller of Examinations.',
                 },
                 {
-                  clause: 'Chapter IV · Statutory Authorities',
+                  clause: 'Authorities of the University',
                   detail:
-                    'Constitutes the Regent Board, Academic Council, Finance Committee, Planning & Development Committee, Faculties, and Selection Boards with defined quorum and oversight rules.',
+                    'Constitutes the Regent Board, Academic Council, Finance Committee, Planning & Development Committee, Faculties, and Selection Boards with statutory quorum rules.',
                 },
                 {
-                  clause: 'Chapter V · Statutes, Ordinances & Regulations',
+                  clause: 'Statutes, Ordinances & Regulations',
                   detail:
-                    'Empowers the Regent Board and Academic Council to promulgate university statutes, semester academic ordinances, residential hall codes, and student examination regulations.',
+                    'Empowers the Regent Board and Academic Council to promulgate university statutes, semester academic ordinances, hall codes, and examination regulations.',
                 },
               ].map((item) => (
                 <div key={item.clause} className="p-5 space-y-1.5">
@@ -200,16 +205,20 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
 
           <aside className="lg:col-span-5 bg-[#FAF8F4] border border-stone-200 p-6 space-y-5">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
-              Statutory Reference Summary
+              Official Bangladesh Laws Citation
             </p>
             <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
               <div className="py-3 flex justify-between gap-4">
                 <dt className="text-slate-600">Enabling Legislation</dt>
-                <dd className="font-mono font-medium text-slate-900">Act No. 12 of 2001</dd>
+                <dd className="font-mono font-medium text-slate-900">Act No. 43 of 2001</dd>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <dt className="text-slate-600">Operational Founding</dt>
-                <dd className="font-mono font-medium text-slate-900">2008 · Gazette SRO</dd>
+                <dt className="text-slate-600">Date Passed</dt>
+                <dd className="font-mono font-medium text-slate-900">15 July 2001</dd>
+              </div>
+              <div className="py-3 flex justify-between gap-4">
+                <dt className="text-slate-600">Gazette Effective Date</dt>
+                <dd className="font-mono font-medium text-slate-900">12 October 2008</dd>
               </div>
               <div className="py-3 flex justify-between gap-4">
                 <dt className="text-slate-600">Chancellor</dt>
@@ -225,17 +234,20 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
               </div>
             </dl>
             <div className="flex flex-wrap gap-3 pt-1">
+              <a
+                href="https://bdlaws.minlaw.gov.bd/act-details-872.html"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors"
+              >
+                Read Official Act (Laws of Bangladesh)
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
               <Link
                 href="/governance/regent-board"
-                className="px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors"
-              >
-                Inspect Regent Board →
-              </Link>
-              <Link
-                href="/governance/academic-ordinance"
                 className="px-4 py-2 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 transition-colors"
               >
-                Academic Ordinance
+                Regent Board →
               </Link>
             </div>
           </aside>

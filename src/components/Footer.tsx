@@ -110,7 +110,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
             {[
-              { label: 'PUST Act & Governance', route: '/governance/pust-act' as AppRoute },
+              { label: 'University Act (2001)', route: '/governance/university-act' as AppRoute },
               { label: 'Regent Board', route: '/governance/regent-board' as AppRoute },
               { label: 'Academic Ordinance', route: '/governance/academic-ordinance' as AppRoute },
               { label: 'VC Office', route: '/administration/vc-office' as AppRoute },

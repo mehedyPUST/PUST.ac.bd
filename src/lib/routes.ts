@@ -6,6 +6,7 @@ export type AppRoute =
   | '/about/mission-vision'
   | '/about/plans'
   | '/governance'
+  | '/governance/university-act'
   | '/governance/pust-act'
   | '/governance/regent-board'
   | '/governance/academic-council'
@@ -78,7 +79,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Governance',
     defaultRoute: '/governance',
     items: [
-      { label: 'PUST Act', route: '/governance/pust-act' },
+      { label: 'University Act', route: '/governance/university-act' },
       { label: 'Regent Board', route: '/governance/regent-board' },
       { label: 'Academic Council', route: '/governance/academic-council' },
       { label: 'Finance Committee', route: '/governance/finance-committee' },

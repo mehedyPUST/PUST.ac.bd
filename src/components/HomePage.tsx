@@ -376,7 +376,7 @@ export function HomePage({
                 {
                   route: '/governance' as AppRoute,
                   title: 'Governance & Statutory Bodies',
-                  desc: 'PUST Act, Regent Board, Academic Council, Finance Committee & Academic Ordinance.',
+                  desc: 'University Act (Act No. 43 of 2001), Regent Board, Academic Council, Finance Committee & Ordinance.',
                 },
                 {
                   route: '/administration' as AppRoute,
