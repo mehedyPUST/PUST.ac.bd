@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
+  ArrowRight,
   Award,
   Bell,
   BookOpen,
@@ -10,6 +11,7 @@ import {
   Eye,
   EyeOff,
   FileSpreadsheet,
+  GraduationCap,
   KeyRound,
   LayoutDashboard,
   Lock,
@@ -141,8 +143,12 @@ export function PortalView({
     if (!user) return;
     setLoadingStudents(true);
     try {
+      const effectiveDept =
+        user.role === 'chairman' || user.role === 'teacher'
+          ? user.departmentCode
+          : stuDeptFilter;
       const res = await pustApi.getStudents({
-        department: stuDeptFilter,
+        department: effectiveDept,
         session: stuSessionFilter,
         search: stuSearch,
       });
@@ -153,6 +159,16 @@ export function PortalView({
       setLoadingStudents(false);
     }
   }, [user, stuDeptFilter, stuSessionFilter, stuSearch]);
+
+  useEffect(() => {
+    if (!user) return;
+    setActiveTab('overview');
+    if (user.role === 'chairman' || user.role === 'teacher') {
+      setStuDeptFilter(user.departmentCode);
+    } else {
+      setStuDeptFilter('ALL');
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -1006,77 +1022,182 @@ export function PortalView({
     );
   }
 
-  // Authenticated Role-Based Portal Workspace (256px Sidebar + Contextual Breadcrumb Header)
-  const portalTabs: Array<{ id: PortalTab; label: string; icon: typeof LayoutDashboard }> = [
-    { id: 'overview', label: 'Overview & Notifications', icon: LayoutDashboard },
-    {
-      id: 'students',
-      label: user.role === 'student' ? 'My Academic Profile' : 'Student Database',
-      icon: Users,
-    },
-    { id: 'library', label: 'Library & Digital Card', icon: BookOpen },
-    { id: 'halls', label: 'Residential Halls & Dues', icon: Building },
-    { id: 'exams', label: 'Exams, Admit Cards & Results', icon: FileSpreadsheet },
-    { id: 'certificates', label: 'Certificate & 4-Office Clearance', icon: Award },
-    ...(user.role !== 'student'
-      ? [{ id: 'governance' as PortalTab, label: 'Notices, Tokens & CMS', icon: ShieldCheck }]
-      : []),
-  ];
+  // Role-Criteria Tab & Workspace Configuration
+  const ROLE_LABELS: Record<UserRole, string> = {
+    student: 'Admitted Student',
+    teacher: 'Faculty Member',
+    chairman: 'Department Chairman',
+    library: 'Central Library Officer',
+    hall: 'Hall Provost & Office',
+    proctor: 'Proctorial Office',
+    registrar: 'Office of the Registrar',
+    vc: 'Vice-Chancellor Office',
+    admin: 'Central Admin Office',
+  };
 
-  const activeTabLabel = portalTabs.find((t) => t.id === activeTab)?.label || 'Overview';
+  const ROLE_SCOPE_SUMMARY: Record<UserRole, string> = {
+    student:
+      'Manage your academic standing, digital library card, residential hall seat & dues, semester exam forms, and 4-office graduation clearances.',
+    teacher:
+      'Inspect your departmental class roster, monitor assigned courses & sessions, review exam schedules, and publish course or session notices.',
+    chairman:
+      'Approve department teachers & students, issue student signup tokens, seal library applications, verify exam forms & results, and grant Chairman clearances.',
+    library:
+      'Verify Chairman-sealed library applications, issue digital & physical library cards, record book checkouts/returns, and sign Library certificate clearances.',
+    hall:
+      'Publish residential seat vacancy circulars, allot & reassign hall seats, clear financial dues, and grant Hall certificate clearances.',
+    proctor:
+      'Review student conduct & disciplinary standing across departments and issue Proctorial clearances for graduating certificates.',
+    registrar:
+      'Oversee university-wide student directory records, review incoming admission inquiries, publish central circulars, and audit governance actions.',
+    vc:
+      'Monitor institutional student records, publish executive university circulars, and review campus-wide governance audit logs.',
+    admin:
+      'Full administrative control over officer approvals, student tokens, financial gateways, public CMS content, and final certificate issuance.',
+  };
+
+  const getRoleTabs = (
+    role: UserRole
+  ): Array<{ id: PortalTab; label: string; icon: typeof LayoutDashboard; desc: string }> => {
+    switch (role) {
+      case 'student':
+        return [
+          { id: 'overview', label: 'My Campus Overview', icon: LayoutDashboard, desc: 'Standing, alerts & shortcuts' },
+          { id: 'students', label: 'My Academic Profile', icon: GraduationCap, desc: 'CGPA, hall & remarks' },
+          { id: 'library', label: 'Library & Digital Card', icon: BookOpen, desc: 'Card & borrowed books' },
+          { id: 'halls', label: 'Hall Seat & Dues', icon: Building, desc: 'Vacancies, seat & payments' },
+          { id: 'exams', label: 'Exams, Admit & Results', icon: FileSpreadsheet, desc: 'Forms, fees & SGPA' },
+          { id: 'certificates', label: 'Certificate Clearances', icon: Award, desc: '4-office graduation tracker' },
+        ];
+      case 'teacher':
+        return [
+          { id: 'overview', label: 'Faculty Overview', icon: LayoutDashboard, desc: 'Assigned courses & alerts' },
+          { id: 'students', label: 'Department Class Roster', icon: Users, desc: `${user.departmentCode} student records` },
+          { id: 'exams', label: 'Courses & Exam Results', icon: FileSpreadsheet, desc: 'Department courses & grades' },
+          { id: 'governance', label: 'Course Notice Publisher', icon: ShieldCheck, desc: 'Course & session circulars' },
+        ];
+      case 'chairman':
+        return [
+          { id: 'overview', label: 'Chairman Desk', icon: LayoutDashboard, desc: `${user.departmentCode} office summary` },
+          { id: 'students', label: 'Department Students', icon: Users, desc: 'Roster & Chairman remarks' },
+          { id: 'library', label: 'Chairman Library Seals', icon: BookOpen, desc: 'Sign & forward applications' },
+          { id: 'exams', label: 'Exams, Courses & Results', icon: FileSpreadsheet, desc: 'Admit cards & SGPA entry' },
+          { id: 'certificates', label: 'Chairman Clearances', icon: Award, desc: 'Graduation office sign-off' },
+          { id: 'governance', label: 'Dept Approvals & Tokens', icon: ShieldCheck, desc: 'Tokens, faculty & notices' },
+        ];
+      case 'library':
+        return [
+          { id: 'overview', label: 'Library Overview', icon: LayoutDashboard, desc: 'Card queue & alerts' },
+          { id: 'library', label: 'Cards & Borrowing Desk', icon: BookOpen, desc: 'Verify seals & checkouts' },
+          { id: 'certificates', label: 'Library Clearances', icon: Award, desc: '4-office graduation sign-off' },
+          { id: 'governance', label: 'Library Circulars', icon: ShieldCheck, desc: 'Publish library notices' },
+        ];
+      case 'hall':
+        return [
+          { id: 'overview', label: 'Hall Provost Overview', icon: LayoutDashboard, desc: `${user.hallAffiliation} summary` },
+          { id: 'students', label: 'Hall Residents Roster', icon: Users, desc: 'Resident standing & rooms' },
+          { id: 'halls', label: 'Seats, Circulars & Dues', icon: Building, desc: 'Allotments & clearances' },
+          { id: 'certificates', label: 'Hall Clearances', icon: Award, desc: '4-office graduation sign-off' },
+          { id: 'governance', label: 'Hall Notice Board', icon: ShieldCheck, desc: 'Publish hall circulars' },
+        ];
+      case 'proctor':
+        return [
+          { id: 'overview', label: 'Proctorial Overview', icon: LayoutDashboard, desc: 'Conduct & clearance queue' },
+          { id: 'students', label: 'Student Conduct Ledger', icon: Users, desc: 'Disciplinary status & notes' },
+          { id: 'certificates', label: 'Proctorial Clearances', icon: Award, desc: '4-office graduation sign-off' },
+          { id: 'governance', label: 'Proctorial Notices', icon: ShieldCheck, desc: 'Publish conduct circulars' },
+        ];
+      case 'registrar':
+      case 'vc':
+        return [
+          { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, desc: 'Governance metrics & alerts' },
+          { id: 'students', label: 'University Student Directory', icon: Users, desc: 'All departments & sessions' },
+          { id: 'governance', label: 'Governance, Notices & Audit', icon: ShieldCheck, desc: 'Circulars, inquiries & logs' },
+        ];
+      case 'admin':
+      default:
+        return [
+          { id: 'overview', label: 'Admin Command Overview', icon: LayoutDashboard, desc: 'Institution-wide summary' },
+          { id: 'students', label: 'All-Dept Student Database', icon: Users, desc: 'Directory & Admin remarks' },
+          { id: 'library', label: 'Library Oversight', icon: BookOpen, desc: 'Cards & borrowing ledger' },
+          { id: 'halls', label: 'Residential Halls', icon: Building, desc: 'Seats, circulars & dues' },
+          { id: 'exams', label: 'Exams, Courses & Results', icon: FileSpreadsheet, desc: 'Circulars, admits & grades' },
+          { id: 'certificates', label: 'Final Certificate Issuance', icon: Award, desc: '4-office tracker & serials' },
+          { id: 'governance', label: 'Notices, Tokens & CMS', icon: ShieldCheck, desc: 'Approvals, gateways & CMS' },
+        ];
+    }
+  };
+
+  const portalTabs = getRoleTabs(user.role);
+  const resolvedTab: PortalTab = portalTabs.some((t) => t.id === activeTab)
+    ? activeTab
+    : portalTabs[0].id;
+  const activeTabMeta = portalTabs.find((t) => t.id === resolvedTab) || portalTabs[0];
+  const studentSelf = user.role === 'student' ? students[0] ?? null : null;
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* 256px Workspace Sidebar */}
-        <aside className="w-full lg:w-64 shrink-0 bg-white border border-stone-200">
-          <div className="p-5 border-b border-stone-200 space-y-1">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
-              {user.role.toUpperCase()} · {user.departmentCode}
+        {/* 264px Role-Criteria Workspace Sidebar */}
+        <aside className="w-full lg:w-68 shrink-0 bg-white border border-stone-200 shadow-xs overflow-hidden lg:sticky lg:top-24">
+          <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white p-5 space-y-1.5">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200">
+              {ROLE_LABELS[user.role]} · {user.departmentCode}
             </p>
-            <p className="font-serif text-lg font-medium text-slate-900 leading-snug">
+            <p className="font-serif text-lg font-medium text-white leading-snug">
               {user.name}
             </p>
-            <p className="font-mono text-xs text-slate-500 tabular-nums">
+            <p className="font-mono text-xs text-emerald-100/90 tabular-nums">
               ID {user.academicId}
               {user.session ? ` · ${user.session}` : ''}
             </p>
           </div>
 
-          <nav aria-label="Campus portal workspace modules" className="p-2 space-y-1">
+          <nav aria-label="Campus portal workspace modules" className="p-2.5 space-y-1">
             {portalTabs.map((tab) => {
               const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+              const isActive = resolvedTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-800 text-white'
-                      : 'text-slate-700 hover:bg-stone-100 hover:text-emerald-900'
+                      ? 'bg-gradient-to-r from-emerald-900 to-emerald-800 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-[#FAF8F4] hover:text-emerald-900'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
-                  <span className="truncate">{tab.label}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-xs sm:text-[13px] font-medium truncate">
+                      {tab.label}
+                    </span>
+                    <span
+                      className={`block text-[11px] truncate ${
+                        isActive ? 'text-emerald-100/85' : 'text-slate-500'
+                      }`}
+                    >
+                      {tab.desc}
+                    </span>
+                  </span>
                 </button>
               );
             })}
           </nav>
 
-          <div className="p-3 border-t border-stone-200 space-y-2">
+          <div className="p-3 border-t border-stone-200 bg-[#FAF8F4]/70 space-y-2">
             <button
               type="button"
               onClick={onBackToSite}
-              className="w-full px-3 py-2 text-xs font-medium border border-stone-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-800 transition-colors cursor-pointer"
+              className="w-full px-3 py-2 text-xs font-medium bg-white border border-stone-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-800 transition-colors cursor-pointer whitespace-nowrap"
             >
-              Public Website
+              Public University Website
             </button>
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium border border-stone-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-white border border-stone-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer whitespace-nowrap"
             >
               <LogOut className="w-3.5 h-3.5" />
               Sign Out
@@ -1087,352 +1208,646 @@ export function PortalView({
         {/* Main Workspace Surface */}
         <div className="flex-1 min-w-0 w-full space-y-6">
           {/* Top Contextual Breadcrumb Header */}
-          <div className="bg-white border border-stone-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <p className="font-mono text-xs text-slate-500">
-                Digital Campus / <span className="text-emerald-800 font-semibold">{activeTabLabel}</span>
+          <div className="bg-white border border-stone-200 shadow-xs overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+            <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <p className="font-mono text-xs text-slate-500">
+                  Digital Campus / {ROLE_LABELS[user.role]} /{' '}
+                  <span className="text-emerald-800 font-semibold">{activeTabMeta.label}</span>
+                </p>
+                <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-0.5">
+                  {activeTabMeta.label}
+                </h1>
+              </div>
+              <p className="font-mono text-xs text-slate-600 tabular-nums">
+                {user.email} · {user.hallAffiliation}
               </p>
-              <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-0.5">
-                {activeTabLabel}
-              </h1>
             </div>
-            <p className="font-mono text-xs text-slate-600 tabular-nums">
-              {user.email} · {user.hallAffiliation}
-            </p>
           </div>
 
-          {/* Tab 1: Overview, In-App Notifications & Saved Bookmarks */}
-          {activeTab === 'overview' && (
+          {/* Tab 1: Role-Tailored Overview, Action Launcher, Targeted Alerts & Saved Bookmarks */}
+          {resolvedTab === 'overview' && (
             <div
+              key="tab-overview"
               className="space-y-6 animate__animated animate__fadeIn"
-              style={{ animationDuration: '240ms' }}
+              style={{ animationDuration: '200ms' }}
             >
-              {/* 4-Card Workspace Identity & KPI Strip */}
+              {/* Role-Specific 4-Card KPI Strip */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white p-5 space-y-1 shadow-xs">
                   <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-200">
-                    Active Role
+                    Active Role Criteria
                   </p>
-                  <p className="font-serif text-xl font-medium text-white capitalize">
-                    {user.role}
+                  <p className="font-serif text-xl font-medium text-white">
+                    {ROLE_LABELS[user.role]}
                   </p>
                   <p className="font-mono text-xs text-emerald-100/90 tabular-nums">
-                    {user.departmentCode} · {user.academicId}
+                    {user.departmentCode} · ID {user.academicId}
                   </p>
                 </div>
 
-                <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                    Targeted Bulletins
-                  </p>
-                  <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
-                    {targetedNotifications.length}
-                  </p>
-                  <p className="text-xs text-slate-600">Scoped to {user.departmentCode}</p>
-                </div>
+                {user.role === 'student' ? (
+                  <>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Academic Standing
+                      </p>
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                        {studentSelf ? `CGPA ${studentSelf.cgpa.toFixed(2)}` : 'Loading...'}
+                      </p>
+                      <p className="text-xs text-slate-600 tabular-nums">
+                        {studentSelf
+                          ? `Sem ${studentSelf.currentSemester} · ${studentSelf.completedSemesters}/8 Completed`
+                          : 'Fetching academic record'}
+                      </p>
+                    </div>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Residential Hall &amp; Seat
+                      </p>
+                      <p className="font-serif text-xl font-medium text-slate-900 truncate">
+                        {studentSelf?.hallName || user.hallAffiliation}
+                      </p>
+                      <p className="font-mono text-xs text-slate-600 tabular-nums truncate">
+                        {studentSelf?.seatNumber || 'Seat pending verification'}
+                      </p>
+                    </div>
+                  </>
+                ) : user.role === 'teacher' ? (
+                  <>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Assigned Courses
+                      </p>
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                        {(user.assignedCourses || []).length}
+                      </p>
+                      <p className="font-mono text-xs text-slate-600 truncate">
+                        {(user.assignedCourses || []).join(', ') || 'Pending assignment'}
+                      </p>
+                    </div>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Department Students
+                      </p>
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                        {loadingStudents ? '...' : students.length}
+                      </p>
+                      <p className="text-xs text-slate-600">Scoped to {user.departmentCode}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Scoped Student Records
+                      </p>
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                        {loadingStudents ? '...' : students.length}
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        {user.role === 'chairman'
+                          ? `${user.departmentCode} Department`
+                          : user.role === 'hall'
+                          ? user.hallAffiliation
+                          : 'University-wide scope'}
+                      </p>
+                    </div>
+                    <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        Targeted Bulletins
+                      </p>
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                        {targetedNotifications.length}
+                      </p>
+                      <p className="text-xs text-slate-600">Scoped to {user.departmentCode}</p>
+                    </div>
+                  </>
+                )}
 
                 <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
                   <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                    Saved Bookmarks
+                    {user.role === 'student' ? 'Targeted Bulletins' : 'Workspace Modules'}
                   </p>
                   <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
-                    {bookmarks.length}
+                    {user.role === 'student' ? targetedNotifications.length : portalTabs.length - 1}
                   </p>
-                  <p className="text-xs text-slate-600">Departments &amp; circulars</p>
+                  <p className="text-xs text-slate-600">
+                    {user.role === 'student'
+                      ? `${bookmarks.length} saved bookmarks`
+                      : `Active workflows for ${user.role}`}
+                  </p>
                 </div>
+              </div>
 
-                <div className="bg-white border border-stone-200 p-5 space-y-1 shadow-xs">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                    Records Accessible
+              {/* Role Criteria Scope & Direct Module Shortcuts */}
+              <div className="bg-white border border-stone-200 shadow-xs overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                <div className="p-6 space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-widest text-emerald-800">
+                        Personalized Role Workspace
+                      </p>
+                      <h2 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                        {ROLE_LABELS[user.role]} Responsibilities &amp; Direct Actions
+                      </h2>
+                    </div>
+                    <span className="font-mono text-xs text-slate-500">
+                      {portalTabs.length - 1} authorized modules
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+                    {ROLE_SCOPE_SUMMARY[user.role]}
                   </p>
-                  <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
-                    {loadingStudents ? '...' : students.length}
-                  </p>
-                  <p className="text-xs text-slate-600">{user.hallAffiliation}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                    {portalTabs
+                      .filter((t) => t.id !== 'overview')
+                      .map((tab) => {
+                        const Icon = tab.icon;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setActiveTab(tab.id)}
+                            className="text-left p-4 border border-stone-200 bg-[#FAF8F4] hover:bg-white hover:border-emerald-800 transition-all flex items-start justify-between gap-3 group cursor-pointer"
+                          >
+                            <div className="flex items-start gap-3 min-w-0">
+                              <div className="p-2 bg-white border border-stone-200 text-emerald-800 group-hover:bg-emerald-800 group-hover:text-white transition-colors shrink-0">
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900 truncate">
+                                  {tab.label}
+                                </p>
+                                <p className="text-xs text-slate-600 mt-0.5 truncate">{tab.desc}</p>
+                              </div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-800 shrink-0 mt-1 transition-colors" />
+                          </button>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                 {/* Targeted In-App Notifications */}
-                <div className="xl:col-span-7 bg-white border border-stone-200 p-6 space-y-4">
-                  <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-emerald-800" />
-                      <h2 className="font-serif text-xl font-medium text-slate-900">
-                        Institutional &amp; Targeted Notifications
-                      </h2>
+                <div className="xl:col-span-7 bg-white border border-stone-200 shadow-xs overflow-hidden">
+                  <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Bell className="w-4 h-4 text-emerald-800" />
+                        <h2 className="font-serif text-xl font-medium text-slate-900">
+                          Targeted Circulars &amp; Notices
+                        </h2>
+                      </div>
+                      <span className="font-mono text-xs text-slate-500 tabular-nums">
+                        {targetedNotifications.length} active
+                      </span>
                     </div>
-                    <span className="font-mono text-xs text-slate-500 tabular-nums">
-                      {targetedNotifications.length} active
-                    </span>
-                  </div>
 
-                  {targetedNotifications.length === 0 ? (
-                    <p className="text-sm text-slate-600">
-                      No targeted notices or alerts at this time.
-                    </p>
-                  ) : (
-                    <div className="divide-y divide-stone-200 border border-stone-200">
-                      {targetedNotifications.map((n) => (
-                        <div key={n.id} className="p-3.5 space-y-1 text-sm">
-                          <p className="font-mono text-[11px] text-emerald-800 tabular-nums">
-                            {n.publishedAt} · {n.category} · {n.departmentCode}
-                            {n.targetSession ? ` · Session ${n.targetSession}` : ''}
-                            {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
-                          </p>
-                          <p className="font-medium text-slate-900">{n.title}</p>
-                          <p className="text-xs text-slate-600">{n.summary}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    {targetedNotifications.length === 0 ? (
+                      <p className="text-sm text-slate-600">
+                        No targeted notices or alerts at this time.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-stone-200 border border-stone-200">
+                        {targetedNotifications.map((n) => (
+                          <div key={n.id} className="p-3.5 space-y-1 text-sm hover:bg-[#FAF8F4] transition-colors">
+                            <p className="font-mono text-[11px] text-emerald-800 tabular-nums">
+                              {n.publishedAt} · {n.category} · {n.departmentCode}
+                              {n.targetSession ? ` · Session ${n.targetSession}` : ''}
+                              {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
+                            </p>
+                            <p className="font-medium text-slate-900">{n.title}</p>
+                            <p className="text-xs text-slate-600">{n.summary}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Saved Bookmarks */}
-                <div className="xl:col-span-5 bg-white border border-stone-200 p-6 space-y-4">
-                  <h2 className="font-serif text-xl font-medium text-slate-900 border-b border-stone-200 pb-3">
-                    Saved Departments &amp; Circulars ({bookmarks.length})
-                  </h2>
-                  {bookmarks.length === 0 ? (
-                    <p className="text-sm text-slate-600">
-                      No saved bookmarks yet. Bookmark departments or notices while browsing the
-                      public site.
-                    </p>
-                  ) : (
-                    <div className="divide-y divide-stone-200 border border-stone-200">
-                      {bookmarks.map((b) => (
-                        <div
-                          key={b.id}
-                          className="p-3.5 flex items-center justify-between gap-3 text-sm"
-                        >
-                          <div>
-                            <p className="font-medium text-slate-900">{b.title}</p>
-                            <p className="text-xs text-slate-500">{b.subtitle}</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              await pustApi.removeBookmark(b.itemId);
-                              await onBookmarksChange();
-                            }}
-                            className="text-xs text-red-700 hover:underline shrink-0 cursor-pointer"
+                {/* Saved Bookmarks + Role Assignment Card */}
+                <div className="xl:col-span-5 bg-white border border-stone-200 shadow-xs overflow-hidden">
+                  <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                  <div className="p-6 space-y-4">
+                    <h2 className="font-serif text-xl font-medium text-slate-900 border-b border-stone-200 pb-3">
+                      Saved Bookmarks ({bookmarks.length})
+                    </h2>
+                    {bookmarks.length === 0 ? (
+                      <p className="text-sm text-slate-600">
+                        No saved bookmarks yet. Bookmark departments or circulars while browsing the
+                        public website.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-stone-200 border border-stone-200">
+                        {bookmarks.map((b) => (
+                          <div
+                            key={b.id}
+                            className="p-3.5 flex items-center justify-between gap-3 text-sm"
                           >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {user.role === 'teacher' && (
-                    <div className="p-4 border border-emerald-200 bg-emerald-50/40 text-xs space-y-1 font-mono">
-                      <p className="font-semibold text-emerald-900">Teaching Assignment</p>
-                      <p>
-                        Courses:{' '}
-                        {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}
-                      </p>
-                      <p>
-                        Sessions:{' '}
-                        {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Tab 2: Combinable Student Database (Dept + Session + Search) */}
-          {activeTab === 'students' && (
-            <div className="bg-white border border-stone-200 p-6 space-y-5">
-              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-4">
-                <div>
-                  <h2 className="font-serif text-2xl font-medium text-slate-900">
-                    {user.role === 'student'
-                      ? 'My Verified Student Record'
-                      : 'University Student Database (Combinable Dept + Session Filters)'}
-                  </h2>
-                  <p className="text-xs text-slate-600 mt-1">
-                    Filter simultaneously by Department and Session to inspect academic standing,
-                    hall seat allocation, disciplinary status, and departmental notes.
-                  </p>
-                </div>
-
-                {user.role !== 'student' && (
-                  <div className="flex flex-wrap gap-2">
-                    <select
-                      value={stuDeptFilter}
-                      disabled={user.role === 'chairman' || user.role === 'teacher'}
-                      onChange={(e) => setStuDeptFilter(e.target.value)}
-                      className="px-3 py-2 text-xs border border-stone-300 bg-stone-50"
-                    >
-                      <option value="ALL">All Departments</option>
-                      {departments.map((d) => (
-                        <option key={d.id} value={d.code}>
-                          {d.code}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={stuSessionFilter}
-                      onChange={(e) => setStuSessionFilter(e.target.value)}
-                      className="px-3 py-2 text-xs border border-stone-300 bg-stone-50"
-                    >
-                      {SESSION_FILTERS.map((s) => (
-                        <option key={s} value={s}>
-                          {s === 'ALL' ? 'All Sessions' : `Session ${s}`}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="search"
-                        value={stuSearch}
-                        onChange={(e) => setStuSearch(e.target.value)}
-                        placeholder="Name or ID..."
-                        className="pl-8 pr-3 py-2 text-xs border border-stone-300 bg-stone-50"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {stuSavedMsg && (
-                <div className="p-3 border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
-                  {stuSavedMsg}
-                </div>
-              )}
-
-              {loadingStudents ? (
-                <PortalRecordsSkeleton rows={4} />
-              ) : students.length === 0 ? (
-                <div className="py-8 text-sm text-slate-600">
-                  No student records match the current Department/Session filter.
-                </div>
-              ) : (
-                <div className="divide-y divide-stone-200 border border-stone-200">
-                  {students.map((stu) => {
-                    const edit = studentEditNotes[stu.id] || {};
-                    return (
-                      <div key={stu.id} className="p-4 space-y-2 text-sm">
-                        <div className="flex flex-wrap justify-between gap-2">
-                          <div>
-                            <p className="font-medium text-slate-900">
-                              {stu.name} · <span className="font-mono">{stu.academicId}</span>
-                            </p>
-                            <p className="font-mono text-xs text-emerald-800 tabular-nums">
-                              {stu.departmentCode} · Session {stu.session} · Sem{' '}
-                              {stu.currentSemester} (Completed {stu.completedSemesters}/8) · CGPA{' '}
-                              {stu.cgpa.toFixed(2)}
-                            </p>
-                            <p className="text-xs text-slate-600 mt-0.5">
-                              Hall: {stu.hallName} ({stu.seatNumber}) · Disciplinary:{' '}
-                              <span className="font-semibold">{stu.disciplinaryStatus}</span> —{' '}
-                              {stu.disciplinaryNotes}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              Chairman Note: {stu.chairmanNotes} · Admin Note:{' '}
-                              {stu.adminNotes || '—'}
-                            </p>
-                          </div>
-                        </div>
-
-                        {['chairman', 'admin', 'proctor'].includes(user.role) && (
-                          <div className="flex flex-wrap gap-2 pt-2">
-                            {user.role === 'chairman' && (
-                              <input
-                                type="text"
-                                value={edit.chairmanNotes ?? stu.chairmanNotes}
-                                onChange={(e) =>
-                                  setStudentEditNotes((prev) => ({
-                                    ...prev,
-                                    [stu.id]: { ...edit, chairmanNotes: e.target.value },
-                                  }))
-                                }
-                                placeholder="Update Chairman note..."
-                                className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
-                              />
-                            )}
-                            {user.role === 'admin' && (
-                              <input
-                                type="text"
-                                value={edit.adminNotes ?? stu.adminNotes}
-                                onChange={(e) =>
-                                  setStudentEditNotes((prev) => ({
-                                    ...prev,
-                                    [stu.id]: { ...edit, adminNotes: e.target.value },
-                                  }))
-                                }
-                                placeholder="Update Admin note..."
-                                className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
-                              />
-                            )}
-                            {user.role === 'proctor' && (
-                              <>
-                                <select
-                                  value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
-                                  onChange={(e) =>
-                                    setStudentEditNotes((prev) => ({
-                                      ...prev,
-                                      [stu.id]: {
-                                        ...edit,
-                                        disciplinaryStatus: e.target
-                                          .value as StudentRecord['disciplinaryStatus'],
-                                      },
-                                    }))
-                                  }
-                                  className="px-2.5 py-1.5 text-xs border border-stone-300 bg-stone-50"
-                                >
-                                  <option value="Clear">Clear</option>
-                                  <option value="Warning">Warning</option>
-                                  <option value="Under Review">Under Review</option>
-                                </select>
-                                <input
-                                  type="text"
-                                  value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
-                                  onChange={(e) =>
-                                    setStudentEditNotes((prev) => ({
-                                      ...prev,
-                                      [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
-                                    }))
-                                  }
-                                  placeholder="Disciplinary remarks..."
-                                  className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
-                                />
-                              </>
-                            )}
+                            <div className="min-w-0">
+                              <p className="font-medium text-slate-900 truncate">{b.title}</p>
+                              <p className="text-xs text-slate-500 truncate">{b.subtitle}</p>
+                            </div>
                             <button
                               type="button"
-                              onClick={() => handleSaveStudentRecord(stu)}
-                              className="px-3.5 py-1.5 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
+                              onClick={async () => {
+                                await pustApi.removeBookmark(b.itemId);
+                                await onBookmarksChange();
+                              }}
+                              className="text-xs text-red-700 hover:underline shrink-0 cursor-pointer"
                             >
-                              Save Record Note
+                              Remove
                             </button>
                           </div>
-                        )}
+                        ))}
                       </div>
-                    );
-                  })}
+                    )}
+
+                    {user.role === 'teacher' && (
+                      <div className="p-4 border border-emerald-200 bg-[#FAF8F4] text-xs space-y-1.5 font-mono">
+                        <p className="font-semibold text-emerald-900 uppercase tracking-wider">
+                          Chairman Course Assignment
+                        </p>
+                        <p className="text-slate-700">
+                          Courses:{' '}
+                          {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}
+                        </p>
+                        <p className="text-slate-700">
+                          Sessions:{' '}
+                          {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
 
-          {activeTab === 'library' && <LibraryPanel user={user} />}
-          {activeTab === 'halls' && <HallPanel user={user} />}
-          {activeTab === 'exams' && <ExamPanel user={user} departments={departments} />}
-          {activeTab === 'certificates' && <CertificatePanel user={user} />}
-          {activeTab === 'governance' && user.role !== 'student' && (
-            <AdminCmsPanel
-              user={user}
-              departments={departments}
-              aboutSections={aboutSections}
-              vcProfiles={vcProfiles}
-              galleryItems={galleryItems}
-              onNoticesChange={onNoticesChange}
-              onCmsChange={onCmsChange}
-            />
+          {/* Tab 2: Student Personal Profile Dossier OR Role-Scoped Student Database */}
+          {resolvedTab === 'students' && (
+            <div
+              key="tab-students"
+              className="bg-white border border-stone-200 shadow-xs overflow-hidden animate__animated animate__fadeIn"
+              style={{ animationDuration: '200ms' }}
+            >
+              <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+              <div className="p-6 space-y-5">
+                {user.role === 'student' ? (
+                  <>
+                    <div className="border-b border-stone-200 pb-4 flex flex-wrap items-end justify-between gap-3">
+                      <div>
+                        <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                          Verified Institutional Record
+                        </p>
+                        <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                          My Academic &amp; Residential Dossier
+                        </h2>
+                      </div>
+                      {studentSelf && (
+                        <span className="font-mono text-xs text-emerald-800 font-semibold tabular-nums">
+                          Status: {studentSelf.approvalStatus.toUpperCase()} · {studentSelf.disciplinaryStatus}
+                        </span>
+                      )}
+                    </div>
+
+                    {loadingStudents ? (
+                      <PortalRecordsSkeleton rows={3} />
+                    ) : !studentSelf ? (
+                      <p className="text-sm text-slate-600">
+                        Your institutional student record is still syncing. Contact your Department Chairman if this persists.
+                      </p>
+                    ) : (
+                      <div className="space-y-6">
+                        <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                          <div className="p-4 border border-stone-200 bg-[#FAF8F4]">
+                            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              Academic ID &amp; Session
+                            </dt>
+                            <dd className="font-mono text-base font-semibold text-slate-900 mt-1 tabular-nums">
+                              {studentSelf.academicId} · {studentSelf.session}
+                            </dd>
+                            <dd className="text-xs text-slate-600 mt-0.5">
+                              Department of {studentSelf.departmentCode}
+                            </dd>
+                          </div>
+
+                          <div className="p-4 border border-stone-200 bg-[#FAF8F4]">
+                            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              Cumulative Standing
+                            </dt>
+                            <dd className="font-mono text-base font-semibold text-emerald-800 mt-1 tabular-nums">
+                              CGPA {studentSelf.cgpa.toFixed(2)} / 4.00
+                            </dd>
+                            <dd className="text-xs text-slate-600 mt-0.5 tabular-nums">
+                              Semester {studentSelf.currentSemester} ({studentSelf.completedSemesters}/8 completed)
+                            </dd>
+                          </div>
+
+                          <div className="p-4 border border-stone-200 bg-[#FAF8F4]">
+                            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              Residential Hall &amp; Seat
+                            </dt>
+                            <dd className="font-serif text-base font-medium text-slate-900 mt-1">
+                              {studentSelf.hallName}
+                            </dd>
+                            <dd className="font-mono text-xs text-slate-600 mt-0.5 tabular-nums">
+                              {studentSelf.seatNumber}
+                            </dd>
+                          </div>
+
+                          <div className="p-4 border border-stone-200 bg-[#FAF8F4]">
+                            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              Disciplinary &amp; Results
+                            </dt>
+                            <dd className="font-mono text-base font-semibold text-slate-900 mt-1">
+                              {studentSelf.disciplinaryStatus}
+                            </dd>
+                            <dd className="text-xs text-slate-600 mt-0.5">
+                              {studentSelf.allResultsPublished ? 'All 8 results published' : 'Degree in progress'}
+                            </dd>
+                          </div>
+                        </dl>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 border border-stone-200 bg-white space-y-1.5">
+                            <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                              Chairman &amp; Admin Remarks
+                            </p>
+                            <p className="text-sm text-slate-700">
+                              <span className="font-medium text-slate-900">Chairman:</span>{' '}
+                              {studentSelf.chairmanNotes || 'No remarks recorded.'}
+                            </p>
+                            <p className="text-sm text-slate-700">
+                              <span className="font-medium text-slate-900">Admin Office:</span>{' '}
+                              {studentSelf.adminNotes || 'No remarks recorded.'}
+                            </p>
+                            <p className="text-sm text-slate-700">
+                              <span className="font-medium text-slate-900">Proctor Note:</span>{' '}
+                              {studentSelf.disciplinaryNotes || 'Clear standing.'}
+                            </p>
+                          </div>
+
+                          <div className="p-4 border border-stone-200 bg-white space-y-1.5">
+                            <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                              Verified Admission Documents
+                            </p>
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              {studentSelf.admissionDocuments.length > 0
+                                ? studentSelf.admissionDocuments.join(' · ')
+                                : 'Admission packet verified on file.'}
+                            </p>
+                            <p className="font-mono text-xs text-slate-500 pt-1 tabular-nums">
+                              Contact: {studentSelf.email} · {studentSelf.phone}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-4">
+                      <div>
+                        <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                          {user.role === 'chairman' || user.role === 'teacher'
+                            ? `Department of ${user.departmentCode} Scope`
+                            : user.role === 'hall'
+                            ? `${user.hallAffiliation} Resident Scope`
+                            : user.role === 'proctor'
+                            ? 'Proctorial Conduct Directory'
+                            : 'University Student Directory'}
+                        </p>
+                        <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                          {user.role === 'proctor'
+                            ? 'Student Conduct & Disciplinary Ledger'
+                            : user.role === 'hall'
+                            ? 'Hall Residents Academic Standing'
+                            : user.role === 'teacher'
+                            ? `${user.departmentCode} Class Roster & Student Standing`
+                            : 'Student Database (Combinable Dept + Session Filters)'}
+                        </h2>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <select
+                          value={
+                            user.role === 'chairman' || user.role === 'teacher'
+                              ? user.departmentCode
+                              : stuDeptFilter
+                          }
+                          disabled={user.role === 'chairman' || user.role === 'teacher'}
+                          onChange={(e) => setStuDeptFilter(e.target.value)}
+                          className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] disabled:opacity-70"
+                        >
+                          <option value="ALL">All Departments</option>
+                          {departments.map((d) => (
+                            <option key={d.id} value={d.code}>
+                              {d.code}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={stuSessionFilter}
+                          onChange={(e) => setStuSessionFilter(e.target.value)}
+                          className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                        >
+                          {SESSION_FILTERS.map((s) => (
+                            <option key={s} value={s}>
+                              {s === 'ALL' ? 'All Sessions' : `Session ${s}`}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="relative">
+                          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="search"
+                            value={stuSearch}
+                            onChange={(e) => setStuSearch(e.target.value)}
+                            placeholder="Name or ID..."
+                            className="pl-8 pr-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {stuSavedMsg && (
+                      <div className="p-3 border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
+                        {stuSavedMsg}
+                      </div>
+                    )}
+
+                    {loadingStudents ? (
+                      <PortalRecordsSkeleton rows={4} />
+                    ) : students.length === 0 ? (
+                      <div className="py-8 text-center space-y-2 text-sm text-slate-600">
+                        <p>No student records match the current Department/Session filter.</p>
+                        {(stuSessionFilter !== 'ALL' || stuSearch || stuDeptFilter !== 'ALL') && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (user.role !== 'chairman' && user.role !== 'teacher') {
+                                setStuDeptFilter('ALL');
+                              }
+                              setStuSessionFilter('ALL');
+                              setStuSearch('');
+                            }}
+                            className="px-3.5 py-1.5 text-xs font-medium border border-stone-300 bg-[#FAF8F4] text-emerald-900 hover:border-emerald-800 cursor-pointer"
+                          >
+                            Reset Filters
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-stone-200 border border-stone-200">
+                        {students.map((stu) => {
+                          const edit = studentEditNotes[stu.id] || {};
+                          return (
+                            <div key={stu.id} className="p-4 space-y-2 text-sm hover:bg-[#FAF8F4]/50 transition-colors">
+                              <div className="flex flex-wrap justify-between gap-2">
+                                <div>
+                                  <p className="font-medium text-slate-900">
+                                    {stu.name} · <span className="font-mono">{stu.academicId}</span>
+                                  </p>
+                                  <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                                    {stu.departmentCode} · Session {stu.session} · Sem{' '}
+                                    {stu.currentSemester} (Completed {stu.completedSemesters}/8) · CGPA{' '}
+                                    {stu.cgpa.toFixed(2)}
+                                  </p>
+                                  <p className="text-xs text-slate-600 mt-0.5">
+                                    Hall: {stu.hallName} ({stu.seatNumber}) · Disciplinary:{' '}
+                                    <span className="font-semibold">{stu.disciplinaryStatus}</span> —{' '}
+                                    {stu.disciplinaryNotes}
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    Chairman Note: {stu.chairmanNotes} · Admin Note:{' '}
+                                    {stu.adminNotes || '—'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {['chairman', 'admin', 'proctor'].includes(user.role) && (
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                  {user.role === 'chairman' && (
+                                    <input
+                                      type="text"
+                                      value={edit.chairmanNotes ?? stu.chairmanNotes}
+                                      onChange={(e) =>
+                                        setStudentEditNotes((prev) => ({
+                                          ...prev,
+                                          [stu.id]: { ...edit, chairmanNotes: e.target.value },
+                                        }))
+                                      }
+                                      placeholder="Update Chairman note..."
+                                      className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                    />
+                                  )}
+                                  {user.role === 'admin' && (
+                                    <input
+                                      type="text"
+                                      value={edit.adminNotes ?? stu.adminNotes}
+                                      onChange={(e) =>
+                                        setStudentEditNotes((prev) => ({
+                                          ...prev,
+                                          [stu.id]: { ...edit, adminNotes: e.target.value },
+                                        }))
+                                      }
+                                      placeholder="Update Admin note..."
+                                      className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                    />
+                                  )}
+                                  {user.role === 'proctor' && (
+                                    <>
+                                      <select
+                                        value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
+                                        onChange={(e) =>
+                                          setStudentEditNotes((prev) => ({
+                                            ...prev,
+                                            [stu.id]: {
+                                              ...edit,
+                                              disciplinaryStatus: e.target
+                                                .value as StudentRecord['disciplinaryStatus'],
+                                            },
+                                          }))
+                                        }
+                                        className="px-2.5 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4]"
+                                      >
+                                        <option value="Clear">Clear</option>
+                                        <option value="Warning">Warning</option>
+                                        <option value="Under Review">Under Review</option>
+                                      </select>
+                                      <input
+                                        type="text"
+                                        value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
+                                        onChange={(e) =>
+                                          setStudentEditNotes((prev) => ({
+                                            ...prev,
+                                            [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
+                                          }))
+                                        }
+                                        placeholder="Disciplinary remarks..."
+                                        className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                                      />
+                                    </>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveStudentRecord(stu)}
+                                    className="px-3.5 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap"
+                                  >
+                                    Save Record Note
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {resolvedTab === 'library' && (
+            <div key="tab-library" className="animate__animated animate__fadeIn" style={{ animationDuration: '200ms' }}>
+              <LibraryPanel user={user} />
+            </div>
+          )}
+          {resolvedTab === 'halls' && (
+            <div key="tab-halls" className="animate__animated animate__fadeIn" style={{ animationDuration: '200ms' }}>
+              <HallPanel user={user} />
+            </div>
+          )}
+          {resolvedTab === 'exams' && (
+            <div key="tab-exams" className="animate__animated animate__fadeIn" style={{ animationDuration: '200ms' }}>
+              <ExamPanel user={user} departments={departments} />
+            </div>
+          )}
+          {resolvedTab === 'certificates' && (
+            <div key="tab-certificates" className="animate__animated animate__fadeIn" style={{ animationDuration: '200ms' }}>
+              <CertificatePanel user={user} />
+            </div>
+          )}
+          {resolvedTab === 'governance' && user.role !== 'student' && (
+            <div key="tab-governance" className="animate__animated animate__fadeIn" style={{ animationDuration: '200ms' }}>
+              <AdminCmsPanel
+                user={user}
+                departments={departments}
+                aboutSections={aboutSections}
+                vcProfiles={vcProfiles}
+                galleryItems={galleryItems}
+                onNoticesChange={onNoticesChange}
+                onCmsChange={onCmsChange}
+              />
+            </div>
           )}
         </div>
       </div>
