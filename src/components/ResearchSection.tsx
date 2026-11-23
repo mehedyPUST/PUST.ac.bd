@@ -181,15 +181,15 @@ export function ResearchSection({
               />
               <div>
                 <p className="font-mono text-xs text-pust-800">
-                  July 06 Hall · Medical Unit · Transport Pool
+                  July 06 · Swadhinota · Matribhasha · Ganatantra
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
                   Residential Halls, Medical &amp; Transport
                 </h3>
                 <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Residential accommodation including July 06 Hall and student dormitories, on-site
-                  Medical Center, ICT Sheba desk, sports grounds, and daily buses across Pabna
-                  town.
+                  Residential accommodation across Male and Female Halls, PUST Medical Section
+                  (+8802588844975), ICT Cell, Student Advisor Office, and Transportation Pool bus
+                  routes (+8802588845650).
                 </p>
               </div>
             </article>

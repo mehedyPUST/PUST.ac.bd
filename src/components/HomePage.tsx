@@ -57,11 +57,11 @@ const NOTICE_CATS: Array<'All' | NoticeRecord['category']> = [
 ];
 
 const FACULTIES_OVERVIEW = [
-  { code: 'FET', name: 'Engineering & Technology', depts: '7 Depts · CSE, EEE, ETE, ICE, ARCH, CE, URP' },
-  { code: 'FS', name: 'Faculty of Science', depts: '4 Depts · Mathematics, Physics, Chemistry, Statistics' },
+  { code: 'FET', name: 'Engineering & Technology', depts: '7 Depts · CSE, EEE, EECE, ICE, CE, ARCH, URP' },
+  { code: 'FS', name: 'Faculty of Science', depts: '5 Depts · Mathematics, Physics, Pharmacy, Chemistry, Statistics' },
   { code: 'FBS', name: 'Business Studies', depts: '2 Depts · Business Admin, Tourism & Hospitality' },
-  { code: 'FHSS', name: 'Humanities & Social Science', depts: '6 Depts · Economics, Bangla, English, PA, HIS, SW' },
-  { code: 'FLES', name: 'Life & Earth Science', depts: '2 Depts · Geography & Environment, Pharmacy' },
+  { code: 'FHSS', name: 'Humanities & Social Science', depts: '6 Depts · Economics, Bangla, Social Work, English, PA, History' },
+  { code: 'FLES', name: 'Life & Earth Science', depts: '1 Dept · Geography & Environment' },
 ];
 
 export function HomePage({
@@ -124,9 +124,11 @@ export function HomePage({
                   Advancing Science, Engineering &amp; Human Inquiry from Pabna
                 </h1>
                 <p className="text-base sm:text-[17px] leading-relaxed text-slate-600 max-w-xl">
-                  Established in 2008 beside the Dhaka–Pabna highway in Rajapur, Pabna University
-                  of Science and Technology serves nearly 5,000 students and 172 faculty members
-                  across 5 faculties, 21 academic departments, and end-to-end digital workflows.
+                  Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna),
+                  Pabna University of Science and Technology serves nearly 5,000 scholars and{' '}
+                  {profile?.facultyMembersCount ?? 185} faculty members across {profile?.facultiesCount ?? 5}{' '}
+                  faculties, {profile?.departmentsCount ?? 21} academic departments, and end-to-end
+                  digital workflows.
                 </p>
               </div>
 
@@ -188,7 +190,7 @@ export function HomePage({
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Community</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                172 Faculty · ~5,000 Students
+                {profile?.facultyMembersCount ?? 185} Faculty · ~{profile?.studentsCount?.toLocaleString() ?? '4,800'} Students
               </dd>
             </div>
             <Link
@@ -594,14 +596,14 @@ export function HomePage({
               />
               <div className="space-y-1.5">
                 <p className="font-mono text-xs text-pust-800">
-                  July 06 Hall · 5 Halls · Medical &amp; Bus Pool
+                  July 06 Hall · Swadhinota · Matribhasha · Ganatantra
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900">
                   Halls &amp; Student Wellness
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  Five residential halls with online vacancy circulars and clearance tracking,
-                  campus medical clinic, and scheduled Pabna bus routes.
+                  Campus residential halls with online vacancy circulars and dues clearance, Medical
+                  Center (+8802588844975), and Transportation Pool routes across Pabna.
                 </p>
                 <Link
                   href="/facilities/residence"

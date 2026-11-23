@@ -15,13 +15,15 @@ import type {
   PaymentGatewayConfig,
 } from '../../types/pust';
 
-const HALL_NAMES = [
-  'July 06 Hall',
-  'Male Hall-1',
-  'Male Hall-2',
-  'Female Hall-1',
-  'Female Hall-2',
+const HALL_OPTIONS = [
+  { value: 'July 06 Hall', label: 'July 06 Hall (Male Hall-1)' },
+  { value: 'Male Hall-1', label: 'Male Hall-1 (July 06 Hall)' },
+  { value: 'Male Hall-2', label: 'Male Hall-2 (Swadhinota Hall)' },
+  { value: 'Female Hall-1', label: 'Female Hall-1 (Matribhasha Hall)' },
+  { value: 'Female Hall-2', label: 'Female Hall-2 (Ganatantra Hall)' },
 ];
+
+const HALL_NAMES = HALL_OPTIONS.map((o) => o.value);
 
 interface HallPanelProps {
   user: AuthUser;
@@ -276,9 +278,9 @@ export function HallPanel({ user }: HallPanelProps) {
               onChange={(e) => setHallName(e.target.value)}
               className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
             >
-              {HALL_NAMES.map((h) => (
-                <option key={h} value={h}>
-                  {h}
+              {HALL_OPTIONS.map((h) => (
+                <option key={h.value} value={h.value}>
+                  {h.label}
                 </option>
               ))}
             </select>
@@ -517,9 +519,9 @@ export function HallPanel({ user }: HallPanelProps) {
               onChange={(e) => setDueHallName(e.target.value)}
               className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:border-pust-800 focus:outline-none"
             >
-              {HALL_NAMES.map((h) => (
-                <option key={h} value={h}>
-                  {h}
+              {HALL_OPTIONS.map((h) => (
+                <option key={h.value} value={h.value}>
+                  {h.label}
                 </option>
               ))}
             </select>

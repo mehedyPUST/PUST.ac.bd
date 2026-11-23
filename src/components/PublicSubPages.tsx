@@ -46,31 +46,41 @@ const FACULTY_FILTERS: Array<{ label: string; value: 'All' | FacultyName }> = [
   { label: 'Life & Earth Science', value: 'Faculty of Life and Earth Science' },
 ];
 
-const FACULTY_DEANS: Array<{ faculty: FacultyName; dean: string; code: string }> = [
+const FACULTY_DEANS: Array<{
+  faculty: FacultyName;
+  dean: string;
+  email: string;
+  code: string;
+}> = [
   {
     faculty: 'Faculty of Engineering and Technology',
     dean: 'Prof. Dr. Md. Anwar Hossain',
+    email: 'dean.et@pust.ac.bd',
     code: 'FET · 7 Departments',
   },
   {
     faculty: 'Faculty of Science',
-    dean: 'Prof. Dr. Md. Harun-Or-Rashid',
-    code: 'FS · 4 Departments',
+    dean: 'Prof. Dr. Md. Shamim Reza',
+    email: 'dean.s@pust.ac.bd',
+    code: 'FS · 5 Departments',
   },
   {
     faculty: 'Faculty of Business Studies',
-    dean: 'Prof. Dr. Md. Kamruzzaman',
+    dean: 'Prof. Dr. Md. Hasebur Rahman',
+    email: 'dean.bs@pust.ac.bd',
     code: 'FBS · 2 Departments',
   },
   {
     faculty: 'Faculty of Humanities and Social Science',
-    dean: 'Prof. Dr. Md. Habibullah',
+    dean: 'Prof. Dr. Mir Humayun Kabir',
+    email: 'dean.hss@pust.ac.bd',
     code: 'FHSS · 6 Departments',
   },
   {
     faculty: 'Faculty of Life and Earth Science',
-    dean: 'Prof. Dr. Md. Rashedul Islam',
-    code: 'FLES · 2 Departments',
+    dean: 'Prof. Dr. Mohammad Najmul Islam',
+    email: 'dean.les@pust.ac.bd',
+    code: 'FLES · 1 Department',
   },
 ];
 
@@ -175,10 +185,10 @@ const DOWNLOAD_FORMS: DigitalFormDef[] = [
 ];
 
 const ACADEMIC_CALENDAR_2026 = [
-  { term: 'Spring / Odd Semester 2026', event: 'Class Commencement (All Sessions)', date: '2026-07-12' },
-  { term: 'Spring / Odd Semester 2026', event: 'Mid-Term Assessments & Course Drop Window', date: '2026-09-20' },
-  { term: 'Spring / Odd Semester 2026', event: 'Exam Form Fill-up & Hall Clearance Window', date: '2026-11-15' },
-  { term: 'Spring / Odd Semester 2026', event: 'Semester Final Examinations', date: '2026-12-06' },
+  { term: 'Academic Session 2025–2026 (UG)', event: 'Orientation & Formal Class Commencement', date: '2026-07-15' },
+  { term: 'Bi-Semester Teaching Period', event: 'Mid-Term Assessments & Course Add/Drop Window', date: '2026-09-20' },
+  { term: 'Postgraduate & Exam Cycle', event: 'M.Sc. / M.Engg. Admissions (CSE/ICE) & Exam Form Fill-up', date: '2026-11-16' },
+  { term: 'Semester-I Final Examinations', event: 'Term-End Final Examinations Across 21 Departments', date: '2026-12-06' },
   { term: 'Convocation Milestone', event: 'First University Convocation at Rajapur Campus', date: '2027-03-15' },
 ];
 
@@ -189,19 +199,19 @@ const UNIVERSITY_MILESTONES = [
     detail: 'Parliament passes Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001).',
   },
   {
-    year: '12 Oct 2008',
-    title: 'Operational Gazette',
-    detail: 'Government SRO brings PUST into active operation on the 30-acre Rajapur site.',
+    year: '5 June 2008',
+    title: 'Curriculum Inaugurated',
+    detail: 'Academic program formally inaugurated alongside Government Gazette operationalization on 12 October 2008.',
   },
   {
     year: '2009',
     title: 'Inaugural 140 Students',
-    detail: 'First academic batch admitted across CSE, EEE, Mathematics, and Business Administration.',
+    detail: 'First academic batch enrolled across CSE, EEE, Mathematics, and Business Administration.',
   },
   {
     year: '2026',
     title: '5 Faculties · 21 Departments',
-    detail: 'Nearly 5,000 scholars and 172 faculty members operating on an integrated digital campus.',
+    detail: 'Nearly 5,000 scholars and 185 faculty members on the 30-acre Rajapur digital campus.',
   },
   {
     year: '15 Mar 2027',
@@ -695,7 +705,8 @@ export function PublicSubPages({
                         </h2>
                       </div>
                       <p className="text-xs text-slate-600">
-                        Dean: <span className="font-medium text-slate-900">{fac.dean}</span>
+                        Dean: <span className="font-medium text-slate-900">{fac.dean}</span> ·{' '}
+                        <span className="font-mono text-pust-800">{fac.email}</span>
                       </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
@@ -863,27 +874,32 @@ export function PublicSubPages({
                 {
                   faculty: 'Faculty of Engineering and Technology',
                   dean: 'Prof. Dr. Md. Anwar Hossain',
-                  depts: 'CSE, EEE, ETE, ICE, Architecture, Civil, URP',
+                  email: 'dean.et@pust.ac.bd',
+                  depts: 'CSE, EEE, EECE, ICE, Civil Engineering, Architecture, URP',
                 },
                 {
                   faculty: 'Faculty of Science',
-                  dean: 'Prof. Dr. Md. Harun-Or-Rashid',
-                  depts: 'Mathematics, Physics, Chemistry, Statistics',
+                  dean: 'Prof. Dr. Md. Shamim Reza',
+                  email: 'dean.s@pust.ac.bd',
+                  depts: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics and Data Science',
                 },
                 {
                   faculty: 'Faculty of Business Studies',
-                  dean: 'Prof. Dr. Md. Kamruzzaman',
+                  dean: 'Prof. Dr. Md. Hasebur Rahman',
+                  email: 'dean.bs@pust.ac.bd',
                   depts: 'Business Administration, Tourism & Hospitality Management',
                 },
                 {
                   faculty: 'Faculty of Humanities and Social Science',
-                  dean: 'Prof. Dr. Md. Habibullah',
-                  depts: 'Economics, Bangla, English, Public Admin, History, Social Work',
+                  dean: 'Prof. Dr. Mir Humayun Kabir',
+                  email: 'dean.hss@pust.ac.bd',
+                  depts: 'Economics, Bangla, Social Work, English, Public Administration, History',
                 },
                 {
                   faculty: 'Faculty of Life and Earth Science',
-                  dean: 'Prof. Dr. Md. Rashedul Islam',
-                  depts: 'Geography & Environment, Pharmacy',
+                  dean: 'Prof. Dr. Mohammad Najmul Islam',
+                  email: 'dean.les@pust.ac.bd',
+                  depts: 'Geography and Environment',
                 },
               ].map((d) => (
                 <div key={d.faculty} className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-1.5">
@@ -891,7 +907,8 @@ export function PublicSubPages({
                     {d.faculty}
                   </p>
                   <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
-                  <p className="text-xs text-slate-600">Departments: {d.depts}</p>
+                  <p className="font-mono text-xs text-pust-800">{d.email}</p>
+                  <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
                 </div>
               ))}
             </div>
@@ -1178,22 +1195,24 @@ export function PublicSubPages({
                   <p className="font-mono text-xs text-pust-800">GST UNIT A · SCIENCE &amp; ENGG.</p>
                   <p className="font-serif text-lg font-medium text-slate-900">13 Departments</p>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    CSE, EEE, ETE, ICE, Architecture, Civil, URP, Mathematics, Physics, Chemistry,
-                    Statistics, Pharmacy &amp; Geography.
+                    CSE, EEE, EECE, ICE, CE, Architecture (with drawing test), URP, Mathematics,
+                    Physics, Pharmacy, Chemistry, Statistics &amp; Data Science, Geography &amp;
+                    Environment.
                   </p>
                 </div>
                 <div className="p-6 space-y-1.5">
                   <p className="font-mono text-xs text-pust-800">GST UNIT B · HUMANITIES</p>
                   <p className="font-serif text-lg font-medium text-slate-900">6 Departments</p>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Economics, Bangla, English, Public Administration, History &amp; Social Work.
+                    Economics (Math eligibility), Bangla, Social Work, English (min. 20% English
+                    score), Public Administration (min. 20% English score), and History.
                   </p>
                 </div>
                 <div className="p-6 space-y-1.5">
                   <p className="font-mono text-xs text-pust-800">GST UNIT C · BUSINESS</p>
                   <p className="font-serif text-lg font-medium text-slate-900">2 Departments</p>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Business Administration &amp; Tourism and Hospitality Management.
+                    Business Administration (BBA) &amp; Tourism and Hospitality Management (THM).
                   </p>
                 </div>
               </div>
@@ -1202,17 +1221,17 @@ export function PublicSubPages({
                 <div className="lg:col-span-5 space-y-6">
                   <p className="text-[15px] text-slate-700 leading-relaxed">
                     {route === '/admissions/graduate'
-                      ? 'Graduate programs (M.Sc., M.Engg., M.Pharm, M.B.A., M.A., M.S.S.) and M.Phil./Ph.D. admissions are coordinated departmentally in coordination with the PUST Academic Council.'
+                      ? 'Graduate programs (M.Sc. Engg., M.Engg., M.Sc., M.Pharm., M.B.A., M.A., M.S.S.) and M.Phil./Ph.D. admissions are coordinated departmentally (e.g., CSE & ICE postgraduate cohorts) under Academic Council rules.'
                       : route === '/admissions/evening-programs'
-                      ? 'Evening professional tracks including Executive MBA (EMBA) and M.Sc. in Engineering offer weekend and evening cohorts for working professionals.'
-                      : 'Undergraduate admissions into all 21 departments follow the Bangladesh GST (General, Science & Technology) Integrated Admission Test across Units A, B, and C, with an architecture studio aptitude assessment.'}
+                      ? 'Evening professional tracks including Executive MBA (EMBA) and Applied Engineering postgraduate cohorts offer weekend and evening schedules for working professionals.'
+                      : 'Undergraduate admissions into all 21 departments follow the centralized Bangladesh GST Integrated Admission Test (Units A, B, and C)—PUST holds no separate university test, aside from Architecture aptitude drawing evaluation.'}
                   </p>
 
                   <dl className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm bg-white px-5 overflow-hidden">
                     <div className="py-3.5 flex justify-between gap-4">
                       <dt className="text-slate-600">Total Undergraduate Intake</dt>
                       <dd className="font-mono tabular-nums font-medium text-slate-900">
-                        920 Seats / Session
+                        830+ – 920 Seats / Session
                       </dd>
                     </div>
                     <div className="py-3.5 flex justify-between gap-4">
@@ -1458,75 +1477,75 @@ export function PublicSubPages({
       {
         label: 'Library',
         route: '/facilities/library',
-        title: 'Central Library & Information Center',
-        body: 'Digital and print monographs with IEEE Xplore, SpringerLink, and ACM access. Students apply for Library Membership in the Campus Portal with Department Chairman digital seal & signature JSON to receive Digital and linked Physical Library Cards.',
+        title: 'Central Library & Information Center (CLIC)',
+        body: 'Managed by Additional Librarian Md. Hafizur Rahaman Mollah (clic@pust.ac.bd), the Central Library houses academic and reference books across all 5 faculties plus registered campus-IP access to IEEE Xplore, SpringerLink, and ACM Digital Library. Students apply in the Campus Portal with Department Chairman digital seal JSON for Digital and Physical Library Cards.',
         img: LIBRARY_IMAGE,
         hours: 'Sun–Thu · 08:30–21:00 BST',
-        location: 'Central Library Complex, Rajapur',
+        location: 'Central Library Complex · clic@pust.ac.bd',
         portalRoute: '/portal?tab=library',
         highlights: [
           'Chairman-sealed digital membership approval workflow',
           'Linked Digital & Physical Library Card ID issuance',
-          'Automated borrow, return & overdue tracking',
+          'Faculty-wise textbook stacks, thesis archive & e-journals',
         ],
       },
       {
         label: 'Residence',
         route: '/facilities/residence',
-        title: 'Residential Halls (July 06 Hall & Dormitories)',
-        body: 'Student residential halls including July 06 Hall, Male Hall-1, Male Hall-2, Female Hall-1, and Female Hall-2. Vacancy circulars, seat allotments with retained seat history, and Hall Financial Clearances are managed online.',
+        title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
+        body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
         img: GROUNDS_IMAGE,
         hours: '24/7 Provost & House Tutor Duty',
-        location: 'Residential Precinct, Rajapur',
+        location: 'North Residential Precinct, Rajapur',
         portalRoute: '/portal?tab=halls',
         highlights: [
-          'Live seat vacancy circulars by Hall & block',
-          'Full retained seat change history per student ID',
-          'Mandatory Hall dues clearance synced with Exam Portal',
+          'July 06 Hall, Swadhinota Hall, Matribhasha Hall & Ganatantra Hall',
+          'Full retained seat allotment & change history per student ID',
+          'Mandatory Hall dues clearance synced directly with Exam Portal',
         ],
       },
       {
         label: 'Transport',
         route: '/facilities/transport',
-        title: 'University Transport Pool',
-        body: 'Scheduled daily bus routes connecting Rajapur Campus with Pabna town centers, Terminal, Edward College, and Ataikula corridor for students, faculty, and officers.',
+        title: 'University Transportation Pool',
+        body: 'Administered by Dr. Mir Humayun Kabir (transport@pust.ac.bd, +8802588845650), the Transportation Pool operates university-owned and contracted buses connecting Rajapur Campus with Pabna Town, Central Terminal, Edward College, and highway corridors for students, faculty, and officers.',
         img: GROUNDS_IMAGE,
         hours: 'Sun–Thu · 07:15–18:30 BST',
-        location: 'Transport Pool Depot, Main Gate',
+        location: 'Transport Pool · +8802588845650 · transport@pust.ac.bd',
         portalRoute: '/portal',
         highlights: [
-          'Dedicated student & faculty shuttle schedules',
+          'Dedicated student, teacher & officer shuttle schedules',
           'Pabna Town, Terminal, Edward College & Highway corridors',
-          'Convocation & examination special shuttle dispatch',
+          'Convocation & semester examination special bus dispatch',
         ],
       },
       {
         label: 'Medical',
         route: '/facilities/medical',
-        title: 'PUST Medical Center',
-        body: 'On-campus primary healthcare, outpatient consultations, emergency ambulance dispatch, and wellness support for residential and non-residential students.',
+        title: 'PUST Medical Section & Health Center',
+        body: 'Staffed by Deputy Chief Medical Officers Dr. Md. Rafiqul Islam and Dr. Nasrin Sultana (medicalsection@pust.ac.bd, +8802588844975), the PUST Medical Center provides primary healthcare, outpatient consultations, essential medications, and 24/7 ambulance referral for residential students, faculty, and staff.',
         img: LAB_IMAGE,
-        hours: 'Outpatient 09:00–17:00 · 24/7 Ambulance',
-        location: 'Medical Center Building, Rajapur',
+        hours: 'Outpatient Sun–Thu · 24/7 Ambulance',
+        location: 'Medical Center · +8802588844975 · medicalsection@pust.ac.bd',
         portalRoute: '/portal',
         highlights: [
-          'Resident medical officers & nursing care',
-          'Essential first-aid and primary prescriptions',
-          'Direct emergency referral to Pabna General Hospital',
+          'Deputy Chief Medical Officers & campus nursing unit',
+          'Free primary consultation, first aid & dispensary services',
+          '24/7 emergency ambulance referral to Pabna General Hospital',
         ],
       },
       {
         label: 'ICT Sheba',
         route: '/facilities/ict-sheba',
         title: 'ICT Cell & ICT Sheba Portal',
-        body: 'Campus fiber-optic Wi-Fi network, institutional @pust.ac.bd email provisioning, digital examination clearance workflows, and smart classroom maintenance.',
+        body: 'Directed by Dr. Md. Abdur Rahim (ictdirector@pust.ac.bd), the ICT Cell maintains PUST’s campus fiber-optic backbone, high-speed Wi-Fi across academic & residential wings, institutional @pust.ac.bd accounts, and automated portal clearance infrastructure.',
         img: LAB_IMAGE,
         hours: 'Sun–Thu · 09:00–17:00 BST',
-        location: 'Academic & Administrative ICT Wing',
+        location: 'ICT Cell Wing · ictdirector@pust.ac.bd',
         portalRoute: '/portal',
         highlights: [
-          'University-wide fiber backbone & eduroam-ready Wi-Fi',
-          'Institutional email & portal token provisioning',
+          'University-wide fiber backbone & campus Wi-Fi network',
+          'Institutional @pust.ac.bd account & signup token provisioning',
           'Digital admit card & 4-office certificate workflow support',
         ],
       },

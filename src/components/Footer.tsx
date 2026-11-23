@@ -152,7 +152,7 @@ export function Footer({ onNavigate }: FooterProps) {
             Contact
           </p>
           <p className="leading-relaxed text-slate-300">
-            Rajapur, Pabna-6600, Bangladesh
+            Rajapur, Gayeshpur, Pabna-6600, Bangladesh
             <br />
             Dhaka–Pabna Highway, 3 km east of Pabna town
           </p>
@@ -165,6 +165,11 @@ export function Footer({ onNavigate }: FooterProps) {
             Registrar: +8802588845193
             <br />
             registrar@pust.ac.bd
+          </p>
+          <p className="font-mono tabular-nums">
+            Controller: +8802588844965
+            <br />
+            controller@pust.ac.bd
           </p>
         </div>
       </div>

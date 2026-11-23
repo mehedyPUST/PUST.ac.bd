@@ -204,7 +204,8 @@ export function AdministrationSection({
                 (route === '/administration/registrar-office' && officer.role === 'Registrar') ||
                 (route === '/administration/proctor-office' && officer.role === 'Proctor') ||
                 (route === '/administration/student-advisor-office' &&
-                  officer.role.includes('Student'));
+                  officer.role.includes('Student Advisor')) ||
+                (route === '/administration/ict-cell' && officer.role.includes('ICT Cell'));
 
               return (
                 <div

@@ -47,7 +47,7 @@ const BUILDINGS: CampusBuilding[] = [
     caption: 'Fig. M1 — Administrative Building housing VC, Registrar & Examination Offices.',
     summary:
       'Central governance hub of the Rajapur campus situated directly north of the Main Gate promenade. Houses executive offices, statutory committee rooms, and student certificate verification counters.',
-    offices: 'VC Office, Pro-VC, Treasurer, Registrar, Controller of Examinations, ICT Cell',
+    offices: 'VC Office, Pro-VC, Treasurer (+8802588844963), Registrar, Controller (+8802588844965), ICT Cell',
     hours: 'Sun – Thu · 09:00 – 17:00',
     facilities: 'Regent Board Hall, Transcript Counter, Automated Fee Desk',
     route: '/administration/vc-office',
@@ -65,8 +65,8 @@ const BUILDINGS: CampusBuilding[] = [
     photo: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
     caption: 'Fig. M2 — Main Academic Promenade and Academic Building I.',
     summary:
-      'Founding multi-story academic complex supporting Faculty of Science, Faculty of Business Studies, and Humanities & Social Science classrooms, smart lecture theaters, and Dean offices.',
-    offices: 'Mathematics, Physics, Chemistry, Statistics, Business Admin, Economics, English, Bangla',
+      'Founding multi-story academic complex supporting Faculty of Science (including Pharmacy), Faculty of Business Studies, Humanities & Social Science, and Geography & Environment.',
+    offices: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics, BBA, THM, Economics, Bangla, English, SW, PA, History, GE',
     hours: 'Sun – Thu · 08:30 – 17:30',
     facilities: 'Multimedia Lecture Halls, Seminar Libraries, Faculty Lounge',
     route: '/academics/departments',
@@ -85,7 +85,7 @@ const BUILDINGS: CampusBuilding[] = [
     caption: 'Fig. M3 — Engineering & Applied Science Research Laboratories.',
     summary:
       'Dedicated engineering and technology complex equipped with high-performance computing clusters, VLSI & THz microwave testbeds, architecture design studios, and structural materials labs.',
-    offices: 'CSE, EEE, ETE, ICE, Architecture, Civil Engineering, URP, IQAC & IIED Labs',
+    offices: 'CSE, EEE, EECE, ICE, CE, Architecture, URP, IQAC & RTTC Research Labs',
     hours: 'Sun – Thu · 08:30 – 18:00 (Labs by schedule)',
     facilities: '30+ Research Labs, High-Speed Campus Fiber Node, Robotics Studio',
     route: '/academics/faculty',
@@ -94,7 +94,7 @@ const BUILDINGS: CampusBuilding[] = [
   {
     id: 'central-library',
     code: 'LB-01',
-    name: 'Central Library & Information Center',
+    name: 'Central Library & Information Center (CLIC)',
     shortName: 'Central Library',
     zone: 'Library & Culture',
     gridRef: 'Central Quad North · Grid C2',
@@ -103,10 +103,10 @@ const BUILDINGS: CampusBuilding[] = [
     photo: '/src/assets/images/pust_central_library_1795431408614.jpg',
     caption: 'Fig. M4 — Central Library Reading Floor and Digital Archive.',
     summary:
-      'Quiet climate-controlled academic archive featuring general reference floors, postgraduate thesis stacks, dedicated digital workstation bays, and institutional IEEE/SpringerLink access.',
-    offices: 'Librarian Office, Circulation & Digital Card Desk, Acquisition & Archive',
+      'Academic and research hub (clic@pust.ac.bd) managed by Additional Librarian Md. Hafizur Rahaman Mollah with faculty-wise monograph collections, thesis archives, and institutional IEEE/SpringerLink access.',
+    offices: 'Librarian Office (clic@pust.ac.bd), Circulation & Digital Card Desk, Archive',
     hours: 'Sun – Thu · 08:30 – 21:00',
-    facilities: '45,000+ Volumes, Wi-Fi Reading Bays, Digital Library Card Portal',
+    facilities: 'Faculty Book Collections, E-Journal IP Bays, Digital Library Card Portal',
     route: '/facilities/library',
     routeLabel: 'Library Services',
   },
@@ -132,7 +132,7 @@ const BUILDINGS: CampusBuilding[] = [
   {
     id: 'residential-halls',
     code: 'RH-01',
-    name: 'July 06 Hall & Residential Precinct',
+    name: 'Residential Halls Precinct (July 06, Swadhinota, Matribhasha & Ganatantra)',
     shortName: 'Residential Halls',
     zone: 'Residential & Wellness',
     gridRef: 'North Campus Sector · Grid D1',
@@ -141,8 +141,8 @@ const BUILDINGS: CampusBuilding[] = [
     photo: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
     caption: 'Fig. M6 — Residential Halls Precinct and Landscaped Quadrangle.',
     summary:
-      'Gated northern residential zone encompassing July 06 Hall, Male Halls 1–2, and Female Halls 1–2 with dining commons, reading rooms, indoor sports courts, and 24-hour security.',
-    offices: 'Provost Offices (5 Halls), House Tutors, Hall Allotment & Clearance Desk',
+      'Gated northern residential zone encompassing July 06 Hall (Male Hall-1), Swadhinota Hall (Male Hall-2), Matribhasha Hall (Female Hall-1), and Ganatantra Hall (Female Hall-2) with dining commons and reading rooms.',
+    offices: 'Provosts: Md. Al-Fahad Bhuiyan, Dr. Md. Kamruzzaman, Dr. Rebeka Sultana Rekha, Laila Arzumand Banu',
     hours: '24/7 Residential Access · Office 09:00 – 17:00',
     facilities: 'Student Dormitories, Hall Dining, Reading Rooms, Online Dues Clearance',
     route: '/facilities/residence',
@@ -160,10 +160,10 @@ const BUILDINGS: CampusBuilding[] = [
     photo: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
     caption: 'Fig. M7 — Teacher-Student Center (TSC) & Campus Medical Pavilion.',
     summary:
-      'Integrated student life and wellness pavilion connecting the Central Cafeteria, debating & robotics club rooms, primary outpatient clinic, pharmacy dispensary, and emergency ambulance bay.',
-    offices: 'Chief Medical Officer, Student Advisor Office, Club Commons, Cafeteria Wing',
-    hours: 'Medical: 08:00 – 20:00 (24/7 Ambulance) · TSC: 08:00 – 21:00',
-    facilities: 'Outpatient Consultation, Student Lounge, Campus Dining & Bus Stand Link',
+      'Integrated student life and wellness pavilion connecting the Student Advisor Office (Dr. Md. Rashedul Haque), Central Cafeteria, student club rooms, and the Medical Center (+8802588844975, medicalsection@pust.ac.bd).',
+    offices: 'Medical Center (Dr. Md. Rafiqul Islam & Dr. Nasrin Sultana), Student Advisor (director.sao@pust.ac.bd)',
+    hours: 'Medical: Sun–Thu (24/7 Ambulance) · TSC: 08:00 – 21:00',
+    facilities: 'Outpatient Clinic, Student Lounge, Campus Dining & Transport Pool (+8802588845650)',
     route: '/facilities/medical',
     routeLabel: 'Medical & Student Care',
   },
@@ -358,7 +358,7 @@ export function CampusMapSection() {
                   y="68"
                   width="132"
                   height="74"
-                  fill={activeBuilding.id === 'wazed-bhaban' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'wazed-bhaban' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -369,7 +369,7 @@ export function CampusMapSection() {
                     y="42"
                     width="82"
                     height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#065F46' : '#E7E5E4'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#6A0000' : '#E7E5E4'}
                     stroke="#78716C"
                     strokeWidth="1.2"
                   />
@@ -378,7 +378,7 @@ export function CampusMapSection() {
                     y="42"
                     width="96"
                     height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#065F46' : '#E7E5E4'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#6A0000' : '#E7E5E4'}
                     stroke="#78716C"
                     strokeWidth="1.2"
                   />
@@ -389,7 +389,7 @@ export function CampusMapSection() {
                   y="196"
                   width="116"
                   height="68"
-                  fill={activeBuilding.id === 'academic-1' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'academic-1' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -399,7 +399,7 @@ export function CampusMapSection() {
                   y="168"
                   width="112"
                   height="64"
-                  fill={activeBuilding.id === 'central-library' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'central-library' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -409,7 +409,7 @@ export function CampusMapSection() {
                   y="186"
                   width="104"
                   height="66"
-                  fill={activeBuilding.id === 'convocation-plaza' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'convocation-plaza' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -419,7 +419,7 @@ export function CampusMapSection() {
                   y="302"
                   width="124"
                   height="68"
-                  fill={activeBuilding.id === 'admin-bhaban' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'admin-bhaban' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -429,7 +429,7 @@ export function CampusMapSection() {
                   y="314"
                   width="112"
                   height="60"
-                  fill={activeBuilding.id === 'medical-tsc' ? '#065F46' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'medical-tsc' ? '#6A0000' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -452,7 +452,7 @@ export function CampusMapSection() {
                 >
                   DHAKA–PABNA HIGHWAY (N6) · RAJAPUR
                 </text>
-                <rect x="348" y="424" width="72" height="22" fill="#065F46" />
+                <rect x="348" y="424" width="72" height="22" fill="#6A0000" />
                 <text
                   x="384"
                   y="439"
