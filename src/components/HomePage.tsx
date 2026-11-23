@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'motion/react';
 import { ArrowRight, ArrowUpRight, ChevronDown, PlayCircle, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 import { ResilientImage } from './ResilientImage';
@@ -14,6 +15,9 @@ import type {
 } from '../types/pust';
 
 const VC_PORTRAIT_IMAGE = '/src/assets/images/pust_vc_portrait_1795438823012.jpg';
+const LAB_IMAGE = '/src/assets/images/pust_engineering_lab_1795431408924.jpg';
+const LIBRARY_IMAGE = '/src/assets/images/pust_central_library_1795431408614.jpg';
+const GROUNDS_IMAGE = '/src/assets/images/pust_campus_grounds_1795431408500.jpg';
 
 interface HomePageProps {
   heroImage: string;
@@ -81,7 +85,12 @@ export function HomePage({
       <section className="bg-[#FAF8F4] border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            <div className="lg:col-span-6 flex flex-col justify-between py-2">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.38 }}
+              className="lg:col-span-6 flex flex-col justify-between py-2"
+            >
               <div className="space-y-6">
                 <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                   Rajapur, Pabna-6600 · First Convocation:{' '}
@@ -118,9 +127,14 @@ export function HomePage({
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="lg:col-span-6">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.42, delay: 0.08 }}
+              className="lg:col-span-6"
+            >
               <ResilientImage
                 src={heroImage}
                 fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
@@ -129,7 +143,7 @@ export function HomePage({
                 containerClassName="h-full flex flex-col"
                 className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
               />
-            </div>
+            </motion.div>
           </div>
 
           {/* Operational Utility Ribbon */}
@@ -137,7 +151,7 @@ export function HomePage({
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-stone-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                2008 · 30-Acre Campus
+                2008 · Act No. 43 of 2001
               </dd>
             </div>
             <div className="px-5 py-4 border-b lg:border-b-0 lg:border-r border-stone-200">
@@ -295,7 +309,7 @@ export function HomePage({
         </div>
       </section>
 
-      {/* Latest Official Bulletins + Dedicated Pages Directory */}
+      {/* Latest Official Bulletins + Institutional Sections Directory */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-5">
@@ -424,8 +438,112 @@ export function HomePage({
         </div>
       </section>
 
+      {/* Campus Facilities & Research Infrastructure Showcase */}
+      <section className="bg-white border-t border-stone-200 py-14 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-5">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                Research &amp; Residential Campus
+              </p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+                Laboratories, Central Library &amp; Rajapur Precinct
+              </h2>
+            </div>
+            <Link
+              href="/facilities"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-800 hover:text-emerald-950 whitespace-nowrap shrink-0"
+            >
+              All Campus Facilities
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <article className="space-y-4">
+              <ResilientImage
+                src={LAB_IMAGE}
+                alt="PUST engineering and instrumentation laboratory"
+                caption="Fig. 2 — Applied Engineering & VLSI Research Laboratories."
+                className="w-full aspect-[4/3] object-cover"
+              />
+              <div className="space-y-1.5">
+                <p className="font-mono text-xs text-emerald-800">IIED &amp; RTTC · 30+ Labs</p>
+                <h3 className="font-serif text-xl font-medium text-slate-900">
+                  Engineering &amp; Science Labs
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Dedicated infrastructure for robotics, THz wireless systems, material synthesis,
+                  environmental testing, and pharmaceutical formulation.
+                </p>
+                <Link
+                  href="/academics/journals"
+                  className="inline-block text-xs font-semibold text-emerald-800 hover:underline pt-1"
+                >
+                  Research &amp; Journals →
+                </Link>
+              </div>
+            </article>
+
+            <article className="space-y-4">
+              <ResilientImage
+                src={LIBRARY_IMAGE}
+                alt="PUST Central Library study floor"
+                caption="Fig. 3 — Central Library & Information Center Reading Floor."
+                className="w-full aspect-[4/3] object-cover"
+              />
+              <div className="space-y-1.5">
+                <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                  Central Library · Sun–Thu 08:30–21:00
+                </p>
+                <h3 className="font-serif text-xl font-medium text-slate-900">
+                  Digital &amp; Print Archives
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Institutional access to IEEE Xplore, SpringerLink, and ACM Digital Library linked
+                  with digital and physical student library cards.
+                </p>
+                <Link
+                  href="/facilities/library"
+                  className="inline-block text-xs font-semibold text-emerald-800 hover:underline pt-1"
+                >
+                  Library Services →
+                </Link>
+              </div>
+            </article>
+
+            <article className="space-y-4">
+              <ResilientImage
+                src={GROUNDS_IMAGE}
+                alt="PUST Rajapur campus quadrangle and residential halls"
+                caption="Fig. 4 — July 06 Hall & Rajapur Residential Campus."
+                className="w-full aspect-[4/3] object-cover"
+              />
+              <div className="space-y-1.5">
+                <p className="font-mono text-xs text-emerald-800">
+                  July 06 Hall · 5 Halls · Medical &amp; Bus Pool
+                </p>
+                <h3 className="font-serif text-xl font-medium text-slate-900">
+                  Halls &amp; Student Wellness
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Five residential halls with online vacancy circulars and clearance tracking,
+                  campus medical clinic, and scheduled Pabna bus routes.
+                </p>
+                <Link
+                  href="/facilities/residence"
+                  className="inline-block text-xs font-semibold text-emerald-800 hover:underline pt-1"
+                >
+                  Residential Halls →
+                </Link>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* Homepage Campus Gallery (Photos & Videos) */}
-      <section className="bg-white border-t border-b border-stone-200 py-14 lg:py-16">
+      <section className="bg-[#FAF8F4] border-t border-b border-stone-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-stone-200">
             <div>
@@ -446,7 +564,7 @@ export function HomePage({
                   className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     galleryCategory === cat
                       ? 'bg-emerald-800 text-white'
-                      : 'bg-stone-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
                   }`}
                 >
                   {cat}
@@ -468,7 +586,7 @@ export function HomePage({
                 key={item.id}
                 type="button"
                 onClick={() => setActiveMedia(item)}
-                className="text-left border border-stone-200 bg-[#FAF8F4] hover:border-emerald-400 transition-colors group cursor-pointer flex flex-col"
+                className="text-left border border-stone-200 bg-white hover:border-emerald-400 transition-colors group cursor-pointer flex flex-col"
               >
                 <div className="relative overflow-hidden bg-slate-900 aspect-[4/3]">
                   <ResilientImage
@@ -497,40 +615,72 @@ export function HomePage({
         </div>
       </section>
 
-      {/* 5 Faculties & Research Spotlight Strip */}
-      <section className="bg-[#FAF8F4] py-12 lg:py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
-                Academic Architecture
-              </p>
-              <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
-                Five Faculties &amp; Research Journals
-              </h2>
+      {/* 5 Faculties & Research Spotlight Strip + Convocation / Admissions CTA */}
+      <section className="bg-white py-14 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                  Academic Architecture
+                </p>
+                <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                  Five Faculties &amp; Research Journals
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-4 text-xs font-medium">
+                <Link href="/academics/faculty" className="text-emerald-800 hover:underline whitespace-nowrap">
+                  Explore 5 Faculties →
+                </Link>
+                <Link href="/academics/journals" className="text-emerald-800 hover:underline whitespace-nowrap">
+                  PUST Journals →
+                </Link>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-4 text-xs font-medium">
-              <Link href="/academics/journals" className="text-emerald-800 hover:underline whitespace-nowrap">
-                PUST Journals →
-              </Link>
-              <Link href="/academics/publications" className="text-emerald-800 hover:underline whitespace-nowrap">
-                Research Publications →
-              </Link>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-stone-200 bg-[#FAF8F4] divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
+              {FACULTIES_OVERVIEW.map((f) => (
+                <Link
+                  key={f.code}
+                  href="/academics/faculty"
+                  className="p-4 hover:bg-emerald-50/40 transition-colors space-y-1.5 block"
+                >
+                  <p className="font-mono text-xs font-semibold text-emerald-800">{f.code}</p>
+                  <h3 className="font-serif text-base font-medium text-slate-900">{f.name}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
+                </Link>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-stone-200 bg-white divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
-            {FACULTIES_OVERVIEW.map((f) => (
+          {/* Admissions & First Convocation Closing Editorial Callout */}
+          <div className="bg-emerald-950 text-white border border-emerald-900 p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-emerald-300 tabular-nums">
+                Admissions 2026–2027 · First Convocation: {profile?.convocationDate ?? '15 March 2027'}
+              </p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-white leading-snug">
+                Join 5,000+ Scholars Across Engineering, Science, Business &amp; Humanities
+              </h2>
+              <p className="text-sm text-emerald-100/90 leading-relaxed max-w-2xl">
+                Explore GST integrated undergraduate tracks, graduate fellowships, and digital
+                student onboarding via departmental signup tokens.
+              </p>
+            </div>
+            <div className="lg:col-span-4 flex flex-wrap lg:justify-end gap-3">
               <Link
-                key={f.code}
-                href="/academics/departments"
-                className="p-4 hover:bg-emerald-50/40 transition-colors space-y-1.5 block"
+                href="/admissions"
+                className="px-5 py-3 text-sm font-medium bg-white text-emerald-950 hover:bg-emerald-50 transition-colors whitespace-nowrap shrink-0"
               >
-                <p className="font-mono text-xs font-semibold text-emerald-800">{f.code}</p>
-                <h3 className="font-serif text-base font-medium text-slate-900">{f.name}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
+                Admissions &amp; Inquiry
               </Link>
-            ))}
+              <Link
+                href="/portal"
+                className="px-5 py-3 text-sm font-medium border border-emerald-400 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap shrink-0"
+              >
+                Student &amp; Officer Portal
+              </Link>
+            </div>
           </div>
         </div>
       </section>

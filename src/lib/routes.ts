@@ -133,7 +133,7 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     id: 'facilities',
-    label: 'Faculties',
+    label: 'Facilities',
     defaultRoute: '/facilities',
     items: [
       { label: 'Library', route: '/facilities/library' },

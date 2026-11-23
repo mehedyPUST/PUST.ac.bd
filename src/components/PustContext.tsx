@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { MotionConfig } from 'motion/react';
 import { pustApi } from '../lib/api';
 import { parseRouteFromPath, type AppRoute } from '../lib/routes';
 import type {
@@ -283,31 +284,33 @@ export function PustShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <PustContext.Provider value={value}>
-      <div className="min-h-screen flex flex-col bg-[#FAF8F4] text-slate-900">
-        <Navbar route={route} user={user} onNavigate={navigateTo} />
-        <div className="flex-1 flex flex-col">{children}</div>
-        <Footer onNavigate={navigateTo} />
-      </div>
+    <MotionConfig reducedMotion="user">
+      <PustContext.Provider value={value}>
+        <div className="min-h-screen flex flex-col bg-[#FAF8F4] text-slate-900">
+          <Navbar route={route} user={user} onNavigate={navigateTo} />
+          <div className="flex-1 flex flex-col">{children}</div>
+          <Footer onNavigate={navigateTo} />
+        </div>
 
-      <DepartmentModal
-        department={activeDepartment}
-        onClose={() => setActiveDepartment(null)}
-        user={user}
-        isBookmarked={activeDepartment ? bookmarkedIds.has(activeDepartment.id) : false}
-        onToggleBookmark={handleToggleBookmarkDepartment}
-        onOpenPortal={() => navigateTo('/portal')}
-      />
+        <DepartmentModal
+          department={activeDepartment}
+          onClose={() => setActiveDepartment(null)}
+          user={user}
+          isBookmarked={activeDepartment ? bookmarkedIds.has(activeDepartment.id) : false}
+          onToggleBookmark={handleToggleBookmarkDepartment}
+          onOpenPortal={() => navigateTo('/portal')}
+        />
 
-      <NoticeModal
-        notice={activeNotice}
-        onClose={() => setActiveNotice(null)}
-        user={user}
-        isBookmarked={activeNotice ? bookmarkedIds.has(activeNotice.id) : false}
-        onToggleBookmark={handleToggleBookmarkNotice}
-        onDeleteNotice={handleDeleteNotice}
-        onOpenPortal={() => navigateTo('/portal')}
-      />
-    </PustContext.Provider>
+        <NoticeModal
+          notice={activeNotice}
+          onClose={() => setActiveNotice(null)}
+          user={user}
+          isBookmarked={activeNotice ? bookmarkedIds.has(activeNotice.id) : false}
+          onToggleBookmark={handleToggleBookmarkNotice}
+          onDeleteNotice={handleDeleteNotice}
+          onOpenPortal={() => navigateTo('/portal')}
+        />
+      </PustContext.Provider>
+    </MotionConfig>
   );
 }

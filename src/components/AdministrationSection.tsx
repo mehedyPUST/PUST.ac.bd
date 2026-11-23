@@ -1,13 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+import { ResilientImage } from './ResilientImage';
 import type {
   AdministrativeUnit,
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
+
+const VC_PORTRAIT_IMAGE = '/src/assets/images/pust_vc_portrait_1795438823012.jpg';
 
 interface AdministrationSectionProps {
   route: AppRoute;
@@ -40,9 +44,9 @@ const OFFICE_SUBROUTES: Array<{ route: AppRoute; label: string; highlight: strin
     label: 'Student Advisor',
     highlight: 'Directorate of Student Welfare & Guidance',
   },
-  { route: '/administration/ict-cell', label: 'ICT Cell', highlight: 'ICT Cell' },
-  { route: '/administration/all-office', label: 'All Office', highlight: 'All' },
-  { route: '/administration/apa', label: 'APA', highlight: 'Annual Performance Agreement' },
+  { route: '/administration/ict-cell', label: 'ICT Cell', highlight: 'ICT Cell & Digital Services' },
+  { route: '/administration/all-office', label: 'All Office', highlight: 'All University Offices & Units' },
+  { route: '/administration/apa', label: 'APA', highlight: 'Annual Performance Agreement (APA)' },
 ];
 
 export function AdministrationSection({
@@ -54,7 +58,14 @@ export function AdministrationSection({
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('All');
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
 
-  if (!profile) return null;
+  if (!profile) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-6">
+        <div className="h-8 w-64 bg-stone-200 animate-pulse" />
+        <div className="h-48 bg-stone-100 border border-stone-200 animate-pulse" />
+      </section>
+    );
+  }
 
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
   const previousVcs = vcProfiles
@@ -69,12 +80,17 @@ export function AdministrationSection({
       : profile.units.filter((u) => u.category === unitFilter);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12">
+    <motion.section
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28 }}
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
+    >
       {/* Sub-navigation bar across all Administration office pages */}
-      <div className="border-b border-slate-200 pb-6 space-y-4">
+      <div className="border-b border-stone-200 pb-6 space-y-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
-            Administration &amp; Governance
+          <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+            Administration &amp; Executive Governance
           </p>
           <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
             {activeOffice ? activeOffice.highlight : 'University Administration & Executive Offices'}
@@ -87,8 +103,8 @@ export function AdministrationSection({
             onClick={() => onNavigate('/administration')}
             className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               route === '/administration'
-                ? 'bg-emerald-700 text-white'
-                : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300 hover:text-emerald-800'
+                ? 'bg-emerald-800 text-white'
+                : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
             }`}
           >
             Overview
@@ -100,8 +116,8 @@ export function AdministrationSection({
               onClick={() => onNavigate(item.route)}
               className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 route === item.route
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300 hover:text-emerald-800'
+                  ? 'bg-emerald-800 text-white'
+                  : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
               }`}
             >
               {item.label}
@@ -110,18 +126,18 @@ export function AdministrationSection({
         </div>
       </div>
 
-      {/* Vice-Chancellor Address + Executive Leadership + Expandable Former VCs Archive */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-slate-200">
-        <div className="lg:col-span-6 space-y-5">
+      {/* Vice-Chancellor Address + Portrait + Executive Leadership + Expandable Former VCs Archive */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-stone-200">
+        <div className="lg:col-span-6 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
+            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Current Vice-Chancellor · {currentVc?.tenure}
             </p>
             <button
               type="button"
               onClick={() => setShowPreviousVcs((prev) => !prev)}
               aria-expanded={showPreviousVcs}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Previous Vice-Chancellors ({previousVcs.length})
               <ChevronDown
@@ -132,20 +148,31 @@ export function AdministrationSection({
             </button>
           </div>
 
-          <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
-            {currentVc?.name}
-          </h2>
-          <p className="text-[15px] leading-[1.75] text-slate-700">{currentVc?.message}</p>
-          <p className="font-mono text-xs text-slate-500">
-            Direct Desk: {currentVc?.email} · {currentVc?.phone}
-          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+            <div className="sm:col-span-4">
+              <ResilientImage
+                src={VC_PORTRAIT_IMAGE}
+                alt={currentVc?.name || 'Vice-Chancellor of PUST'}
+                className="w-full aspect-[3/4] object-cover border border-stone-200"
+              />
+            </div>
+            <div className="sm:col-span-8 space-y-3">
+              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
+                {currentVc?.name}
+              </h2>
+              <p className="text-[15px] leading-[1.75] text-slate-700">{currentVc?.message}</p>
+              <p className="font-mono text-xs text-slate-500 tabular-nums">
+                Direct Desk: {currentVc?.email} · {currentVc?.phone}
+              </p>
+            </div>
+          </div>
 
           {showPreviousVcs && (
-            <div className="pt-4 border-t border-slate-200 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-600">
+            <div className="pt-4 border-t border-stone-200 space-y-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
                 Former Vice-Chancellors of PUST
               </p>
-              <div className="divide-y divide-slate-200 border border-slate-200 bg-white">
+              <div className="divide-y divide-stone-200 border border-stone-200 bg-[#FAF8F4]">
                 {previousVcs.map((vc) => (
                   <div
                     key={vc.id}
@@ -155,7 +182,7 @@ export function AdministrationSection({
                       <p className="font-serif font-medium text-slate-900">{vc.name}</p>
                       <p className="text-xs text-slate-500">{vc.message}</p>
                     </div>
-                    <span className="font-mono tabular-nums text-xs text-emerald-700 whitespace-nowrap shrink-0">
+                    <span className="font-mono tabular-nums text-xs text-emerald-800 whitespace-nowrap shrink-0">
                       {vc.tenure}
                     </span>
                   </div>
@@ -165,13 +192,13 @@ export function AdministrationSection({
           )}
         </div>
 
-        <div className="lg:col-span-6 bg-white border border-slate-200 shadow-sm">
-          <div className="px-6 py-4 border-b border-slate-200 bg-emerald-50/50">
+        <div className="lg:col-span-6 bg-white border border-stone-200">
+          <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF8F4]">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Executive Administration Directory
             </h3>
           </div>
-          <dl className="divide-y divide-slate-200">
+          <dl className="divide-y divide-stone-200">
             {profile.leadership.map((officer) => {
               const isHighlighted =
                 (route === '/administration/vc-office' && officer.role === 'Vice-Chancellor') ||
@@ -190,13 +217,13 @@ export function AdministrationSection({
                     isHighlighted ? 'bg-emerald-50/70' : ''
                   }`}
                 >
-                  <dt className="sm:col-span-4 text-xs uppercase tracking-wider font-semibold text-emerald-700">
+                  <dt className="sm:col-span-4 font-mono text-xs uppercase tracking-wider font-semibold text-emerald-800">
                     {officer.role}
                   </dt>
                   <dd className="sm:col-span-8 space-y-0.5">
                     <p className="font-medium text-sm text-slate-900">{officer.name}</p>
                     <p className="text-xs text-slate-600">{officer.office}</p>
-                    <p className="font-mono text-xs text-slate-500">
+                    <p className="font-mono text-xs text-slate-500 tabular-nums">
                       {officer.email} · {officer.phone}
                     </p>
                   </dd>
@@ -207,6 +234,43 @@ export function AdministrationSection({
         </div>
       </div>
 
+      {/* APA Highlight Strip when viewing APA or Overview */}
+      {(route === '/administration/apa' || route === '/administration') && (
+        <div className="bg-[#FAF8F4] border border-stone-200 p-6 sm:p-8 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+            <h2 className="font-serif text-xl font-medium text-slate-900">
+              Annual Performance Agreement (APA) &amp; Integrity Benchmarks
+            </h2>
+            <span className="font-mono text-xs text-emerald-800 tabular-nums">
+              FY 2026–2027 · UGC Public Accountability
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div className="bg-white border border-stone-200 p-4 space-y-1">
+              <p className="font-mono text-xs text-emerald-800">E-Governance &amp; Service</p>
+              <p className="font-serif font-medium text-slate-900">100% Digital Clearance</p>
+              <p className="text-xs text-slate-600">
+                4-office certificate, hall dues, and library card issuance tracked with timestamps.
+              </p>
+            </div>
+            <div className="bg-white border border-stone-200 p-4 space-y-1">
+              <p className="font-mono text-xs text-emerald-800">Academic Quality (IQAC)</p>
+              <p className="font-serif font-medium text-slate-900">21 OBE Curricula Active</p>
+              <p className="text-xs text-slate-600">
+                Continuous academic auditing and faculty pedagogy workshops across all 5 faculties.
+              </p>
+            </div>
+            <div className="bg-white border border-stone-200 p-4 space-y-1">
+              <p className="font-mono text-xs text-emerald-800">National Integrity Strategy</p>
+              <p className="font-serif font-medium text-slate-900">Transparent Procurement</p>
+              <p className="text-xs text-slate-600">
+                e-GP compliance, citizen charter disclosures, and audit committee reporting.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Statutory Bodies, Administrative Offices, ICT Cell & APA */}
       <div className="space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
@@ -215,8 +279,9 @@ export function AdministrationSection({
               Statutory Bodies, Administrative Offices &amp; Specialized Cells
             </h2>
             <p className="text-sm text-slate-600 mt-1">
-              University governance under the PUST Act (2008), Annual Performance Agreement (APA),
-              Proctorial Desk, Student Advisor Office, IQAC, and ICT Cell.
+              University governance under the University Act (Act No. 43 of 2001), Annual
+              Performance Agreement (APA), Proctorial Desk, Student Advisor Office, IQAC, and ICT
+              Cell.
             </p>
           </div>
 
@@ -230,8 +295,8 @@ export function AdministrationSection({
                   onClick={() => setUnitFilter(tab)}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-emerald-700 text-white shadow-sm'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300 hover:text-emerald-800'
+                      ? 'bg-emerald-800 text-white'
+                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
                   }`}
                 >
                   {tab}
@@ -241,7 +306,7 @@ export function AdministrationSection({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-slate-200 bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-stone-200 bg-white">
           {filteredUnits.map((unit) => {
             const matchesRoute =
               (route === '/administration/ict-cell' && unit.code === 'ICT') ||
@@ -252,11 +317,11 @@ export function AdministrationSection({
             return (
               <div
                 key={unit.code}
-                className={`p-5 border-r border-b border-t border-slate-200 space-y-2 transition-colors ${
+                className={`p-5 border-r border-b border-t border-stone-200 space-y-2 transition-colors ${
                   matchesRoute ? 'bg-emerald-50/70' : 'hover:bg-emerald-50/25'
                 }`}
               >
-                <p className="font-mono text-xs text-emerald-700">
+                <p className="font-mono text-xs text-emerald-800">
                   {unit.code} · {unit.category}
                 </p>
                 <h3 className="font-serif text-lg font-medium text-slate-900">{unit.name}</h3>
@@ -266,6 +331,6 @@ export function AdministrationSection({
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
