@@ -1,0 +1,6 @@
+{
+  "name": "Pabna University of Science and Technology (PUST)",
+  "description": "Modern academic and institutional portal for Pabna University of Science and Technology (PUST), Rajapur, Pabna, featuring 5 faculties, 21 departments, notices, research showcase, admissions, and JWT cookie-based portal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
