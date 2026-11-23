@@ -114,7 +114,7 @@ export const NAV_DROPDOWN_GROUPS: NavDropdownGroup[] = [
   },
   {
     id: 'facilities',
-    label: 'Facilities',
+    label: 'Faculties',
     defaultRoute: '/facilities',
     items: [
       { label: 'Library', route: '/facilities/library' },

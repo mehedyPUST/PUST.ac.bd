@@ -90,6 +90,7 @@ export function AdminCmsPanel({
   const [noticeVisibility, setNoticeVisibility] = useState<NoticeVisibility>('public');
   const [noticeTargetSession, setNoticeTargetSession] = useState('');
   const [noticeTargetCourse, setNoticeTargetCourse] = useState('');
+  const [noticeAttachment, setNoticeAttachment] = useState('');
   const [noticeSummary, setNoticeSummary] = useState('');
   const [noticeBody, setNoticeBody] = useState('');
 
@@ -221,12 +222,14 @@ export function AdminCmsPanel({
         visibility: noticeVisibility,
         targetSession: noticeTargetSession.trim() || undefined,
         targetCourseCode: noticeTargetCourse.trim() || undefined,
+        attachmentName: noticeAttachment.trim() || undefined,
         summary: noticeSummary,
         body: noticeBody,
       });
       setFeedback(`Published ${noticeVisibility} ${noticeScope} notice "${noticeTitle}".`);
       setNoticeRef('');
       setNoticeTitle('');
+      setNoticeAttachment('');
       setNoticeSummary('');
       setNoticeBody('');
       await onNoticesChange();
@@ -437,6 +440,13 @@ export function AdminCmsPanel({
             value={noticeSummary}
             onChange={(e) => setNoticeSummary(e.target.value)}
             placeholder="One-line executive summary"
+            className="w-full px-3 py-2 text-xs border border-slate-300 bg-slate-50"
+          />
+          <input
+            type="text"
+            value={noticeAttachment}
+            onChange={(e) => setNoticeAttachment(e.target.value)}
+            placeholder="Optional Attachment Name (e.g. Exam-Schedule-2026.pdf)"
             className="w-full px-3 py-2 text-xs border border-slate-300 bg-slate-50"
           />
           <textarea

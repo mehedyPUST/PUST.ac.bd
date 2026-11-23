@@ -1118,6 +1118,23 @@ portalRouter.post(
       });
     }
 
+    await pustRepo.createNotice({
+      referenceNo: `PUST/${stu.departmentCode}/RES/${new Date().getFullYear()}-${parsed.data.semester}`,
+      title: `Semester ${parsed.data.semester} Examination Result Published — ${stu.departmentCode} (${stu.session})`,
+      category: 'Result',
+      publishedAt: new Date().toISOString().slice(0, 10),
+      departmentCode: stu.departmentCode,
+      boardScope: 'department',
+      visibility: 'registered',
+      targetSession: stu.session,
+      summary: `Semester ${parsed.data.semester} result published for ${stu.academicId} (SGPA ${sgpa.toFixed(
+        2
+      )} · ${promotionStatus}).`,
+      body: `Registered departmental students in session ${stu.session} may inspect their verified Semester ${parsed.data.semester} grade sheet and promotion status under Portal -> Exams & Results.`,
+      authorName: req.authUser!.name,
+      authorRole: req.authUser!.role,
+    });
+
     res.status(201).json({ result });
   }
 );

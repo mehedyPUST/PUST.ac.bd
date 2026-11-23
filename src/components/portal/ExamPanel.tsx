@@ -817,6 +817,42 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             <div className="border-t border-slate-200 pt-3 text-xs font-mono text-slate-700">
               Registered Courses: {admitPreview.selectedCourseCodes.join(', ')}
             </div>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = [
+                    'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY',
+                    'OFFICIAL EXAMINATION ADMIT CARD',
+                    `Admit Card No: ${admitPreview.admitCardNo}`,
+                    `Form Reference: ${admitPreview.formReference}`,
+                    `Issued Date: ${admitPreview.admitCardIssuedAt}`,
+                    `Student: ${admitPreview.studentName} (${admitPreview.academicId})`,
+                    `Department & Session: ${admitPreview.departmentCode} · ${admitPreview.session}`,
+                    `Semester: ${admitPreview.semester}`,
+                    `Courses: ${admitPreview.selectedCourseCodes.join(', ')}`,
+                    `Payment: ${admitPreview.paymentMethod} (${admitPreview.transactionId})`,
+                  ].join('\n');
+                  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${admitPreview.admitCardNo}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-4 py-2 text-xs font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
+              >
+                Download Admit Card Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 text-xs font-medium border border-slate-300 text-slate-700 hover:border-emerald-700 hover:text-emerald-700 cursor-pointer"
+              >
+                Print / Save PDF
+              </button>
+            </div>
           </div>
         </div>
       )}

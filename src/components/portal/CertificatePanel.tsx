@@ -432,6 +432,40 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                 <dd>{certPreview.issuedAt}</dd>
               </div>
             </dl>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = [
+                    'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY',
+                    `OFFICIAL ${certPreview.certificateType.toUpperCase()}`,
+                    `Certificate Serial: ${certPreview.certificateSerial}`,
+                    `Issued Date: ${certPreview.issuedAt}`,
+                    `Student: ${certPreview.studentName} (${certPreview.academicId})`,
+                    `Department & Session: ${certPreview.departmentCode} · ${certPreview.session}`,
+                    `4-Office Clearances Verified: Chairman, Hall, Library, Proctor`,
+                    `Fee Paid: BDT ${certPreview.feeBdt} via ${certPreview.paymentMethod} (${certPreview.transactionId})`,
+                  ].join('\n');
+                  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${certPreview.certificateSerial}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-4 py-2 text-xs font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
+              >
+                Download Temporary Certificate
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-4 py-2 text-xs font-medium border border-slate-300 text-slate-700 hover:border-emerald-700 hover:text-emerald-700 cursor-pointer"
+              >
+                Print / Save PDF
+              </button>
+            </div>
           </div>
         </div>
       )}

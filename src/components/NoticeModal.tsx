@@ -72,6 +72,11 @@ export function NoticeModal({
           <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-line">
             {notice.body}
           </p>
+          {notice.attachmentName && (
+            <div className="border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-mono text-slate-700">
+              Official Attachment: {notice.attachmentName}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-slate-200">
             <div className="flex items-center gap-3">
