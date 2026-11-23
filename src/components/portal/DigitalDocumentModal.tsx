@@ -281,7 +281,9 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                   {doc.serialCode}
                   {copied && <Check className="w-3 h-3 text-emerald-700" />}
                 </button>
-                <p className="text-[11px] font-medium text-emerald-800 mt-0.5">{doc.statusLabel}</p>
+                <p className="text-[11px] font-medium text-emerald-800 mt-0.5 text-left sm:text-right">
+                  {doc.statusLabel}
+                </p>
               </div>
             </div>
           </div>

@@ -282,7 +282,7 @@ function downloadPrintableFormHtml(form: DigitalFormDef) {
       <div>Applicant Signature &amp; Date: _______________________</div>
       <div>Endorsing Authority Seal: _______________________</div>
     </div>
-    <p style="margin-top:20px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:12px;">Note: ${escapeHtml(
+    <p style="margin-top:20px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:12px;text-align:justify;">Note: ${escapeHtml(
       form.note
     )} Digital submission is recommended via the PUST Campus Portal.</p>
   </div>

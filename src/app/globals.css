@@ -15,6 +15,24 @@
   h1, h2, h3 {
     text-wrap: balance;
   }
+
+  p,
+  blockquote,
+  figcaption,
+  ul.list-disc li,
+  ul.list-decimal li {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .text-center p,
+  .text-center figcaption {
+    text-align: center;
+  }
+
+  .text-right p {
+    text-align: right;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -96,7 +96,7 @@ export function DepartmentModal({
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
                 {department.researchFocus.map((topic) => (
-                  <li key={topic} className="pb-2 border-b border-slate-100 last:border-b-0">
+                  <li key={topic} className="pb-2 border-b border-slate-100 last:border-b-0 text-justify">
                     {topic}
                   </li>
                 ))}
@@ -109,7 +109,7 @@ export function DepartmentModal({
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
                 {department.laboratories.map((lab) => (
-                  <li key={lab} className="pb-2 border-b border-slate-100 last:border-b-0">
+                  <li key={lab} className="pb-2 border-b border-slate-100 last:border-b-0 text-justify">
                     {lab}
                   </li>
                 ))}
