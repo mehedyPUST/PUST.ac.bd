@@ -18,7 +18,7 @@ interface AdministrationSectionProps {
   route: AppRoute;
   profile: UniversityProfile | null;
   vcProfiles: ViceChancellorRecord[];
-  onNavigate: (route: AppRoute) => void;
+  onNavigate: (route: AppRoute | string) => void;
 }
 
 type UnitFilter =
@@ -83,7 +83,7 @@ export function AdministrationSection({
       className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
     >
       {/* Sub-navigation bar across all Administration office pages */}
-      <div className="border-b border-stone-200 pb-6 space-y-4">
+      <div className="border-b border-slate-200 pb-6 space-y-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
             Administration &amp; Executive Governance
@@ -93,14 +93,14 @@ export function AdministrationSection({
           </h1>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => onNavigate('/administration')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               route === '/administration'
-                ? 'bg-emerald-800 text-white'
-                : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
+                ? 'bg-emerald-900 text-white'
+                : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
             }`}
           >
             Overview
@@ -110,10 +110,10 @@ export function AdministrationSection({
               key={item.route}
               type="button"
               onClick={() => onNavigate(item.route)}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 route === item.route
-                  ? 'bg-emerald-800 text-white'
-                  : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
+                  ? 'bg-emerald-900 text-white'
+                  : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
               }`}
             >
               {item.label}
@@ -123,7 +123,7 @@ export function AdministrationSection({
       </div>
 
       {/* Vice-Chancellor Address + Portrait + Executive Leadership + Expandable Former VCs Archive */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-stone-200">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-slate-200">
         <div className="lg:col-span-6 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
@@ -133,7 +133,7 @@ export function AdministrationSection({
               type="button"
               onClick={() => setShowPreviousVcs((prev) => !prev)}
               aria-expanded={showPreviousVcs}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Previous Vice-Chancellors ({previousVcs.length})
               <ChevronDown
@@ -149,7 +149,7 @@ export function AdministrationSection({
               <ResilientImage
                 src={VC_PORTRAIT_IMAGE}
                 alt={currentVc?.name || 'Vice-Chancellor of PUST'}
-                className="w-full aspect-[3/4] object-cover border border-stone-200"
+                className="w-full aspect-[3/4] object-cover"
               />
             </div>
             <div className="sm:col-span-8 space-y-3">
@@ -164,11 +164,11 @@ export function AdministrationSection({
           </div>
 
           {showPreviousVcs && (
-            <div className="pt-4 border-t border-stone-200 space-y-3">
+            <div className="pt-4 border-t border-slate-200 space-y-3">
               <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
                 Former Vice-Chancellors of PUST
               </p>
-              <div className="divide-y divide-stone-200 border border-stone-200 bg-[#FAF8F4]">
+              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-[#F7F7F5] overflow-hidden">
                 {previousVcs.map((vc) => (
                   <div
                     key={vc.id}
@@ -188,13 +188,13 @@ export function AdministrationSection({
           )}
         </div>
 
-        <div className="lg:col-span-6 bg-white border border-stone-200">
-          <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF8F4]">
+        <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Executive Administration Directory
             </h3>
           </div>
-          <dl className="divide-y divide-stone-200">
+          <dl className="divide-y divide-slate-200">
             {profile.leadership.map((officer) => {
               const isHighlighted =
                 (route === '/administration/vc-office' && officer.role === 'Vice-Chancellor') ||
@@ -232,8 +232,8 @@ export function AdministrationSection({
 
       {/* APA Highlight Strip when viewing APA or Overview */}
       {(route === '/administration/apa' || route === '/administration') && (
-        <div className="bg-[#FAF8F4] border border-stone-200 p-6 sm:p-8 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+        <div className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
             <h2 className="font-serif text-xl font-medium text-slate-900">
               Annual Performance Agreement (APA) &amp; Integrity Benchmarks
             </h2>
@@ -242,24 +242,24 @@ export function AdministrationSection({
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            <div className="bg-white border border-stone-200 p-4 space-y-1">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
               <p className="font-mono text-xs text-emerald-800">E-Governance &amp; Service</p>
               <p className="font-serif font-medium text-slate-900">100% Digital Clearance</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 4-office certificate, hall dues, and library card issuance tracked with timestamps.
               </p>
             </div>
-            <div className="bg-white border border-stone-200 p-4 space-y-1">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
               <p className="font-mono text-xs text-emerald-800">Academic Quality (IQAC)</p>
               <p className="font-serif font-medium text-slate-900">21 OBE Curricula Active</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Continuous academic auditing and faculty pedagogy workshops across all 5 faculties.
               </p>
             </div>
-            <div className="bg-white border border-stone-200 p-4 space-y-1">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-1.5">
               <p className="font-mono text-xs text-emerald-800">National Integrity Strategy</p>
               <p className="font-serif font-medium text-slate-900">Transparent Procurement</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 e-GP compliance, citizen charter disclosures, and audit committee reporting.
               </p>
             </div>
@@ -281,7 +281,7 @@ export function AdministrationSection({
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {UNIT_TABS.map((tab) => {
               const active = unitFilter === tab;
               return (
@@ -289,10 +289,10 @@ export function AdministrationSection({
                   key={tab}
                   type="button"
                   onClick={() => setUnitFilter(tab)}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {tab}
@@ -302,7 +302,7 @@ export function AdministrationSection({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-stone-200 bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredUnits.map((unit) => {
             const matchesRoute =
               (route === '/administration/ict-cell' && unit.code === 'ICT') ||
@@ -313,8 +313,10 @@ export function AdministrationSection({
             return (
               <div
                 key={unit.code}
-                className={`p-5 border-r border-b border-t border-stone-200 space-y-2 transition-colors ${
-                  matchesRoute ? 'bg-emerald-50/70' : 'hover:bg-emerald-50/25'
+                className={`p-5 rounded-xl border space-y-2 transition-colors ${
+                  matchesRoute
+                    ? 'border-emerald-700 bg-emerald-50/70'
+                    : 'border-slate-200 bg-white hover:border-emerald-700/40'
                 }`}
               >
                 <p className="font-mono text-xs text-emerald-800">

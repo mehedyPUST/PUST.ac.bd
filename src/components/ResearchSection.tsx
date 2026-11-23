@@ -28,12 +28,12 @@ export function ResearchSection({
       : publications.filter((p) => p.departmentCode === selectedDeptFilter);
 
   return (
-    <section id="research" className="bg-white border-t border-stone-200 pt-10 pb-14 lg:pb-16">
+    <section id="research" className="bg-white border-t border-slate-200 pt-10 pb-14 lg:pb-16">
       <div className="space-y-14">
         {/* Peer-Reviewed Publications & PUST Journals */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                   Faculty Research &amp; Periodicals
@@ -43,16 +43,16 @@ export function ResearchSection({
                 </h2>
               </div>
 
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {deptFilters.map((code) => (
                   <button
                     key={code}
                     type="button"
                     onClick={() => setSelectedDeptFilter(code)}
-                    className={`px-2.5 py-1 text-xs font-mono transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       selectedDeptFilter === code
-                        ? 'bg-emerald-800 text-white'
-                        : 'bg-stone-100 text-slate-700 hover:text-emerald-800 hover:bg-emerald-50'
+                        ? 'bg-emerald-900 text-white'
+                        : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-emerald-900 hover:border-emerald-700/50'
                     }`}
                   >
                     {code}
@@ -66,7 +66,7 @@ export function ResearchSection({
                 No publications listed for the selected department filter.
               </p>
             ) : (
-              <div className="divide-y divide-stone-200 border-b border-stone-200">
+              <div className="divide-y divide-slate-200 border-b border-slate-200">
                 {visiblePubs.map((pub) => (
                   <article key={pub.id} className="py-4 space-y-1.5">
                     <p className="font-mono text-xs text-emerald-800 tabular-nums">
@@ -82,36 +82,35 @@ export function ResearchSection({
             )}
           </div>
 
-          <div className="lg:col-span-5 bg-white border border-stone-200 shadow-xs overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
+          <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div className="p-6 sm:p-7 space-y-5">
-              <div className="border-b border-stone-200 pb-4">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
-                University Periodicals
-              </p>
-              <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
-                Official PUST Journals
-              </h3>
-            </div>
+              <div className="border-b border-slate-200 pb-4">
+                <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
+                  University Periodicals
+                </p>
+                <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                  Official PUST Journals
+                </h3>
+              </div>
 
-            <div className="divide-y divide-stone-200">
-              {journals.map((journal) => (
-                <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
-                  <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
-                  <h4 className="font-serif text-lg font-medium text-slate-900">
-                    {journal.title}
-                  </h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
-                  <p className="text-xs font-semibold text-emerald-800">{journal.currentIssue}</p>
-                </div>
-              ))}
-            </div>
+              <div className="divide-y divide-slate-200">
+                {journals.map((journal) => (
+                  <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
+                    <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
+                    <h4 className="font-serif text-lg font-medium text-slate-900">
+                      {journal.title}
+                    </h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
+                    <p className="text-xs font-semibold text-emerald-800">{journal.currentIssue}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Campus Facilities, Library & Student Life */}
-        <div id="campus" className="pt-12 border-t border-stone-200 space-y-10">
+        <div id="campus" className="pt-12 border-t border-slate-200 space-y-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7">
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
@@ -131,7 +130,7 @@ export function ResearchSection({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
               <ResilientImage
                 src={labImage}
                 alt="Students collaborating in a PUST engineering and instrumentation laboratory"
@@ -152,7 +151,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
               <ResilientImage
                 src={libraryImage}
                 alt="PUST Central Library study hall and digital archive"
@@ -173,7 +172,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
+            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/50 transition-all space-y-4">
               <ResilientImage
                 src={groundsImage}
                 alt="PUST Rajapur campus courtyard and residential halls at golden hour"

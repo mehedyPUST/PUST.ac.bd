@@ -199,11 +199,11 @@ export function CampusMapSection() {
     <section
       id="campus-map"
       aria-labelledby="campus-map-heading"
-      className="bg-[#FAF8F4] border-t border-stone-200 py-14 lg:py-16"
+      className="bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-stone-200 pb-5">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Rajapur 30-Acre Masterplan · Interactive Campus Directory
@@ -232,10 +232,10 @@ export function CampusMapSection() {
                   key={zone}
                   type="button"
                   onClick={() => handleZoneChange(zone)}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-white border border-stone-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900'
                   }`}
                 >
                   {zone === 'All' ? 'All Precincts' : zone}
@@ -249,7 +249,7 @@ export function CampusMapSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left: Interactive Architectural Blueprint */}
           <div className="lg:col-span-7 flex flex-col gap-4">
-            <div className="relative w-full aspect-[16/10] bg-white border border-stone-200 overflow-hidden select-none">
+            <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-slate-200 overflow-hidden select-none shadow-xs">
               {/* Architectural Blueprint SVG Layer */}
               <svg
                 viewBox="0 0 800 500"
@@ -464,7 +464,7 @@ export function CampusMapSection() {
               </svg>
 
               {/* Top-Right Compass / Scale Overlay */}
-              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 bg-white/95 border border-stone-200 absolute top-3 right-3 font-mono text-[10px] text-slate-600">
+              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 absolute top-3 right-3 font-mono text-[10px] text-slate-600">
                 <Compass className="w-3.5 h-3.5 text-emerald-800" />
                 <span>N ↑ · 24.0130° N, 89.2797° E</span>
               </div>
@@ -485,12 +485,12 @@ export function CampusMapSection() {
                       left: `${b.xPercent}%`,
                       top: `${b.yPercent}%`,
                     }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1.5 text-[11px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 ${
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 ${
                       isSelected
-                        ? 'z-20 bg-emerald-800 text-white border-emerald-900 shadow-md scale-[1.03]'
+                        ? 'z-20 bg-emerald-900 text-white border-emerald-950 shadow-md scale-[1.03]'
                         : isInZone
-                        ? 'z-10 bg-white/95 text-slate-900 border-stone-300 hover:border-emerald-700 hover:text-emerald-900'
-                        : 'z-0 bg-white/60 text-slate-400 border-stone-200 hover:bg-white hover:text-slate-700'
+                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-emerald-700 hover:text-emerald-900'
+                        : 'z-0 bg-white/60 text-slate-400 border-slate-200 hover:bg-white hover:text-slate-700'
                     }`}
                   >
                     <MapPin
@@ -505,7 +505,7 @@ export function CampusMapSection() {
             </div>
 
             {/* Direct Clickable Building Directory Grid (Accessible on Desktop & Mobile) */}
-            <div className="bg-white border border-stone-200 p-4 space-y-2.5">
+            <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-2.5">
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Campus Buildings Index ({filteredBuildings.length}) — Click a building name
               </p>
@@ -517,10 +517,10 @@ export function CampusMapSection() {
                       key={b.id}
                       type="button"
                       onClick={() => setSelectedBuildingId(b.id)}
-                      className={`px-3 py-2.5 text-left border transition-colors flex items-center justify-between gap-2 cursor-pointer ${
+                      className={`px-3 py-2.5 rounded-lg text-left border transition-colors flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-800 text-white border-emerald-900'
-                          : 'bg-[#FAF8F4] text-slate-800 border-stone-200 hover:border-emerald-700 hover:bg-emerald-50/40'
+                          ? 'bg-emerald-900 text-white border-emerald-950'
+                          : 'bg-slate-50 text-slate-800 border-slate-200 hover:border-emerald-700 hover:bg-emerald-50/40'
                       }`}
                     >
                       <span className="text-xs font-medium truncate">{b.name}</span>
@@ -544,15 +544,14 @@ export function CampusMapSection() {
             initial={{ opacity: 0.4, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
-            className="lg:col-span-5 bg-white border border-stone-200 shadow-sm flex flex-col justify-between animate__animated animate__fadeIn"
-            style={{ animationDuration: '200ms' }}
+            className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between overflow-hidden"
           >
             <div>
-              <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
               <ResilientImage
                 src={activeBuilding.photo}
                 alt={activeBuilding.name}
                 caption={activeBuilding.caption}
+                containerClassName="p-4 pb-0"
                 className="w-full aspect-[4/3] object-cover"
               />
 
@@ -568,7 +567,7 @@ export function CampusMapSection() {
 
                 <p className="text-sm text-slate-700 leading-relaxed">{activeBuilding.summary}</p>
 
-                <dl className="divide-y divide-stone-200 border-y border-stone-200 text-xs sm:text-sm">
+                <dl className="divide-y divide-slate-200 border-y border-slate-200 text-xs sm:text-sm">
                   <div className="py-2.5 space-y-0.5">
                     <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                       Offices &amp; Academic Units
@@ -596,7 +595,7 @@ export function CampusMapSection() {
             <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
               <Link
                 href={activeBuilding.route}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-emerald-900 text-white hover:bg-emerald-950 transition-colors whitespace-nowrap"
               >
                 {activeBuilding.routeLabel}
                 <ArrowRight className="w-3.5 h-3.5" />

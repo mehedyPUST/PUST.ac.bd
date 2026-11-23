@@ -38,7 +38,7 @@ export function ResilientImage({
 
   return (
     <figure className={containerClassName}>
-      <div className="relative w-full h-full overflow-hidden bg-slate-100 border border-stone-200">
+      <div className="relative w-full h-full overflow-hidden rounded-xl bg-slate-100 border border-slate-200">
         {!failed ? (
           <img
             src={currentSrc}

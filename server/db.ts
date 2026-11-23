@@ -22,24 +22,32 @@ import type {
   LibraryCardRecord,
   NoticeRecord,
   PaymentGatewayConfig,
+  PaymentReceiptRecord,
   PublicationRecord,
+  PublicStatusLookupResult,
   SignupTokenRecord,
   StudentRecord,
   UniversityProfile,
+  VerificationLookupResult,
   ViceChancellorRecord,
 } from '../src/types/pust';
 import {
   SEED_ABOUT_SECTIONS,
+  SEED_CERTIFICATE_APPLICATIONS,
   SEED_COURSES,
   SEED_DEPARTMENTS,
+  SEED_EXAM_APPLICATIONS,
   SEED_EXAM_CIRCULARS,
   SEED_EXAM_RESULTS,
   SEED_FEE_CONFIG,
   SEED_GALLERY_ITEMS,
   SEED_HALL_CIRCULARS,
   SEED_HALL_DUES,
+  SEED_INQUIRIES,
+  SEED_LIBRARY_CARDS,
   SEED_NOTICES,
   SEED_PAYMENT_GATEWAYS,
+  SEED_PAYMENT_RECEIPTS,
   SEED_PUBLICATIONS,
   SEED_STUDENTS,
   SEED_UNIVERSITY_PROFILE,
@@ -64,22 +72,23 @@ class PustRepository {
   private publications: PublicationRecord[] = [...SEED_PUBLICATIONS];
   private notices: NoticeRecord[] = [...SEED_NOTICES];
   private libraryApps: LibraryApplicationRecord[] = [];
-  private libraryCards: LibraryCardRecord[] = [];
+  private libraryCards: LibraryCardRecord[] = [...SEED_LIBRARY_CARDS];
   private libraryBorrows: LibraryBorrowRecord[] = [];
   private hallCirculars: HallCircularRecord[] = [...SEED_HALL_CIRCULARS];
   private hallApps: HallApplicationRecord[] = [];
   private hallDues: HallDueRecord[] = [...SEED_HALL_DUES];
   private examCirculars: ExamCircularRecord[] = [...SEED_EXAM_CIRCULARS];
-  private examApps: ExamApplicationRecord[] = [];
+  private examApps: ExamApplicationRecord[] = [...SEED_EXAM_APPLICATIONS];
   private examResults: ExamResultRecord[] = [...SEED_EXAM_RESULTS];
-  private certificateApps: CertificateApplicationRecord[] = [];
+  private certificateApps: CertificateApplicationRecord[] = [...SEED_CERTIFICATE_APPLICATIONS];
   private paymentGateways: PaymentGatewayConfig[] = [...SEED_PAYMENT_GATEWAYS];
+  private paymentReceipts: PaymentReceiptRecord[] = [...SEED_PAYMENT_RECEIPTS];
   private feeConfig: FeeConfig = { ...SEED_FEE_CONFIG };
   private galleryItems: GalleryItemRecord[] = [...SEED_GALLERY_ITEMS];
   private aboutSections: AboutContentRecord[] = [...SEED_ABOUT_SECTIONS];
   private vcProfiles: ViceChancellorRecord[] = [...SEED_VC_PROFILES];
   private auditLogs: AuditLogRecord[] = [];
-  private inquiries: InquiryRecord[] = [];
+  private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
   private bookmarks: BookmarkRecord[] = [];
 
   async init(): Promise<void> {
@@ -136,10 +145,15 @@ class PustRepository {
     await seedIfEmpty('students', SEED_STUDENTS);
     await seedIfEmpty('courses', SEED_COURSES);
     await seedIfEmpty('exam_circulars', SEED_EXAM_CIRCULARS);
+    await seedIfEmpty('exam_applications', SEED_EXAM_APPLICATIONS);
     await seedIfEmpty('exam_results', SEED_EXAM_RESULTS);
     await seedIfEmpty('hall_circulars', SEED_HALL_CIRCULARS);
     await seedIfEmpty('hall_dues', SEED_HALL_DUES);
+    await seedIfEmpty('library_cards', SEED_LIBRARY_CARDS);
+    await seedIfEmpty('certificate_applications', SEED_CERTIFICATE_APPLICATIONS);
     await seedIfEmpty('payment_gateways', SEED_PAYMENT_GATEWAYS);
+    await seedIfEmpty('payment_receipts', SEED_PAYMENT_RECEIPTS);
+    await seedIfEmpty('inquiries', SEED_INQUIRIES);
     await seedIfEmpty('gallery_items', SEED_GALLERY_ITEMS);
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
@@ -617,19 +631,277 @@ class PustRepository {
     return { ...this.feeConfig };
   }
 
+  // Payment Receipts Ledger
+  listPaymentReceipts = async () => {
+    const items = await this.getAll('payment_receipts', this.paymentReceipts);
+    return items.sort((a, b) => b.paidAt.localeCompare(a.paidAt));
+  };
+  createPaymentReceipt = (input: Omit<PaymentReceiptRecord, 'id'>) =>
+    this.insertItem('payment_receipts', this.paymentReceipts, {
+      id: `rcpt-${crypto.randomUUID()}`,
+      ...input,
+    });
+
   // Inquiries & Bookmarks
-  createInquiry = (input: Omit<InquiryRecord, 'id' | 'status' | 'createdAt'>) =>
-    this.insertItem('inquiries', this.inquiries, {
+  createInquiry = (input: Omit<InquiryRecord, 'id' | 'referenceCode' | 'status' | 'createdAt'>) => {
+    const refSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+    return this.insertItem('inquiries', this.inquiries, {
       id: `inq-${crypto.randomUUID()}`,
+      referenceCode: `PUST-INQ-${new Date().getFullYear()}-${refSuffix}`,
       ...input,
       status: 'Received',
       createdAt: new Date().toISOString(),
     });
-  listInquiries = () => this.getAll('inquiries', this.inquiries);
-  markInquiryReviewed = async (id: string): Promise<boolean> => {
-    const updated = await this.updateItem('inquiries', this.inquiries, id, { status: 'Reviewed' });
-    return Boolean(updated);
   };
+  listInquiries = async () => {
+    const items = await this.getAll('inquiries', this.inquiries);
+    return items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  };
+  markInquiryReviewed = async (
+    id: string,
+    opts?: { responseNote?: string; respondedBy?: string }
+  ): Promise<InquiryRecord | null> => {
+    return this.updateItem('inquiries', this.inquiries, id, {
+      status: 'Reviewed',
+      ...(opts?.responseNote ? { responseNote: opts.responseNote } : {}),
+      ...(opts?.respondedBy ? { respondedBy: opts.respondedBy } : {}),
+      respondedAt: new Date().toISOString(),
+    });
+  };
+
+  // Public Document Verification Lookup
+  async findVerificationByCode(rawCode: string): Promise<VerificationLookupResult | null> {
+    const code = rawCode.trim().toUpperCase();
+    if (!code) return null;
+
+    const certs = await this.listCertificateApplications();
+    const matchedCert = certs.find(
+      (c) =>
+        c.certificateSerial?.toUpperCase() === code ||
+        c.verificationHash?.toUpperCase() === code
+    );
+    if (matchedCert && matchedCert.finalAdminStatus === 'approved' && matchedCert.certificateSerial) {
+      return {
+        valid: true,
+        documentType: 'Certificate',
+        serialCode: matchedCert.certificateSerial,
+        title: `${matchedCert.certificateType} — ${matchedCert.departmentCode}`,
+        holderName: matchedCert.studentName,
+        academicId: matchedCert.academicId,
+        departmentCode: matchedCert.departmentCode,
+        session: matchedCert.session,
+        issuedAt: matchedCert.issuedAt || matchedCert.createdAt.slice(0, 10),
+        issuedBy: 'Controller of Examinations & Admin Office, PUST',
+        status: 'Verified & Active',
+        verificationHash:
+          matchedCert.verificationHash ||
+          `SHA256-${crypto.createHash('sha256').update(matchedCert.certificateSerial).digest('hex').slice(0, 12).toUpperCase()}`,
+        details: [
+          { label: 'Document Type', value: matchedCert.certificateType },
+          { label: 'Clearance Sign-offs', value: '4 / 4 Offices Approved' },
+          { label: 'Payment Reference', value: matchedCert.transactionId },
+          { label: 'Physical Status', value: matchedCert.physicalCollected ? 'Collected' : 'Digital Verified' },
+        ],
+      };
+    }
+
+    const examApps = await this.listExamApplications();
+    const matchedAdmit = examApps.find((e) => e.admitCardNo?.toUpperCase() === code);
+    if (matchedAdmit && matchedAdmit.verificationStatus === 'Approved' && matchedAdmit.admitCardNo) {
+      return {
+        valid: true,
+        documentType: 'Admit Card',
+        serialCode: matchedAdmit.admitCardNo,
+        title: matchedAdmit.examTitle,
+        holderName: matchedAdmit.studentName,
+        academicId: matchedAdmit.academicId,
+        departmentCode: matchedAdmit.departmentCode,
+        session: matchedAdmit.session,
+        issuedAt: matchedAdmit.admitCardIssuedAt || matchedAdmit.createdAt.slice(0, 10),
+        issuedBy: `Department Chairman (${matchedAdmit.departmentCode}) & Examination Office`,
+        status: 'Approved for Examination Entry',
+        verificationHash: `SHA256-${crypto.createHash('sha256').update(matchedAdmit.admitCardNo).digest('hex').slice(0, 12).toUpperCase()}`,
+        details: [
+          { label: 'Semester', value: `Semester ${matchedAdmit.semester}` },
+          { label: 'Courses Registered', value: matchedAdmit.selectedCourseCodes.join(', ') },
+          { label: 'Total Credits', value: matchedAdmit.totalCredits.toFixed(1) },
+          { label: 'Form Reference', value: matchedAdmit.formReference },
+        ],
+      };
+    }
+
+    const hallDues = await this.listHallDues();
+    const matchedClearance = hallDues.find((d) => d.clearanceRef?.toUpperCase() === code);
+    if (matchedClearance && matchedClearance.status === 'Cleared' && matchedClearance.clearanceRef) {
+      return {
+        valid: true,
+        documentType: 'Hall Clearance',
+        serialCode: matchedClearance.clearanceRef,
+        title: `${matchedClearance.hallName} — Financial Clearance`,
+        holderName: matchedClearance.studentName,
+        academicId: matchedClearance.academicId,
+        departmentCode: 'HALL',
+        issuedAt: matchedClearance.clearedAt || matchedClearance.paidAt || new Date().toISOString().slice(0, 10),
+        issuedBy: matchedClearance.clearedBy || matchedClearance.hallName,
+        status: 'Financial Dues Cleared',
+        verificationHash: `SHA256-${crypto.createHash('sha256').update(matchedClearance.clearanceRef).digest('hex').slice(0, 12).toUpperCase()}`,
+        details: [
+          { label: 'Hall Name', value: matchedClearance.hallName },
+          { label: 'Fee Head', value: matchedClearance.feeTitle },
+          { label: 'Amount Paid', value: `BDT ${matchedClearance.amountBdt.toLocaleString()}` },
+          { label: 'Payment Ref', value: matchedClearance.paymentRef || 'Verified' },
+        ],
+      };
+    }
+
+    const libCards = await this.listLibraryCards();
+    const matchedLibCard = libCards.find(
+      (c) =>
+        c.digitalCardNo.toUpperCase() === code ||
+        c.verificationHash?.toUpperCase() === code
+    );
+    if (matchedLibCard) {
+      return {
+        valid: matchedLibCard.status === 'Active',
+        documentType: 'Digital Library Card',
+        serialCode: matchedLibCard.digitalCardNo,
+        title: 'PUST Central Library Digital Membership Card',
+        holderName: matchedLibCard.studentName,
+        academicId: matchedLibCard.academicId,
+        departmentCode: matchedLibCard.departmentCode,
+        session: matchedLibCard.session,
+        issuedAt: matchedLibCard.issuedAt,
+        issuedBy: 'Central Library Office, PUST',
+        status: matchedLibCard.status,
+        verificationHash:
+          matchedLibCard.verificationHash ||
+          `SHA256-${crypto.createHash('sha256').update(matchedLibCard.digitalCardNo).digest('hex').slice(0, 12).toUpperCase()}`,
+        details: [
+          { label: 'Valid Until', value: matchedLibCard.validUntil },
+          { label: 'Physical Reference', value: matchedLibCard.physicalCardRef || 'Digital Card Only' },
+        ],
+      };
+    }
+
+    const libApps = await this.listLibraryApplications();
+    const matchedSeal = libApps.find(
+      (a) => a.chairmanSeal?.verificationHash.toUpperCase() === code
+    );
+    if (matchedSeal?.chairmanSeal) {
+      return {
+        valid: true,
+        documentType: 'Chairman Library Seal',
+        serialCode: matchedSeal.chairmanSeal.verificationHash,
+        title: `Department Chairman Library Attestation (${matchedSeal.departmentCode})`,
+        holderName: matchedSeal.studentName,
+        academicId: matchedSeal.academicId,
+        departmentCode: matchedSeal.departmentCode,
+        session: matchedSeal.session,
+        issuedAt: matchedSeal.chairmanSeal.signedAt.slice(0, 10),
+        issuedBy: matchedSeal.chairmanSeal.chairmanName,
+        status: matchedSeal.status === 'approved' ? 'Verified & Library Approved' : 'Chairman Forwarded',
+        verificationHash: matchedSeal.chairmanSeal.verificationHash,
+        details: [
+          { label: 'Official Seal', value: matchedSeal.chairmanSeal.officialSeal },
+          { label: 'Digital Signature', value: matchedSeal.chairmanSeal.digitalSignature },
+        ],
+      };
+    }
+
+    const receipts = await this.listPaymentReceipts();
+    const matchedReceipt = receipts.find(
+      (r) => r.receiptNo.toUpperCase() === code || r.transactionId.toUpperCase() === code
+    );
+    if (matchedReceipt) {
+      return {
+        valid: true,
+        documentType: 'Payment Receipt',
+        serialCode: matchedReceipt.receiptNo,
+        title: matchedReceipt.title,
+        holderName: matchedReceipt.studentName,
+        academicId: matchedReceipt.academicId,
+        departmentCode: matchedReceipt.departmentCode,
+        issuedAt: matchedReceipt.paidAt.slice(0, 10),
+        issuedBy: `${matchedReceipt.gatewayName} via PUST Finance`,
+        status: 'Verified Payment Settlement',
+        verificationHash: `SHA256-${crypto.createHash('sha256').update(matchedReceipt.receiptNo + matchedReceipt.transactionId).digest('hex').slice(0, 12).toUpperCase()}`,
+        details: [
+          { label: 'Transaction ID', value: matchedReceipt.transactionId },
+          { label: 'Amount Settled', value: `BDT ${matchedReceipt.amountBdt.toLocaleString()}` },
+          { label: 'Gateway', value: matchedReceipt.gatewayName },
+          { label: 'Category', value: matchedReceipt.targetType.replace('_', ' ').toUpperCase() },
+        ],
+      };
+    }
+
+    return null;
+  }
+
+  // Sanitized Pre-Login Status Lookup (Account Approval or Admission Inquiry)
+  async lookupPublicStatus(rawQuery: string): Promise<PublicStatusLookupResult | null> {
+    const q = rawQuery.trim();
+    if (q.length < 3) return null;
+    const upper = q.toUpperCase();
+    const lower = q.toLowerCase();
+
+    const inquiries = await this.listInquiries();
+    const matchedInq = inquiries.find(
+      (i) => i.referenceCode.toUpperCase() === upper || i.email.toLowerCase() === lower
+    );
+    if (matchedInq) {
+      return {
+        found: true,
+        lookupType: 'inquiry',
+        reference: matchedInq.referenceCode,
+        title: `${matchedInq.programLevel} Inquiry — ${matchedInq.departmentCode}`,
+        statusLabel:
+          matchedInq.status === 'Reviewed' ? 'Reviewed by Registrar Office' : 'Received · In Queue',
+        statusState: matchedInq.status === 'Reviewed' ? 'reviewed' : 'received',
+        departmentCode: matchedInq.departmentCode,
+        updatedAt: (matchedInq.respondedAt || matchedInq.createdAt).slice(0, 10),
+        note: matchedInq.responseNote,
+        meta: [
+          { label: 'Applicant', value: matchedInq.fullName },
+          { label: 'Program Level', value: matchedInq.programLevel },
+          { label: 'Department', value: matchedInq.departmentCode },
+          ...(matchedInq.respondedBy ? [{ label: 'Responded By', value: matchedInq.respondedBy }] : []),
+        ],
+      };
+    }
+
+    const users = await this.getAll('users', this.users);
+    const matchedUser = users.find(
+      (u) => u.email.toLowerCase() === lower || u.academicId.toUpperCase() === upper
+    );
+    if (matchedUser) {
+      const authority =
+        matchedUser.role === 'student' || matchedUser.role === 'teacher'
+          ? `${matchedUser.departmentCode} Department Chairman's Office`
+          : 'University Admin Office';
+      return {
+        found: true,
+        lookupType: 'account',
+        reference: matchedUser.academicId,
+        title: `Portal Account Application (${matchedUser.role.toUpperCase()})`,
+        statusLabel:
+          matchedUser.approvalStatus === 'approved'
+            ? 'Approved · Ready to Sign In'
+            : matchedUser.approvalStatus === 'rejected'
+            ? 'Application Declined'
+            : `Pending Approval (${authority})`,
+        statusState: matchedUser.approvalStatus,
+        departmentCode: matchedUser.departmentCode,
+        updatedAt: matchedUser.createdAt.slice(0, 10),
+        meta: [
+          { label: 'Department / Office', value: matchedUser.departmentCode },
+          { label: 'Approving Authority', value: authority },
+          { label: 'Role', value: matchedUser.role },
+        ],
+      };
+    }
+
+    return null;
+  }
 
   async listBookmarks(userId: string): Promise<BookmarkRecord[]> {
     const all = await this.getAll('bookmarks', this.bookmarks);

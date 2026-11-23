@@ -1,0 +1,332 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  Lock,
+  QrCode,
+  Receipt,
+  Smartphone,
+  X,
+} from 'lucide-react';
+import { pustApi } from '../../lib/api';
+import type { PaymentGatewayConfig, PaymentReceiptRecord } from '../../types/pust';
+import { VerificationQrSvg } from './DigitalDocumentModal';
+
+export interface CheckoutTarget {
+  targetType: 'hall_due' | 'exam_application' | 'certificate';
+  targetId?: string;
+  certificateType?: 'Temporary Certificate' | 'Provisional Transcript';
+  title: string;
+  subtitle: string;
+  amountBdt: number;
+}
+
+interface DigitalCheckoutModalProps {
+  target: CheckoutTarget | null;
+  gateways: PaymentGatewayConfig[];
+  onClose: () => void;
+  onSuccess: (receipt: PaymentReceiptRecord, updatedTarget: unknown) => Promise<void> | void;
+}
+
+export function DigitalCheckoutModal({
+  target,
+  gateways,
+  onClose,
+  onSuccess,
+}: DigitalCheckoutModalProps) {
+  const enabledGateways = gateways.filter((g) => g.enabled);
+  const [selectedCode, setSelectedCode] = useState(enabledGateways[0]?.code || 'SSLCOMMERZ');
+  const [accountMask, setAccountMask] = useState('');
+  const [manualRef, setManualRef] = useState('');
+  const [useManualRef, setUseManualRef] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<PaymentReceiptRecord | null>(null);
+
+  useEffect(() => {
+    if (target) {
+      setSelectedCode(enabledGateways[0]?.code || 'SSLCOMMERZ');
+      setAccountMask('');
+      setManualRef('');
+      setUseManualRef(false);
+      setError(null);
+      setReceipt(null);
+    }
+  }, [target, gateways]);
+
+  if (!target) return null;
+
+  const activeGateway =
+    enabledGateways.find((g) => g.code === selectedCode) || enabledGateways[0] || null;
+
+  function gatewayIcon(code: string) {
+    if (code === 'BANGLA_QR') return QrCode;
+    if (code === 'MFS') return Smartphone;
+    return CreditCard;
+  }
+
+  async function handleConfirmPayment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!target || !activeGateway) return;
+    if (useManualRef && manualRef.trim().length < 4) {
+      setError('Enter a valid pre-paid bank or MFS transaction ID (min 4 characters).');
+      return;
+    }
+
+    setProcessing(true);
+    setError(null);
+    try {
+      const res = await pustApi.checkoutPayment({
+        targetType: target.targetType,
+        targetId: target.targetId,
+        certificateType: target.certificateType,
+        gatewayCode: activeGateway.code,
+        accountMask:
+          accountMask.trim() ||
+          (activeGateway.code === 'BANGLA_QR'
+            ? 'Bangla QR Scan'
+            : activeGateway.code === 'MFS'
+            ? 'Mobile Wallet'
+            : 'Online Card / NetBank'),
+        manualRef: useManualRef ? manualRef.trim() : undefined,
+      });
+      setReceipt(res.receipt);
+      await onSuccess(res.receipt, res.updatedTarget);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to settle payment.');
+    } finally {
+      setProcessing(false);
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="checkout-modal-title"
+    >
+      <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 text-emerald-800" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+              PUST Digital Payment Checkout
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close checkout"
+            className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-800"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {receipt ? (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-sm text-emerald-950">
+                    Payment Verified & Settled
+                  </h3>
+                  <p className="text-xs text-emerald-800 mt-0.5">
+                    Your digital receipt has been recorded in the PUST Finance ledger.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-slate-500">Receipt No.</span>
+                  <span className="font-mono font-semibold text-emerald-900">
+                    {receipt.receiptNo}
+                  </span>
+                </div>
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-slate-500">Transaction ID</span>
+                  <span className="font-mono text-slate-800">{receipt.transactionId}</span>
+                </div>
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-slate-500">Gateway</span>
+                  <span className="text-slate-800">{receipt.gatewayName}</span>
+                </div>
+                <div className="px-4 py-2.5 flex justify-between">
+                  <span className="text-slate-500">Amount Paid</span>
+                  <span className="font-semibold text-slate-900 tabular-nums">
+                    BDT {receipt.amountBdt.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full py-2.5 rounded-lg bg-emerald-900 text-white text-xs font-semibold hover:bg-emerald-950"
+              >
+                Done & Return to Portal
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleConfirmPayment} className="space-y-5">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    Payment Item
+                  </p>
+                  <h2
+                    id="checkout-modal-title"
+                    className="font-serif text-lg font-medium text-slate-900 mt-0.5"
+                  >
+                    {target.title}
+                  </h2>
+                  <p className="text-xs text-slate-600 mt-0.5">{target.subtitle}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-500">Payable</p>
+                  <p className="font-mono text-lg font-semibold text-emerald-900 tabular-nums">
+                    ৳{target.amountBdt.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {enabledGateways.length === 0 ? (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                  No digital payment gateways are currently enabled by the Admin Office.
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      Select Payment Channel
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {enabledGateways.map((gw) => {
+                        const Icon = gatewayIcon(gw.code);
+                        const active = gw.code === activeGateway?.code;
+                        return (
+                          <button
+                            key={gw.id}
+                            type="button"
+                            onClick={() => setSelectedCode(gw.code)}
+                            className={`text-left p-3 rounded-xl border transition-colors flex items-start gap-3 ${
+                              active
+                                ? 'border-emerald-700 bg-emerald-50/70'
+                                : 'border-slate-200 hover:border-slate-300 bg-white'
+                            }`}
+                          >
+                            <Icon
+                              className={`w-4 h-4 mt-0.5 shrink-0 ${
+                                active ? 'text-emerald-800' : 'text-slate-500'
+                              }`}
+                            />
+                            <div>
+                              <p className="text-xs font-semibold text-slate-900">{gw.name}</p>
+                              <p className="text-[11px] text-slate-600 mt-0.5">{gw.instructions}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {activeGateway?.code === 'BANGLA_QR' && !useManualRef && (
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center gap-4">
+                      <VerificationQrSvg
+                        seed={`PUST-BQR-${target.targetType}-${target.targetId || target.amountBdt}`}
+                        size={76}
+                      />
+                      <div className="text-xs space-y-1">
+                        <p className="font-semibold text-slate-900">
+                          Scan Merchant QR via Bangla QR
+                        </p>
+                        <p className="text-slate-600">
+                          Merchant ID: <span className="font-mono">PUST.GOV.BD.FIN</span>
+                        </p>
+                        <p className="text-[11px] text-emerald-800">
+                          Click &ldquo;Pay & Generate Receipt&rdquo; after confirming in your app.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-slate-700">
+                        {useManualRef
+                          ? 'Pre-Paid Bank / MFS Transaction ID'
+                          : 'Account / Wallet Reference (optional)'}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setUseManualRef(!useManualRef)}
+                        className="text-[11px] font-medium text-emerald-800 hover:underline"
+                      >
+                        {useManualRef ? 'Use Instant Checkout' : 'Have Existing TXN Ref?'}
+                      </button>
+                    </div>
+
+                    {useManualRef ? (
+                      <input
+                        value={manualRef}
+                        onChange={(e) => setManualRef(e.target.value)}
+                        placeholder="e.g. TXN-902184 or Bank Scroll Ref"
+                        required
+                        className="w-full px-3.5 py-2.5 text-sm font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                      />
+                    ) : (
+                      <input
+                        value={accountMask}
+                        onChange={(e) => setAccountMask(e.target.value)}
+                        placeholder={
+                          activeGateway?.code === 'MFS'
+                            ? 'Wallet e.g. 017••••1234'
+                            : 'Card / Account last 4 digits (optional)'
+                        }
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+
+              {error && (
+                <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  {error}
+                </p>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={processing || enabledGateways.length === 0}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-50"
+                >
+                  {processing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Receipt className="w-3.5 h-3.5" />
+                  )}
+                  {processing ? 'Processing...' : `Pay BDT ${target.amountBdt.toLocaleString()}`}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

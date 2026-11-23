@@ -25,7 +25,19 @@ const studentTokenRegisterSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
   password: z.string().min(8).max(128),
-  admissionDocuments: z.array(z.string().trim().min(2).max(120)).min(1).max(6),
+  admissionDocuments: z.array(z.string().trim().min(2).max(120)).min(1).max(8),
+  digitalDocuments: z
+    .array(
+      z.object({
+        label: z.string().trim().min(2).max(120),
+        fileName: z.string().trim().min(1).max(180),
+        sizeLabel: z.string().trim().min(1).max(40),
+        uploadedAt: z.string().trim().min(4).max(40),
+        verifiedHash: z.string().trim().min(4).max(80),
+      })
+    )
+    .max(8)
+    .optional(),
 });
 
 const officerRegisterSchema = z.object({
@@ -163,6 +175,38 @@ export function mountApiRoutes(app: Express): void {
     res.status(201).json({ inquiry });
   });
 
+  // Public Document Verification & Authenticity Endpoint
+  app.get('/api/verify/:code', async (req, res) => {
+    const code = String(req.params.code || '').trim();
+    if (code.length < 4 || code.length > 80) {
+      res.status(400).json({ error: 'Provide a valid document serial or verification hash.' });
+      return;
+    }
+    const verification = await pustRepo.findVerificationByCode(code);
+    if (!verification) {
+      res.status(404).json({
+        error: 'No matching verified certificate, admit card, clearance, library card, or receipt found.',
+      });
+      return;
+    }
+    res.json({ verification });
+  });
+
+  // Sanitized Pre-Login Status Tracker (Account Approval or Admission Inquiry)
+  app.get('/api/status', async (req, res) => {
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    if (q.length < 3 || q.length > 120) {
+      res.status(400).json({ error: 'Enter your email, academic ID, or PUST-INQ reference code.' });
+      return;
+    }
+    const result = await pustRepo.lookupPublicStatus(q);
+    if (!result) {
+      res.status(404).json({ error: 'No matching account application or inquiry found.' });
+      return;
+    }
+    res.json({ result });
+  });
+
   // Auth status & JWT session
   app.get('/api/auth/bootstrap-status', async (_req, res) => {
     const envPasscode = process.env.ADMIN_PASSCODE?.trim();
@@ -248,6 +292,7 @@ export function mountApiRoutes(app: Express): void {
         hallName: tokenRecord.hallAffiliation,
         seatNumber: 'Unassigned',
         admissionDocuments: parsed.data.admissionDocuments,
+        ...(parsed.data.digitalDocuments ? { digitalDocuments: parsed.data.digitalDocuments } : {}),
         chairmanNotes: 'Awaiting Department Chairman verification of submitted documents.',
         adminNotes: '',
         disciplinaryStatus: 'Clear',
@@ -501,14 +546,31 @@ export function mountApiRoutes(app: Express): void {
     res.json({ inquiries });
   });
 
-  app.patch('/api/inquiries/:id/review', requireRoles('admin', 'registrar'), async (req, res) => {
-    const updated = await pustRepo.markInquiryReviewed(String(req.params.id));
-    if (!updated) {
-      res.status(404).json({ error: 'Inquiry not found.' });
-      return;
+  app.patch(
+    '/api/inquiries/:id/review',
+    requireRoles('admin', 'registrar'),
+    async (req: AuthenticatedRequest, res) => {
+      const parsed = z
+        .object({ responseNote: z.string().trim().max(800).optional() })
+        .safeParse(req.body || {});
+      const responseNote = parsed.success ? parsed.data.responseNote : undefined;
+      const updated = await pustRepo.markInquiryReviewed(String(req.params.id), {
+        responseNote,
+        respondedBy: req.authUser!.name,
+      });
+      if (!updated) {
+        res.status(404).json({ error: 'Inquiry not found.' });
+        return;
+      }
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        'Reviewed Admission Inquiry',
+        updated.referenceCode
+      );
+      res.json({ updated: true, inquiry: updated });
     }
-    res.json({ updated: true });
-  });
+  );
 
   // Protected user bookmarks
   app.get('/api/bookmarks', requireAuth, async (req: AuthenticatedRequest, res) => {

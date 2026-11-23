@@ -21,7 +21,7 @@ export default function PortalPage() {
   } = usePust();
 
   return (
-    <main className="flex-1 bg-[#FAF8F4]">
+    <main className="flex-1 bg-[#F7F7F5]">
       <PortalView
         user={user}
         departments={departments}

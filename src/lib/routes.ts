@@ -47,6 +47,7 @@ export type AppRoute =
   | '/facilities/ict-sheba'
   | '/notices'
   | '/gallery'
+  | '/verify'
   | '/portal';
 
 export interface NavSubItem {
@@ -152,6 +153,7 @@ const ALL_VALID_ROUTES = new Set<AppRoute>([
   '/',
   '/notices',
   '/gallery',
+  '/verify',
   '/portal',
   ...NAV_GROUPS.flatMap((g) => [g.defaultRoute, ...g.items.map((i) => i.route)]),
 ]);

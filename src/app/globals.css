@@ -28,10 +28,19 @@
 }
 
 @media print {
+  body {
+    background: #ffffff !important;
+  }
   header,
   footer,
   aside,
-  nav {
+  nav,
+  .print\:hidden {
     display: none !important;
+  }
+  .print-only-document {
+    box-shadow: none !important;
+    max-width: 100% !important;
+    margin: 0 !important;
   }
 }

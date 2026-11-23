@@ -1,34 +1,24 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import type { AppRoute } from '../lib/routes';
+import { PustCrest } from './PustCrest';
 
 interface FooterProps {
-  onNavigate?: (route: AppRoute) => void;
+  onNavigate?: (route: AppRoute | string) => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
-  const [logoFailed, setLogoFailed] = useState(false);
-
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
+    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
         <div className="lg:col-span-4 space-y-3">
           <div className="flex items-center gap-3">
-            {!logoFailed && (
-              <img
-                src="https://pust.ac.bd/includes/images/pust_logo.png?key=38"
-                alt="PUST Official Crest"
-                referrerPolicy="no-referrer"
-                onError={() => setLogoFailed(true)}
-                className="w-10 h-10 object-contain bg-white/95 p-1 shrink-0"
-              />
-            )}
+            <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
-                About PUST
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
+                Est. 2008 · Rajapur, Pabna
               </p>
               <h2 className="font-serif text-lg font-medium text-white">
                 Pabna University of Science and Technology
@@ -36,9 +26,8 @@ export function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           <p className="text-sm text-slate-400 leading-relaxed">
-            Established in 2008 by the Government of Bangladesh in Rajapur, Pabna-6600. Advancing
-            applied engineering, scientific research, and regional higher education across 5
-            faculties and 21 academic departments.
+            A public university in Bangladesh advancing engineering, pure and applied sciences,
+            business, and humanities across 5 faculties and 21 academic departments.
           </p>
           <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-400">
             <a
@@ -47,7 +36,7 @@ export function Footer({ onNavigate }: FooterProps) {
               rel="noreferrer"
               className="hover:text-emerald-400 transition-colors"
             >
-              Official Portal
+              Official Site
             </a>
             <a
               href="https://www.facebook.com/pust.ac.bd"
@@ -85,9 +74,9 @@ export function Footer({ onNavigate }: FooterProps) {
             {[
               { label: 'Our University', route: '/about/our-university' as AppRoute },
               { label: 'History', route: '/about/history' as AppRoute },
-              { label: 'Mission & Plans', route: '/about/mission-vision' as AppRoute },
               { label: 'Notice Board', route: '/notices' as AppRoute },
-              { label: 'Photo & Video Gallery', route: '/gallery' as AppRoute },
+              { label: 'Verify Documents', route: '/verify' as AppRoute },
+              { label: 'Campus Gallery', route: '/gallery' as AppRoute },
               { label: 'Admission Desk', route: '/admissions' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
@@ -133,13 +122,13 @@ export function Footer({ onNavigate }: FooterProps) {
         {/* Academic & Student Services */}
         <div className="lg:col-span-2 space-y-2 text-sm">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
-            Academic &amp; Services
+            Digital Services
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
             {[
               { label: '21 Departments', route: '/academics/departments' as AppRoute },
               { label: 'Academic Calendar', route: '/academics/calendar' as AppRoute },
-              { label: 'Forms Download', route: '/academics/forms-download' as AppRoute },
+              { label: 'Digital Forms', route: '/academics/forms-download' as AppRoute },
               { label: 'Central Library', route: '/facilities/library' as AppRoute },
               { label: 'Residence & Halls', route: '/facilities/residence' as AppRoute },
               { label: 'Campus Portal', route: '/portal' as AppRoute },

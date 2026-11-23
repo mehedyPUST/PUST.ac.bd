@@ -2,9 +2,22 @@
 
 import { useMemo, useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, FileDown, PlayCircle, Search, X } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  FileDown,
+  FileText,
+  PlayCircle,
+  Printer,
+  Search,
+  X,
+} from 'lucide-react';
+import { pustApi } from '../lib/api';
 import type { AppRoute } from '../lib/routes';
 import { CardsGridSkeleton } from './PustSkeletons';
+import { PustCrest } from './PustCrest';
 import { ResearchSection } from './ResearchSection';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -16,6 +29,7 @@ import type {
   NoticeCategory,
   NoticeRecord,
   PublicationRecord,
+  PublicStatusLookupResult,
   UniversityProfile,
 } from '../types/pust';
 
@@ -72,36 +86,91 @@ const NOTICE_FILTERS: Array<'All' | NoticeCategory> = [
   'NOC & Orders',
 ];
 
-const DOWNLOAD_FORMS = [
+interface DigitalFormDef {
+  code: string;
+  title: string;
+  office: string;
+  note: string;
+  portalTarget: string;
+  portalLabel: string;
+  fields: string[];
+}
+
+const DOWNLOAD_FORMS: DigitalFormDef[] = [
   {
     code: 'PUST-REG-01',
     title: 'Admission Verification & Token Request Form',
     office: 'Office of the Registrar / Department Chairman',
     note: 'Digital token issuance and document verification handled inside Campus Portal.',
+    portalTarget: '/portal',
+    portalLabel: 'Activate via Portal Token',
+    fields: [
+      'Applicant Full Name (as per SSC/HSC)',
+      'GST Unit & Admission Roll Number',
+      'Department Allocated & Session',
+      'Academic ID / Temporary Reference',
+      'Digital Document Verification Packet Hash',
+    ],
   },
   {
     code: 'PUST-LIB-02',
     title: 'Central Library Membership & Card Requisition Form',
     office: 'Department Chairman Seal + Central Library',
     note: 'Forwarded digitally with Chairman official seal and signature JSON.',
+    portalTarget: '/portal?tab=library',
+    portalLabel: 'Start Library Application',
+    fields: [
+      'Student Name & Academic ID',
+      'Department Code & Academic Session',
+      'Chairman Digital Seal JSON Endorsement',
+      'Central Library Verification Officer',
+      'Linked Digital / Physical Library Card Ref',
+    ],
   },
   {
     code: 'PUST-HALL-03',
     title: 'Residential Hall Seat Application & Clearance Form',
     office: 'Provost Office (July 06 Hall & Dormitories)',
     note: 'Check vacancy circulars, hall dues, and clearance references in Campus Portal.',
+    portalTarget: '/portal?tab=halls',
+    portalLabel: 'Apply / Clear Hall Dues',
+    fields: [
+      'Student Name, Academic ID & Department',
+      'Preferred Residential Hall (July 06 Hall / Dormitories)',
+      'Permanent District & Residential Statement',
+      'Hall Financial Receipt & Clearance Reference',
+      'Provost / House Tutor Seat Allotment Endorsement',
+    ],
   },
   {
     code: 'PUST-EX-04',
     title: 'Semester Examination Form Fill-up & Admit Card Application',
     office: 'Department Chairman & Controller of Examinations',
     note: 'Enforces automatic Hall clearance check and online payment receipt.',
+    portalTarget: '/portal?tab=exams',
+    portalLabel: 'Open Exam Form Fill-up',
+    fields: [
+      'Student Name, Academic ID & Semester',
+      'Registered Course Codes & Credit Total',
+      'Verified Hall Financial Clearance Status',
+      'Digital Checkout Receipt (SSLCommerz / Bangla QR / MFS)',
+      'Chairman Digital Admit Card Verification',
+    ],
   },
   {
     code: 'PUST-CERT-05',
     title: 'Provisional / Temporary Certificate & 4-Office Clearance Form',
     office: 'Chairman, Hall, Library, Proctor & Admin Office',
     note: 'Track real-time 4-office clearances and download verified Temporary Certificate.',
+    portalTarget: '/portal?tab=certificates',
+    portalLabel: 'Start Certificate Clearance',
+    fields: [
+      'Graduating Student Name & Academic ID',
+      '8-Semester Completion & Final CGPA Verification',
+      'Certificate Fee Payment Receipt Reference',
+      '4-Office Clearances (Chairman, Hall, Library, Proctor)',
+      'Central Admin Certificate Serial & Public Verify Hash',
+    ],
   },
 ];
 
@@ -172,6 +241,65 @@ const DEGREE_PROGRAMS = [
   },
 ];
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function downloadPrintableFormHtml(form: DigitalFormDef) {
+  const rows = form.fields
+    .map(
+      (f) =>
+        `<tr><th style="text-align:left;padding:10px 12px;border:1px solid #cbd5e1;background:#f8fafc;width:38%;font-size:12px;color:#334155;">${escapeHtml(
+          f
+        )}</th><td style="padding:14px 12px;border:1px solid #cbd5e1;font-size:13px;color:#64748b;">________________________________________________</td></tr>`
+    )
+    .join('');
+
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(form.code)} — ${escapeHtml(form.title)}</title>
+</head>
+<body style="font-family:sans-serif;background:#f7f7f5;padding:32px;color:#0f172a;">
+  <div style="max-width:760px;margin:0 auto;background:#ffffff;border:2px solid #064e3b;padding:32px;">
+    <div style="border-bottom:2px solid #e2e8f0;padding-bottom:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#065f46;font-weight:700;">Pabna University of Science and Technology</div>
+        <h1 style="margin:6px 0 4px;font-size:21px;font-family:Georgia,serif;">${escapeHtml(form.title)}</h1>
+        <p style="margin:0;font-size:12px;color:#475569;">Receiving Authority: ${escapeHtml(form.office)}</p>
+      </div>
+      <div style="font-family:monospace;font-size:13px;font-weight:700;color:#064e3b;">${escapeHtml(form.code)}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      ${rows}
+    </table>
+    <div style="margin-top:28px;display:flex;justify-content:space-between;font-size:12px;color:#334155;">
+      <div>Applicant Signature &amp; Date: _______________________</div>
+      <div>Endorsing Authority Seal: _______________________</div>
+    </div>
+    <p style="margin-top:20px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:12px;">Note: ${escapeHtml(
+      form.note
+    )} Digital submission is recommended via the PUST Campus Portal.</p>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${form.code}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 interface PublicSubPagesProps {
   route: AppRoute;
   profile: UniversityProfile | null;
@@ -182,7 +310,7 @@ interface PublicSubPagesProps {
   notices: NoticeRecord[];
   loadingData: boolean;
   dataError: string | null;
-  onNavigate: (route: AppRoute) => void;
+  onNavigate: (route: AppRoute | string) => void;
   onSelectDepartment: (dept: DepartmentRecord) => void;
   onSelectNotice: (notice: NoticeRecord) => void;
   onSubmitInquiry: (payload: {
@@ -218,6 +346,7 @@ export function PublicSubPages({
   const [galleryCategory, setGalleryCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
+  const [previewForm, setPreviewForm] = useState<DigitalFormDef | null>(null);
 
   const [inqName, setInqName] = useState('');
   const [inqEmail, setInqEmail] = useState('');
@@ -227,8 +356,14 @@ export function PublicSubPages({
   const [inqDept, setInqDept] = useState('CSE');
   const [inqMessage, setInqMessage] = useState('');
   const [inqSubmitting, setInqSubmitting] = useState(false);
-  const [inqSuccess, setInqSuccess] = useState<string | null>(null);
+  const [inqSuccess, setInqSuccess] = useState<{ referenceCode: string; email: string } | null>(null);
   const [inqError, setInqError] = useState<string | null>(null);
+
+  // Public Status Tracker on Admissions
+  const [statusQuery, setStatusQuery] = useState('');
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [statusResult, setStatusResult] = useState<PublicStatusLookupResult | null>(null);
 
   const filteredDepartments = useMemo(() => {
     return departments.filter((d) => {
@@ -276,9 +411,11 @@ export function PublicSubPages({
         departmentCode: inqDept,
         message: inqMessage,
       });
-      setInqSuccess(
-        `Inquiry recorded under reference ${inquiry.id.slice(0, 12)}. Our Admissions Desk will respond to ${inquiry.email}.`
-      );
+      setInqSuccess({
+        referenceCode: inquiry.referenceCode || inquiry.id,
+        email: inquiry.email,
+      });
+      setStatusQuery(inquiry.referenceCode || inquiry.id);
       setInqName('');
       setInqEmail('');
       setInqPhone('');
@@ -287,6 +424,25 @@ export function PublicSubPages({
       setInqError(err instanceof Error ? err.message : 'Unable to submit inquiry.');
     } finally {
       setInqSubmitting(false);
+    }
+  }
+
+  async function handleCheckStatus(e: FormEvent, overrideQuery?: string) {
+    e.preventDefault();
+    const q = (overrideQuery ?? statusQuery).trim();
+    if (!q) return;
+    setStatusLoading(true);
+    setStatusError(null);
+    try {
+      const res = await pustApi.checkPublicStatus(q);
+      setStatusResult(res.result);
+    } catch (err) {
+      setStatusResult(null);
+      setStatusError(
+        err instanceof Error ? err.message : 'No inquiry or pending portal account found.'
+      );
+    } finally {
+      setStatusLoading(false);
     }
   }
 
@@ -312,14 +468,14 @@ export function PublicSubPages({
           transition={{ duration: 0.28 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
         >
-          <div className="border-b border-stone-200 pb-6 space-y-4">
+          <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               About Pabna University of Science &amp; Technology
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {activeSection?.title || 'Our University'}
             </h1>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {[
                 { label: 'Our University', route: '/about/our-university' as AppRoute },
                 { label: 'History', route: '/about/history' as AppRoute },
@@ -330,10 +486,10 @@ export function PublicSubPages({
                   key={tab.route}
                   type="button"
                   onClick={() => onNavigate(tab.route)}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route || (route === '/about' && tab.route === '/about/our-university')
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {tab.label}
@@ -348,16 +504,16 @@ export function PublicSubPages({
                 {activeSection?.body}
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-stone-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                 {aboutSections.map((sec) => (
                   <button
                     key={sec.id}
                     type="button"
                     onClick={() => onNavigate(`/about/${sec.slug}` as AppRoute)}
-                    className={`text-left p-4 border transition-colors cursor-pointer ${
+                    className={`text-left p-4 rounded-xl border transition-colors cursor-pointer ${
                       sec.slug === activeSlug
-                        ? 'border-emerald-800 bg-emerald-50/40'
-                        : 'border-stone-200 bg-[#FAF8F4] hover:border-emerald-400'
+                        ? 'border-emerald-800 bg-emerald-50/50'
+                        : 'border-slate-200 bg-[#F7F7F5] hover:border-emerald-700/50'
                     }`}
                   >
                     <p className="font-serif text-base font-medium text-slate-900">{sec.title}</p>
@@ -374,7 +530,7 @@ export function PublicSubPages({
                 caption="Rajapur Campus Quadrangle along the Dhaka–Pabna Highway."
                 className="w-full aspect-[4/3] object-cover"
               />
-              <dl className="border border-stone-200 bg-[#FAF8F4] divide-y divide-stone-200 text-sm">
+              <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Established</dt>
                   <dd className="font-mono font-medium">2008 (Act No. 43 of 2001)</dd>
@@ -398,13 +554,13 @@ export function PublicSubPages({
           </div>
 
           {/* Institutional Chronological Milestones */}
-          <div className="pt-8 border-t border-stone-200 space-y-4">
+          <div className="pt-8 border-t border-slate-200 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Institutional Chronology
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-stone-200 bg-[#FAF8F4] divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] divide-y sm:divide-y-0 sm:divide-x divide-slate-200 overflow-hidden">
               {UNIVERSITY_MILESTONES.map((m) => (
-                <div key={m.year} className="p-4 space-y-1.5">
+                <div key={m.year} className="p-5 space-y-1.5">
                   <p className="font-mono text-xs font-semibold text-emerald-800 tabular-nums">
                     {m.year}
                   </p>
@@ -425,7 +581,7 @@ export function PublicSubPages({
       { label: 'Departments (21)', route: '/academics/departments' },
       { label: 'Programs', route: '/academics/programs' },
       { label: 'Faculties', route: '/academics/faculty' },
-      { label: 'Forms Download', route: '/academics/forms-download' },
+      { label: 'Digital Forms Hub', route: '/academics/forms-download' },
       { label: 'Academic Calendar', route: '/academics/calendar' },
       { label: 'Scholarship', route: '/academics/scholarship' },
       { label: 'Seminars & Workshops', route: '/academics/seminars' },
@@ -443,24 +599,24 @@ export function PublicSubPages({
           transition={{ duration: 0.28 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8"
         >
-          <div className="border-b border-stone-200 pb-6 space-y-4">
+          <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Academic Affairs &amp; Research
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {academicSubTabs.find((t) => t.route === route)?.label || 'Academic Directory'}
             </h1>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {academicSubTabs.map((tab) => (
                 <button
                   key={tab.route}
                   type="button"
                   onClick={() => onNavigate(tab.route)}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route ||
                     (route === '/academics' && tab.route === '/academics/departments')
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {tab.label}
@@ -475,14 +631,14 @@ export function PublicSubPages({
                 {DEGREE_PROGRAMS.map((prog) => (
                   <div
                     key={prog.level}
-                    className="p-6 border border-stone-200 bg-[#FAF8F4] space-y-3"
+                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-3"
                   >
                     <p className="font-mono text-xs uppercase tracking-wider text-emerald-800">
                       {prog.duration}
                     </p>
                     <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
                     <p className="text-sm font-medium text-slate-800">{prog.degrees}</p>
-                    <dl className="pt-3 border-t border-stone-200 space-y-1.5 text-xs">
+                    <dl className="pt-3 border-t border-slate-200 space-y-1.5 text-xs">
                       <div className="flex justify-between gap-4">
                         <dt className="text-slate-500">Credit Structure</dt>
                         <dd className="font-mono text-slate-900">{prog.credits}</dd>
@@ -495,7 +651,7 @@ export function PublicSubPages({
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-4 p-5 border border-stone-200 bg-white">
+              <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
                 <p className="text-sm text-slate-700">
                   All degree programs operate under the Outcome-Based Education (OBE) framework and
                   4.00 grading ordinance.
@@ -504,14 +660,14 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => onNavigate('/governance/academic-ordinance')}
-                    className="px-4 py-2 text-xs font-medium border border-stone-300 text-slate-800 hover:border-emerald-800 hover:text-emerald-800 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-800 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer"
                   >
                     Academic Ordinance
                   </button>
                   <button
                     type="button"
                     onClick={() => onNavigate('/academics/departments')}
-                    className="px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer"
                   >
                     Browse 21 Departments
                   </button>
@@ -523,8 +679,11 @@ export function PublicSubPages({
               {FACULTY_DEANS.map((fac) => {
                 const facDepts = departments.filter((d) => d.faculty === fac.faculty);
                 return (
-                  <div key={fac.faculty} className="border border-stone-200 bg-white">
-                    <div className="px-6 py-4 bg-[#FAF8F4] border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div
+                    key={fac.faculty}
+                    className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
+                  >
+                    <div className="px-6 py-4 bg-[#F7F7F5] border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
                         <p className="font-mono text-xs text-emerald-800">{fac.code}</p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
@@ -535,13 +694,13 @@ export function PublicSubPages({
                         Dean: <span className="font-medium text-slate-900">{fac.dean}</span>
                       </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-stone-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                       {facDepts.map((dept) => (
                         <button
                           key={dept.id}
                           type="button"
                           onClick={() => onSelectDepartment(dept)}
-                          className="text-left p-5 hover:bg-emerald-50/40 transition-colors space-y-1.5 border-b border-stone-200 cursor-pointer"
+                          className="text-left p-5 hover:bg-emerald-50/40 transition-colors space-y-1.5 border-b border-slate-200 cursor-pointer"
                         >
                           <p className="font-mono text-xs text-emerald-800 tabular-nums">
                             {dept.code} · {dept.intakeSeats} Seats
@@ -558,19 +717,35 @@ export function PublicSubPages({
               })}
             </div>
           ) : route === '/academics/forms-download' ? (
-            <div className="space-y-4">
-              <p className="text-sm text-slate-600">
-                Official student and departmental forms. Download printable form templates or submit
-                and track clearances directly in the Campus Portal.
-              </p>
-              <div className="divide-y divide-stone-200 border border-stone-200">
+            <div className="space-y-5">
+              <div className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-wider text-emerald-800">
+                    100% Paperless &amp; Printable Forms Hub
+                  </p>
+                  <p className="text-sm text-slate-700 mt-1">
+                    Preview official HTML printable copies or launch the live digital submission
+                    workflow directly inside the PUST Campus Portal.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('/verify')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Verify Issued Documents
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
                 {DOWNLOAD_FORMS.map((form) => (
                   <div
                     key={form.code}
-                    className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white"
+                    className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F7F7F5]/60 transition-colors"
                   >
                     <div className="space-y-1">
-                      <p className="font-mono text-xs text-emerald-800">{form.code}</p>
+                      <p className="font-mono text-xs text-emerald-800 font-semibold">{form.code}</p>
                       <h2 className="font-serif text-lg font-medium text-slate-900">{form.title}</h2>
                       <p className="text-xs text-slate-600">
                         {form.office} — {form.note}
@@ -579,44 +754,27 @@ export function PublicSubPages({
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <button
                         type="button"
-                        onClick={() => {
-                          const content = [
-                            'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY (PUST)',
-                            'Rajapur, Pabna-6600, Bangladesh',
-                            '============================================================',
-                            `FORM CODE : ${form.code}`,
-                            `TITLE     : ${form.title}`,
-                            `OFFICE    : ${form.office}`,
-                            '------------------------------------------------------------',
-                            'Student Name        : ______________________________________',
-                            'Academic ID / Roll  : ______________________________________',
-                            'Department & Session: ______________________________________',
-                            'Hall Affiliation    : ______________________________________',
-                            'Signature & Date    : ______________________________________',
-                            '------------------------------------------------------------',
-                            `Notes: ${form.note}`,
-                          ].join('\n');
-                          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `${form.code}.txt`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 whitespace-nowrap shrink-0 cursor-pointer"
+                        onClick={() => setPreviewForm(form)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        <FileDown className="w-3.5 h-3.5" />
-                        Download Template
+                        <FileText className="w-3.5 h-3.5" />
+                        Preview &amp; Print
                       </button>
                       <button
                         type="button"
-                        onClick={() => onNavigate('/portal')}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+                        onClick={() => downloadPrintableFormHtml(form)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        Open Digital Form in Portal
+                        <FileDown className="w-3.5 h-3.5" />
+                        HTML Copy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onNavigate(form.portalTarget)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        {form.portalLabel}
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -624,7 +782,7 @@ export function PublicSubPages({
               </div>
             </div>
           ) : route === '/academics/calendar' ? (
-            <div className="divide-y divide-stone-200 border border-stone-200 bg-white">
+            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
               {ACADEMIC_CALENDAR_2026.map((row) => (
                 <div
                   key={row.event}
@@ -662,14 +820,14 @@ export function PublicSubPages({
                     'Financial waivers coordinated between July 06 Hall / dormitories and the Student Welfare Directorate.',
                 },
               ].map((s) => (
-                <div key={s.title} className="p-6 border border-stone-200 bg-[#FAF8F4] space-y-2">
+                <div key={s.title} className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2">
                   <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
                   <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
                 </div>
               ))}
             </div>
           ) : route === '/academics/seminars' ? (
-            <div className="divide-y divide-stone-200 border border-stone-200">
+            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
               {[
                 {
                   date: '2026-12-03',
@@ -724,7 +882,7 @@ export function PublicSubPages({
                   depts: 'Geography & Environment, Pharmacy',
                 },
               ].map((d) => (
-                <div key={d.faculty} className="p-6 border border-stone-200 bg-[#FAF8F4] space-y-1.5">
+                <div key={d.faculty} className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-1.5">
                   <p className="font-mono text-xs uppercase tracking-wider text-emerald-800">
                     {d.faculty}
                   </p>
@@ -734,11 +892,11 @@ export function PublicSubPages({
               ))}
             </div>
           ) : route === '/academics/chairmen' ? (
-            <div className="divide-y divide-stone-200 border border-stone-200">
+            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
               {departments.map((d) => (
                 <div
                   key={d.id}
-                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                  className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                 >
                   <div>
                     <p className="font-mono text-xs text-emerald-800">
@@ -770,10 +928,10 @@ export function PublicSubPages({
                       key={tab.value}
                       type="button"
                       onClick={() => setSelectedFaculty(tab.value)}
-                      className={`px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                         selectedFaculty === tab.value
-                          ? 'bg-emerald-800 text-white'
-                          : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:text-emerald-800 hover:bg-emerald-50'
+                          ? 'bg-emerald-900 text-white'
+                          : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-emerald-900 hover:border-emerald-700/50'
                       }`}
                     >
                       {tab.label}
@@ -788,7 +946,7 @@ export function PublicSubPages({
                     value={deptQuery}
                     onChange={(e) => setDeptQuery(e.target.value)}
                     placeholder="Filter 21 departments..."
-                    className="w-full pl-10 pr-4 py-2 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                    className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                   />
                 </div>
               </div>
@@ -796,11 +954,11 @@ export function PublicSubPages({
               {loadingData ? (
                 <CardsGridSkeleton count={6} />
               ) : dataError ? (
-                <div className="p-6 border border-red-200 bg-red-50 text-sm text-red-800">
+                <div className="p-6 rounded-xl border border-red-200 bg-red-50 text-sm text-red-800">
                   {dataError}
                 </div>
               ) : filteredDepartments.length === 0 ? (
-                <div className="p-10 border border-stone-200 bg-[#FAF8F4] text-center space-y-3">
+                <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
                   <p className="text-sm text-slate-700">
                     No academic departments match your current search or faculty filter.
                   </p>
@@ -810,7 +968,7 @@ export function PublicSubPages({
                       setSelectedFaculty('All');
                       setDeptQuery('');
                     }}
-                    className="px-4 py-2 text-xs font-medium bg-emerald-800 text-white cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white cursor-pointer"
                   >
                     Reset Department Filters
                   </button>
@@ -822,9 +980,8 @@ export function PublicSubPages({
                       key={dept.id}
                       type="button"
                       onClick={() => onSelectDepartment(dept)}
-                      className="text-left border border-stone-200 bg-white shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
+                      className="text-left rounded-2xl border border-slate-200 bg-white shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
                     >
-                      <div className="h-1 w-full bg-gradient-to-r from-emerald-900 to-emerald-700" />
                       <div className="p-6 flex-1 flex flex-col justify-between gap-4">
                         <div>
                           <p className="font-mono text-xs text-emerald-800 tabular-nums">
@@ -838,7 +995,7 @@ export function PublicSubPages({
                             {dept.summary}
                           </p>
                         </div>
-                        <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between text-xs text-slate-600">
+                        <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
                           <span>{dept.degrees.join(' / ')}</span>
                           <span className="font-semibold text-emerald-800 group-hover:underline">
                             Prospectus
@@ -852,6 +1009,99 @@ export function PublicSubPages({
             </div>
           )}
         </motion.section>
+
+        {/* Interactive Printable Form Preview Modal */}
+        {previewForm && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto print:static print:bg-white print:p-0"
+            onClick={() => setPreviewForm(null)}
+          >
+            <div
+              className="print-only-document w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:rounded-none print:shadow-none print:border-2 print:border-emerald-900"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="print:hidden px-6 py-3.5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-xs font-semibold text-emerald-900">
+                  Template Preview · {previewForm.code}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    Print Template
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => downloadPrintableFormHtml(previewForm)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer"
+                  >
+                    <FileDown className="w-3.5 h-3.5" />
+                    Download HTML
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewForm(null)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8 space-y-5">
+                <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                  <div className="flex items-start gap-3">
+                    <PustCrest size={42} className="shrink-0" />
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                        Pabna University of Science and Technology
+                      </p>
+                      <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                        {previewForm.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        Receiving Authority: {previewForm.office}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="font-mono text-xs font-semibold text-emerald-900 shrink-0">
+                    {previewForm.code}
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
+                  {previewForm.fields.map((field) => (
+                    <div key={field} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <span className="font-medium text-slate-700">{field}</span>
+                      <span className="font-mono text-slate-400">
+                        [ Submitted via Portal or Handwritten ]
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+                  <span>{previewForm.note}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = previewForm.portalTarget;
+                      setPreviewForm(null);
+                      onNavigate(target);
+                    }}
+                    className="print:hidden inline-flex items-center gap-1.5 px-4 py-2 font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer"
+                  >
+                    {previewForm.portalLabel}
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     );
   }
@@ -868,30 +1118,30 @@ export function PublicSubPages({
     const admissionNotices = notices.filter((n) => n.category === 'Admission');
 
     return (
-      <main className="flex-1 bg-[#FAF8F4]">
+      <main className="flex-1 bg-[#F7F7F5]">
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10"
         >
-          <div className="border-b border-stone-200 pb-6 space-y-4">
+          <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Admissions 2026–2027
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {admissionTabs.find((t) => t.route === route)?.label || 'Admissions Desk'}
             </h1>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {admissionTabs.map((t) => (
                 <button
                   key={t.route}
                   type="button"
                   onClick={() => onNavigate(t.route)}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-white border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {t.label}
@@ -901,7 +1151,7 @@ export function PublicSubPages({
           </div>
 
           {route === '/admissions/notice' ? (
-            <div className="divide-y divide-stone-200 border border-stone-200 bg-white">
+            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
               {admissionNotices.map((n) => (
                 <button
                   key={n.id}
@@ -919,32 +1169,32 @@ export function PublicSubPages({
             </div>
           ) : (
             <div className="space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 border border-stone-200 bg-white divide-y md:divide-y-0 md:divide-x divide-stone-200">
-                <div className="p-5 space-y-1.5">
+              <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl border border-slate-200 bg-white divide-y md:divide-y-0 md:divide-x divide-slate-200 overflow-hidden shadow-xs">
+                <div className="p-6 space-y-1.5">
                   <p className="font-mono text-xs text-emerald-800">GST UNIT A · SCIENCE &amp; ENGG.</p>
                   <p className="font-serif text-lg font-medium text-slate-900">13 Departments</p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     CSE, EEE, ETE, ICE, Architecture, Civil, URP, Mathematics, Physics, Chemistry,
                     Statistics, Pharmacy &amp; Geography.
                   </p>
                 </div>
-                <div className="p-5 space-y-1.5">
+                <div className="p-6 space-y-1.5">
                   <p className="font-mono text-xs text-emerald-800">GST UNIT B · HUMANITIES</p>
                   <p className="font-serif text-lg font-medium text-slate-900">6 Departments</p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     Economics, Bangla, English, Public Administration, History &amp; Social Work.
                   </p>
                 </div>
-                <div className="p-5 space-y-1.5">
+                <div className="p-6 space-y-1.5">
                   <p className="font-mono text-xs text-emerald-800">GST UNIT C · BUSINESS</p>
                   <p className="font-serif text-lg font-medium text-slate-900">2 Departments</p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     Business Administration &amp; Tourism and Hospitality Management.
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-5 space-y-6">
                   <p className="text-[15px] text-slate-700 leading-relaxed">
                     {route === '/admissions/graduate'
@@ -954,7 +1204,7 @@ export function PublicSubPages({
                       : 'Undergraduate admissions into all 21 departments follow the Bangladesh GST (General, Science & Technology) Integrated Admission Test across Units A, B, and C, with an architecture studio aptitude assessment.'}
                   </p>
 
-                  <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm bg-white px-5">
+                  <dl className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm bg-white px-5 overflow-hidden">
                     <div className="py-3.5 flex justify-between gap-4">
                       <dt className="text-slate-600">Total Undergraduate Intake</dt>
                       <dd className="font-mono tabular-nums font-medium text-slate-900">
@@ -976,30 +1226,104 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => onNavigate('/portal')}
-                    className="px-5 py-2.5 text-sm font-medium border border-emerald-800 text-emerald-800 bg-white hover:bg-emerald-800 hover:text-white transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium rounded-lg border border-emerald-800 text-emerald-800 bg-white hover:bg-emerald-900 hover:text-white transition-colors cursor-pointer"
                   >
                     Have a Student Signup Token? Register in Portal
                   </button>
+
+                  {/* Pre-Login Public Inquiry & Account Application Status Tracker */}
+                  <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-xs">
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+                        Live Status Tracker
+                      </p>
+                      <h2 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+                        Track Inquiry or Pending Portal Account
+                      </h2>
+                      <p className="text-xs text-slate-600 mt-1">
+                        Enter your inquiry reference (e.g. PUST-INQ-2026-101) or registered institutional email.
+                      </p>
+                    </div>
+
+                    <form onSubmit={(e) => handleCheckStatus(e)} className="flex gap-2">
+                      <input
+                        type="text"
+                        required
+                        value={statusQuery}
+                        onChange={(e) => setStatusQuery(e.target.value)}
+                        placeholder="PUST-INQ-2026-101 or email"
+                        className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-700 focus:outline-none"
+                      />
+                      <button
+                        type="submit"
+                        disabled={statusLoading}
+                        className="px-3.5 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                      >
+                        {statusLoading ? 'Checking...' : 'Check Status'}
+                      </button>
+                    </form>
+
+                    {statusError && (
+                      <div className="p-3 rounded-lg border border-red-200 bg-red-50 text-xs text-red-800 flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{statusError}</span>
+                      </div>
+                    )}
+
+                    {statusResult && (
+                      <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2 text-xs">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono font-semibold text-emerald-900">
+                            {statusResult.reference}
+                          </span>
+                          <span className="inline-flex items-center gap-1 font-mono font-semibold text-slate-800">
+                            {statusResult.statusState === 'approved' ||
+                            statusResult.statusState === 'reviewed' ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                            ) : (
+                              <Clock className="w-3.5 h-3.5 text-amber-700" />
+                            )}
+                            {statusResult.statusLabel}
+                          </span>
+                        </div>
+                        <p className="font-medium text-slate-900">{statusResult.title}</p>
+                        {statusResult.note && (
+                          <p className="text-slate-700 bg-white border border-slate-200 rounded-lg p-2.5">
+                            {statusResult.note}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="lg:col-span-7 bg-white border border-stone-200 p-6 sm:p-8">
+                <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
                   <h2 className="font-serif text-2xl font-medium text-slate-900">
                     Submit an Admission Inquiry
                   </h2>
                   <p className="text-sm text-slate-600 mt-1 mb-6">
                     Prospective applicants and guardians may send questions directly to the PUST
-                    Admissions Desk.
+                    Admissions Desk and receive a tracked reference number.
                   </p>
 
                   {inqError && (
-                    <div className="mb-5 p-3.5 border border-red-200 bg-red-50 text-sm text-red-900">
+                    <div className="mb-5 p-3.5 rounded-lg border border-red-200 bg-red-50 text-sm text-red-900">
                       {inqError}
                     </div>
                   )}
                   {inqSuccess && (
-                    <div className="mb-5 p-4 border border-emerald-200 bg-emerald-50 text-sm text-emerald-900 flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                      <span>{inqSuccess}</span>
+                    <div className="mb-5 p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-sm text-emerald-950 space-y-1">
+                      <div className="flex items-center gap-2 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                        <span>
+                          Inquiry recorded under tracking ID{' '}
+                          <span className="font-mono">{inqSuccess.referenceCode}</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-emerald-800 pl-6">
+                        Confirmation queued for {inqSuccess.email}. Use the tracker on the left any
+                        time to read the Registrar’s official reply.
+                      </p>
                     </div>
                   )}
 
@@ -1015,7 +1339,7 @@ export function PublicSubPages({
                           value={inqName}
                           onChange={(e) => setInqName(e.target.value)}
                           placeholder="Applicant full name"
-                          className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                         />
                       </div>
                       <div>
@@ -1028,7 +1352,7 @@ export function PublicSubPages({
                           value={inqEmail}
                           onChange={(e) => setInqEmail(e.target.value)}
                           placeholder="applicant@example.com"
-                          className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                         />
                       </div>
                     </div>
@@ -1044,7 +1368,7 @@ export function PublicSubPages({
                           value={inqPhone}
                           onChange={(e) => setInqPhone(e.target.value)}
                           placeholder="+880 1XXX-XXXXXX"
-                          className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                         />
                       </div>
                       <div>
@@ -1056,7 +1380,7 @@ export function PublicSubPages({
                           onChange={(e) =>
                             setInqProgram(e.target.value as InquiryRecord['programLevel'])
                           }
-                          className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                         >
                           <option value="Undergraduate (GST)">Undergraduate (GST)</option>
                           <option value="Graduate (M.Sc. / MBA)">Graduate (M.Sc. / MBA)</option>
@@ -1072,7 +1396,7 @@ export function PublicSubPages({
                         <select
                           value={inqDept}
                           onChange={(e) => setInqDept(e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                         >
                           {departments.map((d) => (
                             <option key={d.id} value={d.code}>
@@ -1093,14 +1417,14 @@ export function PublicSubPages({
                         value={inqMessage}
                         onChange={(e) => setInqMessage(e.target.value)}
                         placeholder="Ask about eligibility, GST merit cutoffs, July 06 Hall allotment, or syllabus..."
-                        className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-700 focus:bg-white"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-emerald-700 focus:bg-white"
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={inqSubmitting}
-                      className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 disabled:opacity-60 transition-colors cursor-pointer"
+                      className="px-6 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-60 transition-colors cursor-pointer"
                     >
                       {inqSubmitting ? 'Submitting Inquiry...' : 'Send Admission Inquiry'}
                     </button>
@@ -1124,6 +1448,7 @@ export function PublicSubPages({
       img: string;
       hours: string;
       location: string;
+      portalRoute: string;
       highlights: string[];
     }> = [
       {
@@ -1134,6 +1459,7 @@ export function PublicSubPages({
         img: LIBRARY_IMAGE,
         hours: 'Sun–Thu · 08:30–21:00 BST',
         location: 'Central Library Complex, Rajapur',
+        portalRoute: '/portal?tab=library',
         highlights: [
           'Chairman-sealed digital membership approval workflow',
           'Linked Digital & Physical Library Card ID issuance',
@@ -1148,6 +1474,7 @@ export function PublicSubPages({
         img: GROUNDS_IMAGE,
         hours: '24/7 Provost & House Tutor Duty',
         location: 'Residential Precinct, Rajapur',
+        portalRoute: '/portal?tab=halls',
         highlights: [
           'Live seat vacancy circulars by Hall & block',
           'Full retained seat change history per student ID',
@@ -1162,6 +1489,7 @@ export function PublicSubPages({
         img: GROUNDS_IMAGE,
         hours: 'Sun–Thu · 07:15–18:30 BST',
         location: 'Transport Pool Depot, Main Gate',
+        portalRoute: '/portal',
         highlights: [
           'Dedicated student & faculty shuttle schedules',
           'Pabna Town, Terminal, Edward College & Highway corridors',
@@ -1176,6 +1504,7 @@ export function PublicSubPages({
         img: LAB_IMAGE,
         hours: 'Outpatient 09:00–17:00 · 24/7 Ambulance',
         location: 'Medical Center Building, Rajapur',
+        portalRoute: '/portal',
         highlights: [
           'Resident medical officers & nursing care',
           'Essential first-aid and primary prescriptions',
@@ -1190,6 +1519,7 @@ export function PublicSubPages({
         img: LAB_IMAGE,
         hours: 'Sun–Thu · 09:00–17:00 BST',
         location: 'Academic & Administrative ICT Wing',
+        portalRoute: '/portal',
         highlights: [
           'University-wide fiber backbone & eduroam-ready Wi-Fi',
           'Institutional email & portal token provisioning',
@@ -1208,23 +1538,23 @@ export function PublicSubPages({
           transition={{ duration: 0.28 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10"
         >
-          <div className="border-b border-stone-200 pb-6 space-y-4">
+          <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Campus Facilities &amp; Student Services
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {currentFac.title}
             </h1>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {facTabs.map((f) => (
                 <button
                   key={f.route}
                   type="button"
                   onClick={() => onNavigate(f.route)}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {f.label}
@@ -1237,7 +1567,7 @@ export function PublicSubPages({
             <div className="lg:col-span-6 space-y-6">
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
-              <dl className="border border-stone-200 bg-[#FAF8F4] divide-y divide-stone-200 text-sm">
+              <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
                 <div className="px-4 py-3 flex justify-between gap-4">
                   <dt className="text-slate-600">Service Hours</dt>
                   <dd className="font-mono font-medium text-slate-900">{currentFac.hours}</dd>
@@ -1261,8 +1591,8 @@ export function PublicSubPages({
 
               <button
                 type="button"
-                onClick={() => onNavigate('/portal')}
-                className="px-5 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors cursor-pointer"
+                onClick={() => onNavigate(currentFac.portalRoute)}
+                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 transition-colors cursor-pointer"
               >
                 Access Service in Campus Portal
               </button>
@@ -1303,7 +1633,7 @@ export function PublicSubPages({
           transition={{ duration: 0.28 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8"
         >
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-stone-200">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200">
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                 University Media Archive
@@ -1312,16 +1642,16 @@ export function PublicSubPages({
                 Campus Photos &amp; Videos Gallery
               </h1>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {cats.map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setGalleryCategory(c)}
-                  className={`px-3.5 py-2 text-xs font-medium cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors ${
                     galleryCategory === c
-                      ? 'bg-emerald-800 text-white'
-                      : 'bg-[#FAF8F4] border border-stone-200 text-slate-700 hover:bg-emerald-50'
+                      ? 'bg-emerald-900 text-white'
+                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                   }`}
                 >
                   {c}
@@ -1336,9 +1666,9 @@ export function PublicSubPages({
                 key={item.id}
                 type="button"
                 onClick={() => setActiveMedia(item)}
-                className="text-left border border-stone-200 bg-[#FAF8F4] hover:border-emerald-400 transition-colors group cursor-pointer flex flex-col"
+                className="text-left rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-emerald-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden shadow-xs"
               >
-                <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden">
+                <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
                   <ResilientImage
                     src={item.mediaUrl}
                     alt={item.title}
@@ -1350,7 +1680,7 @@ export function PublicSubPages({
                     </span>
                   )}
                 </div>
-                <div className="p-4 space-y-1">
+                <div className="p-5 space-y-1">
                   <p className="font-mono text-xs text-emerald-800 tabular-nums">
                     {item.category} · {item.mediaType.toUpperCase()} · {item.eventDate}
                   </p>
@@ -1366,14 +1696,14 @@ export function PublicSubPages({
 
         {activeMedia && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
             onClick={() => setActiveMedia(null)}
           >
             <div
-              className="w-full max-w-2xl bg-white border border-stone-200 shadow-2xl"
+              className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start justify-between px-5 py-4 border-b border-stone-200 bg-[#FAF8F4]">
+              <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
                 <div>
                   <p className="font-mono text-xs text-emerald-800">
                     {activeMedia.category} · {activeMedia.mediaType.toUpperCase()}
@@ -1385,12 +1715,12 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={() => setActiveMedia(null)}
-                  className="p-1.5 text-slate-500 hover:text-slate-900 cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-5 space-y-4">
+              <div className="p-6 space-y-4">
                 <ResilientImage
                   src={activeMedia.mediaUrl}
                   alt={activeMedia.title}
@@ -1407,14 +1737,14 @@ export function PublicSubPages({
 
   // 6. NOTICES PAGE (/notices)
   return (
-    <main className="flex-1 bg-[#FAF8F4]">
+    <main className="flex-1 bg-[#F7F7F5]">
       <motion.section
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28 }}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16"
       >
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-stone-200">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-slate-200">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               Central &amp; Department Circulars
@@ -1431,22 +1761,22 @@ export function PublicSubPages({
               value={noticeQuery}
               onChange={(e) => setNoticeQuery(e.target.value)}
               placeholder="Search circulars or memo no."
-              className="w-full pl-10 pr-4 py-2.5 text-sm border border-stone-300 bg-white focus:outline-none focus:border-emerald-700"
+              className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-emerald-700"
             />
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 py-5 border-b border-stone-200">
+        <div className="flex flex-wrap items-center justify-between gap-4 py-5 border-b border-slate-200">
           <div className="flex flex-wrap gap-1.5">
             {NOTICE_FILTERS.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedNoticeCat(cat)}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
-                    ? 'bg-emerald-800 text-white'
-                    : 'bg-white border border-stone-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-800'
+                    ? 'bg-emerald-900 text-white'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-700/50 hover:text-emerald-900'
                 }`}
               >
                 {cat}
@@ -1466,10 +1796,10 @@ export function PublicSubPages({
                 key={scope.id}
                 type="button"
                 onClick={() => setNoticeBoardScope(scope.id)}
-                className={`px-3 py-1.5 text-xs font-medium cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer ${
                   noticeBoardScope === scope.id
                     ? 'bg-slate-900 text-white'
-                    : 'bg-white border border-stone-200 text-slate-700'
+                    : 'bg-white border border-slate-200 text-slate-700'
                 }`}
               >
                 {scope.label}
@@ -1479,7 +1809,7 @@ export function PublicSubPages({
         </div>
 
         {filteredNotices.length === 0 ? (
-          <div className="py-10 text-sm text-slate-600 bg-white border border-stone-200 mt-6 p-6 text-center space-y-3">
+          <div className="py-10 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 p-6 text-center space-y-3">
             <p>No notices match the selected filter criteria.</p>
             <button
               type="button"
@@ -1488,13 +1818,13 @@ export function PublicSubPages({
                 setNoticeBoardScope('all');
                 setNoticeQuery('');
               }}
-              className="px-4 py-2 text-xs font-medium bg-emerald-800 text-white cursor-pointer"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white cursor-pointer"
             >
               Reset Notice Filters
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-stone-200 border border-stone-200 bg-white mt-6">
+          <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs">
             {filteredNotices.map((notice) => (
               <button
                 key={notice.id}

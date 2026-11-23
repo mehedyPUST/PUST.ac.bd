@@ -200,6 +200,19 @@ const feeConfigSchema = z.object({
   defaultExamFeeBdt: z.number().int().min(50).max(20000),
 });
 
+const paymentCheckoutSchema = z.object({
+  targetType: z.enum(['hall_due', 'exam_application', 'certificate']),
+  targetId: z.string().trim().max(80).optional(),
+  certificateType: z.enum(['Temporary Certificate', 'Provisional Transcript']).optional(),
+  gatewayCode: z.string().trim().min(2).max(30),
+  accountMask: z.string().trim().max(40).optional(),
+  manualRef: z.string().trim().max(60).optional(),
+});
+
+const resultPublishSchema = z.object({
+  promotionMode: z.enum(['auto', 'manual_promoted', 'manual_repeat']).optional(),
+});
+
 function marksToGrade(marks: number): { gradePoint: number; letterGrade: string } {
   if (marks >= 80) return { gradePoint: 4.0, letterGrade: 'A+' };
   if (marks >= 75) return { gradePoint: 3.75, letterGrade: 'A' };
@@ -211,6 +224,22 @@ function marksToGrade(marks: number): { gradePoint: number; letterGrade: string 
   if (marks >= 45) return { gradePoint: 2.25, letterGrade: 'C' };
   if (marks >= 40) return { gradePoint: 2.0, letterGrade: 'D' };
   return { gradePoint: 0.0, letterGrade: 'F' };
+}
+
+async function computeCumulativeCgpa(academicId: string, fallbackSgpa: number): Promise<number> {
+  const allResults = (await pustRepo.listExamResults()).filter(
+    (r) => r.academicId === academicId && r.published
+  );
+  if (allResults.length === 0) return fallbackSgpa;
+  let weighted = 0;
+  let credits = 0;
+  for (const res of allResults) {
+    for (const c of res.courses) {
+      weighted += c.gradePoint * c.credits;
+      credits += c.credits;
+    }
+  }
+  return credits > 0 ? Number((weighted / credits).toFixed(2)) : fallbackSgpa;
 }
 
 // 1. Account Approvals & Authority Management
@@ -552,14 +581,23 @@ portalRouter.patch(
       libraryNote: parsed.data.note || 'Verified and Digital Library Card issued.',
     });
 
+    const cardNo = `PUST-LIB-${target.departmentCode}-${target.academicId}`;
+    const cardHash = `SHA256-LIB-${crypto
+      .createHash('sha256')
+      .update(`${cardNo}:${target.chairmanSeal.verificationHash}`)
+      .digest('hex')
+      .slice(0, 10)
+      .toUpperCase()}`;
+
     const card = await pustRepo.createLibraryCard({
       studentId: target.studentId,
       academicId: target.academicId,
       studentName: target.studentName,
       departmentCode: target.departmentCode,
       session: target.session,
-      digitalCardNo: `PUST-LIB-${target.departmentCode}-${target.academicId}`,
+      digitalCardNo: cardNo,
       physicalCardRef: parsed.data.physicalCardRef || undefined,
+      verificationHash: cardHash,
       issuedAt: new Date().toISOString().slice(0, 10),
       validUntil: '2028-12-31',
       status: 'Active',
@@ -620,12 +658,13 @@ portalRouter.get('/halls/overview', requireAuth, async (req: AuthenticatedReques
   const circulars = await pustRepo.listHallCirculars();
   let apps = await pustRepo.listHallApplications();
   let dues = await pustRepo.listHallDues();
+  const gateways = (await pustRepo.listPaymentGateways()).filter((g) => g.enabled);
 
   if (req.authUser!.role === 'student') {
     apps = apps.filter((a) => a.academicId === req.authUser!.academicId);
     dues = dues.filter((d) => d.academicId === req.authUser!.academicId);
   }
-  res.json({ circulars, applications: apps, dues });
+  res.json({ circulars, applications: apps, dues, gateways });
 });
 
 portalRouter.post(
@@ -1065,7 +1104,7 @@ portalRouter.patch(
 
 portalRouter.post(
   '/exams/results',
-  requireRoles('chairman', 'admin'),
+  requireRoles('teacher', 'chairman', 'admin'),
   async (req: AuthenticatedRequest, res) => {
     const parsed = resultCreateSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1075,6 +1114,16 @@ portalRouter.post(
     const stu = await pustRepo.findStudentByAcademicId(parsed.data.academicId);
     if (!stu) {
       res.status(404).json({ error: 'Student academic ID not found.' });
+      return;
+    }
+
+    if (
+      (req.authUser!.role === 'teacher' || req.authUser!.role === 'chairman') &&
+      stu.departmentCode !== req.authUser!.departmentCode
+    ) {
+      res.status(403).json({
+        error: 'You may only submit marksheets for students in your own department.',
+      });
       return;
     }
 
@@ -1096,6 +1145,8 @@ portalRouter.post(
     if (parsed.data.promotionMode === 'manual_promoted') promotionStatus = 'Promoted (Manual)';
     if (parsed.data.promotionMode === 'manual_repeat') promotionStatus = 'Probation / Repeat';
 
+    const publishImmediately = req.authUser!.role === 'chairman' || req.authUser!.role === 'admin';
+
     const result = await pustRepo.createExamResult({
       academicId: stu.academicId,
       studentName: stu.name,
@@ -1105,37 +1156,127 @@ portalRouter.post(
       courses: evaluatedCourses,
       sgpa,
       promotionStatus,
-      published: true,
+      status: publishImmediately ? 'published' : 'pending_chairman',
+      published: publishImmediately,
       enteredBy: req.authUser!.name,
+      ...(publishImmediately ? { reviewedBy: req.authUser!.name } : {}),
       publishedAt: new Date().toISOString().slice(0, 10),
     });
 
-    if (promotionStatus.startsWith('Promoted')) {
+    if (publishImmediately) {
+      const cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, sgpa);
       await pustRepo.updateStudentById(stu.id, {
-        currentSemester: Math.max(stu.currentSemester, parsed.data.semester + 1),
-        completedSemesters: Math.max(stu.completedSemesters, parsed.data.semester),
-        cgpa: Number(((stu.cgpa + sgpa) / 2).toFixed(2)),
+        ...(promotionStatus.startsWith('Promoted')
+          ? {
+              currentSemester: Math.max(stu.currentSemester, parsed.data.semester + 1),
+              completedSemesters: Math.max(stu.completedSemesters, parsed.data.semester),
+            }
+          : {}),
+        cgpa: cumulativeCgpa,
+      });
+
+      await pustRepo.createNotice({
+        referenceNo: `PUST/${stu.departmentCode}/RES/${new Date().getFullYear()}-${parsed.data.semester}`,
+        title: `Semester ${parsed.data.semester} Examination Result Published — ${stu.departmentCode} (${stu.session})`,
+        category: 'Result',
+        publishedAt: new Date().toISOString().slice(0, 10),
+        departmentCode: stu.departmentCode,
+        boardScope: 'department',
+        visibility: 'registered',
+        targetSession: stu.session,
+        summary: `Semester ${parsed.data.semester} result published for ${stu.academicId} (SGPA ${sgpa.toFixed(
+          2
+        )} · ${promotionStatus}).`,
+        body: `Registered departmental students in session ${stu.session} may inspect their verified Semester ${parsed.data.semester} grade sheet and promotion status under Portal -> Exams & Results.`,
+        authorName: req.authUser!.name,
+        authorRole: req.authUser!.role,
+      });
+    } else {
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        'Submitted draft marksheet for Chairman review',
+        `${stu.academicId} · Sem ${parsed.data.semester}`
+      );
+    }
+
+    res.status(201).json({ result, pendingChairmanReview: !publishImmediately });
+  }
+);
+
+portalRouter.patch(
+  '/exams/results/:id/publish',
+  requireRoles('chairman', 'admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = resultPublishSchema.safeParse(req.body || {});
+    const results = await pustRepo.listExamResults();
+    const target = results.find((r) => r.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Submitted grade sheet not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode !== req.authUser!.departmentCode
+    ) {
+      res.status(403).json({ error: 'Cannot publish results outside your department.' });
+      return;
+    }
+
+    let promotionStatus = target.promotionStatus;
+    if (parsed.success && parsed.data.promotionMode === 'manual_promoted') {
+      promotionStatus = 'Promoted (Manual)';
+    } else if (parsed.success && parsed.data.promotionMode === 'manual_repeat') {
+      promotionStatus = 'Probation / Repeat';
+    }
+
+    const updated = await pustRepo.updateExamResult(target.id, {
+      published: true,
+      status: 'published',
+      promotionStatus,
+      reviewedBy: req.authUser!.name,
+      publishedAt: new Date().toISOString().slice(0, 10),
+    });
+
+    const stu = await pustRepo.findStudentByAcademicId(target.academicId);
+    if (stu) {
+      const cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, target.sgpa);
+      await pustRepo.updateStudentById(stu.id, {
+        ...(promotionStatus.startsWith('Promoted')
+          ? {
+              currentSemester: Math.max(stu.currentSemester, target.semester + 1),
+              completedSemesters: Math.max(stu.completedSemesters, target.semester),
+            }
+          : {}),
+        cgpa: cumulativeCgpa,
       });
     }
 
     await pustRepo.createNotice({
-      referenceNo: `PUST/${stu.departmentCode}/RES/${new Date().getFullYear()}-${parsed.data.semester}`,
-      title: `Semester ${parsed.data.semester} Examination Result Published — ${stu.departmentCode} (${stu.session})`,
+      referenceNo: `PUST/${target.departmentCode}/RES/${new Date().getFullYear()}-${target.semester}`,
+      title: `Semester ${target.semester} Examination Result Published — ${target.departmentCode} (${target.session})`,
       category: 'Result',
       publishedAt: new Date().toISOString().slice(0, 10),
-      departmentCode: stu.departmentCode,
+      departmentCode: target.departmentCode,
       boardScope: 'department',
       visibility: 'registered',
-      targetSession: stu.session,
-      summary: `Semester ${parsed.data.semester} result published for ${stu.academicId} (SGPA ${sgpa.toFixed(
+      targetSession: target.session,
+      summary: `Semester ${target.semester} result published for ${target.academicId} (SGPA ${target.sgpa.toFixed(
         2
       )} · ${promotionStatus}).`,
-      body: `Registered departmental students in session ${stu.session} may inspect their verified Semester ${parsed.data.semester} grade sheet and promotion status under Portal -> Exams & Results.`,
+      body: `Registered departmental students in session ${target.session} may inspect their verified Semester ${target.semester} grade sheet and promotion status under Portal -> Exams & Results.`,
       authorName: req.authUser!.name,
       authorRole: req.authUser!.role,
     });
 
-    res.status(201).json({ result });
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Verified and published exam result',
+      `${target.academicId} · Sem ${target.semester}`
+    );
+
+    res.json({ result: updated });
   }
 );
 
@@ -1356,11 +1497,16 @@ portalRouter.patch(
         ? target.certificateSerial ||
           `PUST-CERT-${target.departmentCode}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`
         : undefined;
+    const certHash = serial
+      ? target.verificationHash ||
+        `SHA256-CERT-${crypto.createHash('sha256').update(`${serial}:${target.academicId}`).digest('hex').slice(0, 10).toUpperCase()}`
+      : undefined;
 
     const updated = await pustRepo.updateCertificateApplication(target.id, {
       finalAdminStatus: parsed.data.decision,
       adminNote: parsed.data.adminNote,
       certificateSerial: serial,
+      verificationHash: certHash,
       issuedAt: parsed.data.decision === 'approved' ? new Date().toISOString().slice(0, 10) : undefined,
       physicalCollected: parsed.data.physicalCollected ?? target.physicalCollected,
     });
@@ -1470,3 +1616,196 @@ portalRouter.get('/audit-logs', requireRoles('admin', 'vc', 'registrar'), async 
   const logs = await pustRepo.listAuditLogs();
   res.json({ logs });
 });
+
+// 9. Unified Digital Payment Checkout & Institutional Receipts Ledger
+portalRouter.get('/payments/receipts', requireAuth, async (req: AuthenticatedRequest, res) => {
+  let receipts = await pustRepo.listPaymentReceipts();
+  if (req.authUser!.role === 'student') {
+    receipts = receipts.filter((r) => r.academicId === req.authUser!.academicId);
+  } else if (req.authUser!.role === 'chairman') {
+    receipts = receipts.filter((r) => r.departmentCode === req.authUser!.departmentCode);
+  }
+  res.json({ receipts });
+});
+
+portalRouter.post(
+  '/payments/checkout',
+  requireRoles('student'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = paymentCheckoutSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Provide valid checkout details and gateway selection.' });
+      return;
+    }
+
+    const gateways = await pustRepo.listPaymentGateways();
+    const gw = gateways.find((g) => g.code === parsed.data.gatewayCode && g.enabled);
+    if (!gw) {
+      res.status(400).json({ error: 'Selected payment gateway is disabled or unavailable.' });
+      return;
+    }
+
+    const nowDate = new Date().toISOString().slice(0, 10);
+    const txRand = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const transactionId = parsed.data.manualRef?.trim() || `${gw.code}-${new Date().getFullYear()}-${txRand}`;
+    const receiptNo = `PUST-RCPT-${new Date().getFullYear()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}${txRand.slice(0, 2)}`;
+
+    if (parsed.data.targetType === 'hall_due') {
+      const dues = await pustRepo.listHallDues();
+      const due = dues.find((d) => d.id === parsed.data.targetId);
+      if (!due || due.academicId !== req.authUser!.academicId) {
+        res.status(404).json({ error: 'Hall fee record not found.' });
+        return;
+      }
+      if (due.status === 'Cleared') {
+        res.status(409).json({ error: 'This hall fee has already been cleared.' });
+        return;
+      }
+
+      const receipt = await pustRepo.createPaymentReceipt({
+        receiptNo,
+        transactionId,
+        academicId: req.authUser!.academicId,
+        studentName: req.authUser!.name,
+        departmentCode: req.authUser!.departmentCode,
+        targetType: 'hall_due',
+        targetId: due.id,
+        title: due.feeTitle,
+        amountBdt: due.amountBdt,
+        gatewayCode: gw.code,
+        gatewayName: gw.name,
+        accountMask: parsed.data.accountMask || 'Digital Checkout',
+        status: 'Verified',
+        paidAt: nowDate,
+      });
+
+      const updatedTarget = await pustRepo.updateHallDue(due.id, {
+        paymentMethod: gw.code,
+        paymentRef: transactionId,
+        receiptNo,
+        paidAt: nowDate,
+        status: 'Payment Submitted',
+      });
+
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        'student',
+        'Completed Hall Fee Digital Payment',
+        receiptNo
+      );
+      res.status(201).json({ receipt, updatedTarget });
+      return;
+    }
+
+    if (parsed.data.targetType === 'exam_application') {
+      const apps = await pustRepo.listExamApplications();
+      const app = apps.find((a) => a.id === parsed.data.targetId);
+      if (!app || app.academicId !== req.authUser!.academicId) {
+        res.status(404).json({ error: 'Examination application not found.' });
+        return;
+      }
+      if (app.paymentStatus === 'Paid') {
+        res.status(409).json({ error: 'Examination fee is already marked Paid.' });
+        return;
+      }
+
+      const receipt = await pustRepo.createPaymentReceipt({
+        receiptNo,
+        transactionId,
+        academicId: req.authUser!.academicId,
+        studentName: req.authUser!.name,
+        departmentCode: req.authUser!.departmentCode,
+        targetType: 'exam_application',
+        targetId: app.id,
+        title: `${app.examTitle} (${app.formReference})`,
+        amountBdt: app.feeBdt,
+        gatewayCode: gw.code,
+        gatewayName: gw.name,
+        accountMask: parsed.data.accountMask || 'Digital Checkout',
+        status: 'Verified',
+        paidAt: nowDate,
+      });
+
+      const updatedTarget = await pustRepo.updateExamApplication(app.id, {
+        paymentMethod: gw.code,
+        transactionId,
+        receiptNo,
+        paymentStatus: 'Paid',
+      });
+
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        'student',
+        'Completed Examination Fee Digital Payment',
+        receiptNo
+      );
+      res.status(201).json({ receipt, updatedTarget });
+      return;
+    }
+
+    // Certificate application + digital fee checkout
+    const stu = await pustRepo.findStudentByAcademicId(req.authUser!.academicId);
+    if (!stu || stu.completedSemesters < 8 || !stu.allResultsPublished) {
+      res.status(409).json({
+        error:
+          'Eligibility requirement not met: All 8 semesters must be completed with published final results before applying for a certificate.',
+      });
+      return;
+    }
+
+    const certType = parsed.data.certificateType || 'Temporary Certificate';
+    const feeConfig = await pustRepo.getFeeConfig();
+    const makeOffice = (office: ClearanceOfficeKey, officeLabel: string): OfficeClearanceState => ({
+      office,
+      officeLabel,
+      status: 'pending',
+      note: 'Awaiting independent office clearance review.',
+      history: [],
+    });
+
+    const createdCert = await pustRepo.createCertificateApplication({
+      studentId: req.authUser!.sub,
+      academicId: stu.academicId,
+      studentName: stu.name,
+      departmentCode: stu.departmentCode,
+      session: stu.session,
+      certificateType: certType,
+      feeBdt: feeConfig.certificateFeeBdt,
+      paymentMethod: gw.code,
+      transactionId,
+      receiptNo,
+      clearances: {
+        chairman: makeOffice('chairman', "Department Chairman's Office"),
+        hall: makeOffice('hall', 'Hall Office'),
+        library: makeOffice('library', 'Library Office'),
+        proctor: makeOffice('proctor', "Proctor's Office"),
+      },
+      finalAdminStatus: 'waiting_offices',
+    });
+
+    const receipt = await pustRepo.createPaymentReceipt({
+      receiptNo,
+      transactionId,
+      academicId: stu.academicId,
+      studentName: stu.name,
+      departmentCode: stu.departmentCode,
+      targetType: 'certificate',
+      targetId: createdCert.id,
+      title: `${certType} Clearance & Issuance Fee`,
+      amountBdt: feeConfig.certificateFeeBdt,
+      gatewayCode: gw.code,
+      gatewayName: gw.name,
+      accountMask: parsed.data.accountMask || 'Digital Checkout',
+      status: 'Verified',
+      paidAt: nowDate,
+    });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'student',
+      'Submitted Certificate Application & Digital Payment',
+      receiptNo
+    );
+    res.status(201).json({ receipt, updatedTarget: createdCert });
+  }
+);

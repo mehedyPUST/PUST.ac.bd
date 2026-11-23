@@ -48,7 +48,7 @@ interface PustContextValue {
   bookmarkedIds: Set<string>;
   bootstrapStatus: BootstrapStatus;
   setUser: (user: AuthUser | null) => void;
-  navigateTo: (target: AppRoute) => void;
+  navigateTo: (target: AppRoute | string) => void;
   setActiveDepartment: (dept: DepartmentRecord | null) => void;
   setActiveNotice: (notice: NoticeRecord | null) => void;
   loadCmsProfile: () => Promise<void>;
@@ -101,7 +101,7 @@ export function PustShell({ children }: { children: ReactNode }) {
   const [activeNotice, setActiveNotice] = useState<NoticeRecord | null>(null);
 
   const navigateTo = useCallback(
-    (target: AppRoute) => {
+    (target: AppRoute | string) => {
       router.push(target);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'auto' });
@@ -285,10 +285,10 @@ export function PustShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SkeletonTheme baseColor="#E8E4DA" highlightColor="#FAF8F4" borderRadius={2}>
+    <SkeletonTheme baseColor="#E2E8F0" highlightColor="#F8FAFC" borderRadius={8}>
       <MotionConfig reducedMotion="user">
         <PustContext.Provider value={value}>
-        <div className="min-h-screen flex flex-col bg-[#FAF8F4] text-slate-900">
+        <div className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900">
           <Navbar route={route} user={user} onNavigate={navigateTo} />
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer onNavigate={navigateTo} />

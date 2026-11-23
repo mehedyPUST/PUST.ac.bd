@@ -1,9 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Award, CheckCircle2, Clock, AlertCircle, ShieldCheck } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  AlertCircle,
+  Award,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  ShieldCheck,
+} from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import { usePust } from '../PustContext';
 import { PortalRecordsSkeleton } from '../PustSkeletons';
+import { DigitalCheckoutModal, type CheckoutTarget } from './DigitalCheckoutModal';
+import { DigitalDocumentModal, type DigitalDocumentData } from './DigitalDocumentModal';
 import type {
   AuthUser,
   CertificateApplicationRecord,
@@ -20,6 +30,7 @@ interface CertificatePanelProps {
 }
 
 export function CertificatePanel({ user }: CertificatePanelProps) {
+  const { navigateTo } = usePust();
   const [applications, setApplications] = useState<CertificateApplicationRecord[]>([]);
   const [feeConfig, setFeeConfig] = useState<FeeConfig>({
     certificateFeeBdt: 1500,
@@ -32,16 +43,17 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'issued'>('all');
 
-  // Student Apply
+  // Digital Checkout & Verified Document Modals
+  const [checkoutTarget, setCheckoutTarget] = useState<CheckoutTarget | null>(null);
+  const [activeDoc, setActiveDoc] = useState<DigitalDocumentData | null>(null);
+
+  // Student Certificate Type
   const [certType, setCertType] =
     useState<CertificateApplicationRecord['certificateType']>('Temporary Certificate');
-  const [payMethod, setPayMethod] = useState('SSLCommerz');
-  const [txnId, setTxnId] = useState('');
 
   // Office Review Notes & Resubmission Notes
   const [officeNotes, setOfficeNotes] = useState<Record<string, string>>({});
   const [resubmitNotes, setResubmitNotes] = useState<Record<string, string>>({});
-  const [certPreview, setCertPreview] = useState<CertificateApplicationRecord | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -51,7 +63,6 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
       setFeeConfig(data.feeConfig);
       setGateways(data.gateways);
       setStudent(data.student);
-      if (data.gateways.length > 0) setPayMethod(data.gateways[0].name);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load certificate workflow.');
     } finally {
@@ -63,30 +74,19 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
     refresh();
   }, [refresh]);
 
-  async function handleApplyCertificate(e: FormEvent) {
-    e.preventDefault();
+  function handleOpenCertificateCheckout() {
     setError(null);
     setFeedback(null);
-    try {
-      const res = await pustApi.applyCertificate({
-        certificateType: certType,
-        paymentMethod: payMethod,
-        transactionId: txnId,
-      });
-      setFeedback(
-        `Certificate application submitted (${res.application.id}). Initiated independent clearance checks across Chairman, Hall, Library, and Proctor offices.`
-      );
-      setTxnId('');
-      await refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to apply for certificate.');
-    }
+    setCheckoutTarget({
+      targetType: 'certificate',
+      certificateType: certType,
+      title: certType,
+      subtitle: 'Initiates 4-Office Independent Graduation Clearances (Chairman · Hall · Library · Proctor)',
+      amountBdt: feeConfig.certificateFeeBdt,
+    });
   }
 
-  async function handleOfficeDecision(
-    appId: string,
-    decision: 'approved' | 'declined'
-  ) {
+  async function handleOfficeDecision(appId: string, decision: 'approved' | 'declined') {
     setError(null);
     setFeedback(null);
     const note =
@@ -132,13 +132,48 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
       });
       setFeedback(
         decision === 'approved'
-          ? `Issued Temporary Certificate ${res.application.certificateSerial ?? ''}.`
+          ? `Issued Digital ${res.application.certificateType} ${
+              res.application.certificateSerial ?? ''
+            }.`
           : 'Declined certificate final issuance.'
       );
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to complete final verification.');
     }
+  }
+
+  function openCertificateDocument(app: CertificateApplicationRecord) {
+    if (!app.certificateSerial) return;
+    setActiveDoc({
+      kind: 'certificate',
+      serialCode: app.certificateSerial,
+      verificationHash: app.verificationHash,
+      title: `Official ${app.certificateType}`,
+      subtitle: 'Academic Credential · 4-Office Clearances & Registrar Verification Complete',
+      holderName: app.studentName,
+      academicId: app.academicId,
+      departmentCode: app.departmentCode,
+      session: app.session,
+      issuedAt: app.issuedAt || app.createdAt.slice(0, 10),
+      issuedBy: 'Central Academic Administration & Controller of Examinations',
+      statusLabel: 'Verified & Authentic',
+      rows: [
+        { label: 'Credential Type', value: app.certificateType },
+        {
+          label: 'Fee & Receipt',
+          value: `BDT ${app.feeBdt.toLocaleString()} via ${app.paymentMethod} (${
+            app.receiptNo || app.transactionId
+          })`,
+        },
+        ...OFFICE_KEYS.map((k) => ({
+          label: app.clearances[k].officeLabel,
+          value: `${app.clearances[k].status.toUpperCase()} — ${app.clearances[k].note}`,
+        })),
+      ],
+      footerNote:
+        'Employers and institutions can authenticate this serial and cryptographic hash on the PUST Public Registry (/verify).',
+    });
   }
 
   const studentEligible = Boolean(
@@ -196,7 +231,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
   const headerSubtitle =
     user.role === 'student'
-      ? 'Check your 8-semester eligibility, submit certificate fees, track 4-office clearances, and download your issued certificate.'
+      ? 'Verify 8-semester eligibility, pay fees digitally, track 4-office clearances, and download your QR-verified certificate.'
       : myOfficeRole
       ? `Review, approve, or decline ${myOfficeRole.toUpperCase()} clearance checkpoints for graduating students.`
       : 'Audit 4-office clearance completion and issue official Provisional / Temporary Certificates.';
@@ -204,67 +239,72 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Header Card */}
-      <div className="bg-white border border-stone-200 shadow-xs overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-800" />
-        <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-emerald-800">
-              {user.role === 'student'
-                ? 'Student Graduation Workflow'
-                : myOfficeRole
-                ? `Clearance Authority · ${myOfficeRole.toUpperCase()} Office`
-                : 'Central Admin Final Issuance'}
-            </p>
-            <h2 className="font-serif text-2xl font-semibold text-slate-900">{headerTitle}</h2>
-            <p className="text-xs text-slate-600 max-w-2xl">{headerSubtitle}</p>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">
+            {user.role === 'student'
+              ? 'Student Graduation Workflow'
+              : myOfficeRole
+              ? `Clearance Authority · ${myOfficeRole.toUpperCase()} Office`
+              : 'Central Admin Final Issuance'}
+          </p>
+          <h2 className="font-serif text-2xl font-medium text-slate-900">{headerTitle}</h2>
+          <p className="text-xs text-slate-600 max-w-2xl">{headerSubtitle}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs font-mono tabular-nums">
+          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+              {myOfficeRole
+                ? 'Pending My Office'
+                : user.role === 'admin'
+                ? 'Ready to Issue'
+                : 'In Progress'}
+            </span>
+            <span className="text-base font-semibold text-amber-800">{pendingMyOfficeCount}</span>
           </div>
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono tabular-nums border-t sm:border-t-0 pt-3 sm:pt-0 border-stone-200">
-            <div className="px-3 py-2 bg-[#FAF8F4] border border-stone-200">
-              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
-                {myOfficeRole
-                  ? 'Pending My Office'
-                  : user.role === 'admin'
-                  ? 'Ready to Issue'
-                  : 'In Progress'}
-              </span>
-              <span className="text-base font-semibold text-amber-800">{pendingMyOfficeCount}</span>
-            </div>
-            <div className="px-3 py-2 bg-[#FAF8F4] border border-stone-200">
-              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
-                Waiting 4-Office
-              </span>
-              <span className="text-base font-semibold text-slate-900">{waitingOfficesCount}</span>
-            </div>
-            <div className="px-3 py-2 bg-[#FAF8F4] border border-stone-200">
-              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
-                Issued
-              </span>
-              <span className="text-base font-semibold text-emerald-800">{issuedCount}</span>
-            </div>
+          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+              Waiting 4-Office
+            </span>
+            <span className="text-base font-semibold text-slate-900">{waitingOfficesCount}</span>
+          </div>
+          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+              Issued
+            </span>
+            <span className="text-base font-semibold text-emerald-800">{issuedCount}</span>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 border border-red-200 bg-red-50 text-sm text-red-900">{error}</div>
+        <div className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-sm text-red-900">
+          {error}
+        </div>
       )}
       {feedback && (
-        <div className="p-3.5 border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
+        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
           {feedback}
         </div>
       )}
 
-      {/* Student Eligibility & Certificate Application */}
+      {/* Student Eligibility & Digital Checkout */}
       {user.role === 'student' && (
-        <div className="bg-white border border-stone-200 shadow-xs p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-200 pb-3">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3.5">
             <div>
               <h3 className="font-serif text-lg font-medium text-slate-900">
-                Graduation Eligibility &amp; Fee Submission
+                Graduation Eligibility &amp; Digital Fee Submission
               </h3>
               <p className="font-mono text-xs text-slate-600 mt-1 tabular-nums">
                 Completed Semesters: {student?.completedSemesters ?? 0}/8 · All Results Published:{' '}
-                <span className={student?.allResultsPublished ? 'text-emerald-800 font-semibold' : 'text-amber-800 font-semibold'}>
+                <span
+                  className={
+                    student?.allResultsPublished
+                      ? 'text-emerald-800 font-semibold'
+                      : 'text-amber-800 font-semibold'
+                  }
+                >
                   {student?.allResultsPublished ? 'YES' : 'NO'}
                 </span>{' '}
                 · Official Fee: ৳{feeConfig.certificateFeeBdt.toLocaleString()}
@@ -290,64 +330,55 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
           </div>
 
           {!studentEligible ? (
-            <div className="p-4 border border-amber-300 bg-amber-50/70 text-sm text-amber-950">
+            <div className="p-4 rounded-xl border border-amber-300 bg-amber-50/70 text-sm text-amber-950">
               Eligibility check: You must complete all 8 academic semesters with published final
-              results before applying for a Temporary Certificate.
+              results before applying for a Temporary Certificate or Provisional Transcript.
             </div>
           ) : (
-            <form onSubmit={handleApplyCertificate} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <select
-                value={certType}
-                onChange={(e) =>
-                  setCertType(e.target.value as CertificateApplicationRecord['certificateType'])
-                }
-                className="px-3 py-2 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-800"
-              >
-                <option value="Temporary Certificate">Temporary Certificate</option>
-                <option value="Provisional Transcript">Provisional Transcript</option>
-              </select>
-              <select
-                value={payMethod}
-                onChange={(e) => setPayMethod(e.target.value)}
-                className="px-3 py-2 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-800"
-              >
-                {gateways.map((g) => (
-                  <option key={g.id} value={g.name}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                required
-                value={txnId}
-                onChange={(e) => setTxnId(e.target.value)}
-                placeholder="Fee Transaction Ref"
-                className="px-3 py-2 text-sm border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-800"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
-              >
-                Apply (৳{feeConfig.certificateFeeBdt.toLocaleString()})
-              </button>
-            </form>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1">
+                <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+                  Select Credential Type
+                </label>
+                <select
+                  value={certType}
+                  onChange={(e) =>
+                    setCertType(e.target.value as CertificateApplicationRecord['certificateType'])
+                  }
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
+                >
+                  <option value="Temporary Certificate">Temporary Certificate</option>
+                  <option value="Provisional Transcript">Provisional Transcript</option>
+                </select>
+              </div>
+              <div className="sm:pt-5">
+                <button
+                  type="button"
+                  onClick={handleOpenCertificateCheckout}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Pay Fee &amp; Submit Application (৳{feeConfig.certificateFeeBdt.toLocaleString()})
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}
 
       {/* Certificate Applications & 4-Office Independent Clearance Tracker */}
-      <div className="bg-white border border-stone-200 shadow-xs p-6 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-4">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Live 4-Office Clearance Status &amp; Resubmission History
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Each application requires independent clearance from Chairman, Hall, Library, and Proctor offices.
+              Each application requires independent clearance from Chairman, Hall, Library, and
+              Proctor offices.
             </p>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {(
               [
                 { id: 'all', label: `All (${applications.length})` },
@@ -366,10 +397,10 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                 key={tab.id}
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
                   statusFilter === tab.id
-                    ? 'border-emerald-900 bg-gradient-to-r from-emerald-900 to-emerald-800 text-white'
-                    : 'border-stone-300 bg-[#FAF8F4] text-slate-700 hover:border-emerald-700'
+                    ? 'border-emerald-900 bg-emerald-900 text-white'
+                    : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700'
                 }`}
               >
                 {tab.label}
@@ -381,27 +412,29 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         {loading ? (
           <PortalRecordsSkeleton rows={2} />
         ) : filteredApplications.length === 0 ? (
-          <div className="p-6 border border-stone-200 bg-[#FAF8F4] text-center text-sm text-slate-600">
+          <div className="p-6 rounded-xl border border-slate-200 bg-[#F7F7F5] text-center text-sm text-slate-600">
             No certificate applications match the selected filter.
           </div>
         ) : (
           <div className="space-y-6">
             {filteredApplications.map((app) => {
-              const allCleared = OFFICE_KEYS.every(
-                (k) => app.clearances[k].status === 'approved'
-              );
+              const allCleared = OFFICE_KEYS.every((k) => app.clearances[k].status === 'approved');
 
               return (
-                <div key={app.id} className="border border-stone-200 bg-[#FAF8F4]/40 p-5 space-y-4">
-                  <div className="flex flex-wrap justify-between gap-3 border-b border-stone-200 pb-3">
+                <div
+                  key={app.id}
+                  className="rounded-xl border border-slate-200 bg-[#F7F7F5]/60 p-5 space-y-4"
+                >
+                  <div className="flex flex-wrap justify-between items-start gap-3 border-b border-slate-200 pb-3">
                     <div className="space-y-1">
                       <p className="font-medium text-slate-900">
-                        {app.studentName} · <span className="font-mono tabular-nums">{app.academicId}</span> (
+                        {app.studentName} ·{' '}
+                        <span className="font-mono tabular-nums">{app.academicId}</span> (
                         {app.departmentCode} · {app.session})
                       </p>
                       <p className="font-mono text-xs text-slate-500 tabular-nums">
-                        {app.certificateType} · Paid ৳{app.feeBdt.toLocaleString()} via {app.paymentMethod} (
-                        {app.transactionId}) · Status:{' '}
+                        {app.certificateType} · Paid ৳{app.feeBdt.toLocaleString()} via{' '}
+                        {app.paymentMethod} ({app.receiptNo || app.transactionId}) · Status:{' '}
                         <span
                           className={`font-semibold ${
                             app.finalAdminStatus === 'approved'
@@ -417,11 +450,11 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                     {app.certificateSerial && (
                       <button
                         type="button"
-                        onClick={() => setCertPreview(app)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer h-fit whitespace-nowrap shrink-0 tabular-nums"
+                        onClick={() => openCertificateDocument(app)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                       >
                         <Award className="w-3.5 h-3.5" />
-                        Certificate ({app.certificateSerial})
+                        View Official Certificate ({app.certificateSerial})
                       </button>
                     )}
                   </div>
@@ -435,14 +468,14 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                       return (
                         <div
                           key={key}
-                          className={`p-3.5 border text-xs space-y-2 transition-colors ${
+                          className={`p-3.5 rounded-xl border text-xs space-y-2 transition-colors ${
                             isMyOffice
-                              ? 'border-emerald-800 bg-white ring-1 ring-emerald-800/20 shadow-xs'
+                              ? 'border-emerald-800 bg-white ring-1 ring-emerald-800/15 shadow-xs'
                               : state.status === 'approved'
-                              ? 'border-emerald-300 bg-emerald-50/40'
+                              ? 'border-emerald-300 bg-emerald-50/50'
                               : state.status === 'declined'
-                              ? 'border-red-300 bg-red-50/50'
-                              : 'border-stone-200 bg-white'
+                              ? 'border-red-300 bg-red-50/60'
+                              : 'border-slate-200 bg-white'
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -475,7 +508,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           <p className="text-slate-700 leading-relaxed">{state.note}</p>
 
                           {state.history.length > 0 && (
-                            <div className="border-t border-stone-200 pt-1.5 space-y-0.5 text-[11px] text-slate-500 font-mono">
+                            <div className="border-t border-slate-200 pt-1.5 space-y-0.5 text-[11px] text-slate-500 font-mono">
                               {state.history.map((h, idx) => (
                                 <p key={`${h.timestamp}-${idx}`}>
                                   [{h.action}] {h.actor}: {h.note}
@@ -496,12 +529,12 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                                   }))
                                 }
                                 placeholder="Resolution note..."
-                                className="w-full px-2.5 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4] focus:outline-none focus:border-emerald-800"
+                                className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-emerald-800"
                               />
                               <button
                                 type="button"
                                 onClick={() => handleResubmit(app.id, key)}
-                                className="w-full py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer"
+                                className="w-full py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer"
                               >
                                 Resubmit Clearance
                               </button>
@@ -514,7 +547,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
                   {/* Independent Office Action Bar */}
                   {myOfficeRole && app.finalAdminStatus !== 'approved' && (
-                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-200">
+                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200">
                       <input
                         type="text"
                         value={officeNotes[app.id] ?? ''}
@@ -522,19 +555,19 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           setOfficeNotes((prev) => ({ ...prev, [app.id]: e.target.value }))
                         }
                         placeholder={`Written ${myOfficeRole.toUpperCase()} note (required for decline)...`}
-                        className="flex-1 min-w-[220px] px-3 py-1.5 text-xs border border-stone-300 bg-white focus:outline-none focus:border-emerald-800"
+                        className="flex-1 min-w-[220px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-emerald-800"
                       />
                       <button
                         type="button"
                         onClick={() => handleOfficeDecision(app.id, 'approved')}
-                        className="px-4 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
+                        className="px-4 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Approve ({myOfficeRole.toUpperCase()})
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOfficeDecision(app.id, 'declined')}
-                        className="px-4 py-1.5 text-xs font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
+                        className="px-4 py-1.5 text-xs font-medium rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Decline with Note
                       </button>
@@ -543,22 +576,20 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
                   {/* Admin Office Final Verification */}
                   {user.role === 'admin' && app.finalAdminStatus !== 'approved' && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-200">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
                       <p className="text-xs text-slate-600">
                         {allCleared
-                          ? 'All 4 offices cleared. Ready for Final Verification & Temporary Certificate issuance.'
+                          ? 'All 4 offices cleared. Ready for Final Verification & Digital Certificate issuance.'
                           : 'Waiting for all 4 independent offices to clear before issuance.'}
                       </p>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          disabled={!allCleared}
-                          onClick={() => handleAdminFinal(app.id, 'approved')}
-                          className="px-4 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
-                        >
-                          Final Approve &amp; Issue Temporary Certificate
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        disabled={!allCleared}
+                        onClick={() => handleAdminFinal(app.id, 'approved')}
+                        className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        Final Approve &amp; Issue Digital Certificate
+                      </button>
                     </div>
                   )}
                 </div>
@@ -568,93 +599,25 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         )}
       </div>
 
-      {/* Temporary Certificate Modal */}
-      {certPreview && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
-          onClick={() => setCertPreview(null)}
-        >
-          <div
-            className="animate__animated animate__fadeInUp w-full max-w-xl bg-white border border-stone-200 shadow-2xl overflow-hidden"
-            style={{ animationDuration: '220ms' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="h-1.5 bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-800" />
-            <div className="p-8 space-y-5">
-              <div className="border-b border-stone-200 pb-4 flex justify-between items-start gap-3">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-wider text-emerald-800">
-                    Official Provisional / Temporary Certificate
-                  </p>
-                  <h3 className="font-serif text-2xl font-semibold text-slate-900 mt-0.5">
-                    Pabna University of Science and Technology
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setCertPreview(null)}
-                  className="px-2.5 py-1 text-xs border border-stone-300 bg-[#FAF8F4] text-slate-600 hover:text-slate-900 hover:border-emerald-800 cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  Close
-                </button>
-              </div>
-              <p className="text-sm leading-relaxed text-slate-800">
-                This is to certify that <span className="font-semibold">{certPreview.studentName}</span>{' '}
-                (Academic ID <span className="font-mono tabular-nums">{certPreview.academicId}</span>, Department
-                of <span className="font-mono">{certPreview.departmentCode}</span>, Session{' '}
-                <span className="font-mono tabular-nums">{certPreview.session}</span>) has fulfilled all
-                academic requirements across 8 semesters and obtained complete clearances from the
-                Chairman, Hall, Library, and Proctor offices.
-              </p>
-              <dl className="grid grid-cols-2 gap-3 text-xs border-t border-stone-200 pt-4 font-mono tabular-nums bg-[#FAF8F4] p-3.5 border">
-                <div>
-                  <dt className="text-slate-500">Certificate Serial</dt>
-                  <dd className="font-semibold text-emerald-800 mt-0.5">{certPreview.certificateSerial}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">Issued Date</dt>
-                  <dd className="text-slate-900 mt-0.5">{certPreview.issuedAt}</dd>
-                </div>
-              </dl>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const text = [
-                      'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY',
-                      `OFFICIAL ${certPreview.certificateType.toUpperCase()}`,
-                      `Certificate Serial: ${certPreview.certificateSerial}`,
-                      `Issued Date: ${certPreview.issuedAt}`,
-                      `Student: ${certPreview.studentName} (${certPreview.academicId})`,
-                      `Department & Session: ${certPreview.departmentCode} · ${certPreview.session}`,
-                      `4-Office Clearances Verified: Chairman, Hall, Library, Proctor`,
-                      `Fee Paid: BDT ${certPreview.feeBdt} via ${certPreview.paymentMethod} (${certPreview.transactionId})`,
-                    ].join('\n');
-                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${certPreview.certificateSerial}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                  className="px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  Download Temporary Certificate
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="px-4 py-2 text-xs font-medium border border-stone-300 bg-[#FAF8F4] text-slate-700 hover:border-emerald-800 hover:text-emerald-800 cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  Print / Save PDF
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Unified Digital Payment Checkout Modal */}
+      <DigitalCheckoutModal
+        target={checkoutTarget}
+        gateways={gateways}
+        onClose={() => setCheckoutTarget(null)}
+        onSuccess={async (receipt) => {
+          setFeedback(
+            `Certificate fee paid (${receipt.receiptNo} via ${receipt.gatewayName}). Initiated 4-office clearances across Chairman, Hall, Library, and Proctor.`
+          );
+          await refresh();
+        }}
+      />
+
+      {/* Unified Verified Digital Document Viewer */}
+      <DigitalDocumentModal
+        doc={activeDoc}
+        onClose={() => setActiveDoc(null)}
+        onOpenVerify={(code) => navigateTo(`/verify?code=${encodeURIComponent(code)}`)}
+      />
     </div>
   );
 }
-

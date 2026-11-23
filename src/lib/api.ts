@@ -8,6 +8,7 @@ import type {
   ClearanceOfficeKey,
   CourseRecord,
   DepartmentRecord,
+  DigitalDocumentMeta,
   ExamApplicationRecord,
   ExamCircularRecord,
   ExamResultRecord,
@@ -25,11 +26,14 @@ import type {
   NoticeRecord,
   NoticeVisibility,
   PaymentGatewayConfig,
+  PaymentReceiptRecord,
   PublicationRecord,
+  PublicStatusLookupResult,
   SignupTokenRecord,
   StudentRecord,
   UniversityProfile,
   UserRole,
+  VerificationLookupResult,
   ViceChancellorRecord,
 } from '../types/pust';
 
@@ -125,10 +129,24 @@ export const pustApi = {
 
   getInquiries: () => apiFetch<{ inquiries: InquiryRecord[] }>('/api/inquiries'),
 
-  markInquiryReviewed: (id: string) =>
-    apiFetch<{ updated: boolean }>(`/api/inquiries/${encodeURIComponent(id)}/review`, {
-      method: 'PATCH',
-    }),
+  markInquiryReviewed: (id: string, responseNote?: string) =>
+    apiFetch<{ updated: boolean; inquiry?: InquiryRecord }>(
+      `/api/inquiries/${encodeURIComponent(id)}/review`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ responseNote }),
+      }
+    ),
+
+  verifyDocument: (code: string) =>
+    apiFetch<{ verification: VerificationLookupResult }>(
+      `/api/verify/${encodeURIComponent(code.trim())}`
+    ),
+
+  checkPublicStatus: (query: string) =>
+    apiFetch<{ result: PublicStatusLookupResult }>(
+      `/api/status?q=${encodeURIComponent(query.trim())}`
+    ),
 
   // Authentication & Registration
   getBootstrapStatus: () => apiFetch<BootstrapStatus>('/api/auth/bootstrap-status'),
@@ -147,6 +165,7 @@ export const pustApi = {
     email: string;
     password: string;
     admissionDocuments: string[];
+    digitalDocuments?: DigitalDocumentMeta[];
   }) =>
     apiFetch<{ user: AuthUser; pendingMessage: string }>('/api/auth/register-student', {
       method: 'POST',
@@ -331,6 +350,7 @@ export const pustApi = {
       circulars: HallCircularRecord[];
       applications: HallApplicationRecord[];
       dues: HallDueRecord[];
+      gateways: PaymentGatewayConfig[];
     }>('/api/portal/halls/overview'),
 
   createHallCircular: (payload: {
@@ -469,10 +489,22 @@ export const pustApi = {
     promotionMode: 'auto' | 'manual_promoted' | 'manual_repeat';
     courses: Array<{ code: string; title: string; credits: number; marks: number }>;
   }) =>
-    apiFetch<{ result: ExamResultRecord }>('/api/portal/exams/results', {
+    apiFetch<{ result: ExamResultRecord; pendingChairmanReview?: boolean }>('/api/portal/exams/results', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+
+  approvePendingExamResult: (
+    id: string,
+    promotionMode?: 'auto' | 'manual_promoted' | 'manual_repeat'
+  ) =>
+    apiFetch<{ result: ExamResultRecord }>(
+      `/api/portal/exams/results/${encodeURIComponent(id)}/publish`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ promotionMode }),
+      }
+    ),
 
   // Portal: Certificate Application & 4-Office Independent Clearances
   getCertificatesOverview: () =>
@@ -584,4 +616,24 @@ export const pustApi = {
     }),
 
   getAuditLogs: () => apiFetch<{ logs: AuditLogRecord[] }>('/api/portal/audit-logs'),
+
+  // Portal: Unified Digital Payment Checkout & Institutional Receipts Ledger
+  getPaymentReceipts: () =>
+    apiFetch<{ receipts: PaymentReceiptRecord[] }>('/api/portal/payments/receipts'),
+
+  checkoutPayment: (payload: {
+    targetType: 'hall_due' | 'exam_application' | 'certificate';
+    targetId?: string;
+    certificateType?: 'Temporary Certificate' | 'Provisional Transcript';
+    gatewayCode: string;
+    accountMask?: string;
+    manualRef?: string;
+  }) =>
+    apiFetch<{ receipt: PaymentReceiptRecord; updatedTarget: unknown }>(
+      '/api/portal/payments/checkout',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
 };

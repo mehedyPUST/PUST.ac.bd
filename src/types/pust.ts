@@ -48,6 +48,14 @@ export interface SignupTokenRecord {
   createdAt: string;
 }
 
+export interface DigitalDocumentMeta {
+  label: string;
+  fileName: string;
+  sizeLabel: string;
+  uploadedAt: string;
+  verifiedHash: string;
+}
+
 export interface StudentRecord {
   id: string;
   userId?: string;
@@ -64,6 +72,7 @@ export interface StudentRecord {
   hallName: string;
   seatNumber: string;
   admissionDocuments: string[];
+  digitalDocuments?: DigitalDocumentMeta[];
   chairmanNotes: string;
   adminNotes: string;
   disciplinaryStatus: 'Clear' | 'Warning' | 'Under Review';
@@ -166,6 +175,7 @@ export interface LibraryCardRecord {
   session: string;
   digitalCardNo: string;
   physicalCardRef?: string;
+  verificationHash?: string;
   issuedAt: string;
   validUntil: string;
   status: 'Active' | 'Suspended';
@@ -228,6 +238,7 @@ export interface HallDueRecord {
   amountBdt: number;
   paymentMethod?: string;
   paymentRef?: string;
+  receiptNo?: string;
   paidAt?: string;
   status: 'Unpaid' | 'Payment Submitted' | 'Cleared';
   clearanceRef?: string;
@@ -265,6 +276,7 @@ export interface ExamApplicationRecord {
   paymentMethod?: string;
   transactionId?: string;
   paymentStatus: 'Pending' | 'Paid';
+  receiptNo?: string;
   verificationStatus: 'Pending Chairman Verification' | 'Approved' | 'Rejected';
   admitCardNo?: string;
   admitCardIssuedAt?: string;
@@ -290,8 +302,10 @@ export interface ExamResultRecord {
   }>;
   sgpa: number;
   promotionStatus: 'Promoted (Auto)' | 'Promoted (Manual)' | 'Probation / Repeat';
+  status?: 'pending_chairman' | 'published';
   published: boolean;
   enteredBy: string;
+  reviewedBy?: string;
   publishedAt: string;
 }
 
@@ -323,10 +337,12 @@ export interface CertificateApplicationRecord {
   feeBdt: number;
   paymentMethod: string;
   transactionId: string;
+  receiptNo?: string;
   clearances: Record<ClearanceOfficeKey, OfficeClearanceState>;
   finalAdminStatus: 'waiting_offices' | 'pending_admin' | 'approved' | 'rejected';
   adminNote?: string;
   certificateSerial?: string;
+  verificationHash?: string;
   issuedAt?: string;
   physicalCollected?: boolean;
   createdAt: string;
@@ -432,6 +448,7 @@ export interface UniversityProfile {
 
 export interface InquiryRecord {
   id: string;
+  referenceCode: string;
   fullName: string;
   email: string;
   phone: string;
@@ -444,7 +461,63 @@ export interface InquiryRecord {
   departmentCode: string;
   message: string;
   status: 'Received' | 'Reviewed';
+  responseNote?: string;
+  respondedBy?: string;
+  respondedAt?: string;
   createdAt: string;
+}
+
+export interface PaymentReceiptRecord {
+  id: string;
+  receiptNo: string;
+  transactionId: string;
+  academicId: string;
+  studentName: string;
+  departmentCode: string;
+  targetType: 'hall_due' | 'exam_application' | 'certificate';
+  targetId: string;
+  title: string;
+  amountBdt: number;
+  gatewayCode: string;
+  gatewayName: string;
+  accountMask?: string;
+  status: 'Verified';
+  paidAt: string;
+}
+
+export interface VerificationLookupResult {
+  valid: boolean;
+  documentType:
+    | 'Certificate'
+    | 'Admit Card'
+    | 'Hall Clearance'
+    | 'Digital Library Card'
+    | 'Chairman Library Seal'
+    | 'Payment Receipt';
+  serialCode: string;
+  title: string;
+  holderName: string;
+  academicId: string;
+  departmentCode: string;
+  session?: string;
+  issuedAt: string;
+  issuedBy: string;
+  status: string;
+  verificationHash: string;
+  details: Array<{ label: string; value: string }>;
+}
+
+export interface PublicStatusLookupResult {
+  found: boolean;
+  lookupType: 'account' | 'inquiry';
+  reference: string;
+  title: string;
+  statusLabel: string;
+  statusState: 'pending' | 'approved' | 'rejected' | 'reviewed' | 'received';
+  departmentCode?: string;
+  updatedAt: string;
+  note?: string;
+  meta: Array<{ label: string; value: string }>;
 }
 
 export interface BookmarkRecord {

@@ -1,9 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Printer } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  FileCheck2,
+  Plus,
+  Printer,
+  Trash2,
+} from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import { usePust } from '../PustContext';
 import { PortalRecordsSkeleton } from '../PustSkeletons';
+import { DigitalCheckoutModal, type CheckoutTarget } from './DigitalCheckoutModal';
+import { DigitalDocumentModal, type DigitalDocumentData } from './DigitalDocumentModal';
 import type {
   AuthUser,
   CourseRecord,
@@ -20,7 +31,30 @@ interface ExamPanelProps {
   departments: DepartmentRecord[];
 }
 
+interface GradeRowInput {
+  key: string;
+  code: string;
+  title: string;
+  credits: number;
+  marks: number;
+}
+
+function computePustGrade(marks: number): { letter: string; gp: number } {
+  const m = Math.max(0, Math.min(100, Number(marks) || 0));
+  if (m >= 80) return { letter: 'A+', gp: 4.0 };
+  if (m >= 75) return { letter: 'A', gp: 3.75 };
+  if (m >= 70) return { letter: 'A-', gp: 3.5 };
+  if (m >= 65) return { letter: 'B+', gp: 3.25 };
+  if (m >= 60) return { letter: 'B', gp: 3.0 };
+  if (m >= 55) return { letter: 'B-', gp: 2.75 };
+  if (m >= 50) return { letter: 'C+', gp: 2.5 };
+  if (m >= 45) return { letter: 'C', gp: 2.25 };
+  if (m >= 40) return { letter: 'D', gp: 2.0 };
+  return { letter: 'F', gp: 0.0 };
+}
+
 export function ExamPanel({ user, departments }: ExamPanelProps) {
+  const { navigateTo } = usePust();
   const [courses, setCourses] = useState<CourseRecord[]>([]);
   const [circulars, setCirculars] = useState<ExamCircularRecord[]>([]);
   const [applications, setApplications] = useState<ExamApplicationRecord[]>([]);
@@ -32,11 +66,13 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Student Exam Apply & Pay
+  // Digital Checkout & Document Modals
+  const [checkoutTarget, setCheckoutTarget] = useState<CheckoutTarget | null>(null);
+  const [activeDoc, setActiveDoc] = useState<DigitalDocumentData | null>(null);
+
+  // Student Exam Apply
   const [selectedCircularId, setSelectedCircularId] = useState('');
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [payInputs, setPayInputs] = useState<Record<string, { method: string; txn: string }>>({});
-  const [admitPreview, setAdmitPreview] = useState<ExamApplicationRecord | null>(null);
 
   // Chairman/Admin Create Course
   const [courseCode, setCourseCode] = useState('');
@@ -59,16 +95,19 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [circFee, setCircFee] = useState(1450);
   const [circCourseCodes, setCircCourseCodes] = useState<string[]>([]);
 
-  // Chairman/Admin Result Entry
+  // Teacher / Chairman / Admin Multi-Course Gradebook Entry
   const [resAcademicId, setResAcademicId] = useState('');
   const [resSemester, setResSemester] = useState(6);
   const [resPromoMode, setResPromoMode] = useState<'auto' | 'manual_promoted' | 'manual_repeat'>(
     'auto'
   );
-  const [resCourseCode, setResCourseCode] = useState('CSE-3201');
-  const [resCourseTitle, setResCourseTitle] = useState('Operating Systems');
-  const [resCredits, setResCredits] = useState(3);
-  const [resMarks, setResMarks] = useState(82);
+  const [courseRows, setCourseRows] = useState<GradeRowInput[]>([
+    { key: 'row-1', code: 'CSE-3201', title: 'Operating Systems', credits: 3, marks: 82 },
+    { key: 'row-2', code: 'CSE-3203', title: 'Computer Networks', credits: 3, marks: 76 },
+  ]);
+  const [pendingPromoModes, setPendingPromoModes] = useState<
+    Record<string, 'auto' | 'manual_promoted' | 'manual_repeat'>
+  >({});
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -98,6 +137,31 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
   const activeCircular = circulars.find((c) => c.id === selectedCircularId) || circulars[0];
 
+  const deptCourses = useMemo(
+    () =>
+      user.role === 'teacher' || user.role === 'chairman'
+        ? courses.filter((c) => c.departmentCode === user.departmentCode)
+        : courses,
+    [courses, user.role, user.departmentCode]
+  );
+
+  const estimatedSgpa = useMemo(() => {
+    let totalCr = 0;
+    let totalPts = 0;
+    for (const row of courseRows) {
+      const cr = Number(row.credits) || 0;
+      const { gp } = computePustGrade(row.marks);
+      totalCr += cr;
+      totalPts += cr * gp;
+    }
+    return totalCr > 0 ? totalPts / totalCr : 0;
+  }, [courseRows]);
+
+  const totalGradebookCredits = useMemo(
+    () => courseRows.reduce((sum, r) => sum + (Number(r.credits) || 0), 0),
+    [courseRows]
+  );
+
   function handleSelectCircular(id: string) {
     setSelectedCircularId(id);
     const found = circulars.find((c) => c.id === id);
@@ -114,6 +178,43 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     setCircCourseCodes((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
+  }
+
+  function addCatalogCourseRow(course: CourseRecord) {
+    setCourseRows((prev) => {
+      if (prev.some((r) => r.code.toUpperCase() === course.code.toUpperCase())) return prev;
+      return [
+        ...prev,
+        {
+          key: `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          code: course.code,
+          title: course.title,
+          credits: course.credits,
+          marks: 75,
+        },
+      ];
+    });
+  }
+
+  function addBlankCourseRow() {
+    setCourseRows((prev) => [
+      ...prev,
+      {
+        key: `row-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        code: '',
+        title: '',
+        credits: 3,
+        marks: 75,
+      },
+    ]);
+  }
+
+  function updateCourseRow(key: string, patch: Partial<GradeRowInput>) {
+    setCourseRows((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+  }
+
+  function removeCourseRow(key: string) {
+    setCourseRows((prev) => (prev.length > 1 ? prev.filter((r) => r.key !== key) : prev));
   }
 
   async function handleCreateCourse(e: FormEvent) {
@@ -171,32 +272,11 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         selectedCourseCodes: selectedCourses,
       });
       setFeedback(
-        `Exam form submitted (${res.application.formReference}). Complete fee payment below to unlock Admit Card verification.`
+        `Exam form submitted (${res.application.formReference}). Complete digital fee checkout below to unlock Chairman Admit Card approval.`
       );
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to submit exam form.');
-    }
-  }
-
-  async function handlePayExam(app: ExamApplicationRecord) {
-    setError(null);
-    setFeedback(null);
-    const defaultMethod = gateways[0]?.name || 'SSLCommerz';
-    const input = payInputs[app.id] || { method: defaultMethod, txn: '' };
-    if (!input.txn.trim()) {
-      setError('Enter the payment transaction reference ID.');
-      return;
-    }
-    try {
-      await pustApi.payExam(app.id, {
-        paymentMethod: input.method,
-        transactionId: input.txn,
-      });
-      setFeedback(`Payment recorded for ${app.formReference}. Awaiting Chairman Admit Card approval.`);
-      await refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to submit exam fee.');
     }
   }
 
@@ -224,78 +304,215 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
+    const sanitized = courseRows
+      .map((r) => ({
+        code: r.code.trim().toUpperCase(),
+        title: r.title.trim(),
+        credits: Number(r.credits),
+        marks: Number(r.marks),
+      }))
+      .filter((r) => r.code && r.title && r.credits > 0);
+
+    if (sanitized.length === 0) {
+      setError('Add at least one valid course row with code, title, and credits.');
+      return;
+    }
+
     try {
       const res = await pustApi.publishExamResult({
-        academicId: resAcademicId,
+        academicId: resAcademicId.trim(),
         semester: Number(resSemester),
         promotionMode: resPromoMode,
-        courses: [
-          {
-            code: resCourseCode,
-            title: resCourseTitle,
-            credits: Number(resCredits),
-            marks: Number(resMarks),
-          },
-        ],
+        courses: sanitized,
       });
-      setFeedback(
-        `Published Semester ${res.result.semester} result for ${res.result.academicId}: SGPA ${res.result.sgpa.toFixed(
-          2
-        )} (${res.result.promotionStatus}).`
-      );
+
+      if (res.pendingChairmanReview) {
+        setFeedback(
+          `Submitted Semester ${res.result.semester} marksheet for ${res.result.academicId} to Chairman verification queue (Calculated SGPA ${res.result.sgpa.toFixed(
+            2
+          )}).`
+        );
+      } else {
+        setFeedback(
+          `Published Semester ${res.result.semester} result for ${res.result.academicId}: SGPA ${res.result.sgpa.toFixed(
+            2
+          )} (${res.result.promotionStatus}).`
+        );
+      }
       setResAcademicId('');
       await refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to publish result.');
+      setError(err instanceof Error ? err.message : 'Unable to submit exam result.');
     }
+  }
+
+  async function handleApprovePendingResult(r: ExamResultRecord) {
+    setError(null);
+    setFeedback(null);
+    const promoMode = pendingPromoModes[r.id] || 'auto';
+    try {
+      const res = await pustApi.approvePendingExamResult(r.id, promoMode);
+      setFeedback(
+        `Verified & published Semester ${res.result.semester} marksheet for ${res.result.academicId} (SGPA ${res.result.sgpa.toFixed(
+          2
+        )} · ${res.result.promotionStatus}). Cumulative CGPA updated.`
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to publish pending marksheet.');
+    }
+  }
+
+  function openAdmitCardDocument(app: ExamApplicationRecord) {
+    if (!app.admitCardNo) return;
+    setActiveDoc({
+      kind: 'admit_card',
+      serialCode: app.admitCardNo,
+      title: 'Official Examination Admit Card',
+      subtitle: app.examTitle,
+      holderName: app.studentName,
+      academicId: app.academicId,
+      departmentCode: app.departmentCode,
+      session: app.session,
+      issuedAt: app.admitCardIssuedAt || app.createdAt.slice(0, 10),
+      issuedBy: 'Controller of Examinations & Department Chairman',
+      statusLabel: 'Verified & Active',
+      rows: [
+        { label: 'Form Reference', value: app.formReference },
+        { label: 'Semester', value: `Semester ${app.semester}` },
+        { label: 'Total Registered Credits', value: `${app.totalCredits} Credits` },
+        {
+          label: 'Fee Settlement',
+          value: `BDT ${app.feeBdt.toLocaleString()} · ${app.paymentMethod || 'Digital'} (${
+            app.receiptNo || app.transactionId || 'Verified'
+          })`,
+        },
+        { label: 'Hall Financial Check', value: 'Cleared' },
+      ],
+      tableHeaders: ['Course Code', 'Course Title', 'Credits'],
+      tableRows: app.selectedCourseCodes.map((code) => {
+        const info = courses.find((c) => c.code === code);
+        return [code, info?.title || 'Departmental Registered Course', `${info?.credits ?? 3}`];
+      }),
+      footerNote:
+        'Verify authenticity anytime on the Public Registry using the Admit Card number above.',
+    });
+  }
+
+  function openGradeSheetDocument(r: ExamResultRecord) {
+    const serial = `PUST-GRD-${r.departmentCode}-${r.academicId}-S${r.semester}`;
+    setActiveDoc({
+      kind: 'transcript',
+      serialCode: serial,
+      title: `Official Semester ${r.semester} Grade Sheet`,
+      subtitle: 'Controller of Examinations · PUST 4.00 Grading Scale',
+      holderName: r.studentName,
+      academicId: r.academicId,
+      departmentCode: r.departmentCode,
+      session: r.session,
+      issuedAt: r.publishedAt.slice(0, 10),
+      issuedBy: r.reviewedBy ? `${r.reviewedBy} (Verified)` : r.enteredBy,
+      statusLabel: r.promotionStatus,
+      rows: [
+        { label: 'Semester SGPA', value: `${r.sgpa.toFixed(2)} / 4.00` },
+        { label: 'Academic Standing', value: r.promotionStatus },
+        { label: 'Prepared By', value: r.enteredBy },
+        { label: 'Verified & Published By', value: r.reviewedBy || 'Department Chairman' },
+      ],
+      tableHeaders: ['Code', 'Course Title', 'Cr', 'Marks', 'Grade', 'GP'],
+      tableRows: r.courses.map((c) => [
+        c.code,
+        c.title,
+        String(c.credits),
+        String(c.marks),
+        c.letterGrade,
+        c.gradePoint.toFixed(2),
+      ]),
+      footerNote:
+        'Grades computed automatically under the PUST Ordinance (80+ A+ 4.00 down to 40 D 2.00).',
+    });
   }
 
   const pendingVerifyCount = applications.filter(
     (a) => a.paymentStatus === 'Paid' && a.verificationStatus === 'Pending Chairman Verification'
   ).length;
 
-  const deptCourses =
-    user.role === 'teacher' || user.role === 'chairman'
-      ? courses.filter((c) => c.departmentCode === user.departmentCode)
-      : courses;
+  const pendingResults = results.filter(
+    (r) => !r.published || r.status === 'pending_chairman'
+  );
+  const publishedResults = results.filter(
+    (r) => r.published && r.status !== 'pending_chairman'
+  );
+
+  const canEnterMarks = ['teacher', 'chairman', 'admin'].includes(user.role);
 
   return (
     <div className="space-y-6">
       {/* Role-Specific Module Header */}
-      <div className="bg-white border border-stone-200 shadow-xs overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
-        <div className="p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
-              {user.role === 'student'
-                ? 'Controller of Examinations · Student Desk'
-                : user.role === 'teacher'
-                ? `Department of ${user.departmentCode} · Teaching & Exam Schedule`
-                : 'Examinations, Hall Dues Clearance & Results'}
-            </p>
-            <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
-              {user.role === 'student'
-                ? 'Exam Form Fill-up, Admit Cards & My SGPA Results'
-                : user.role === 'teacher'
-                ? `${user.departmentCode} Departmental Courses, Circulars & Published Results`
-                : 'Exam Form Fill-up, Admit Cards & SGPA Publishing'}
-            </h2>
-          </div>
-          <p className="font-mono text-xs text-slate-600 tabular-nums">
-            {user.role === 'chairman' || user.role === 'admin'
-              ? `${pendingVerifyCount} awaiting verification · ${circulars.length} circular(s)`
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">
+            {user.role === 'student'
+              ? 'Controller of Examinations · Student Desk'
               : user.role === 'teacher'
-              ? `${deptCourses.length} course(s) · ${results.length} published result(s)`
-              : `${applications.length} form(s) · ${results.length} result(s)`}
+              ? `Department of ${user.departmentCode} · Gradebook & Exam Desk`
+              : 'Examinations, Hall Dues Clearance & Results'}
           </p>
+          <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+            {user.role === 'student'
+              ? 'Exam Form Fill-up, Admit Cards & My SGPA Results'
+              : user.role === 'teacher'
+              ? `${user.departmentCode} Courses, Circulars & Marksheet Submission`
+              : 'Exam Form Fill-up, Admit Cards & SGPA Publishing'}
+          </h2>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs font-mono tabular-nums">
+          {(user.role === 'chairman' || user.role === 'admin') && (
+            <>
+              <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                  Admit Queue
+                </span>
+                <span className="text-base font-semibold text-amber-800">{pendingVerifyCount}</span>
+              </div>
+              <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+                <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                  Pending Results
+                </span>
+                <span className="text-base font-semibold text-emerald-900">
+                  {pendingResults.length}
+                </span>
+              </div>
+            </>
+          )}
+          {user.role === 'teacher' && (
+            <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                Dept Courses
+              </span>
+              <span className="text-base font-semibold text-emerald-900">{deptCourses.length}</span>
+            </div>
+          )}
+          {user.role === 'student' && (
+            <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
+              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                Forms · Results
+              </span>
+              <span className="text-base font-semibold text-emerald-900">
+                {applications.length} · {publishedResults.length}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 border border-red-200 bg-red-50 text-sm text-red-900">{error}</div>
+        <div className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-sm text-red-900">
+          {error}
+        </div>
       )}
       {feedback && (
-        <div className="p-3.5 border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
+        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
           {feedback}
         </div>
       )}
@@ -303,16 +520,19 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       {/* Teacher: Department Courses & Active Exam Circulars */}
       {user.role === 'teacher' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-6 bg-white border border-stone-200 p-6 space-y-4 shadow-xs">
+          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Department Course Catalog ({deptCourses.length})
             </h3>
             {deptCourses.length === 0 ? (
               <p className="text-sm text-slate-600">No departmental courses assigned yet.</p>
             ) : (
-              <div className="divide-y divide-stone-200 border border-stone-200 text-sm">
+              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm">
                 {deptCourses.map((c) => (
-                  <div key={c.id} className="p-3.5 flex items-center justify-between gap-2">
+                  <div
+                    key={c.id}
+                    className="p-3.5 flex items-center justify-between gap-2 bg-white hover:bg-[#F7F7F5] transition-colors"
+                  >
                     <div>
                       <p className="font-mono text-xs font-semibold text-emerald-800">
                         {c.code} · Sem {c.semester} ({c.session})
@@ -328,16 +548,16 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             )}
           </div>
 
-          <div className="lg:col-span-6 bg-white border border-stone-200 p-6 space-y-4 shadow-xs">
+          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Active Examination Circulars
             </h3>
             {circulars.length === 0 ? (
               <p className="text-sm text-slate-600">No active examination circulars.</p>
             ) : (
-              <div className="divide-y divide-stone-200 border border-stone-200 text-sm">
+              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm">
                 {circulars.map((c) => (
-                  <div key={c.id} className="p-3.5 space-y-1">
+                  <div key={c.id} className="p-3.5 space-y-1 bg-white">
                     <p className="font-mono text-xs text-emerald-800 tabular-nums">
                       {c.departmentCode} · Sem {c.semester} ({c.session}) · Deadline {c.deadline}
                     </p>
@@ -355,13 +575,13 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
       {/* Student Hall Clearance Alert + Form Fill-up */}
       {user.role === 'student' && (
-        <div className="bg-white border border-stone-200 p-6 space-y-5 shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs">
           <h3 className="font-serif text-lg font-medium text-slate-900">
             Semester Examination Form Fill-up
           </h3>
 
           {hallBlocked ? (
-            <div className="p-4 border border-amber-300 bg-amber-50 text-sm text-amber-900 space-y-1">
+            <div className="p-4 rounded-xl border border-amber-300 bg-amber-50 text-sm text-amber-900 space-y-1">
               <p className="font-semibold">
                 Hall Financial Clearance Required Before Exam Form Fill-up
               </p>
@@ -372,8 +592,11 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               </p>
             </div>
           ) : (
-            <div className="p-3.5 border border-emerald-200 bg-[#FAF8F4] text-xs text-emerald-900 font-mono">
-              Hall Clearance Verified: No outstanding Hall dues blocking examination registration.
+            <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 text-xs text-emerald-900 font-mono flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
+              <span>
+                Hall Clearance Verified: No outstanding Hall dues blocking examination registration.
+              </span>
             </div>
           )}
 
@@ -386,7 +609,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   value={activeCircular.id}
                   onChange={(e) => handleSelectCircular(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
                 >
                   {circulars.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -408,10 +631,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                     return (
                       <label
                         key={code}
-                        className={`flex items-start gap-2.5 p-3 border text-sm cursor-pointer transition-colors ${
+                        className={`flex items-start gap-2.5 p-3 rounded-xl border text-sm cursor-pointer transition-colors ${
                           checked
-                            ? 'border-emerald-800 bg-emerald-50/40'
-                            : 'border-stone-200 bg-[#FAF8F4]'
+                            ? 'border-emerald-800 bg-emerald-50/50'
+                            : 'border-slate-200 bg-[#F7F7F5]'
                         }`}
                       >
                         <input
@@ -437,7 +660,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <button
                 type="submit"
                 disabled={hallBlocked || selectedCourses.length === 0}
-                className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 hover:from-emerald-950 hover:to-emerald-900 text-white disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-emerald-900 hover:bg-emerald-950 text-white disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Submit Exam Registration Form
               </button>
@@ -451,7 +674,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <form
             onSubmit={handleCreateCourse}
-            className="lg:col-span-5 bg-white border border-stone-200 p-6 space-y-3 shadow-xs"
+            className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs"
           >
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Assign Departmental Course
@@ -463,7 +686,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value)}
                 placeholder="Code (e.g. CSE-4101)"
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
               />
               <input
                 type="number"
@@ -473,7 +696,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 required
                 value={courseCredits}
                 onChange={(e) => setCourseCredits(Number(e.target.value))}
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none tabular-nums"
               />
             </div>
             <input
@@ -482,14 +705,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               value={courseTitle}
               onChange={(e) => setCourseTitle(e.target.value)}
               placeholder="Course Title"
-              className="w-full px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
             />
             <div className="grid grid-cols-3 gap-2">
               <select
                 value={courseDept}
                 disabled={user.role === 'chairman'}
                 onChange={(e) => setCourseDept(e.target.value)}
-                className="px-2.5 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.code}>
@@ -503,19 +726,19 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 max={10}
                 value={courseSem}
                 onChange={(e) => setCourseSem(Number(e.target.value))}
-                className="px-2.5 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
               />
               <input
                 type="text"
                 value={courseSession}
                 onChange={(e) => setCourseSession(e.target.value)}
                 placeholder="Session"
-                className="px-2.5 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
             >
               Save Course
             </button>
@@ -523,7 +746,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
           <form
             onSubmit={handleCreateExamCircular}
-            className="lg:col-span-7 bg-white border border-stone-200 p-6 space-y-3 shadow-xs"
+            className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs"
           >
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Publish Exam Form Fill-up Circular
@@ -535,13 +758,13 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={circTitle}
                 onChange={(e) => setCircTitle(e.target.value)}
                 placeholder="Exam Circular Title"
-                className="sm:col-span-2 px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
               />
               <select
                 value={circDept}
                 disabled={user.role === 'chairman'}
                 onChange={(e) => setCircDept(e.target.value)}
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.code}>
@@ -555,7 +778,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={circFee}
                 onChange={(e) => setCircFee(Number(e.target.value))}
                 placeholder="Fee BDT"
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
               />
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -566,20 +789,20 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 value={circSem}
                 onChange={(e) => setCircSem(Number(e.target.value))}
                 placeholder="Semester"
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
               />
               <input
                 type="text"
                 value={circSession}
                 onChange={(e) => setCircSession(e.target.value)}
                 placeholder="Session (e.g. 2022-23)"
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               />
               <input
                 type="date"
                 value={circDeadline}
                 onChange={(e) => setCircDeadline(e.target.value)}
-                className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               />
             </div>
             <div>
@@ -594,10 +817,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       key={c.id}
                       type="button"
                       onClick={() => toggleCircularCourse(c.code)}
-                      className={`px-2.5 py-1 text-xs font-mono border transition-colors cursor-pointer whitespace-nowrap ${
+                      className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                         active
-                          ? 'bg-emerald-800 text-white border-emerald-900'
-                          : 'bg-[#FAF8F4] text-slate-700 border-stone-200 hover:border-emerald-700'
+                          ? 'bg-emerald-900 text-white border-emerald-900'
+                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-emerald-700'
                       }`}
                     >
                       {c.code}
@@ -609,7 +832,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             <button
               type="submit"
               disabled={circCourseCodes.length === 0}
-              className="px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
               Publish Exam Circular
             </button>
@@ -619,223 +842,449 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
       {/* Exam Form Applications, Payment, Chairman Admit Card Issuance (Student, Chairman & Admin) */}
       {(user.role === 'student' || user.role === 'chairman' || user.role === 'admin') && (
-        <div className="bg-white border border-stone-200 p-6 space-y-4 shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
           <h3 className="font-serif text-lg font-medium text-slate-900">
-            Examination Registrations, Payments &amp; Admit Cards
+            Examination Registrations, Digital Payments &amp; Admit Cards
           </h3>
           {loading ? (
             <PortalRecordsSkeleton rows={3} />
           ) : applications.length === 0 ? (
             <p className="text-sm text-slate-600">No examination applications submitted yet.</p>
           ) : (
-            <div className="divide-y divide-stone-200 border border-stone-200">
-              {applications.map((app) => {
-                const payInput = payInputs[app.id] || {
-                  method: gateways[0]?.name || 'SSLCommerz',
-                  txn: '',
-                };
-                return (
-                  <div key={app.id} className="p-4 space-y-3 hover:bg-[#FAF8F4]/50 transition-colors">
-                    <div className="flex flex-wrap justify-between gap-2 text-sm">
-                      <div>
-                        <p className="font-medium text-slate-900">
-                          {app.examTitle} · <span className="font-mono">{app.formReference}</span>
-                        </p>
-                        <p className="font-mono text-xs text-slate-500 tabular-nums">
-                          {app.studentName} ({app.academicId}) · {app.departmentCode} · Credits{' '}
-                          {app.totalCredits} · Fee ৳{app.feeBdt} · Payment:{' '}
-                          <span className="font-semibold text-emerald-800">{app.paymentStatus}</span>{' '}
-                          · Verification: {app.verificationStatus}
-                        </p>
-                        <p className="font-mono text-xs text-slate-600 mt-1">
-                          Courses: {app.selectedCourseCodes.join(', ')}
-                        </p>
-                      </div>
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+              {applications.map((app) => (
+                <div
+                  key={app.id}
+                  className="p-4 space-y-3 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
+                >
+                  <div className="flex flex-wrap justify-between items-start gap-3 text-sm">
+                    <div>
+                      <p className="font-medium text-slate-900">
+                        {app.examTitle} ·{' '}
+                        <span className="font-mono text-xs text-slate-600">{app.formReference}</span>
+                      </p>
+                      <p className="font-mono text-xs text-slate-500 tabular-nums mt-0.5">
+                        {app.studentName} ({app.academicId}) · {app.departmentCode} · Credits{' '}
+                        {app.totalCredits} · Fee ৳{app.feeBdt.toLocaleString()} · Payment:{' '}
+                        <span
+                          className={`font-semibold ${
+                            app.paymentStatus === 'Paid' ? 'text-emerald-800' : 'text-amber-800'
+                          }`}
+                        >
+                          {app.paymentStatus}
+                        </span>{' '}
+                        {app.receiptNo ? `(${app.receiptNo})` : ''} · Verification:{' '}
+                        <span className="font-semibold text-slate-800">
+                          {app.verificationStatus}
+                        </span>
+                      </p>
+                      <p className="font-mono text-xs text-slate-600 mt-1">
+                        Courses: {app.selectedCourseCodes.join(', ')}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {user.role === 'student' && app.paymentStatus === 'Pending' && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCheckoutTarget({
+                              targetType: 'exam_application',
+                              targetId: app.id,
+                              title: app.examTitle,
+                              subtitle: `Form ${app.formReference} · ${app.selectedCourseCodes.length} Course(s) · ${app.totalCredits} Credits`,
+                              amountBdt: app.feeBdt,
+                            })
+                          }
+                          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          Pay Online (৳{app.feeBdt.toLocaleString()})
+                        </button>
+                      )}
 
                       {app.admitCardNo && (
                         <button
                           type="button"
-                          onClick={() => setAdmitPreview(app)}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer h-fit whitespace-nowrap"
+                          onClick={() => openAdmitCardDocument(app)}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                         >
                           <Printer className="w-3.5 h-3.5" />
-                          Admit Card ({app.admitCardNo})
+                          View Digital Admit Card ({app.admitCardNo})
                         </button>
                       )}
                     </div>
+                  </div>
 
-                    {user.role === 'student' && app.paymentStatus === 'Pending' && (
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <select
-                          value={payInput.method}
-                          onChange={(e) =>
-                            setPayInputs((prev) => ({
-                              ...prev,
-                              [app.id]: { ...payInput, method: e.target.value },
-                            }))
-                          }
-                          className="px-3 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4]"
-                        >
-                          {gateways.map((g) => (
-                            <option key={g.id} value={g.name}>
-                              {g.name}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          type="text"
-                          value={payInput.txn}
-                          onChange={(e) =>
-                            setPayInputs((prev) => ({
-                              ...prev,
-                              [app.id]: { ...payInput, txn: e.target.value },
-                            }))
-                          }
-                          placeholder="Transaction ID (e.g. SSL-2026-8842)"
-                          className="px-3 py-1.5 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none w-64"
-                        />
+                  {(user.role === 'chairman' || user.role === 'admin') &&
+                    app.paymentStatus === 'Paid' &&
+                    app.verificationStatus === 'Pending Chairman Verification' && (
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
                         <button
                           type="button"
-                          onClick={() => handlePayExam(app)}
-                          className="px-4 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap"
+                          onClick={() => handleVerifyExam(app, 'Approved', true)}
+                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
                         >
-                          Confirm Fee Payment
+                          Verify Payment &amp; Issue Digital Admit Card
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleVerifyExam(app, 'Rejected', false)}
+                          className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-red-300 text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
+                        >
+                          Reject
                         </button>
                       </div>
                     )}
-
-                    {(user.role === 'chairman' || user.role === 'admin') &&
-                      app.paymentStatus === 'Paid' &&
-                      app.verificationStatus === 'Pending Chairman Verification' && (
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          <button
-                            type="button"
-                            onClick={() => handleVerifyExam(app, 'Approved', true)}
-                            className="px-3.5 py-1.5 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer whitespace-nowrap"
-                          >
-                            Verify Payment &amp; Issue Digital Admit Card
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleVerifyExam(app, 'Rejected', false)}
-                            className="px-3.5 py-1.5 text-xs font-medium border border-red-300 text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-                  </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </div>
       )}
 
-      {/* Chairman / Admin Result Publishing */}
-      {(user.role === 'chairman' || user.role === 'admin') && (
+      {/* Teacher / Chairman / Admin Interactive Multi-Course Gradebook Builder */}
+      {canEnterMarks && (
         <form
           onSubmit={handlePublishResult}
-          className="bg-white border border-stone-200 p-6 space-y-4 shadow-xs"
+          className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs"
         >
-          <h3 className="font-serif text-lg font-medium text-slate-900">
-            Result Entry, Auto-GPA Calculation &amp; Semester Promotion
-          </h3>
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+                {user.role === 'teacher'
+                  ? 'Step 1 · Teacher Marksheet Preparation'
+                  : 'Direct Result Entry & Publication'}
+              </p>
+              <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+                Interactive Multi-Course Gradebook &amp; SGPA Calculator
+              </h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                {user.role === 'teacher'
+                  ? 'Submitted marksheets enter the Chairman Verification Queue before official publication.'
+                  : 'Enter multi-course marks under the PUST 4.00 grading scale and publish directly.'}
+              </p>
+            </div>
+            <div className="px-4 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200 text-right font-mono tabular-nums">
+              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                Live Estimated SGPA
+              </span>
+              <span className="text-lg font-semibold text-emerald-900">
+                {estimatedSgpa.toFixed(2)}{' '}
+                <span className="text-xs font-normal text-slate-500">
+                  ({totalGradebookCredits} Cr)
+                </span>
+              </span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input
-              type="text"
-              required
-              value={resAcademicId}
-              onChange={(e) => setResAcademicId(e.target.value)}
-              placeholder="Student Academic ID (e.g. 220101)"
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4] focus:bg-white focus:border-emerald-800 focus:outline-none"
-            />
-            <input
-              type="number"
-              min={1}
-              max={10}
-              value={resSemester}
-              onChange={(e) => setResSemester(Number(e.target.value))}
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
-            />
-            <select
-              value={resPromoMode}
-              onChange={(e) => setResPromoMode(e.target.value as typeof resPromoMode)}
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
+            <div>
+              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+                Student Academic ID
+              </label>
+              <input
+                type="text"
+                required
+                value={resAcademicId}
+                onChange={(e) => setResAcademicId(e.target.value)}
+                placeholder="e.g. 220101"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+                Semester (1–10)
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={10}
+                value={resSemester}
+                onChange={(e) => setResSemester(Number(e.target.value))}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
+              />
+            </div>
+            <div>
+              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+                Promotion Policy
+              </label>
+              <select
+                value={resPromoMode}
+                onChange={(e) => setResPromoMode(e.target.value as typeof resPromoMode)}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+              >
+                <option value="auto">Auto Promotion Check (SGPA &gt;= 2.00)</option>
+                <option value="manual_promoted">Manual Override — Promoted</option>
+                <option value="manual_repeat">Manual Override — Repeat / Probation</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Quick Pick Courses from Catalog */}
+          {deptCourses.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Quick-Add From Course Catalog
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {deptCourses.map((c) => {
+                  const already = courseRows.some(
+                    (r) => r.code.toUpperCase() === c.code.toUpperCase()
+                  );
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      disabled={already}
+                      onClick={() => addCatalogCourseRow(c)}
+                      className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        already
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 opacity-70 cursor-default'
+                          : 'bg-[#F7F7F5] border-slate-200 text-slate-700 hover:border-emerald-700'
+                      }`}
+                    >
+                      {already ? '✓ ' : '+ '}
+                      {c.code}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic Multi-Course Table */}
+          <div className="rounded-xl border border-slate-200 overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#F7F7F5] border-b border-slate-200 font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  <th className="px-3 py-2.5">Course Code</th>
+                  <th className="px-3 py-2.5">Course Title</th>
+                  <th className="px-3 py-2.5 w-24">Credits</th>
+                  <th className="px-3 py-2.5 w-24">Marks (0–100)</th>
+                  <th className="px-3 py-2.5 w-28">Grade · GP</th>
+                  <th className="px-3 py-2.5 w-12 text-right">Act</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {courseRows.map((row) => {
+                  const { letter, gp } = computePustGrade(row.marks);
+                  return (
+                    <tr key={row.key} className="bg-white">
+                      <td className="p-2">
+                        <input
+                          type="text"
+                          required
+                          value={row.code}
+                          onChange={(e) => updateCourseRow(row.key, { code: e.target.value })}
+                          placeholder="CSE-3201"
+                          className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <input
+                          type="text"
+                          required
+                          value={row.title}
+                          onChange={(e) => updateCourseRow(row.key, { title: e.target.value })}
+                          placeholder="Course Title"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-emerald-800 focus:outline-none"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <input
+                          type="number"
+                          step="0.5"
+                          min={0.5}
+                          max={6}
+                          required
+                          value={row.credits}
+                          onChange={(e) =>
+                            updateCourseRow(row.key, { credits: Number(e.target.value) })
+                          }
+                          className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          required
+                          value={row.marks}
+                          onChange={(e) =>
+                            updateCourseRow(row.key, { marks: Number(e.target.value) })
+                          }
+                          className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
+                        />
+                      </td>
+                      <td className="px-3 py-2 font-mono font-semibold tabular-nums whitespace-nowrap">
+                        <span
+                          className={
+                            letter === 'F' ? 'text-red-700' : 'text-emerald-800'
+                          }
+                        >
+                          {letter} · {gp.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="p-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => removeCourseRow(row.key)}
+                          disabled={courseRows.length <= 1}
+                          aria-label="Remove course row"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 disabled:opacity-30 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={addBlankCourseRow}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-emerald-700 hover:text-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <option value="auto">Automatic Promotion Check (SGPA &gt;= 2.00)</option>
-              <option value="manual_promoted">Manual Override — Promoted</option>
-              <option value="manual_repeat">Manual Override — Repeat / Probation</option>
-            </select>
+              <Plus className="w-3.5 h-3.5" />
+              Add Custom Course Row
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+            >
+              {user.role === 'teacher'
+                ? 'Submit Marksheet for Chairman Review'
+                : 'Calculate SGPA & Publish Result'}
+            </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <input
-              type="text"
-              required
-              value={resCourseCode}
-              onChange={(e) => setResCourseCode(e.target.value)}
-              placeholder="Course Code"
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
-            />
-            <input
-              type="text"
-              required
-              value={resCourseTitle}
-              onChange={(e) => setResCourseTitle(e.target.value)}
-              placeholder="Course Title"
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
-            />
-            <input
-              type="number"
-              step="0.5"
-              value={resCredits}
-              onChange={(e) => setResCredits(Number(e.target.value))}
-              placeholder="Credits"
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
-            />
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={resMarks}
-              onChange={(e) => setResMarks(Number(e.target.value))}
-              placeholder="Marks (0-100)"
-              className="px-3 py-2 text-xs border border-stone-300 bg-[#FAF8F4]"
-            />
-          </div>
-          <button
-            type="submit"
-            className="px-5 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer"
-          >
-            Calculate SGPA &amp; Publish Result
-          </button>
         </form>
       )}
 
-      {/* Results Ledger */}
-      <div className="bg-white border border-stone-200 p-6 space-y-4 shadow-xs">
+      {/* Pending Chairman Review Queue */}
+      {pendingResults.length > 0 && (user.role === 'teacher' || user.role === 'chairman' || user.role === 'admin') && (
+        <div className="bg-white rounded-2xl border border-amber-300 p-6 space-y-4 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                Pending Chairman Verification Queue ({pendingResults.length})
+              </p>
+              <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+                Teacher-Submitted Marksheets Awaiting Departmental Seal
+              </h3>
+            </div>
+          </div>
+
+          <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+            {pendingResults.map((r) => (
+              <div key={r.id} className="p-4 space-y-3 bg-amber-50/30 text-sm">
+                <div className="flex flex-wrap justify-between items-start gap-2">
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {r.studentName} ({r.academicId}) · Semester {r.semester} ({r.session})
+                    </p>
+                    <p className="font-mono text-xs text-slate-500 mt-0.5">
+                      Submitted by {r.enteredBy} · Provisional SGPA{' '}
+                      <span className="font-semibold text-amber-900 tabular-nums">
+                        {r.sgpa.toFixed(2)}
+                      </span>
+                    </p>
+                  </div>
+                  {(user.role === 'chairman' || user.role === 'admin') && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <select
+                        value={pendingPromoModes[r.id] || 'auto'}
+                        onChange={(e) =>
+                          setPendingPromoModes((prev) => ({
+                            ...prev,
+                            [r.id]: e.target.value as 'auto' | 'manual_promoted' | 'manual_repeat',
+                          }))
+                        }
+                        className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white"
+                      >
+                        <option value="auto">Auto Promotion</option>
+                        <option value="manual_promoted">Override: Promoted</option>
+                        <option value="manual_repeat">Override: Repeat</option>
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => handleApprovePendingResult(r)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        <FileCheck2 className="w-3.5 h-3.5" />
+                        Verify &amp; Publish Result
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-3 font-mono text-xs text-slate-700">
+                  {r.courses.map((c) => (
+                    <span
+                      key={c.code}
+                      className="px-2 py-1 rounded-md bg-white border border-slate-200 tabular-nums"
+                    >
+                      {c.code}: {c.marks} ({c.letterGrade}, {c.gradePoint.toFixed(2)})
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Published Results Ledger */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
         <h3 className="font-serif text-lg font-medium text-slate-900">
           Published Semester Results &amp; Promotion Standing
         </h3>
         {loading ? (
           <PortalRecordsSkeleton rows={2} />
-        ) : results.length === 0 ? (
+        ) : publishedResults.length === 0 ? (
           <p className="text-sm text-slate-600">No semester results published yet.</p>
         ) : (
-          <div className="divide-y divide-stone-200 border border-stone-200">
-            {results.map((r) => (
-              <div key={r.id} className="p-4 space-y-2 text-sm hover:bg-[#FAF8F4]/50 transition-colors">
-                <div className="flex flex-wrap justify-between gap-2">
-                  <p className="font-medium text-slate-900">
-                    {r.studentName} ({r.academicId}) · Semester {r.semester} ({r.session})
-                  </p>
-                  <p className="font-mono text-xs font-semibold text-emerald-800 tabular-nums">
-                    SGPA {r.sgpa.toFixed(2)} · {r.promotionStatus}
-                  </p>
+          <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+            {publishedResults.map((r) => (
+              <div
+                key={r.id}
+                className="p-4 space-y-2.5 text-sm bg-white hover:bg-[#F7F7F5]/60 transition-colors"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {r.studentName} ({r.academicId}) · Semester {r.semester} ({r.session})
+                    </p>
+                    <p className="font-mono text-xs text-slate-500 mt-0.5 tabular-nums">
+                      Prepared by {r.enteredBy}
+                      {r.reviewedBy ? ` · Verified by ${r.reviewedBy}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 shrink-0">
+                    <span className="font-mono text-xs font-semibold text-emerald-800 tabular-nums">
+                      SGPA {r.sgpa.toFixed(2)} · {r.promotionStatus}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => openGradeSheetDocument(r)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-emerald-800 hover:text-emerald-900 cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      View Official Grade Sheet
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-3 font-mono text-xs text-slate-600">
+                <div className="flex flex-wrap gap-2.5 font-mono text-xs text-slate-600">
                   {r.courses.map((c) => (
-                    <span key={c.code}>
+                    <span
+                      key={c.code}
+                      className="px-2 py-1 rounded-md bg-[#F7F7F5] border border-slate-200 tabular-nums"
+                    >
                       {c.code}: {c.marks} ({c.letterGrade}, {c.gradePoint.toFixed(2)})
                     </span>
                   ))}
@@ -846,111 +1295,25 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         )}
       </div>
 
-      {/* Printable Admit Card Modal */}
-      {admitPreview && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
-          onClick={() => setAdmitPreview(null)}
-        >
-          <div
-            className="w-full max-w-xl bg-white border border-stone-300 shadow-2xl overflow-hidden animate__animated animate__fadeInUp"
-            style={{ animationDuration: '200ms' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="h-1.5 bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-800" />
-            <div className="p-6 space-y-4">
-              <div className="border-b border-stone-200 pb-3 flex justify-between items-start">
-                <div>
-                  <p className="font-mono text-xs uppercase text-emerald-800">
-                    Controller of Examinations · Official Admit Card
-                  </p>
-                  <h3 className="font-serif text-xl font-semibold text-slate-900">
-                    Pabna University of Science and Technology
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setAdmitPreview(null)}
-                  className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
-              <dl className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <dt className="text-xs text-slate-500">Admit Card No.</dt>
-                  <dd className="font-mono font-semibold text-emerald-800">
-                    {admitPreview.admitCardNo}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-slate-500">Issued Date</dt>
-                  <dd className="font-mono tabular-nums">{admitPreview.admitCardIssuedAt}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-slate-500">Student Name</dt>
-                  <dd className="font-medium">{admitPreview.studentName}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-slate-500">Academic ID</dt>
-                  <dd className="font-mono tabular-nums">{admitPreview.academicId}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-slate-500">Department &amp; Session</dt>
-                  <dd className="font-mono">
-                    {admitPreview.departmentCode} · {admitPreview.session}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-slate-500">Form &amp; Payment Ref</dt>
-                  <dd className="font-mono">
-                    {admitPreview.formReference} ({admitPreview.transactionId})
-                  </dd>
-                </div>
-              </dl>
-              <div className="border-t border-stone-200 pt-3 text-xs font-mono text-slate-700">
-                Registered Courses: {admitPreview.selectedCourseCodes.join(', ')}
-              </div>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const text = [
-                      'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY',
-                      'OFFICIAL EXAMINATION ADMIT CARD',
-                      `Admit Card No: ${admitPreview.admitCardNo}`,
-                      `Form Reference: ${admitPreview.formReference}`,
-                      `Issued Date: ${admitPreview.admitCardIssuedAt}`,
-                      `Student: ${admitPreview.studentName} (${admitPreview.academicId})`,
-                      `Department & Session: ${admitPreview.departmentCode} · ${admitPreview.session}`,
-                      `Semester: ${admitPreview.semester}`,
-                      `Courses: ${admitPreview.selectedCourseCodes.join(', ')}`,
-                      `Payment: ${admitPreview.paymentMethod} (${admitPreview.transactionId})`,
-                    ].join('\n');
-                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${admitPreview.admitCardNo}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                  className="px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer"
-                >
-                  Download Admit Card Copy
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="px-4 py-2 text-xs font-medium border border-stone-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-800 cursor-pointer"
-                >
-                  Print / Save PDF
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Unified Digital Payment Checkout Modal */}
+      <DigitalCheckoutModal
+        target={checkoutTarget}
+        gateways={gateways}
+        onClose={() => setCheckoutTarget(null)}
+        onSuccess={async (receipt) => {
+          setFeedback(
+            `Exam fee settled cleanly (${receipt.receiptNo} via ${receipt.gatewayName}). Awaiting Chairman Admit Card verification.`
+          );
+          await refresh();
+        }}
+      />
+
+      {/* Unified Verified Digital Document Viewer (Admit Card / Official Grade Sheet) */}
+      <DigitalDocumentModal
+        doc={activeDoc}
+        onClose={() => setActiveDoc(null)}
+        onOpenVerify={(code) => navigateTo(`/verify?code=${encodeURIComponent(code)}`)}
+      />
     </div>
   );
 }
