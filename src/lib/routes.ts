@@ -5,6 +5,12 @@ export type AppRoute =
   | '/about/history'
   | '/about/mission-vision'
   | '/about/plans'
+  | '/governance'
+  | '/governance/pust-act'
+  | '/governance/regent-board'
+  | '/governance/academic-council'
+  | '/governance/finance-committee'
+  | '/governance/academic-ordinance'
   | '/administration'
   | '/administration/vc-office'
   | '/administration/pro-vc-office'
@@ -42,20 +48,20 @@ export type AppRoute =
   | '/gallery'
   | '/portal';
 
-export interface NavDropdownItem {
+export interface NavSubItem {
   label: string;
   route: AppRoute;
   description?: string;
 }
 
-export interface NavDropdownGroup {
-  id: 'about' | 'administration' | 'academic' | 'admission' | 'facilities';
+export interface NavGroup {
+  id: 'about' | 'governance' | 'administration' | 'academic' | 'admission' | 'facilities';
   label: string;
   defaultRoute: AppRoute;
-  items: NavDropdownItem[];
+  items: NavSubItem[];
 }
 
-export const NAV_DROPDOWN_GROUPS: NavDropdownGroup[] = [
+export const NAV_GROUPS: NavGroup[] = [
   {
     id: 'about',
     label: 'About',
@@ -65,6 +71,18 @@ export const NAV_DROPDOWN_GROUPS: NavDropdownGroup[] = [
       { label: 'History', route: '/about/history' },
       { label: 'Mission and Vision', route: '/about/mission-vision' },
       { label: 'Strategic Plans', route: '/about/plans' },
+    ],
+  },
+  {
+    id: 'governance',
+    label: 'Governance',
+    defaultRoute: '/governance',
+    items: [
+      { label: 'PUST Act', route: '/governance/pust-act' },
+      { label: 'Regent Board', route: '/governance/regent-board' },
+      { label: 'Academic Council', route: '/governance/academic-council' },
+      { label: 'Finance Committee', route: '/governance/finance-committee' },
+      { label: 'Academic Ordinance', route: '/governance/academic-ordinance' },
     ],
   },
   {
@@ -126,12 +144,15 @@ export const NAV_DROPDOWN_GROUPS: NavDropdownGroup[] = [
   },
 ];
 
+// Backward-compatible alias if any module imports NAV_DROPDOWN_GROUPS
+export const NAV_DROPDOWN_GROUPS = NAV_GROUPS;
+
 const ALL_VALID_ROUTES = new Set<AppRoute>([
   '/',
   '/notices',
   '/gallery',
   '/portal',
-  ...NAV_DROPDOWN_GROUPS.flatMap((g) => [g.defaultRoute, ...g.items.map((i) => i.route)]),
+  ...NAV_GROUPS.flatMap((g) => [g.defaultRoute, ...g.items.map((i) => i.route)]),
 ]);
 
 export function parseRouteFromPath(pathname: string): AppRoute {

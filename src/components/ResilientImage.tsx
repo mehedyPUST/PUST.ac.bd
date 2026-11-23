@@ -1,8 +1,11 @@
-import { useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Building2 } from 'lucide-react';
 
 interface ResilientImageProps {
   src: string;
+  fallbackSrc?: string;
   alt: string;
   caption?: string;
   className?: string;
@@ -11,22 +14,37 @@ interface ResilientImageProps {
 
 export function ResilientImage({
   src,
+  fallbackSrc,
   alt,
   caption,
   className = 'w-full h-full object-cover',
   containerClassName = '',
 }: ResilientImageProps) {
+  const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setCurrentSrc(src);
+    setFailed(false);
+  }, [src]);
+
+  function handleError() {
+    if (fallbackSrc && currentSrc !== fallbackSrc) {
+      setCurrentSrc(fallbackSrc);
+      return;
+    }
+    setFailed(true);
+  }
 
   return (
     <figure className={containerClassName}>
-      <div className="relative w-full h-full overflow-hidden bg-slate-100 border border-slate-200">
+      <div className="relative w-full h-full overflow-hidden bg-slate-100 border border-stone-200">
         {!failed ? (
           <img
-            src={src}
+            src={currentSrc}
             alt={alt}
             referrerPolicy="no-referrer"
-            onError={() => setFailed(true)}
+            onError={handleError}
             className={className}
           />
         ) : (

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { ResilientImage } from './ResilientImage';
 import type { JournalRecord, PublicationRecord } from '../types/pust';

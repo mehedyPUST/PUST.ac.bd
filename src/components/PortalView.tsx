@@ -1,5 +1,18 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { LogOut, Search } from 'lucide-react';
+'use client';
+
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  Award,
+  Bell,
+  BookOpen,
+  Building,
+  FileSpreadsheet,
+  LayoutDashboard,
+  LogOut,
+  Search,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
 import { CertificatePanel } from './portal/CertificatePanel';
@@ -13,19 +26,11 @@ import type {
   BootstrapStatus,
   DepartmentRecord,
   GalleryItemRecord,
+  NoticeRecord,
   StudentRecord,
   UserRole,
   ViceChancellorRecord,
 } from '../types/pust';
-
-const HALL_OPTIONS = [
-  'July 06 Hall',
-  'Male Hall-1',
-  'Male Hall-2',
-  'Female Hall-1',
-  'Female Hall-2',
-  'Non-Residential',
-];
 
 const SESSION_FILTERS = ['ALL', '2025-26', '2024-25', '2023-24', '2022-23', '2021-22'];
 
@@ -37,6 +42,7 @@ interface PortalViewProps {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  notices?: NoticeRecord[];
   onUserChange: (user: AuthUser | null) => void;
   onBookmarksChange: () => Promise<void>;
   onNoticesChange: () => Promise<void>;
@@ -62,6 +68,7 @@ export function PortalView({
   aboutSections,
   vcProfiles,
   galleryItems,
+  notices = [],
   onUserChange,
   onBookmarksChange,
   onNoticesChange,
@@ -92,7 +99,7 @@ export function PortalView({
   const [offRole, setOffRole] = useState<Exclude<UserRole, 'admin' | 'student'>>('teacher');
   const [offDept, setOffDept] = useState('CSE');
   const [offAcademicId, setOffAcademicId] = useState('');
-  const [offHall, setOffHall] = useState('Academic Block');
+  const [offHall] = useState('Academic Block');
 
   // Admin Claim / Passcode
   const [adminName, setAdminName] = useState('PUST Admin Office');
@@ -106,7 +113,15 @@ export function PortalView({
   const [stuSessionFilter, setStuSessionFilter] = useState('ALL');
   const [stuSearch, setStuSearch] = useState('');
   const [studentEditNotes, setStudentEditNotes] = useState<
-    Record<string, { chairmanNotes?: string; adminNotes?: string; disciplinaryStatus?: StudentRecord['disciplinaryStatus']; disciplinaryNotes?: string }>
+    Record<
+      string,
+      {
+        chairmanNotes?: string;
+        adminNotes?: string;
+        disciplinaryStatus?: StudentRecord['disciplinaryStatus'];
+        disciplinaryNotes?: string;
+      }
+    >
   >({});
   const [stuSavedMsg, setStuSavedMsg] = useState<string | null>(null);
 
@@ -129,6 +144,20 @@ export function PortalView({
       loadStudents();
     }
   }, [user, loadStudents]);
+
+  const targetedNotifications = useMemo(() => {
+    if (!user) return [];
+    return notices
+      .filter((n) => {
+        if (n.boardScope === 'central') return true;
+        if (n.departmentCode === user.departmentCode) {
+          if (!n.targetSession || !user.session) return true;
+          return n.targetSession === user.session;
+        }
+        return false;
+      })
+      .slice(0, 5);
+  }, [notices, user]);
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
@@ -254,9 +283,9 @@ export function PortalView({
   if (!user) {
     return (
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
+            <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
               PUST Integrated Digital University Platform
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
@@ -270,24 +299,24 @@ export function PortalView({
           <button
             type="button"
             onClick={onBackToSite}
-            className="text-sm font-medium text-emerald-700 hover:text-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+            className="text-sm font-medium text-emerald-800 hover:text-emerald-950 whitespace-nowrap shrink-0 cursor-pointer"
           >
             ← Back to Public Website
           </button>
         </div>
 
-        <div className="bg-white border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-4">
+        <div className="bg-white border border-stone-200 p-6 sm:p-8 space-y-6">
+          <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-4">
             <button
               type="button"
               onClick={() => {
                 setAuthMode('login');
                 setAuthError(null);
               }}
-              className={`px-4 py-2 text-xs sm:text-sm font-medium cursor-pointer ${
+              className={`px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap cursor-pointer ${
                 authMode === 'login'
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:text-emerald-800'
+                  ? 'bg-emerald-800 text-white'
+                  : 'bg-stone-100 text-slate-700 hover:text-emerald-800'
               }`}
             >
               Member Sign In
@@ -298,10 +327,10 @@ export function PortalView({
                 setAuthMode('student-token');
                 setAuthError(null);
               }}
-              className={`px-4 py-2 text-xs sm:text-sm font-medium cursor-pointer ${
+              className={`px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap cursor-pointer ${
                 authMode === 'student-token'
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:text-emerald-800'
+                  ? 'bg-emerald-800 text-white'
+                  : 'bg-stone-100 text-slate-700 hover:text-emerald-800'
               }`}
             >
               Student Token Signup
@@ -312,10 +341,10 @@ export function PortalView({
                 setAuthMode('officer');
                 setAuthError(null);
               }}
-              className={`px-4 py-2 text-xs sm:text-sm font-medium cursor-pointer ${
+              className={`px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap cursor-pointer ${
                 authMode === 'officer'
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:text-emerald-800'
+                  ? 'bg-emerald-800 text-white'
+                  : 'bg-stone-100 text-slate-700 hover:text-emerald-800'
               }`}
             >
               Officer / Teacher Signup
@@ -327,10 +356,10 @@ export function PortalView({
                   setAuthMode('admin-claim');
                   setAuthError(null);
                 }}
-                className={`px-4 py-2 text-xs sm:text-sm font-medium cursor-pointer ${
+                className={`px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap cursor-pointer ${
                   authMode === 'admin-claim'
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:text-emerald-800'
+                    ? 'bg-emerald-800 text-white'
+                    : 'bg-stone-100 text-slate-700 hover:text-emerald-800'
                 }`}
               >
                 Claim Initial Admin Office
@@ -343,10 +372,10 @@ export function PortalView({
                   setAuthMode('admin-passcode');
                   setAuthError(null);
                 }}
-                className={`px-4 py-2 text-xs sm:text-sm font-medium cursor-pointer ${
+                className={`px-4 py-2 text-xs sm:text-sm font-medium whitespace-nowrap cursor-pointer ${
                   authMode === 'admin-passcode'
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-slate-100 text-slate-700 hover:text-emerald-800'
+                    ? 'bg-emerald-800 text-white'
+                    : 'bg-stone-100 text-slate-700 hover:text-emerald-800'
                 }`}
               >
                 Admin Passcode Sign In
@@ -377,7 +406,7 @@ export function PortalView({
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   placeholder="member@pust.ac.bd"
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 bg-slate-50 focus:outline-none focus:border-emerald-600 focus:bg-white"
+                  className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-stone-50 focus:outline-none focus:border-emerald-700 focus:bg-white"
                 />
               </div>
               <div>
@@ -390,13 +419,13 @@ export function PortalView({
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="Enter password"
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 bg-slate-50 focus:outline-none focus:border-emerald-600 focus:bg-white"
+                  className="w-full px-3.5 py-2.5 text-sm border border-stone-300 bg-stone-50 focus:outline-none focus:border-emerald-700 focus:bg-white"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60 cursor-pointer"
+                className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Signing In...' : 'Sign In to Campus Portal'}
               </button>
@@ -420,7 +449,7 @@ export function PortalView({
                     value={stuToken}
                     onChange={(e) => setStuToken(e.target.value)}
                     placeholder="PUST-CSE-..."
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50 font-mono"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50 font-mono"
                   />
                 </div>
                 <div>
@@ -432,7 +461,7 @@ export function PortalView({
                     required
                     value={stuName}
                     onChange={(e) => setStuName(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
                 <div>
@@ -444,7 +473,7 @@ export function PortalView({
                     required
                     value={stuEmail}
                     onChange={(e) => setStuEmail(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
                 <div>
@@ -457,7 +486,7 @@ export function PortalView({
                     required
                     value={stuPassword}
                     onChange={(e) => setStuPassword(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
               </div>
@@ -470,13 +499,13 @@ export function PortalView({
                   required
                   value={stuDocs}
                   onChange={(e) => setStuDocs(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                  className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60 cursor-pointer"
+                className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Submitting...' : 'Submit for Chairman Approval'}
               </button>
@@ -499,7 +528,7 @@ export function PortalView({
                     required
                     value={offName}
                     onChange={(e) => setOffName(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
                 <div>
@@ -511,7 +540,7 @@ export function PortalView({
                     onChange={(e) =>
                       setOffRole(e.target.value as Exclude<UserRole, 'admin' | 'student'>)
                     }
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   >
                     <option value="teacher">Teacher (Chairman Approval)</option>
                     <option value="chairman">Department Chairman (Admin Approval)</option>
@@ -531,7 +560,7 @@ export function PortalView({
                     required
                     value={offEmail}
                     onChange={(e) => setOffEmail(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
                 <div>
@@ -544,7 +573,7 @@ export function PortalView({
                     required
                     value={offPassword}
                     onChange={(e) => setOffPassword(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
                 <div>
@@ -554,7 +583,7 @@ export function PortalView({
                   <select
                     value={offDept}
                     onChange={(e) => setOffDept(e.target.value)}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   >
                     {departments.map((d) => (
                       <option key={d.id} value={d.code}>
@@ -577,14 +606,14 @@ export function PortalView({
                     value={offAcademicId}
                     onChange={(e) => setOffAcademicId(e.target.value)}
                     placeholder="PUST-FAC-104"
-                    className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                    className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
                   />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60 cursor-pointer"
+                className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 disabled:opacity-60 cursor-pointer"
               >
                 Submit Officer / Teacher Application
               </button>
@@ -603,7 +632,7 @@ export function PortalView({
                 value={adminName}
                 onChange={(e) => setAdminName(e.target.value)}
                 placeholder="Admin Officer Name"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
               />
               <input
                 type="email"
@@ -611,7 +640,7 @@ export function PortalView({
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
                 placeholder="admin@pust.ac.bd"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
               />
               <input
                 type="password"
@@ -620,12 +649,12 @@ export function PortalView({
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
                 placeholder="Strong Password (8+ chars)"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
+                className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
               >
                 Claim Admin Office Account
               </button>
@@ -640,7 +669,7 @@ export function PortalView({
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
                 placeholder="admin@pust.ac.bd"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
               />
               <input
                 type="password"
@@ -648,12 +677,12 @@ export function PortalView({
                 value={adminPasscode}
                 onChange={(e) => setAdminPasscode(e.target.value)}
                 placeholder="Server ADMIN_PASSCODE"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 bg-slate-50"
+                className="w-full px-3.5 py-2 text-sm border border-stone-300 bg-stone-50"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
+                className="px-6 py-2.5 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
               >
                 Sign In as Admin
               </button>
@@ -664,310 +693,386 @@ export function PortalView({
     );
   }
 
-  // Authenticated Role-Based Portal Workspace
-  const portalTabs: Array<{ id: PortalTab; label: string }> = [
-    { id: 'overview', label: 'Overview & Bookmarks' },
-    { id: 'students', label: user.role === 'student' ? 'My Academic Profile' : 'Student Database' },
-    { id: 'library', label: 'Library & Digital Card' },
-    { id: 'halls', label: 'Residential Halls & Dues' },
-    { id: 'exams', label: 'Exams, Admit Cards & Results' },
-    { id: 'certificates', label: 'Certificate & 4-Office Clearance' },
+  // Authenticated Role-Based Portal Workspace (256px Sidebar + Contextual Breadcrumb Header)
+  const portalTabs: Array<{ id: PortalTab; label: string; icon: typeof LayoutDashboard }> = [
+    { id: 'overview', label: 'Overview & Notifications', icon: LayoutDashboard },
+    {
+      id: 'students',
+      label: user.role === 'student' ? 'My Academic Profile' : 'Student Database',
+      icon: Users,
+    },
+    { id: 'library', label: 'Library & Digital Card', icon: BookOpen },
+    { id: 'halls', label: 'Residential Halls & Dues', icon: Building },
+    { id: 'exams', label: 'Exams, Admit Cards & Results', icon: FileSpreadsheet },
+    { id: 'certificates', label: 'Certificate & 4-Office Clearance', icon: Award },
     ...(user.role !== 'student'
-      ? [{ id: 'governance' as PortalTab, label: 'Notices, Tokens & CMS' }]
+      ? [{ id: 'governance' as PortalTab, label: 'Notices, Tokens & CMS', icon: ShieldCheck }]
       : []),
   ];
 
+  const activeTabLabel = portalTabs.find((t) => t.id === activeTab)?.label || 'Overview';
+
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14 space-y-6">
-      {/* Header Bar */}
-      <div className="bg-white border border-slate-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs uppercase text-emerald-700">
-            Authenticated Role: {user.role.toUpperCase()} · {user.departmentCode} · ID{' '}
-            {user.academicId}
-            {user.session ? ` · Session ${user.session}` : ''}
-          </p>
-          <h1 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
-            {user.name}
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {user.email} · {user.hallAffiliation}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={onBackToSite}
-            className="px-4 py-2 text-xs sm:text-sm font-medium border border-slate-300 text-slate-700 hover:border-emerald-700 hover:text-emerald-700 cursor-pointer"
-          >
-            Public Website
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-medium border border-slate-300 text-slate-700 hover:border-red-400 hover:text-red-700 cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
-      </div>
-
-      {/* Portal Module Tabs */}
-      <div className="flex flex-wrap gap-1.5 border-b border-slate-200 pb-4">
-        {portalTabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === tab.id
-                ? 'bg-emerald-700 text-white'
-                : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300 hover:text-emerald-800'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab 1: Overview & Saved Bookmarks */}
-      {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-6 bg-white border border-slate-200 p-6 space-y-4">
-            <h2 className="font-serif text-xl font-medium text-slate-900">
-              Saved Departments &amp; Circulars ({bookmarks.length})
-            </h2>
-            {bookmarks.length === 0 ? (
-              <p className="text-sm text-slate-600">
-                No saved bookmarks yet. Bookmark departments or notices while browsing the public
-                site.
-              </p>
-            ) : (
-              <div className="divide-y divide-slate-200 border border-slate-200">
-                {bookmarks.map((b) => (
-                  <div key={b.id} className="p-3.5 flex items-center justify-between gap-3 text-sm">
-                    <div>
-                      <p className="font-medium text-slate-900">{b.title}</p>
-                      <p className="text-xs text-slate-500">{b.subtitle}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        await pustApi.removeBookmark(b.itemId);
-                        await onBookmarksChange();
-                      }}
-                      className="text-xs text-red-700 hover:underline cursor-pointer"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-6 bg-white border border-slate-200 p-6 space-y-3">
-            <h2 className="font-serif text-xl font-medium text-slate-900">
-              Active Digital Services for {user.role.toUpperCase()}
-            </h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Use the navigation tabs above to manage Library Membership cards, Residential Hall
-              vacancies &amp; clearances, Semester Examination form fill-up &amp; Admit Cards,
-              4-office Certificate clearances, and Departmental/Central Notices.
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* 256px Workspace Sidebar */}
+        <aside className="w-full lg:w-64 shrink-0 bg-white border border-stone-200">
+          <div className="p-5 border-b border-stone-200 space-y-1">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+              {user.role.toUpperCase()} · {user.departmentCode}
             </p>
-            {user.role === 'teacher' && (
-              <div className="p-4 border border-emerald-200 bg-emerald-50/40 text-xs space-y-1 font-mono">
-                <p>Assigned Courses: {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}</p>
-                <p>Assigned Sessions: {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2: Combinable Student Database (Dept + Session + Search) */}
-      {activeTab === 'students' && (
-        <div className="bg-white border border-slate-200 p-6 space-y-5">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-              <h2 className="font-serif text-2xl font-medium text-slate-900">
-                {user.role === 'student'
-                  ? 'My Verified Student Record'
-                  : 'University Student Database (Combinable Dept + Session Filters)'}
-              </h2>
-              <p className="text-xs text-slate-600 mt-1">
-                Filter simultaneously by Department and Session to inspect academic standing, hall
-                seat allocation, disciplinary status, and departmental notes.
-              </p>
-            </div>
-
-            {user.role !== 'student' && (
-              <div className="flex flex-wrap gap-2">
-                <select
-                  value={stuDeptFilter}
-                  disabled={user.role === 'chairman' || user.role === 'teacher'}
-                  onChange={(e) => setStuDeptFilter(e.target.value)}
-                  className="px-3 py-2 text-xs border border-slate-300 bg-slate-50"
-                >
-                  <option value="ALL">All Departments</option>
-                  {departments.map((d) => (
-                    <option key={d.id} value={d.code}>
-                      {d.code}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={stuSessionFilter}
-                  onChange={(e) => setStuSessionFilter(e.target.value)}
-                  className="px-3 py-2 text-xs border border-slate-300 bg-slate-50"
-                >
-                  {SESSION_FILTERS.map((s) => (
-                    <option key={s} value={s}>
-                      {s === 'ALL' ? 'All Sessions' : `Session ${s}`}
-                    </option>
-                  ))}
-                </select>
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="search"
-                    value={stuSearch}
-                    onChange={(e) => setStuSearch(e.target.value)}
-                    placeholder="Name or ID..."
-                    className="pl-8 pr-3 py-2 text-xs border border-slate-300 bg-slate-50"
-                  />
-                </div>
-              </div>
-            )}
+            <p className="font-serif text-lg font-medium text-slate-900 leading-snug">
+              {user.name}
+            </p>
+            <p className="font-mono text-xs text-slate-500 tabular-nums">
+              ID {user.academicId}
+              {user.session ? ` · ${user.session}` : ''}
+            </p>
           </div>
 
-          {stuSavedMsg && (
-            <div className="p-3 border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
-              {stuSavedMsg}
-            </div>
-          )}
-
-          <div className="divide-y divide-slate-200 border border-slate-200">
-            {students.map((stu) => {
-              const edit = studentEditNotes[stu.id] || {};
+          <nav aria-label="Campus portal workspace modules" className="p-2 space-y-1">
+            {portalTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
-                <div key={stu.id} className="p-4 space-y-2 text-sm">
-                  <div className="flex flex-wrap justify-between gap-2">
-                    <div>
-                      <p className="font-medium text-slate-900">
-                        {stu.name} · <span className="font-mono">{stu.academicId}</span>
-                      </p>
-                      <p className="font-mono text-xs text-emerald-700 tabular-nums">
-                        {stu.departmentCode} · Session {stu.session} · Sem {stu.currentSemester}{' '}
-                        (Completed {stu.completedSemesters}/8) · CGPA {stu.cgpa.toFixed(2)}
-                      </p>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        Hall: {stu.hallName} ({stu.seatNumber}) · Disciplinary:{' '}
-                        <span className="font-semibold">{stu.disciplinaryStatus}</span> —{' '}
-                        {stu.disciplinaryNotes}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Chairman Note: {stu.chairmanNotes} · Admin Note: {stu.adminNotes || '—'}
-                      </p>
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+                    isActive
+                      ? 'bg-emerald-800 text-white'
+                      : 'text-slate-700 hover:bg-stone-100 hover:text-emerald-900'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="p-3 border-t border-stone-200 space-y-2">
+            <button
+              type="button"
+              onClick={onBackToSite}
+              className="w-full px-3 py-2 text-xs font-medium border border-stone-300 text-slate-700 hover:border-emerald-800 hover:text-emerald-800 transition-colors cursor-pointer"
+            >
+              Public Website
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium border border-stone-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Workspace Surface */}
+        <div className="flex-1 min-w-0 w-full space-y-6">
+          {/* Top Contextual Breadcrumb Header */}
+          <div className="bg-white border border-stone-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <p className="font-mono text-xs text-slate-500">
+                Digital Campus / <span className="text-emerald-800 font-semibold">{activeTabLabel}</span>
+              </p>
+              <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-0.5">
+                {activeTabLabel}
+              </h1>
+            </div>
+            <p className="font-mono text-xs text-slate-600 tabular-nums">
+              {user.email} · {user.hallAffiliation}
+            </p>
+          </div>
+
+          {/* Tab 1: Overview, In-App Notifications & Saved Bookmarks */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                {/* Targeted In-App Notifications */}
+                <div className="xl:col-span-7 bg-white border border-stone-200 p-6 space-y-4">
+                  <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 text-emerald-800" />
+                      <h2 className="font-serif text-xl font-medium text-slate-900">
+                        Institutional &amp; Targeted Notifications
+                      </h2>
                     </div>
+                    <span className="font-mono text-xs text-slate-500 tabular-nums">
+                      {targetedNotifications.length} active
+                    </span>
                   </div>
 
-                  {['chairman', 'admin', 'proctor'].includes(user.role) && (
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {user.role === 'chairman' && (
-                        <input
-                          type="text"
-                          value={edit.chairmanNotes ?? stu.chairmanNotes}
-                          onChange={(e) =>
-                            setStudentEditNotes((prev) => ({
-                              ...prev,
-                              [stu.id]: { ...edit, chairmanNotes: e.target.value },
-                            }))
-                          }
-                          placeholder="Update Chairman note..."
-                          className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-slate-300 bg-slate-50"
-                        />
-                      )}
-                      {user.role === 'admin' && (
-                        <input
-                          type="text"
-                          value={edit.adminNotes ?? stu.adminNotes}
-                          onChange={(e) =>
-                            setStudentEditNotes((prev) => ({
-                              ...prev,
-                              [stu.id]: { ...edit, adminNotes: e.target.value },
-                            }))
-                          }
-                          placeholder="Update Admin note..."
-                          className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-slate-300 bg-slate-50"
-                        />
-                      )}
-                      {user.role === 'proctor' && (
-                        <>
-                          <select
-                            value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
-                            onChange={(e) =>
-                              setStudentEditNotes((prev) => ({
-                                ...prev,
-                                [stu.id]: {
-                                  ...edit,
-                                  disciplinaryStatus: e.target.value as StudentRecord['disciplinaryStatus'],
-                                },
-                              }))
-                            }
-                            className="px-2.5 py-1.5 text-xs border border-slate-300 bg-slate-50"
-                          >
-                            <option value="Clear">Clear</option>
-                            <option value="Warning">Warning</option>
-                            <option value="Under Review">Under Review</option>
-                          </select>
-                          <input
-                            type="text"
-                            value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
-                            onChange={(e) =>
-                              setStudentEditNotes((prev) => ({
-                                ...prev,
-                                [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
-                              }))
-                            }
-                            placeholder="Disciplinary remarks..."
-                            className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-slate-300 bg-slate-50"
-                          />
-                        </>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleSaveStudentRecord(stu)}
-                        className="px-3.5 py-1.5 text-xs font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
-                      >
-                        Save Record Note
-                      </button>
+                  {targetedNotifications.length === 0 ? (
+                    <p className="text-sm text-slate-600">
+                      No targeted notices or alerts at this time.
+                    </p>
+                  ) : (
+                    <div className="divide-y divide-stone-200 border border-stone-200">
+                      {targetedNotifications.map((n) => (
+                        <div key={n.id} className="p-3.5 space-y-1 text-sm">
+                          <p className="font-mono text-[11px] text-emerald-800 tabular-nums">
+                            {n.publishedAt} · {n.category} · {n.departmentCode}
+                            {n.targetSession ? ` · Session ${n.targetSession}` : ''}
+                            {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
+                          </p>
+                          <p className="font-medium text-slate-900">{n.title}</p>
+                          <p className="text-xs text-slate-600">{n.summary}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
-      {activeTab === 'library' && <LibraryPanel user={user} />}
-      {activeTab === 'halls' && <HallPanel user={user} />}
-      {activeTab === 'exams' && <ExamPanel user={user} departments={departments} />}
-      {activeTab === 'certificates' && <CertificatePanel user={user} />}
-      {activeTab === 'governance' && user.role !== 'student' && (
-        <AdminCmsPanel
-          user={user}
-          departments={departments}
-          aboutSections={aboutSections}
-          vcProfiles={vcProfiles}
-          galleryItems={galleryItems}
-          onNoticesChange={onNoticesChange}
-          onCmsChange={onCmsChange}
-        />
-      )}
+                {/* Saved Bookmarks */}
+                <div className="xl:col-span-5 bg-white border border-stone-200 p-6 space-y-4">
+                  <h2 className="font-serif text-xl font-medium text-slate-900 border-b border-stone-200 pb-3">
+                    Saved Departments &amp; Circulars ({bookmarks.length})
+                  </h2>
+                  {bookmarks.length === 0 ? (
+                    <p className="text-sm text-slate-600">
+                      No saved bookmarks yet. Bookmark departments or notices while browsing the
+                      public site.
+                    </p>
+                  ) : (
+                    <div className="divide-y divide-stone-200 border border-stone-200">
+                      {bookmarks.map((b) => (
+                        <div
+                          key={b.id}
+                          className="p-3.5 flex items-center justify-between gap-3 text-sm"
+                        >
+                          <div>
+                            <p className="font-medium text-slate-900">{b.title}</p>
+                            <p className="text-xs text-slate-500">{b.subtitle}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await pustApi.removeBookmark(b.itemId);
+                              await onBookmarksChange();
+                            }}
+                            className="text-xs text-red-700 hover:underline shrink-0 cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {user.role === 'teacher' && (
+                    <div className="p-4 border border-emerald-200 bg-emerald-50/40 text-xs space-y-1 font-mono">
+                      <p className="font-semibold text-emerald-900">Teaching Assignment</p>
+                      <p>
+                        Courses:{' '}
+                        {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}
+                      </p>
+                      <p>
+                        Sessions:{' '}
+                        {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Combinable Student Database (Dept + Session + Search) */}
+          {activeTab === 'students' && (
+            <div className="bg-white border border-stone-200 p-6 space-y-5">
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-4">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-slate-900">
+                    {user.role === 'student'
+                      ? 'My Verified Student Record'
+                      : 'University Student Database (Combinable Dept + Session Filters)'}
+                  </h2>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Filter simultaneously by Department and Session to inspect academic standing,
+                    hall seat allocation, disciplinary status, and departmental notes.
+                  </p>
+                </div>
+
+                {user.role !== 'student' && (
+                  <div className="flex flex-wrap gap-2">
+                    <select
+                      value={stuDeptFilter}
+                      disabled={user.role === 'chairman' || user.role === 'teacher'}
+                      onChange={(e) => setStuDeptFilter(e.target.value)}
+                      className="px-3 py-2 text-xs border border-stone-300 bg-stone-50"
+                    >
+                      <option value="ALL">All Departments</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.code}>
+                          {d.code}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={stuSessionFilter}
+                      onChange={(e) => setStuSessionFilter(e.target.value)}
+                      className="px-3 py-2 text-xs border border-stone-300 bg-stone-50"
+                    >
+                      {SESSION_FILTERS.map((s) => (
+                        <option key={s} value={s}>
+                          {s === 'ALL' ? 'All Sessions' : `Session ${s}`}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="search"
+                        value={stuSearch}
+                        onChange={(e) => setStuSearch(e.target.value)}
+                        placeholder="Name or ID..."
+                        className="pl-8 pr-3 py-2 text-xs border border-stone-300 bg-stone-50"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {stuSavedMsg && (
+                <div className="p-3 border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
+                  {stuSavedMsg}
+                </div>
+              )}
+
+              {students.length === 0 ? (
+                <div className="py-8 text-sm text-slate-600">
+                  No student records match the current Department/Session filter.
+                </div>
+              ) : (
+                <div className="divide-y divide-stone-200 border border-stone-200">
+                  {students.map((stu) => {
+                    const edit = studentEditNotes[stu.id] || {};
+                    return (
+                      <div key={stu.id} className="p-4 space-y-2 text-sm">
+                        <div className="flex flex-wrap justify-between gap-2">
+                          <div>
+                            <p className="font-medium text-slate-900">
+                              {stu.name} · <span className="font-mono">{stu.academicId}</span>
+                            </p>
+                            <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                              {stu.departmentCode} · Session {stu.session} · Sem{' '}
+                              {stu.currentSemester} (Completed {stu.completedSemesters}/8) · CGPA{' '}
+                              {stu.cgpa.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-slate-600 mt-0.5">
+                              Hall: {stu.hallName} ({stu.seatNumber}) · Disciplinary:{' '}
+                              <span className="font-semibold">{stu.disciplinaryStatus}</span> —{' '}
+                              {stu.disciplinaryNotes}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Chairman Note: {stu.chairmanNotes} · Admin Note:{' '}
+                              {stu.adminNotes || '—'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {['chairman', 'admin', 'proctor'].includes(user.role) && (
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            {user.role === 'chairman' && (
+                              <input
+                                type="text"
+                                value={edit.chairmanNotes ?? stu.chairmanNotes}
+                                onChange={(e) =>
+                                  setStudentEditNotes((prev) => ({
+                                    ...prev,
+                                    [stu.id]: { ...edit, chairmanNotes: e.target.value },
+                                  }))
+                                }
+                                placeholder="Update Chairman note..."
+                                className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
+                              />
+                            )}
+                            {user.role === 'admin' && (
+                              <input
+                                type="text"
+                                value={edit.adminNotes ?? stu.adminNotes}
+                                onChange={(e) =>
+                                  setStudentEditNotes((prev) => ({
+                                    ...prev,
+                                    [stu.id]: { ...edit, adminNotes: e.target.value },
+                                  }))
+                                }
+                                placeholder="Update Admin note..."
+                                className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
+                              />
+                            )}
+                            {user.role === 'proctor' && (
+                              <>
+                                <select
+                                  value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
+                                  onChange={(e) =>
+                                    setStudentEditNotes((prev) => ({
+                                      ...prev,
+                                      [stu.id]: {
+                                        ...edit,
+                                        disciplinaryStatus: e.target
+                                          .value as StudentRecord['disciplinaryStatus'],
+                                      },
+                                    }))
+                                  }
+                                  className="px-2.5 py-1.5 text-xs border border-stone-300 bg-stone-50"
+                                >
+                                  <option value="Clear">Clear</option>
+                                  <option value="Warning">Warning</option>
+                                  <option value="Under Review">Under Review</option>
+                                </select>
+                                <input
+                                  type="text"
+                                  value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
+                                  onChange={(e) =>
+                                    setStudentEditNotes((prev) => ({
+                                      ...prev,
+                                      [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
+                                    }))
+                                  }
+                                  placeholder="Disciplinary remarks..."
+                                  className="flex-1 min-w-[200px] px-3 py-1.5 text-xs border border-stone-300 bg-stone-50"
+                                />
+                              </>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleSaveStudentRecord(stu)}
+                              className="px-3.5 py-1.5 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 cursor-pointer"
+                            >
+                              Save Record Note
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'library' && <LibraryPanel user={user} />}
+          {activeTab === 'halls' && <HallPanel user={user} />}
+          {activeTab === 'exams' && <ExamPanel user={user} departments={departments} />}
+          {activeTab === 'certificates' && <CertificatePanel user={user} />}
+          {activeTab === 'governance' && user.role !== 'student' && (
+            <AdminCmsPanel
+              user={user}
+              departments={departments}
+              aboutSections={aboutSections}
+              vcProfiles={vcProfiles}
+              galleryItems={galleryItems}
+              onNoticesChange={onNoticesChange}
+              onCmsChange={onCmsChange}
+            />
+          )}
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { Bookmark, Check, Trash2, X } from 'lucide-react';
 import type { AuthUser, NoticeRecord } from '../types/pust';
 

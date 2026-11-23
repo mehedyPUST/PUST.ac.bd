@@ -1,6 +1,9 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown, Menu, X } from 'lucide-react';
-import { NAV_DROPDOWN_GROUPS, type AppRoute } from '../lib/routes';
+import { NAV_GROUPS, type AppRoute } from '../lib/routes';
 import type { AuthUser } from '../types/pust';
 
 interface NavbarProps {
@@ -10,15 +13,16 @@ interface NavbarProps {
 }
 
 export function Navbar({ route, user, onNavigate }: NavbarProps) {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [logoFailed, setLogoFailed] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
-        setOpenDropdown(null);
+        setHoveredGroup(null);
       }
     }
     document.addEventListener('mousedown', handleOutside);
@@ -26,7 +30,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
   }, []);
 
   function go(target: AppRoute) {
-    setOpenDropdown(null);
+    setHoveredGroup(null);
     setMobileMenuOpen(false);
     onNavigate(target);
   }
@@ -34,79 +38,82 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs"
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Zone 1: Single-line Brand Wordmark */}
-        <a
+        {/* Zone 1: Single-line Brand Wordmark + Official Crest */}
+        <Link
           href="/"
-          onClick={(e) => {
-            e.preventDefault();
-            go('/');
+          onClick={() => {
+            setHoveredGroup(null);
+            setMobileMenuOpen(false);
           }}
-          className="font-serif text-base sm:text-lg font-semibold tracking-tight text-slate-900 hover:text-emerald-700 transition-colors whitespace-nowrap shrink-0"
+          className="inline-flex items-center gap-2 font-serif text-sm sm:text-base font-semibold tracking-tight text-slate-900 hover:text-emerald-800 transition-colors whitespace-nowrap shrink-0"
         >
-          Pabna University of Science &amp; Technology
-        </a>
+          {!logoFailed && (
+            <img
+              src="https://pust.ac.bd/includes/images/pust_logo.png?key=38"
+              alt="PUST Official Crest"
+              referrerPolicy="no-referrer"
+              onError={() => setLogoFailed(true)}
+              className="w-8 h-8 object-contain shrink-0"
+            />
+          )}
+          <span className="hidden sm:inline">Pabna University of Science &amp; Technology</span>
+          <span className="sm:hidden">PUST</span>
+        </Link>
 
-        {/* Zone 2: Clean Dropdown Navigation */}
+        {/* Zone 2: Direct Page Navigation Links (Subtopics shown on hover) */}
         <nav
           aria-label="Primary navigation"
-          className="hidden xl:flex items-center gap-5 text-sm font-medium text-slate-700"
+          className="hidden xl:flex items-center gap-4 2xl:gap-5 text-[13px] 2xl:text-sm font-medium text-slate-700"
         >
-          {NAV_DROPDOWN_GROUPS.map((group) => {
+          {NAV_GROUPS.map((group) => {
             const isActiveGroup =
               route === group.defaultRoute || group.items.some((item) => item.route === route);
-            const isOpen = openDropdown === group.id;
+            const isHovered = hoveredGroup === group.id;
 
             return (
               <div
                 key={group.id}
                 className="relative"
-                onMouseEnter={() => setOpenDropdown(group.id)}
-                onMouseLeave={() => setOpenDropdown((prev) => (prev === group.id ? null : prev))}
+                onMouseEnter={() => setHoveredGroup(group.id)}
+                onMouseLeave={() => setHoveredGroup((prev) => (prev === group.id ? null : prev))}
               >
-                <button
-                  type="button"
-                  onClick={() => setOpenDropdown((prev) => (prev === group.id ? null : group.id))}
-                  aria-expanded={isOpen}
-                  className={`inline-flex items-center gap-1 py-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    isActiveGroup || isOpen
-                      ? 'text-emerald-700 font-semibold'
-                      : 'hover:text-emerald-700'
+                <Link
+                  href={group.defaultRoute}
+                  onClick={() => setHoveredGroup(null)}
+                  className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
+                    isActiveGroup
+                      ? 'text-emerald-800 font-semibold underline underline-offset-4'
+                      : 'hover:text-emerald-800'
                   }`}
                 >
                   {group.label}
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
+                </Link>
 
-                {isOpen && (
+                {/* Non-dropdown hover preview of section subtopics */}
+                {isHovered && (
                   <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                    <div className="bg-white border border-slate-200 shadow-lg py-1.5">
-                      <button
-                        type="button"
-                        onClick={() => go(group.defaultRoute)}
-                        className="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-700 border-b border-slate-100 hover:bg-emerald-50/50 transition-colors cursor-pointer"
-                      >
-                        {group.label} Overview
-                      </button>
+                    <div className="bg-white border border-stone-200 shadow-lg py-1.5">
+                      <p className="px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-widest text-emerald-800 border-b border-stone-100">
+                        {group.label} Subtopics
+                      </p>
                       {group.items.map((item) => {
                         const activeItem = route === item.route;
                         return (
-                          <button
+                          <Link
                             key={item.route}
-                            type="button"
-                            onClick={() => go(item.route)}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block w-full text-left px-3.5 py-1.5 text-xs transition-colors ${
                               activeItem
-                                ? 'bg-emerald-50 text-emerald-800 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-700'
+                                ? 'bg-emerald-50 text-emerald-900 font-semibold'
+                                : 'text-slate-700 hover:bg-stone-50 hover:text-emerald-800'
                             }`}
                           >
                             {item.label}
-                          </button>
+                          </Link>
                         );
                       })}
                     </div>
@@ -116,93 +123,95 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             );
           })}
 
-          <a
+          <Link
             href="/notices"
-            onClick={(e) => {
-              e.preventDefault();
-              go('/notices');
-            }}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
+            className={`py-2 transition-colors whitespace-nowrap shrink-0 ${
               route === '/notices'
-                ? 'text-emerald-700 font-semibold underline underline-offset-4'
-                : 'hover:text-emerald-700'
+                ? 'text-emerald-800 font-semibold underline underline-offset-4'
+                : 'hover:text-emerald-800'
             }`}
           >
             Notices
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/gallery"
-            onClick={(e) => {
-              e.preventDefault();
-              go('/gallery');
-            }}
-            className={`transition-colors whitespace-nowrap shrink-0 ${
+            className={`py-2 transition-colors whitespace-nowrap shrink-0 ${
               route === '/gallery'
-                ? 'text-emerald-700 font-semibold underline underline-offset-4'
-                : 'hover:text-emerald-700'
+                ? 'text-emerald-800 font-semibold underline underline-offset-4'
+                : 'hover:text-emerald-800'
             }`}
           >
             Gallery
-          </a>
+          </Link>
         </nav>
 
-        {/* Zone 3: Primary Campus Portal CTA + Mobile Drawer Button */}
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => go(route === '/portal' ? '/' : '/portal')}
-            className="px-4 py-2 text-xs sm:text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+        {/* Zone 3: Single Primary Action CTA + Mobile Drawer Trigger */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <Link
+            href={route === '/portal' ? '/' : '/portal'}
+            onClick={() => {
+              setHoveredGroup(null);
+              setMobileMenuOpen(false);
+            }}
+            className="px-3.5 py-2 text-xs sm:text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap shrink-0"
           >
             {route === '/portal'
               ? 'Public Website'
               : user
               ? `${user.name.split(' ')[0]} · Portal`
               : 'Campus Portal'}
-          </button>
+          </Link>
 
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation menu"
-            className="xl:hidden p-2 text-slate-700 hover:text-emerald-700 cursor-pointer"
+            className="xl:hidden p-2 text-slate-700 hover:text-emerald-800 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Responsive Mobile Accordion Navigation */}
+      {/* Responsive Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white max-h-[80vh] overflow-y-auto px-4 py-3 space-y-1 text-sm">
+        <div className="xl:hidden border-t border-stone-200 bg-white max-h-[80vh] overflow-y-auto px-4 py-3 space-y-1 text-sm">
           <button
             type="button"
             onClick={() => go('/')}
-            className={`w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium ${
-              route === '/' ? 'text-emerald-700' : 'text-slate-800'
+            className={`w-full text-left py-2.5 px-2 border-b border-stone-100 font-medium ${
+              route === '/' ? 'text-emerald-800' : 'text-slate-800'
             }`}
           >
             Home
           </button>
 
-          {NAV_DROPDOWN_GROUPS.map((group) => {
+          {NAV_GROUPS.map((group) => {
             const expanded = mobileExpanded === group.id;
             return (
-              <div key={group.id} className="border-b border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setMobileExpanded(expanded ? null : group.id)}
-                  className="w-full flex items-center justify-between py-2.5 px-2 font-medium text-slate-800"
-                >
-                  <span>{group.label}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-500 transition-transform ${
-                      expanded ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
+              <div key={group.id} className="border-b border-stone-100">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => go(group.defaultRoute)}
+                    className="flex-1 text-left py-2.5 px-2 font-medium text-slate-800 hover:text-emerald-800"
+                  >
+                    {group.label}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Toggle ${group.label} subtopics`}
+                    onClick={() => setMobileExpanded(expanded ? null : group.id)}
+                    className="p-2 text-slate-500 hover:text-emerald-800"
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                </div>
                 {expanded && (
-                  <div className="pl-4 pb-2 space-y-1 bg-slate-50">
+                  <div className="pl-4 pb-2 space-y-1 bg-stone-50">
                     {group.items.map((item) => (
                       <button
                         key={item.route}
@@ -210,8 +219,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                         onClick={() => go(item.route)}
                         className={`block w-full text-left py-1.5 px-2 text-xs ${
                           route === item.route
-                            ? 'text-emerald-700 font-semibold'
-                            : 'text-slate-700 hover:text-emerald-700'
+                            ? 'text-emerald-800 font-semibold'
+                            : 'text-slate-700 hover:text-emerald-800'
                         }`}
                       >
                         {item.label}
@@ -226,7 +235,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
           <button
             type="button"
             onClick={() => go('/notices')}
-            className="w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium text-slate-800"
+            className="w-full text-left py-2.5 px-2 border-b border-stone-100 font-medium text-slate-800"
           >
             Notice Board
           </button>

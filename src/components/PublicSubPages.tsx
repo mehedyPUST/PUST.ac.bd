@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState, type FormEvent } from 'react';
 import { CheckCircle2, FileDown, PlayCircle, Search, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
@@ -343,30 +345,65 @@ export function PublicSubPages({
           {route === '/academics/forms-download' ? (
             <div className="space-y-4">
               <p className="text-sm text-slate-600">
-                Official student and departmental forms. Digital submissions and clearances are
-                processed directly in the Campus Portal.
+                Official student and departmental forms. Download printable form templates or submit
+                and track clearances directly in the Campus Portal.
               </p>
-              <div className="divide-y divide-slate-200 border border-slate-200">
+              <div className="divide-y divide-stone-200 border border-stone-200">
                 {DOWNLOAD_FORMS.map((form) => (
                   <div
                     key={form.code}
                     className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white"
                   >
                     <div className="space-y-1">
-                      <p className="font-mono text-xs text-emerald-700">{form.code}</p>
+                      <p className="font-mono text-xs text-emerald-800">{form.code}</p>
                       <h2 className="font-serif text-lg font-medium text-slate-900">{form.title}</h2>
                       <p className="text-xs text-slate-600">
                         {form.office} — {form.note}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => onNavigate('/portal')}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-emerald-700 text-white hover:bg-emerald-800 whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <FileDown className="w-3.5 h-3.5" />
-                      Open Digital Form in Portal
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const content = [
+                            'PABNA UNIVERSITY OF SCIENCE AND TECHNOLOGY (PUST)',
+                            'Rajapur, Pabna-6600, Bangladesh',
+                            '============================================================',
+                            `FORM CODE : ${form.code}`,
+                            `TITLE     : ${form.title}`,
+                            `OFFICE    : ${form.office}`,
+                            '------------------------------------------------------------',
+                            'Student Name        : ______________________________________',
+                            'Academic ID / Roll  : ______________________________________',
+                            'Department & Session: ______________________________________',
+                            'Hall Affiliation    : ______________________________________',
+                            'Signature & Date    : ______________________________________',
+                            '------------------------------------------------------------',
+                            `Notes: ${form.note}`,
+                          ].join('\n');
+                          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${form.code}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-emerald-800 hover:text-emerald-800 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                        Download Template
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onNavigate('/portal')}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-emerald-800 text-white hover:bg-emerald-900 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        Open Digital Form in Portal
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

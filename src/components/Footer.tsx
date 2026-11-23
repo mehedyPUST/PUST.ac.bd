@@ -1,21 +1,40 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
 import type { AppRoute } from '../lib/routes';
 
 interface FooterProps {
-  onNavigate: (route: AppRoute) => void;
+  onNavigate?: (route: AppRoute) => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
+  const [logoFailed, setLogoFailed] = useState(false);
+
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
+    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
         <div className="lg:col-span-4 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
-            About PUST
-          </p>
-          <h2 className="font-serif text-lg font-medium text-white">
-            Pabna University of Science and Technology
-          </h2>
+          <div className="flex items-center gap-3">
+            {!logoFailed && (
+              <img
+                src="https://pust.ac.bd/includes/images/pust_logo.png?key=38"
+                alt="PUST Official Crest"
+                referrerPolicy="no-referrer"
+                onError={() => setLogoFailed(true)}
+                className="w-10 h-10 object-contain bg-white/95 p-1 shrink-0"
+              />
+            )}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                About PUST
+              </p>
+              <h2 className="font-serif text-lg font-medium text-white">
+                Pabna University of Science and Technology
+              </h2>
+            </div>
+          </div>
           <p className="text-sm text-slate-400 leading-relaxed">
             Established in 2008 by the Government of Bangladesh in Rajapur, Pabna-6600. Advancing
             applied engineering, scientific research, and regional higher education across 5
@@ -57,7 +76,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
         </div>
 
-        {/* Quick Links & Academic */}
+        {/* Quick Links & About */}
         <div className="lg:col-span-2 space-y-2 text-sm">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
             Quick Links
@@ -72,40 +91,40 @@ export function Footer({ onNavigate }: FooterProps) {
               { label: 'Admission Desk', route: '/admissions' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
-                <button
-                  type="button"
-                  onClick={() => onNavigate(item.route)}
-                  className="text-slate-300 hover:text-white transition-colors cursor-pointer text-left"
+                <Link
+                  href={item.route}
+                  onClick={() => onNavigate?.(item.route)}
+                  className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Administration */}
+        {/* Administration & Governance */}
         <div className="lg:col-span-2 space-y-2 text-sm">
           <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-2">
-            Administration
+            Governance &amp; Admin
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
             {[
+              { label: 'PUST Act & Governance', route: '/governance/pust-act' as AppRoute },
+              { label: 'Regent Board', route: '/governance/regent-board' as AppRoute },
+              { label: 'Academic Ordinance', route: '/governance/academic-ordinance' as AppRoute },
               { label: 'VC Office', route: '/administration/vc-office' as AppRoute },
-              { label: 'Pro-VC Office', route: '/administration/pro-vc-office' as AppRoute },
               { label: 'Registrar Office', route: '/administration/registrar-office' as AppRoute },
-              { label: 'Proctor Office', route: '/administration/proctor-office' as AppRoute },
-              { label: 'ICT Cell', route: '/administration/ict-cell' as AppRoute },
-              { label: 'APA & Governance', route: '/administration/apa' as AppRoute },
+              { label: 'ICT Cell & APA', route: '/administration/apa' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
-                <button
-                  type="button"
-                  onClick={() => onNavigate(item.route)}
-                  className="text-slate-300 hover:text-white transition-colors cursor-pointer text-left"
+                <Link
+                  href={item.route}
+                  onClick={() => onNavigate?.(item.route)}
+                  className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -126,13 +145,13 @@ export function Footer({ onNavigate }: FooterProps) {
               { label: 'Campus Portal', route: '/portal' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
-                <button
-                  type="button"
-                  onClick={() => onNavigate(item.route)}
-                  className="text-slate-300 hover:text-white transition-colors cursor-pointer text-left"
+                <Link
+                  href={item.route}
+                  onClick={() => onNavigate?.(item.route)}
+                  className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -148,12 +167,12 @@ export function Footer({ onNavigate }: FooterProps) {
             <br />
             Dhaka–Pabna Highway, 3 km east of Pabna town
           </p>
-          <p className="font-mono pt-1">
+          <p className="font-mono pt-1 tabular-nums">
             VC: +8802588842379
             <br />
             vc@pust.ac.bd
           </p>
-          <p className="font-mono">
+          <p className="font-mono tabular-nums">
             Registrar: +8802588845193
             <br />
             registrar@pust.ac.bd
@@ -161,10 +180,10 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-800 bg-slate-950/50">
+      <div className="border-t border-slate-800 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
           <p>© 2026 Pabna University of Science and Technology (PUST). All rights reserved.</p>
-          <p className="font-mono">First Convocation: 15 March 2027 · Rajapur Campus</p>
+          <p className="font-mono tabular-nums">First Convocation: 15 March 2027 · Rajapur Campus</p>
         </div>
       </div>
     </footer>

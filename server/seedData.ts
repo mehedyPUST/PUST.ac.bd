@@ -279,6 +279,16 @@ export const SEED_ABOUT_SECTIONS: AboutContentRecord[] = [
 
 export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
   {
+    id: 'gal-0',
+    title: 'First Convocation Ceremonial Pavilion & Grounds',
+    description:
+      'Grand ceremonial pavilion prepared on the 30-acre Rajapur campus lawn ahead of the historic First Convocation on 15 March 2027.',
+    category: 'Convocation',
+    mediaType: 'photo',
+    mediaUrl: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    eventDate: '2026-11-21',
+  },
+  {
     id: 'gal-1',
     title: 'Main Academic Promenade & Campus Architecture',
     description: 'Morning light across the Rajapur academic buildings and library complex.',

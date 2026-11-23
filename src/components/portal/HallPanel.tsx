@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { pustApi } from '../../lib/api';
 import type {

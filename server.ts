@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import next from 'next';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
@@ -24,6 +25,8 @@ import { portalRouter } from './server/routes/portalRoutes';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const dev = process.env.NODE_ENV !== 'production';
 
 const studentTokenRegisterSchema = z.object({
   signupToken: z.string().trim().min(5).max(40),
@@ -109,13 +112,20 @@ const bookmarkSchema = z.object({
 async function startServer() {
   await pustRepo.init();
 
+  const nextApp = next({ dev, dir: __dirname });
+  const handle = nextApp.getRequestHandler();
+  await nextApp.prepare();
+
   const app = express();
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
-  app.use(express.json({ limit: '128kb' }));
-  app.use(cookieParser());
+  // Serve generated campus photography assets reliably in Next.js + Express
+  app.use('/src/assets/images', express.static(path.resolve(__dirname, 'src/assets/images')));
 
+  // Scope JSON body parsing, cookies, and same-origin protection strictly to /api
+  app.use('/api', express.json({ limit: '128kb' }));
+  app.use('/api', cookieParser());
   app.use('/api', verifySameOriginMutation);
 
   // Public institutional endpoints
@@ -549,25 +559,15 @@ async function startServer() {
   // Mount all university digital platform workflow routes
   app.use('/api/portal', portalRouter);
 
-  if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distDir = path.resolve(__dirname, 'dist');
-    app.use(express.static(distDir));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distDir, 'index.html'));
-    });
-  }
+  // Delegate all Next.js pages and _next static assets to Next.js
+  app.all('*', (req, res) => {
+    return handle(req, res);
+  });
 
   const PORT = Number(process.env.PORT) || 3000;
   app.listen(PORT, '0.0.0.0', () => {
     console.log(
-      `PUST server listening on http://0.0.0.0:${PORT} (storage: ${pustRepo.getStorageBackend()})`
+      `PUST Next.js + Express server listening on http://0.0.0.0:${PORT} (storage: ${pustRepo.getStorageBackend()})`
     );
   });
 }

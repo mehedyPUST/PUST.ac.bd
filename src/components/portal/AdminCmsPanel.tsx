@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Trash2 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
