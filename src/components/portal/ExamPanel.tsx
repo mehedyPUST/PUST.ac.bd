@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Printer } from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import { PortalRecordsSkeleton } from '../PustSkeletons';
 import type {
   AuthUser,
   CourseRecord,
@@ -538,7 +539,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           Examination Registrations, Payments &amp; Admit Cards
         </h3>
         {loading ? (
-          <p className="text-sm text-slate-600">Loading exam registrations...</p>
+          <PortalRecordsSkeleton rows={3} />
         ) : applications.length === 0 ? (
           <p className="text-sm text-slate-600">No examination applications submitted yet.</p>
         ) : (

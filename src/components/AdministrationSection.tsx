@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
   AdministrativeUnit,
@@ -59,12 +60,7 @@ export function AdministrationSection({
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
 
   if (!profile) {
-    return (
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-6">
-        <div className="h-8 w-64 bg-stone-200 animate-pulse" />
-        <div className="h-48 bg-stone-100 border border-stone-200 animate-pulse" />
-      </section>
-    );
+    return <PageHeaderAndSectionSkeleton />;
   }
 
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];

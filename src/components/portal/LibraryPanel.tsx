@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { pustApi } from '../../lib/api';
+import { PortalRecordsSkeleton } from '../PustSkeletons';
 import type {
   AuthUser,
   LibraryApplicationRecord,
@@ -436,7 +437,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
           Book Borrowing &amp; Return Ledger
         </h3>
         {loading ? (
-          <p className="text-sm text-slate-600">Loading library records...</p>
+          <PortalRecordsSkeleton rows={3} />
         ) : borrows.length === 0 ? (
           <p className="text-sm text-slate-600">No active or archived book checkouts recorded.</p>
         ) : (

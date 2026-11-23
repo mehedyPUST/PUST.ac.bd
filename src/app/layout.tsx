@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Fraunces, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { PustShell } from '../components/PustContext';
+import 'animate.css';
+import 'react-loading-skeleton/dist/skeleton.css';
 import './globals.css';
 
 const fraunces = Fraunces({

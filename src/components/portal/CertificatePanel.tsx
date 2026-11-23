@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Award } from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import { PortalRecordsSkeleton } from '../PustSkeletons';
 import type {
   AuthUser,
   CertificateApplicationRecord,
@@ -231,7 +232,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
           Live 4-Office Clearance Status &amp; Resubmission History
         </h3>
         {loading ? (
-          <p className="text-sm text-slate-600">Loading certificate clearance records...</p>
+          <PortalRecordsSkeleton rows={2} />
         ) : applications.length === 0 ? (
           <p className="text-sm text-slate-600">No certificate applications found.</p>
         ) : (

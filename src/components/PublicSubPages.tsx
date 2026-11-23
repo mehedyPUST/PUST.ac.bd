@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, FileDown, PlayCircle, Search, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+import { CardsGridSkeleton } from './PustSkeletons';
 import { ResearchSection } from './ResearchSection';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -793,14 +794,7 @@ export function PublicSubPages({
               </div>
 
               {loadingData ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <div
-                      key={n}
-                      className="h-44 border border-stone-200 bg-[#FAF8F4] animate-pulse p-6"
-                    />
-                  ))}
-                </div>
+                <CardsGridSkeleton count={6} />
               ) : dataError ? (
                 <div className="p-6 border border-red-200 bg-red-50 text-sm text-red-800">
                   {dataError}
@@ -822,31 +816,34 @@ export function PublicSubPages({
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-l border-stone-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filteredDepartments.map((dept) => (
                     <button
                       key={dept.id}
                       type="button"
                       onClick={() => onSelectDepartment(dept)}
-                      className="text-left p-6 border-r border-b border-t border-stone-200 bg-[#FAF8F4]/50 hover:bg-emerald-50/40 transition-colors flex flex-col justify-between gap-4 group cursor-pointer"
+                      className="text-left border border-stone-200 bg-white shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
                     >
-                      <div>
-                        <p className="font-mono text-xs text-emerald-800 tabular-nums">
-                          {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
-                        </p>
-                        <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-emerald-900">
-                          {dept.name}
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-1">Chair: {dept.chairmanName}</p>
-                        <p className="text-sm text-slate-700 mt-3 leading-relaxed line-clamp-2">
-                          {dept.summary}
-                        </p>
-                      </div>
-                      <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between text-xs text-slate-600">
-                        <span>{dept.degrees.join(' / ')}</span>
-                        <span className="font-semibold text-emerald-800 group-hover:underline">
-                          Prospectus
-                        </span>
+                      <div className="h-1 w-full bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                      <div className="p-6 flex-1 flex flex-col justify-between gap-4">
+                        <div>
+                          <p className="font-mono text-xs text-emerald-800 tabular-nums">
+                            {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
+                          </p>
+                          <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-emerald-900">
+                            {dept.name}
+                          </h2>
+                          <p className="text-xs text-slate-500 mt-1">Chair: {dept.chairmanName}</p>
+                          <p className="text-sm text-slate-700 mt-3 leading-relaxed line-clamp-2">
+                            {dept.summary}
+                          </p>
+                        </div>
+                        <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between text-xs text-slate-600">
+                          <span>{dept.degrees.join(' / ')}</span>
+                          <span className="font-semibold text-emerald-800 group-hover:underline">
+                            Prospectus
+                          </span>
+                        </div>
                       </div>
                     </button>
                   ))}

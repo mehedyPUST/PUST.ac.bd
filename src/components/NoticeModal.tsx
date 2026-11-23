@@ -37,9 +37,11 @@ export function NoticeModal({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.22 }}
-        className="w-full max-w-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+        style={{ animationDuration: '220ms' }}
+        className="w-full max-w-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto animate__animated animate__fadeInUp"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
         <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-stone-200 bg-[#FAF8F4]">
           <div>
             <p className="font-mono text-xs tracking-wider uppercase text-emerald-800 tabular-nums">

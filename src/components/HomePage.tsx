@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, ArrowUpRight, ChevronDown, PlayCircle, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 import { CampusMapSection } from './CampusMapSection';
+import { HeroSummarySkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
   AboutContentRecord,
@@ -110,7 +111,7 @@ export function HomePage({
               <div className="mt-8 pt-6 border-t border-stone-200 flex flex-wrap items-center gap-4">
                 <Link
                   href="/academics/departments"
-                  className="px-6 py-3 text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap shrink-0"
+                  className="px-6 py-3 text-sm font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 shadow-xs transition-all whitespace-nowrap shrink-0"
                 >
                   Explore 21 Departments
                 </Link>
@@ -148,7 +149,7 @@ export function HomePage({
           </div>
 
           {/* Operational Utility Ribbon */}
-          <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-stone-200 bg-white">
+          <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-stone-200 bg-white shadow-xs">
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-stone-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
@@ -167,9 +168,9 @@ export function HomePage({
                 172 Faculty · ~5,000 Students
               </dd>
             </div>
-            <div className="px-5 py-4 bg-emerald-50/40">
-              <dt className="text-xs uppercase tracking-wider text-slate-500">First Convocation</dt>
-              <dd className="font-mono tabular-nums text-sm font-semibold text-emerald-800 mt-1">
+            <div className="px-5 py-4 bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white">
+              <dt className="text-xs uppercase tracking-wider text-emerald-200">First Convocation</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1">
                 {profile?.convocationDate ?? '15 March 2027'} · Rajapur
               </dd>
             </div>
@@ -190,9 +191,13 @@ export function HomePage({
                 {ourUniversity?.title || 'Our University'}
               </h2>
             </div>
-            <p className="text-[15px] leading-relaxed text-slate-700 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-emerald-800">
-              {ourUniversity?.body}
-            </p>
+            {ourUniversity ? (
+              <p className="text-[15px] leading-relaxed text-slate-700 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-emerald-800">
+                {ourUniversity.body}
+              </p>
+            ) : (
+              <HeroSummarySkeleton />
+            )}
             {missionVision && (
               <div className="pt-4 border-t border-stone-200 space-y-1.5">
                 <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
@@ -460,8 +465,8 @@ export function HomePage({
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <article className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={LAB_IMAGE}
                 alt="PUST engineering and instrumentation laboratory"
@@ -486,7 +491,7 @@ export function HomePage({
               </div>
             </article>
 
-            <article className="space-y-4">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={LIBRARY_IMAGE}
                 alt="PUST Central Library study floor"
@@ -513,7 +518,7 @@ export function HomePage({
               </div>
             </article>
 
-            <article className="space-y-4">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={GROUNDS_IMAGE}
                 alt="PUST Rajapur campus quadrangle and residential halls"
@@ -590,7 +595,7 @@ export function HomePage({
                 key={item.id}
                 type="button"
                 onClick={() => setActiveMedia(item)}
-                className="text-left border border-stone-200 bg-white hover:border-emerald-400 transition-colors group cursor-pointer flex flex-col"
+                className="text-left border border-stone-200 bg-white shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all group cursor-pointer flex flex-col"
               >
                 <div className="relative overflow-hidden bg-slate-900 aspect-[4/3]">
                   <ResilientImage
@@ -642,23 +647,28 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-stone-200 bg-[#FAF8F4] divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {FACULTIES_OVERVIEW.map((f) => (
                 <Link
                   key={f.code}
                   href="/academics/faculty"
-                  className="p-4 hover:bg-emerald-50/40 transition-colors space-y-1.5 block"
+                  className="bg-white border border-stone-200 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all flex flex-col justify-between overflow-hidden group"
                 >
-                  <p className="font-mono text-xs font-semibold text-emerald-800">{f.code}</p>
-                  <h3 className="font-serif text-base font-medium text-slate-900">{f.name}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
+                  <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                  <div className="p-5 space-y-1.5 flex-1">
+                    <p className="font-mono text-xs font-semibold text-emerald-800">{f.code}</p>
+                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900">
+                      {f.name}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed">{f.depts}</p>
+                  </div>
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Admissions & First Convocation Closing Editorial Callout */}
-          <div className="bg-emerald-950 text-white border border-emerald-900 p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white border border-emerald-900 shadow-md p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-300 tabular-nums">
                 Admissions 2026–2027 · First Convocation: {profile?.convocationDate ?? '15 March 2027'}
@@ -696,7 +706,8 @@ export function HomePage({
           onClick={() => setActiveMedia(null)}
         >
           <div
-            className="w-full max-w-2xl bg-white border border-stone-200 shadow-2xl overflow-hidden"
+            className="w-full max-w-2xl bg-white border border-stone-200 shadow-2xl overflow-hidden animate__animated animate__fadeInUp"
+            style={{ animationDuration: '200ms' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-stone-200 bg-[#FAF8F4]">

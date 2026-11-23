@@ -544,9 +544,11 @@ export function CampusMapSection() {
             initial={{ opacity: 0.4, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
-            className="lg:col-span-5 bg-white border border-stone-200 flex flex-col justify-between"
+            className="lg:col-span-5 bg-white border border-stone-200 shadow-sm flex flex-col justify-between animate__animated animate__fadeIn"
+            style={{ animationDuration: '200ms' }}
           >
             <div>
+              <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
               <ResilientImage
                 src={activeBuilding.photo}
                 alt={activeBuilding.name}

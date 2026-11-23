@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { MotionConfig } from 'motion/react';
+import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
 import { parseRouteFromPath, type AppRoute } from '../lib/routes';
 import type {
@@ -284,8 +285,9 @@ export function PustShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <MotionConfig reducedMotion="user">
-      <PustContext.Provider value={value}>
+    <SkeletonTheme baseColor="#E8E4DA" highlightColor="#FAF8F4" borderRadius={2}>
+      <MotionConfig reducedMotion="user">
+        <PustContext.Provider value={value}>
         <div className="min-h-screen flex flex-col bg-[#FAF8F4] text-slate-900">
           <Navbar route={route} user={user} onNavigate={navigateTo} />
           <div className="flex-1 flex flex-col">{children}</div>
@@ -312,5 +314,6 @@ export function PustShell({ children }: { children: ReactNode }) {
         />
       </PustContext.Provider>
     </MotionConfig>
+    </SkeletonTheme>
   );
 }

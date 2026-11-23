@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { pustApi } from '../../lib/api';
+import { PortalRecordsSkeleton } from '../PustSkeletons';
 import type {
   AuthUser,
   HallApplicationRecord,
@@ -345,7 +346,7 @@ export function HallPanel({ user }: HallPanelProps) {
           Hall Seat Applications &amp; Seat History
         </h3>
         {loading ? (
-          <p className="text-sm text-slate-600">Loading hall seat records...</p>
+          <PortalRecordsSkeleton rows={3} />
         ) : applications.length === 0 ? (
           <p className="text-sm text-slate-600">No hall seat applications on record.</p>
         ) : (
