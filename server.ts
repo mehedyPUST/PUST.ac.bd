@@ -8,8 +8,9 @@ import {
   AUTH_COOKIE_NAME,
   clearAuthCookie,
   hashPassword,
-  requireAdmin,
+  optionalAuth,
   requireAuth,
+  requireRoles,
   setAuthCookie,
   signAuthToken,
   timingSafeStringMatch,
@@ -19,15 +20,24 @@ import {
   type AuthenticatedRequest,
 } from './server/auth';
 import { pustRepo } from './server/db';
+import { portalRouter } from './server/routes/portalRoutes';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const registerSchema = z.object({
+const studentTokenRegisterSchema = z.object({
+  signupToken: z.string().trim().min(5).max(40),
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
   password: z.string().min(8).max(128),
-  role: z.enum(['student', 'faculty']),
+  admissionDocuments: z.array(z.string().trim().min(2).max(120)).min(1).max(6),
+});
+
+const officerRegisterSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().email().max(120),
+  password: z.string().min(8).max(128),
+  role: z.enum(['registrar', 'vc', 'chairman', 'teacher', 'proctor', 'library', 'hall']),
   departmentCode: z.string().trim().min(2).max(16),
   academicId: z.string().trim().min(3).max(32),
   hallAffiliation: z.string().trim().min(2).max(60),
@@ -58,10 +68,17 @@ const createNoticeSchema = z.object({
     'Admission',
     'Academic',
     'Examination',
+    'Result',
+    'Course',
     'Job & Tender',
     'NOC & Orders',
   ]),
   departmentCode: z.string().trim().min(2).max(24),
+  boardScope: z.enum(['central', 'department', 'course']).default('central'),
+  visibility: z.enum(['public', 'registered']).default('public'),
+  targetSession: z.string().trim().max(20).optional(),
+  targetCourseCode: z.string().trim().max(20).optional(),
+  attachmentName: z.string().trim().max(120).optional(),
   summary: z.string().trim().min(10).max(320),
   body: z.string().trim().min(20).max(3000),
   pinned: z.boolean().optional(),
@@ -96,19 +113,28 @@ async function startServer() {
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
-  app.use(express.json({ limit: '64kb' }));
+  app.use(express.json({ limit: '128kb' }));
   app.use(cookieParser());
 
-  // Enforce Origin / CSRF check on all cookie-authenticated or state-changing API routes
   app.use('/api', verifySameOriginMutation);
 
-  // Public university catalog, leadership profile, publications & notices
+  // Public institutional endpoints
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true, storageBackend: pustRepo.getStorageBackend() });
   });
 
-  app.get('/api/university-profile', (_req, res) => {
-    res.json({ profile: pustRepo.getUniversityProfile() });
+  app.get('/api/university-profile', async (_req, res) => {
+    const [aboutSections, vcProfiles, galleryItems] = await Promise.all([
+      pustRepo.listAboutSections(),
+      pustRepo.listViceChancellors(),
+      pustRepo.listGalleryItems(),
+    ]);
+    res.json({
+      profile: pustRepo.getUniversityProfile(),
+      aboutSections,
+      vcProfiles,
+      galleryItems,
+    });
   });
 
   app.get('/api/departments', async (_req, res) => {
@@ -121,14 +147,23 @@ async function startServer() {
     res.json({ publications });
   });
 
-  app.get('/api/notices', async (req, res) => {
-    const category = typeof req.query.category === 'string' ? req.query.category : undefined;
-    const search = typeof req.query.search === 'string' ? req.query.search : undefined;
-    const notices = await pustRepo.listNotices(category, search);
+  // Backend-enforced notice visibility (Public vs Registered Users)
+  app.get('/api/notices', async (req: AuthenticatedRequest, res) => {
+    const claims = optionalAuth(req);
+    const notices = await pustRepo.listNotices({
+      isAuthenticated: Boolean(claims),
+      userRole: claims?.role,
+      userDept: claims?.departmentCode,
+      userSession: claims?.session,
+      category: typeof req.query.category === 'string' ? req.query.category : undefined,
+      search: typeof req.query.search === 'string' ? req.query.search : undefined,
+      boardScope: typeof req.query.boardScope === 'string' ? req.query.boardScope : undefined,
+      departmentCode:
+        typeof req.query.departmentCode === 'string' ? req.query.departmentCode : undefined,
+    });
     res.json({ notices });
   });
 
-  // Public admission inquiry submission
   app.post('/api/inquiries', async (req, res) => {
     const parsed = createInquirySchema.safeParse(req.body);
     if (!parsed.success) {
@@ -139,7 +174,7 @@ async function startServer() {
     res.status(201).json({ inquiry });
   });
 
-  // Auth status & session inspection
+  // Auth status & JWT session
   app.get('/api/auth/bootstrap-status', async (_req, res) => {
     const envPasscode = process.env.ADMIN_PASSCODE?.trim();
     const hasAdmin = await pustRepo.hasAdminUser();
@@ -157,7 +192,7 @@ async function startServer() {
       return;
     }
     const claims = verifyAuthToken(token);
-    if (!claims) {
+    if (!claims || claims.approvalStatus !== 'approved') {
       clearAuthCookie(req, res);
       res.json({ user: null });
       return;
@@ -168,50 +203,118 @@ async function startServer() {
         name: claims.name,
         email: claims.email,
         role: claims.role,
+        approvalStatus: claims.approvalStatus,
         departmentCode: claims.departmentCode,
         academicId: claims.academicId,
+        session: claims.session,
         hallAffiliation: claims.hallAffiliation,
         createdAt: '',
       },
     });
   });
 
-  app.post('/api/auth/register', async (req, res) => {
-    const parsed = registerSchema.safeParse(req.body);
+  // Student Signup via Unique Portal Token -> Pending Department Chairman Approval
+  app.post('/api/auth/register-student', async (req, res) => {
+    const parsed = studentTokenRegisterSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({
-        error: 'Please complete all fields (password must be at least 8 characters).',
+        error: 'Provide a valid signup token, personal details, password (8+ chars), and admission documents.',
       });
       return;
     }
 
-    try {
-      const existing = await pustRepo.findUserByEmail(parsed.data.email);
-      if (existing) {
-        res.status(409).json({ error: 'An account with this email already exists.' });
-        return;
-      }
+    const tokenRecord = await pustRepo.findValidToken(parsed.data.signupToken);
+    if (!tokenRecord) {
+      res.status(400).json({ error: 'Invalid or already used student portal signup token.' });
+      return;
+    }
 
+    try {
       const created = await pustRepo.createUser({
         name: parsed.data.name,
         email: parsed.data.email,
         passwordHash: hashPassword(parsed.data.password),
-        role: parsed.data.role,
-        departmentCode: parsed.data.departmentCode,
-        academicId: parsed.data.academicId,
-        hallAffiliation: parsed.data.hallAffiliation,
+        role: 'student',
+        approvalStatus: 'pending',
+        departmentCode: tokenRecord.departmentCode,
+        academicId: tokenRecord.academicId,
+        session: tokenRecord.session,
+        hallAffiliation: tokenRecord.hallAffiliation,
+      });
+      await pustRepo.markTokenUsed(tokenRecord.id);
+
+      await pustRepo.upsertStudent({
+        id: `stu-${tokenRecord.academicId}`,
+        userId: created.id,
+        academicId: tokenRecord.academicId,
+        name: parsed.data.name,
+        email: created.email,
+        phone: tokenRecord.studentPhone,
+        departmentCode: tokenRecord.departmentCode,
+        session: tokenRecord.session,
+        currentSemester: 1,
+        cgpa: 0,
+        completedSemesters: 0,
+        allResultsPublished: false,
+        hallName: tokenRecord.hallAffiliation,
+        seatNumber: 'Unassigned',
+        admissionDocuments: parsed.data.admissionDocuments,
+        chairmanNotes: 'Awaiting Department Chairman verification of submitted documents.',
+        adminNotes: '',
+        disciplinaryStatus: 'Clear',
+        disciplinaryNotes: 'Clean record.',
+        approvalStatus: 'pending',
       });
 
-      const { passwordHash: _ignored, ...safeUser } = created;
-      const token = signAuthToken(safeUser);
-      setAuthCookie(req, res, token);
-      res.status(201).json({ user: safeUser });
+      const { passwordHash: _p, ...safeUser } = created;
+      res.status(201).json({
+        user: safeUser,
+        pendingMessage: `Signup submitted for ${tokenRecord.departmentCode} Chairman verification. You may log in once approved.`,
+      });
     } catch (err) {
       if (err instanceof Error && err.message === 'DUPLICATE_EMAIL') {
         res.status(409).json({ error: 'An account with this email already exists.' });
         return;
       }
-      res.status(500).json({ error: 'Unable to create account.' });
+      res.status(500).json({ error: 'Unable to submit student registration.' });
+    }
+  });
+
+  // Officer / Teacher Registration -> Pending Admin or Chairman Approval per hierarchy
+  app.post('/api/auth/register-officer', async (req, res) => {
+    const parsed = officerRegisterSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Complete all officer/faculty registration fields.' });
+      return;
+    }
+    try {
+      const created = await pustRepo.createUser({
+        name: parsed.data.name,
+        email: parsed.data.email,
+        passwordHash: hashPassword(parsed.data.password),
+        role: parsed.data.role,
+        approvalStatus: 'pending',
+        departmentCode: parsed.data.departmentCode,
+        academicId: parsed.data.academicId,
+        hallAffiliation: parsed.data.hallAffiliation,
+        assignedCourses: [],
+        assignedSessions: [],
+      });
+      const { passwordHash: _p, ...safeUser } = created;
+      const authority =
+        parsed.data.role === 'teacher'
+          ? `${parsed.data.departmentCode} Department Chairman's Office`
+          : 'Admin Office';
+      res.status(201).json({
+        user: safeUser,
+        pendingMessage: `Account submitted and awaiting approval from ${authority}.`,
+      });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'DUPLICATE_EMAIL') {
+        res.status(409).json({ error: 'An account with this email already exists.' });
+        return;
+      }
+      res.status(500).json({ error: 'Unable to register officer account.' });
     }
   });
 
@@ -228,25 +331,39 @@ async function startServer() {
       return;
     }
 
+    if (user.approvalStatus === 'pending') {
+      const authority =
+        user.role === 'student' || user.role === 'teacher'
+          ? `${user.departmentCode} Department Chairman's Office`
+          : 'Admin Office';
+      res.status(403).json({
+        error: `Account awaiting approval from ${authority}.`,
+      });
+      return;
+    }
+    if (user.approvalStatus === 'rejected') {
+      res.status(403).json({ error: 'This account application was declined by the approving authority.' });
+      return;
+    }
+
     const { passwordHash: _ignored, ...safeUser } = user;
     const token = signAuthToken(safeUser);
     setAuthCookie(req, res, token);
     res.json({ user: safeUser });
   });
 
-  // One-time first-run Registrar/Admin setup when ADMIN_PASSCODE is unset and no admin exists
   app.post('/api/auth/bootstrap-admin', async (req, res) => {
     const envPasscode = process.env.ADMIN_PASSCODE?.trim();
     if (envPasscode) {
       res.status(409).json({
-        error: 'Registrar admin access is managed by server environment configuration.',
+        error: 'Admin access is managed by server environment configuration.',
       });
       return;
     }
 
     const alreadyHasAdmin = await pustRepo.hasAdminUser();
     if (alreadyHasAdmin) {
-      res.status(409).json({ error: 'Registrar admin account has already been claimed.' });
+      res.status(409).json({ error: 'Admin Office account has already been claimed.' });
       return;
     }
 
@@ -264,21 +381,22 @@ async function startServer() {
         email: parsed.data.email,
         passwordHash: hashPassword(parsed.data.password),
         role: 'admin',
-        departmentCode: 'REGISTRAR',
-        academicId: 'PUST-REG-01',
+        approvalStatus: 'approved',
+        departmentCode: 'ADMIN',
+        academicId: 'PUST-ADMIN-01',
         hallAffiliation: 'Administrative Building',
       });
 
       const { passwordHash: _ignored, ...safeUser } = created;
       const token = signAuthToken(safeUser);
       setAuthCookie(req, res, token);
+      await pustRepo.logAudit(safeUser.name, 'admin', 'Claimed initial Admin Office account', safeUser.email);
       res.status(201).json({ user: safeUser });
     } catch {
-      res.status(409).json({ error: 'Could not claim admin account with this email.' });
+      res.status(409).json({ error: 'Could not claim Admin account with this email.' });
     }
   });
 
-  // Override login when ADMIN_PASSCODE env secret is configured
   app.post('/api/auth/admin-passcode-login', async (req, res) => {
     const envPasscode = process.env.ADMIN_PASSCODE?.trim();
     if (!envPasscode) {
@@ -291,17 +409,18 @@ async function startServer() {
       return;
     }
     if (!timingSafeStringMatch(parsed.data.passcode, envPasscode)) {
-      res.status(401).json({ error: 'Invalid Registrar passcode.' });
+      res.status(401).json({ error: 'Invalid Admin passcode.' });
       return;
     }
 
     const safeUser = {
-      id: 'env-registrar-admin',
-      name: parsed.data.name || 'University Registrar',
+      id: 'env-admin-office',
+      name: parsed.data.name || 'PUST Admin Office',
       email: parsed.data.email.toLowerCase(),
       role: 'admin' as const,
-      departmentCode: 'REGISTRAR',
-      academicId: 'PUST-REG-ENV',
+      approvalStatus: 'approved' as const,
+      departmentCode: 'ADMIN',
+      academicId: 'PUST-ADMIN-ENV',
       hallAffiliation: 'Administrative Building',
       createdAt: new Date().toISOString(),
     };
@@ -313,6 +432,93 @@ async function startServer() {
   app.post('/api/auth/logout', (req, res) => {
     clearAuthCookie(req, res);
     res.json({ ok: true });
+  });
+
+  // Role-restricted Notice Board publishing (Central, Department, Teacher Course/Session)
+  app.post(
+    '/api/notices',
+    requireRoles('admin', 'registrar', 'vc', 'chairman', 'teacher', 'proctor', 'library', 'hall'),
+    async (req: AuthenticatedRequest, res) => {
+      const parsed = createNoticeSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: 'Please complete all notice fields.' });
+        return;
+      }
+
+      const actor = req.authUser!;
+      if (parsed.data.boardScope === 'central') {
+        if (!['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(actor.role)) {
+          res.status(403).json({
+            error: 'Only Admin or authorized central offices can publish to the Central Notice Board.',
+          });
+          return;
+        }
+      } else if (parsed.data.boardScope === 'department') {
+        if (
+          (actor.role !== 'chairman' && actor.role !== 'teacher') ||
+          parsed.data.departmentCode !== actor.departmentCode
+        ) {
+          res.status(403).json({
+            error: 'You may only publish departmental notices for your assigned department.',
+          });
+          return;
+        }
+      } else if (parsed.data.boardScope === 'course') {
+        if (actor.role !== 'teacher' || !parsed.data.targetCourseCode) {
+          res.status(403).json({
+            error: 'Course-targeted notices require a teacher role and target course code.',
+          });
+          return;
+        }
+      }
+
+      const notice = await pustRepo.createNotice({
+        ...parsed.data,
+        publishedAt: new Date().toISOString().slice(0, 10),
+        authorName: actor.name,
+        authorRole: actor.role,
+      });
+      await pustRepo.logAudit(
+        actor.name,
+        actor.role,
+        `Published ${parsed.data.visibility} ${parsed.data.boardScope} notice`,
+        notice.referenceNo
+      );
+      res.status(201).json({ notice });
+    }
+  );
+
+  app.delete(
+    '/api/notices/:id',
+    requireRoles('admin', 'registrar', 'chairman'),
+    async (req: AuthenticatedRequest, res) => {
+      const deleted = await pustRepo.deleteNotice(String(req.params.id));
+      if (!deleted) {
+        res.status(404).json({ error: 'Notice not found.' });
+        return;
+      }
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        'Deleted notice',
+        String(req.params.id)
+      );
+      res.json({ deleted: true });
+    }
+  );
+
+  app.get('/api/inquiries', requireRoles('admin', 'registrar'), async (_req, res) => {
+    const inquiries = await pustRepo.listInquiries();
+    res.json({ inquiries });
+  });
+
+  app.patch('/api/inquiries/:id/review', requireRoles('admin', 'registrar'), async (req, res) => {
+    const updated = await pustRepo.markInquiryReviewed(String(req.params.id));
+    if (!updated) {
+      res.status(404).json({ error: 'Inquiry not found.' });
+      return;
+    }
+    res.json({ updated: true });
   });
 
   // Protected user bookmarks
@@ -340,45 +546,9 @@ async function startServer() {
     res.json({ removed });
   });
 
-  // Protected Registrar / Admin endpoints
-  app.post('/api/notices', requireAdmin, async (req: AuthenticatedRequest, res) => {
-    const parsed = createNoticeSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ error: 'Please complete all notice fields.' });
-      return;
-    }
-    const notice = await pustRepo.createNotice({
-      ...parsed.data,
-      publishedAt: new Date().toISOString().slice(0, 10),
-      authorName: req.authUser!.name,
-    });
-    res.status(201).json({ notice });
-  });
+  // Mount all university digital platform workflow routes
+  app.use('/api/portal', portalRouter);
 
-  app.delete('/api/notices/:id', requireAdmin, async (req: AuthenticatedRequest, res) => {
-    const deleted = await pustRepo.deleteNotice(String(req.params.id));
-    if (!deleted) {
-      res.status(404).json({ error: 'Notice not found.' });
-      return;
-    }
-    res.json({ deleted: true });
-  });
-
-  app.get('/api/inquiries', requireAdmin, async (_req, res) => {
-    const inquiries = await pustRepo.listInquiries();
-    res.json({ inquiries });
-  });
-
-  app.patch('/api/inquiries/:id/review', requireAdmin, async (req, res) => {
-    const updated = await pustRepo.markInquiryReviewed(String(req.params.id));
-    if (!updated) {
-      res.status(404).json({ error: 'Inquiry not found.' });
-      return;
-    }
-    res.json({ updated: true });
-  });
-
-  // Mount Vite middleware in dev or serve built assets in production
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({

@@ -1,13 +1,36 @@
 import type {
+  AboutContentRecord,
+  AuditLogRecord,
   AuthUser,
   BookmarkRecord,
   BootstrapStatus,
+  CertificateApplicationRecord,
+  ClearanceOfficeKey,
+  CourseRecord,
   DepartmentRecord,
+  ExamApplicationRecord,
+  ExamCircularRecord,
+  ExamResultRecord,
+  FeeConfig,
+  GalleryItemRecord,
+  HallApplicationRecord,
+  HallCircularRecord,
+  HallDueRecord,
   InquiryRecord,
+  LibraryApplicationRecord,
+  LibraryBorrowRecord,
+  LibraryCardRecord,
+  NoticeBoardScope,
   NoticeCategory,
   NoticeRecord,
+  NoticeVisibility,
+  PaymentGatewayConfig,
   PublicationRecord,
+  SignupTokenRecord,
+  StudentRecord,
   UniversityProfile,
+  UserRole,
+  ViceChancellorRecord,
 } from '../types/pust';
 
 async function apiFetch<T>(url: string, init: RequestInit = {}): Promise<T> {
@@ -33,17 +56,33 @@ async function apiFetch<T>(url: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const pustApi = {
-  getUniversityProfile: () => apiFetch<{ profile: UniversityProfile }>('/api/university-profile'),
+  // Public institutional & CMS data
+  getUniversityProfile: () =>
+    apiFetch<{
+      profile: UniversityProfile;
+      aboutSections: AboutContentRecord[];
+      vcProfiles: ViceChancellorRecord[];
+      galleryItems: GalleryItemRecord[];
+    }>('/api/university-profile'),
 
   getDepartments: () => apiFetch<{ departments: DepartmentRecord[] }>('/api/departments'),
 
   getPublications: () => apiFetch<{ publications: PublicationRecord[] }>('/api/publications'),
 
-  getNotices: (category?: string, search?: string) => {
-    const params = new URLSearchParams();
-    if (category && category !== 'All') params.set('category', category);
-    if (search && search.trim()) params.set('search', search.trim());
-    const qs = params.toString();
+  getNotices: (params?: {
+    category?: string;
+    search?: string;
+    boardScope?: string;
+    departmentCode?: string;
+  }) => {
+    const qsParams = new URLSearchParams();
+    if (params?.category && params.category !== 'All') qsParams.set('category', params.category);
+    if (params?.search && params.search.trim()) qsParams.set('search', params.search.trim());
+    if (params?.boardScope && params.boardScope !== 'all') qsParams.set('boardScope', params.boardScope);
+    if (params?.departmentCode && params.departmentCode !== 'ALL') {
+      qsParams.set('departmentCode', params.departmentCode);
+    }
+    const qs = qsParams.toString();
     return apiFetch<{ notices: NoticeRecord[] }>(`/api/notices${qs ? `?${qs}` : ''}`);
   },
 
@@ -52,6 +91,11 @@ export const pustApi = {
     title: string;
     category: NoticeCategory;
     departmentCode: string;
+    boardScope: NoticeBoardScope;
+    visibility: NoticeVisibility;
+    targetSession?: string;
+    targetCourseCode?: string;
+    attachmentName?: string;
     summary: string;
     body: string;
     pinned?: boolean;
@@ -86,6 +130,7 @@ export const pustApi = {
       method: 'PATCH',
     }),
 
+  // Authentication & Registration
   getBootstrapStatus: () => apiFetch<BootstrapStatus>('/api/auth/bootstrap-status'),
 
   getMe: () => apiFetch<{ user: AuthUser | null }>('/api/auth/me'),
@@ -96,16 +141,28 @@ export const pustApi = {
       body: JSON.stringify({ email, password }),
     }),
 
-  register: (payload: {
+  registerStudent: (payload: {
+    signupToken: string;
     name: string;
     email: string;
     password: string;
-    role: 'student' | 'faculty';
+    admissionDocuments: string[];
+  }) =>
+    apiFetch<{ user: AuthUser; pendingMessage: string }>('/api/auth/register-student', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  registerOfficer: (payload: {
+    name: string;
+    email: string;
+    password: string;
+    role: Exclude<UserRole, 'admin' | 'student'>;
     departmentCode: string;
     academicId: string;
     hallAffiliation: string;
   }) =>
-    apiFetch<{ user: AuthUser }>('/api/auth/register', {
+    apiFetch<{ user: AuthUser; pendingMessage: string }>('/api/auth/register-officer', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
@@ -127,6 +184,7 @@ export const pustApi = {
       method: 'POST',
     }),
 
+  // Bookmarks
   getBookmarks: () => apiFetch<{ bookmarks: BookmarkRecord[] }>('/api/bookmarks'),
 
   addBookmark: (payload: {
@@ -144,4 +202,386 @@ export const pustApi = {
     apiFetch<{ removed: boolean }>(`/api/bookmarks/${encodeURIComponent(itemId)}`, {
       method: 'DELETE',
     }),
+
+  // Portal: Users, Approvals, Assignments & Signup Tokens
+  getUsers: () => apiFetch<{ users: AuthUser[] }>('/api/portal/users'),
+
+  approveUser: (id: string, approvalStatus: 'approved' | 'rejected') =>
+    apiFetch<{ user: AuthUser }>(`/api/portal/users/${encodeURIComponent(id)}/approval`, {
+      method: 'PATCH',
+      body: JSON.stringify({ approvalStatus }),
+    }),
+
+  assignTeacher: (id: string, assignedCourses: string[], assignedSessions: string[]) =>
+    apiFetch<{ user: AuthUser }>(`/api/portal/users/${encodeURIComponent(id)}/assignments`, {
+      method: 'PATCH',
+      body: JSON.stringify({ assignedCourses, assignedSessions }),
+    }),
+
+  getSignupTokens: () => apiFetch<{ tokens: SignupTokenRecord[] }>('/api/portal/signup-tokens'),
+
+  createSignupToken: (payload: {
+    studentName: string;
+    studentEmail: string;
+    studentPhone: string;
+    departmentCode: string;
+    session: string;
+    academicId: string;
+    hallAffiliation: string;
+  }) =>
+    apiFetch<{ token: SignupTokenRecord }>('/api/portal/signup-tokens', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  // Portal: Combinable Student Database
+  getStudents: (filters?: { department?: string; session?: string; search?: string }) => {
+    const qs = new URLSearchParams();
+    if (filters?.department && filters.department !== 'ALL') qs.set('department', filters.department);
+    if (filters?.session && filters.session !== 'ALL') qs.set('session', filters.session);
+    if (filters?.search && filters.search.trim()) qs.set('search', filters.search.trim());
+    const q = qs.toString();
+    return apiFetch<{ students: StudentRecord[] }>(`/api/portal/students${q ? `?${q}` : ''}`);
+  },
+
+  updateStudentRecords: (
+    id: string,
+    payload: {
+      chairmanNotes?: string;
+      adminNotes?: string;
+      disciplinaryStatus?: StudentRecord['disciplinaryStatus'];
+      disciplinaryNotes?: string;
+    }
+  ) =>
+    apiFetch<{ student: StudentRecord }>(`/api/portal/students/${encodeURIComponent(id)}/records`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  // Portal: Library Membership & Cards
+  getLibraryOverview: () =>
+    apiFetch<{
+      applications: LibraryApplicationRecord[];
+      cards: LibraryCardRecord[];
+      borrows: LibraryBorrowRecord[];
+    }>('/api/portal/library/overview'),
+
+  applyLibrary: () =>
+    apiFetch<{ application: LibraryApplicationRecord }>('/api/portal/library/apply', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+
+  chairmanSealLibrary: (
+    id: string,
+    payload: {
+      decision: 'forward' | 'reject';
+      officialSeal: string;
+      digitalSignature: string;
+      note?: string;
+    }
+  ) =>
+    apiFetch<{ application: LibraryApplicationRecord }>(
+      `/api/portal/library/applications/${encodeURIComponent(id)}/chairman`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  verifyLibrary: (
+    id: string,
+    payload: {
+      decision: 'approve' | 'reject';
+      physicalCardRef?: string;
+      note?: string;
+    }
+  ) =>
+    apiFetch<{ application: LibraryApplicationRecord; card?: LibraryCardRecord }>(
+      `/api/portal/library/applications/${encodeURIComponent(id)}/verify`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  borrowBook: (payload: {
+    academicId: string;
+    bookTitle: string;
+    isbn: string;
+    dueAt: string;
+  }) =>
+    apiFetch<{ borrow: LibraryBorrowRecord }>('/api/portal/library/borrows', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  returnBook: (id: string) =>
+    apiFetch<{ borrow: LibraryBorrowRecord }>(
+      `/api/portal/library/borrows/${encodeURIComponent(id)}/return`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({}),
+      }
+    ),
+
+  // Portal: Residential Hall Management & Clearance
+  getHallsOverview: () =>
+    apiFetch<{
+      circulars: HallCircularRecord[];
+      applications: HallApplicationRecord[];
+      dues: HallDueRecord[];
+    }>('/api/portal/halls/overview'),
+
+  createHallCircular: (payload: {
+    hallName: string;
+    title: string;
+    vacantSeats: number;
+    deadline: string;
+    description: string;
+  }) =>
+    apiFetch<{ circular: HallCircularRecord }>('/api/portal/halls/circulars', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  applyHall: (payload: { circularId: string; statement: string }) =>
+    apiFetch<{ application: HallApplicationRecord }>('/api/portal/halls/apply', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  reviewHallApp: (
+    id: string,
+    payload: {
+      status: 'accepted' | 'rejected';
+      reviewNote: string;
+      assignedSeat?: string;
+    }
+  ) =>
+    apiFetch<{ application: HallApplicationRecord }>(
+      `/api/portal/halls/applications/${encodeURIComponent(id)}/review`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  reassignHallSeat: (id: string, payload: { assignedSeat: string; note: string }) =>
+    apiFetch<{ application: HallApplicationRecord }>(
+      `/api/portal/halls/applications/${encodeURIComponent(id)}/seat`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  createHallDue: (payload: {
+    academicId: string;
+    hallName: string;
+    feeTitle: string;
+    amountBdt: number;
+  }) =>
+    apiFetch<{ due: HallDueRecord }>('/api/portal/halls/dues', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  payHallDue: (id: string, payload: { paymentMethod: string; paymentRef: string }) =>
+    apiFetch<{ due: HallDueRecord }>(`/api/portal/halls/dues/${encodeURIComponent(id)}/pay`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  clearHallDue: (id: string) =>
+    apiFetch<{ due: HallDueRecord }>(`/api/portal/halls/dues/${encodeURIComponent(id)}/clear`, {
+      method: 'PATCH',
+      body: JSON.stringify({}),
+    }),
+
+  // Portal: Exams, Courses, Payments, Admit Cards & Results
+  getExamsOverview: () =>
+    apiFetch<{
+      courses: CourseRecord[];
+      circulars: ExamCircularRecord[];
+      applications: ExamApplicationRecord[];
+      results: ExamResultRecord[];
+      gateways: PaymentGatewayConfig[];
+      hallClearanceBlocked: boolean;
+      unpaidHallDues: HallDueRecord[];
+    }>('/api/portal/exams/overview'),
+
+  createCourse: (payload: {
+    code: string;
+    title: string;
+    credits: number;
+    departmentCode: string;
+    semester: number;
+    session: string;
+    teacherEmail?: string;
+  }) =>
+    apiFetch<{ course: CourseRecord }>('/api/portal/exams/courses', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  createExamCircular: (payload: {
+    title: string;
+    departmentCode: string;
+    semester: number;
+    session: string;
+    deadline: string;
+    feeBdt: number;
+    eligibleCourseCodes: string[];
+  }) =>
+    apiFetch<{ circular: ExamCircularRecord }>('/api/portal/exams/circulars', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  applyExam: (payload: { circularId: string; selectedCourseCodes: string[] }) =>
+    apiFetch<{ application: ExamApplicationRecord }>('/api/portal/exams/apply', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  payExam: (id: string, payload: { paymentMethod: string; transactionId: string }) =>
+    apiFetch<{ application: ExamApplicationRecord }>(
+      `/api/portal/exams/applications/${encodeURIComponent(id)}/pay`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  verifyExam: (id: string, payload: { decision: 'Approved' | 'Rejected'; physicalCollected?: boolean }) =>
+    apiFetch<{ application: ExamApplicationRecord }>(
+      `/api/portal/exams/applications/${encodeURIComponent(id)}/verify`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  publishExamResult: (payload: {
+    academicId: string;
+    semester: number;
+    promotionMode: 'auto' | 'manual_promoted' | 'manual_repeat';
+    courses: Array<{ code: string; title: string; credits: number; marks: number }>;
+  }) =>
+    apiFetch<{ result: ExamResultRecord }>('/api/portal/exams/results', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  // Portal: Certificate Application & 4-Office Independent Clearances
+  getCertificatesOverview: () =>
+    apiFetch<{
+      applications: CertificateApplicationRecord[];
+      feeConfig: FeeConfig;
+      gateways: PaymentGatewayConfig[];
+      student: StudentRecord | null;
+    }>('/api/portal/certificates/overview'),
+
+  applyCertificate: (payload: {
+    certificateType: 'Temporary Certificate' | 'Provisional Transcript';
+    paymentMethod: string;
+    transactionId: string;
+  }) =>
+    apiFetch<{ application: CertificateApplicationRecord }>('/api/portal/certificates/apply', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  reviewCertificateOffice: (
+    id: string,
+    payload: { decision: 'approved' | 'declined'; note: string }
+  ) =>
+    apiFetch<{ application: CertificateApplicationRecord }>(
+      `/api/portal/certificates/${encodeURIComponent(id)}/office-review`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  resubmitCertificateOffice: (id: string, payload: { office: ClearanceOfficeKey; note: string }) =>
+    apiFetch<{ application: CertificateApplicationRecord }>(
+      `/api/portal/certificates/${encodeURIComponent(id)}/resubmit`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  finalAdminCertificate: (
+    id: string,
+    payload: { decision: 'approved' | 'rejected'; adminNote?: string; physicalCollected?: boolean }
+  ) =>
+    apiFetch<{ application: CertificateApplicationRecord }>(
+      `/api/portal/certificates/${encodeURIComponent(id)}/admin-final`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  // Portal: CMS, Payment Configuration & Audit Logs
+  upsertAboutSection: (payload: {
+    slug: AboutContentRecord['slug'];
+    title: string;
+    body: string;
+  }) =>
+    apiFetch<{ section: AboutContentRecord }>('/api/portal/cms/about', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  updateViceChancellor: (payload: {
+    name: string;
+    email: string;
+    phone: string;
+    tenure: string;
+    message: string;
+    promoteNewVc: boolean;
+  }) =>
+    apiFetch<{ profiles: ViceChancellorRecord[] }>('/api/portal/cms/vice-chancellor', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  createGalleryItem: (payload: {
+    title: string;
+    description: string;
+    category: GalleryItemRecord['category'];
+    mediaType: GalleryItemRecord['mediaType'];
+    mediaUrl: string;
+    eventDate: string;
+  }) =>
+    apiFetch<{ item: GalleryItemRecord }>('/api/portal/cms/gallery', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteGalleryItem: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/cms/gallery/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+
+  getPaymentConfig: () =>
+    apiFetch<{ gateways: PaymentGatewayConfig[]; feeConfig: FeeConfig }>('/api/portal/config/payments'),
+
+  savePaymentGateway: (payload: PaymentGatewayConfig) =>
+    apiFetch<{ gateway: PaymentGatewayConfig }>('/api/portal/config/payments', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  saveFeeConfig: (payload: FeeConfig) =>
+    apiFetch<{ feeConfig: FeeConfig }>('/api/portal/config/fees', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  getAuditLogs: () => apiFetch<{ logs: AuditLogRecord[] }>('/api/portal/audit-logs'),
 };

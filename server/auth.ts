@@ -1,11 +1,10 @@
 import crypto from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import type { AuthUser, UserRole } from '../src/types/pust';
+import type { ApprovalStatus, AuthUser, UserRole } from '../src/types/pust';
 
 export const AUTH_COOKIE_NAME = 'pust_token';
 
-// Ephemeral fallback key keeps JWT signing secure in preview before JWT_SECRET is set in environment
 const EPHEMERAL_JWT_SECRET = crypto.randomBytes(32).toString('hex');
 
 function getJwtSecret(): string {
@@ -18,8 +17,10 @@ export interface JwtClaims {
   email: string;
   name: string;
   role: UserRole;
+  approvalStatus: ApprovalStatus;
   departmentCode: string;
   academicId: string;
+  session?: string;
   hallAffiliation: string;
 }
 
@@ -57,8 +58,10 @@ export function signAuthToken(user: AuthUser): string {
     email: user.email,
     name: user.name,
     role: user.role,
+    approvalStatus: user.approvalStatus,
     departmentCode: user.departmentCode,
     academicId: user.academicId,
+    session: user.session,
     hallAffiliation: user.hallAffiliation,
   };
   return jwt.sign(claims, getJwtSecret(), {
@@ -79,6 +82,17 @@ export function verifyAuthToken(token: string): JwtClaims | null {
   } catch {
     return null;
   }
+}
+
+export function optionalAuth(req: AuthenticatedRequest): JwtClaims | null {
+  const token = req.cookies?.[AUTH_COOKIE_NAME];
+  if (typeof token !== 'string' || !token) return null;
+  const claims = verifyAuthToken(token);
+  if (claims && claims.approvalStatus === 'approved') {
+    req.authUser = claims;
+    return claims;
+  }
+  return null;
 }
 
 function isHttpsRequest(req: Request): boolean {
@@ -179,20 +193,24 @@ export function requireAuth(
     res.status(401).json({ error: 'Session expired or invalid' });
     return;
   }
+  if (claims.approvalStatus !== 'approved') {
+    res.status(403).json({ error: 'Account pending approval by university authority' });
+    return;
+  }
   req.authUser = claims;
   next();
 }
 
-export function requireAdmin(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  requireAuth(req, res, () => {
-    if (req.authUser?.role !== 'admin') {
-      res.status(403).json({ error: 'Registrar / Admin privileges required' });
-      return;
-    }
-    next();
-  });
+export function requireRoles(...allowed: UserRole[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    requireAuth(req, res, () => {
+      if (!req.authUser || !allowed.includes(req.authUser.role)) {
+        res.status(403).json({
+          error: `Restricted to authorized roles (${allowed.join(', ')})`,
+        });
+        return;
+      }
+      next();
+    });
+  };
 }
