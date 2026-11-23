@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight, ArrowUpRight, ChevronDown, PlayCircle, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+import { CampusMapSection } from './CampusMapSection';
 import { ResilientImage } from './ResilientImage';
 import type {
   AboutContentRecord,
@@ -542,8 +543,11 @@ export function HomePage({
         </div>
       </section>
 
+      {/* Interactive Rajapur Campus Map & Building Directory */}
+      <CampusMapSection />
+
       {/* Homepage Campus Gallery (Photos & Videos) */}
-      <section className="bg-[#FAF8F4] border-t border-b border-stone-200 py-14 lg:py-16">
+      <section className="bg-white border-t border-b border-stone-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-stone-200">
             <div>
@@ -616,7 +620,7 @@ export function HomePage({
       </section>
 
       {/* 5 Faculties & Research Spotlight Strip + Convocation / Admissions CTA */}
-      <section className="bg-white py-14 lg:py-16">
+      <section className="bg-[#FAF8F4] py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
