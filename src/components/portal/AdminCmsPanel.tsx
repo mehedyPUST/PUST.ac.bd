@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Check, Copy, Trash2 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
 import type {
   AboutContentRecord,
@@ -58,6 +58,15 @@ export function AdminCmsPanel({
 
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copiedTokenId, setCopiedTokenId] = useState<string | null>(null);
+
+  const handleCopyToken = (id: string, token: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(token).catch(() => {});
+      setCopiedTokenId(id);
+      setTimeout(() => setCopiedTokenId((curr) => (curr === id ? null : curr)), 1800);
+    }
+  };
 
   // Teacher assignment inputs
   const [teacherAssigns, setTeacherAssigns] = useState<
@@ -540,20 +549,39 @@ export function AdminCmsPanel({
             </select>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-medium bg-emerald-700 text-white hover:bg-emerald-800 cursor-pointer"
+              className="px-4 py-2 text-xs font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 text-white hover:from-emerald-950 hover:to-emerald-900 cursor-pointer"
             >
               Generate Signup Token
             </button>
           </form>
 
           {tokens.length > 0 && (
-            <div className="divide-y divide-slate-200 border border-slate-200 text-xs">
+            <div className="divide-y divide-stone-200 border border-stone-200 text-xs">
               {tokens.map((t) => (
-                <div key={t.id} className="p-3 flex flex-wrap justify-between gap-2">
-                  <p className="font-mono">
-                    <span className="font-semibold text-emerald-700">{t.token}</span> ·{' '}
-                    {t.studentName} ({t.academicId}, {t.departmentCode} · {t.session})
-                  </p>
+                <div key={t.id} className="p-3 flex flex-wrap items-center justify-between gap-2 bg-[#FAF8F4]/50">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono font-semibold text-emerald-800">{t.token}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyToken(t.id, t.token)}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] border border-stone-300 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer"
+                    >
+                      {copiedTokenId === t.id ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-700" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                    <span className="font-mono text-slate-700">
+                      · {t.studentName} ({t.academicId}, {t.departmentCode} · {t.session})
+                    </span>
+                  </div>
                   <p className="font-mono text-slate-500">
                     {t.used ? 'USED' : 'ACTIVE'} · Issued by {t.createdBy}
                   </p>

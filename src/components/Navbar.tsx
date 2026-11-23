@@ -94,9 +94,10 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
 
                 {/* Non-dropdown hover preview of section subtopics */}
                 {isHovered && (
-                  <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                    <div className="bg-white border border-stone-200 shadow-lg py-1.5">
-                      <p className="px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-widest text-emerald-800 border-b border-stone-100">
+                  <div className="absolute left-0 top-full pt-1 w-60 z-50 animate__animated animate__fadeIn" style={{ animationDuration: '150ms' }}>
+                    <div className="bg-white border border-stone-200 shadow-xl overflow-hidden">
+                      <div className="h-0.5 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+                      <p className="px-3.5 py-2 font-mono text-[10px] uppercase tracking-widest text-emerald-800 border-b border-stone-100 bg-[#FAF8F4]">
                         {group.label} Subtopics
                       </p>
                       {group.items.map((item) => {
@@ -154,7 +155,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               setHoveredGroup(null);
               setMobileMenuOpen(false);
             }}
-            className="px-3.5 py-2 text-xs sm:text-sm font-medium bg-emerald-800 text-white hover:bg-emerald-900 transition-colors whitespace-nowrap shrink-0"
+            className="px-4 py-2 text-xs sm:text-sm font-medium bg-gradient-to-r from-emerald-900 to-emerald-800 hover:from-emerald-950 hover:to-emerald-900 text-white shadow-xs transition-all whitespace-nowrap shrink-0"
           >
             {route === '/portal'
               ? 'Public Website'

@@ -82,8 +82,10 @@ export function ResearchSection({
             )}
           </div>
 
-          <div className="lg:col-span-5 bg-[#FAF8F4] border border-stone-200 p-6 sm:p-7 space-y-5">
-            <div className="border-b border-stone-200 pb-4">
+          <div className="lg:col-span-5 bg-white border border-stone-200 shadow-xs overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
+            <div className="p-6 sm:p-7 space-y-5">
+              <div className="border-b border-stone-200 pb-4">
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                 University Periodicals
               </p>
@@ -103,6 +105,7 @@ export function ResearchSection({
                   <p className="text-xs font-semibold text-emerald-800">{journal.currentIssue}</p>
                 </div>
               ))}
+            </div>
             </div>
           </div>
         </div>
@@ -127,8 +130,8 @@ export function ResearchSection({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <article className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={labImage}
                 alt="Students collaborating in a PUST engineering and instrumentation laboratory"
@@ -149,7 +152,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="space-y-4">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={libraryImage}
                 alt="PUST Central Library study hall and digital archive"
@@ -170,7 +173,7 @@ export function ResearchSection({
               </div>
             </article>
 
-            <article className="space-y-4">
+            <article className="bg-[#FAF8F4] border border-stone-200 p-5 shadow-xs hover:shadow-md hover:border-emerald-700/60 transition-all space-y-4">
               <ResilientImage
                 src={groundsImage}
                 alt="PUST Rajapur campus courtyard and residential halls at golden hour"

@@ -40,6 +40,14 @@ const GALLERY_CATS: Array<'All' | GalleryItemRecord['category']> = [
   'Campus Life',
 ];
 
+const NOTICE_CATS: Array<'All' | NoticeRecord['category']> = [
+  'All',
+  'Admission',
+  'Examination',
+  'Academic',
+  'General',
+];
+
 const FACULTIES_OVERVIEW = [
   { code: 'FET', name: 'Engineering & Technology', depts: '7 Depts · CSE, EEE, ETE, ICE, ARCH, CE, URP' },
   { code: 'FS', name: 'Faculty of Science', depts: '4 Depts · Mathematics, Physics, Chemistry, Statistics' },
@@ -59,11 +67,17 @@ export function HomePage({
   onSelectNotice,
 }: HomePageProps) {
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
+  const [noticeCategory, setNoticeCategory] =
+    useState<'All' | NoticeRecord['category']>('All');
   const [galleryCategory, setGalleryCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
 
-  const featuredNotices = notices.slice(0, 4);
+  const filteredNotices =
+    noticeCategory === 'All'
+      ? notices
+      : notices.filter((n) => n.category === noticeCategory);
+  const featuredNotices = filteredNotices.slice(0, 4);
   const leadNotice = featuredNotices[0];
   const secondaryNotices = featuredNotices.slice(1);
 
@@ -319,7 +333,7 @@ export function HomePage({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-5">
-            <div className="flex items-end justify-between gap-4 pb-4 border-b border-stone-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                   Latest Bulletins
@@ -337,47 +351,85 @@ export function HomePage({
               </Link>
             </div>
 
-            <div className="border border-stone-200 bg-white divide-y divide-stone-200">
-              {leadNotice && (
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter circulars by category">
+              {NOTICE_CATS.map((cat) => (
                 <button
+                  key={cat}
                   type="button"
-                  onClick={() => onSelectNotice(leadNotice)}
-                  className="w-full text-left p-6 bg-emerald-50/30 hover:bg-emerald-50/60 transition-colors space-y-2 group cursor-pointer"
+                  onClick={() => setNoticeCategory(cat)}
+                  className={`px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    noticeCategory === cat
+                      ? 'bg-gradient-to-r from-emerald-900 to-emerald-800 text-white border-emerald-900'
+                      : 'bg-white text-slate-700 border-stone-300 hover:border-emerald-800 hover:text-emerald-800'
+                  }`}
                 >
-                  <p className="font-mono text-xs text-slate-500 tabular-nums">
-                    {leadNotice.publishedAt} ·{' '}
-                    <span className="font-semibold text-emerald-800">{leadNotice.category}</span> ·{' '}
-                    {leadNotice.referenceNo}
-                    {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
-                  </p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
-                    {leadNotice.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
-                </button>
-              )}
-
-              {secondaryNotices.map((notice) => (
-                <button
-                  key={notice.id}
-                  type="button"
-                  onClick={() => onSelectNotice(notice)}
-                  className="w-full text-left px-6 py-4 hover:bg-emerald-50/30 transition-colors space-y-1 group cursor-pointer"
-                >
-                  <p className="font-mono text-xs text-slate-500 tabular-nums">
-                    {notice.publishedAt} ·{' '}
-                    <span className="font-semibold text-emerald-800">{notice.category}</span> ·{' '}
-                    {notice.referenceNo}
-                    {notice.visibility === 'registered' && ' · Campus Members Only'}
-                  </p>
-                  <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
-                    {notice.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
-                    {notice.summary}
-                  </p>
+                  {cat}
                 </button>
               ))}
+            </div>
+
+            <div className="border border-stone-200 bg-white shadow-xs overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+              <div className="divide-y divide-stone-200">
+                {featuredNotices.length === 0 ? (
+                  <div className="p-8 text-center space-y-3">
+                    <p className="text-sm text-slate-600">
+                      No circulars currently listed under{' '}
+                      <span className="font-medium text-slate-900">{noticeCategory}</span>.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setNoticeCategory('All')}
+                      className="px-4 py-2 text-xs font-medium border border-stone-300 bg-[#FAF8F4] text-emerald-900 hover:border-emerald-800 transition-colors cursor-pointer"
+                    >
+                      Show All Circulars
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {leadNotice && (
+                      <button
+                        type="button"
+                        onClick={() => onSelectNotice(leadNotice)}
+                        className="w-full text-left p-6 bg-emerald-50/30 hover:bg-emerald-50/60 transition-colors space-y-2 group cursor-pointer"
+                      >
+                        <p className="font-mono text-xs text-slate-500 tabular-nums">
+                          {leadNotice.publishedAt} ·{' '}
+                          <span className="font-semibold text-emerald-800">{leadNotice.category}</span> ·{' '}
+                          {leadNotice.referenceNo}
+                          {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
+                        </p>
+                        <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
+                          {leadNotice.title}
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
+                      </button>
+                    )}
+
+                    {secondaryNotices.map((notice) => (
+                      <button
+                        key={notice.id}
+                        type="button"
+                        onClick={() => onSelectNotice(notice)}
+                        className="w-full text-left px-6 py-4 hover:bg-emerald-50/30 transition-colors space-y-1 group cursor-pointer"
+                      >
+                        <p className="font-mono text-xs text-slate-500 tabular-nums">
+                          {notice.publishedAt} ·{' '}
+                          <span className="font-semibold text-emerald-800">{notice.category}</span> ·{' '}
+                          {notice.referenceNo}
+                          {notice.visibility === 'registered' && ' · Campus Members Only'}
+                        </p>
+                        <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-emerald-900 transition-colors">
+                          {notice.title}
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
+                          {notice.summary}
+                        </p>
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -391,7 +443,9 @@ export function HomePage({
               </h2>
             </div>
 
-            <div className="divide-y divide-stone-200 border border-stone-200 bg-white">
+            <div className="border border-stone-200 bg-white shadow-xs overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-emerald-900 to-emerald-700" />
+              <div className="divide-y divide-stone-200">
               {[
                 {
                   route: '/governance' as AppRoute,
@@ -439,6 +493,7 @@ export function HomePage({
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-800 shrink-0 transition-colors" />
                 </button>
               ))}
+              </div>
             </div>
           </div>
         </div>

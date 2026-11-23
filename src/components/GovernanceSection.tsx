@@ -164,6 +164,11 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
       </div>
 
       {/* Content by Governance Sub-Page */}
+      <div
+        key={activeRoute}
+        className="animate__animated animate__fadeIn"
+        style={{ animationDuration: '220ms' }}
+      >
       {activeRoute === '/governance/university-act' && (
         <div className="space-y-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -210,7 +215,9 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
               </div>
             </div>
 
-            <aside className="lg:col-span-5 bg-[#FAF8F4] border border-stone-200 p-6 space-y-5">
+            <aside className="lg:col-span-5 bg-white border border-stone-200 shadow-xs overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-emerald-950 via-emerald-800 to-emerald-700" />
+              <div className="p-6 space-y-5">
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-800">
                 Official Bangladesh Laws Citation
               </p>
@@ -258,6 +265,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
                   Open Source Page
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
+              </div>
               </div>
             </aside>
           </div>
@@ -589,6 +597,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
