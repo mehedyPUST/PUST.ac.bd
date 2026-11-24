@@ -53,6 +53,21 @@ function computePustGrade(marks: number): { letter: string; gp: number } {
   return { letter: 'F', gp: 0.0 };
 }
 
+const ACADEMIC_SESSIONS = ['2025-26', '2024-25', '2023-24', '2022-23', '2021-22', '2020-21'];
+
+const ACADEMIC_YEARS = [
+  { value: 1, label: '1st' },
+  { value: 2, label: '2nd' },
+  { value: 3, label: '3rd' },
+  { value: 4, label: '4th' },
+  { value: 5, label: '5th' },
+] as const;
+
+const YEAR_SEMESTERS = [
+  { value: 1, label: '1st' },
+  { value: 2, label: '2nd' },
+] as const;
+
 export function ExamPanel({ user, departments }: ExamPanelProps) {
   const { navigateTo } = usePust();
   const [courses, setCourses] = useState<CourseRecord[]>([]);
@@ -75,14 +90,16 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
   // Chairman/Admin Create Course
-  const [courseCode, setCourseCode] = useState('');
+  const [courseCodeSuffix, setCourseCodeSuffix] = useState('');
   const [courseTitle, setCourseTitle] = useState('');
   const [courseCredits, setCourseCredits] = useState(3);
   const [courseDept, setCourseDept] = useState(
     user.departmentCode === 'ADMIN' ? 'CSE' : user.departmentCode
   );
-  const [courseSem, setCourseSem] = useState(6);
+  const [courseYear, setCourseYear] = useState(3);
+  const [courseTermSem, setCourseTermSem] = useState(2);
   const [courseSession, setCourseSession] = useState('2022-23');
+  const [savingCourse, setSavingCourse] = useState(false);
 
   // Chairman/Admin Create Exam Circular
   const [circTitle, setCircTitle] = useState('');
@@ -134,6 +151,21 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (user.role === 'chairman' && user.departmentCode && user.departmentCode !== 'ADMIN') {
+      setCourseDept(user.departmentCode);
+      setCircDept(user.departmentCode);
+    } else if (!courseDept && departments.length > 0) {
+      setCourseDept(departments[0].code);
+    }
+  }, [user.role, user.departmentCode, departments, courseDept]);
+
+  const courseDeptPrefix = (courseDept || 'CSE')
+    .replace(/[^A-Za-z]/g, '')
+    .slice(0, 3)
+    .toUpperCase();
+  const computedCourseSemester = (courseYear - 1) * 2 + courseTermSem;
 
   const activeCircular = circulars.find((c) => c.id === selectedCircularId) || circulars[0];
 
@@ -221,21 +253,46 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
+
+    const sanitizedSuffix = courseCodeSuffix
+      .trim()
+      .toUpperCase()
+      .replace(new RegExp(`^${courseDeptPrefix}[-\\s]*`, 'i'), '')
+      .replace(/^-+/, '');
+
+    if (!sanitizedSuffix) {
+      setError(`Enter the course code suffix after ${courseDeptPrefix}- (e.g. 4101).`);
+      return;
+    }
+
+    const fullCourseCode = `${courseDeptPrefix}-${sanitizedSuffix}`;
+    if (fullCourseCode.length < 3 || fullCourseCode.length > 20) {
+      setError('Course code must be between 3 and 20 characters.');
+      return;
+    }
+
+    setSavingCourse(true);
     try {
       const res = await pustApi.createCourse({
-        code: courseCode.toUpperCase(),
-        title: courseTitle,
+        code: fullCourseCode,
+        title: courseTitle.trim(),
         credits: Number(courseCredits),
         departmentCode: courseDept,
-        semester: Number(courseSem),
+        semester: computedCourseSemester,
         session: courseSession,
       });
-      setFeedback(`Added course ${res.course.code} — ${res.course.title}.`);
-      setCourseCode('');
+      const yearLabel = ACADEMIC_YEARS.find((y) => y.value === courseYear)?.label ?? `${courseYear}`;
+      const semLabel = YEAR_SEMESTERS.find((s) => s.value === courseTermSem)?.label ?? `${courseTermSem}`;
+      setFeedback(
+        `Added course ${res.course.code} — ${res.course.title} (${yearLabel} Year, ${semLabel} Semester · ${res.course.session}).`
+      );
+      setCourseCodeSuffix('');
       setCourseTitle('');
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add course.');
+    } finally {
+      setSavingCourse(false);
     }
   }
 
@@ -674,74 +731,186 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <form
             onSubmit={handleCreateCourse}
-            className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs"
+            className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
           >
-            <h3 className="font-serif text-lg font-medium text-slate-900">
-              Assign Departmental Course
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                type="text"
-                required
-                value={courseCode}
-                onChange={(e) => setCourseCode(e.target.value)}
-                placeholder="Code (e.g. CSE-4101)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-              />
-              <input
-                type="number"
-                step="0.5"
-                min={0.5}
-                max={6}
-                required
-                value={courseCredits}
-                onChange={(e) => setCourseCredits(Number(e.target.value))}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
-              />
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="font-serif text-lg font-medium text-slate-900">
+                Assign Departmental Course
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Register a course under department, session, year, and semester.
+              </p>
             </div>
-            <input
-              type="text"
-              required
-              value={courseTitle}
-              onChange={(e) => setCourseTitle(e.target.value)}
-              placeholder="Course Title"
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-            />
-            <div className="grid grid-cols-3 gap-2">
+
+            <div>
+              <label
+                htmlFor="course-dept"
+                className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+              >
+                Department Name
+              </label>
               <select
+                id="course-dept"
                 value={courseDept}
                 disabled={user.role === 'chairman'}
                 onChange={(e) => setCourseDept(e.target.value)}
-                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.code}>
-                    {d.code}
+                    {d.name} ({d.code})
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label
+                  htmlFor="course-session"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Session
+                </label>
+                <select
+                  id="course-session"
+                  value={courseSession}
+                  onChange={(e) => setCourseSession(e.target.value)}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                >
+                  {ACADEMIC_SESSIONS.map((sess) => (
+                    <option key={sess} value={sess}>
+                      {sess}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="course-year"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Year
+                </label>
+                <select
+                  id="course-year"
+                  value={courseYear}
+                  onChange={(e) => setCourseYear(Number(e.target.value))}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                >
+                  {ACADEMIC_YEARS.map((yr) => (
+                    <option key={yr.value} value={yr.value}>
+                      {yr.label} Year
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="course-term-semester"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Semester
+                </label>
+                <select
+                  id="course-term-semester"
+                  value={courseTermSem}
+                  onChange={(e) => setCourseTermSem(Number(e.target.value))}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                >
+                  {YEAR_SEMESTERS.map((sem) => (
+                    <option key={sem.value} value={sem.value}>
+                      {sem.label} Semester
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div className="sm:col-span-8">
+                <label
+                  htmlFor="course-code-suffix"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Course Code
+                </label>
+                <div className="flex items-stretch rounded-lg border border-slate-300 bg-[#F7F7F5] focus-within:bg-white focus-within:border-pust-800 overflow-hidden">
+                  <span
+                    className="inline-flex items-center px-3 py-2 font-mono text-xs font-semibold text-pust-900 bg-pust-50 border-r border-slate-300 select-none shrink-0"
+                    title="First 3 letters of selected department"
+                  >
+                    {courseDeptPrefix}-
+                  </span>
+                  <input
+                    id="course-code-suffix"
+                    type="text"
+                    required
+                    maxLength={14}
+                    value={courseCodeSuffix}
+                    onChange={(e) => setCourseCodeSuffix(e.target.value.toUpperCase())}
+                    placeholder="4101"
+                    className="w-full min-w-0 px-3 py-2 font-mono text-xs uppercase bg-transparent text-slate-900 focus:outline-none tabular-nums"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-4">
+                <label
+                  htmlFor="course-credits"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Credits
+                </label>
+                <input
+                  id="course-credits"
+                  type="number"
+                  step="0.5"
+                  min={0.5}
+                  max={6}
+                  required
+                  value={courseCredits}
+                  onChange={(e) => setCourseCredits(Number(e.target.value))}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="course-title"
+                className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+              >
+                Course Title
+              </label>
               <input
-                type="number"
-                min={1}
-                max={10}
-                value={courseSem}
-                onChange={(e) => setCourseSem(Number(e.target.value))}
-                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
-              />
-              <input
+                id="course-title"
                 type="text"
-                value={courseSession}
-                onChange={(e) => setCourseSession(e.target.value)}
-                placeholder="Session"
-                className="px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+                required
+                minLength={3}
+                maxLength={120}
+                value={courseTitle}
+                onChange={(e) => setCourseTitle(e.target.value)}
+                placeholder="e.g. Artificial Intelligence & Neural Networks"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
               />
             </div>
-            <button
-              type="submit"
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Save Course
-            </button>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                {courseDeptPrefix}-
+                {courseCodeSuffix.trim().toUpperCase() || '____'} · Semester {computedCourseSemester}/10
+              </span>
+              <button
+                type="submit"
+                disabled={savingCourse}
+                className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                {savingCourse ? 'Saving Course...' : 'Save Course'}
+              </button>
+            </div>
           </form>
 
           <form
