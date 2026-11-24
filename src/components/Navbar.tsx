@@ -97,19 +97,23 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
           {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band */}
-            <div className="min-h-14 sm:h-[60px] px-3 sm:px-5 lg:px-6 py-1.5 sm:py-0 bg-pust-900 flex items-center justify-between gap-2 sm:gap-3 text-white">
+            <div className="h-14 sm:h-[60px] px-3.5 sm:px-6 flex items-center justify-between gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
                   setHoveredGroup(null);
                   setMobileMenuOpen(false);
                 }}
-                className="flex-1 min-w-0 block font-serif text-[13px] sm:text-[17px] md:text-[20px] lg:text-[clamp(1.9rem,3.1vw,2.625rem)] font-medium tracking-normal lg:tracking-[0.025em] text-white hover:text-pust-100 transition-colors leading-tight lg:leading-none lg:whitespace-nowrap"
+                className="font-serif text-base sm:text-xl lg:text-[26px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
               >
                 Pabna University of Science and Technology
               </Link>
 
-              <div className="flex lg:hidden items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden xl:inline font-mono text-[11px] uppercase tracking-widest text-pust-200">
+                  Est. 2008 · Rajapur, Pabna
+                </span>
+
                 {/* Mobile Portal CTA & Menu Trigger */}
                 <Link
                   href={route === '/portal' ? '/' : '/portal'}
@@ -117,7 +121,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
                   }}
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal'
                     ? 'Public Site'
@@ -130,7 +134,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                   onClick={() => setMobileMenuOpen((prev) => !prev)}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
+                  className="lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
