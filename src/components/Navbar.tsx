@@ -30,13 +30,11 @@ interface NavbarProps {
 }
 
 const HOME_SUBTOPICS = [
-  { label: 'Banner', href: '/#banner' },
   { label: 'Vice-Chancellor’s Message', href: '/#vc-message' },
   { label: 'Notice Board', href: '/#notice-board' },
   { label: 'Recent Publications', href: '/#recent-publications' },
   { label: 'News and Events', href: '/#news-events' },
   { label: 'Campus Map', href: '/#campus-map' },
-  { label: 'Footer', href: '/#footer' },
 ];
 
 export function Navbar({
