@@ -2,6 +2,7 @@ export interface CalendarExportEvent {
   uid: string;
   title: string;
   date: string; // YYYY-MM-DD or descriptive
+  endDate?: string; // inclusive YYYY-MM-DD for multi-day spans
   description?: string;
   location?: string;
 }
@@ -33,8 +34,12 @@ function nextDayDigits(yyyymmdd: string): string {
 
 export function downloadIcsCalendar(events: CalendarExportEvent[], fileName = 'PUST-Academic-Calendar.ics'): boolean {
   const validEvents = events
-    .map((ev) => ({ ...ev, yyyymmdd: parseIsoDateDigits(ev.date) }))
-    .filter((ev): ev is CalendarExportEvent & { yyyymmdd: string } => ev.yyyymmdd !== null);
+    .map((ev) => ({
+      ...ev,
+      yyyymmdd: parseIsoDateDigits(ev.date),
+      endDigits: ev.endDate ? parseIsoDateDigits(ev.endDate) : null,
+    }))
+    .filter((ev): ev is CalendarExportEvent & { yyyymmdd: string; endDigits: string | null } => ev.yyyymmdd !== null);
 
   if (validEvents.length === 0) return false;
 
@@ -50,7 +55,8 @@ export function downloadIcsCalendar(events: CalendarExportEvent[], fileName = 'P
 
   for (const ev of validEvents) {
     const dtStart = ev.yyyymmdd;
-    const dtEnd = nextDayDigits(dtStart);
+    const inclusiveEnd = ev.endDigits && ev.endDigits >= dtStart ? ev.endDigits : dtStart;
+    const dtEnd = nextDayDigits(inclusiveEnd);
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${escapeIcsText(ev.uid)}@pust.ac.bd`);
     lines.push(`DTSTAMP:${stamp}`);

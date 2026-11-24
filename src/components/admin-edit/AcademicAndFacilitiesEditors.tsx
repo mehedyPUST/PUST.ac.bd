@@ -550,25 +550,32 @@ export function AcademicAndFacilitiesEditors({
         }}
         className="space-y-4"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-slate-600">
-            Manage key dates under Academics → Academic Calendar.
+            Manage key exams, holidays, semester deadlines &amp; milestones under Academics → Academic Calendar.
           </p>
           <button
             type="button"
             onClick={() =>
               setCalendar((prev) => [
                 ...prev,
-                { term: 'Academic Cycle', event: 'New Calendar Event', date: '2027-01-20' },
+                {
+                  term: 'Academic Cycle',
+                  event: 'New Calendar Event',
+                  date: '2027-01-20',
+                  category: 'deadline',
+                  venue: 'Academic Building I',
+                  details: '',
+                },
               ])
             }
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Plus className="w-3 h-3" /> Add Date
           </button>
         </div>
         {calendar.map((row, idx) => (
-          <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+          <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
                 <input
@@ -580,33 +587,43 @@ export function AcademicAndFacilitiesEditors({
                       prev.map((r, i) => (i === idx ? { ...r, date: e.target.value } : r))
                     )
                   }
-                  placeholder="Date"
+                  placeholder="Start Date (YYYY-MM-DD)"
                   className={`${INPUT_CLASS} font-mono`}
                 />
                 <input
                   type="text"
-                  required
-                  value={row.event}
+                  value={row.endDate || ''}
                   onChange={(e) =>
                     setCalendar((prev) =>
-                      prev.map((r, i) => (i === idx ? { ...r, event: e.target.value } : r))
+                      prev.map((r, i) =>
+                        i === idx ? { ...r, endDate: e.target.value || undefined } : r
+                      )
                     )
                   }
-                  placeholder="Event"
-                  className={INPUT_CLASS}
+                  placeholder="End Date (optional)"
+                  className={`${INPUT_CLASS} font-mono`}
                 />
-                <input
-                  type="text"
-                  required
-                  value={row.term}
+                <select
+                  value={row.category || 'academic'}
                   onChange={(e) =>
                     setCalendar((prev) =>
-                      prev.map((r, i) => (i === idx ? { ...r, term: e.target.value } : r))
+                      prev.map((r, i) =>
+                        i === idx
+                          ? {
+                              ...r,
+                              category: e.target.value as 'exam' | 'holiday' | 'deadline' | 'academic',
+                            }
+                          : r
+                      )
                     )
                   }
-                  placeholder="Term"
                   className={INPUT_CLASS}
-                />
+                >
+                  <option value="exam">Exam</option>
+                  <option value="holiday">Holiday</option>
+                  <option value="deadline">Semester Deadline</option>
+                  <option value="academic">Academic Milestone</option>
+                </select>
               </div>
               {calendar.length > 1 && (
                 <button
@@ -617,6 +634,60 @@ export function AcademicAndFacilitiesEditors({
                   Del
                 </button>
               )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input
+                type="text"
+                required
+                value={row.event}
+                onChange={(e) =>
+                  setCalendar((prev) =>
+                    prev.map((r, i) => (i === idx ? { ...r, event: e.target.value } : r))
+                  )
+                }
+                placeholder="Event Title"
+                className={INPUT_CLASS}
+              />
+              <input
+                type="text"
+                required
+                value={row.term}
+                onChange={(e) =>
+                  setCalendar((prev) =>
+                    prev.map((r, i) => (i === idx ? { ...r, term: e.target.value } : r))
+                  )
+                }
+                placeholder="Term / Cycle"
+                className={INPUT_CLASS}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={row.venue || ''}
+                onChange={(e) =>
+                  setCalendar((prev) =>
+                    prev.map((r, i) =>
+                      i === idx ? { ...r, venue: e.target.value || undefined } : r
+                    )
+                  )
+                }
+                placeholder="Venue / Office (optional)"
+                className={INPUT_CLASS}
+              />
+              <input
+                type="text"
+                value={row.details || ''}
+                onChange={(e) =>
+                  setCalendar((prev) =>
+                    prev.map((r, i) =>
+                      i === idx ? { ...r, details: e.target.value || undefined } : r
+                    )
+                  )
+                }
+                placeholder="Details / Student Guidance (optional)"
+                className={INPUT_CLASS}
+              />
             </div>
           </div>
         ))}

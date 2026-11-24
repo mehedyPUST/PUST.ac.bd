@@ -549,10 +549,16 @@ export interface FacultyDeanItem {
   depts: string;
 }
 
+export type AcademicCalendarCategory = 'exam' | 'holiday' | 'deadline' | 'academic';
+
 export interface AcademicCalendarItem {
   term: string;
   event: string;
   date: string;
+  endDate?: string;
+  category?: AcademicCalendarCategory;
+  venue?: string;
+  details?: string;
 }
 
 export interface ScholarshipItem {

@@ -530,29 +530,203 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
   ],
   academicCalendar: [
     {
-      term: 'Academic Session 2025–2026 (UG)',
-      event: 'Orientation & Formal Class Commencement',
+      term: 'Academic Session 2025–2026 (Sem-I)',
+      event: 'Orientation & Semester-I Class Commencement',
       date: '2026-07-15',
+      category: 'academic',
+      venue: 'Academic Building I & Central Auditorium',
+      details:
+        'Formal welcome for incoming undergraduate batches and commencement of Semester-I lectures across all 21 departments.',
     },
     {
-      term: 'Bi-Semester Teaching Period',
-      event: 'Mid-Term Assessments & Course Add/Drop Window',
+      term: 'Academic Session 2025–2026 (Sem-I)',
+      event: 'Course Add/Drop & Semester Registration Deadline',
       date: '2026-09-20',
+      endDate: '2026-09-24',
+      category: 'deadline',
+      venue: 'Departmental Chairman Offices & Campus Portal',
+      details:
+        'Final window to add or drop elective courses and lock credit hours with departmental advisor approval.',
     },
     {
-      term: 'Postgraduate & Exam Cycle',
-      event: 'M.Sc. / M.Engg. Admissions (CSE/ICE) & Exam Form Fill-up',
+      term: 'Academic Session 2025–2026 (Sem-I)',
+      event: 'Mid-Term Continuous Assessments',
+      date: '2026-10-04',
+      endDate: '2026-10-12',
+      category: 'exam',
+      venue: 'Departmental Lecture Rooms & Wazed Engineering Bhaban',
+      details:
+        'Scheduled mid-semester written assessments, laboratory quizzes, and continuous evaluation milestones.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Durga Puja & Autumn Academic Recess',
+      date: '2026-10-19',
+      endDate: '2026-10-22',
+      category: 'holiday',
+      venue: 'All Academic & Administrative Wings Closed',
+      details:
+        'Scheduled national holiday and autumn recess; essential Residential Hall and Medical Center duties remain operational.',
+    },
+    {
+      term: 'Semester-I Final Cycle',
+      event: 'Exam Form Fill-Up & Hall Dues Clearance Deadline',
       date: '2026-11-16',
+      endDate: '2026-11-30',
+      category: 'deadline',
+      venue: 'Controller of Examinations & PUST Campus Portal',
+      details:
+        'Mandatory deadline to clear Residential Hall dues, pay exam fees, and secure Chairman verification for digital Admit Cards.',
     },
     {
-      term: 'Semester-I Final Examinations',
-      event: 'Term-End Final Examinations Across 21 Departments',
+      term: 'Semester-I Final Cycle',
+      event: 'Thesis & Final-Year Project Proposal Submission Deadline',
+      date: '2026-12-01',
+      category: 'deadline',
+      venue: 'Respective Department Research Committees',
+      details:
+        'Final submission date for 4th-year undergraduate thesis synopses and M.Sc./M.Engg. research proposals.',
+    },
+    {
+      term: 'Seminars & Quality Assurance',
+      event: 'Outcome-Based Education (OBE) & Digital Assessment Symposium',
+      date: '2026-12-03',
+      category: 'academic',
+      venue: 'Central Auditorium · IQAC & ICT Cell',
+      details:
+        'Faculty and scholar symposium reviewing OBE curriculum attainment metrics and automated examination workflows.',
+    },
+    {
+      term: 'Semester-I Final Cycle',
+      event: 'Semester-I Term-End Final Examinations (21 Departments)',
       date: '2026-12-06',
+      endDate: '2026-12-21',
+      category: 'exam',
+      venue: 'Academic Building I & Wazed Engineering Bhaban',
+      details:
+        'Term-end written, studio, and practical examinations across all 5 faculties. Digital Admit Cards are required at examination halls.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Victory Day (National Holiday & Campus Observance)',
+      date: '2026-12-16',
+      category: 'holiday',
+      venue: 'Independence Plaza & Administrative Promenade',
+      details:
+        'National holiday observing Victory Day with ceremonial flag hoisting and floral tribute at the university memorial.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Winter Vacation & Christmas Recess',
+      date: '2026-12-22',
+      endDate: '2026-12-31',
+      category: 'holiday',
+      venue: 'University Campus (Rajapur, Pabna)',
+      details:
+        'Post-examination winter break across all undergraduate and postgraduate classes prior to Semester-II reopening.',
+    },
+    {
+      term: 'Academic Session 2025–2026 (Sem-II)',
+      event: 'Semester-II Classes Begin & Enrollment Opens',
+      date: '2027-01-03',
+      category: 'academic',
+      venue: 'All 5 Faculties & 21 Departments',
+      details:
+        'Formal commencement of Semester-II teaching schedules and opening of portal course enrollment.',
+    },
+    {
+      term: 'Academic Session 2025–2026 (Sem-II)',
+      event: 'Semester-II Course Registration & Tuition Fee Deadline',
+      date: '2027-01-18',
+      category: 'deadline',
+      venue: 'Office of the Treasurer & Campus Portal',
+      details:
+        'Last day for Semester-II course registration without late surcharge and settlement of semester tuition dues.',
+    },
+    {
+      term: 'Financial Aid & Merit Cycle',
+      event: 'Merit Scholarship & Dean’s List Application Deadline',
+      date: '2027-01-25',
+      category: 'deadline',
+      venue: 'Student Advisor Office & Faculty Deans',
+      details:
+        'Closing date for UGC stipend, PUST Merit Scholarship, and Residential Fee Waiver applications.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Shab-e-Barat Holiday (Subject to Lunar Sighting)',
+      date: '2027-02-04',
+      category: 'holiday',
+      venue: 'All Academic & Administrative Offices Closed',
+      details:
+        'Scheduled university holiday for Shab-e-Barat; classes and administrative counters remain closed.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Shaheed Dibosh & International Mother Language Day',
+      date: '2027-02-21',
+      category: 'holiday',
+      venue: 'Central Shaheed Minar, Rajapur Campus',
+      details:
+        'National holiday and morning Prabhat Pheri honoring the Language Movement martyrs.',
+    },
+    {
+      term: 'Academic Session 2025–2026 (Sem-II)',
+      event: 'Semester-II Mid-Term Examinations',
+      date: '2027-02-22',
+      endDate: '2027-02-28',
+      category: 'exam',
+      venue: 'Academic Building I & Wazed Engineering Bhaban',
+      details:
+        'Mandatory mid-semester assessment week covering core theory and departmental laboratory courses.',
     },
     {
       term: 'Convocation Milestone',
-      event: 'First University Convocation at Rajapur Campus',
+      event: 'First University Convocation at Rajapur Ceremonial Pavilion',
       date: '2027-03-15',
+      category: 'academic',
+      venue: 'Convocation Grounds, Rajapur Campus',
+      details:
+        'Historic First Convocation of PUST conferring degrees upon graduating undergraduate and postgraduate cohorts.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Eid-ul-Fitr & Independence Day Recess',
+      date: '2027-03-19',
+      endDate: '2027-03-27',
+      category: 'holiday',
+      venue: 'All Academic & Administrative Wings Closed',
+      details:
+        'Combined Eid-ul-Fitr vacation (subject to moon sighting) and Bangladesh Independence & National Day on 26 March.',
+    },
+    {
+      term: 'University Holiday',
+      event: 'Pahela Baishakh (Bengali New Year 1434)',
+      date: '2027-04-14',
+      category: 'holiday',
+      venue: 'Campus Quadrangle & Independence Plaza',
+      details:
+        'National cultural holiday celebrating Bengali New Year with campus festivities.',
+    },
+    {
+      term: 'Semester-II Final Cycle',
+      event: 'Semester-II Exam Form Fill-Up & Clearance Deadline',
+      date: '2027-04-25',
+      endDate: '2027-05-03',
+      category: 'deadline',
+      venue: 'Departmental Chairman Offices & Campus Portal',
+      details:
+        'Deadline for final exam form fill-up, hall financial clearance, and digital Admit Card approval.',
+    },
+    {
+      term: 'Semester-II Final Cycle',
+      event: 'Semester-II Term-End Final Examinations',
+      date: '2027-05-09',
+      endDate: '2027-05-24',
+      category: 'exam',
+      venue: 'All Academic Buildings & Departmental Labs',
+      details:
+        'Annual term-end examinations concluding Academic Session 2025–2026 prior to summer result publication.',
     },
   ],
   scholarships: [

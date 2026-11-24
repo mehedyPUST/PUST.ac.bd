@@ -36,7 +36,7 @@ const STATIC_RESOURCE_ENRICHMENTS: Partial<Record<string, string>> = {
   '/academics/programs': 'undergraduate bsc ba bba bpharm barch graduate msc ma mba mpa degree credit curriculum',
   '/academics/faculty': '5 faculties engineering science business humanities social science life earth deans',
   '/academics/forms-download': 'forms download fillable form print html transcript testimonial temporary certificate id card readmission clearance syllabus',
-  '/academics/calendar': 'academic calendar 2026 ics export add to calendar semester exam schedule classes vacation holiday',
+  '/academics/calendar': 'academic calendar 2026 2027 ics export add to calendar semester exam schedule deadlines midterm final classes vacation holiday',
   '/academics/scholarship': 'scholarship stipend fellowship merit need financial aid waiver tuition',
   '/academics/seminars': 'seminars workshops colloquium conference symposium research event iqac ics calendar',
   '/academics/deans': 'all deans faculty leadership dean.et dean.s dean.bs dean.hss dean.les email',

@@ -29,6 +29,7 @@ import {
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
+import { AcademicCalendarHighlights, AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
 import { CardsGridSkeleton } from './PustSkeletons';
@@ -204,8 +205,6 @@ export function PublicSubPages({
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormItem | null>(null);
   const [formFieldValues, setFormFieldValues] = useState<Record<string, string>>({});
-  const [calendarTermFilter, setCalendarTermFilter] = useState<string>('All Terms');
-  const [calendarQuery, setCalendarQuery] = useState<string>('');
   const [chairmanFacultyFilter, setChairmanFacultyFilter] = useState<'All' | FacultyName>('All');
   const [chairmanQuery, setChairmanQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
@@ -784,138 +783,7 @@ export function PublicSubPages({
               </div>
             </div>
           ) : route === '/academics/calendar' ? (
-            (() => {
-              const calendarItems = resolved.academicExtras.academicCalendar;
-              const termOptions = [
-                'All Terms',
-                ...Array.from(new Set(calendarItems.map((c) => c.term))),
-              ];
-              const qCal = calendarQuery.trim().toLowerCase();
-              const visibleCalendar = calendarItems.filter((row) => {
-                const matchesTerm =
-                  calendarTermFilter === 'All Terms' || row.term === calendarTermFilter;
-                const matchesQuery =
-                  !qCal ||
-                  row.event.toLowerCase().includes(qCal) ||
-                  row.term.toLowerCase().includes(qCal) ||
-                  row.date.toLowerCase().includes(qCal);
-                return matchesTerm && matchesQuery;
-              });
-
-              return (
-                <div className="editable-region space-y-5">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex flex-wrap gap-1.5">
-                      {termOptions.map((term) => (
-                        <button
-                          key={term}
-                          type="button"
-                          onClick={() => setCalendarTermFilter(term)}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            calendarTermFilter === term
-                              ? 'bg-pust-900 text-white'
-                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
-                          }`}
-                        >
-                          {term}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                      <EditTriggerButton
-                        target={{ kind: 'academic-calendar' }}
-                        label="Edit Calendar"
-                        variant="compact"
-                      />
-                      <div className="relative w-full sm:w-56">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <input
-                          type="search"
-                          value={calendarQuery}
-                          onChange={(e) => setCalendarQuery(e.target.value)}
-                          placeholder="Search dates or events..."
-                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          downloadIcsCalendar(
-                            visibleCalendar.map((row, idx) => ({
-                              uid: `pust-cal-${idx}-${row.date}`,
-                              title: row.event,
-                              date: row.date,
-                              description: `PUST Academic Calendar — ${row.term}`,
-                            })),
-                            'PUST-Academic-Calendar.ics'
-                          )
-                        }
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
-                      >
-                        <CalendarPlus className="w-3.5 h-3.5" />
-                        Export All (.ics)
-                      </button>
-                    </div>
-                  </div>
-
-                  {visibleCalendar.length === 0 ? (
-                    <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-2">
-                      <p className="text-sm text-slate-600">
-                        No academic calendar events match your filter criteria.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCalendarTermFilter('All Terms');
-                          setCalendarQuery('');
-                        }}
-                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
-                      >
-                        Reset Calendar Filters
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-                      {visibleCalendar.map((row, idx) => (
-                        <div
-                          key={`${row.event}-${idx}`}
-                          className="p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center"
-                        >
-                          <p className="sm:col-span-2 font-mono text-xs text-pust-800 tabular-nums">
-                            {row.date}
-                          </p>
-                          <p className="sm:col-span-5 font-medium text-slate-900">{row.event}</p>
-                          <p className="sm:col-span-3 text-xs text-slate-600">{row.term}</p>
-                          <div className="sm:col-span-2 flex sm:justify-end">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                downloadIcsCalendar(
-                                  [
-                                    {
-                                      uid: `pust-cal-${idx}-${row.date}`,
-                                      title: row.event,
-                                      date: row.date,
-                                      description: `PUST Academic Calendar — ${row.term}`,
-                                    },
-                                  ],
-                                  `PUST-${row.date}.ics`
-                                )
-                              }
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
-                            >
-                              <CalendarPlus className="w-3.5 h-3.5" />
-                              Add (.ics)
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()
+            <AcademicCalendarView items={resolved.academicExtras.academicCalendar} />
           ) : route === '/academics/scholarship' ? (
             <div className="editable-region space-y-4">
               <div className="flex justify-end empty:hidden">
@@ -1286,6 +1154,8 @@ export function PublicSubPages({
                   ))}
                 </div>
               )}
+
+              <AcademicCalendarHighlights items={resolved.academicExtras.academicCalendar} />
             </div>
           )}
         </section>
