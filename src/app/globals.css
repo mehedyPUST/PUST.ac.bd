@@ -34,14 +34,13 @@
     text-wrap: balance;
   }
 
-  @media (min-width: 640px) {
-    p,
-    li,
-    blockquote,
-    figcaption,
-    dd {
-      text-align: justify;
-    }
+  p,
+  li,
+  blockquote,
+  figcaption,
+  dd {
+    text-align: justify;
+    text-justify: inter-word;
   }
 
   .text-center p,
