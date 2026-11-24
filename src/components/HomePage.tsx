@@ -6,16 +6,24 @@ import {
   ArrowRight,
   ArrowUpRight,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   FileCheck2,
   PlayCircle,
   ShieldCheck,
   X,
 } from 'lucide-react';
+import {
+  getYouTubeEmbedUrl,
+  getYouTubeThumbnailUrl,
+  parseYouTubeVideoId,
+} from '../lib/media';
 import type { AppRoute } from '../lib/routes';
 import { HeroSummarySkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
   AboutContentRecord,
+  BannerSlideRecord,
   GalleryItemRecord,
   NoticeRecord,
   PublicationRecord,
@@ -28,6 +36,7 @@ const VC_PORTRAIT_FALLBACK = 'https://pust.ac.bd/includes/images/messages_pic/VC
 
 interface HomePageProps {
   heroImage: string;
+  bannerSlides?: BannerSlideRecord[];
   profile: UniversityProfile | null;
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
@@ -79,6 +88,7 @@ const UPCOMING_CAMPUS_EVENTS = [
 
 export function HomePage({
   heroImage,
+  bannerSlides = [],
   profile,
   aboutSections,
   vcProfiles,
@@ -94,6 +104,42 @@ export function HomePage({
   const [eventCategory, setEventCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
+
+  const slides = useMemo<BannerSlideRecord[]>(() => {
+    if (bannerSlides.length > 0) return bannerSlides;
+    return [
+      {
+        id: 'default-banner',
+        imageUrl: heroImage,
+        caption: 'Fig. 1 — Main Academic Promenade and Campus Grounds, Rajapur Campus, Pabna.',
+        alt: 'Pabna University of Science and Technology Rajapur campus academic complex',
+        orderIndex: 1,
+      },
+    ];
+  }, [bannerSlides, heroImage]);
+
+  const [activeSlideIdx, setActiveSlideIdx] = useState(0);
+  const [bannerPaused, setBannerPaused] = useState(false);
+
+  useEffect(() => {
+    setActiveSlideIdx((prev) => (prev >= slides.length ? 0 : prev));
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (slides.length <= 1 || bannerPaused) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setActiveSlideIdx((prev) => (prev + 1) % slides.length);
+    }, 5500);
+    return () => window.clearInterval(timer);
+  }, [slides.length, bannerPaused]);
+
+  const currentSlide = slides[activeSlideIdx] || slides[0];
 
   useEffect(() => {
     if (!activeMedia) return;
@@ -197,16 +243,92 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="lg:col-span-6">
-              <ResilientImage
-                src={heroImage}
-                fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
-                alt="Pabna University of Science and Technology Rajapur campus academic complex"
-                caption="Fig. 1 — Main Academic Promenade and Campus Grounds, Rajapur Campus, Pabna."
-                containerClassName="h-full flex flex-col"
-                className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
-                priority
-              />
+            <div
+              className="lg:col-span-6 flex flex-col"
+              onMouseEnter={() => setBannerPaused(true)}
+              onMouseLeave={() => setBannerPaused(false)}
+              onFocusCapture={() => setBannerPaused(true)}
+              onBlurCapture={() => setBannerPaused(false)}
+            >
+              <div className="relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+                <ResilientImage
+                  key={currentSlide.id}
+                  src={currentSlide.imageUrl}
+                  fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
+                  alt={
+                    currentSlide.alt ||
+                    currentSlide.caption ||
+                    'Pabna University of Science and Technology campus banner'
+                  }
+                  containerClassName="w-full h-full"
+                  className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
+                  priority
+                />
+
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-transparent pt-12 pb-3.5 px-4 sm:px-5 text-white pointer-events-none">
+                  <div className="flex items-end justify-between gap-4">
+                    <p className="text-xs sm:text-sm font-serif italic text-white/95 leading-snug line-clamp-2">
+                      {currentSlide.caption}
+                    </p>
+                    {slides.length > 1 && (
+                      <span className="font-mono text-[11px] tabular-nums text-white/80 shrink-0">
+                        {String(activeSlideIdx + 1).padStart(2, '0')} /{' '}
+                        {String(slides.length).padStart(2, '0')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {slides.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
+                      }
+                      aria-label="Previous banner slide"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-950/55 text-white hover:bg-slate-950/80 transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
+                      aria-label="Next banner slide"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-950/55 text-white hover:bg-slate-950/80 transition-colors cursor-pointer"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {slides.length > 1 && (
+                <div
+                  className="mt-2.5 flex items-center justify-between gap-3"
+                  aria-label="Banner slide controls"
+                >
+                  <div className="flex items-center gap-1.5">
+                    {slides.map((s, idx) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setActiveSlideIdx(idx)}
+                        aria-label={`View slide ${idx + 1}: ${s.caption}`}
+                        aria-current={idx === activeSlideIdx ? 'true' : undefined}
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          idx === activeSlideIdx
+                            ? 'w-7 bg-pust-900'
+                            : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="font-mono text-[11px] text-slate-500 truncate">
+                    {bannerPaused ? 'Paused' : 'Auto-sliding'} · {slides.length} Campus Photos
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -727,37 +849,46 @@ export function HomePage({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visibleEvents.slice(0, 4).map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveMedia(item)}
-                className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
-              >
-                <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
-                  <ResilientImage
-                    src={item.mediaUrl}
-                    alt={item.title}
-                    containerClassName="w-full h-full"
-                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                  />
-                  {item.mediaType === 'video' && (
-                    <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
-                      <PlayCircle className="w-10 h-10" />
-                    </span>
-                  )}
-                </div>
-                <div className="p-4 space-y-1 flex-1">
-                  <p className="font-mono text-[11px] text-pust-800 tabular-nums">
-                    {item.category} · {item.mediaType.toUpperCase()} · {item.eventDate}
-                  </p>
-                  <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
-                </div>
-              </button>
-            ))}
+            {visibleEvents.slice(0, 4).map((item) => {
+              const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+              const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveMedia(item)}
+                  className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
+                >
+                  <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
+                    <ResilientImage
+                      src={thumbUrl}
+                      fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
+                      alt={item.title}
+                      containerClassName="w-full h-full"
+                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                    />
+                    {item.mediaType === 'video' && (
+                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
+                        <PlayCircle className="w-10 h-10" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4 space-y-1 flex-1">
+                    <p className="font-mono text-[11px] text-pust-800 tabular-nums">
+                      {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
+                      {item.eventDate}
+                      {item.visibility === 'registered' && (
+                        <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+                      )}
+                    </p>
+                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Scheduled University Seminars & Milestones */}
@@ -790,49 +921,63 @@ export function HomePage({
       </section>
 
       {/* Media Preview Modal */}
-      {activeMedia && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
-          onClick={() => setActiveMedia(null)}
-        >
+      {activeMedia && (() => {
+        const activeYtId =
+          activeMedia.mediaType === 'video' ? parseYouTubeVideoId(activeMedia.mediaUrl) : null;
+        return (
           <div
-            className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
+            onClick={() => setActiveMedia(null)}
           >
-            <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
-              <div>
-                <p className="font-mono text-xs text-pust-800 tabular-nums">
-                  {activeMedia.category} · {activeMedia.mediaType.toUpperCase()} ·{' '}
-                  {activeMedia.eventDate}
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
-                  {activeMedia.title}
-                </h3>
+            <div
+              className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
+                <div>
+                  <p className="font-mono text-xs text-pust-800 tabular-nums">
+                    {activeMedia.category} ·{' '}
+                    {activeYtId ? 'YOUTUBE' : activeMedia.mediaType.toUpperCase()} ·{' '}
+                    {activeMedia.eventDate}
+                    {activeMedia.visibility === 'registered' ? ' · REGISTERED MEMBERS ONLY' : ''}
+                  </p>
+                  <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                    {activeMedia.title}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveMedia(null)}
+                  aria-label="Close media modal"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveMedia(null)}
-                aria-label="Close media modal"
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              {activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
-                <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
-              ) : (
-                <ResilientImage
-                  src={activeMedia.mediaUrl}
-                  alt={activeMedia.title}
-                  className="w-full aspect-video object-cover"
-                />
-              )}
-              <p className="text-sm text-slate-700 leading-relaxed">{activeMedia.description}</p>
+              <div className="p-5 space-y-4">
+                {activeYtId ? (
+                  <iframe
+                    src={getYouTubeEmbedUrl(activeYtId)}
+                    title={activeMedia.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                  />
+                ) : activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
+                  <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
+                ) : (
+                  <ResilientImage
+                    src={activeMedia.mediaUrl}
+                    alt={activeMedia.title}
+                    className="w-full aspect-video object-cover"
+                  />
+                )}
+                <p className="text-sm text-slate-700 leading-relaxed">{activeMedia.description}</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </main>
   );
 }

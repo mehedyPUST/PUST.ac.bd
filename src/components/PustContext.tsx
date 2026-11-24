@@ -17,6 +17,7 @@ import { parseRouteFromPath, type AppRoute } from '../lib/routes';
 import type {
   AboutContentRecord,
   AuthUser,
+  BannerSlideRecord,
   BookmarkRecord,
   BootstrapStatus,
   DepartmentRecord,
@@ -39,6 +40,7 @@ interface PustContextValue {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  bannerSlides: BannerSlideRecord[];
   departments: DepartmentRecord[];
   publications: PublicationRecord[];
   notices: NoticeRecord[];
@@ -80,6 +82,7 @@ export interface PustInitialData {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  bannerSlides: BannerSlideRecord[];
   departments: DepartmentRecord[];
   publications: PublicationRecord[];
   notices: NoticeRecord[];
@@ -105,6 +108,9 @@ export function PustShell({
   );
   const [galleryItems, setGalleryItems] = useState<GalleryItemRecord[]>(
     initialData?.galleryItems ?? []
+  );
+  const [bannerSlides, setBannerSlides] = useState<BannerSlideRecord[]>(
+    initialData?.bannerSlides ?? []
   );
   const [departments, setDepartments] = useState<DepartmentRecord[]>(
     initialData?.departments ?? []
@@ -156,8 +162,11 @@ export function PustShell({
       setAboutSections(profileRes.aboutSections);
     }
     setVcProfiles((prev) => mergeVcProfiles(profileRes.vcProfiles, prev));
-    if (Array.isArray(profileRes.galleryItems) && profileRes.galleryItems.length > 0) {
+    if (Array.isArray(profileRes.galleryItems)) {
       setGalleryItems(profileRes.galleryItems);
+    }
+    if (Array.isArray(profileRes.bannerSlides)) {
+      setBannerSlides(profileRes.bannerSlides);
     }
   }, [mergeVcProfiles]);
 
@@ -199,8 +208,11 @@ export function PustShell({
         setVcProfiles((prev) =>
           mergeVcProfiles(profileRes.vcProfiles, initialData?.vcProfiles ?? prev)
         );
-        if (Array.isArray(profileRes.galleryItems) && profileRes.galleryItems.length > 0) {
+        if (Array.isArray(profileRes.galleryItems)) {
           setGalleryItems(profileRes.galleryItems);
+        }
+        if (Array.isArray(profileRes.bannerSlides)) {
+          setBannerSlides(profileRes.bannerSlides);
         }
         setDepartments(deptRes.departments);
         setPublications(pubRes.publications);
@@ -294,6 +306,7 @@ export function PustShell({
       aboutSections,
       vcProfiles,
       galleryItems,
+      bannerSlides,
       departments,
       publications,
       notices,
@@ -318,6 +331,7 @@ export function PustShell({
       aboutSections,
       vcProfiles,
       galleryItems,
+      bannerSlides,
       departments,
       publications,
       notices,

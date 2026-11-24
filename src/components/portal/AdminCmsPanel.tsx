@@ -1,12 +1,32 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { BookOpen, Check, Copy, Pin, PinOff, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import {
+  ArrowDown,
+  ArrowUp,
+  BookOpen,
+  Check,
+  Copy,
+  FileText,
+  Image as ImageIcon,
+  Lock,
+  Pin,
+  PinOff,
+  Trash2,
+  Upload,
+  Video,
+} from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import {
+  detectAttachmentType,
+  getYouTubeThumbnailUrl,
+  parseYouTubeVideoId,
+} from '../../lib/media';
 import type {
   AboutContentRecord,
   AuditLogRecord,
   AuthUser,
+  BannerSlideRecord,
   DepartmentRecord,
   FeeConfig,
   GalleryItemRecord,
@@ -19,6 +39,15 @@ import type {
   SignupTokenRecord,
   ViceChancellorRecord,
 } from '../../types/pust';
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+    reader.onerror = () => reject(new Error('Unable to read selected file.'));
+    reader.readAsDataURL(file);
+  });
+}
 
 const HALL_OPTIONS = [
   'July 06 Hall',
@@ -36,6 +65,7 @@ interface AdminCmsPanelProps {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  bannerSlides?: BannerSlideRecord[];
   notices?: NoticeRecord[];
   onNoticesChange: () => Promise<void>;
   onCmsChange: () => Promise<void>;
@@ -47,6 +77,7 @@ export function AdminCmsPanel({
   aboutSections,
   vcProfiles,
   galleryItems,
+  bannerSlides = [],
   notices = [],
   onNoticesChange,
   onCmsChange,
@@ -146,6 +177,9 @@ export function AdminCmsPanel({
   const [noticeTargetSession, setNoticeTargetSession] = useState('');
   const [noticeTargetCourse, setNoticeTargetCourse] = useState('');
   const [noticeAttachment, setNoticeAttachment] = useState('');
+  const [noticeAttachmentUrl, setNoticeAttachmentUrl] = useState('');
+  const [noticeAttachmentType, setNoticeAttachmentType] = useState<'image' | 'pdf' | 'other' | ''>('');
+  const [uploadingNoticeFile, setUploadingNoticeFile] = useState(false);
   const [noticeSummary, setNoticeSummary] = useState('');
   const [noticeBody, setNoticeBody] = useState('');
   const [noticePinned, setNoticePinned] = useState(false);
@@ -167,13 +201,23 @@ export function AdminCmsPanel({
   const [vcMsg, setVcMsg] = useState(currentVc?.message || '');
   const [promoteNewVc, setPromoteNewVc] = useState(false);
 
-  // Admin Gallery CMS
+  // Admin Hero Banner Slides CMS
+  const [bannerUrl, setBannerUrl] = useState('');
+  const [bannerCaption, setBannerCaption] = useState('');
+  const [bannerAlt, setBannerAlt] = useState('');
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [savingBanner, setSavingBanner] = useState(false);
+  const [bannerCaptionsDraft, setBannerCaptionsDraft] = useState<Record<string, string>>({});
+
+  // Admin Gallery / News & Events CMS
   const [galTitle, setGalTitle] = useState('');
   const [galDesc, setGalDesc] = useState('');
   const [galCat, setGalCat] = useState<GalleryItemRecord['category']>('Academic Event');
   const [galType, setGalType] = useState<GalleryItemRecord['mediaType']>('photo');
+  const [galVisibility, setGalVisibility] = useState<'public' | 'registered'>('public');
   const [galUrl, setGalUrl] = useState('/src/assets/images/pust_campus_hero_1795431408503.jpg');
   const [galDate, setGalDate] = useState('2026-11-20');
+  const [uploadingGalleryPhoto, setUploadingGalleryPhoto] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -292,6 +336,10 @@ export function AdminCmsPanel({
 
     setPublishingNotice(true);
     try {
+      const resolvedUrl = noticeAttachmentUrl.trim() || undefined;
+      const resolvedType = resolvedUrl
+        ? noticeAttachmentType || detectAttachmentType(resolvedUrl || noticeAttachment)
+        : undefined;
       await pustApi.createNotice({
         referenceNo: trimmedRef,
         title: trimmedTitle,
@@ -302,6 +350,8 @@ export function AdminCmsPanel({
         targetSession: noticeTargetSession.trim() || undefined,
         targetCourseCode: noticeTargetCourse.trim() || undefined,
         attachmentName: noticeAttachment.trim() || undefined,
+        attachmentUrl: resolvedUrl,
+        attachmentType: resolvedType,
         summary: trimmedSummary,
         body: trimmedBody,
         pinned: noticePinned,
@@ -312,6 +362,8 @@ export function AdminCmsPanel({
       setNoticeTargetSession('');
       setNoticeTargetCourse('');
       setNoticeAttachment('');
+      setNoticeAttachmentUrl('');
+      setNoticeAttachmentType('');
       setNoticeSummary('');
       setNoticeBody('');
       setNoticePinned(false);
@@ -320,6 +372,36 @@ export function AdminCmsPanel({
       setError(err instanceof Error ? err.message : 'Unable to publish notice.');
     } finally {
       setPublishingNotice(false);
+    }
+  }
+
+  async function handleNoticeFileUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError(null);
+    setFeedback(null);
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Attachment size must be 8 MB or less.');
+      return;
+    }
+    setUploadingNoticeFile(true);
+    try {
+      const dataBase64 = await readFileAsDataUrl(file);
+      const uploaded = await pustApi.uploadMediaToImageKit({
+        purpose: 'notice',
+        fileName: file.name,
+        mimeType: file.type || (file.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'),
+        dataBase64,
+      });
+      setNoticeAttachment(file.name);
+      setNoticeAttachmentUrl(uploaded.url);
+      setNoticeAttachmentType(uploaded.attachmentType);
+      setFeedback(`Uploaded "${file.name}" to ImageKit.io and attached to notice draft.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to upload attachment to ImageKit.io.');
+    } finally {
+      setUploadingNoticeFile(false);
     }
   }
 
@@ -395,22 +477,150 @@ export function AdminCmsPanel({
     }
   }
 
+  async function handleBannerFileUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError(null);
+    setFeedback(null);
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Banner image size must be 8 MB or less.');
+      return;
+    }
+    setUploadingBanner(true);
+    try {
+      const dataBase64 = await readFileAsDataUrl(file);
+      const uploaded = await pustApi.uploadMediaToImageKit({
+        purpose: 'banner',
+        fileName: file.name,
+        mimeType: file.type || 'image/jpeg',
+        dataBase64,
+      });
+      setBannerUrl(uploaded.url);
+      if (!bannerCaption.trim()) {
+        setBannerCaption(file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '));
+      }
+      setFeedback(`Uploaded banner image "${file.name}" to ImageKit.io. Enter caption and click Add Banner Slide.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to upload banner image to ImageKit.io.');
+    } finally {
+      setUploadingBanner(false);
+    }
+  }
+
+  async function handleAddBannerSlide(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setFeedback(null);
+    if (!bannerUrl.trim() || !bannerCaption.trim()) {
+      setError('Upload or enter a banner image URL and photo caption.');
+      return;
+    }
+    setSavingBanner(true);
+    try {
+      await pustApi.createBannerSlide({
+        imageUrl: bannerUrl.trim(),
+        caption: bannerCaption.trim(),
+        alt: bannerAlt.trim() || undefined,
+      });
+      setFeedback('Added new slide to the Homepage Hero Banner carousel.');
+      setBannerUrl('');
+      setBannerCaption('');
+      setBannerAlt('');
+      await onCmsChange();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to add banner slide.');
+    } finally {
+      setSavingBanner(false);
+    }
+  }
+
+  async function handleMoveBannerSlide(index: number, direction: -1 | 1) {
+    const nextIdx = index + direction;
+    if (nextIdx < 0 || nextIdx >= bannerSlides.length) return;
+    setError(null);
+    setFeedback(null);
+    const reordered = [...bannerSlides];
+    const [moved] = reordered.splice(index, 1);
+    reordered.splice(nextIdx, 0, moved);
+    try {
+      await pustApi.reorderBannerSlides(reordered.map((s) => s.id));
+      await onCmsChange();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to reorder banner slides.');
+    }
+  }
+
+  async function handleSaveBannerCaption(slide: BannerSlideRecord) {
+    const nextCaption = (bannerCaptionsDraft[slide.id] ?? slide.caption).trim();
+    if (nextCaption.length < 3) {
+      setError('Banner caption must be at least 3 characters.');
+      return;
+    }
+    setError(null);
+    setFeedback(null);
+    try {
+      await pustApi.updateBannerSlide(slide.id, { caption: nextCaption });
+      setFeedback('Updated banner slide caption.');
+      await onCmsChange();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update banner caption.');
+    }
+  }
+
+  async function handleGalleryPhotoUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError(null);
+    setFeedback(null);
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Photo size must be 8 MB or less.');
+      return;
+    }
+    setUploadingGalleryPhoto(true);
+    try {
+      const dataBase64 = await readFileAsDataUrl(file);
+      const uploaded = await pustApi.uploadMediaToImageKit({
+        purpose: 'gallery',
+        fileName: file.name,
+        mimeType: file.type || 'image/jpeg',
+        dataBase64,
+      });
+      setGalType('photo');
+      setGalUrl(uploaded.url);
+      setFeedback(`Uploaded photo "${file.name}" to ImageKit.io.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to upload photo to ImageKit.io.');
+    } finally {
+      setUploadingGalleryPhoto(false);
+    }
+  }
+
   async function handleAddGallery(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
+    if (galType === 'video' && !parseYouTubeVideoId(galUrl) && !galUrl.trim().match(/\.(mp4|webm)(\?|$)/i)) {
+      setError('Please enter a valid YouTube video URL (e.g. https://www.youtube.com/watch?v=... or https://youtu.be/...).');
+      return;
+    }
     try {
       await pustApi.createGalleryItem({
         title: galTitle,
         description: galDesc,
         category: galCat,
         mediaType: galType,
-        mediaUrl: galUrl,
+        mediaUrl: galUrl.trim(),
         eventDate: galDate,
+        visibility: galVisibility,
       });
-      setFeedback(`Added "${galTitle}" to Homepage Gallery.`);
+      setFeedback(`Added "${galTitle}" (${galVisibility === 'registered' ? 'Registered Users Only' : 'Public'}) to News & Events.`);
       setGalTitle('');
       setGalDesc('');
+      if (galType === 'video') {
+        setGalUrl('');
+      }
       await onCmsChange();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add gallery item.');
@@ -835,17 +1045,69 @@ export function AdminCmsPanel({
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
-              <div>
-                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
-                  Attachment Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={noticeAttachment}
-                  onChange={(e) => setNoticeAttachment(e.target.value)}
-                  placeholder="Optional Attachment Name (e.g. Exam-Schedule-2026.pdf)"
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-                />
+              <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-slate-600 font-semibold">
+                      Official Attachment — Image or PDF (ImageKit.io)
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Upload a circular PDF or image directly to ImageKit.io, or paste an existing file URL.
+                    </p>
+                  </div>
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-slate-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0">
+                    <Upload className="w-3.5 h-3.5" />
+                    {uploadingNoticeFile ? 'Uploading...' : 'Upload Image / PDF'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                      disabled={uploadingNoticeFile}
+                      onChange={handleNoticeFileUpload}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <input
+                    type="text"
+                    value={noticeAttachment}
+                    onChange={(e) => setNoticeAttachment(e.target.value)}
+                    placeholder="Attachment File Label (e.g. Exam-Schedule-2026.pdf)"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                  />
+                  <input
+                    type="url"
+                    value={noticeAttachmentUrl}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNoticeAttachmentUrl(val);
+                      setNoticeAttachmentType(val.trim() ? detectAttachmentType(val) : '');
+                    }}
+                    placeholder="ImageKit / File URL (auto-filled after upload)"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+
+                {(noticeAttachment || noticeAttachmentUrl) && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] font-mono text-slate-700">
+                    <span className="inline-flex items-center gap-1.5 truncate">
+                      <FileText className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                      Ready: {noticeAttachment || noticeAttachmentUrl}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNoticeAttachment('');
+                        setNoticeAttachmentUrl('');
+                        setNoticeAttachmentType('');
+                      }}
+                      className="text-red-700 hover:underline cursor-pointer"
+                    >
+                      Clear Attachment
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
@@ -932,6 +1194,11 @@ export function AdminCmsPanel({
                             <span className="uppercase">· {n.boardScope}</span>
                             {n.visibility === 'registered' && (
                               <span className="font-semibold text-amber-800">· REGISTERED ONLY</span>
+                            )}
+                            {(n.attachmentName || n.attachmentUrl) && (
+                              <span className="text-slate-600">
+                                · FILE: {n.attachmentName || 'Attached'}
+                              </span>
                             )}
                             {n.pinned && (
                               <span className="px-1.5 py-0.5 rounded bg-pust-50 border border-pust-200 text-pust-900 font-semibold">
@@ -1368,95 +1635,362 @@ export function AdminCmsPanel({
             </form>
           </div>
 
+          {/* Homepage Hero Banner Carousel Manager */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
-              Homepage Gallery CMS (Photos &amp; Videos)
-            </h3>
-            <form onSubmit={handleAddGallery} className="space-y-2.5 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-medium text-slate-900">
+                  Homepage Banner Carousel &amp; Photo Captions (ImageKit.io)
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Upload banner photos to ImageKit.io or paste an ImageKit URL. Multiple slides auto-slide on the homepage with captions.
+                </p>
+              </div>
+              <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0">
+                <Upload className="w-3.5 h-3.5" />
+                {uploadingBanner ? 'Uploading to ImageKit...' : 'Upload Banner Image'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  disabled={uploadingBanner}
+                  onChange={handleBannerFileUpload}
+                  className="sr-only"
+                />
+              </label>
+            </div>
+
+            <form onSubmit={handleAddBannerSlide} className="space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Banner Image URL (ImageKit.io / HTTPS)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={bannerUrl}
+                    onChange={(e) => setBannerUrl(e.target.value)}
+                    placeholder="https://ik.imagekit.io/... or upload above"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Photo Caption (Displayed on Slider)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    minLength={3}
+                    value={bannerCaption}
+                    onChange={(e) => setBannerCaption(e.target.value)}
+                    placeholder="e.g. Fig. 5 — Academic Building & Campus Quadrangle"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <input
+                  type="text"
+                  value={bannerAlt}
+                  onChange={(e) => setBannerAlt(e.target.value)}
+                  placeholder="Optional accessibility alt description"
+                  className="flex-1 min-w-[220px] px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+                <button
+                  type="submit"
+                  disabled={savingBanner || uploadingBanner}
+                  className="px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  {savingBanner ? 'Saving Slide...' : 'Add Banner Slide'}
+                </button>
+              </div>
+            </form>
+
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs">
+              {bannerSlides.length === 0 ? (
+                <p className="p-4 text-slate-600 bg-[#F7F7F5]">
+                  No custom slides configured; homepage uses default institutional banner.
+                </p>
+              ) : (
+                bannerSlides.map((slide, idx) => (
+                  <div
+                    key={slide.id}
+                    className="p-3.5 flex flex-col sm:flex-row sm:items-center gap-3 bg-white"
+                  >
+                    <div className="w-24 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
+                      <img
+                        src={slide.imageUrl}
+                        alt={slide.alt || slide.caption}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500 tabular-nums">
+                        Slide {String(idx + 1).padStart(2, '0')} · {slide.imageUrl.slice(0, 64)}
+                        {slide.imageUrl.length > 64 ? '…' : ''}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <input
+                          type="text"
+                          value={bannerCaptionsDraft[slide.id] ?? slide.caption}
+                          onChange={(e) =>
+                            setBannerCaptionsDraft((prev) => ({
+                              ...prev,
+                              [slide.id]: e.target.value,
+                            }))
+                          }
+                          className="flex-1 min-w-[200px] px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveBannerCaption(slide)}
+                          className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+                        >
+                          Save Caption
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveBannerSlide(idx, -1)}
+                        aria-label={`Move slide ${idx + 1} up`}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-700 hover:border-pust-800 disabled:opacity-40 cursor-pointer"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === bannerSlides.length - 1}
+                        onClick={() => handleMoveBannerSlide(idx, 1)}
+                        aria-label={`Move slide ${idx + 1} down`}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-700 hover:border-pust-800 disabled:opacity-40 cursor-pointer"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setError(null);
+                          setFeedback(null);
+                          await pustApi.deleteBannerSlide(slide.id);
+                          setFeedback('Removed banner slide.');
+                          await onCmsChange();
+                        }}
+                        aria-label={`Delete slide ${idx + 1}`}
+                        className="p-1.5 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* News & Events / Gallery CMS (Photos via ImageKit.io, YouTube Videos, Public/Registered Privacy) */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-medium text-slate-900">
+                  News &amp; Events CMS (Photos, YouTube Videos &amp; Privacy)
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Add event photos via ImageKit.io or embed YouTube video links, and control visibility (Public vs Registered Users Only).
+                </p>
+              </div>
+              {galType === 'photo' && (
+                <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0">
+                  <Upload className="w-3.5 h-3.5" />
+                  {uploadingGalleryPhoto ? 'Uploading Photo...' : 'Upload Photo to ImageKit.io'}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    disabled={uploadingGalleryPhoto}
+                    onChange={handleGalleryPhotoUpload}
+                    className="sr-only"
+                  />
+                </label>
+              )}
+            </div>
+
+            <form onSubmit={handleAddGallery} className="space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
                 <input
                   type="text"
                   required
                   value={galTitle}
                   onChange={(e) => setGalTitle(e.target.value)}
-                  placeholder="Event / Media Title"
+                  placeholder="News / Event Title"
                   className="sm:col-span-2 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <select
                   value={galCat}
                   onChange={(e) => setGalCat(e.target.value as GalleryItemRecord['category'])}
-                  className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                 >
                   <option value="Festival">Festival</option>
                   <option value="Academic Event">Academic Event</option>
                   <option value="Convocation">Convocation</option>
                   <option value="Campus Life">Campus Life</option>
                 </select>
-                <div className="grid grid-cols-2 gap-2">
-                  <select
-                    value={galType}
-                    onChange={(e) => setGalType(e.target.value as GalleryItemRecord['mediaType'])}
-                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
-                  >
-                    <option value="photo">Photo</option>
-                    <option value="video">Video</option>
-                  </select>
-                  <input
-                    type="date"
-                    value={galDate}
-                    onChange={(e) => setGalDate(e.target.value)}
-                    className="px-2 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
-                  />
-                </div>
+                <select
+                  value={galType}
+                  onChange={(e) => {
+                    const nextType = e.target.value as GalleryItemRecord['mediaType'];
+                    setGalType(nextType);
+                    if (nextType === 'video' && galUrl.startsWith('/src/assets/')) {
+                      setGalUrl('');
+                    } else if (nextType === 'photo' && !galUrl.trim()) {
+                      setGalUrl('/src/assets/images/pust_campus_hero_1795431408503.jpg');
+                    }
+                  }}
+                  className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                >
+                  <option value="photo">Photo</option>
+                  <option value="video">YouTube Video</option>
+                </select>
+                <select
+                  value={galVisibility}
+                  onChange={(e) => setGalVisibility(e.target.value as 'public' | 'registered')}
+                  aria-label="News and Events Privacy"
+                  className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                >
+                  <option value="public">Public (Everyone)</option>
+                  <option value="registered">Registered Users Only</option>
+                </select>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
                 <input
                   type="text"
                   required
                   value={galUrl}
                   onChange={(e) => setGalUrl(e.target.value)}
-                  placeholder="Image / Video Asset URL"
-                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  placeholder={
+                    galType === 'video'
+                      ? 'YouTube Link (https://www.youtube.com/watch?v=... or https://youtu.be/...)'
+                      : 'Photo URL (upload above to ImageKit.io or paste URL)'
+                  }
+                  className="sm:col-span-5 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="text"
                   required
                   value={galDesc}
                   onChange={(e) => setGalDesc(e.target.value)}
-                  placeholder="Description"
-                  className="px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  placeholder="Event summary / description"
+                  className="sm:col-span-5 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+                <input
+                  type="date"
+                  value={galDate}
+                  onChange={(e) => setGalDate(e.target.value)}
+                  className="sm:col-span-2 px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                 />
               </div>
+
+              {galType === 'video' && galUrl.trim() && (
+                <div className="text-[11px] font-mono">
+                  {parseYouTubeVideoId(galUrl) ? (
+                    <span className="text-emerald-800">
+                      Valid YouTube video detected (ID: {parseYouTubeVideoId(galUrl)}) — thumbnail &amp; player ready.
+                    </span>
+                  ) : (
+                    <span className="text-amber-800">
+                      Paste a standard YouTube watch, youtu.be, or Shorts link for embedded playback.
+                    </span>
+                  )}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                disabled={uploadingGalleryPhoto}
+                className="px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer whitespace-nowrap shrink-0"
               >
-                Add Gallery Item
+                Publish to News &amp; Events
               </button>
             </form>
 
-            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-56 overflow-y-auto">
-              {galleryItems.map((item) => (
-                <div key={item.id} className="p-3 flex items-center justify-between gap-2 bg-white">
-                  <div>
-                    <p className="font-medium text-slate-900">{item.title}</p>
-                    <p className="font-mono text-slate-500">
-                      {item.category} · {item.mediaType} · {item.eventDate}
-                    </p>
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-72 overflow-y-auto">
+              {galleryItems.map((item) => {
+                const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+                const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+                const isRegisteredOnly = item.visibility === 'registered';
+                return (
+                  <div key={item.id} className="p-3 flex flex-wrap items-center justify-between gap-3 bg-white">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-16 h-11 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 shrink-0 flex items-center justify-center">
+                        <img
+                          src={thumbUrl}
+                          alt={item.title}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-900 truncate">{item.title}</p>
+                        <p className="font-mono text-slate-500 flex flex-wrap items-center gap-1.5">
+                          <span className="inline-flex items-center gap-1">
+                            {item.mediaType === 'video' ? (
+                              <Video className="w-3 h-3 text-pust-800" />
+                            ) : (
+                              <ImageIcon className="w-3 h-3 text-pust-800" />
+                            )}
+                            {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()}
+                          </span>
+                          <span>· {item.category}</span>
+                          <span>· {item.eventDate}</span>
+                          <span
+                            className={`font-semibold ${
+                              isRegisteredOnly ? 'text-amber-800' : 'text-emerald-800'
+                            }`}
+                          >
+                            · {isRegisteredOnly ? 'REGISTERED ONLY' : 'PUBLIC'}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setError(null);
+                          setFeedback(null);
+                          const nextVis = isRegisteredOnly ? 'public' : 'registered';
+                          await pustApi.updateGalleryItem(item.id, { visibility: nextVis });
+                          setFeedback(
+                            `Set "${item.title}" to ${
+                              nextVis === 'registered' ? 'Registered Users Only' : 'Public'
+                            }.`
+                          );
+                          await onCmsChange();
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
+                      >
+                        <Lock className="w-3 h-3" />
+                        {isRegisteredOnly ? 'Make Public' : 'Set Reg. Only'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await pustApi.deleteGalleryItem(item.id);
+                          await onCmsChange();
+                        }}
+                        className="p-1.5 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer"
+                        aria-label={`Remove ${item.title}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await pustApi.deleteGalleryItem(item.id);
-                      await onCmsChange();
-                    }}
-                    className="p-1.5 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer"
-                    aria-label={`Remove ${item.title}`}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

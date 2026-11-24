@@ -1,8 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Bookmark, Check, Printer, Trash2, X } from 'lucide-react';
+import {
+  Bookmark,
+  Check,
+  ExternalLink,
+  FileDown,
+  FileText,
+  Printer,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { detectAttachmentType, isSafeMediaUrl } from '../lib/media';
 import type { AuthUser, NoticeRecord } from '../types/pust';
 
 interface NoticeModalProps {
@@ -24,6 +34,12 @@ export function NoticeModal({
   onDeleteNotice,
   onOpenPortal,
 }: NoticeModalProps) {
+  const [showInlinePdf, setShowInlinePdf] = useState(false);
+
+  useEffect(() => {
+    setShowInlinePdf(false);
+  }, [notice?.id]);
+
   useEffect(() => {
     if (!notice) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -34,6 +50,13 @@ export function NoticeModal({
   }, [notice, onClose]);
 
   if (!notice) return null;
+
+  const safeAttachmentUrl =
+    notice.attachmentUrl && isSafeMediaUrl(notice.attachmentUrl) ? notice.attachmentUrl : null;
+  const attachmentKind = detectAttachmentType(
+    safeAttachmentUrl || notice.attachmentName || '',
+    notice.attachmentType
+  );
 
   return (
     <div
@@ -98,9 +121,72 @@ export function NoticeModal({
           <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-line">
             {notice.body}
           </p>
-          {notice.attachmentName && (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-mono text-slate-700">
-              Official Attachment: {notice.attachmentName}
+
+          {(notice.attachmentName || safeAttachmentUrl) && (
+            <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText className="w-4 h-4 text-pust-800 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                      Official Attachment{attachmentKind === 'pdf' ? ' (PDF)' : attachmentKind === 'image' ? ' (Image)' : ''}
+                    </p>
+                    <p className="text-xs font-mono font-medium text-slate-900 truncate">
+                      {notice.attachmentName || 'Circular Document'}
+                    </p>
+                  </div>
+                </div>
+                {safeAttachmentUrl && (
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    {attachmentKind === 'pdf' && (
+                      <button
+                        type="button"
+                        onClick={() => setShowInlinePdf((prev) => !prev)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
+                      >
+                        {showInlinePdf ? 'Hide Preview' : 'Preview PDF'}
+                      </button>
+                    )}
+                    <a
+                      href={safeAttachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap"
+                    >
+                      {attachmentKind === 'pdf' ? (
+                        <>
+                          <FileDown className="w-3.5 h-3.5" />
+                          Open / Download PDF
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Open Full File
+                        </>
+                      )}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {safeAttachmentUrl && attachmentKind === 'image' && (
+                <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                  <img
+                    src={safeAttachmentUrl}
+                    alt={notice.attachmentName || notice.title}
+                    referrerPolicy="no-referrer"
+                    className="w-full max-h-96 object-contain"
+                  />
+                </div>
+              )}
+
+              {safeAttachmentUrl && attachmentKind === 'pdf' && showInlinePdf && (
+                <iframe
+                  src={safeAttachmentUrl}
+                  title={notice.attachmentName || notice.title}
+                  className="w-full h-96 rounded-lg border border-slate-200 bg-white"
+                />
+              )}
             </div>
           )}
 

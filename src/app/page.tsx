@@ -12,6 +12,7 @@ export default function Home() {
     aboutSections,
     vcProfiles,
     galleryItems,
+    bannerSlides,
     publications,
     notices,
     navigateTo,
@@ -21,6 +22,7 @@ export default function Home() {
   return (
     <HomePage
       heroImage={OFFICIAL_BANNER_IMAGE}
+      bannerSlides={bannerSlides}
       profile={profile}
       aboutSections={aboutSections}
       vcProfiles={vcProfiles}

@@ -134,6 +134,8 @@ export interface NoticeRecord {
   summary: string;
   body: string;
   attachmentName?: string;
+  attachmentUrl?: string;
+  attachmentType?: 'image' | 'pdf' | 'other';
   pinned?: boolean;
   authorName: string;
   authorRole: UserRole;
@@ -371,6 +373,16 @@ export interface GalleryItemRecord {
   mediaType: 'photo' | 'video';
   mediaUrl: string;
   eventDate: string;
+  visibility?: 'public' | 'registered';
+}
+
+export interface BannerSlideRecord {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  alt?: string;
+  orderIndex: number;
+  updatedAt?: string;
 }
 
 export interface AboutContentRecord {

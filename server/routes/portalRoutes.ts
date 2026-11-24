@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { requireAuth, requireRoles, type AuthenticatedRequest } from '../auth';
 import { pustRepo } from '../db';
+import { isSafeMediaUrl } from '../../src/lib/media';
 import type { ClearanceOfficeKey, OfficeClearanceState, UserRole } from '../../src/types/pust';
 
 export const portalRouter = Router();
@@ -183,8 +184,54 @@ const galleryCreateSchema = z.object({
   description: z.string().trim().min(5).max(400),
   category: z.enum(['Festival', 'Academic Event', 'Convocation', 'Campus Life']),
   mediaType: z.enum(['photo', 'video']),
-  mediaUrl: z.string().trim().min(5).max(500),
+  mediaUrl: z
+    .string()
+    .trim()
+    .min(5)
+    .max(800)
+    .refine(isSafeMediaUrl, 'Media URL must be a valid https://, http://, or local asset path.'),
   eventDate: z.string().trim().min(8).max(20),
+  visibility: z.enum(['public', 'registered']).default('public'),
+});
+
+const galleryUpdateSchema = z.object({
+  title: z.string().trim().min(3).max(140).optional(),
+  description: z.string().trim().min(5).max(400).optional(),
+  visibility: z.enum(['public', 'registered']).optional(),
+});
+
+const bannerCreateSchema = z.object({
+  imageUrl: z
+    .string()
+    .trim()
+    .min(5)
+    .max(800)
+    .refine(isSafeMediaUrl, 'Banner image URL must be a valid https://, http://, or local asset path.'),
+  caption: z.string().trim().min(3).max(240),
+  alt: z.string().trim().max(180).optional(),
+});
+
+const bannerUpdateSchema = z.object({
+  imageUrl: z
+    .string()
+    .trim()
+    .min(5)
+    .max(800)
+    .refine(isSafeMediaUrl, 'Banner image URL must be a valid https://, http://, or local asset path.')
+    .optional(),
+  caption: z.string().trim().min(3).max(240).optional(),
+  alt: z.string().trim().max(180).optional(),
+});
+
+const bannerReorderSchema = z.object({
+  orderedIds: z.array(z.string().trim().min(1).max(80)).min(1).max(20),
+});
+
+const mediaUploadSchema = z.object({
+  purpose: z.enum(['banner', 'notice', 'gallery']),
+  fileName: z.string().trim().min(1).max(160),
+  mimeType: z.string().trim().min(3).max(100),
+  dataBase64: z.string().min(8).max(14_000_000),
 });
 
 const paymentGatewaySchema = z.object({
@@ -1596,14 +1643,214 @@ portalRouter.put(
   }
 );
 
+const ALLOWED_IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const ALLOWED_NOTICE_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf',
+]);
+const NOTICE_PUBLISHER_ROLES = new Set<UserRole>([
+  'admin',
+  'registrar',
+  'vc',
+  'chairman',
+  'teacher',
+  'proctor',
+  'library',
+  'hall',
+]);
+
+portalRouter.post('/media/upload', requireAuth, async (req: AuthenticatedRequest, res) => {
+  const parsed = mediaUploadSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Provide a valid file payload, MIME type, and upload purpose.' });
+    return;
+  }
+
+  const { purpose, fileName, mimeType, dataBase64 } = parsed.data;
+  const actor = req.authUser!;
+
+  if ((purpose === 'banner' || purpose === 'gallery') && actor.role !== 'admin') {
+    res.status(403).json({ error: 'Only Admin Office may upload homepage banner or gallery media.' });
+    return;
+  }
+  if (purpose === 'notice' && !NOTICE_PUBLISHER_ROLES.has(actor.role)) {
+    res.status(403).json({ error: 'Your role is not authorized to upload notice attachments.' });
+    return;
+  }
+
+  const normalizedMime = mimeType.toLowerCase();
+  const allowedMimes = purpose === 'notice' ? ALLOWED_NOTICE_MIMES : ALLOWED_IMAGE_MIMES;
+  if (!allowedMimes.has(normalizedMime)) {
+    res.status(400).json({
+      error:
+        purpose === 'notice'
+          ? 'Unsupported attachment format. Upload a JPG, PNG, WebP, GIF image or PDF file.'
+          : 'Unsupported image format. Upload a JPG, PNG, WebP, or GIF image.',
+    });
+    return;
+  }
+
+  const rawBase64 = dataBase64.includes(',') ? dataBase64.split(',').pop() || '' : dataBase64;
+  const fileBuffer = Buffer.from(rawBase64, 'base64');
+  if (fileBuffer.byteLength === 0 || fileBuffer.byteLength > 8 * 1024 * 1024) {
+    res.status(400).json({ error: 'Uploaded file must be between 1 byte and 8 MB.' });
+    return;
+  }
+
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY?.trim();
+  if (!privateKey) {
+    res.status(503).json({
+      error:
+        'ImageKit.io is not configured yet. Add IMAGEKIT_PRIVATE_KEY in environment secrets, or paste an existing ImageKit URL.',
+    });
+    return;
+  }
+
+  const safeFileName =
+    fileName
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 120) || `pust-${purpose}-${Date.now()}`;
+
+  try {
+    const form = new FormData();
+    form.append('file', new Blob([fileBuffer], { type: normalizedMime }), safeFileName);
+    form.append('fileName', safeFileName);
+    form.append('folder', `/pust/${purpose}`);
+    form.append('useUniqueFileName', 'true');
+
+    const ikRes = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
+      },
+      body: form,
+    });
+
+    const ikData = (await ikRes.json().catch(() => ({}))) as {
+      url?: string;
+      fileId?: string;
+      name?: string;
+      message?: string;
+    };
+
+    if (!ikRes.ok || !ikData.url) {
+      res.status(502).json({
+        error: ikData.message || `ImageKit.io upload failed (HTTP ${ikRes.status}).`,
+      });
+      return;
+    }
+
+    await pustRepo.logAudit(
+      actor.name,
+      actor.role,
+      `Uploaded ${purpose} asset to ImageKit.io`,
+      ikData.name || safeFileName
+    );
+
+    res.status(201).json({
+      url: ikData.url,
+      fileId: ikData.fileId || '',
+      name: ikData.name || safeFileName,
+      mimeType: normalizedMime,
+      attachmentType: normalizedMime === 'application/pdf' ? 'pdf' : 'image',
+    });
+  } catch (err) {
+    res.status(502).json({
+      error: err instanceof Error ? err.message : 'Unable to reach ImageKit.io upload API.',
+    });
+  }
+});
+
+portalRouter.post('/cms/banners', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const parsed = bannerCreateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0]?.message || 'Provide a valid banner image URL and caption.' });
+    return;
+  }
+  const slide = await pustRepo.createBannerSlide(parsed.data);
+  const bannerSlides = await pustRepo.listBannerSlides();
+  await pustRepo.logAudit(req.authUser!.name, 'admin', 'Added homepage banner slide', slide.caption.slice(0, 60));
+  res.status(201).json({ slide, bannerSlides });
+});
+
+portalRouter.patch('/cms/banners/reorder', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const parsed = bannerReorderSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Provide a valid ordered list of banner slide IDs.' });
+    return;
+  }
+  const bannerSlides = await pustRepo.reorderBannerSlides(parsed.data.orderedIds);
+  await pustRepo.logAudit(req.authUser!.name, 'admin', 'Reordered homepage banner slides', `${bannerSlides.length} slides`);
+  res.json({ bannerSlides });
+});
+
+portalRouter.patch('/cms/banners/:id', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const parsed = bannerUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid banner slide update payload.' });
+    return;
+  }
+  const slide = await pustRepo.updateBannerSlide(String(req.params.id), parsed.data);
+  if (!slide) {
+    res.status(404).json({ error: 'Banner slide not found.' });
+    return;
+  }
+  const bannerSlides = await pustRepo.listBannerSlides();
+  await pustRepo.logAudit(req.authUser!.name, 'admin', 'Updated homepage banner slide', slide.caption.slice(0, 60));
+  res.json({ slide, bannerSlides });
+});
+
+portalRouter.delete('/cms/banners/:id', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const deleted = await pustRepo.deleteBannerSlide(String(req.params.id));
+  if (!deleted) {
+    res.status(404).json({ error: 'Banner slide not found.' });
+    return;
+  }
+  const bannerSlides = await pustRepo.listBannerSlides();
+  await pustRepo.logAudit(req.authUser!.name, 'admin', 'Removed homepage banner slide', String(req.params.id));
+  res.json({ deleted: true, bannerSlides });
+});
+
 portalRouter.post('/cms/gallery', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
   const parsed = galleryCreateSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: 'Complete all gallery media fields.' });
+    res.status(400).json({
+      error: parsed.error.issues[0]?.message || 'Complete all News & Events media fields.',
+    });
     return;
   }
   const item = await pustRepo.createGalleryItem(parsed.data);
+  await pustRepo.logAudit(
+    req.authUser!.name,
+    'admin',
+    `Added ${parsed.data.visibility} News & Events ${parsed.data.mediaType}`,
+    parsed.data.title
+  );
   res.status(201).json({ item });
+});
+
+portalRouter.patch('/cms/gallery/:id', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const parsed = galleryUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Invalid News & Events update payload.' });
+    return;
+  }
+  const item = await pustRepo.updateGalleryItem(String(req.params.id), parsed.data);
+  if (!item) {
+    res.status(404).json({ error: 'Gallery item not found.' });
+    return;
+  }
+  await pustRepo.logAudit(
+    req.authUser!.name,
+    'admin',
+    `Updated News & Events item (${item.visibility || 'public'})`,
+    item.title
+  );
+  res.json({ item });
 });
 
 portalRouter.delete(

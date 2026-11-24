@@ -12,6 +12,7 @@ export default function PortalPage() {
     aboutSections,
     vcProfiles,
     galleryItems,
+    bannerSlides,
     notices,
     setUser,
     loadBookmarks,
@@ -30,6 +31,7 @@ export default function PortalPage() {
         aboutSections={aboutSections}
         vcProfiles={vcProfiles}
         galleryItems={galleryItems}
+        bannerSlides={bannerSlides}
         notices={notices}
         onUserChange={setUser}
         onBookmarksChange={loadBookmarks}

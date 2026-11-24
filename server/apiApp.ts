@@ -19,6 +19,7 @@ import {
 } from './auth';
 import { pustRepo } from './db';
 import { portalRouter } from './routes/portalRoutes';
+import { isSafeMediaUrl } from '../src/lib/media';
 
 const studentTokenRegisterSchema = z.object({
   signupToken: z.string().trim().min(5).max(40),
@@ -86,7 +87,14 @@ const createNoticeSchema = z.object({
   visibility: z.enum(['public', 'registered']).default('public'),
   targetSession: z.string().trim().max(20).optional(),
   targetCourseCode: z.string().trim().max(20).optional(),
-  attachmentName: z.string().trim().max(120).optional(),
+  attachmentName: z.string().trim().max(160).optional(),
+  attachmentUrl: z
+    .string()
+    .trim()
+    .max(800)
+    .refine((val) => !val || isSafeMediaUrl(val), 'Attachment URL must be a valid https://, http://, or local path.')
+    .optional(),
+  attachmentType: z.enum(['image', 'pdf', 'other']).optional(),
   summary: z.string().trim().min(3, 'Executive summary must be at least 3 characters.').max(320),
   body: z.string().trim().min(5, 'Circular details must be at least 5 characters.').max(5000),
   pinned: z.boolean().optional(),
@@ -122,7 +130,7 @@ export function mountApiRoutes(app: Express): void {
     res.setHeader('Expires', '0');
     next();
   });
-  app.use('/api', express.json({ limit: '128kb' }));
+  app.use('/api', express.json({ limit: '15mb' }));
   app.use('/api', cookieParser());
   app.use('/api', verifySameOriginMutation);
 
@@ -131,17 +139,23 @@ export function mountApiRoutes(app: Express): void {
     res.json({ ok: true, storageBackend: pustRepo.getStorageBackend() });
   });
 
-  app.get('/api/university-profile', async (_req, res) => {
-    const [aboutSections, vcProfiles, galleryItems] = await Promise.all([
+  app.get('/api/university-profile', async (req: AuthenticatedRequest, res) => {
+    const claims = optionalAuth(req);
+    const [aboutSections, vcProfiles, rawGalleryItems, bannerSlides] = await Promise.all([
       pustRepo.listAboutSections(),
       pustRepo.listViceChancellors(),
       pustRepo.listGalleryItems(),
+      pustRepo.listBannerSlides(),
     ]);
+    const galleryItems = claims
+      ? rawGalleryItems
+      : rawGalleryItems.filter((item) => (item.visibility || 'public') === 'public');
     res.json({
       profile: pustRepo.getUniversityProfile(),
       aboutSections,
       vcProfiles,
       galleryItems,
+      bannerSlides,
     });
   });
 

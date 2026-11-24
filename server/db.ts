@@ -4,6 +4,7 @@ import type {
   AboutContentRecord,
   AuditLogRecord,
   AuthUser,
+  BannerSlideRecord,
   BookmarkRecord,
   CertificateApplicationRecord,
   CourseRecord,
@@ -33,6 +34,7 @@ import type {
 } from '../src/types/pust';
 import {
   SEED_ABOUT_SECTIONS,
+  SEED_BANNER_SLIDES,
   SEED_CERTIFICATE_APPLICATIONS,
   SEED_COURSES,
   SEED_DEPARTMENTS,
@@ -85,6 +87,7 @@ class PustRepository {
   private paymentReceipts: PaymentReceiptRecord[] = [...SEED_PAYMENT_RECEIPTS];
   private feeConfig: FeeConfig = { ...SEED_FEE_CONFIG };
   private galleryItems: GalleryItemRecord[] = [...SEED_GALLERY_ITEMS];
+  private bannerSlides: BannerSlideRecord[] = [...SEED_BANNER_SLIDES];
   private aboutSections: AboutContentRecord[] = [...SEED_ABOUT_SECTIONS];
   private vcProfiles: ViceChancellorRecord[] = [...SEED_VC_PROFILES];
   private auditLogs: AuditLogRecord[] = [];
@@ -160,6 +163,7 @@ class PustRepository {
     await seedIfEmpty('payment_receipts', SEED_PAYMENT_RECEIPTS);
     await seedIfEmpty('inquiries', SEED_INQUIRIES);
     await seedIfEmpty('gallery_items', SEED_GALLERY_ITEMS);
+    await seedIfEmpty('banner_slides', SEED_BANNER_SLIDES);
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
@@ -392,9 +396,49 @@ class PustRepository {
   createGalleryItem = (item: Omit<GalleryItemRecord, 'id'>) =>
     this.insertItem('gallery_items', this.galleryItems, {
       id: `gal-${crypto.randomUUID()}`,
+      visibility: 'public',
       ...item,
     });
+  updateGalleryItem = (id: string, patch: Partial<GalleryItemRecord>) =>
+    this.updateItem('gallery_items', this.galleryItems, id, patch);
   deleteGalleryItem = (id: string) => this.removeItem('gallery_items', this.galleryItems, id);
+
+  // Hero Banner Slides
+  listBannerSlides = async (): Promise<BannerSlideRecord[]> => {
+    const items = await this.getAll('banner_slides', this.bannerSlides);
+    return items.sort((a, b) => a.orderIndex - b.orderIndex);
+  };
+  createBannerSlide = async (
+    input: Omit<BannerSlideRecord, 'id' | 'orderIndex' | 'updatedAt'>
+  ): Promise<BannerSlideRecord> => {
+    const existing = await this.listBannerSlides();
+    const maxOrder = existing.reduce((max, s) => Math.max(max, s.orderIndex), 0);
+    return this.insertItem('banner_slides', this.bannerSlides, {
+      id: `banner-${crypto.randomUUID()}`,
+      ...input,
+      orderIndex: maxOrder + 1,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    });
+  };
+  updateBannerSlide = (id: string, patch: Partial<BannerSlideRecord>) =>
+    this.updateItem('banner_slides', this.bannerSlides, id, {
+      ...patch,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    });
+  reorderBannerSlides = async (orderedIds: string[]): Promise<BannerSlideRecord[]> => {
+    const current = await this.listBannerSlides();
+    const orderMap = new Map<string, number>();
+    orderedIds.forEach((id, index) => orderMap.set(id, index + 1));
+    let nextOrder = orderedIds.length + 1;
+    for (const slide of current) {
+      const assigned = orderMap.get(slide.id) ?? nextOrder++;
+      await this.updateItem('banner_slides', this.bannerSlides, slide.id, {
+        orderIndex: assigned,
+      });
+    }
+    return this.listBannerSlides();
+  };
+  deleteBannerSlide = (id: string) => this.removeItem('banner_slides', this.bannerSlides, id);
 
   // Notices (enforces backend visibility + scope + session/course filters)
   async listNotices(opts: {

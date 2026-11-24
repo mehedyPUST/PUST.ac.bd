@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { PustShell } from '../components/PustContext';
 import {
   SEED_ABOUT_SECTIONS,
+  SEED_BANNER_SLIDES,
   SEED_DEPARTMENTS,
   SEED_GALLERY_ITEMS,
   SEED_NOTICES,
@@ -76,9 +77,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             profile: SEED_UNIVERSITY_PROFILE,
             aboutSections: SEED_ABOUT_SECTIONS,
             vcProfiles: [...SEED_VC_PROFILES].sort((a, b) => b.orderIndex - a.orderIndex),
-            galleryItems: [...SEED_GALLERY_ITEMS].sort((a, b) =>
-              b.eventDate.localeCompare(a.eventDate)
-            ),
+            galleryItems: [...SEED_GALLERY_ITEMS]
+              .filter((g) => (g.visibility || 'public') === 'public')
+              .sort((a, b) => b.eventDate.localeCompare(a.eventDate)),
+            bannerSlides: [...SEED_BANNER_SLIDES].sort((a, b) => a.orderIndex - b.orderIndex),
             departments: SEED_DEPARTMENTS,
             publications: SEED_PUBLICATIONS,
             notices: initialPublicNotices,

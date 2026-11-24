@@ -15,6 +15,11 @@ import {
   X,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import {
+  getYouTubeEmbedUrl,
+  getYouTubeThumbnailUrl,
+  parseYouTubeVideoId,
+} from '../lib/media';
 import type { AppRoute } from '../lib/routes';
 import { CardsGridSkeleton } from './PustSkeletons';
 import { PustCrest } from './PustCrest';
@@ -1734,77 +1739,110 @@ export function PublicSubPages({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveMedia(item)}
-                className="text-left rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden shadow-xs"
-              >
-                <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
-                  <ResilientImage
-                    src={item.mediaUrl}
-                    alt={item.title}
-                    containerClassName="w-full h-full"
-                    className="w-full h-full object-cover"
-                  />
-                  {item.mediaType === 'video' && (
-                    <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
-                      <PlayCircle className="w-10 h-10" />
-                    </span>
-                  )}
-                </div>
-                <div className="p-5 space-y-1">
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
-                    {item.category} · {item.mediaType.toUpperCase()} · {item.eventDate}
-                  </p>
-                  <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
-                    {item.title}
-                  </h2>
-                  <p className="text-xs text-slate-600">{item.description}</p>
-                </div>
-              </button>
-            ))}
+            {items.map((item) => {
+              const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+              const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveMedia(item)}
+                  className="text-left rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden shadow-xs"
+                >
+                  <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
+                    <ResilientImage
+                      src={thumbUrl}
+                      fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
+                      alt={item.title}
+                      containerClassName="w-full h-full"
+                      className="w-full h-full object-cover"
+                    />
+                    {item.mediaType === 'video' && (
+                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
+                        <PlayCircle className="w-10 h-10" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-5 space-y-1">
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
+                      {item.eventDate}
+                      {item.visibility === 'registered' && (
+                        <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+                      )}
+                    </p>
+                    <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
+                      {item.title}
+                    </h2>
+                    <p className="text-xs text-slate-600">{item.description}</p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
 
-        {activeMedia && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
-            onClick={() => setActiveMedia(null)}
-          >
+        {activeMedia && (() => {
+          const activeYtId =
+            activeMedia.mediaType === 'video' ? parseYouTubeVideoId(activeMedia.mediaUrl) : null;
+          return (
             <div
-              className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
+              onClick={() => setActiveMedia(null)}
             >
-              <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
-                <div>
-                  <p className="font-mono text-xs text-pust-800">
-                    {activeMedia.category} · {activeMedia.mediaType.toUpperCase()}
-                  </p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900">
-                    {activeMedia.title}
-                  </h3>
+              <div
+                className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
+                  <div>
+                    <p className="font-mono text-xs text-pust-800">
+                      {activeMedia.category} ·{' '}
+                      {activeYtId ? 'YOUTUBE' : activeMedia.mediaType.toUpperCase()} ·{' '}
+                      {activeMedia.eventDate}
+                      {activeMedia.visibility === 'registered' ? ' · REGISTERED MEMBERS ONLY' : ''}
+                    </p>
+                    <h3 className="font-serif text-xl font-medium text-slate-900">
+                      {activeMedia.title}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMedia(null)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveMedia(null)}
-                  className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-6 space-y-4">
-                <ResilientImage
-                  src={activeMedia.mediaUrl}
-                  alt={activeMedia.title}
-                  className="w-full aspect-video object-cover"
-                />
-                <p className="text-sm text-slate-700">{activeMedia.description}</p>
+                <div className="p-6 space-y-4">
+                  {activeYtId ? (
+                    <iframe
+                      src={getYouTubeEmbedUrl(activeYtId)}
+                      title={activeMedia.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                    />
+                  ) : activeMedia.mediaUrl.endsWith('.mp4') ||
+                    activeMedia.mediaUrl.endsWith('.webm') ? (
+                    <video
+                      src={activeMedia.mediaUrl}
+                      controls
+                      className="w-full aspect-video rounded-xl bg-black"
+                    />
+                  ) : (
+                    <ResilientImage
+                      src={activeMedia.mediaUrl}
+                      alt={activeMedia.title}
+                      className="w-full aspect-video object-cover"
+                    />
+                  )}
+                  <p className="text-sm text-slate-700">{activeMedia.description}</p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
     );
   }

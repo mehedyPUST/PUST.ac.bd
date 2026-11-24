@@ -42,6 +42,7 @@ import { LibraryPanel } from './portal/LibraryPanel';
 import type {
   AboutContentRecord,
   AuthUser,
+  BannerSlideRecord,
   BookmarkRecord,
   BootstrapStatus,
   DepartmentRecord,
@@ -65,6 +66,7 @@ interface PortalViewProps {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  bannerSlides?: BannerSlideRecord[];
   notices?: NoticeRecord[];
   onUserChange: (user: AuthUser | null) => void;
   onBookmarksChange: () => Promise<void>;
@@ -111,6 +113,7 @@ export function PortalView({
   aboutSections,
   vcProfiles,
   galleryItems,
+  bannerSlides = [],
   notices = [],
   onUserChange,
   onBookmarksChange,
@@ -280,7 +283,7 @@ export function PortalView({
     try {
       const res = await pustApi.login(loginEmail, loginPassword);
       onUserChange(res.user);
-      await Promise.all([onBookmarksChange(), onNoticesChange()]);
+      await Promise.all([onBookmarksChange(), onNoticesChange(), onCmsChange()]);
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Sign-in failed.');
     } finally {
@@ -354,7 +357,7 @@ export function PortalView({
         password: adminPassword,
       });
       onUserChange(res.user);
-      await Promise.all([onBookmarksChange(), onNoticesChange()]);
+      await Promise.all([onBookmarksChange(), onNoticesChange(), onCmsChange()]);
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Admin Office setup failed.');
     } finally {
@@ -373,7 +376,7 @@ export function PortalView({
         passcode: adminPasscode,
       });
       onUserChange(res.user);
-      await Promise.all([onBookmarksChange(), onNoticesChange()]);
+      await Promise.all([onBookmarksChange(), onNoticesChange(), onCmsChange()]);
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Admin passcode sign-in failed.');
     } finally {
@@ -402,7 +405,7 @@ export function PortalView({
   async function handleLogout() {
     await pustApi.logout();
     onUserChange(null);
-    await onNoticesChange();
+    await Promise.all([onNoticesChange(), onCmsChange()]);
   }
 
   async function handleSaveStudentRecord(stu: StudentRecord) {
@@ -2089,6 +2092,7 @@ export function PortalView({
               aboutSections={aboutSections}
               vcProfiles={vcProfiles}
               galleryItems={galleryItems}
+              bannerSlides={bannerSlides}
               notices={notices}
               onNoticesChange={onNoticesChange}
               onCmsChange={onCmsChange}

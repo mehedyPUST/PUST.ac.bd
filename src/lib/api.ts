@@ -2,6 +2,7 @@ import type {
   AboutContentRecord,
   AuditLogRecord,
   AuthUser,
+  BannerSlideRecord,
   BookmarkRecord,
   BootstrapStatus,
   CertificateApplicationRecord,
@@ -68,6 +69,7 @@ export const pustApi = {
       aboutSections: AboutContentRecord[];
       vcProfiles: ViceChancellorRecord[];
       galleryItems: GalleryItemRecord[];
+      bannerSlides: BannerSlideRecord[];
     }>('/api/university-profile'),
 
   getDepartments: () => apiFetch<{ departments: DepartmentRecord[] }>('/api/departments'),
@@ -101,6 +103,8 @@ export const pustApi = {
     targetSession?: string;
     targetCourseCode?: string;
     attachmentName?: string;
+    attachmentUrl?: string;
+    attachmentType?: 'image' | 'pdf' | 'other';
     summary: string;
     body: string;
     pinned?: boolean;
@@ -597,6 +601,58 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
+  uploadMediaToImageKit: (payload: {
+    purpose: 'banner' | 'notice' | 'gallery';
+    fileName: string;
+    mimeType: string;
+    dataBase64: string;
+  }) =>
+    apiFetch<{
+      url: string;
+      fileId: string;
+      name: string;
+      mimeType: string;
+      attachmentType: 'image' | 'pdf';
+    }>('/api/portal/media/upload', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  createBannerSlide: (payload: { imageUrl: string; caption: string; alt?: string }) =>
+    apiFetch<{ slide: BannerSlideRecord; bannerSlides: BannerSlideRecord[] }>(
+      '/api/portal/cms/banners',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  updateBannerSlide: (
+    id: string,
+    payload: { imageUrl?: string; caption?: string; alt?: string }
+  ) =>
+    apiFetch<{ slide: BannerSlideRecord; bannerSlides: BannerSlideRecord[] }>(
+      `/api/portal/cms/banners/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  reorderBannerSlides: (orderedIds: string[]) =>
+    apiFetch<{ bannerSlides: BannerSlideRecord[] }>('/api/portal/cms/banners/reorder', {
+      method: 'PATCH',
+      body: JSON.stringify({ orderedIds }),
+    }),
+
+  deleteBannerSlide: (id: string) =>
+    apiFetch<{ deleted: boolean; bannerSlides: BannerSlideRecord[] }>(
+      `/api/portal/cms/banners/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+      }
+    ),
+
   createGalleryItem: (payload: {
     title: string;
     description: string;
@@ -604,9 +660,23 @@ export const pustApi = {
     mediaType: GalleryItemRecord['mediaType'];
     mediaUrl: string;
     eventDate: string;
+    visibility: 'public' | 'registered';
   }) =>
     apiFetch<{ item: GalleryItemRecord }>('/api/portal/cms/gallery', {
       method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateGalleryItem: (
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      visibility?: 'public' | 'registered';
+    }
+  ) =>
+    apiFetch<{ item: GalleryItemRecord }>(`/api/portal/cms/gallery/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
       body: JSON.stringify(payload),
     }),
 

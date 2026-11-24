@@ -1,5 +1,6 @@
 import type {
   AboutContentRecord,
+  BannerSlideRecord,
   CertificateApplicationRecord,
   CourseRecord,
   DepartmentRecord,
@@ -350,6 +351,42 @@ Our Vision
   },
 ];
 
+export const SEED_BANNER_SLIDES: BannerSlideRecord[] = [
+  {
+    id: 'banner-1',
+    imageUrl:
+      'https://pust.ac.bd/includes/images/slides/1791951638WhatsApp%20Image%202026-09-22%20at%201.42.30%20PM%20(1).jpeg',
+    caption: 'Fig. 1 — Main Academic Promenade and Campus Grounds, Rajapur Campus, Pabna.',
+    alt: 'Pabna University of Science and Technology Rajapur campus academic complex',
+    orderIndex: 1,
+    updatedAt: '2026-11-23',
+  },
+  {
+    id: 'banner-2',
+    imageUrl: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    caption: 'Fig. 2 — Ceremonial Pavilion and Campus Lawn ahead of the First Convocation (15 March 2027).',
+    alt: 'PUST First Convocation Ceremonial Pavilion',
+    orderIndex: 2,
+    updatedAt: '2026-11-23',
+  },
+  {
+    id: 'banner-3',
+    imageUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    caption: 'Fig. 3 — Central Library & Information Center (CLIC) serving 5 Faculties and 21 Departments.',
+    alt: 'PUST Central Library reading hall',
+    orderIndex: 3,
+    updatedAt: '2026-11-23',
+  },
+  {
+    id: 'banner-4',
+    imageUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    caption: 'Fig. 4 — Faculty of Engineering & Technology Research and Computing Laboratories.',
+    alt: 'PUST Engineering and Computing Laboratory',
+    orderIndex: 4,
+    updatedAt: '2026-11-23',
+  },
+];
+
 export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
   {
     id: 'gal-0',
@@ -360,6 +397,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     mediaType: 'photo',
     mediaUrl: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
     eventDate: '2026-11-21',
+    visibility: 'public',
   },
   {
     id: 'gal-1',
@@ -369,6 +407,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     mediaType: 'photo',
     mediaUrl: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
     eventDate: '2026-11-10',
+    visibility: 'public',
   },
   {
     id: 'gal-2',
@@ -378,6 +417,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     mediaType: 'photo',
     mediaUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
     eventDate: '2026-10-22',
+    visibility: 'public',
   },
   {
     id: 'gal-3',
@@ -387,6 +427,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     mediaType: 'video',
     mediaUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
     eventDate: '2026-10-14',
+    visibility: 'public',
   },
   {
     id: 'gal-4',
@@ -396,6 +437,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     mediaType: 'photo',
     mediaUrl: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
     eventDate: '2026-09-28',
+    visibility: 'public',
   },
 ];
 
