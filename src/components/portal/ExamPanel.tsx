@@ -107,7 +107,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     user.departmentCode === 'ADMIN' ? 'CSE' : user.departmentCode
   );
   const [circYear, setCircYear] = useState(3);
-  const [circTermSem, setCircTermSem] = useState(2);
+  const [circTermSem, setCircTermSem] = useState(1);
   const [circSession, setCircSession] = useState('2022-23');
   const [circDeadline, setCircDeadline] = useState('2026-12-10');
   const [circFee, setCircFee] = useState(1450);
@@ -172,13 +172,29 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const computedCourseSemester = (courseYear - 1) * 2 + courseTermSem;
   const computedCircSemester = (circYear - 1) * 2 + circTermSem;
 
-  const circularVisibleCourses = useMemo(
+  const filteredCircularCourses = useMemo(
     () =>
-      showAllDeptCourses
-        ? courses
-        : courses.filter((c) => c.departmentCode === circDept),
-    [courses, circDept, showAllDeptCourses]
+      courses.filter(
+        (c) =>
+          c.departmentCode === circDept &&
+          c.session === circSession &&
+          c.semester === computedCircSemester
+      ),
+    [courses, circDept, circSession, computedCircSemester]
   );
+
+  const deptAllCircularCourses = useMemo(
+    () => courses.filter((c) => c.departmentCode === circDept),
+    [courses, circDept]
+  );
+
+  const circularVisibleCourses = showAllDeptCourses
+    ? deptAllCircularCourses
+    : filteredCircularCourses;
+
+  useEffect(() => {
+    setCircCourseCodes(filteredCircularCourses.slice(0, 15).map((c) => c.code));
+  }, [filteredCircularCourses]);
 
   const selectedCircularCredits = useMemo(
     () =>
@@ -236,19 +252,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     });
   }
 
-  function handleSelectTermCircularCourses() {
-    const termMatches = courses
-      .filter(
-        (c) =>
-          c.departmentCode === circDept &&
-          (c.semester === computedCircSemester || c.session === circSession)
-      )
-      .map((c) => c.code);
-    const fallbackDept = courses
-      .filter((c) => c.departmentCode === circDept)
-      .map((c) => c.code);
-    const picked = (termMatches.length > 0 ? termMatches : fallbackDept).slice(0, 15);
-    setCircCourseCodes(picked);
+  function handleSelectAllVisibleCircularCourses() {
+    setCircCourseCodes(circularVisibleCourses.slice(0, 15).map((c) => c.code));
   }
 
   function addCatalogCourseRow(course: CourseRecord) {
@@ -1013,7 +1018,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   disabled={user.role === 'chairman'}
                   onChange={(e) => {
                     setCircDept(e.target.value);
-                    setCircCourseCodes([]);
+                    setShowAllDeptCourses(false);
                   }}
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
                 >
@@ -1138,32 +1143,36 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             <div className="pt-1 border-t border-slate-100">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <span className="text-xs font-medium text-slate-700">
-                  Eligible Courses ({circCourseCodes.length}/15 selected)
+                  Eligible Courses ({circCourseCodes.length}/{Math.min(15, circularVisibleCourses.length)} selected)
                 </span>
                 <div className="flex flex-wrap items-center gap-3 text-xs">
-                  <button
-                    type="button"
-                    onClick={handleSelectTermCircularCourses}
-                    className="font-medium text-pust-800 hover:text-pust-950 hover:underline cursor-pointer whitespace-nowrap shrink-0"
-                  >
-                    Auto-pick {circDept}
-                  </button>
-                  {user.role === 'admin' && (
+                  {circularVisibleCourses.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => setShowAllDeptCourses((prev) => !prev)}
-                      className="text-slate-600 hover:text-slate-900 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                      onClick={handleSelectAllVisibleCircularCourses}
+                      className="font-medium text-pust-800 hover:text-pust-950 hover:underline cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      {showAllDeptCourses ? `Only ${circDept}` : 'Show all depts'}
+                      Select all
                     </button>
                   )}
                   {circCourseCodes.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setCircCourseCodes([])}
-                      className="text-slate-500 hover:text-red-700 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                      className="text-slate-600 hover:text-red-700 hover:underline cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      Clear
+                      Deselect all
+                    </button>
+                  )}
+                  {deptAllCircularCourses.length > filteredCircularCourses.length && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllDeptCourses((prev) => !prev)}
+                      className="text-slate-500 hover:text-slate-900 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      {showAllDeptCourses
+                        ? 'Filter by term'
+                        : `All ${circDept} (${deptAllCircularCourses.length})`}
                     </button>
                   )}
                 </div>
@@ -1171,8 +1180,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
               {circularVisibleCourses.length === 0 ? (
                 <p className="text-xs text-slate-500 py-2">
-                  No courses assigned under {circDept} yet. Add a course on the left or show all
-                  departments.
+                  No courses matched {circDept} · {circSession} ·{' '}
+                  {ACADEMIC_YEARS.find((y) => y.value === circYear)?.label} Year,{' '}
+                  {YEAR_SEMESTERS.find((s) => s.value === circTermSem)?.label} Semester. Add courses
+                  on the left or view all {circDept} courses.
                 </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
@@ -1184,23 +1195,35 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                         type="button"
                         onClick={() => toggleCircularCourse(c.code)}
                         aria-pressed={active}
-                        className={`flex items-center justify-between gap-2 px-3 py-2 text-left rounded-lg border transition-colors cursor-pointer ${
+                        className={`flex items-center justify-between gap-2.5 px-3 py-2 text-left rounded-lg border transition-colors cursor-pointer ${
                           active
                             ? 'bg-pust-900 text-white border-pust-900'
                             : 'bg-[#F7F7F5] text-slate-800 border-slate-200 hover:border-pust-700'
                         }`}
                       >
-                        <div className="min-w-0">
-                          <span className="block font-mono text-xs font-semibold truncate">
-                            {c.code}
-                          </span>
+                        <div className="flex items-center gap-2.5 min-w-0">
                           <span
-                            className={`block text-[11px] truncate ${
-                              active ? 'text-white/80' : 'text-slate-500'
+                            aria-hidden="true"
+                            className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                              active
+                                ? 'bg-white text-pust-900 border-white'
+                                : 'bg-white border-slate-300 text-transparent'
                             }`}
                           >
-                            {c.title}
+                            ✓
                           </span>
+                          <div className="min-w-0">
+                            <span className="block font-mono text-xs font-semibold truncate">
+                              {c.code}
+                            </span>
+                            <span
+                              className={`block text-[11px] truncate ${
+                                active ? 'text-white/80' : 'text-slate-500'
+                              }`}
+                            >
+                              {c.title}
+                            </span>
+                          </div>
                         </div>
                         <span
                           className={`font-mono text-[11px] tabular-nums shrink-0 ${
