@@ -252,7 +252,10 @@ export function AdministrationSection({
               )}
 
               {/* Sub-Navigation Rail across Administration Pages */}
-              <nav aria-label="Administration offices" className="flex flex-wrap gap-2 pt-2">
+              <nav
+                aria-label="Administration offices"
+                className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1"
+              >
                 <Link
                   href="/administration"
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
@@ -337,30 +340,30 @@ export function AdministrationSection({
               />
 
               <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
-                <div className="py-3 flex items-baseline justify-between gap-4">
+                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
-                  <dd className="font-medium text-slate-900 text-right">Honorable Vice-Chancellor</dd>
+                  <dd className="font-medium text-slate-900 sm:text-right">Honorable Vice-Chancellor</dd>
                 </div>
-                <div className="py-3 flex items-baseline justify-between gap-4">
+                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
-                  <dd className="font-mono tabular-nums text-xs text-slate-800 text-right">
+                  <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
                     {currentVc?.tenure}
                   </dd>
                 </div>
-                <div className="py-3 flex items-baseline justify-between gap-4">
+                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
-                  <dd className="font-mono text-xs text-right">
+                  <dd className="font-mono text-xs sm:text-right min-w-0">
                     <a
                       href={`mailto:${currentVc?.email || 'vc@pust.ac.bd'}`}
-                      className="text-pust-900 hover:underline"
+                      className="text-pust-900 hover:underline break-all"
                     >
                       {currentVc?.email}
                     </a>
                   </dd>
                 </div>
-                <div className="py-3 flex items-baseline justify-between gap-4">
+                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
-                  <dd className="font-mono tabular-nums text-xs text-slate-800 text-right">
+                  <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
                     <a
                       href={`tel:${currentVc?.phone || '+8802588842379'}`}
                       className="hover:text-pust-900"
@@ -568,7 +571,7 @@ export function AdministrationSection({
                       <dd className="lg:col-span-5 flex flex-wrap items-center lg:justify-end gap-3 text-xs font-mono tabular-nums text-slate-600">
                         <a
                           href={`mailto:${officer.email}`}
-                          className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
+                          className="inline-flex items-center gap-1.5 text-pust-900 hover:underline break-all"
                         >
                           <Mail className="w-3.5 h-3.5 shrink-0" />
                           {officer.email}
@@ -683,7 +686,7 @@ export function AdministrationSection({
                 variant="compact"
               />
               <div
-                className="flex flex-wrap gap-1.5 p-1 bg-white border border-slate-200 rounded-lg"
+                className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 p-1 bg-white border border-slate-200 rounded-lg max-w-full"
                 role="group"
                 aria-label="Filter administrative units by category"
               >

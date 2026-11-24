@@ -14,6 +14,7 @@ import { MotionConfig } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
 import { parseRouteFromPath, type AppRoute } from '../lib/routes';
+import { OfflineIndicator, PwaRegistrar } from './PwaManager';
 import type {
   AboutContentRecord,
   AuthUser,
@@ -531,6 +532,8 @@ export function PustShell({
             onRefreshDepartments={loadDepartments}
             onRefreshPublications={loadPublications}
           />
+          <PwaRegistrar />
+          <OfflineIndicator />
         </PustContext.Provider>
       </MotionConfig>
     </SkeletonTheme>

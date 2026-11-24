@@ -727,7 +727,7 @@ export function GlobalSearchBar({
               )}
             </div>
 
-            <div className="px-3.5 py-2 border-t border-slate-100 bg-[#F7F7F5] flex items-center justify-between text-[10px] font-mono text-slate-500">
+            <div className="px-3.5 py-2 border-t border-slate-100 bg-[#F7F7F5] flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-slate-500">
               <span className="inline-flex items-center gap-2">
                 <span className="inline-flex items-center gap-1">
                   <Building2 className="w-3 h-3" /> Depts
@@ -741,7 +741,7 @@ export function GlobalSearchBar({
                   <Compass className="w-3 h-3" /> Resources
                 </span>
               </span>
-              <span>↑↓ Navigate · ↵ Open · Esc Close</span>
+              <span className="hidden sm:inline">↑↓ Navigate · ↵ Open · Esc Close</span>
             </div>
           </motion.div>
         )}

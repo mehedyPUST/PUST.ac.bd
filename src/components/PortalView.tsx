@@ -32,6 +32,7 @@ import {
 import { pustApi } from '../lib/api';
 import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
+import { PwaInstallButton } from './PwaManager';
 import { PortalRecordsSkeleton } from './PustSkeletons';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
 import { CertificatePanel } from './portal/CertificatePanel';
@@ -1173,18 +1174,18 @@ export function PortalView({
                 </p>
                 <span className="text-[11px] text-slate-500">Pre-login lookup</span>
               </div>
-              <form onSubmit={handleCheckStatus} className="flex gap-2">
+              <form onSubmit={handleCheckStatus} className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={statusQuery}
                   onChange={(e) => setStatusQuery(e.target.value)}
                   placeholder="Registered email or PUST-INQ-2026-101"
-                  className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                  className="flex-1 min-w-0 px-3 py-2.5 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={statusLoading}
-                  className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                  className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {statusLoading ? 'Checking...' : 'Check Status'}
                 </button>
@@ -1344,25 +1345,41 @@ export function PortalView({
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* 264px Role-Criteria Workspace Sidebar */}
+        {/* Responsive Role-Criteria Workspace Sidebar (horizontal strip on mobile, sticky rail on lg+) */}
         <aside className="w-full lg:w-68 shrink-0 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden lg:sticky lg:top-24">
-          <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-5 space-y-2">
-            <div className="flex items-center gap-2.5">
-              <PustCrest variant="light" size={30} className="shrink-0" />
-              <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 truncate">
-                {ROLE_LABELS[user.role]}
-              </p>
+          <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-4 sm:p-5 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <PustCrest variant="light" size={30} className="shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-pust-200 truncate">
+                    {ROLE_LABELS[user.role]}
+                  </p>
+                  <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate">
+                    {user.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Sign out of portal"
+                className="lg:hidden inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                Sign Out
+              </button>
             </div>
-            <p className="font-serif text-lg font-medium text-white leading-snug">
-              {user.name}
-            </p>
             <p className="font-mono text-xs text-pust-100/90 tabular-nums">
               {user.departmentCode} · ID {user.academicId}
               {user.session ? ` · ${user.session}` : ''}
             </p>
           </div>
 
-          <nav aria-label="Campus portal workspace modules" className="p-2.5 space-y-1">
+          <nav
+            aria-label="Campus portal workspace modules"
+            className="flex lg:flex-col overflow-x-auto no-scrollbar lg:overflow-visible gap-1.5 lg:gap-1 p-2.5"
+          >
             {portalTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = resolvedTab === tab.id;
@@ -1371,19 +1388,19 @@ export function PortalView({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-left rounded-xl transition-all cursor-pointer ${
+                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
                     isActive
                       ? 'bg-pust-900 text-white shadow-xs'
-                      : 'text-slate-700 hover:bg-[#F7F7F5] hover:text-pust-900'
+                      : 'bg-[#F7F7F5] lg:bg-transparent text-slate-700 hover:bg-[#F7F7F5] hover:text-pust-900'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-xs sm:text-[13px] font-medium truncate">
+                  <span className="min-w-0 lg:flex-1">
+                    <span className="block text-xs sm:text-[13px] font-medium lg:truncate">
                       {tab.label}
                     </span>
                     <span
-                      className={`block text-[11px] truncate ${
+                      className={`hidden lg:block text-[11px] truncate ${
                         isActive ? 'text-pust-100/85' : 'text-slate-500'
                       }`}
                     >
@@ -1395,7 +1412,8 @@ export function PortalView({
             })}
           </nav>
 
-          <div className="p-3 border-t border-slate-200 bg-[#F7F7F5]/70 space-y-2">
+          <div className="hidden lg:block p-3 border-t border-slate-200 bg-[#F7F7F5]/70 space-y-2">
+            <PwaInstallButton variant="portal" />
             <button
               type="button"
               onClick={() => navigateTo('/verify')}
@@ -1854,9 +1872,9 @@ export function PortalView({
                               {studentSelf.digitalDocuments.map((dd, i) => (
                                 <div
                                   key={`${dd.fileName}-${i}`}
-                                  className="px-3 py-1.5 rounded-lg bg-[#F7F7F5] border border-slate-200 text-[11px] font-mono text-slate-700 flex items-center justify-between gap-2"
+                                  className="px-3 py-1.5 rounded-lg bg-[#F7F7F5] border border-slate-200 text-[11px] font-mono text-slate-700 flex flex-wrap items-center justify-between gap-2"
                                 >
-                                  <span className="truncate">{dd.fileName}</span>
+                                  <span className="truncate min-w-0">{dd.fileName}</span>
                                   <span className="text-pust-800 shrink-0">
                                     {dd.sizeLabel} · {dd.verifiedHash}
                                   </span>
@@ -2000,68 +2018,68 @@ export function PortalView({
 
                             {['chairman', 'admin', 'proctor'].includes(user.role) && (
                               <div className="flex flex-wrap gap-2 pt-2">
-                                {user.role === 'chairman' && (
-                                  <input
-                                    type="text"
-                                    value={edit.chairmanNotes ?? stu.chairmanNotes}
-                                    onChange={(e) =>
-                                      setStudentEditNotes((prev) => ({
-                                        ...prev,
-                                        [stu.id]: { ...edit, chairmanNotes: e.target.value },
-                                      }))
-                                    }
-                                    placeholder="Update Chairman note..."
-                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-                                  />
-                                )}
-                                {user.role === 'admin' && (
-                                  <input
-                                    type="text"
-                                    value={edit.adminNotes ?? stu.adminNotes}
-                                    onChange={(e) =>
-                                      setStudentEditNotes((prev) => ({
-                                        ...prev,
-                                        [stu.id]: { ...edit, adminNotes: e.target.value },
-                                      }))
-                                    }
-                                    placeholder="Update Admin note..."
-                                    className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-                                  />
-                                )}
-                                {user.role === 'proctor' && (
-                                  <>
-                                    <select
-                                      value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
-                                      onChange={(e) =>
-                                        setStudentEditNotes((prev) => ({
-                                          ...prev,
-                                          [stu.id]: {
-                                            ...edit,
-                                            disciplinaryStatus: e.target
-                                              .value as StudentRecord['disciplinaryStatus'],
-                                          },
-                                        }))
-                                      }
-                                      className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
-                                    >
-                                      <option value="Clear">Clear</option>
-                                      <option value="Warning">Warning</option>
-                                      <option value="Under Review">Under Review</option>
-                                    </select>
+                                  {user.role === 'chairman' && (
                                     <input
                                       type="text"
-                                      value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
+                                      value={edit.chairmanNotes ?? stu.chairmanNotes}
                                       onChange={(e) =>
                                         setStudentEditNotes((prev) => ({
                                           ...prev,
-                                          [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
+                                          [stu.id]: { ...edit, chairmanNotes: e.target.value },
                                         }))
                                       }
-                                      placeholder="Disciplinary remarks..."
-                                      className="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                                      placeholder="Update Chairman note..."
+                                      className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
                                     />
-                                  </>
-                                )}
+                                  )}
+                                  {user.role === 'admin' && (
+                                    <input
+                                      type="text"
+                                      value={edit.adminNotes ?? stu.adminNotes}
+                                      onChange={(e) =>
+                                        setStudentEditNotes((prev) => ({
+                                          ...prev,
+                                          [stu.id]: { ...edit, adminNotes: e.target.value },
+                                        }))
+                                      }
+                                      placeholder="Update Admin note..."
+                                      className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                                    />
+                                  )}
+                                  {user.role === 'proctor' && (
+                                    <>
+                                      <select
+                                        value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
+                                        onChange={(e) =>
+                                          setStudentEditNotes((prev) => ({
+                                            ...prev,
+                                            [stu.id]: {
+                                              ...edit,
+                                              disciplinaryStatus: e.target
+                                                .value as StudentRecord['disciplinaryStatus'],
+                                            },
+                                          }))
+                                        }
+                                        className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+                                      >
+                                        <option value="Clear">Clear</option>
+                                        <option value="Warning">Warning</option>
+                                        <option value="Under Review">Under Review</option>
+                                      </select>
+                                      <input
+                                        type="text"
+                                        value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
+                                        onChange={(e) =>
+                                          setStudentEditNotes((prev) => ({
+                                            ...prev,
+                                            [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
+                                          }))
+                                        }
+                                        placeholder="Disciplinary remarks..."
+                                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                                      />
+                                    </>
+                                  )}
                                 <button
                                   type="button"
                                   onClick={() => handleSaveStudentRecord(stu)}

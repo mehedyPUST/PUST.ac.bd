@@ -371,7 +371,7 @@ export function PublicSubPages({
                 label="Edit Section"
               />
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {[
                 { label: 'Our University', route: '/about/our-university' as AppRoute },
                 { label: 'Mission & Vision', route: '/about/mission-vision' as AppRoute },
@@ -477,28 +477,28 @@ export function PublicSubPages({
                 className="w-full aspect-[4/3] object-cover"
               />
               <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
-                <div className="px-4 py-3 flex justify-between">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Established</dt>
-                  <dd className="font-mono font-medium">
+                  <dd className="font-mono font-medium sm:text-right">
                     {profile?.establishedYear ?? 2008} (Act No. 43 of 2001)
                   </dd>
                 </div>
-                <div className="px-4 py-3 flex justify-between">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Campus Area</dt>
-                  <dd className="font-mono font-medium">
+                  <dd className="font-mono font-medium sm:text-right">
                     {profile?.campusAcres ?? 30} Acres · Rajapur, Pabna
                   </dd>
                 </div>
-                <div className="px-4 py-3 flex justify-between">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Faculties &amp; Departments</dt>
-                  <dd className="font-mono font-medium">
+                  <dd className="font-mono font-medium sm:text-right">
                     {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21}{' '}
                     Departments
                   </dd>
                 </div>
-                <div className="px-4 py-3 flex justify-between">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">First Convocation</dt>
-                  <dd className="font-mono font-semibold text-pust-800">
+                  <dd className="font-mono font-semibold text-pust-800 sm:text-right">
                     {profile?.convocationDate ?? '15 March 2027'}
                   </dd>
                 </div>
@@ -561,12 +561,12 @@ export function PublicSubPages({
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {academicSubTabs.find((t) => t.route === route)?.label || 'Academic Directory'}
             </h1>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {academicSubTabs.map((tab) => (
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route ||
                     (route === '/academics' && tab.route === '/academics/departments')
                       ? 'bg-pust-900 text-white'
@@ -1448,7 +1448,7 @@ export function PublicSubPages({
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {admissionTabs.find((t) => t.route === route)?.label || 'Admissions'}
             </h1>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {admissionTabs.map((t) => (
                 <Link
                   key={t.route}
@@ -1549,24 +1549,24 @@ export function PublicSubPages({
                   </p>
 
                   <dl className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm bg-white px-5 overflow-hidden">
-                    <div className="py-3.5 flex justify-between gap-4">
+                    <div className="py-3.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="text-slate-600">Total Undergraduate Intake</dt>
-                      <dd className="font-mono tabular-nums font-medium text-slate-900">
+                      <dd className="font-mono tabular-nums font-medium text-slate-900 sm:text-right">
                         {resolved.admissionsConfig.totalIntakeLabel}
                       </dd>
                     </div>
-                    <div className="py-3.5 flex justify-between gap-4">
+                    <div className="py-3.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="text-slate-600">Admitted Student Signup</dt>
-                      <dd className="text-right font-medium text-pust-800">
+                      <dd className="sm:text-right font-medium text-pust-800">
                         {resolved.admissionsConfig.signupMethodLabel}
                       </dd>
                     </div>
-                    <div className="py-3.5 flex justify-between items-center gap-4">
+                    <div className="py-3.5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-4">
                       <dt className="text-slate-600">Registrar Admissions Desk</dt>
-                      <dd className="flex items-center gap-2 font-mono text-pust-800">
+                      <dd className="flex flex-wrap items-center gap-2 font-mono text-pust-800 min-w-0">
                         <a
                           href={`mailto:${resolved.admissionsConfig.deskEmail}`}
-                          className="hover:underline"
+                          className="hover:underline break-all"
                         >
                           {resolved.admissionsConfig.deskEmail}
                         </a>
@@ -1574,7 +1574,7 @@ export function PublicSubPages({
                           type="button"
                           onClick={() => handleCopyContact(resolved.admissionsConfig.deskEmail)}
                           aria-label={`Copy ${resolved.admissionsConfig.deskEmail}`}
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 bg-[#F7F7F5] text-[10px] font-sans font-medium text-slate-700 hover:border-pust-800 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 bg-[#F7F7F5] text-[10px] font-sans font-medium text-slate-700 hover:border-pust-800 cursor-pointer shrink-0"
                         >
                           {copiedContact === resolved.admissionsConfig.deskEmail ? (
                             <Check className="w-3 h-3 text-emerald-700" />
@@ -1608,19 +1608,19 @@ export function PublicSubPages({
                       </p>
                     </div>
 
-                    <form onSubmit={(e) => handleCheckStatus(e)} className="flex gap-2">
+                    <form onSubmit={(e) => handleCheckStatus(e)} className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
                         required
                         value={statusQuery}
                         onChange={(e) => setStatusQuery(e.target.value)}
                         placeholder="PUST-INQ-2026-101 or email"
-                        className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                        className="flex-1 min-w-0 px-3 py-2.5 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
                       />
                       <button
                         type="submit"
                         disabled={statusLoading}
-                        className="px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                        className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
                       >
                         {statusLoading ? 'Checking...' : 'Check Status'}
                       </button>
@@ -1826,7 +1826,7 @@ export function PublicSubPages({
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {currentFac.title}
             </h1>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {facTabs.map((f) => (
                 <Link
                   key={f.route}
@@ -1848,13 +1848,13 @@ export function PublicSubPages({
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
               <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
-                <div className="px-4 py-3 flex justify-between gap-4">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Service Hours</dt>
-                  <dd className="font-mono font-medium text-slate-900">{currentFac.hours}</dd>
+                  <dd className="font-mono font-medium text-slate-900 sm:text-right">{currentFac.hours}</dd>
                 </div>
-                <div className="px-4 py-3 flex justify-between gap-4">
+                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Location</dt>
-                  <dd className="font-medium text-slate-900 text-right">{currentFac.location}</dd>
+                  <dd className="font-medium text-slate-900 sm:text-right">{currentFac.location}</dd>
                 </div>
               </dl>
 
@@ -2120,7 +2120,7 @@ export function PublicSubPages({
                 {activeNoticeHeading}
               </h1>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {noticeSubTabs.map((tab) => (
                 <Link
                   key={tab.route}
@@ -2157,14 +2157,14 @@ export function PublicSubPages({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 py-5 border-b border-slate-200">
-          <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3 py-5 border-b border-slate-200">
+          <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0">
             {NOTICE_FILTERS.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedNoticeCat(cat)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
                     ? 'bg-pust-900 text-white'
                     : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'

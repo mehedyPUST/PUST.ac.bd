@@ -34,12 +34,14 @@
     text-wrap: balance;
   }
 
-  p,
-  li,
-  blockquote,
-  figcaption,
-  dd {
-    text-align: justify;
+  @media (min-width: 640px) {
+    p,
+    li,
+    blockquote,
+    figcaption,
+    dd {
+      text-align: justify;
+    }
   }
 
   .text-center p,
@@ -52,6 +54,15 @@
   .text-left dd.text-left {
     text-align: inherit;
   }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -314,17 +314,19 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
             {doc.rows.map((r) => (
               <div
                 key={r.label}
-                className="px-4 py-2.5 flex items-center justify-between gap-4 text-xs bg-white"
+                className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs bg-white"
               >
                 <span className="text-slate-500">{r.label}</span>
-                <span className="font-medium text-slate-900 text-right tabular-nums">{r.value}</span>
+                <span className="font-medium text-slate-900 sm:text-right tabular-nums break-words">
+                  {r.value}
+                </span>
               </div>
             ))}
           </div>
 
           {doc.tableHeaders && doc.tableRows && doc.tableRows.length > 0 && (
             <div className="rounded-xl border border-slate-200 overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
+              <table className="w-full min-w-[460px] text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500">
                     {doc.tableHeaders.map((h) => (

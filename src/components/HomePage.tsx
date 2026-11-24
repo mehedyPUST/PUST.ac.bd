@@ -223,22 +223,22 @@ export function HomePage({
                 </p>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center gap-3">
+              <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
                 <Link
                   href="/portal"
-                  className="px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   Open Digital Campus Portal
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
                 >
                   Explore {profile?.departmentsCount ?? 21} Departments
                 </Link>
                 <Link
                   href="/verify"
-                  className="inline-flex items-center gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   Verify Document
@@ -280,7 +280,7 @@ export function HomePage({
                   type="button"
                   onClick={() => setFullViewSlide(currentSlide)}
                   aria-label={`View full image: ${currentSlide.caption}`}
-                  className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/75 text-white text-xs font-medium border border-white/20 shadow-md backdrop-blur-[2px] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
+                  className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/75 text-white text-xs font-medium border border-white/20 shadow-md backdrop-blur-[2px] opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   View Full
@@ -308,7 +308,7 @@ export function HomePage({
                         setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
                       }
                       aria-label="Previous banner slide"
-                      className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-950/55 text-white hover:bg-slate-950/80 transition-colors cursor-pointer"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/60 text-white hover:bg-slate-950/85 transition-colors cursor-pointer"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -316,7 +316,7 @@ export function HomePage({
                       type="button"
                       onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
                       aria-label="Next banner slide"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-950/55 text-white hover:bg-slate-950/80 transition-colors cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/60 text-white hover:bg-slate-950/85 transition-colors cursor-pointer"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -326,10 +326,10 @@ export function HomePage({
 
               {slides.length > 1 && (
                 <div
-                  className="mt-2.5 flex items-center justify-between gap-3"
+                  className="mt-1.5 flex items-center justify-between gap-3"
                   aria-label="Banner slide controls"
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-0.5">
                     {slides.map((s, idx) => (
                       <button
                         key={s.id}
@@ -337,12 +337,16 @@ export function HomePage({
                         onClick={() => setActiveSlideIdx(idx)}
                         aria-label={`View slide ${idx + 1}: ${s.caption}`}
                         aria-current={idx === activeSlideIdx ? 'true' : undefined}
-                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                          idx === activeSlideIdx
-                            ? 'w-7 bg-pust-900'
-                            : 'w-2.5 bg-slate-300 hover:bg-slate-400'
-                        }`}
-                      />
+                        className="py-2.5 px-1 inline-flex items-center justify-center cursor-pointer group"
+                      >
+                        <span
+                          className={`block h-1.5 rounded-full transition-all ${
+                            idx === activeSlideIdx
+                              ? 'w-7 bg-pust-900'
+                              : 'w-2.5 bg-slate-300 group-hover:bg-slate-400'
+                          }`}
+                        />
+                      </button>
                     ))}
                   </div>
                   <p className="font-mono text-[11px] text-slate-500 truncate">
@@ -355,7 +359,7 @@ export function HomePage({
 
           {/* Operational Utility Ribbon */}
           <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-            <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
+            <div className="px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
                 {profile?.establishedYear ?? 2008} · Act No. 43 of 2001

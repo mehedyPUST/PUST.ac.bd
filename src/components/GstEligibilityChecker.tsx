@@ -121,7 +121,11 @@ export function GstEligibilityChecker({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Select GST Unit">
+        <div
+          className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 w-full sm:w-auto pb-1 sm:pb-0"
+          role="group"
+          aria-label="Select GST Unit"
+        >
           {(
             [
               { key: 'A', label: 'Unit A (Science & Engg.)' },
@@ -133,7 +137,7 @@ export function GstEligibilityChecker({
               key={u.key}
               type="button"
               onClick={() => setUnit(u.key)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 unit === u.key
                   ? 'bg-pust-900 text-white'
                   : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50'
@@ -145,7 +149,7 @@ export function GstEligibilityChecker({
         </div>
       </div>
 
-      <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-4 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -179,16 +183,16 @@ export function GstEligibilityChecker({
           </div>
 
           <div className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2 text-xs">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-slate-600">Combined SSC + HSC GPA</span>
               <span className="font-mono font-semibold text-slate-900 tabular-nums">
                 {evaluation.combined.toFixed(2)} / 10.00
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-slate-600">Unit {unit} Baseline</span>
               <span
-                className={`font-mono font-semibold tabular-nums ${
+                className={`font-mono font-semibold tabular-nums sm:text-right ${
                   evaluation.meetsBaselineGpa ? 'text-emerald-700' : 'text-red-700'
                 }`}
               >

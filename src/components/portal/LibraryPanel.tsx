@@ -237,7 +237,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
               </h3>
 
               {/* Visual 3-Step Digital Pipeline */}
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                 {[
                   { step: 1, title: 'Application', subtitle: 'Student submitted' },
                   { step: 2, title: 'Chairman Seal', subtitle: 'Dept JSON signed' },
@@ -525,7 +525,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                             setPhysicalRefs((prev) => ({ ...prev, [app.id]: e.target.value }))
                           }
                           placeholder="Optional Physical Card Ref (e.g. PHY-2026-042)"
-                          className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none w-72"
+                          className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none w-full sm:w-72"
                         />
                         <button
                           type="button"

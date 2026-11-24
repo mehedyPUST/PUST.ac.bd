@@ -94,13 +94,13 @@ export function NoticeModal({
             type="button"
             onClick={onClose}
             aria-label="Close circular"
-            className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-5">
           <div className="text-xs text-slate-600 border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               Issued by:{' '}

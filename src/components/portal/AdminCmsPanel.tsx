@@ -1643,7 +1643,7 @@ export function AdminCmsPanel({
                               }))
                             }
                             placeholder="Courses (comma-separated, e.g. CSE-3201, CSE-3203)"
-                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] flex-1 min-w-[200px] focus:bg-white focus:outline-none focus:border-pust-800"
+                            className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] w-full sm:w-auto sm:flex-1 sm:min-w-[200px] focus:bg-white focus:outline-none focus:border-pust-800"
                           />
                           <input
                             type="text"
@@ -1655,7 +1655,7 @@ export function AdminCmsPanel({
                               }))
                             }
                             placeholder="Sessions (e.g. 2022-23, 2023-24)"
-                            className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] w-52 focus:bg-white focus:outline-none focus:border-pust-800"
+                            className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] w-full sm:w-52 focus:bg-white focus:outline-none focus:border-pust-800"
                           />
                           <button
                             type="button"
@@ -1733,7 +1733,7 @@ export function AdminCmsPanel({
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Vice-Chancellor CMS &amp; Archive Promotion
               </h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input
                   type="text"
                   required
@@ -1917,7 +1917,7 @@ export function AdminCmsPanel({
                   value={bannerAlt}
                   onChange={(e) => setBannerAlt(e.target.value)}
                   placeholder="Optional accessibility alt description"
-                  className="flex-1 min-w-[220px] px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="w-full sm:w-auto sm:flex-1 sm:min-w-[220px] px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <button
                   type="submit"
@@ -1963,7 +1963,7 @@ export function AdminCmsPanel({
                               [slide.id]: e.target.value,
                             }))
                           }
-                          className="flex-1 min-w-[200px] px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                          className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
                         />
                         <button
                           type="button"

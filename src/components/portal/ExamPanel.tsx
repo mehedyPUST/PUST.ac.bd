@@ -1804,7 +1804,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
           {/* Dynamic Multi-Course Table (This Semester Result) */}
           <div className="rounded-xl border border-slate-200 overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full min-w-[680px] text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-[#F7F7F5] border-b border-slate-200 font-mono text-[11px] uppercase tracking-wider text-slate-500">
                   <th className="px-3 py-2.5">Course Code</th>

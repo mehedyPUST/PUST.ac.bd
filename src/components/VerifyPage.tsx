@@ -267,10 +267,10 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               {result.details.map((row) => (
                 <div
                   key={row.label}
-                  className="px-4 py-3 flex items-center justify-between gap-4 text-xs"
+                  className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs"
                 >
                   <span className="text-slate-500">{row.label}</span>
-                  <span className="font-medium text-slate-900 text-right tabular-nums">
+                  <span className="font-medium text-slate-900 sm:text-right tabular-nums break-words">
                     {row.value}
                   </span>
                 </div>

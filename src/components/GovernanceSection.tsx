@@ -108,7 +108,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
           />
         </div>
 
-        <nav aria-label="Governance sub-navigation" className="flex flex-wrap gap-2">
+        <nav
+          aria-label="Governance sub-navigation"
+          className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1"
+        >
           {GOVERNANCE_TABS.map((tab) => {
             const isActive = activeRoute === tab.route;
             return (
@@ -157,9 +160,12 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   </p>
                   <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
                     {governanceContent.actCitations.map((item, idx) => (
-                      <div key={`${item.label}-${idx}`} className="py-3 flex justify-between gap-4">
+                      <div
+                        key={`${item.label}-${idx}`}
+                        className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
+                      >
                         <dt className="text-slate-600">{item.label}</dt>
-                        <dd className="font-mono font-medium text-slate-900 text-right">
+                        <dd className="font-mono font-medium text-slate-900 sm:text-right break-words">
                           {item.value}
                         </dd>
                       </div>
@@ -240,7 +246,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   title="Pabna University of Science and Technology Act, 2001 — Laws of Bangladesh"
                   referrerPolicy="no-referrer"
                   className={`w-full bg-white border-0 transition-all ${
-                    expandedPreview ? 'h-[780px]' : 'h-[520px]'
+                    expandedPreview ? 'h-[520px] sm:h-[780px]' : 'h-[380px] sm:h-[520px]'
                   }`}
                 />
               </div>
@@ -317,9 +323,12 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </p>
               <dl className="divide-y divide-slate-200 text-sm">
                 {governanceContent.academicCouncilStructure.map((row, idx) => (
-                  <div key={`${row.label}-${idx}`} className="py-3 flex justify-between gap-4">
+                  <div
+                    key={`${row.label}-${idx}`}
+                    className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
+                  >
                     <dt className="text-slate-600">{row.label}</dt>
-                    <dd className="font-medium text-slate-900 text-right">{row.value}</dd>
+                    <dd className="font-medium text-slate-900 sm:text-right">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -358,9 +367,12 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </p>
               <dl className="divide-y divide-slate-200 text-sm">
                 {governanceContent.financeCommitteeLeadership.map((row, idx) => (
-                  <div key={`${row.label}-${idx}`} className="py-3 flex justify-between gap-4">
+                  <div
+                    key={`${row.label}-${idx}`}
+                    className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
+                  >
                     <dt className="text-slate-600">{row.label}</dt>
-                    <dd className="font-medium text-slate-900 text-right">{row.value}</dd>
+                    <dd className="font-medium text-slate-900 sm:text-right">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -381,9 +393,12 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
 
                 <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-[#F7F7F5] text-sm overflow-hidden">
                   {governanceContent.ordinanceRules.map((rule, idx) => (
-                    <div key={`${rule.label}-${idx}`} className="p-4 flex justify-between gap-4">
+                    <div
+                      key={`${rule.label}-${idx}`}
+                      className="p-4 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
+                    >
                       <span className="text-slate-600">{rule.label}</span>
-                      <span className="font-mono font-medium text-slate-900 text-right">
+                      <span className="font-mono font-medium text-slate-900 sm:text-right">
                         {rule.value}
                       </span>
                     </div>
@@ -398,7 +413,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   </h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs sm:text-sm">
+                  <table className="w-full min-w-[480px] text-left text-xs sm:text-sm">
                     <thead className="border-b border-slate-200 bg-slate-50 font-mono text-xs text-slate-600">
                       <tr>
                         <th className="px-4 py-2.5">Numerical Marks</th>

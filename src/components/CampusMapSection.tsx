@@ -77,7 +77,7 @@ export function CampusMapSection() {
             <div
               role="group"
               aria-label="Filter campus buildings by precinct"
-              className="flex flex-wrap gap-1.5"
+              className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 max-w-full pb-1 sm:pb-0"
             >
               {ZONES.map((zone) => {
                 const active = selectedZone === zone;
@@ -433,11 +433,11 @@ export function CampusMapSection() {
                       </dt>
                       <dd className="text-slate-800 font-medium leading-relaxed">{activeBuilding.offices}</dd>
                     </div>
-                    <div className="py-2.5 flex justify-between gap-4">
+                    <div className="py-2.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 shrink-0">
                         Visiting Hours
                       </dt>
-                      <dd className="font-mono text-xs text-slate-900 text-right tabular-nums">
+                      <dd className="font-mono text-xs text-slate-900 sm:text-right tabular-nums">
                         {activeBuilding.hours}
                       </dd>
                     </div>

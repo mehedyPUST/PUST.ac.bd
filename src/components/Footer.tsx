@@ -6,6 +6,7 @@ import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
+import { PwaInstallButton } from './PwaManager';
 
 interface FooterProps {
   onNavigate?: (route: AppRoute | string) => void;
@@ -64,6 +65,9 @@ export function Footer({ onNavigate }: FooterProps) {
                 {social.label}
               </a>
             ))}
+          </div>
+          <div className="pt-2">
+            <PwaInstallButton variant="footer" allowGuideFallback />
           </div>
         </div>
 
@@ -155,7 +159,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <br />
               <a
                 href={`mailto:${c.email}`}
-                className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors"
+                className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors break-all"
               >
                 {c.email}
               </a>

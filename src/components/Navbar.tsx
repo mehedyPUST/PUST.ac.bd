@@ -17,6 +17,7 @@ import type {
 } from '../types/pust';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { PustCrest } from './PustCrest';
+import { PwaInstallButton } from './PwaManager';
 
 interface NavbarProps {
   route: AppRoute;
@@ -126,7 +127,7 @@ export function Navbar({
           {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-10 lg:h-[60px] px-2.5 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
+            <div className="h-11 lg:h-[60px] px-2.5 lg:px-6 flex items-center justify-between gap-1.5 lg:gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -134,13 +135,13 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-sm sm:text-base lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                className="font-serif text-sm sm:text-base lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5"
               >
                 <span className="sm:hidden">PUST</span>
                 <span className="hidden sm:inline">Pabna University of Science and Technology</span>
               </Link>
 
-              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <div className="hidden 2xl:inline-flex items-center gap-1.5">
                   <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
                     {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
@@ -173,7 +174,7 @@ export function Navbar({
                   }}
                   aria-label="Toggle site search"
                   aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
+                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
                     mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
@@ -187,7 +188,7 @@ export function Navbar({
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
                     title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`lg:hidden min-h-[36px] inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950'
                         : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
@@ -206,7 +207,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[36px] inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -227,7 +228,7 @@ export function Navbar({
                   }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className="lg:hidden w-8 h-8 inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
+                  className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
                 >
                   {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </button>
@@ -793,7 +794,7 @@ export function Navbar({
                 type="button"
                 aria-label="Toggle Home sections"
                 onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
-                className="p-2 text-slate-500 hover:text-pust-900"
+                className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
               >
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${
@@ -809,7 +810,7 @@ export function Navbar({
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-left py-1.5 px-2 text-xs rounded-md text-slate-700 hover:text-pust-900"
+                    className="block w-full text-left py-2.5 px-2 text-xs rounded-md text-slate-700 hover:text-pust-900"
                   >
                     {item.label}
                   </Link>
@@ -826,7 +827,7 @@ export function Navbar({
                   <button
                     type="button"
                     onClick={() => go(group.defaultRoute)}
-                    className="flex-1 text-left py-2.5 px-2 font-medium text-slate-800 hover:text-pust-900"
+                    className="flex-1 text-left py-3 px-2 font-medium text-slate-800 hover:text-pust-900 cursor-pointer"
                   >
                     {group.label}
                   </button>
@@ -834,7 +835,7 @@ export function Navbar({
                     type="button"
                     aria-label={`Toggle ${group.label} subtopics`}
                     onClick={() => setMobileExpanded(expanded ? null : group.id)}
-                    className="p-2 text-slate-500 hover:text-pust-900"
+                    className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
                   >
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
@@ -848,7 +849,7 @@ export function Navbar({
                         key={item.route}
                         type="button"
                         onClick={() => go(item.route)}
-                        className={`block w-full text-left py-1.5 px-2 text-xs rounded-md ${
+                        className={`block w-full text-left py-2.5 px-2 text-xs rounded-md cursor-pointer ${
                           route === item.route
                             ? 'text-pust-900 font-semibold bg-pust-50'
                             : 'text-slate-700 hover:text-pust-900'
@@ -866,7 +867,7 @@ export function Navbar({
           <button
             type="button"
             onClick={() => go('/verify')}
-            className={`w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium ${
+            className={`w-full text-left py-3 px-2 border-b border-slate-100 font-medium cursor-pointer ${
               route === '/verify' ? 'text-pust-900' : 'text-slate-800'
             }`}
           >
@@ -875,10 +876,13 @@ export function Navbar({
           <button
             type="button"
             onClick={() => go('/gallery')}
-            className="w-full text-left py-2.5 px-2 font-medium text-slate-800"
+            className="w-full text-left py-3 px-2 font-medium text-slate-800 cursor-pointer"
           >
             News &amp; Events Gallery
           </button>
+          <div className="pt-3 mt-1 border-t border-slate-100">
+            <PwaInstallButton variant="drawer" allowGuideFallback />
+          </div>
         </div>
       )}
     </header>

@@ -17,9 +17,9 @@ export function Breadcrumb() {
     <div className="bg-[#F7F7F5] border-b border-slate-200 print:hidden">
       <nav
         aria-label="Breadcrumb"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2"
       >
-        <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600">
+        <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-600 overflow-x-auto no-scrollbar">
           {crumbs.map((crumb, index) => {
             const isFirst = index === 0;
             const isLast = index === crumbs.length - 1;

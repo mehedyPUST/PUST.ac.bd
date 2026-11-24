@@ -52,14 +52,14 @@ export function DepartmentModal({
         className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-start justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 bg-slate-50">
           <div>
             <p className="font-mono text-xs tracking-wider uppercase text-pust-800">
               {department.code} · {department.faculty}
             </p>
             <h3
               id="dept-modal-title"
-              className="font-serif text-2xl font-medium text-slate-900 mt-1"
+              className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-1"
             >
               Department of {department.name}
             </h3>
@@ -71,13 +71,13 @@ export function DepartmentModal({
             type="button"
             onClick={onClose}
             aria-label="Close department details"
-            className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           <p className="text-[15px] leading-relaxed text-slate-700">{department.summary}</p>
 
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm">

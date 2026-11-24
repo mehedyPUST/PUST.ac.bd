@@ -555,7 +555,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           setOfficeNotes((prev) => ({ ...prev, [app.id]: e.target.value }))
                         }
                         placeholder={`Written ${myOfficeRole.toUpperCase()} note (required for decline)...`}
-                        className="flex-1 min-w-[220px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[220px] px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
                       />
                       <button
                         type="button"
