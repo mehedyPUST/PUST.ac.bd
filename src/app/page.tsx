@@ -11,6 +11,7 @@ export default function Home() {
     aboutSections,
     vcProfiles,
     galleryItems,
+    publications,
     notices,
     navigateTo,
     setActiveNotice,
@@ -23,6 +24,7 @@ export default function Home() {
       aboutSections={aboutSections}
       vcProfiles={vcProfiles}
       galleryItems={galleryItems}
+      publications={publications}
       notices={notices}
       onNavigate={navigateTo}
       onSelectNotice={setActiveNotice}

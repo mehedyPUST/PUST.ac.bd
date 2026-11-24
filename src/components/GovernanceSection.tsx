@@ -20,10 +20,10 @@ const GOVERNANCE_TABS: Array<{
   subtitle: string;
 }> = [
   {
-    route: '/governance/university-act',
-    label: 'University Act',
+    route: '/governance/pust-act',
+    label: 'PUST Act',
     code: 'ACT NO. 43 OF 2001 · PASSED 15 JULY 2001 · EFFECTIVE 12 OCT 2008',
-    heading: 'Pabna University of Science and Technology Act, 2001',
+    heading: 'PUST Act — Pabna University of Science and Technology Act, 2001',
     subtitle:
       'Statutory charter enacted by the Parliament of Bangladesh (Act No. 43 of 2001, passed 15 July 2001 and operationalized via Gazette notification on 12 October 2008) establishing PUST as a public university for science and technology.',
   },
@@ -117,8 +117,8 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
   const [expandedPreview, setExpandedPreview] = useState(false);
 
   const activeRoute =
-    route === '/governance' || route === '/governance/pust-act'
-      ? '/governance/university-act'
+    route === '/governance' || route === '/governance/university-act'
+      ? '/governance/pust-act'
       : route;
   const activeTab =
     GOVERNANCE_TABS.find((t) => t.route === activeRoute) || GOVERNANCE_TABS[0];
@@ -161,12 +161,12 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
 
       {/* Content by Governance Sub-Page */}
       <div>
-        {activeRoute === '/governance/university-act' && (
+        {activeRoute === '/governance/pust-act' && (
           <div className="space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7 space-y-5">
                 <h2 className="font-serif text-2xl font-medium text-slate-900">
-                  Statutory Mandate Under the University Act (Act No. 43 of 2001)
+                  Statutory Mandate Under the PUST Act (Act No. 43 of 2001)
                 </h2>
                 <p className="text-base leading-[1.8] text-slate-700">
                   Pabna University of Science and Technology operates as a public statutory university

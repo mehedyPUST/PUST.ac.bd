@@ -10,7 +10,10 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden">
+    <footer
+      id="footer"
+      className="bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
         <div className="lg:col-span-4 space-y-3">
@@ -75,9 +78,9 @@ export function Footer({ onNavigate }: FooterProps) {
               { label: 'Our University', route: '/about/our-university' as AppRoute },
               { label: 'History and Plans', route: '/about/history' as AppRoute },
               { label: 'Notice Board', route: '/notices' as AppRoute },
+              { label: 'Recent Publications', route: '/academics/publications' as AppRoute },
+              { label: 'News & Events', route: '/gallery' as AppRoute },
               { label: 'Verify Documents', route: '/verify' as AppRoute },
-              { label: 'Campus Gallery', route: '/gallery' as AppRoute },
-              { label: 'Admission Desk', route: '/admissions' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
                 <Link
@@ -99,12 +102,12 @@ export function Footer({ onNavigate }: FooterProps) {
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
             {[
-              { label: 'University Act (2001)', route: '/governance/university-act' as AppRoute },
+              { label: 'PUST Act (2001)', route: '/governance/pust-act' as AppRoute },
               { label: 'Regent Board', route: '/governance/regent-board' as AppRoute },
+              { label: 'Academic Council', route: '/governance/academic-council' as AppRoute },
               { label: 'Academic Ordinance', route: '/governance/academic-ordinance' as AppRoute },
               { label: 'VC Office', route: '/administration/vc-office' as AppRoute },
               { label: 'Registrar Office', route: '/administration/registrar-office' as AppRoute },
-              { label: 'ICT Cell & APA', route: '/administration/apa' as AppRoute },
             ].map((item) => (
               <li key={item.route}>
                 <Link

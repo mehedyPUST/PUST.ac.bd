@@ -499,9 +499,8 @@ export function PublicSubPages({
             <div className="flex flex-wrap gap-2">
               {[
                 { label: 'Our University', route: '/about/our-university' as AppRoute },
+                { label: 'Mission & Vision', route: '/about/mission-vision' as AppRoute },
                 { label: 'History and Plans', route: '/about/history' as AppRoute },
-                { label: 'Mission and Vision', route: '/about/mission-vision' as AppRoute },
-                { label: 'Strategic Plans', route: '/about/plans' as AppRoute },
               ].map((tab) => (
                 <Link
                   key={tab.route}
@@ -649,10 +648,10 @@ export function PublicSubPages({
   // 2. ACADEMIC PAGES (/academics/*)
   if (route.startsWith('/academics')) {
     const academicSubTabs: Array<{ label: string; route: AppRoute }> = [
-      { label: 'Departments (21)', route: '/academics/departments' },
-      { label: 'Programs', route: '/academics/programs' },
-      { label: 'Faculties', route: '/academics/faculty' },
-      { label: 'Digital Forms Hub', route: '/academics/forms-download' },
+      { label: 'Academic Programs', route: '/academics/programs' },
+      { label: 'Faculty', route: '/academics/faculty' },
+      { label: 'Departments', route: '/academics/departments' },
+      { label: 'Forms Download', route: '/academics/forms-download' },
       { label: 'Academic Calendar', route: '/academics/calendar' },
       { label: 'Scholarship', route: '/academics/scholarship' },
       { label: 'Seminars & Workshops', route: '/academics/seminars' },
@@ -989,6 +988,7 @@ export function PublicSubPages({
               labImage={LAB_IMAGE}
               libraryImage={LIBRARY_IMAGE}
               groundsImage={GROUNDS_IMAGE}
+              focus={route === '/academics/journals' ? 'journals' : 'publications'}
             />
           ) : (
             // Default /academics & /academics/departments

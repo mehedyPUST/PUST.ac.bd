@@ -48,7 +48,7 @@ interface OfficeMeta {
 const OFFICE_SUBROUTES: OfficeMeta[] = [
   {
     route: '/administration/vc-office',
-    label: 'VC Office',
+    label: 'Vice-Chancellor Office',
     highlight: 'Office of the Vice-Chancellor',
     summary:
       'Executive head of the university, Chair of the Regent Board and Academic Council, directing institutional strategy and research expansion.',
@@ -56,8 +56,8 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/pro-vc-office',
-    label: 'Pro-VC Office',
-    highlight: 'Office of the Pro-Vice-Chancellor',
+    label: 'Pro Vice-Chancellor Office',
+    highlight: 'Office of the Pro Vice-Chancellor',
     summary:
       'Coordinates academic governance, faculty development, Outcome-Based Education (OBE) schedules, and inter-faculty coordination.',
     matchLeadership: (role) => role === 'Pro-Vice-Chancellor',
@@ -90,7 +90,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/student-advisor-office',
-    label: 'Student Advisor',
+    label: 'Student Advisor Office',
     highlight: 'Directorate of Student Welfare & Guidance',
     summary:
       'Supports scholarships, cultural and technical clubs, student counseling, and campus co-curricular life.',

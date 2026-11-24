@@ -70,9 +70,8 @@ export const NAV_GROUPS: NavGroup[] = [
     defaultRoute: '/about',
     items: [
       { label: 'Our University', route: '/about/our-university' },
+      { label: 'Mission & Vision', route: '/about/mission-vision' },
       { label: 'History and Plans', route: '/about/history' },
-      { label: 'Mission and Vision', route: '/about/mission-vision' },
-      { label: 'Strategic Plans', route: '/about/plans' },
     ],
   },
   {
@@ -80,7 +79,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Governance',
     defaultRoute: '/governance',
     items: [
-      { label: 'University Act', route: '/governance/university-act' },
+      { label: 'PUST Act', route: '/governance/pust-act' },
       { label: 'Regent Board', route: '/governance/regent-board' },
       { label: 'Academic Council', route: '/governance/academic-council' },
       { label: 'Finance Committee', route: '/governance/finance-committee' },
@@ -92,8 +91,8 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Administration',
     defaultRoute: '/administration',
     items: [
-      { label: 'VC Office', route: '/administration/vc-office' },
-      { label: 'Pro-VC Office', route: '/administration/pro-vc-office' },
+      { label: 'Vice-Chancellor Office', route: '/administration/vc-office' },
+      { label: 'Pro Vice-Chancellor Office', route: '/administration/pro-vc-office' },
       { label: 'Treasurer Office', route: '/administration/treasurer-office' },
       { label: 'Registrar Office', route: '/administration/registrar-office' },
       { label: 'Proctor Office', route: '/administration/proctor-office' },
@@ -155,6 +154,8 @@ const ALL_VALID_ROUTES = new Set<AppRoute>([
   '/gallery',
   '/verify',
   '/portal',
+  '/about/plans',
+  '/governance/university-act',
   ...NAV_GROUPS.flatMap((g) => [g.defaultRoute, ...g.items.map((i) => i.route)]),
 ]);
 
@@ -179,7 +180,7 @@ const SECTION_ROOT_LABELS: Record<string, string> = {
 
 const STANDALONE_ROUTE_LABELS: Record<string, string> = {
   '/notices': 'University Notices',
-  '/gallery': 'Campus Gallery',
+  '/gallery': 'News & Events Gallery',
   '/verify': 'Document Verification',
   '/portal': 'Digital Campus Portal',
 };
@@ -202,9 +203,15 @@ export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
     return crumbs;
   }
 
-  if (clean === '/governance/pust-act') {
+  if (clean === '/about/plans') {
+    crumbs.push({ label: 'About', href: '/about' });
+    crumbs.push({ label: 'Strategic Plans' });
+    return crumbs;
+  }
+
+  if (clean === '/governance/university-act' || clean === '/governance/pust-act') {
     crumbs.push({ label: 'Governance', href: '/governance' });
-    crumbs.push({ label: 'University Act' });
+    crumbs.push({ label: 'PUST Act' });
     return crumbs;
   }
 
