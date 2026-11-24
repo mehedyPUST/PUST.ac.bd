@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
-import { motion } from 'motion/react';
 import {
   AlertCircle,
   ArrowRight,
@@ -476,12 +475,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-white">
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
-        >
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               About Pabna University of Science &amp; Technology
@@ -584,7 +578,7 @@ export function PublicSubPages({
               ))}
             </div>
           </div>
-        </motion.section>
+        </section>
       </main>
     );
   }
@@ -607,12 +601,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-white">
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8"
-        >
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Academic Affairs &amp; Research
@@ -1029,7 +1018,7 @@ export function PublicSubPages({
               )}
             </div>
           )}
-        </motion.section>
+        </section>
 
         {/* Interactive Printable Form Preview Modal */}
         {previewForm && (
@@ -1140,12 +1129,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-[#F7F7F5]">
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10"
-        >
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Admissions 2026–2027
@@ -1456,7 +1440,7 @@ export function PublicSubPages({
               </div>
             </div>
           )}
-        </motion.section>
+        </section>
       </main>
     );
   }
@@ -1555,12 +1539,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-white">
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10"
-        >
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Campus Facilities &amp; Student Services
@@ -1629,7 +1608,7 @@ export function PublicSubPages({
               />
             </div>
           </div>
-        </motion.section>
+        </section>
       </main>
     );
   }
@@ -1650,12 +1629,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-white">
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.28 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8"
-        >
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200">
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
@@ -1715,7 +1689,7 @@ export function PublicSubPages({
               </button>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {activeMedia && (
           <div
@@ -1761,12 +1735,7 @@ export function PublicSubPages({
   // 6. NOTICES PAGE (/notices)
   return (
     <main className="flex-1 bg-[#F7F7F5]">
-      <motion.section
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16"
-      >
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-slate-200">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
@@ -1880,7 +1849,7 @@ export function PublicSubPages({
             ))}
           </div>
         )}
-      </motion.section>
+      </section>
     </main>
   );
 }

@@ -5,7 +5,10 @@ import type { ApprovalStatus, AuthUser, UserRole } from '../src/types/pust';
 
 export const AUTH_COOKIE_NAME = 'pust_token';
 
-const EPHEMERAL_JWT_SECRET = crypto.randomBytes(32).toString('hex');
+const globalForAuth = globalThis as unknown as { __pustEphemeralJwtSecret?: string };
+const EPHEMERAL_JWT_SECRET =
+  globalForAuth.__pustEphemeralJwtSecret ??
+  (globalForAuth.__pustEphemeralJwtSecret = crypto.randomBytes(32).toString('hex'));
 
 function getJwtSecret(): string {
   const configured = process.env.JWT_SECRET?.trim();

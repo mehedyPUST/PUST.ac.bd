@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'motion/react';
 import { ChevronRight, Home } from 'lucide-react';
 import { getBreadcrumbsForPath } from '../lib/routes';
 
@@ -16,11 +15,7 @@ export function Breadcrumb() {
 
   return (
     <div className="bg-[#F7F7F5] border-b border-slate-200 print:hidden">
-      <motion.nav
-        key={pathname}
-        initial={{ opacity: 0, y: -4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      <nav
         aria-label="Breadcrumb"
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5"
       >
@@ -60,7 +55,7 @@ export function Breadcrumb() {
             );
           })}
         </ol>
-      </motion.nav>
+      </nav>
     </div>
   );
 }

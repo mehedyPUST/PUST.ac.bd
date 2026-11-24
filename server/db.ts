@@ -91,7 +91,12 @@ class PustRepository {
   private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
   private bookmarks: BookmarkRecord[] = [];
 
+  private initialized = false;
+
   async init(): Promise<void> {
+    if (this.initialized) return;
+    this.initialized = true;
+
     const uri = process.env.MONGODB_URI?.trim();
     const dbName = process.env.MONGODB_DB_NAME?.trim() || 'pust_portal';
 
@@ -925,4 +930,6 @@ class PustRepository {
   }
 }
 
-export const pustRepo = new PustRepository();
+const globalForPust = globalThis as unknown as { __pustRepo?: PustRepository };
+export const pustRepo =
+  globalForPust.__pustRepo ?? (globalForPust.__pustRepo = new PustRepository());

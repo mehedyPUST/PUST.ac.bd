@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import { ExternalLink, Eye, Maximize2, Minimize2 } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 
@@ -165,12 +164,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
       </div>
 
       {/* Content by Governance Sub-Page */}
-      <motion.div
-        key={activeRoute}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.22 }}
-      >
+      <div>
         {activeRoute === '/governance/university-act' && (
           <div className="space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -598,7 +592,7 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </section>
   );
 }
