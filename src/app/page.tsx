@@ -3,7 +3,8 @@
 import { HomePage } from '../components/HomePage';
 import { usePust } from '../components/PustContext';
 
-const OFFICIAL_BANNER_IMAGE = '/src/assets/images/pust_campus_hero_1795431408503.jpg';
+const OFFICIAL_BANNER_IMAGE =
+  'https://pust.ac.bd/includes/images/slides/1791951638WhatsApp%20Image%202026-09-22%20at%201.42.30%20PM%20(1).jpeg';
 
 export default function Home() {
   const {

@@ -200,7 +200,7 @@ export function HomePage({
             <div className="lg:col-span-6">
               <ResilientImage
                 src={heroImage}
-                fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
+                fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
                 alt="Pabna University of Science and Technology Rajapur campus academic complex"
                 caption="Fig. 1 — Main Academic Promenade and Campus Grounds, Rajapur Campus, Pabna."
                 containerClassName="h-full flex flex-col"
