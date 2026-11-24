@@ -416,10 +416,23 @@ export function HomePage({
                   <p className="font-mono text-xs text-slate-600 tabular-nums">
                     {currentVc?.tenure}
                   </p>
-                  <p className="font-mono text-xs text-slate-600 tabular-nums pt-1">
-                    {currentVc?.email}
-                    <br />
-                    {currentVc?.phone}
+                  <p className="font-mono text-xs text-slate-600 tabular-nums pt-1 space-y-0.5">
+                    {currentVc?.email && (
+                      <a
+                        href={`mailto:${currentVc.email}`}
+                        className="block text-pust-900 hover:underline"
+                      >
+                        {currentVc.email}
+                      </a>
+                    )}
+                    {currentVc?.phone && (
+                      <a
+                        href={`tel:${currentVc.phone.replace(/\s+/g, '')}`}
+                        className="block hover:text-slate-900"
+                      >
+                        {currentVc.phone}
+                      </a>
+                    )}
                   </p>
                 </div>
               </div>

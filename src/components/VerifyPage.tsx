@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react';
 import {
   AlertCircle,
   ArrowRight,
+  Check,
   CheckCircle2,
+  Copy,
   FileCheck2,
+  Link2,
   Printer,
   Search,
   ShieldCheck,
@@ -26,6 +29,19 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   const [result, setResult] = useState<VerificationLookupResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [copiedField, setCopiedField] = useState<'link' | 'hash' | null>(null);
+
+  async function handleCopyText(text: string, field: 'link' | 'hash') {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      window.setTimeout(() => {
+        setCopiedField((prev) => (prev === field ? null : prev));
+      }, 2000);
+    } catch {
+      // Clipboard unavailable in restricted browser context
+    }
+  }
 
   async function runVerification(rawCode: string) {
     const clean = rawCode.trim();
@@ -165,13 +181,36 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="print:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white whitespace-nowrap"
-            >
-              <Printer className="w-3.5 h-3.5" /> Print Verification Slip
-            </button>
+            <div className="print:hidden flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const shareUrl =
+                    typeof window !== 'undefined'
+                      ? `${window.location.origin}/verify?code=${encodeURIComponent(result.serialCode)}`
+                      : `/verify?code=${encodeURIComponent(result.serialCode)}`;
+                  handleCopyText(shareUrl, 'link');
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white whitespace-nowrap cursor-pointer"
+              >
+                {copiedField === 'link' ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-300" /> Copied Link
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="w-3.5 h-3.5" /> Copy Verify Link
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white whitespace-nowrap cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" /> Print Verification Slip
+              </button>
+            </div>
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
@@ -236,11 +275,31 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                   </span>
                 </div>
               ))}
-              <div className="px-4 py-3 flex items-center justify-between gap-4 text-xs bg-slate-50">
+              <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-4 text-xs bg-slate-50">
                 <span className="text-slate-500">Integrity Digest</span>
-                <span className="font-mono text-pust-900 font-medium">
-                  {result.verificationHash}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-pust-900 font-medium break-all">
+                    {result.verificationHash}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyText(result.verificationHash, 'hash')}
+                    aria-label="Copy verification digest"
+                    className="print:hidden inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer shrink-0"
+                  >
+                    {copiedField === 'hash' ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-700" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

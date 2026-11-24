@@ -5,16 +5,23 @@ import Link from 'next/link';
 import {
   AlertCircle,
   ArrowRight,
+  Calculator,
+  CalendarPlus,
+  Check,
   CheckCircle2,
   Clock,
+  Copy,
   FileDown,
   FileText,
+  Mail,
+  Phone,
   PlayCircle,
   Printer,
   Search,
   X,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { downloadIcsCalendar } from '../lib/calendarExport';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import {
   getYouTubeEmbedUrl,
@@ -23,6 +30,7 @@ import {
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
+import { GstEligibilityChecker } from './GstEligibilityChecker';
 import { CardsGridSkeleton } from './PustSkeletons';
 import { PustCrest } from './PustCrest';
 import { ResearchSection } from './ResearchSection';
@@ -75,15 +83,21 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function downloadPrintableFormHtml(form: DigitalFormItem) {
+function downloadPrintableFormHtml(
+  form: DigitalFormItem,
+  fieldValues: Record<string, string> = {}
+) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const rows = form.fields
-    .map(
-      (f) =>
-        `<tr><th style="text-align:left;padding:10px 12px;border:1px solid #cbd5e1;background:#f8fafc;width:38%;font-size:12px;color:#334155;">${escapeHtml(
-          f
-        )}</th><td style="padding:14px 12px;border:1px solid #cbd5e1;font-size:13px;color:#64748b;">________________________________________________</td></tr>`
-    )
+    .map((f) => {
+      const entered = (fieldValues[f] || '').trim();
+      const valueHtml = entered
+        ? `<span style="color:#0f172a;font-weight:600;">${escapeHtml(entered)}</span>`
+        : `<span style="color:#64748b;">________________________________________________</span>`;
+      return `<tr><th style="text-align:left;padding:10px 12px;border:1px solid #cbd5e1;background:#f8fafc;width:38%;font-size:12px;color:#334155;">${escapeHtml(
+        f
+      )}</th><td style="padding:14px 12px;border:1px solid #cbd5e1;font-size:13px;">${valueHtml}</td></tr>`;
+    })
     .join('');
 
   const html = `<!doctype html>
@@ -189,6 +203,29 @@ export function PublicSubPages({
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormItem | null>(null);
+  const [formFieldValues, setFormFieldValues] = useState<Record<string, string>>({});
+  const [calendarTermFilter, setCalendarTermFilter] = useState<string>('All Terms');
+  const [calendarQuery, setCalendarQuery] = useState<string>('');
+  const [chairmanFacultyFilter, setChairmanFacultyFilter] = useState<'All' | FacultyName>('All');
+  const [chairmanQuery, setChairmanQuery] = useState<string>('');
+  const [copiedContact, setCopiedContact] = useState<string | null>(null);
+
+  async function handleCopyContact(val: string) {
+    try {
+      await navigator.clipboard.writeText(val);
+      setCopiedContact(val);
+      window.setTimeout(() => {
+        setCopiedContact((prev) => (prev === val ? null : prev));
+      }, 1800);
+    } catch {
+      // Clipboard unavailable
+    }
+  }
+
+  function openFillableForm(form: DigitalFormItem) {
+    setFormFieldValues({});
+    setPreviewForm(form);
+  }
 
   useEffect(() => {
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
@@ -580,7 +617,14 @@ export function PublicSubPages({
                   All degree programs operate under the Outcome-Based Education (OBE) framework and
                   4.00 grading ordinance.
                 </p>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/governance/academic-ordinance#cgpa-calculator"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-pust-800 text-pust-900 hover:bg-pust-50 transition-colors cursor-pointer"
+                  >
+                    <Calculator className="w-3.5 h-3.5" />
+                    SGPA / CGPA Calculator
+                  </Link>
                   <button
                     type="button"
                     onClick={() => onNavigate('/governance/academic-ordinance')}
@@ -623,7 +667,12 @@ export function PublicSubPages({
                       </div>
                       <p className="text-xs text-slate-600">
                         Dean: <span className="font-medium text-slate-900">{fac.dean}</span> ·{' '}
-                        <span className="font-mono text-pust-800">{fac.email}</span>
+                        <a
+                          href={`mailto:${fac.email}`}
+                          className="font-mono text-pust-800 hover:underline"
+                        >
+                          {fac.email}
+                        </a>
                       </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
@@ -707,11 +756,11 @@ export function PublicSubPages({
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
                       <button
                         type="button"
-                        onClick={() => setPreviewForm(form)}
+                        onClick={() => openFillableForm(form)}
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                       >
                         <FileText className="w-3.5 h-3.5" />
-                        Preview &amp; Print
+                        Fill &amp; Print Form
                       </button>
                       <button
                         type="button"
@@ -719,7 +768,7 @@ export function PublicSubPages({
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                       >
                         <FileDown className="w-3.5 h-3.5" />
-                        HTML Copy
+                        Blank HTML
                       </button>
                       <button
                         type="button"
@@ -735,29 +784,138 @@ export function PublicSubPages({
               </div>
             </div>
           ) : route === '/academics/calendar' ? (
-            <div className="editable-region space-y-4">
-              <div className="flex justify-end empty:hidden">
-                <EditTriggerButton
-                  target={{ kind: 'academic-calendar' }}
-                  label="Edit Calendar"
-                  variant="compact"
-                />
-              </div>
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-                {resolved.academicExtras.academicCalendar.map((row, idx) => (
-                  <div
-                    key={`${row.event}-${idx}`}
-                    className="p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-baseline"
-                  >
-                    <p className="sm:col-span-3 font-mono text-xs text-pust-800 tabular-nums">
-                      {row.date}
-                    </p>
-                    <p className="sm:col-span-5 font-medium text-slate-900">{row.event}</p>
-                    <p className="sm:col-span-4 text-xs text-slate-600 sm:text-right">{row.term}</p>
+            (() => {
+              const calendarItems = resolved.academicExtras.academicCalendar;
+              const termOptions = [
+                'All Terms',
+                ...Array.from(new Set(calendarItems.map((c) => c.term))),
+              ];
+              const qCal = calendarQuery.trim().toLowerCase();
+              const visibleCalendar = calendarItems.filter((row) => {
+                const matchesTerm =
+                  calendarTermFilter === 'All Terms' || row.term === calendarTermFilter;
+                const matchesQuery =
+                  !qCal ||
+                  row.event.toLowerCase().includes(qCal) ||
+                  row.term.toLowerCase().includes(qCal) ||
+                  row.date.toLowerCase().includes(qCal);
+                return matchesTerm && matchesQuery;
+              });
+
+              return (
+                <div className="editable-region space-y-5">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex flex-wrap gap-1.5">
+                      {termOptions.map((term) => (
+                        <button
+                          key={term}
+                          type="button"
+                          onClick={() => setCalendarTermFilter(term)}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            calendarTermFilter === term
+                              ? 'bg-pust-900 text-white'
+                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                          }`}
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                      <EditTriggerButton
+                        target={{ kind: 'academic-calendar' }}
+                        label="Edit Calendar"
+                        variant="compact"
+                      />
+                      <div className="relative w-full sm:w-56">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="search"
+                          value={calendarQuery}
+                          onChange={(e) => setCalendarQuery(e.target.value)}
+                          placeholder="Search dates or events..."
+                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          downloadIcsCalendar(
+                            visibleCalendar.map((row, idx) => ({
+                              uid: `pust-cal-${idx}-${row.date}`,
+                              title: row.event,
+                              date: row.date,
+                              description: `PUST Academic Calendar — ${row.term}`,
+                            })),
+                            'PUST-Academic-Calendar.ics'
+                          )
+                        }
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        <CalendarPlus className="w-3.5 h-3.5" />
+                        Export All (.ics)
+                      </button>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {visibleCalendar.length === 0 ? (
+                    <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-2">
+                      <p className="text-sm text-slate-600">
+                        No academic calendar events match your filter criteria.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCalendarTermFilter('All Terms');
+                          setCalendarQuery('');
+                        }}
+                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                      >
+                        Reset Calendar Filters
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                      {visibleCalendar.map((row, idx) => (
+                        <div
+                          key={`${row.event}-${idx}`}
+                          className="p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center"
+                        >
+                          <p className="sm:col-span-2 font-mono text-xs text-pust-800 tabular-nums">
+                            {row.date}
+                          </p>
+                          <p className="sm:col-span-5 font-medium text-slate-900">{row.event}</p>
+                          <p className="sm:col-span-3 text-xs text-slate-600">{row.term}</p>
+                          <div className="sm:col-span-2 flex sm:justify-end">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadIcsCalendar(
+                                  [
+                                    {
+                                      uid: `pust-cal-${idx}-${row.date}`,
+                                      title: row.event,
+                                      date: row.date,
+                                      description: `PUST Academic Calendar — ${row.term}`,
+                                    },
+                                  ],
+                                  `PUST-${row.date}.ics`
+                                )
+                              }
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                            >
+                              <CalendarPlus className="w-3.5 h-3.5" />
+                              Add (.ics)
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()
           ) : route === '/academics/scholarship' ? (
             <div className="editable-region space-y-4">
               <div className="flex justify-end empty:hidden">
@@ -781,20 +939,63 @@ export function PublicSubPages({
             </div>
           ) : route === '/academics/seminars' ? (
             <div className="editable-region space-y-4">
-              <div className="flex justify-end empty:hidden">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 <EditTriggerButton
                   target={{ kind: 'seminars' }}
                   label="Edit Seminars"
                   variant="compact"
                 />
+                <button
+                  type="button"
+                  onClick={() =>
+                    downloadIcsCalendar(
+                      resolved.upcomingSeminars.map((sem) => ({
+                        uid: `pust-sem-${sem.id}`,
+                        title: sem.title,
+                        date: sem.date,
+                        description: `Organized by ${sem.organizer}`,
+                      })),
+                      'PUST-Seminars-Workshops.ics'
+                    )
+                  }
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5" />
+                  Export Seminars (.ics)
+                </button>
               </div>
               <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
                 {resolved.upcomingSeminars.map((sem) => (
-                  <div key={sem.id} className="p-5 space-y-1">
-                    <p className="font-mono text-xs text-pust-800 tabular-nums">
-                      {sem.date} · {sem.organizer}
-                    </p>
-                    <h2 className="font-serif text-lg font-medium text-slate-900">{sem.title}</h2>
+                  <div
+                    key={sem.id}
+                    className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {sem.date} · {sem.organizer}
+                      </p>
+                      <h2 className="font-serif text-lg font-medium text-slate-900">{sem.title}</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadIcsCalendar(
+                          [
+                            {
+                              uid: `pust-sem-${sem.id}`,
+                              title: sem.title,
+                              date: sem.date,
+                              description: `Organized by ${sem.organizer}`,
+                            },
+                          ],
+                          `PUST-Seminar-${sem.date}.ics`
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
+                    >
+                      <CalendarPlus className="w-3.5 h-3.5" />
+                      Add (.ics)
+                    </button>
                   </div>
                 ))}
               </div>
@@ -809,57 +1010,163 @@ export function PublicSubPages({
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resolved.academicExtras.facultyDeans.map((d) => (
-                  <div
-                    key={d.faculty}
-                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-1.5"
-                  >
-                    <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                      {d.faculty}
-                    </p>
-                    <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
-                    <p className="font-mono text-xs text-pust-800">{d.email}</p>
-                    <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
-                  </div>
-                ))}
+                {resolved.academicExtras.facultyDeans.map((d) => {
+                  const isCopied = copiedContact === d.email;
+                  return (
+                    <div
+                      key={d.faculty}
+                      className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
+                    >
+                      <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
+                        {d.faculty}
+                      </p>
+                      <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
+                      <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
+                        <a
+                          href={`mailto:${d.email}`}
+                          className="inline-flex items-center gap-1.5 font-mono text-xs text-pust-800 hover:underline"
+                        >
+                          <Mail className="w-3.5 h-3.5 shrink-0" />
+                          {d.email}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyContact(d.email)}
+                          aria-label={`Copy ${d.email}`}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-700" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              Copy
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : route === '/academics/chairmen' ? (
-            <div className="editable-region space-y-4">
-              <div className="flex justify-end empty:hidden">
-                <EditTriggerButton
-                  target={{ kind: 'department', department: null }}
-                  label="Add Department"
-                  icon="add"
-                  variant="compact"
-                />
-              </div>
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
-                {departments.map((d) => (
-                  <div
-                    key={d.id}
-                    className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                  >
-                    <div>
-                      <p className="font-mono text-xs text-pust-800">
-                        {d.code} · {d.faculty}
-                      </p>
-                      <p className="font-serif text-lg font-medium text-slate-900">
-                        Department of {d.name}
-                      </p>
+            (() => {
+              const qChair = chairmanQuery.trim().toLowerCase();
+              const visibleChairmen = departments.filter((d) => {
+                const matchesFac =
+                  chairmanFacultyFilter === 'All' || d.faculty === chairmanFacultyFilter;
+                const matchesQ =
+                  !qChair ||
+                  d.name.toLowerCase().includes(qChair) ||
+                  d.code.toLowerCase().includes(qChair) ||
+                  d.chairmanName.toLowerCase().includes(qChair) ||
+                  d.faculty.toLowerCase().includes(qChair);
+                return matchesFac && matchesQ;
+              });
+
+              return (
+                <div className="editable-region space-y-5">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex flex-wrap gap-1.5">
+                      {FACULTY_FILTERS.map((tab) => (
+                        <button
+                          key={tab.value}
+                          type="button"
+                          onClick={() => setChairmanFacultyFilter(tab.value)}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            chairmanFacultyFilter === tab.value
+                              ? 'bg-pust-900 text-white'
+                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                       <EditTriggerButton
-                        target={{ kind: 'department', department: d }}
-                        label="Edit"
+                        target={{ kind: 'department', department: null }}
+                        label="Add Department"
+                        icon="add"
                         variant="compact"
                       />
+                      <div className="relative w-full sm:w-64">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="search"
+                          value={chairmanQuery}
+                          onChange={(e) => setChairmanQuery(e.target.value)}
+                          placeholder="Search chairman or dept..."
+                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {visibleChairmen.length === 0 ? (
+                    <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-2">
+                      <p className="text-sm text-slate-600">
+                        No department chairman matched your filter.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChairmanFacultyFilter('All');
+                          setChairmanQuery('');
+                        }}
+                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                      >
+                        Reset Filter
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
+                      {visibleChairmen.map((d) => (
+                        <div
+                          key={d.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onSelectDepartment(d)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectDepartment(d);
+                            }
+                          }}
+                          className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-pust-50/40 transition-colors cursor-pointer group"
+                        >
+                          <div>
+                            <p className="font-mono text-xs text-pust-800">
+                              {d.code} · {d.faculty}
+                            </p>
+                            <p className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
+                              Department of {d.name}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+                            <span className="text-xs font-semibold text-pust-800 group-hover:underline whitespace-nowrap">
+                              Prospectus →
+                            </span>
+                            <EditTriggerButton
+                              target={{ kind: 'department', department: d }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()
           ) : route === '/academics/journals' || route === '/academics/publications' ? (
             <ResearchSection
               publications={publications}
@@ -995,24 +1302,33 @@ export function PublicSubPages({
             >
               <div className="print:hidden px-6 py-3.5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
                 <span className="font-mono text-xs font-semibold text-pust-900">
-                  Template Preview · {previewForm.code}
+                  Fillable Form Studio · {previewForm.code}
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {Object.values(formFieldValues).some((v) => v.trim() !== '') && (
+                    <button
+                      type="button"
+                      onClick={() => setFormFieldValues({})}
+                      className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-600 hover:text-slate-900 cursor-pointer"
+                    >
+                      Clear Fields
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => window.print()}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    Print Template
+                    Print Filled Form
                   </button>
                   <button
                     type="button"
-                    onClick={() => downloadPrintableFormHtml(previewForm)}
+                    onClick={() => downloadPrintableFormHtml(previewForm, formFieldValues)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
                   >
                     <FileDown className="w-3.5 h-3.5" />
-                    Download HTML
+                    Download Filled HTML
                   </button>
                   <button
                     type="button"
@@ -1046,14 +1362,40 @@ export function PublicSubPages({
                 </div>
 
                 <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
-                  {previewForm.fields.map((field) => (
-                    <div key={field} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <span className="font-medium text-slate-700">{field}</span>
-                      <span className="font-mono text-slate-400">
-                        [ Submitted via Portal or Handwritten ]
-                      </span>
-                    </div>
-                  ))}
+                  {previewForm.fields.map((field) => {
+                    const val = formFieldValues[field] || '';
+                    return (
+                      <div
+                        key={field}
+                        className="px-4 py-3 grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-2"
+                      >
+                        <label
+                          htmlFor={`form-field-${field}`}
+                          className="sm:col-span-5 font-medium text-slate-700"
+                        >
+                          {field}
+                        </label>
+                        <div className="sm:col-span-7">
+                          <input
+                            id={`form-field-${field}`}
+                            type="text"
+                            value={val}
+                            onChange={(e) =>
+                              setFormFieldValues((prev) => ({
+                                ...prev,
+                                [field]: e.target.value,
+                              }))
+                            }
+                            placeholder="Type value to populate print/HTML..."
+                            className="print:hidden w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-700 focus:outline-none"
+                          />
+                          <span className="hidden print:inline font-mono text-slate-900">
+                            {val.trim() || '________________________________________'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
@@ -1181,6 +1523,21 @@ export function PublicSubPages({
                 ))}
               </div>
 
+              <GstEligibilityChecker
+                departments={departments}
+                onSelectDepartment={onSelectDepartment}
+                onPrefillInquiry={(deptCode, message) => {
+                  setInqProgram('Undergraduate (GST)');
+                  setInqDept(deptCode);
+                  setInqMessage(message);
+                  if (typeof document !== 'undefined') {
+                    document
+                      .getElementById('admission-inquiry-form')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              />
+
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-5 space-y-6">
                   <p className="text-[15px] text-slate-700 leading-relaxed">
@@ -1204,10 +1561,27 @@ export function PublicSubPages({
                         {resolved.admissionsConfig.signupMethodLabel}
                       </dd>
                     </div>
-                    <div className="py-3.5 flex justify-between gap-4">
+                    <div className="py-3.5 flex justify-between items-center gap-4">
                       <dt className="text-slate-600">Registrar Admissions Desk</dt>
-                      <dd className="font-mono text-pust-800">
-                        {resolved.admissionsConfig.deskEmail}
+                      <dd className="flex items-center gap-2 font-mono text-pust-800">
+                        <a
+                          href={`mailto:${resolved.admissionsConfig.deskEmail}`}
+                          className="hover:underline"
+                        >
+                          {resolved.admissionsConfig.deskEmail}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyContact(resolved.admissionsConfig.deskEmail)}
+                          aria-label={`Copy ${resolved.admissionsConfig.deskEmail}`}
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 bg-[#F7F7F5] text-[10px] font-sans font-medium text-slate-700 hover:border-pust-800 cursor-pointer"
+                        >
+                          {copiedContact === resolved.admissionsConfig.deskEmail ? (
+                            <Check className="w-3 h-3 text-emerald-700" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </button>
                       </dd>
                     </div>
                   </dl>
@@ -1286,7 +1660,10 @@ export function PublicSubPages({
                   </div>
                 </div>
 
-                <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+                <div
+                  id="admission-inquiry-form"
+                  className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs scroll-mt-28"
+                >
                   <h2 className="font-serif text-2xl font-medium text-slate-900">
                     Submit an Admission Inquiry
                   </h2>
@@ -1492,13 +1869,43 @@ export function PublicSubPages({
                 </ul>
               </div>
 
-              <button
-                type="button"
-                onClick={() => onNavigate(currentFac.portalRoute)}
-                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
-              >
-                Access Service in Campus Portal
-              </button>
+              {(() => {
+                const emailMatch = `${currentFac.location} ${currentFac.body}`.match(
+                  /[a-zA-Z0-9._%+-]+@pust\.ac\.bd/
+                );
+                const phoneMatch = `${currentFac.location} ${currentFac.body}`.match(
+                  /\+880\d{7,11}/
+                );
+                return (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onNavigate(currentFac.portalRoute)}
+                      className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                    >
+                      Access Service in Campus Portal
+                    </button>
+                    {emailMatch && (
+                      <a
+                        href={`mailto:${emailMatch[0]}`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        {emailMatch[0]}
+                      </a>
+                    )}
+                    {phoneMatch && (
+                      <a
+                        href={`tel:${phoneMatch[0]}`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        {phoneMatch[0]}
+                      </a>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
             <div className="lg:col-span-6">
               <ResilientImage

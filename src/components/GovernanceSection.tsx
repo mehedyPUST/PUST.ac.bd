@@ -6,6 +6,7 @@ import { ExternalLink, Eye, Maximize2, Minimize2 } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import type { GovernanceTabKind } from '../types/pust';
+import { CgpaCalculator } from './CgpaCalculator';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
 
@@ -426,6 +427,8 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 </div>
               </div>
             </div>
+
+            <CgpaCalculator />
           </div>
         )}
       </div>

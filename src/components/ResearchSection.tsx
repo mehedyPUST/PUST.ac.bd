@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Check, Copy, Search } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -27,73 +28,154 @@ export function ResearchSection({
   const { profile } = usePust();
   const { academicExtras } = resolveUniversityContent(profile);
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
+  const [pubQuery, setPubQuery] = useState('');
+  const [copiedPubId, setCopiedPubId] = useState<string | null>(null);
 
   const deptFilters = ['ALL', ...Array.from(new Set(publications.map((p) => p.departmentCode)))];
-  const visiblePubs =
-    selectedDeptFilter === 'ALL'
-      ? publications
-      : publications.filter((p) => p.departmentCode === selectedDeptFilter);
+  const q = pubQuery.trim().toLowerCase();
+  const visiblePubs = publications.filter((p) => {
+    const matchesDept =
+      selectedDeptFilter === 'ALL' || p.departmentCode === selectedDeptFilter;
+    const matchesQuery =
+      !q ||
+      p.title.toLowerCase().includes(q) ||
+      p.authors.toLowerCase().includes(q) ||
+      p.domain.toLowerCase().includes(q) ||
+      (p.venue || '').toLowerCase().includes(q) ||
+      String(p.year).includes(q);
+    return matchesDept && matchesQuery;
+  });
+
+  async function handleCopyCitation(pub: PublicationRecord) {
+    const citation = `${pub.authors} (${pub.year}). "${pub.title}." ${
+      pub.venue || `${pub.domain} Research Series`
+    }, Dept. of ${pub.departmentCode}, Pabna University of Science and Technology.`;
+    try {
+      await navigator.clipboard.writeText(citation);
+      setCopiedPubId(pub.id);
+      window.setTimeout(() => {
+        setCopiedPubId((prev) => (prev === pub.id ? null : prev));
+      }, 1800);
+    } catch {
+      // Clipboard unavailable
+    }
+  }
 
   const publicationsBlock = (
     <div className={focus === 'journals' ? 'lg:col-span-6 space-y-6' : 'lg:col-span-7 space-y-6'}>
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-            Faculty Research &amp; Periodicals
-          </p>
-          <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
-            Recent Peer-Reviewed Publications
-          </h2>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
+      <div className="space-y-4 pb-4 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+              Faculty Research &amp; Periodicals
+            </p>
+            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+              Recent Peer-Reviewed Publications
+            </h2>
+          </div>
           <EditTriggerButton
             target={{ kind: 'publication', publication: null }}
             label="Add Publication"
             icon="add"
             variant="compact"
           />
-          {deptFilters.map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => setSelectedDeptFilter(code)}
-              className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                selectedDeptFilter === code
-                  ? 'bg-pust-900 text-white'
-                  : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
-              }`}
-            >
-              {code}
-            </button>
-          ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {deptFilters.map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => setSelectedDeptFilter(code)}
+                className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  selectedDeptFilter === code
+                    ? 'bg-pust-900 text-white'
+                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                }`}
+              >
+                {code}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full sm:w-64 shrink-0">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="search"
+              value={pubQuery}
+              onChange={(e) => setPubQuery(e.target.value)}
+              placeholder="Search title, author, domain..."
+              aria-label="Filter publications"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+            />
+          </div>
         </div>
       </div>
 
       {visiblePubs.length === 0 ? (
-        <p className="text-sm text-slate-600 py-6">
-          No publications listed for the selected department filter.
-        </p>
+        <div className="py-6 space-y-2">
+          <p className="text-sm text-slate-600">
+            No publications matched your selected department or keyword.
+          </p>
+          {(selectedDeptFilter !== 'ALL' || pubQuery) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDeptFilter('ALL');
+                setPubQuery('');
+              }}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 text-pust-900 hover:border-pust-800 cursor-pointer"
+            >
+              Reset Publication Filters
+            </button>
+          )}
+        </div>
       ) : (
         <div className="divide-y divide-slate-200 border-b border-slate-200">
-          {visiblePubs.map((pub) => (
-            <article key={pub.id} className="py-4 space-y-1.5">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-mono text-xs text-pust-800 tabular-nums">
-                  {pub.departmentCode} · {pub.domain} · {pub.year}
+          {visiblePubs.map((pub) => {
+            const isCopied = copiedPubId === pub.id;
+            return (
+              <article key={pub.id} className="py-4 space-y-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="font-mono text-xs text-pust-800 tabular-nums">
+                    {pub.departmentCode} · {pub.domain} · {pub.year}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCitation(pub)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 bg-[#F7F7F5] text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-700" />
+                          Citation Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          Copy Citation
+                        </>
+                      )}
+                    </button>
+                    <EditTriggerButton
+                      target={{ kind: 'publication', publication: pub }}
+                      label="Edit"
+                      variant="compact"
+                    />
+                  </div>
+                </div>
+                <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
+                  {pub.title}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Authors: {pub.authors}
+                  {pub.venue ? ` · ${pub.venue}` : ''}
                 </p>
-                <EditTriggerButton
-                  target={{ kind: 'publication', publication: pub }}
-                  label="Edit"
-                  variant="compact"
-                />
-              </div>
-              <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
-                {pub.title}
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">Authors: {pub.authors}</p>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>

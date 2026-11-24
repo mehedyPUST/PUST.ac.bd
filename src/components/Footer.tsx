@@ -145,9 +145,20 @@ export function Footer({ onNavigate }: FooterProps) {
               key={`${c.label}-${idx}`}
               className={`font-mono tabular-nums ${idx === 0 ? 'pt-1' : ''}`}
             >
-              {c.label}: {c.phone}
+              {c.label}:{' '}
+              <a
+                href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                className="hover:text-amber-300 transition-colors"
+              >
+                {c.phone}
+              </a>
               <br />
-              {c.email}
+              <a
+                href={`mailto:${c.email}`}
+                className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors"
+              >
+                {c.email}
+              </a>
             </p>
           ))}
         </div>
