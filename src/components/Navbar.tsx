@@ -63,15 +63,16 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
   const governanceGroup = NAV_GROUPS.find((g) => g.id === 'governance')!;
   const adminGroup = NAV_GROUPS.find((g) => g.id === 'administration')!;
   const academicGroup = NAV_GROUPS.find((g) => g.id === 'academic')!;
-  const admissionGroup = NAV_GROUPS.find((g) => g.id === 'admission')!;
   const facilitiesGroup = NAV_GROUPS.find((g) => g.id === 'facilities')!;
+  const noticesGroup = NAV_GROUPS.find((g) => g.id === 'notices')!;
+  const admissionGroup = NAV_GROUPS.find((g) => g.id === 'admission')!;
 
   return (
     <header
       ref={navRef}
       className="sticky top-0 z-40 bg-white border-b border-slate-200 print:hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Zone 1: Brand Crest & Title */}
         <Link
           href="/"
@@ -80,7 +81,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             setMobileMenuOpen(false);
           }}
           title="Pabna University of Science and Technology"
-          className="inline-flex items-center gap-2.5 font-serif text-sm xl:text-[15px] font-semibold tracking-tight text-slate-900 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
+          className="inline-flex items-center gap-2 font-serif text-sm font-semibold tracking-tight text-slate-900 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
         >
           <PustCrest size={34} className="shrink-0" />
           <span className="hidden xl:inline">Pabna University of Science &amp; Technology</span>
@@ -90,7 +91,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
         {/* Zone 2: Desktop Single-Row Nav Links & Sub-Topic Menus */}
         <nav
           aria-label="Primary navigation"
-          className="hidden lg:flex items-center gap-3.5 xl:gap-4 text-[13px] font-medium text-slate-700"
+          className="hidden lg:flex items-center gap-3 xl:gap-3.5 text-[13px] font-medium text-slate-700"
         >
           {/* Home */}
           <div
@@ -283,45 +284,6 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             )}
           </div>
 
-          {/* Admission */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('admission')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'admission' ? null : prev))}
-          >
-            <Link
-              href="/admissions"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/admissions')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Admission
-            </Link>
-            {hoveredGroup === 'admission' && (
-              <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {admissionGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Facilities */}
           <div
             className="relative"
@@ -361,7 +323,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             )}
           </div>
 
-          {/* Notices & Gallery/Verify */}
+          {/* Notices */}
           <div
             className="relative"
             onMouseEnter={() => setHoveredGroup('notices')}
@@ -371,7 +333,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               href="/notices"
               onClick={() => setHoveredGroup(null)}
               className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route === '/notices' || route === '/gallery' || route === '/verify'
+                route.startsWith('/notices')
                   ? 'text-pust-900 font-semibold'
                   : 'hover:text-pust-900'
               }`}
@@ -381,46 +343,77 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             {hoveredGroup === 'notices' && (
               <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  <Link
-                    href="/notices"
-                    onClick={() => setHoveredGroup(null)}
-                    className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                      route === '/notices'
-                        ? 'bg-pust-50 text-pust-900 font-semibold'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                    }`}
-                  >
-                    Notice Board
-                  </Link>
-                  <Link
-                    href="/gallery"
-                    onClick={() => setHoveredGroup(null)}
-                    className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                      route === '/gallery'
-                        ? 'bg-pust-50 text-pust-900 font-semibold'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                    }`}
-                  >
-                    News &amp; Events Gallery
-                  </Link>
-                  <Link
-                    href="/verify"
-                    onClick={() => setHoveredGroup(null)}
-                    className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                      route === '/verify'
-                        ? 'bg-pust-50 text-pust-900 font-semibold'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                    }`}
-                  >
-                    Verify Documents
-                  </Link>
+                  {noticesGroup.items.map((item) => (
+                    <Link
+                      key={item.route}
+                      href={item.route}
+                      onClick={() => setHoveredGroup(null)}
+                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                        route === item.route
+                          ? 'bg-pust-50 text-pust-900 font-semibold'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
           </div>
+
+          {/* Admission */}
+          <div
+            className="relative"
+            onMouseEnter={() => setHoveredGroup('admission')}
+            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'admission' ? null : prev))}
+          >
+            <Link
+              href="/admissions"
+              onClick={() => setHoveredGroup(null)}
+              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
+                route.startsWith('/admissions')
+                  ? 'text-pust-900 font-semibold'
+                  : 'hover:text-pust-900'
+              }`}
+            >
+              Admission
+            </Link>
+            {hoveredGroup === 'admission' && (
+              <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                  {admissionGroup.items.map((item) => (
+                    <Link
+                      key={item.route}
+                      href={item.route}
+                      onClick={() => setHoveredGroup(null)}
+                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                        route === item.route
+                          ? 'bg-pust-50 text-pust-900 font-semibold'
+                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Verify (standalone link) */}
+          <Link
+            href="/verify"
+            onClick={() => setHoveredGroup(null)}
+            className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
+              route === '/verify' ? 'text-pust-900 font-semibold' : 'hover:text-pust-900'
+            }`}
+          >
+            Verify
+          </Link>
         </nav>
 
-        {/* Zone 3: Primary CTA + Mobile Trigger */}
+        {/* Zone 3: Primary CTA (Portal) + Mobile Trigger */}
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href={route === '/portal' ? '/' : '/portal'}
@@ -434,7 +427,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               ? 'Public Website'
               : user
               ? `${user.name.split(' ')[0]} · Portal`
-              : 'Campus Portal'}
+              : 'Portal'}
           </Link>
 
           <button
@@ -539,24 +532,19 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
 
           <button
             type="button"
-            onClick={() => go('/notices')}
-            className="w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium text-slate-800"
+            onClick={() => go('/verify')}
+            className={`w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium ${
+              route === '/verify' ? 'text-pust-900' : 'text-slate-800'
+            }`}
           >
-            Notice Board
+            Verify
           </button>
           <button
             type="button"
             onClick={() => go('/gallery')}
-            className="w-full text-left py-2.5 px-2 border-b border-slate-100 font-medium text-slate-800"
+            className="w-full text-left py-2.5 px-2 font-medium text-slate-800"
           >
             News &amp; Events Gallery
-          </button>
-          <button
-            type="button"
-            onClick={() => go('/verify')}
-            className="w-full text-left py-2.5 px-2 font-medium text-pust-900"
-          >
-            Verify Digital Documents
           </button>
         </div>
       )}

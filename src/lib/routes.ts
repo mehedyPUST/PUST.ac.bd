@@ -46,6 +46,11 @@ export type AppRoute =
   | '/facilities/medical'
   | '/facilities/ict-sheba'
   | '/notices'
+  | '/notices/general'
+  | '/notices/job'
+  | '/notices/press-release'
+  | '/notices/noc'
+  | '/notices/result'
   | '/gallery'
   | '/verify'
   | '/portal';
@@ -57,7 +62,14 @@ export interface NavSubItem {
 }
 
 export interface NavGroup {
-  id: 'about' | 'governance' | 'administration' | 'academic' | 'admission' | 'facilities';
+  id:
+    | 'about'
+    | 'governance'
+    | 'administration'
+    | 'academic'
+    | 'facilities'
+    | 'notices'
+    | 'admission';
   label: string;
   defaultRoute: AppRoute;
   items: NavSubItem[];
@@ -121,17 +133,6 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: 'admission',
-    label: 'Admission',
-    defaultRoute: '/admissions',
-    items: [
-      { label: 'Undergraduate', route: '/admissions/undergraduate' },
-      { label: 'Graduate', route: '/admissions/graduate' },
-      { label: 'Evening Programs', route: '/admissions/evening-programs' },
-      { label: 'Admission Notice', route: '/admissions/notice' },
-    ],
-  },
-  {
     id: 'facilities',
     label: 'Facilities',
     defaultRoute: '/facilities',
@@ -141,6 +142,29 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Residence', route: '/facilities/residence' },
       { label: 'Medical', route: '/facilities/medical' },
       { label: 'ICT Sheba', route: '/facilities/ict-sheba' },
+    ],
+  },
+  {
+    id: 'notices',
+    label: 'Notices',
+    defaultRoute: '/notices',
+    items: [
+      { label: 'General Notice', route: '/notices/general' },
+      { label: 'Job Notice', route: '/notices/job' },
+      { label: 'Press Release', route: '/notices/press-release' },
+      { label: 'NOC', route: '/notices/noc' },
+      { label: 'Result Notice', route: '/notices/result' },
+    ],
+  },
+  {
+    id: 'admission',
+    label: 'Admission',
+    defaultRoute: '/admissions',
+    items: [
+      { label: 'Undergraduate', route: '/admissions/undergraduate' },
+      { label: 'Graduate', route: '/admissions/graduate' },
+      { label: 'Evening Programs', route: '/admissions/evening-programs' },
+      { label: 'Admission Notice', route: '/admissions/notice' },
     ],
   },
 ];
@@ -174,12 +198,12 @@ const SECTION_ROOT_LABELS: Record<string, string> = {
   '/governance': 'Governance',
   '/administration': 'Administration',
   '/academics': 'Academics',
-  '/admissions': 'Admissions',
   '/facilities': 'Facilities',
+  '/notices': 'Notices',
+  '/admissions': 'Admissions',
 };
 
 const STANDALONE_ROUTE_LABELS: Record<string, string> = {
-  '/notices': 'University Notices',
   '/gallery': 'News & Events Gallery',
   '/verify': 'Document Verification',
   '/portal': 'Digital Campus Portal',

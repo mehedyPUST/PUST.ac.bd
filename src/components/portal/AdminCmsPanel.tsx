@@ -614,6 +614,7 @@ export function AdminCmsPanel({
                   'Course',
                   'Job & Tender',
                   'NOC & Orders',
+                  'Press Release',
                 ] as NoticeCategory[]
               ).map((c) => (
                 <option key={c} value={c}>

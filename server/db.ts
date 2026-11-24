@@ -163,7 +163,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 2;
+    const INSTITUTIONAL_SEED_VERSION = 3;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
@@ -188,6 +188,21 @@ class PustRepository {
           { $set: docToSync },
           { upsert: true }
         );
+      }
+
+      const newNoticeIds = new Set([
+        'notice-press-release-convocation',
+        'notice-result-fall-2026',
+        'notice-job-faculty-2026',
+      ]);
+      for (const notice of SEED_NOTICES) {
+        if (newNoticeIds.has(notice.id)) {
+          await db.collection('notices').updateOne(
+            { id: notice.id },
+            { $setOnInsert: notice },
+            { upsert: true }
+          );
+        }
       }
 
       await seedMetaCol.updateOne(

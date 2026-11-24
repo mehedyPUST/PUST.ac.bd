@@ -114,7 +114,8 @@ export type NoticeCategory =
   | 'Result'
   | 'Course'
   | 'Job & Tender'
-  | 'NOC & Orders';
+  | 'NOC & Orders'
+  | 'Press Release';
 
 export type NoticeVisibility = 'public' | 'registered';
 export type NoticeBoardScope = 'central' | 'department' | 'course';

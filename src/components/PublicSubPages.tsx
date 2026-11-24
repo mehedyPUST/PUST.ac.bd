@@ -87,13 +87,14 @@ const FACULTY_DEANS: Array<{
 const NOTICE_FILTERS: Array<'All' | NoticeCategory> = [
   'All',
   'General',
+  'Job & Tender',
+  'Press Release',
+  'NOC & Orders',
+  'Result',
   'Admission',
   'Academic',
   'Examination',
-  'Result',
   'Course',
-  'Job & Tender',
-  'NOC & Orders',
 ];
 
 interface DigitalFormDef {
@@ -337,6 +338,15 @@ interface PublicSubPagesProps {
   }) => Promise<InquiryRecord>;
 }
 
+function getCategoryForNoticeRoute(route: AppRoute): 'All' | NoticeCategory {
+  if (route === '/notices/general') return 'General';
+  if (route === '/notices/job') return 'Job & Tender';
+  if (route === '/notices/press-release') return 'Press Release';
+  if (route === '/notices/noc') return 'NOC & Orders';
+  if (route === '/notices/result') return 'Result';
+  return 'All';
+}
+
 export function PublicSubPages({
   route,
   profile,
@@ -354,13 +364,19 @@ export function PublicSubPages({
 }: PublicSubPagesProps) {
   const [selectedFaculty, setSelectedFaculty] = useState<'All' | FacultyName>('All');
   const [deptQuery, setDeptQuery] = useState('');
-  const [selectedNoticeCat, setSelectedNoticeCat] = useState<'All' | NoticeCategory>('All');
+  const [selectedNoticeCat, setSelectedNoticeCat] = useState<'All' | NoticeCategory>(() =>
+    getCategoryForNoticeRoute(route)
+  );
   const [noticeBoardScope, setNoticeBoardScope] = useState<'all' | 'central' | 'department'>('all');
   const [noticeQuery, setNoticeQuery] = useState('');
   const [galleryCategory, setGalleryCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormDef | null>(null);
+
+  useEffect(() => {
+    setSelectedNoticeCat(getCategoryForNoticeRoute(route));
+  }, [route]);
 
   useEffect(() => {
     if (!activeMedia && !previewForm) return;
@@ -1181,8 +1197,7 @@ export function PublicSubPages({
   // 3. ADMISSIONS PAGES (/admissions/*)
   if (route.startsWith('/admissions')) {
     const admissionTabs: Array<{ label: string; route: AppRoute }> = [
-      { label: 'Admissions Overview', route: '/admissions' },
-      { label: 'Undergraduate (GST)', route: '/admissions/undergraduate' },
+      { label: 'Undergraduate', route: '/admissions/undergraduate' },
       { label: 'Graduate', route: '/admissions/graduate' },
       { label: 'Evening Programs', route: '/admissions/evening-programs' },
       { label: 'Admission Notice', route: '/admissions/notice' },
@@ -1197,7 +1212,7 @@ export function PublicSubPages({
               Admissions 2026–2027
             </p>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
-              {admissionTabs.find((t) => t.route === route)?.label || 'Admissions Desk'}
+              {admissionTabs.find((t) => t.route === route)?.label || 'Admissions'}
             </h1>
             <div className="flex flex-wrap gap-2">
               {admissionTabs.map((t) => (
@@ -1205,7 +1220,8 @@ export function PublicSubPages({
                   key={t.route}
                   href={t.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    route === t.route
+                    route === t.route ||
+                    (route === '/admissions' && t.route === '/admissions/undergraduate')
                       ? 'bg-pust-900 text-white'
                       : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
@@ -1535,21 +1551,6 @@ export function PublicSubPages({
         ],
       },
       {
-        label: 'Residence',
-        route: '/facilities/residence',
-        title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
-        body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
-        img: GROUNDS_IMAGE,
-        hours: '24/7 Provost & House Tutor Duty',
-        location: 'North Residential Precinct, Rajapur',
-        portalRoute: '/portal?tab=halls',
-        highlights: [
-          'July 06 Hall, Swadhinota Hall, Matribhasha Hall & Ganatantra Hall',
-          'Full retained seat allotment & change history per student ID',
-          'Mandatory Hall dues clearance synced directly with Exam Portal',
-        ],
-      },
-      {
         label: 'Transport',
         route: '/facilities/transport',
         title: 'University Transportation Pool',
@@ -1562,6 +1563,21 @@ export function PublicSubPages({
           'Dedicated student, teacher & officer shuttle schedules',
           'Pabna Town, Terminal, Edward College & Highway corridors',
           'Convocation & semester examination special bus dispatch',
+        ],
+      },
+      {
+        label: 'Residence',
+        route: '/facilities/residence',
+        title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
+        body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
+        img: GROUNDS_IMAGE,
+        hours: '24/7 Provost & House Tutor Duty',
+        location: 'North Residential Precinct, Rajapur',
+        portalRoute: '/portal?tab=halls',
+        highlights: [
+          'July 06 Hall, Swadhinota Hall, Matribhasha Hall & Ganatantra Hall',
+          'Full retained seat allotment & change history per student ID',
+          'Mandatory Hall dues clearance synced directly with Exam Portal',
         ],
       },
       {
@@ -1793,21 +1809,50 @@ export function PublicSubPages({
     );
   }
 
-  // 6. NOTICES PAGE (/notices)
+  // 6. NOTICES PAGES (/notices & /notices/*)
+  const noticeSubTabs: Array<{ label: string; route: AppRoute }> = [
+    { label: 'All Notices', route: '/notices' },
+    { label: 'General Notice', route: '/notices/general' },
+    { label: 'Job Notice', route: '/notices/job' },
+    { label: 'Press Release', route: '/notices/press-release' },
+    { label: 'NOC', route: '/notices/noc' },
+    { label: 'Result Notice', route: '/notices/result' },
+  ];
+  const activeNoticeHeading =
+    noticeSubTabs.find((t) => t.route === route && route !== '/notices')?.label ||
+    'University Notice Board';
+
   return (
     <main className="flex-1 bg-[#F7F7F5]">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-slate-200">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Central &amp; Department Circulars
-            </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
-              University Notice Board
-            </h1>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+          <div className="space-y-4">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                Central &amp; Department Circulars
+              </p>
+              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
+                {activeNoticeHeading}
+              </h1>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {noticeSubTabs.map((tab) => (
+                <Link
+                  key={tab.route}
+                  href={tab.route}
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    route === tab.route
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="relative w-full lg:w-72">
+          <div className="relative w-full lg:w-72 shrink-0">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="search"

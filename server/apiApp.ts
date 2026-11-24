@@ -79,6 +79,7 @@ const createNoticeSchema = z.object({
     'Course',
     'Job & Tender',
     'NOC & Orders',
+    'Press Release',
   ]),
   departmentCode: z.string().trim().min(2).max(24),
   boardScope: z.enum(['central', 'department', 'course']).default('central'),
