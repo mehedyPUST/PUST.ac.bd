@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Copy, Mail, Phone, Search, X } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
+import { EditTriggerButton } from './EditTriggerButton';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -319,7 +320,7 @@ export function AdministrationSection({
             {/* Sticky Portrait & Desk Dossier Column */}
             <aside className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
               <ResilientImage
-                src={VC_PORTRAIT_IMAGE}
+                src={currentVc?.photoUrl || VC_PORTRAIT_IMAGE}
                 fallbackSrc={VC_PORTRAIT_FALLBACK}
                 alt={currentVc?.name || 'Honorable Vice-Chancellor of PUST'}
                 caption={`Fig. 2 — ${currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}, Honorable Vice-Chancellor.`}
@@ -379,9 +380,16 @@ export function AdministrationSection({
             {/* Long-Form Editorial Welcome Message */}
             <article className="lg:col-span-8 max-w-prose space-y-6">
               <header className="space-y-2 border-b border-slate-200 pb-6">
-                <p className="text-xs font-medium text-pust-800">
-                  Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs font-medium text-pust-800">
+                    Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
+                  </p>
+                  <EditTriggerButton
+                    target={{ kind: 'vc' }}
+                    label="Edit VC Profile & Message"
+                    variant="compact"
+                  />
+                </div>
                 <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
                   {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
                 </h2>
@@ -462,29 +470,36 @@ export function AdministrationSection({
               </p>
             </div>
 
-            <div className="w-full md:w-80 relative">
-              <Search
-                className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-                aria-hidden="true"
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <EditTriggerButton
+                target={{ kind: 'leadership' }}
+                label="Edit Leadership"
+                variant="compact"
               />
-              <input
-                type="search"
-                value={directoryQuery}
-                onChange={(e) => setDirectoryQuery(e.target.value)}
-                placeholder="Search office, role, or officer..."
-                aria-label="Filter executive administration directory"
-                className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800"
-              />
-              {directoryQuery && (
-                <button
-                  type="button"
-                  onClick={() => setDirectoryQuery('')}
-                  aria-label="Clear search"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <div className="w-full md:w-80 relative">
+                <Search
+                  className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  value={directoryQuery}
+                  onChange={(e) => setDirectoryQuery(e.target.value)}
+                  placeholder="Search office, role, or officer..."
+                  aria-label="Filter executive administration directory"
+                  className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800"
+                />
+                {directoryQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setDirectoryQuery('')}
+                    aria-label="Clear search"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -508,6 +523,7 @@ export function AdministrationSection({
                 {filteredLeadership.map((officer) => {
                   const isHighlighted = activeOffice?.matchLeadership?.(officer.role) ?? false;
                   const isCopied = copiedEmail === officer.email;
+                  const originalIdx = profile.leadership.indexOf(officer);
 
                   return (
                     <div
@@ -558,6 +574,14 @@ export function AdministrationSection({
                           <Phone className="w-3.5 h-3.5 shrink-0" />
                           {officer.phone}
                         </a>
+                        <EditTriggerButton
+                          target={{
+                            kind: 'leadership',
+                            officerIndex: originalIdx >= 0 ? originalIdx : 0,
+                          }}
+                          label="Edit"
+                          variant="compact"
+                        />
                       </dd>
                     </div>
                   );
@@ -645,28 +669,35 @@ export function AdministrationSection({
               </p>
             </div>
 
-            <div
-              className="flex flex-wrap gap-1.5 p-1 bg-white border border-slate-200 rounded-lg"
-              role="group"
-              aria-label="Filter administrative units by category"
-            >
-              {UNIT_TABS.map((tab) => {
-                const active = unitFilter === tab;
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setUnitFilter(tab)}
-                    className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      active
-                        ? 'bg-pust-900 text-white'
-                        : 'text-slate-700 hover:bg-[#FAF8F4] hover:text-pust-900'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap items-center gap-3">
+              <EditTriggerButton
+                target={{ kind: 'unit' }}
+                label="Edit Units"
+                variant="compact"
+              />
+              <div
+                className="flex flex-wrap gap-1.5 p-1 bg-white border border-slate-200 rounded-lg"
+                role="group"
+                aria-label="Filter administrative units by category"
+              >
+                {UNIT_TABS.map((tab) => {
+                  const active = unitFilter === tab;
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setUnitFilter(tab)}
+                      className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        active
+                          ? 'bg-pust-900 text-white'
+                          : 'text-slate-700 hover:bg-[#FAF8F4] hover:text-pust-900'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -683,9 +714,16 @@ export function AdministrationSection({
                       : 'border-slate-200 bg-white hover:border-pust-700/50'
                   }`}
                 >
-                  <p className="font-mono text-xs text-pust-800">
-                    {unit.code} · {unit.category}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-mono text-xs text-pust-800">
+                      {unit.code} · {unit.category}
+                    </p>
+                    <EditTriggerButton
+                      target={{ kind: 'unit', unitCode: unit.code }}
+                      label="Edit"
+                      variant="compact"
+                    />
+                  </div>
                   <h3 className="font-serif text-lg font-medium text-slate-900">{unit.name}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">{unit.description}</p>
                 </div>

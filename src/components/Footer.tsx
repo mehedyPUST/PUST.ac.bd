@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import type { AppRoute } from '../lib/routes';
+import { EditTriggerButton } from './EditTriggerButton';
+import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
 
 interface FooterProps {
@@ -9,6 +11,7 @@ interface FooterProps {
 }
 
 export function Footer({ onNavigate }: FooterProps) {
+  const { profile } = usePust();
   return (
     <footer
       id="footer"
@@ -30,8 +33,16 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             A public university in Bangladesh advancing engineering, pure and applied sciences,
-            business, and humanities across 5 faculties and 21 academic departments.
+            business, and humanities across {profile?.facultiesCount ?? 5} faculties and{' '}
+            {profile?.departmentsCount ?? 21} academic departments.
           </p>
+          <div className="pt-1">
+            <EditTriggerButton
+              target={{ kind: 'hero-profile' }}
+              label="Edit University Stats"
+              variant="dark"
+            />
+          </div>
           <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
             <a
               href="https://pust.ac.bd/"
@@ -180,7 +191,9 @@ export function Footer({ onNavigate }: FooterProps) {
       <div className="border-t border-pust-900 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-300">
           <p>© 2026 Pabna University of Science and Technology (PUST). All rights reserved.</p>
-          <p className="font-mono tabular-nums">First Convocation: 15 March 2027 · Rajapur Campus</p>
+          <p className="font-mono tabular-nums">
+            First Convocation: {profile?.convocationDate ?? '15 March 2027'} · Rajapur Campus
+          </p>
         </div>
       </div>
     </footer>

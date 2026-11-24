@@ -401,6 +401,7 @@ export interface ViceChancellorRecord {
   email: string;
   phone: string;
   message: string;
+  photoUrl?: string;
   isCurrent: boolean;
   orderIndex: number;
 }
@@ -455,10 +456,26 @@ export interface UniversityProfile {
   facultyMembersCount: number;
   studentsCount: number;
   convocationDate: string;
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
   leadership: LeadershipOfficer[];
   units: AdministrativeUnit[];
   journals: JournalRecord[];
 }
+
+export type EditModalTarget =
+  | { kind: 'hero-profile' }
+  | { kind: 'banner'; slideId?: string }
+  | { kind: 'vc' }
+  | { kind: 'about'; slug: AboutContentRecord['slug'] }
+  | { kind: 'notice'; notice?: NoticeRecord | null }
+  | { kind: 'gallery'; item?: GalleryItemRecord | null }
+  | { kind: 'publication'; publication?: PublicationRecord | null }
+  | { kind: 'journals' }
+  | { kind: 'department'; department: DepartmentRecord }
+  | { kind: 'leadership'; officerIndex?: number }
+  | { kind: 'unit'; unitCode?: string };
 
 export interface InquiryRecord {
   id: string;

@@ -114,7 +114,25 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
-  updateNotice: (id: string, payload: { pinned: boolean }) =>
+  updateNotice: (
+    id: string,
+    payload: Partial<{
+      referenceNo: string;
+      title: string;
+      category: NoticeCategory;
+      departmentCode: string;
+      boardScope: NoticeBoardScope;
+      visibility: NoticeVisibility;
+      targetSession: string;
+      targetCourseCode: string;
+      attachmentName: string;
+      attachmentUrl: string;
+      attachmentType: 'image' | 'pdf' | 'other';
+      summary: string;
+      body: string;
+      pinned: boolean;
+    }>
+  ) =>
     apiFetch<{ notice: NoticeRecord }>(`/api/notices/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -594,6 +612,7 @@ export const pustApi = {
     phone: string;
     tenure: string;
     message: string;
+    photoUrl?: string;
     promoteNewVc: boolean;
   }) =>
     apiFetch<{ profiles: ViceChancellorRecord[] }>('/api/portal/cms/vice-chancellor', {
@@ -669,11 +688,15 @@ export const pustApi = {
 
   updateGalleryItem: (
     id: string,
-    payload: {
-      title?: string;
-      description?: string;
-      visibility?: 'public' | 'registered';
-    }
+    payload: Partial<{
+      title: string;
+      description: string;
+      category: GalleryItemRecord['category'];
+      mediaType: GalleryItemRecord['mediaType'];
+      mediaUrl: string;
+      eventDate: string;
+      visibility: 'public' | 'registered';
+    }>
   ) =>
     apiFetch<{ item: GalleryItemRecord }>(`/api/portal/cms/gallery/${encodeURIComponent(id)}`, {
       method: 'PATCH',
@@ -682,6 +705,35 @@ export const pustApi = {
 
   deleteGalleryItem: (id: string) =>
     apiFetch<{ deleted: boolean }>(`/api/portal/cms/gallery/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+
+  updateUniversityProfile: (payload: Partial<UniversityProfile>) =>
+    apiFetch<{ profile: UniversityProfile }>('/api/portal/cms/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  updateDepartment: (id: string, payload: Partial<Omit<DepartmentRecord, 'id' | 'code'>>) =>
+    apiFetch<{ department: DepartmentRecord }>(`/api/portal/cms/departments/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  createPublication: (payload: Omit<PublicationRecord, 'id'>) =>
+    apiFetch<{ publication: PublicationRecord }>('/api/portal/cms/publications', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updatePublication: (id: string, payload: Partial<Omit<PublicationRecord, 'id'>>) =>
+    apiFetch<{ publication: PublicationRecord }>(`/api/portal/cms/publications/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  deletePublication: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/cms/publications/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     }),
 

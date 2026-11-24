@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { EditTriggerButton } from './EditTriggerButton';
 import { ResilientImage } from './ResilientImage';
 import type { JournalRecord, PublicationRecord } from '../types/pust';
 
@@ -41,7 +42,13 @@ export function ResearchSection({
           </h2>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <EditTriggerButton
+            target={{ kind: 'publication', publication: null }}
+            label="Add Publication"
+            icon="add"
+            variant="compact"
+          />
           {deptFilters.map((code) => (
             <button
               key={code}
@@ -67,9 +74,16 @@ export function ResearchSection({
         <div className="divide-y divide-slate-200 border-b border-slate-200">
           {visiblePubs.map((pub) => (
             <article key={pub.id} className="py-4 space-y-1.5">
-              <p className="font-mono text-xs text-pust-800 tabular-nums">
-                {pub.departmentCode} · {pub.domain} · {pub.year}
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-mono text-xs text-pust-800 tabular-nums">
+                  {pub.departmentCode} · {pub.domain} · {pub.year}
+                </p>
+                <EditTriggerButton
+                  target={{ kind: 'publication', publication: pub }}
+                  label="Edit"
+                  variant="compact"
+                />
+              </div>
               <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
                 {pub.title}
               </h3>
@@ -88,13 +102,20 @@ export function ResearchSection({
       } bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden`}
     >
       <div className="p-6 sm:p-7 space-y-5">
-        <div className="border-b border-slate-200 pb-4">
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-            University Periodicals
-          </p>
-          <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
-            Official PUST Journals
-          </h2>
+        <div className="border-b border-slate-200 pb-4 flex items-end justify-between gap-3">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+              University Periodicals
+            </p>
+            <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+              Official PUST Journals
+            </h2>
+          </div>
+          <EditTriggerButton
+            target={{ kind: 'journals' }}
+            label="Edit Journals"
+            variant="compact"
+          />
         </div>
 
         <div className="divide-y divide-slate-200">

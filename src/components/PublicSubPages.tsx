@@ -21,6 +21,7 @@ import {
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
+import { EditTriggerButton } from './EditTriggerButton';
 import { CardsGridSkeleton } from './PustSkeletons';
 import { PustCrest } from './PustCrest';
 import { ResearchSection } from './ResearchSection';
@@ -514,9 +515,15 @@ export function PublicSubPages({
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               About Pabna University of Science &amp; Technology
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
-              {activeSection?.title || 'Our University'}
-            </h1>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+                {activeSection?.title || 'Our University'}
+              </h1>
+              <EditTriggerButton
+                target={{ kind: 'about', slug: activeSlug }}
+                label="Edit Section"
+              />
+            </div>
             <div className="flex flex-wrap gap-2">
               {[
                 { label: 'Our University', route: '/about/our-university' as AppRoute },
@@ -624,15 +631,22 @@ export function PublicSubPages({
               <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Established</dt>
-                  <dd className="font-mono font-medium">2008 (Act No. 43 of 2001)</dd>
+                  <dd className="font-mono font-medium">
+                    {profile?.establishedYear ?? 2008} (Act No. 43 of 2001)
+                  </dd>
                 </div>
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Campus Area</dt>
-                  <dd className="font-mono font-medium">30 Acres · Rajapur, Pabna</dd>
+                  <dd className="font-mono font-medium">
+                    {profile?.campusAcres ?? 30} Acres · Rajapur, Pabna
+                  </dd>
                 </div>
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">Faculties &amp; Departments</dt>
-                  <dd className="font-mono font-medium">5 Faculties · 21 Departments</dd>
+                  <dd className="font-mono font-medium">
+                    {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21}{' '}
+                    Departments
+                  </dd>
                 </div>
                 <div className="px-4 py-3 flex justify-between">
                   <dt className="text-slate-600">First Convocation</dt>
@@ -782,20 +796,34 @@ export function PublicSubPages({
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
                       {facDepts.map((dept) => (
-                        <button
+                        <div
                           key={dept.id}
-                          type="button"
+                          role="button"
+                          tabIndex={0}
                           onClick={() => onSelectDepartment(dept)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectDepartment(dept);
+                            }
+                          }}
                           className="text-left p-5 bg-white hover:bg-pust-50/40 transition-colors space-y-1.5 cursor-pointer"
                         >
-                          <p className="font-mono text-xs text-pust-800 tabular-nums">
-                            {dept.code} · {dept.intakeSeats} Seats
-                          </p>
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-mono text-xs text-pust-800 tabular-nums">
+                              {dept.code} · {dept.intakeSeats} Seats
+                            </p>
+                            <EditTriggerButton
+                              target={{ kind: 'department', department: dept }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
                           <h3 className="font-serif text-lg font-medium text-slate-900">
                             {dept.name}
                           </h3>
                           <p className="text-xs text-slate-500">Chair: {dept.chairmanName}</p>
-                        </button>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -998,7 +1026,14 @@ export function PublicSubPages({
                       Department of {d.name}
                     </p>
                   </div>
-                  <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+                    <EditTriggerButton
+                      target={{ kind: 'department', department: d }}
+                      label="Edit"
+                      variant="compact"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -1069,17 +1104,31 @@ export function PublicSubPages({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filteredDepartments.map((dept) => (
-                    <button
+                    <div
                       key={dept.id}
-                      type="button"
+                      role="button"
+                      tabIndex={0}
                       onClick={() => onSelectDepartment(dept)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onSelectDepartment(dept);
+                        }
+                      }}
                       className="text-left rounded-2xl border border-slate-200 bg-white shadow-xs hover:shadow-md hover:border-pust-700/60 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
                     >
                       <div className="p-6 flex-1 flex flex-col justify-between gap-4">
                         <div>
-                          <p className="font-mono text-xs text-pust-800 tabular-nums">
-                            {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
-                          </p>
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-mono text-xs text-pust-800 tabular-nums">
+                              {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
+                            </p>
+                            <EditTriggerButton
+                              target={{ kind: 'department', department: dept }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
                           <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-pust-900">
                             {dept.name}
                           </h2>
@@ -1095,7 +1144,7 @@ export function PublicSubPages({
                           </span>
                         </div>
                       </div>
-                    </button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -1238,21 +1287,45 @@ export function PublicSubPages({
           </div>
 
           {route === '/admissions/notice' ? (
-            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-              {admissionNotices.map((n) => (
-                <button
-                  key={n.id}
-                  type="button"
-                  onClick={() => onSelectNotice(n)}
-                  className="w-full text-left p-5 hover:bg-pust-50/35 cursor-pointer space-y-1"
-                >
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
-                    {n.publishedAt} · {n.referenceNo}
-                  </p>
-                  <h2 className="font-serif text-lg font-medium text-slate-900">{n.title}</h2>
-                  <p className="text-sm text-slate-600">{n.summary}</p>
-                </button>
-              ))}
+            <div className="space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'notice', notice: null }}
+                  label="Add Admission Notice"
+                  icon="add"
+                  variant="compact"
+                />
+              </div>
+              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                {admissionNotices.map((n) => (
+                  <div
+                    key={n.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onSelectNotice(n)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onSelectNotice(n);
+                      }
+                    }}
+                    className="w-full text-left p-5 hover:bg-pust-50/35 cursor-pointer space-y-1"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {n.publishedAt} · {n.referenceNo}
+                      </p>
+                      <EditTriggerButton
+                        target={{ kind: 'notice', notice: n }}
+                        label="Edit"
+                        variant="compact"
+                      />
+                    </div>
+                    <h2 className="font-serif text-lg font-medium text-slate-900">{n.title}</h2>
+                    <p className="text-sm text-slate-600">{n.summary}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="space-y-10">
@@ -1720,7 +1793,13 @@ export function PublicSubPages({
                 Campus Photos &amp; Videos Gallery
               </h1>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <EditTriggerButton
+                target={{ kind: 'gallery', item: null }}
+                label="Add Media"
+                icon="add"
+                variant="compact"
+              />
               {cats.map((c) => (
                 <button
                   key={c}
@@ -1743,10 +1822,17 @@ export function PublicSubPages({
               const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
               const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
               return (
-                <button
+                <div
                   key={item.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setActiveMedia(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveMedia(item);
+                    }
+                  }}
                   className="text-left rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden shadow-xs"
                 >
                   <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
@@ -1758,10 +1844,16 @@ export function PublicSubPages({
                       className="w-full h-full object-cover"
                     />
                     {item.mediaType === 'video' && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
+                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
                         <PlayCircle className="w-10 h-10" />
                       </span>
                     )}
+                    <EditTriggerButton
+                      target={{ kind: 'gallery', item }}
+                      label="Edit"
+                      variant="overlay"
+                      className="absolute top-2.5 right-2.5 z-10"
+                    />
                   </div>
                   <div className="p-5 space-y-1">
                     <p className="font-mono text-xs text-pust-800 tabular-nums">
@@ -1776,7 +1868,7 @@ export function PublicSubPages({
                     </h2>
                     <p className="text-xs text-slate-600">{item.description}</p>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -1890,15 +1982,23 @@ export function PublicSubPages({
             </div>
           </div>
 
-          <div className="relative w-full lg:w-72 shrink-0">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="search"
-              value={noticeQuery}
-              onChange={(e) => setNoticeQuery(e.target.value)}
-              placeholder="Search circulars or memo no."
-              className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
+            <EditTriggerButton
+              target={{ kind: 'notice', notice: null }}
+              label="New Notice"
+              icon="add"
+              variant="compact"
             />
+            <div className="relative w-full sm:w-72 shrink-0">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="search"
+                value={noticeQuery}
+                onChange={(e) => setNoticeQuery(e.target.value)}
+                placeholder="Search circulars or memo no."
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+              />
+            </div>
           </div>
         </div>
 
@@ -1962,10 +2062,17 @@ export function PublicSubPages({
         ) : (
           <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs">
             {filteredNotices.map((notice) => (
-              <button
+              <div
                 key={notice.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => onSelectNotice(notice)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectNotice(notice);
+                  }
+                }}
                 className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/35 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
               >
                 <div className="lg:col-span-3 font-mono text-xs text-slate-500 tabular-nums">
@@ -1981,15 +2088,22 @@ export function PublicSubPages({
                   <p className="text-sm text-slate-600 mt-1 leading-relaxed">{notice.summary}</p>
                 </div>
 
-                <div className="lg:col-span-2 lg:text-right font-mono text-xs text-slate-500 tabular-nums">
-                  {notice.referenceNo}
-                  {notice.visibility === 'registered' && (
-                    <span className="block text-pust-800 font-semibold mt-0.5">
-                      Registered Only
-                    </span>
-                  )}
+                <div className="lg:col-span-2 lg:text-right font-mono text-xs text-slate-500 tabular-nums flex lg:flex-col items-center lg:items-end justify-between gap-2">
+                  <div>
+                    {notice.referenceNo}
+                    {notice.visibility === 'registered' && (
+                      <span className="block text-pust-800 font-semibold mt-0.5">
+                        Registered Only
+                      </span>
+                    )}
+                  </div>
+                  <EditTriggerButton
+                    target={{ kind: 'notice', notice }}
+                    label="Edit"
+                    variant="compact"
+                  />
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}

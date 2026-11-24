@@ -176,6 +176,12 @@ const vcUpdateSchema = z.object({
   phone: z.string().trim().min(4).max(40),
   tenure: z.string().trim().min(4).max(60),
   message: z.string().trim().min(20).max(8000),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be a valid https://, http://, or local asset path.')
+    .optional(),
   promoteNewVc: z.boolean().default(false),
 });
 
@@ -197,7 +203,99 @@ const galleryCreateSchema = z.object({
 const galleryUpdateSchema = z.object({
   title: z.string().trim().min(3).max(140).optional(),
   description: z.string().trim().min(5).max(400).optional(),
+  category: z.enum(['Festival', 'Academic Event', 'Convocation', 'Campus Life']).optional(),
+  mediaType: z.enum(['photo', 'video']).optional(),
+  mediaUrl: z
+    .string()
+    .trim()
+    .min(5)
+    .max(2000)
+    .refine(isSafeMediaUrl, 'Media URL must be a valid https://, http://, or local asset path.')
+    .optional(),
+  eventDate: z.string().trim().min(8).max(20).optional(),
   visibility: z.enum(['public', 'registered']).optional(),
+});
+
+const profileUpdateSchema = z.object({
+  establishedYear: z.number().int().min(1900).max(2100).optional(),
+  campusAcres: z.number().min(1).max(10000).optional(),
+  facultiesCount: z.number().int().min(1).max(100).optional(),
+  departmentsCount: z.number().int().min(1).max(200).optional(),
+  facultyMembersCount: z.number().int().min(1).max(10000).optional(),
+  studentsCount: z.number().int().min(1).max(500000).optional(),
+  convocationDate: z.string().trim().min(3).max(80).optional(),
+  heroEyebrow: z.string().trim().max(240).optional(),
+  heroTitle: z.string().trim().min(5).max(240).optional(),
+  heroSubtitle: z.string().trim().min(10).max(1000).optional(),
+  leadership: z
+    .array(
+      z.object({
+        role: z.string().trim().min(2).max(120),
+        name: z.string().trim().min(2).max(120),
+        email: z.string().trim().email().max(120),
+        phone: z.string().trim().min(3).max(40),
+        office: z.string().trim().min(2).max(160),
+      })
+    )
+    .max(40)
+    .optional(),
+  units: z
+    .array(
+      z.object({
+        code: z.string().trim().min(2).max(30),
+        name: z.string().trim().min(2).max(160),
+        category: z.enum([
+          'Statutory Governance',
+          'Administrative Office',
+          'Specialized Cell & Institute',
+        ]),
+        description: z.string().trim().min(5).max(800),
+      })
+    )
+    .max(60)
+    .optional(),
+  journals: z
+    .array(
+      z.object({
+        id: z.string().trim().min(1).max(60),
+        title: z.string().trim().min(3).max(200),
+        issn: z.string().trim().min(3).max(60),
+        scope: z.string().trim().min(5).max(600),
+        currentIssue: z.string().trim().min(2).max(140),
+      })
+    )
+    .max(30)
+    .optional(),
+});
+
+const departmentUpdateSchema = z.object({
+  name: z.string().trim().min(2).max(160).optional(),
+  faculty: z
+    .enum([
+      'Faculty of Engineering and Technology',
+      'Faculty of Science',
+      'Faculty of Business Studies',
+      'Faculty of Humanities and Social Science',
+      'Faculty of Life and Earth Science',
+    ])
+    .optional(),
+  established: z.number().int().min(1950).max(2100).optional(),
+  degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12).optional(),
+  intakeSeats: z.number().int().min(5).max(1000).optional(),
+  building: z.string().trim().min(2).max(140).optional(),
+  chairmanName: z.string().trim().min(2).max(120).optional(),
+  summary: z.string().trim().min(10).max(2000).optional(),
+  researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
+  laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
+});
+
+const publicationSchema = z.object({
+  title: z.string().trim().min(4).max(300),
+  authors: z.string().trim().min(2).max(240),
+  departmentCode: z.string().trim().min(2).max(24),
+  domain: z.string().trim().min(2).max(120),
+  year: z.number().int().min(1990).max(2100),
+  venue: z.string().trim().min(2).max(240),
 });
 
 const bannerCreateSchema = z.object({
@@ -1862,6 +1960,117 @@ portalRouter.delete(
       res.status(404).json({ error: 'Gallery item not found.' });
       return;
     }
+    res.json({ deleted: true });
+  }
+);
+
+portalRouter.put('/cms/profile', requireRoles('admin'), async (req: AuthenticatedRequest, res) => {
+  const parsed = profileUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: parsed.error.issues[0]?.message || 'Invalid university profile payload.',
+    });
+    return;
+  }
+  const profile = await pustRepo.updateUniversityProfile(parsed.data);
+  await pustRepo.logAudit(
+    req.authUser!.name,
+    'admin',
+    'Updated University Profile CMS',
+    'Hero, Stats, Leadership, Units or Journals'
+  );
+  res.json({ profile });
+});
+
+portalRouter.patch(
+  '/cms/departments/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = departmentUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message || 'Invalid department update payload.',
+      });
+      return;
+    }
+    const department = await pustRepo.updateDepartment(String(req.params.id), parsed.data);
+    if (!department) {
+      res.status(404).json({ error: 'Department not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Updated Department Directory',
+      `${department.code} — ${department.name}`
+    );
+    res.json({ department });
+  }
+);
+
+portalRouter.post(
+  '/cms/publications',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = publicationSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message || 'Complete all publication fields.',
+      });
+      return;
+    }
+    const publication = await pustRepo.createPublication(parsed.data);
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Added Faculty Publication',
+      publication.title.slice(0, 60)
+    );
+    res.status(201).json({ publication });
+  }
+);
+
+portalRouter.patch(
+  '/cms/publications/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = publicationSchema.partial().safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message || 'Invalid publication update payload.',
+      });
+      return;
+    }
+    const publication = await pustRepo.updatePublication(String(req.params.id), parsed.data);
+    if (!publication) {
+      res.status(404).json({ error: 'Publication not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Updated Faculty Publication',
+      publication.title.slice(0, 60)
+    );
+    res.json({ publication });
+  }
+);
+
+portalRouter.delete(
+  '/cms/publications/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const ok = await pustRepo.deletePublication(String(req.params.id));
+    if (!ok) {
+      res.status(404).json({ error: 'Publication not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Deleted Faculty Publication',
+      String(req.params.id)
+    );
     res.json({ deleted: true });
   }
 );

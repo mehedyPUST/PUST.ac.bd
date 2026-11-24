@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId, type Collection, type Db } from 'mongodb';
+import { MongoClient, type Collection, type Db } from 'mongodb';
 import crypto from 'node:crypto';
 import type {
   AboutContentRecord,
@@ -93,6 +93,7 @@ class PustRepository {
   private auditLogs: AuditLogRecord[] = [];
   private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
   private bookmarks: BookmarkRecord[] = [];
+  private universityProfile: UniversityProfile = structuredClone(SEED_UNIVERSITY_PROFILE);
 
   private initialized = false;
 
@@ -226,6 +227,11 @@ class PustRepository {
     if ((await feeCol.countDocuments()) === 0) {
       await feeCol.insertOne({ id: 'global-fee-config', ...SEED_FEE_CONFIG });
     }
+
+    const profileCol = db.collection<UniversityProfile & { id: string }>('university_profile');
+    if ((await profileCol.countDocuments()) === 0) {
+      await profileCol.insertOne({ id: 'main', ...structuredClone(SEED_UNIVERSITY_PROFILE) });
+    }
   }
 
   private async getAll<T extends { id: string }>(name: string, mem: T[]): Promise<T[]> {
@@ -282,8 +288,29 @@ class PustRepository {
     return this.storageBackend;
   }
 
-  getUniversityProfile(): UniversityProfile {
-    return SEED_UNIVERSITY_PROFILE;
+  async getUniversityProfile(): Promise<UniversityProfile> {
+    if (this.storageBackend === 'mongodb' && this.db) {
+      const doc = await this.db
+        .collection<UniversityProfile & { id: string }>('university_profile')
+        .findOne({ id: 'main' }, { projection: { _id: 0, id: 0 } });
+      if (doc) return doc;
+    }
+    return structuredClone(this.universityProfile);
+  }
+
+  async updateUniversityProfile(patch: Partial<UniversityProfile>): Promise<UniversityProfile> {
+    const current = await this.getUniversityProfile();
+    const updated: UniversityProfile = {
+      ...current,
+      ...patch,
+    };
+    this.universityProfile = structuredClone(updated);
+    if (this.storageBackend === 'mongodb' && this.db) {
+      await this.db
+        .collection<UniversityProfile & { id: string }>('university_profile')
+        .updateOne({ id: 'main' }, { $set: { id: 'main', ...updated } }, { upsert: true });
+    }
+    return structuredClone(updated);
   }
 
   async logAudit(actorName: string, actorRole: AuthUser['role'], action: string, target: string) {
@@ -305,7 +332,18 @@ class PustRepository {
 
   // Departments & Publications
   listDepartments = () => this.getAll('departments', this.departments);
+  updateDepartment = (id: string, patch: Partial<DepartmentRecord>) =>
+    this.updateItem('departments', this.departments, id, patch);
+
   listPublications = () => this.getAll('publications', this.publications);
+  createPublication = (input: Omit<PublicationRecord, 'id'>) =>
+    this.insertItem('publications', this.publications, {
+      id: `pub-${crypto.randomUUID()}`,
+      ...input,
+    });
+  updatePublication = (id: string, patch: Partial<PublicationRecord>) =>
+    this.updateItem('publications', this.publications, id, patch);
+  deletePublication = (id: string) => this.removeItem('publications', this.publications, id);
 
   // About CMS
   listAboutSections = async () => {
@@ -355,6 +393,7 @@ class PustRepository {
     phone: string;
     tenure: string;
     message: string;
+    photoUrl?: string;
     promoteNewVc: boolean;
   }): Promise<ViceChancellorRecord[]> {
     const list = await this.listViceChancellors();
@@ -373,17 +412,22 @@ class PustRepository {
         email: input.email,
         phone: input.phone,
         message: input.message,
+        ...(input.photoUrl ? { photoUrl: input.photoUrl } : {}),
         isCurrent: true,
         orderIndex: maxOrder + 1,
       });
     } else if (current) {
-      await this.updateItem('vc_profiles', this.vcProfiles, current.id, {
+      const patch: Partial<ViceChancellorRecord> = {
         name: input.name,
         tenure: input.tenure,
         email: input.email,
         phone: input.phone,
         message: input.message,
-      });
+      };
+      if (input.photoUrl !== undefined) {
+        patch.photoUrl = input.photoUrl || undefined;
+      }
+      await this.updateItem('vc_profiles', this.vcProfiles, current.id, patch);
     }
     return this.listViceChancellors();
   }

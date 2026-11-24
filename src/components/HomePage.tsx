@@ -20,6 +20,7 @@ import {
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
+import { EditTriggerButton } from './EditTriggerButton';
 import { HeroSummarySkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -208,19 +209,32 @@ export function HomePage({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-6 flex flex-col justify-between py-2">
               <div className="space-y-5">
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                  Rajapur, Pabna-6600 · First Convocation:{' '}
-                  {profile?.convocationDate ?? '15 March 2027'}
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                    {profile?.heroEyebrow ||
+                      `Rajapur, Pabna-6600 · First Convocation: ${
+                        profile?.convocationDate ?? '15 March 2027'
+                      }`}
+                  </p>
+                  <EditTriggerButton
+                    target={{ kind: 'hero-profile' }}
+                    label="Edit Hero & Stats"
+                    variant="compact"
+                  />
+                </div>
                 <h1 className="font-serif text-[clamp(2.2rem,3.9vw,3.45rem)] leading-[1.08] font-medium tracking-tight text-slate-900">
-                  Advancing Science, Engineering &amp; Human Inquiry from Pabna
+                  {profile?.heroTitle ||
+                    'Advancing Science, Engineering & Human Inquiry from Pabna'}
                 </h1>
                 <p className="text-base sm:text-[17px] leading-relaxed text-slate-600 max-w-xl">
-                  Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna),
-                  Pabna University of Science and Technology serves nearly 5,000 scholars and{' '}
-                  {profile?.facultyMembersCount ?? 185} faculty members across {profile?.facultiesCount ?? 5}{' '}
-                  faculties, {profile?.departmentsCount ?? 21} academic departments, and end-to-end
-                  digital workflows.
+                  {profile?.heroSubtitle ||
+                    `Established in ${
+                      profile?.establishedYear ?? 2008
+                    } beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and ${
+                      profile?.facultyMembersCount ?? 185
+                    } faculty members across ${profile?.facultiesCount ?? 5} faculties, ${
+                      profile?.departmentsCount ?? 21
+                    } academic departments, and end-to-end digital workflows.`}
                 </p>
               </div>
 
@@ -235,7 +249,7 @@ export function HomePage({
                   href="/academics/departments"
                   className="px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
                 >
-                  Explore 21 Departments
+                  Explore {profile?.departmentsCount ?? 21} Departments
                 </Link>
                 <Link
                   href="/verify"
@@ -268,6 +282,13 @@ export function HomePage({
                   containerClassName="w-full h-full"
                   className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
                   priority
+                />
+
+                <EditTriggerButton
+                  target={{ kind: 'banner', slideId: currentSlide.id }}
+                  label="Edit Banner"
+                  variant="overlay"
+                  className="absolute top-3 left-3 z-10"
                 />
 
                 <button
@@ -352,13 +373,13 @@ export function HomePage({
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                2008 · Act No. 43 of 2001
+                {profile?.establishedYear ?? 2008} · Act No. 43 of 2001
               </dd>
             </div>
             <div className="px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200">
               <dt className="text-xs uppercase tracking-wider text-slate-500">Academic Scope</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                5 Faculties · 21 Departments
+                {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21} Departments
               </dd>
             </div>
             <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
@@ -394,7 +415,7 @@ export function HomePage({
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
                 <div className="sm:col-span-5">
                   <ResilientImage
-                    src={VC_PORTRAIT_IMAGE}
+                    src={currentVc?.photoUrl || VC_PORTRAIT_IMAGE}
                     fallbackSrc={VC_PORTRAIT_FALLBACK}
                     alt={currentVc?.name || 'Current Vice-Chancellor of PUST'}
                     className="w-full aspect-[3/4] object-cover object-top"
@@ -443,13 +464,20 @@ export function HomePage({
 
             {/* About PUST Brief & Sub-Topic Links */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                  About PUST
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
-                  {ourUniversity?.title || 'Our University'}
-                </h3>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                    About PUST
+                  </p>
+                  <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
+                    {ourUniversity?.title || 'Our University'}
+                  </h3>
+                </div>
+                <EditTriggerButton
+                  target={{ kind: 'about', slug: 'our-university' }}
+                  label="Edit About"
+                  variant="compact"
+                />
               </div>
               {ourUniversity ? (
                 <p className="text-sm leading-relaxed text-slate-600 line-clamp-4">
@@ -489,9 +517,16 @@ export function HomePage({
           {/* Right Reading Column: Full Vice-Chancellor Welcome Address */}
           <article className="lg:col-span-7 rounded-2xl bg-[#FAF8F4] border border-slate-200 p-6 sm:p-8 lg:p-10 space-y-6">
             <header className="space-y-2 border-b border-slate-200 pb-5">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
+                </p>
+                <EditTriggerButton
+                  target={{ kind: 'vc' }}
+                  label="Edit VC Profile & Message"
+                  variant="compact"
+                />
+              </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
                 {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
               </h2>
@@ -567,13 +602,21 @@ export function HomePage({
                   Recent University Circulars
                 </h2>
               </div>
-              <Link
-                href="/notices"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
-              >
-                All Notices
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="flex items-center gap-3 shrink-0">
+                <EditTriggerButton
+                  target={{ kind: 'notice', notice: null }}
+                  label="Add Notice"
+                  icon="add"
+                  variant="compact"
+                />
+                <Link
+                  href="/notices"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                >
+                  All Notices
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter circulars by category">
@@ -612,45 +655,73 @@ export function HomePage({
                 ) : (
                   <>
                     {leadNotice && (
-                      <button
+                      <div
                         key={leadNotice.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         onClick={() => onSelectNotice(leadNotice)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSelectNotice(leadNotice);
+                          }
+                        }}
                         className="w-full text-left p-6 bg-pust-50/35 hover:bg-pust-50/70 transition-colors space-y-2 group cursor-pointer"
                       >
-                        <p className="font-mono text-xs text-slate-500 tabular-nums">
-                          {leadNotice.publishedAt} ·{' '}
-                          <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
-                          {leadNotice.referenceNo}
-                          {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
-                        </p>
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-mono text-xs text-slate-500 tabular-nums">
+                            {leadNotice.publishedAt} ·{' '}
+                            <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
+                            {leadNotice.referenceNo}
+                            {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
+                          </p>
+                          <EditTriggerButton
+                            target={{ kind: 'notice', notice: leadNotice }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
                         <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                           {leadNotice.title}
                         </h3>
                         <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
-                      </button>
+                      </div>
                     )}
 
                     {secondaryNotices.map((notice) => (
-                      <button
+                      <div
                         key={notice.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         onClick={() => onSelectNotice(notice)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSelectNotice(notice);
+                          }
+                        }}
                         className="w-full text-left px-6 py-4 hover:bg-slate-50 transition-colors space-y-1 group cursor-pointer"
                       >
-                        <p className="font-mono text-xs text-slate-500 tabular-nums">
-                          {notice.publishedAt} ·{' '}
-                          <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
-                          {notice.referenceNo}
-                          {notice.visibility === 'registered' && ' · Campus Members Only'}
-                        </p>
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-mono text-xs text-slate-500 tabular-nums">
+                            {notice.publishedAt} ·{' '}
+                            <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
+                            {notice.referenceNo}
+                            {notice.visibility === 'registered' && ' · Campus Members Only'}
+                          </p>
+                          <EditTriggerButton
+                            target={{ kind: 'notice', notice }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
                         <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                           {notice.title}
                         </h3>
                         <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
                           {notice.summary}
                         </p>
-                      </button>
+                      </div>
                     ))}
                   </>
                 )}
@@ -738,13 +809,21 @@ export function HomePage({
                   Recent Publications
                 </h2>
               </div>
-              <Link
-                href="/academics/publications"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
-              >
-                All Publications
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="flex items-center gap-3 shrink-0">
+                <EditTriggerButton
+                  target={{ kind: 'publication', publication: null }}
+                  label="Add Publication"
+                  icon="add"
+                  variant="compact"
+                />
+                <Link
+                  href="/academics/publications"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                >
+                  All Publications
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter publications by department">
@@ -772,9 +851,16 @@ export function HomePage({
               ) : (
                 visiblePublications.map((pub) => (
                   <article key={pub.id} className="py-4 space-y-1.5">
-                    <p className="font-mono text-xs text-pust-800 tabular-nums">
-                      {pub.departmentCode} · {pub.domain} · {pub.year}
-                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {pub.departmentCode} · {pub.domain} · {pub.year}
+                      </p>
+                      <EditTriggerButton
+                        target={{ kind: 'publication', publication: pub }}
+                        label="Edit"
+                        variant="compact"
+                      />
+                    </div>
                     <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
                       {pub.title}
                     </h3>
@@ -798,12 +884,19 @@ export function HomePage({
                   Official PUST Journals
                 </h3>
               </div>
-              <Link
-                href="/academics/journals"
-                className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
-              >
-                Journals →
-              </Link>
+              <div className="flex items-center gap-2 shrink-0">
+                <EditTriggerButton
+                  target={{ kind: 'journals' }}
+                  label="Edit Journals"
+                  variant="compact"
+                />
+                <Link
+                  href="/academics/journals"
+                  className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                >
+                  Journals →
+                </Link>
+              </div>
             </div>
 
             <div className="divide-y divide-slate-200">
@@ -853,6 +946,12 @@ export function HomePage({
                   {cat}
                 </button>
               ))}
+              <EditTriggerButton
+                target={{ kind: 'gallery', item: null }}
+                label="Add Event"
+                icon="add"
+                variant="compact"
+              />
               <Link
                 href="/gallery"
                 className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
@@ -868,10 +967,17 @@ export function HomePage({
               const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
               const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
               return (
-                <button
+                <div
                   key={item.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setActiveMedia(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveMedia(item);
+                    }
+                  }}
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
                 >
                   <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
@@ -882,8 +988,14 @@ export function HomePage({
                       containerClassName="w-full h-full"
                       className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
                     />
+                    <EditTriggerButton
+                      target={{ kind: 'gallery', item }}
+                      label="Edit"
+                      variant="overlay"
+                      className="absolute top-2.5 right-2.5 z-10"
+                    />
                     {item.mediaType === 'video' && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
+                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white pointer-events-none">
                         <PlayCircle className="w-10 h-10" />
                       </span>
                     )}
@@ -901,7 +1013,7 @@ export function HomePage({
                     </h3>
                     <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

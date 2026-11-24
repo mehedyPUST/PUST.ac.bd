@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Bookmark, Check, X } from 'lucide-react';
+import { Bookmark, Check, Pencil, X } from 'lucide-react';
 import type { AuthUser, DepartmentRecord } from '../types/pust';
 
 interface DepartmentModalProps {
@@ -12,6 +12,8 @@ interface DepartmentModalProps {
   isBookmarked: boolean;
   onToggleBookmark: (dept: DepartmentRecord) => void;
   onOpenPortal: () => void;
+  editMode?: boolean;
+  onEditDepartment?: (dept: DepartmentRecord) => void;
 }
 
 export function DepartmentModal({
@@ -21,6 +23,8 @@ export function DepartmentModal({
   isBookmarked,
   onToggleBookmark,
   onOpenPortal,
+  editMode = false,
+  onEditDepartment,
 }: DepartmentModalProps) {
   useEffect(() => {
     if (!department) return;
@@ -151,13 +155,29 @@ export function DepartmentModal({
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              Close Prospectus
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {user?.role === 'admin' && editMode && onEditDepartment && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onEditDepartment(department);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold border border-amber-400 bg-amber-50 text-amber-950 hover:bg-amber-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit Department
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                Close Prospectus
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>

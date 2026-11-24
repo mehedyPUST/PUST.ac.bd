@@ -100,6 +100,11 @@ const createNoticeSchema = z.object({
   pinned: z.boolean().optional(),
 });
 
+const updateNoticeSchema = createNoticeSchema.partial().refine(
+  (obj) => Object.keys(obj).length > 0,
+  'Provide at least one field to update.'
+);
+
 const createInquirySchema = z.object({
   fullName: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
@@ -141,7 +146,8 @@ export function mountApiRoutes(app: Express): void {
 
   app.get('/api/university-profile', async (req: AuthenticatedRequest, res) => {
     const claims = optionalAuth(req);
-    const [aboutSections, vcProfiles, rawGalleryItems, bannerSlides] = await Promise.all([
+    const [profile, aboutSections, vcProfiles, rawGalleryItems, bannerSlides] = await Promise.all([
+      pustRepo.getUniversityProfile(),
       pustRepo.listAboutSections(),
       pustRepo.listViceChancellors(),
       pustRepo.listGalleryItems(),
@@ -151,7 +157,7 @@ export function mountApiRoutes(app: Express): void {
       ? rawGalleryItems
       : rawGalleryItems.filter((item) => (item.visibility || 'public') === 'public');
     res.json({
-      profile: pustRepo.getUniversityProfile(),
+      profile,
       aboutSections,
       vcProfiles,
       galleryItems,
@@ -554,9 +560,10 @@ export function mountApiRoutes(app: Express): void {
     '/api/notices/:id',
     requireRoles('admin', 'registrar', 'vc', 'chairman'),
     async (req: AuthenticatedRequest, res) => {
-      const parsed = z.object({ pinned: z.boolean() }).safeParse(req.body);
+      const parsed = updateNoticeSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ error: 'Invalid notice update payload.' });
+        const firstIssue = parsed.error.issues[0];
+        res.status(400).json({ error: firstIssue?.message || 'Invalid notice update payload.' });
         return;
       }
       const existing = await pustRepo.findNoticeById(String(req.params.id));
@@ -571,12 +578,14 @@ export function mountApiRoutes(app: Express): void {
         res.status(403).json({ error: 'Chairmen may only manage notices in their department.' });
         return;
       }
-      const updated = await pustRepo.updateNotice(existing.id, { pinned: parsed.data.pinned });
+      const updated = await pustRepo.updateNotice(existing.id, parsed.data);
+      const isPinOnly =
+        Object.keys(parsed.data).length === 1 && parsed.data.pinned !== undefined;
       await pustRepo.logAudit(
         req.authUser!.name,
         req.authUser!.role,
-        parsed.data.pinned ? 'Pinned notice' : 'Unpinned notice',
-        existing.referenceNo
+        isPinOnly ? (parsed.data.pinned ? 'Pinned notice' : 'Unpinned notice') : 'Edited notice',
+        updated?.referenceNo || existing.referenceNo
       );
       res.json({ notice: updated });
     }

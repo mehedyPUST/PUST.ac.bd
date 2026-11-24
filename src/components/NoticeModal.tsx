@@ -8,6 +8,7 @@ import {
   ExternalLink,
   FileDown,
   FileText,
+  Pencil,
   Printer,
   Trash2,
   X,
@@ -23,6 +24,8 @@ interface NoticeModalProps {
   onToggleBookmark: (notice: NoticeRecord) => void;
   onDeleteNotice?: (id: string) => void;
   onOpenPortal: () => void;
+  editMode?: boolean;
+  onEditNotice?: (notice: NoticeRecord) => void;
 }
 
 export function NoticeModal({
@@ -33,6 +36,8 @@ export function NoticeModal({
   onToggleBookmark,
   onDeleteNotice,
   onOpenPortal,
+  editMode = false,
+  onEditNotice,
 }: NoticeModalProps) {
   const [showInlinePdf, setShowInlinePdf] = useState(false);
 
@@ -212,6 +217,20 @@ export function NoticeModal({
                 >
                   <Bookmark className="w-4 h-4" />
                   Sign in to Save
+                </button>
+              )}
+
+              {user?.role === 'admin' && editMode && onEditNotice && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onEditNotice(notice);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold border border-amber-400 bg-amber-50 text-amber-950 hover:bg-amber-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit Circular
                 </button>
               )}
 

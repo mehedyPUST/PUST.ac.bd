@@ -21,6 +21,7 @@ import type {
   BookmarkRecord,
   BootstrapStatus,
   DepartmentRecord,
+  EditModalTarget,
   GalleryItemRecord,
   InquiryRecord,
   NoticeRecord,
@@ -28,6 +29,7 @@ import type {
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
+import { AdminEditModal } from './AdminEditModal';
 import { Breadcrumb } from './Breadcrumb';
 import { DepartmentModal } from './DepartmentModal';
 import { Footer } from './Footer';
@@ -50,12 +52,19 @@ interface PustContextValue {
   bookmarks: BookmarkRecord[];
   bookmarkedIds: Set<string>;
   bootstrapStatus: BootstrapStatus;
+  editMode: boolean;
+  setEditMode: (enabled: boolean) => void;
+  toggleEditMode: () => void;
+  openEditModal: (target: EditModalTarget) => void;
+  closeEditModal: () => void;
   setUser: (user: AuthUser | null) => void;
   navigateTo: (target: AppRoute | string) => void;
   setActiveDepartment: (dept: DepartmentRecord | null) => void;
   setActiveNotice: (notice: NoticeRecord | null) => void;
   loadCmsProfile: () => Promise<void>;
   loadNotices: () => Promise<void>;
+  loadDepartments: () => Promise<void>;
+  loadPublications: () => Promise<void>;
   loadBookmarks: () => Promise<void>;
   submitInquiry: (payload: {
     fullName: string;
@@ -132,6 +141,46 @@ export function PustShell({
 
   const [activeDepartment, setActiveDepartment] = useState<DepartmentRecord | null>(null);
   const [activeNotice, setActiveNotice] = useState<NoticeRecord | null>(null);
+  const [editMode, setEditModeState] = useState(false);
+  const [editTarget, setEditTarget] = useState<EditModalTarget | null>(null);
+
+  const isAdmin = user?.role === 'admin';
+  const effectiveEditMode = isAdmin && editMode;
+
+  useEffect(() => {
+    if (!isAdmin) {
+      setEditModeState(false);
+      setEditTarget(null);
+    }
+  }, [isAdmin]);
+
+  const setEditMode = useCallback(
+    (enabled: boolean) => {
+      if (!isAdmin) {
+        setEditModeState(false);
+        return;
+      }
+      setEditModeState(enabled);
+    },
+    [isAdmin]
+  );
+
+  const toggleEditMode = useCallback(() => {
+    if (!isAdmin) return;
+    setEditModeState((prev) => !prev);
+  }, [isAdmin]);
+
+  const openEditModal = useCallback(
+    (target: EditModalTarget) => {
+      if (!isAdmin) return;
+      setEditTarget(target);
+    },
+    [isAdmin]
+  );
+
+  const closeEditModal = useCallback(() => {
+    setEditTarget(null);
+  }, []);
 
   const navigateTo = useCallback(
     (target: AppRoute | string) => {
@@ -173,6 +222,20 @@ export function PustShell({
   const loadNotices = useCallback(async () => {
     const res = await pustApi.getNotices();
     setNotices(res.notices);
+    setActiveNotice((curr) => (curr ? res.notices.find((n) => n.id === curr.id) ?? null : null));
+  }, []);
+
+  const loadDepartments = useCallback(async () => {
+    const res = await pustApi.getDepartments();
+    setDepartments(res.departments);
+    setActiveDepartment((curr) =>
+      curr ? res.departments.find((d) => d.id === curr.id) ?? null : null
+    );
+  }, []);
+
+  const loadPublications = useCallback(async () => {
+    const res = await pustApi.getPublications();
+    setPublications(res.publications);
   }, []);
 
   const loadBookmarks = useCallback(async () => {
@@ -316,12 +379,19 @@ export function PustShell({
       bookmarks,
       bookmarkedIds,
       bootstrapStatus,
+      editMode: effectiveEditMode,
+      setEditMode,
+      toggleEditMode,
+      openEditModal,
+      closeEditModal,
       setUser,
       navigateTo,
       setActiveDepartment,
       setActiveNotice,
       loadCmsProfile,
       loadNotices,
+      loadDepartments,
+      loadPublications,
       loadBookmarks,
       submitInquiry,
     }),
@@ -341,9 +411,16 @@ export function PustShell({
       bookmarks,
       bookmarkedIds,
       bootstrapStatus,
+      effectiveEditMode,
+      setEditMode,
+      toggleEditMode,
+      openEditModal,
+      closeEditModal,
       navigateTo,
       loadCmsProfile,
       loadNotices,
+      loadDepartments,
+      loadPublications,
       loadBookmarks,
       submitInquiry,
     ]
@@ -353,33 +430,58 @@ export function PustShell({
     <SkeletonTheme baseColor="#E2E8F0" highlightColor="#F8FAFC" borderRadius={8}>
       <MotionConfig reducedMotion="user">
         <PustContext.Provider value={value}>
-        <div className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900">
-          <Navbar route={route} user={user} onNavigate={navigateTo} />
-          <Breadcrumb />
-          <div className="flex-1 flex flex-col">{children}</div>
-          <Footer onNavigate={navigateTo} />
-        </div>
+          <div className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900">
+            <Navbar
+              route={route}
+              user={user}
+              editMode={effectiveEditMode}
+              onToggleEditMode={toggleEditMode}
+              onOpenEditModal={openEditModal}
+              onNavigate={navigateTo}
+            />
+            <Breadcrumb />
+            <div className="flex-1 flex flex-col">{children}</div>
+            <Footer onNavigate={navigateTo} />
+          </div>
 
-        <DepartmentModal
-          department={activeDepartment}
-          onClose={() => setActiveDepartment(null)}
-          user={user}
-          isBookmarked={activeDepartment ? bookmarkedIds.has(activeDepartment.id) : false}
-          onToggleBookmark={handleToggleBookmarkDepartment}
-          onOpenPortal={() => navigateTo('/portal')}
-        />
+          <DepartmentModal
+            department={activeDepartment}
+            onClose={() => setActiveDepartment(null)}
+            user={user}
+            isBookmarked={activeDepartment ? bookmarkedIds.has(activeDepartment.id) : false}
+            onToggleBookmark={handleToggleBookmarkDepartment}
+            onOpenPortal={() => navigateTo('/portal')}
+            editMode={effectiveEditMode}
+            onEditDepartment={(dept) => openEditModal({ kind: 'department', department: dept })}
+          />
 
-        <NoticeModal
-          notice={activeNotice}
-          onClose={() => setActiveNotice(null)}
-          user={user}
-          isBookmarked={activeNotice ? bookmarkedIds.has(activeNotice.id) : false}
-          onToggleBookmark={handleToggleBookmarkNotice}
-          onDeleteNotice={handleDeleteNotice}
-          onOpenPortal={() => navigateTo('/portal')}
-        />
-      </PustContext.Provider>
-    </MotionConfig>
+          <NoticeModal
+            notice={activeNotice}
+            onClose={() => setActiveNotice(null)}
+            user={user}
+            isBookmarked={activeNotice ? bookmarkedIds.has(activeNotice.id) : false}
+            onToggleBookmark={handleToggleBookmarkNotice}
+            onDeleteNotice={handleDeleteNotice}
+            onOpenPortal={() => navigateTo('/portal')}
+            editMode={effectiveEditMode}
+            onEditNotice={(n) => openEditModal({ kind: 'notice', notice: n })}
+          />
+
+          <AdminEditModal
+            target={editTarget}
+            onClose={closeEditModal}
+            profile={profile}
+            aboutSections={aboutSections}
+            vcProfiles={vcProfiles}
+            bannerSlides={bannerSlides}
+            departments={departments}
+            onRefreshProfile={loadCmsProfile}
+            onRefreshNotices={loadNotices}
+            onRefreshDepartments={loadDepartments}
+            onRefreshPublications={loadPublications}
+          />
+        </PustContext.Provider>
+      </MotionConfig>
     </SkeletonTheme>
   );
 }

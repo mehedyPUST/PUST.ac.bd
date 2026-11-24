@@ -2,14 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Eye, Menu, Pencil, Plus, X } from 'lucide-react';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
-import type { AuthUser } from '../types/pust';
+import type { AuthUser, EditModalTarget } from '../types/pust';
 import { PustCrest } from './PustCrest';
 
 interface NavbarProps {
   route: AppRoute;
   user: AuthUser | null;
+  editMode?: boolean;
+  onToggleEditMode?: () => void;
+  onOpenEditModal?: (target: EditModalTarget) => void;
   onNavigate: (route: AppRoute | string) => void;
 }
 
@@ -22,7 +25,14 @@ const HOME_SUBTOPICS = [
   { label: 'Footer', href: '/#footer' },
 ];
 
-export function Navbar({ route, user, onNavigate }: NavbarProps) {
+export function Navbar({
+  route,
+  user,
+  editMode = false,
+  onToggleEditMode,
+  onOpenEditModal,
+  onNavigate,
+}: NavbarProps) {
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -113,6 +123,24 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                 <span className="hidden xl:inline font-mono text-[11px] uppercase tracking-widest text-pust-200">
                   Est. 2008 · Rajapur, Pabna
                 </span>
+
+                {/* Mobile Admin Edit Mode Toggle */}
+                {user?.role === 'admin' && onToggleEditMode && (
+                  <button
+                    type="button"
+                    onClick={onToggleEditMode}
+                    aria-pressed={editMode}
+                    title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
+                    className={`lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      editMode
+                        ? 'bg-amber-400 text-slate-950'
+                        : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
+                    }`}
+                  >
+                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                    <span>{editMode ? 'Editing' : 'Edit'}</span>
+                  </button>
+                )}
 
                 {/* Mobile Portal CTA & Menu Trigger */}
                 <Link
@@ -483,25 +511,99 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
                 </Link>
               </nav>
 
-              {/* Desktop Portal Action */}
-              <Link
-                href={route === '/portal' ? '/' : '/portal'}
-                onClick={() => {
-                  setHoveredGroup(null);
-                  setMobileMenuOpen(false);
-                }}
-                className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
-              >
-                {route === '/portal'
-                  ? 'Public Website'
-                  : user
-                  ? `${user.name.split(' ')[0]} · Portal`
-                  : 'Portal'}
-              </Link>
+              {/* Desktop Admin Edit Mode & Portal Action */}
+              <div className="flex items-center gap-2 shrink-0">
+                {user?.role === 'admin' && onToggleEditMode && (
+                  <button
+                    type="button"
+                    onClick={onToggleEditMode}
+                    aria-pressed={editMode}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      editMode
+                        ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
+                        : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
+                    }`}
+                  >
+                    {editMode ? (
+                      <>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Exit Edit Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Edit Mode</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                <Link
+                  href={route === '/portal' ? '/' : '/portal'}
+                  onClick={() => {
+                    setHoveredGroup(null);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+                >
+                  {route === '/portal'
+                    ? 'Public Website'
+                    : user
+                    ? `${user.name.split(' ')[0]} · Portal`
+                    : 'Portal'}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Slim Active Admin Edit Mode Banner */}
+      {user?.role === 'admin' && editMode && (
+        <div className="border-t border-amber-300 bg-amber-50 text-amber-950">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+              <span className="font-semibold">Admin Edit Mode Active</span>
+              <span className="hidden sm:inline text-amber-900">
+                — Click any inline Edit button across sections, cards, notices, departments, or
+                banners to modify it directly.
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {onOpenEditModal && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onOpenEditModal({ kind: 'notice', notice: null })}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    New Notice
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onOpenEditModal({ kind: 'banner' })}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Banners
+                  </button>
+                </>
+              )}
+              {onToggleEditMode && (
+                <button
+                  type="button"
+                  onClick={onToggleEditMode}
+                  className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold hover:bg-slate-800 cursor-pointer"
+                >
+                  Done Editing
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Responsive Mobile Navigation */}
       {mobileMenuOpen && (
