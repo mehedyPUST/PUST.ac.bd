@@ -75,7 +75,6 @@ export function HomePage({
   onSelectNotice,
 }: HomePageProps) {
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
-  const [showFullVcMessage, setShowFullVcMessage] = useState(false);
   const [noticeCategory, setNoticeCategory] =
     useState<'All' | NoticeRecord['category']>('All');
   const [galleryCategory, setGalleryCategory] =
@@ -262,67 +261,53 @@ export function HomePage({
 
           {/* Current Vice-Chancellor + Portrait + Expandable Previous VCs Archive */}
           <div className="lg:col-span-7 rounded-2xl bg-[#F7F7F5] border border-slate-200 p-6 sm:p-8 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start border-b border-slate-200 pb-6">
-              <div className="sm:col-span-4">
-                <ResilientImage
-                  src={VC_PORTRAIT_IMAGE}
-                  fallbackSrc={VC_PORTRAIT_FALLBACK}
-                  alt={currentVc?.name || 'Current Vice-Chancellor of PUST'}
-                  className="w-full aspect-[3/4] object-cover object-top"
-                />
-              </div>
+            <div className="space-y-6 border-b border-slate-200 pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                <div className="sm:col-span-4">
+                  <ResilientImage
+                    src={VC_PORTRAIT_IMAGE}
+                    fallbackSrc={VC_PORTRAIT_FALLBACK}
+                    alt={currentVc?.name || 'Current Vice-Chancellor of PUST'}
+                    className="w-full aspect-[3/4] object-cover object-top"
+                  />
+                </div>
 
-              <div className="sm:col-span-8 flex flex-col justify-between space-y-4">
-                <div>
+                <div className="sm:col-span-8 space-y-3">
                   <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                     Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
                   </p>
-                  <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                  <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
                     {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
                   </h2>
-                  <p className="font-mono text-xs text-slate-500 mt-1 tabular-nums">
+                  <p className="font-mono text-xs text-slate-600 tabular-nums">
                     Honorable Vice-Chancellor · {currentVc?.email} · {currentVc?.phone}
                   </p>
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowPreviousVcs((prev) => !prev)}
+                      aria-expanded={showPreviousVcs}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      Previous Vice-Chancellors ({previousVcs.length})
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform ${
+                          showPreviousVcs ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    <Link
+                      href="/administration/vc-office"
+                      className="text-xs font-medium text-pust-900 hover:underline whitespace-nowrap"
+                    >
+                      VC Office Directory →
+                    </Link>
+                  </div>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <p
-                    className={`text-[15px] text-slate-700 leading-relaxed whitespace-pre-line ${
-                      showFullVcMessage ? '' : 'line-clamp-6'
-                    }`}
-                  >
-                    {currentVc?.message}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowFullVcMessage((prev) => !prev)}
-                    className="text-xs font-semibold text-pust-800 hover:underline cursor-pointer"
-                  >
-                    {showFullVcMessage ? 'Show shorter message' : 'Read full welcome message →'}
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowPreviousVcs((prev) => !prev)}
-                    aria-expanded={showPreviousVcs}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    Previous Vice-Chancellors ({previousVcs.length})
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform ${
-                        showPreviousVcs ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  <Link
-                    href="/administration/vc-office"
-                    className="text-xs font-medium text-pust-900 hover:underline whitespace-nowrap"
-                  >
-                    VC Office Directory →
-                  </Link>
-                </div>
+              <div className="text-[15px] text-slate-700 leading-[1.75] whitespace-pre-line">
+                {currentVc?.message}
               </div>
             </div>
 
