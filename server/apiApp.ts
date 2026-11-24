@@ -114,7 +114,13 @@ const bookmarkSchema = z.object({
 });
 
 export function mountApiRoutes(app: Express): void {
-  // Scope JSON body parsing, cookies, and same-origin protection strictly to /api
+  // Scope JSON body parsing, cookies, no-cache headers, and same-origin protection strictly to /api
+  app.use('/api', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
   app.use('/api', express.json({ limit: '128kb' }));
   app.use('/api', cookieParser());
   app.use('/api', verifySameOriginMutation);

@@ -166,7 +166,7 @@ const certAdminFinalSchema = z.object({
 const aboutUpsertSchema = z.object({
   slug: z.enum(['our-university', 'history', 'mission-vision', 'plans']),
   title: z.string().trim().min(3).max(120),
-  body: z.string().trim().min(20).max(2500),
+  body: z.string().trim().min(20).max(8000),
 });
 
 const vcUpdateSchema = z.object({
@@ -174,7 +174,7 @@ const vcUpdateSchema = z.object({
   email: z.string().trim().email().max(120),
   phone: z.string().trim().min(4).max(40),
   tenure: z.string().trim().min(4).max(60),
-  message: z.string().trim().min(20).max(2000),
+  message: z.string().trim().min(20).max(8000),
   promoteNewVc: z.boolean().default(false),
 });
 

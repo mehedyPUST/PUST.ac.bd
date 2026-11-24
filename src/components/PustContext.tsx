@@ -137,13 +137,29 @@ export function PustShell({
     [router]
   );
 
+  const mergeVcProfiles = useCallback(
+    (incoming: ViceChancellorRecord[], fallback: ViceChancellorRecord[]) => {
+      if (!Array.isArray(incoming) || incoming.length === 0) return fallback;
+      return incoming.map((vc) => {
+        if (vc.message && vc.message.trim().length > 0) return vc;
+        const seeded = fallback.find((f) => f.id === vc.id || (vc.isCurrent && f.isCurrent));
+        return seeded ? { ...vc, message: seeded.message } : vc;
+      });
+    },
+    []
+  );
+
   const loadCmsProfile = useCallback(async () => {
     const profileRes = await pustApi.getUniversityProfile();
-    setProfile(profileRes.profile);
-    setAboutSections(profileRes.aboutSections);
-    setVcProfiles(profileRes.vcProfiles);
-    setGalleryItems(profileRes.galleryItems);
-  }, []);
+    if (profileRes.profile) setProfile(profileRes.profile);
+    if (Array.isArray(profileRes.aboutSections) && profileRes.aboutSections.length > 0) {
+      setAboutSections(profileRes.aboutSections);
+    }
+    setVcProfiles((prev) => mergeVcProfiles(profileRes.vcProfiles, prev));
+    if (Array.isArray(profileRes.galleryItems) && profileRes.galleryItems.length > 0) {
+      setGalleryItems(profileRes.galleryItems);
+    }
+  }, [mergeVcProfiles]);
 
   const loadNotices = useCallback(async () => {
     const res = await pustApi.getNotices();
@@ -176,10 +192,16 @@ export function PustShell({
           pustApi.getBootstrapStatus(),
         ]);
         if (!active) return;
-        setProfile(profileRes.profile);
-        setAboutSections(profileRes.aboutSections);
-        setVcProfiles(profileRes.vcProfiles);
-        setGalleryItems(profileRes.galleryItems);
+        if (profileRes.profile) setProfile(profileRes.profile);
+        if (Array.isArray(profileRes.aboutSections) && profileRes.aboutSections.length > 0) {
+          setAboutSections(profileRes.aboutSections);
+        }
+        setVcProfiles((prev) =>
+          mergeVcProfiles(profileRes.vcProfiles, initialData?.vcProfiles ?? prev)
+        );
+        if (Array.isArray(profileRes.galleryItems) && profileRes.galleryItems.length > 0) {
+          setGalleryItems(profileRes.galleryItems);
+        }
         setDepartments(deptRes.departments);
         setPublications(pubRes.publications);
         setNotices(noticeRes.notices);

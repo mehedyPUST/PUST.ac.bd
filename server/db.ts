@@ -163,6 +163,46 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
+    const INSTITUTIONAL_SEED_VERSION = 2;
+    const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
+    const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
+    if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
+      for (const section of SEED_ABOUT_SECTIONS) {
+        await db.collection('about_sections').updateOne(
+          { id: section.id },
+          { $set: section },
+          { upsert: true }
+        );
+      }
+
+      const existingVcs = (await db
+        .collection<ViceChancellorRecord>('vc_profiles')
+        .find({}, { projection: { _id: 0 } })
+        .toArray()) as ViceChancellorRecord[];
+      const hasAdminPromotedVc = existingVcs.some((v) => v.orderIndex > 7 && v.isCurrent);
+
+      for (const vc of SEED_VC_PROFILES) {
+        const docToSync = hasAdminPromotedVc && vc.id === 'vc-7' ? { ...vc, isCurrent: false } : vc;
+        await db.collection('vc_profiles').updateOne(
+          { id: vc.id },
+          { $set: docToSync },
+          { upsert: true }
+        );
+      }
+
+      await seedMetaCol.updateOne(
+        { id: 'institutional_content' },
+        {
+          $set: {
+            id: 'institutional_content',
+            version: INSTITUTIONAL_SEED_VERSION,
+            syncedAt: new Date().toISOString(),
+          },
+        },
+        { upsert: true }
+      );
+    }
+
     const feeCol = db.collection<FeeConfig & { id: string }>('fee_config');
     if ((await feeCol.countDocuments()) === 0) {
       await feeCol.insertOne({ id: 'global-fee-config', ...SEED_FEE_CONFIG });
@@ -249,7 +289,10 @@ class PustRepository {
   listPublications = () => this.getAll('publications', this.publications);
 
   // About CMS
-  listAboutSections = () => this.getAll('about_sections', this.aboutSections);
+  listAboutSections = async () => {
+    const list = await this.getAll('about_sections', this.aboutSections);
+    return list.length > 0 ? list : [...SEED_ABOUT_SECTIONS];
+  };
   async upsertAboutSection(
     slug: AboutContentRecord['slug'],
     title: string,
@@ -277,8 +320,14 @@ class PustRepository {
 
   // Vice-Chancellor Profile & Archive
   async listViceChancellors(): Promise<ViceChancellorRecord[]> {
-    const list = await this.getAll('vc_profiles', this.vcProfiles);
-    return list.sort((a, b) => b.orderIndex - a.orderIndex);
+    const raw = await this.getAll('vc_profiles', this.vcProfiles);
+    const list = raw.length > 0 ? raw : [...SEED_VC_PROFILES];
+    const hydrated = list.map((vc) => {
+      if (vc.message && vc.message.trim().length > 0) return vc;
+      const seeded = SEED_VC_PROFILES.find((s) => s.id === vc.id || (vc.isCurrent && s.isCurrent));
+      return seeded ? { ...vc, message: seeded.message } : vc;
+    });
+    return hydrated.sort((a, b) => b.orderIndex - a.orderIndex);
   }
 
   async updateCurrentViceChancellor(input: {

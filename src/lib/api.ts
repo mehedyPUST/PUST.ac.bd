@@ -45,6 +45,7 @@ async function apiFetch<T>(url: string, init: RequestInit = {}): Promise<T> {
   }
 
   const res = await fetch(url, {
+    cache: 'no-store',
     ...init,
     headers,
     credentials: 'include',
