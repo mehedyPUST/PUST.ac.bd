@@ -162,3 +162,69 @@ export function parseRouteFromPath(pathname: string): AppRoute {
   const clean = (pathname.replace(/\/+$/, '') || '/') as AppRoute;
   return ALL_VALID_ROUTES.has(clean) ? clean : '/';
 }
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+const SECTION_ROOT_LABELS: Record<string, string> = {
+  '/about': 'About',
+  '/governance': 'Governance',
+  '/administration': 'Administration',
+  '/academics': 'Academics',
+  '/admissions': 'Admissions',
+  '/facilities': 'Facilities',
+};
+
+const STANDALONE_ROUTE_LABELS: Record<string, string> = {
+  '/notices': 'University Notices',
+  '/gallery': 'Campus Gallery',
+  '/verify': 'Document Verification',
+  '/portal': 'Digital Campus Portal',
+};
+
+export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  if (clean === '/') {
+    return [];
+  }
+
+  const crumbs: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
+
+  if (STANDALONE_ROUTE_LABELS[clean]) {
+    crumbs.push({ label: STANDALONE_ROUTE_LABELS[clean] });
+    return crumbs;
+  }
+
+  if (SECTION_ROOT_LABELS[clean]) {
+    crumbs.push({ label: SECTION_ROOT_LABELS[clean] });
+    return crumbs;
+  }
+
+  if (clean === '/governance/pust-act') {
+    crumbs.push({ label: 'Governance', href: '/governance' });
+    crumbs.push({ label: 'University Act' });
+    return crumbs;
+  }
+
+  for (const group of NAV_GROUPS) {
+    const matchedItem = group.items.find((item) => item.route === clean);
+    if (matchedItem) {
+      const parentLabel = SECTION_ROOT_LABELS[group.defaultRoute] || group.label;
+      crumbs.push({ label: parentLabel, href: group.defaultRoute });
+      crumbs.push({ label: matchedItem.label });
+      return crumbs;
+    }
+
+    if (clean.startsWith(`${group.defaultRoute}/`)) {
+      const parentLabel = SECTION_ROOT_LABELS[group.defaultRoute] || group.label;
+      crumbs.push({ label: parentLabel, href: group.defaultRoute });
+      crumbs.push({ label: 'Page Not Found' });
+      return crumbs;
+    }
+  }
+
+  crumbs.push({ label: 'Page Not Found' });
+  return crumbs;
+}

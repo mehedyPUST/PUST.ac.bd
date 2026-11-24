@@ -27,6 +27,7 @@ import type {
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
+import { Breadcrumb } from './Breadcrumb';
 import { DepartmentModal } from './DepartmentModal';
 import { Footer } from './Footer';
 import { Navbar } from './Navbar';
@@ -290,6 +291,7 @@ export function PustShell({ children }: { children: ReactNode }) {
         <PustContext.Provider value={value}>
         <div className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900">
           <Navbar route={route} user={user} onNavigate={navigateTo} />
+          <Breadcrumb />
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer onNavigate={navigateTo} />
         </div>
