@@ -23,7 +23,8 @@ import type {
   ViceChancellorRecord,
 } from '../types/pust';
 
-const VC_PORTRAIT_IMAGE = '/src/assets/images/pust_vc_portrait_1795438823012.jpg';
+const VC_PORTRAIT_IMAGE = '/src/assets/images/VC_Sir_PUST_2026.JPG';
+const VC_PORTRAIT_FALLBACK = 'https://pust.ac.bd/includes/images/messages_pic/VC_Sir_PUST_2026.JPG';
 const LAB_IMAGE = '/src/assets/images/pust_engineering_lab_1795431408924.jpg';
 const LIBRARY_IMAGE = '/src/assets/images/pust_central_library_1795431408614.jpg';
 const GROUNDS_IMAGE = '/src/assets/images/pust_campus_grounds_1795431408500.jpg';
@@ -74,6 +75,7 @@ export function HomePage({
   onSelectNotice,
 }: HomePageProps) {
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
+  const [showFullVcMessage, setShowFullVcMessage] = useState(false);
   const [noticeCategory, setNoticeCategory] =
     useState<'All' | NoticeRecord['category']>('All');
   const [galleryCategory, setGalleryCategory] =
@@ -264,25 +266,41 @@ export function HomePage({
               <div className="sm:col-span-4">
                 <ResilientImage
                   src={VC_PORTRAIT_IMAGE}
+                  fallbackSrc={VC_PORTRAIT_FALLBACK}
                   alt={currentVc?.name || 'Current Vice-Chancellor of PUST'}
-                  className="w-full aspect-[3/4] object-cover"
+                  className="w-full aspect-[3/4] object-cover object-top"
                 />
               </div>
 
               <div className="sm:col-span-8 flex flex-col justify-between space-y-4">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                    Current Vice-Chancellor · {currentVc?.tenure}
+                    Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
                   </p>
                   <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
                     {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
                   </h2>
                   <p className="font-mono text-xs text-slate-500 mt-1 tabular-nums">
-                    {currentVc?.email} · {currentVc?.phone}
+                    Honorable Vice-Chancellor · {currentVc?.email} · {currentVc?.phone}
                   </p>
                 </div>
 
-                <p className="text-[15px] text-slate-700 leading-relaxed">{currentVc?.message}</p>
+                <div className="space-y-2">
+                  <p
+                    className={`text-[15px] text-slate-700 leading-relaxed whitespace-pre-line ${
+                      showFullVcMessage ? '' : 'line-clamp-6'
+                    }`}
+                  >
+                    {currentVc?.message}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullVcMessage((prev) => !prev)}
+                    className="text-xs font-semibold text-pust-800 hover:underline cursor-pointer"
+                  >
+                    {showFullVcMessage ? 'Show shorter message' : 'Read full welcome message →'}
+                  </button>
+                </div>
 
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   <button

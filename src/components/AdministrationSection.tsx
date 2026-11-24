@@ -12,7 +12,8 @@ import type {
   ViceChancellorRecord,
 } from '../types/pust';
 
-const VC_PORTRAIT_IMAGE = '/src/assets/images/pust_vc_portrait_1795438823012.jpg';
+const VC_PORTRAIT_IMAGE = '/src/assets/images/VC_Sir_PUST_2026.JPG';
+const VC_PORTRAIT_FALLBACK = 'https://pust.ac.bd/includes/images/messages_pic/VC_Sir_PUST_2026.JPG';
 
 interface AdministrationSectionProps {
   route: AppRoute;
@@ -141,16 +142,23 @@ export function AdministrationSection({
             <div className="sm:col-span-4">
               <ResilientImage
                 src={VC_PORTRAIT_IMAGE}
+                fallbackSrc={VC_PORTRAIT_FALLBACK}
                 alt={currentVc?.name || 'Vice-Chancellor of PUST'}
-                className="w-full aspect-[3/4] object-cover"
+                className="w-full aspect-[3/4] object-cover object-top"
               />
             </div>
             <div className="sm:col-span-8 space-y-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                Welcome Message from the Vice-Chancellor
+              </p>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
                 {currentVc?.name}
               </h2>
-              <p className="text-[15px] leading-[1.75] text-slate-700">{currentVc?.message}</p>
-              <p className="font-mono text-xs text-slate-500 tabular-nums">
+              <p className="text-xs font-medium text-slate-600">Honorable Vice-Chancellor</p>
+              <p className="text-[15px] leading-[1.75] text-slate-700 whitespace-pre-line">
+                {currentVc?.message}
+              </p>
+              <p className="font-mono text-xs text-slate-500 tabular-nums pt-2">
                 Direct Desk: {currentVc?.email} · {currentVc?.phone}
               </p>
             </div>

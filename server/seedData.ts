@@ -227,8 +227,19 @@ export const SEED_VC_PROFILES: ViceChancellorRecord[] = [
     tenure: '16 May 2026 – Present',
     email: 'vc@pust.ac.bd',
     phone: '+8802588842379',
-    message:
-      'Appointed under Section 10(1) of the PUST Act, 2001 (gazetted 14 May 2026) after serving as Professor of Soil Science and Treasurer at Bangladesh Open University (Ph.D., Okayama University, Japan). Building upon our 2008 founding with 140 students across CSE, EEE, Mathematics, and Business Administration, Pabna University of Science and Technology now anchors 5 faculties, 21 departments, 185 faculty members, and nearly 5,000 students on our 30-acre Rajapur campus—driving outcome-based research, paperless workflows, and our historic First Convocation on 15 March 2027.',
+    message: `Welcome to the website of Pabna University of Science and Technology (PUST), one of the most promising universities in Bangladesh committed to teaching, research, and academic excellence!
+
+Founded in 2008, PUST started its journey with around 140 students enrolled in 4 departments including departments of Computer Science and Engineering (CSE), Electrical and Electronic Engineering (EEE), Mathematics (Math), and Business Administration (BA). This thriving university is spread over 30 acres of land beside the Dhaka-Pabna highway and is located about 3 kilometers east of Pabna town. Within this short span of time, PUST has been able to achieve substantial progress, while it currently accommodates 5 faculties, 21 departments, 172 teaching staff, and nearly 5000 students. We are already in a process of elevating this university to reach a global standard in terms of academics, research, and areal expansion.
+
+Since its establishment, PUST has always had the mission of promoting research in the field of science and technology. Our academics and students have secured commendable recognition through high-quality research publications in national and international journals. Recent webinars have attracted distinct scholars from around the world including noble laureates. We are determined to continue our progress in teaching quality, research output, and service to the community. In addition, PUST is unique in its campus design, educational curriculum, co-curricular, and extra-curricular activities. Students of PUST regularly participate in debate, sports, computer programming, engineering and architectural designs, competition for business ideas, and alike, and have won many awards at the national and international levels.
+
+At the time when Bangladesh envisions to be a developed nation by 2041 and has made a commitment to obtain the Sustainable Development Goals (SDGs) by 2030, and in an age when we experience the emergence of the Fourth Industrial Revolution (4IR), I can affirm that all stakeholders of the PUST is highly committed to meeting all future challenges and is ready to effectively contribute to nation’s all endeavors in achieving the international and national commitments.
+
+As the Vice-Chancellor of PUST, my enthusiasm is always to prepare the university to face all future challenges with wisdom, acquired experience, available resources, dedicated administrators, experienced faculty members, talented students, and employees.
+
+I look forward to the continued progress of the PUST towards academic excellence and intellectual freedom. Our vision is to build PUST as one of the national leaders in creating a center of excellence in research, learning, and teaching. I strongly believe that all our efforts and dedication must make our journey towards acquiring knowledge, enlightenment, and liberation successful.
+
+Long Live the Pabna University of Science and Technology! Long Live Bangladesh!`,
     isCurrent: true,
     orderIndex: 7,
   },
