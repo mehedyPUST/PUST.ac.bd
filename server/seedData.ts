@@ -322,8 +322,8 @@ export const SEED_ABOUT_SECTIONS: AboutContentRecord[] = [
   {
     id: 'about-history',
     slug: 'history',
-    title: 'History & Founding',
-    body: 'The Parliament of Bangladesh passed the Pabna University of Science and Technology Act (Act No. 43 of 2001) on 15 July 2001. Following formal inauguration of the academic curriculum on 5 June 2008 and the Government Gazette notification on 12 October 2008, classes commenced in 2009 with 140 pioneering students across four founding departments: Computer Science and Engineering (CSE), Electrical and Electronic Engineering (EEE), Mathematics, and Business Administration. Over subsequent years PUST expanded to 5 faculties and 21 academic departments.',
+    title: 'History and Plans',
+    body: 'The government passed the Act in 15 July 2001 to establish a science and technology university in Pabna. The university will be located in the district head quarter of Pabna. Pabna is a central district town in northern Bangladesh having long historical and cultural heritage. The academic curriculum of the Pabna University of Science and Technology was started on 05 June 2008. This university will play an innovative role in providing need-based higher education, training and research. Also the university will be committed to maintain and raise the quality and standard of higher education for the students as in international standards. This practical and need-based curricula will produce highly qualified trained scientists and technologists for the needs of Bangladesh as well as the world employment market. The university offers education in science- and technology-based subjects for undergraduate and post graduate levels. This newly established university will occupies an area of about 30 acres, with a number of multi-storied buildings. Because of its location, it has already drawn the attention of brilliant students for admission and scholarly faculty members for teaching and research.',
     updatedAt: '2026-11-23',
   },
   {

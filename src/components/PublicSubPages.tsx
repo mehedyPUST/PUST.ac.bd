@@ -487,7 +487,7 @@ export function PublicSubPages({
             <div className="flex flex-wrap gap-2">
               {[
                 { label: 'Our University', route: '/about/our-university' as AppRoute },
-                { label: 'History', route: '/about/history' as AppRoute },
+                { label: 'History and Plans', route: '/about/history' as AppRoute },
                 { label: 'Mission and Vision', route: '/about/mission-vision' as AppRoute },
                 { label: 'Strategic Plans', route: '/about/plans' as AppRoute },
               ].map((tab) => (

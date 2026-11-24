@@ -242,7 +242,7 @@ export function HomePage({
                 href="/about/history"
                 className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
               >
-                History
+                History and Plans
               </Link>
               <Link
                 href="/about/mission-vision"

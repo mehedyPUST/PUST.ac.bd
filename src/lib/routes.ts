@@ -70,7 +70,7 @@ export const NAV_GROUPS: NavGroup[] = [
     defaultRoute: '/about',
     items: [
       { label: 'Our University', route: '/about/our-university' },
-      { label: 'History', route: '/about/history' },
+      { label: 'History and Plans', route: '/about/history' },
       { label: 'Mission and Vision', route: '/about/mission-vision' },
       { label: 'Strategic Plans', route: '/about/plans' },
     ],

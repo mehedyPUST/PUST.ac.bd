@@ -73,7 +73,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <ul className="space-y-1.5 text-xs sm:text-sm">
             {[
               { label: 'Our University', route: '/about/our-university' as AppRoute },
-              { label: 'History', route: '/about/history' as AppRoute },
+              { label: 'History and Plans', route: '/about/history' as AppRoute },
               { label: 'Notice Board', route: '/notices' as AppRoute },
               { label: 'Verify Documents', route: '/verify' as AppRoute },
               { label: 'Campus Gallery', route: '/gallery' as AppRoute },
