@@ -61,9 +61,11 @@ export function Navbar({
   }, [route]);
 
   useEffect(() => {
-    function handleOutside(e: MouseEvent) {
+    function handleOutside(e: MouseEvent | TouchEvent) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setHoveredGroup(null);
+        setMobileMenuOpen(false);
+        setMobileSearchOpen(false);
       }
     }
     function handleKeyDown(e: KeyboardEvent) {
@@ -74,9 +76,11 @@ export function Navbar({
       }
     }
     document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside, { passive: true });
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -101,15 +105,15 @@ export function Navbar({
       ref={navRef}
       className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
     >
-      <div className="relative">
+      <div className="relative z-10">
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-10 lg:h-[60px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-11 lg:h-[60px] bg-pust-900"
         />
 
-        <div className="relative max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 flex items-stretch">
-          {/* Left Column: Spanning Official University Crest Box */}
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+          {/* Left Column: Official University Crest */}
           <Link
             href="/"
             onClick={() => {
@@ -118,16 +122,16 @@ export function Navbar({
               setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 bg-white px-1.5 py-1 lg:px-4 lg:py-2 flex items-center justify-center shrink-0"
+            className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
           >
             <PustCrest size={26} className="lg:hidden" />
             <PustCrest size={72} className="hidden lg:block" />
           </Link>
 
-          {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
+          {/* Right Column: Tier 1 University Title + Site-Wide Search + Mobile Actions */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-11 lg:h-[60px] px-2.5 lg:px-6 flex items-center justify-between gap-1.5 lg:gap-3 text-white">
+            <div className="h-11 lg:h-[60px] pl-2.5 pr-0 sm:px-3 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -135,10 +139,10 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-sm sm:text-base lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5"
+                className="font-serif text-base md:text-lg lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5 min-w-0"
               >
-                <span className="sm:hidden">PUST</span>
-                <span className="hidden sm:inline">Pabna University of Science and Technology</span>
+                <span className="md:hidden font-semibold tracking-wide">PUST</span>
+                <span className="hidden md:inline">Pabna University of Science and Technology</span>
               </Link>
 
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -174,11 +178,11 @@ export function Navbar({
                   }}
                   aria-label="Toggle site search"
                   aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
+                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
-                  {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+                  {mobileSearchOpen ? <X className="w-[18px] h-[18px]" /> : <Search className="w-[18px] h-[18px]" />}
                 </button>
 
                 {/* Mobile Admin Edit Mode Toggle */}
@@ -187,15 +191,16 @@ export function Navbar({
                     type="button"
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
+                    aria-label={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
                     title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden min-h-[36px] inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`lg:hidden min-h-[36px] min-w-[36px] inline-flex items-center justify-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950'
                         : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
                     }`}
                   >
-                    {editMode ? <Eye className="w-3 h-3" /> : <Pencil className="w-3 h-3" />}
-                    <span>{editMode ? 'Editing' : 'Edit'}</span>
+                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                    <span className="hidden sm:inline">{editMode ? 'Editing' : 'Edit'}</span>
                   </button>
                 )}
 
@@ -207,7 +212,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden min-h-[36px] inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[34px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -228,9 +233,11 @@ export function Navbar({
                   }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
+                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                    mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
+                  }`}
                 >
-                  {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -671,9 +678,9 @@ export function Navbar({
         }
 
         return (
-          <div className="border-t border-amber-300 bg-amber-50 text-amber-950">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2">
+          <div className="relative z-10 border-t border-amber-300 bg-amber-50 text-amber-950">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-1.5 md:py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-2 text-xs">
+              <div className="hidden md:flex items-center gap-2 shrink-0">
                 <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
                 <span className="font-semibold">Admin Edit Mode Active</span>
                 <span className="hidden 2xl:inline text-amber-900">
@@ -681,14 +688,14 @@ export function Navbar({
                   footer to modify directly.
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar md:flex-wrap pb-0.5 md:pb-0">
                 {onOpenEditModal && (
                   <>
                     {contextual && (
                       <button
                         type="button"
                         onClick={openContextual}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-400 border border-amber-500 text-slate-950 font-semibold hover:bg-amber-300 cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-400 border border-amber-500 text-slate-950 font-semibold hover:bg-amber-300 whitespace-nowrap shrink-0 cursor-pointer"
                       >
                         <Pencil className="w-3 h-3" />
                         {contextual.label}
@@ -697,7 +704,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'hero-profile' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" />
                       Hero &amp; Tagline
@@ -705,7 +712,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'banner' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" />
                       Banners
@@ -713,7 +720,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'notice', notice: null })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Plus className="w-3 h-3" />
                       New Notice
@@ -721,7 +728,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'campus-building' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" />
                       Campus Map
@@ -729,7 +736,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'seminars' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" />
                       Seminars
@@ -737,7 +744,7 @@ export function Navbar({
                     <button
                       type="button"
                       onClick={() => onOpenEditModal({ kind: 'footer-config' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <Pencil className="w-3 h-3" />
                       Footer
@@ -748,7 +755,7 @@ export function Navbar({
                   <button
                     type="button"
                     onClick={onToggleEditMode}
-                    className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold hover:bg-slate-800 cursor-pointer"
+                    className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold hover:bg-slate-800 whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Done Editing
                   </button>
@@ -761,129 +768,159 @@ export function Navbar({
 
       {/* Expandable Mobile / Tablet Search Strip */}
       {mobileSearchOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3">
-          <GlobalSearchBar
-            variant="mobile"
-            autoFocus
-            onActionComplete={() => setMobileSearchOpen(false)}
+        <>
+          <div
+            aria-hidden="true"
+            onClick={() => setMobileSearchOpen(false)}
+            className="fixed inset-x-0 top-11 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
-        </div>
-      )}
-
-      {/* Responsive Mobile Navigation */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white max-h-[80vh] overflow-y-auto px-4 py-3 space-y-1 text-sm">
-          <div className="pb-2.5 mb-1 border-b border-slate-100">
+          <div className="relative z-10 lg:hidden border-t border-slate-200 bg-white px-3.5 py-3 shadow-md">
             <GlobalSearchBar
               variant="mobile"
-              onActionComplete={() => setMobileMenuOpen(false)}
+              autoFocus
+              onActionComplete={() => setMobileSearchOpen(false)}
             />
           </div>
-          <div className="border-b border-slate-100">
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => go('/')}
-                className={`flex-1 text-left py-2.5 px-2 font-medium ${
-                  route === '/' ? 'text-pust-900' : 'text-slate-800'
-                }`}
-              >
-                Home
-              </button>
-              <button
-                type="button"
-                aria-label="Toggle Home sections"
-                onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
-                className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
-              >
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    mobileExpanded === 'home' ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
+        </>
+      )}
+
+      {/* Responsive Mobile Navigation Drawer */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            aria-hidden="true"
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-x-0 top-11 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+          />
+          <nav
+            aria-label="Mobile navigation"
+            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-2.75rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
+          >
+            <div className="pb-2.5 mb-1 border-b border-slate-100">
+              <GlobalSearchBar
+                variant="mobile"
+                onActionComplete={() => setMobileMenuOpen(false)}
+              />
             </div>
-            {mobileExpanded === 'home' && (
-              <div className="pl-3 pb-2 space-y-0.5 bg-slate-50 rounded-lg mb-1.5">
-                {HOME_SUBTOPICS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-left py-2.5 px-2 text-xs rounded-md text-slate-700 hover:text-pust-900"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {NAV_GROUPS.map((group) => {
-            const expanded = mobileExpanded === group.id;
-            return (
-              <div key={group.id} className="border-b border-slate-100">
-                <div className="flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => go(group.defaultRoute)}
-                    className="flex-1 text-left py-3 px-2 font-medium text-slate-800 hover:text-pust-900 cursor-pointer"
-                  >
-                    {group.label}
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Toggle ${group.label} subtopics`}
-                    onClick={() => setMobileExpanded(expanded ? null : group.id)}
-                    className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
-                  >
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
-                    />
-                  </button>
+            <div className="border-b border-slate-100">
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => go('/')}
+                  className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
+                    route === '/' ? 'text-pust-900 font-semibold' : 'text-slate-800'
+                  }`}
+                >
+                  Home
+                </button>
+                <button
+                  type="button"
+                  aria-label="Toggle Home sections"
+                  aria-expanded={mobileExpanded === 'home'}
+                  onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
+                  className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
+                >
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      mobileExpanded === 'home' ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+              {mobileExpanded === 'home' && (
+                <div className="pl-3 pr-2 py-1.5 space-y-0.5 bg-slate-50 rounded-lg mb-2">
+                  {HOME_SUBTOPICS.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-xs rounded-md text-slate-700 hover:text-pust-900 hover:bg-white transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
                 </div>
-                {expanded && (
-                  <div className="pl-3 pb-2 space-y-0.5 bg-slate-50 rounded-lg mb-1.5">
-                    {group.items.map((item) => (
-                      <button
-                        key={item.route}
-                        type="button"
-                        onClick={() => go(item.route)}
-                        className={`block w-full text-left py-2.5 px-2 text-xs rounded-md cursor-pointer ${
-                          route === item.route
-                            ? 'text-pust-900 font-semibold bg-pust-50'
-                            : 'text-slate-700 hover:text-pust-900'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              )}
+            </div>
 
-          <button
-            type="button"
-            onClick={() => go('/verify')}
-            className={`w-full text-left py-3 px-2 border-b border-slate-100 font-medium cursor-pointer ${
-              route === '/verify' ? 'text-pust-900' : 'text-slate-800'
-            }`}
-          >
-            Verify
-          </button>
-          <button
-            type="button"
-            onClick={() => go('/gallery')}
-            className="w-full text-left py-3 px-2 font-medium text-slate-800 cursor-pointer"
-          >
-            News &amp; Events Gallery
-          </button>
-          <div className="pt-3 mt-1 border-t border-slate-100">
-            <PwaInstallButton variant="drawer" allowGuideFallback />
-          </div>
-        </div>
+            {NAV_GROUPS.map((group) => {
+              const expanded = mobileExpanded === group.id;
+              const isGroupActive =
+                route === group.defaultRoute ||
+                group.items.some((item) => item.route === route) ||
+                route.startsWith(`/${group.id === 'academic' ? 'academics' : group.id === 'admission' ? 'admissions' : group.id}`);
+              return (
+                <div key={group.id} className="border-b border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => go(group.defaultRoute)}
+                      className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
+                        isGroupActive ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
+                      }`}
+                    >
+                      {group.label}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Toggle ${group.label} subtopics`}
+                      aria-expanded={expanded}
+                      onClick={() => setMobileExpanded(expanded ? null : group.id)}
+                      className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                  </div>
+                  {expanded && (
+                    <div className="pl-3 pr-2 py-1.5 space-y-0.5 bg-slate-50 rounded-lg mb-2">
+                      {group.items.map((item) => (
+                        <button
+                          key={item.route}
+                          type="button"
+                          onClick={() => go(item.route)}
+                          className={`flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-xs rounded-md cursor-pointer transition-colors ${
+                            route === item.route ||
+                            (route === '/governance/university-act' &&
+                              item.route === '/governance/pust-act')
+                              ? 'text-pust-900 font-semibold bg-pust-50'
+                              : 'text-slate-700 hover:text-pust-900 hover:bg-white'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => go('/verify')}
+              className={`w-full min-h-[44px] text-left py-2.5 px-2 border-b border-slate-100 font-medium cursor-pointer ${
+                route === '/verify' ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
+              }`}
+            >
+              Verify
+            </button>
+            <button
+              type="button"
+              onClick={() => go('/gallery')}
+              className={`w-full min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
+                route === '/gallery' ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
+              }`}
+            >
+              News &amp; Events Gallery
+            </button>
+            <div className="pt-3 mt-1 border-t border-slate-100">
+              <PwaInstallButton variant="drawer" allowGuideFallback />
+            </div>
+          </nav>
+        </>
       )}
     </header>
   );
