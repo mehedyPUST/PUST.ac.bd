@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileCheck2,
+  Maximize2,
   PlayCircle,
   ShieldCheck,
   X,
@@ -120,13 +121,14 @@ export function HomePage({
 
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
   const [bannerPaused, setBannerPaused] = useState(false);
+  const [fullViewSlide, setFullViewSlide] = useState<BannerSlideRecord | null>(null);
 
   useEffect(() => {
     setActiveSlideIdx((prev) => (prev >= slides.length ? 0 : prev));
   }, [slides.length]);
 
   useEffect(() => {
-    if (slides.length <= 1 || bannerPaused) return;
+    if (slides.length <= 1 || bannerPaused || fullViewSlide) return;
     if (
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -137,18 +139,21 @@ export function HomePage({
       setActiveSlideIdx((prev) => (prev + 1) % slides.length);
     }, 5500);
     return () => window.clearInterval(timer);
-  }, [slides.length, bannerPaused]);
+  }, [slides.length, bannerPaused, fullViewSlide]);
 
   const currentSlide = slides[activeSlideIdx] || slides[0];
 
   useEffect(() => {
-    if (!activeMedia) return;
+    if (!activeMedia && !fullViewSlide) return;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') setActiveMedia(null);
+      if (e.key === 'Escape') {
+        if (fullViewSlide) setFullViewSlide(null);
+        if (activeMedia) setActiveMedia(null);
+      }
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [activeMedia]);
+  }, [activeMedia, fullViewSlide]);
 
   const filteredNotices =
     noticeCategory === 'All'
@@ -250,7 +255,7 @@ export function HomePage({
               onFocusCapture={() => setBannerPaused(true)}
               onBlurCapture={() => setBannerPaused(false)}
             >
-              <div className="relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
                 <ResilientImage
                   key={currentSlide.id}
                   src={currentSlide.imageUrl}
@@ -264,6 +269,16 @@ export function HomePage({
                   className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
                   priority
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setFullViewSlide(currentSlide)}
+                  aria-label={`View full image: ${currentSlide.caption}`}
+                  className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/75 text-white text-xs font-medium border border-white/20 shadow-md backdrop-blur-[2px] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  View Full
+                </button>
 
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-transparent pt-12 pb-3.5 px-4 sm:px-5 text-white pointer-events-none">
                   <div className="flex items-end justify-between gap-4">
@@ -978,6 +993,49 @@ export function HomePage({
           </div>
         );
       })()}
+      {/* Banner Full Image Lightbox Modal */}
+      {fullViewSlide && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-xs p-4 sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full banner image view"
+          onClick={() => setFullViewSlide(null)}
+        >
+          <div
+            className="relative w-full max-w-5xl rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setFullViewSlide(null)}
+              aria-label="Close full image view"
+              className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-slate-950/80 text-white border border-white/20 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center justify-center bg-black max-h-[80vh]">
+              <ResilientImage
+                src={fullViewSlide.imageUrl}
+                fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
+                alt={fullViewSlide.alt || fullViewSlide.caption}
+                containerClassName="w-full flex items-center justify-center bg-black"
+                className="max-h-[80vh] w-auto max-w-full object-contain"
+              />
+            </div>
+
+            <div className="px-5 py-3.5 bg-slate-950 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-white">
+              <p className="text-xs sm:text-sm font-serif italic text-white/95 leading-snug">
+                {fullViewSlide.caption}
+              </p>
+              <span className="font-mono text-[11px] text-white/60 shrink-0">
+                Press ESC or × to close
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

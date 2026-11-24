@@ -188,7 +188,7 @@ const galleryCreateSchema = z.object({
     .string()
     .trim()
     .min(5)
-    .max(800)
+    .max(2000)
     .refine(isSafeMediaUrl, 'Media URL must be a valid https://, http://, or local asset path.'),
   eventDate: z.string().trim().min(8).max(20),
   visibility: z.enum(['public', 'registered']).default('public'),
@@ -205,7 +205,7 @@ const bannerCreateSchema = z.object({
     .string()
     .trim()
     .min(5)
-    .max(800)
+    .max(2000)
     .refine(isSafeMediaUrl, 'Banner image URL must be a valid https://, http://, or local asset path.'),
   caption: z.string().trim().min(3).max(240),
   alt: z.string().trim().max(180).optional(),
@@ -216,7 +216,7 @@ const bannerUpdateSchema = z.object({
     .string()
     .trim()
     .min(5)
-    .max(800)
+    .max(2000)
     .refine(isSafeMediaUrl, 'Banner image URL must be a valid https://, http://, or local asset path.')
     .optional(),
   caption: z.string().trim().min(3).max(240).optional(),

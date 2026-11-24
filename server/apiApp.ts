@@ -91,7 +91,7 @@ const createNoticeSchema = z.object({
   attachmentUrl: z
     .string()
     .trim()
-    .max(800)
+    .max(2000)
     .refine((val) => !val || isSafeMediaUrl(val), 'Attachment URL must be a valid https://, http://, or local path.')
     .optional(),
   attachmentType: z.enum(['image', 'pdf', 'other']).optional(),

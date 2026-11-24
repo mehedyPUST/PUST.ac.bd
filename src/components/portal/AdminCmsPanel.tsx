@@ -7,8 +7,10 @@ import {
   BookOpen,
   Check,
   Copy,
+  ExternalLink,
   FileText,
   Image as ImageIcon,
+  Link2,
   Lock,
   Pin,
   PinOff,
@@ -20,6 +22,7 @@ import { pustApi } from '../../lib/api';
 import {
   detectAttachmentType,
   getYouTubeThumbnailUrl,
+  isSafeMediaUrl,
   parseYouTubeVideoId,
 } from '../../lib/media';
 import type {
@@ -179,6 +182,8 @@ export function AdminCmsPanel({
   const [noticeAttachment, setNoticeAttachment] = useState('');
   const [noticeAttachmentUrl, setNoticeAttachmentUrl] = useState('');
   const [noticeAttachmentType, setNoticeAttachmentType] = useState<'image' | 'pdf' | 'other' | ''>('');
+  const [noticeAttachMode, setNoticeAttachMode] = useState<'upload' | 'link'>('upload');
+  const [noticeTypeOverride, setNoticeTypeOverride] = useState<'auto' | 'image' | 'pdf'>('auto');
   const [uploadingNoticeFile, setUploadingNoticeFile] = useState(false);
   const [noticeSummary, setNoticeSummary] = useState('');
   const [noticeBody, setNoticeBody] = useState('');
@@ -202,6 +207,7 @@ export function AdminCmsPanel({
   const [promoteNewVc, setPromoteNewVc] = useState(false);
 
   // Admin Hero Banner Slides CMS
+  const [bannerSourceMode, setBannerSourceMode] = useState<'upload' | 'link'>('upload');
   const [bannerUrl, setBannerUrl] = useState('');
   const [bannerCaption, setBannerCaption] = useState('');
   const [bannerAlt, setBannerAlt] = useState('');
@@ -214,6 +220,7 @@ export function AdminCmsPanel({
   const [galDesc, setGalDesc] = useState('');
   const [galCat, setGalCat] = useState<GalleryItemRecord['category']>('Academic Event');
   const [galType, setGalType] = useState<GalleryItemRecord['mediaType']>('photo');
+  const [galPhotoSourceMode, setGalPhotoSourceMode] = useState<'upload' | 'link'>('upload');
   const [galVisibility, setGalVisibility] = useState<'public' | 'registered'>('public');
   const [galUrl, setGalUrl] = useState('/src/assets/images/pust_campus_hero_1795431408503.jpg');
   const [galDate, setGalDate] = useState('2026-11-20');
@@ -334,11 +341,19 @@ export function AdminCmsPanel({
       return;
     }
 
+    const resolvedUrl = noticeAttachmentUrl.trim() || undefined;
+    if (resolvedUrl && !isSafeMediaUrl(resolvedUrl)) {
+      setError('Attachment direct link must start with https://, http://, or a valid local / path.');
+      return;
+    }
+
     setPublishingNotice(true);
     try {
-      const resolvedUrl = noticeAttachmentUrl.trim() || undefined;
+      const explicitKind = noticeTypeOverride === 'auto' ? undefined : noticeTypeOverride;
       const resolvedType = resolvedUrl
-        ? noticeAttachmentType || detectAttachmentType(resolvedUrl || noticeAttachment)
+        ? explicitKind ||
+          (noticeAttachmentType || undefined) ||
+          detectAttachmentType(resolvedUrl || noticeAttachment)
         : undefined;
       await pustApi.createNotice({
         referenceNo: trimmedRef,
@@ -364,6 +379,7 @@ export function AdminCmsPanel({
       setNoticeAttachment('');
       setNoticeAttachmentUrl('');
       setNoticeAttachmentType('');
+      setNoticeTypeOverride('auto');
       setNoticeSummary('');
       setNoticeBody('');
       setNoticePinned(false);
@@ -397,6 +413,7 @@ export function AdminCmsPanel({
       setNoticeAttachment(file.name);
       setNoticeAttachmentUrl(uploaded.url);
       setNoticeAttachmentType(uploaded.attachmentType);
+      setNoticeTypeOverride(uploaded.attachmentType === 'pdf' ? 'pdf' : 'image');
       setFeedback(`Uploaded "${file.name}" to ImageKit.io and attached to notice draft.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to upload attachment to ImageKit.io.');
@@ -512,14 +529,19 @@ export function AdminCmsPanel({
     e.preventDefault();
     setError(null);
     setFeedback(null);
-    if (!bannerUrl.trim() || !bannerCaption.trim()) {
-      setError('Upload or enter a banner image URL and photo caption.');
+    const trimmedUrl = bannerUrl.trim();
+    if (!trimmedUrl || !bannerCaption.trim()) {
+      setError('Upload an image or enter a direct banner image URL and photo caption.');
+      return;
+    }
+    if (!isSafeMediaUrl(trimmedUrl)) {
+      setError('Direct banner image link must start with https://, http://, or a valid local / path.');
       return;
     }
     setSavingBanner(true);
     try {
       await pustApi.createBannerSlide({
-        imageUrl: bannerUrl.trim(),
+        imageUrl: trimmedUrl,
         caption: bannerCaption.trim(),
         alt: bannerAlt.trim() || undefined,
       });
@@ -601,8 +623,13 @@ export function AdminCmsPanel({
     e.preventDefault();
     setError(null);
     setFeedback(null);
-    if (galType === 'video' && !parseYouTubeVideoId(galUrl) && !galUrl.trim().match(/\.(mp4|webm)(\?|$)/i)) {
+    const trimmedUrl = galUrl.trim();
+    if (galType === 'video' && !parseYouTubeVideoId(trimmedUrl) && !trimmedUrl.match(/\.(mp4|webm)(\?|$)/i)) {
       setError('Please enter a valid YouTube video URL (e.g. https://www.youtube.com/watch?v=... or https://youtu.be/...).');
+      return;
+    }
+    if (galType === 'photo' && !isSafeMediaUrl(trimmedUrl)) {
+      setError('Please upload a photo or enter a valid direct photo link (https://, http://, or local / path).');
       return;
     }
     try {
@@ -611,7 +638,7 @@ export function AdminCmsPanel({
         description: galDesc,
         category: galCat,
         mediaType: galType,
-        mediaUrl: galUrl.trim(),
+        mediaUrl: trimmedUrl,
         eventDate: galDate,
         visibility: galVisibility,
       });
@@ -1046,66 +1073,193 @@ export function AdminCmsPanel({
                 />
               </div>
               <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
                   <div>
                     <p className="font-mono text-[10px] uppercase tracking-wider text-slate-600 font-semibold">
-                      Official Attachment — Image or PDF (ImageKit.io)
+                      Official Attachment — Image or PDF
                     </p>
                     <p className="text-[11px] text-slate-500 mt-0.5">
-                      Upload a circular PDF or image directly to ImageKit.io, or paste an existing file URL.
+                      Upload a circular image/PDF to ImageKit.io or add a direct image/PDF link.
                     </p>
                   </div>
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-slate-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0">
-                    <Upload className="w-3.5 h-3.5" />
-                    {uploadingNoticeFile ? 'Uploading...' : 'Upload Image / PDF'}
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                      disabled={uploadingNoticeFile}
-                      onChange={handleNoticeFileUpload}
-                      className="sr-only"
-                    />
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <input
-                    type="text"
-                    value={noticeAttachment}
-                    onChange={(e) => setNoticeAttachment(e.target.value)}
-                    placeholder="Attachment File Label (e.g. Exam-Schedule-2026.pdf)"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
-                  />
-                  <input
-                    type="url"
-                    value={noticeAttachmentUrl}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setNoticeAttachmentUrl(val);
-                      setNoticeAttachmentType(val.trim() ? detectAttachmentType(val) : '');
-                    }}
-                    placeholder="ImageKit / File URL (auto-filled after upload)"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
-                  />
-                </div>
-
-                {(noticeAttachment || noticeAttachmentUrl) && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] font-mono text-slate-700">
-                    <span className="inline-flex items-center gap-1.5 truncate">
-                      <FileText className="w-3.5 h-3.5 text-pust-800 shrink-0" />
-                      Ready: {noticeAttachment || noticeAttachmentUrl}
-                    </span>
+                  <div className="inline-flex rounded-lg border border-slate-300 bg-white p-0.5 text-[11px] font-medium shrink-0">
                     <button
                       type="button"
-                      onClick={() => {
-                        setNoticeAttachment('');
-                        setNoticeAttachmentUrl('');
-                        setNoticeAttachmentType('');
-                      }}
-                      className="text-red-700 hover:underline cursor-pointer"
+                      onClick={() => setNoticeAttachMode('upload')}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                        noticeAttachMode === 'upload'
+                          ? 'bg-pust-900 text-white'
+                          : 'text-slate-700 hover:text-slate-900'
+                      }`}
                     >
-                      Clear Attachment
+                      <Upload className="w-3 h-3" />
+                      Upload (ImageKit.io)
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setNoticeAttachMode('link')}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                        noticeAttachMode === 'link'
+                          ? 'bg-pust-900 text-white'
+                          : 'text-slate-700 hover:text-slate-900'
+                      }`}
+                    >
+                      <Link2 className="w-3 h-3" />
+                      Direct Link (Image / PDF)
+                    </button>
+                  </div>
+                </div>
+
+                {noticeAttachMode === 'upload' ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+                    <label className="sm:col-span-5 inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-medium bg-white border border-dashed border-slate-400 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap">
+                      <Upload className="w-3.5 h-3.5 text-pust-800" />
+                      {uploadingNoticeFile ? 'Uploading to ImageKit.io...' : 'Choose Image or PDF File'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                        disabled={uploadingNoticeFile}
+                        onChange={handleNoticeFileUpload}
+                        className="sr-only"
+                      />
+                    </label>
+                    <input
+                      type="text"
+                      value={noticeAttachment}
+                      onChange={(e) => setNoticeAttachment(e.target.value)}
+                      placeholder="Display Label (e.g. Exam-Schedule-2026.pdf)"
+                      className="sm:col-span-7 w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    <div className="sm:col-span-6">
+                      <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                        Direct Image or PDF URL
+                      </label>
+                      <input
+                        type="text"
+                        value={noticeAttachmentUrl}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNoticeAttachmentUrl(val);
+                          const detected = val.trim() ? detectAttachmentType(val) : '';
+                          setNoticeAttachmentType(detected);
+                        }}
+                        placeholder="https://example.edu/circular.pdf or https://.../photo.jpg"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                        Link File Type
+                      </label>
+                      <select
+                        value={noticeTypeOverride}
+                        onChange={(e) => {
+                          const next = e.target.value as 'auto' | 'image' | 'pdf';
+                          setNoticeTypeOverride(next);
+                          if (next !== 'auto') {
+                            setNoticeAttachmentType(next);
+                          } else {
+                            setNoticeAttachmentType(
+                              noticeAttachmentUrl.trim()
+                                ? detectAttachmentType(noticeAttachmentUrl)
+                                : ''
+                            );
+                          }
+                        }}
+                        aria-label="Direct link attachment format"
+                        className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                      >
+                        <option value="auto">Auto-detect (.pdf / .jpg)</option>
+                        <option value="image">Image (JPG / PNG / WebP)</option>
+                        <option value="pdf">PDF Document</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-3">
+                      <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                        Display Name (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={noticeAttachment}
+                        onChange={(e) => setNoticeAttachment(e.target.value)}
+                        placeholder="e.g. Exam-Circular.pdf"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {noticeAttachmentUrl.trim() && !isSafeMediaUrl(noticeAttachmentUrl) && (
+                  <p className="text-[11px] font-mono text-red-700">
+                    Enter a valid direct link starting with https://, http://, or a local / path.
+                  </p>
+                )}
+
+                {(noticeAttachment || noticeAttachmentUrl) && (
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-2.5 text-[11px] font-mono text-slate-700">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {(() => {
+                        const effectiveType =
+                          noticeTypeOverride !== 'auto'
+                            ? noticeTypeOverride
+                            : noticeAttachmentType ||
+                              detectAttachmentType(noticeAttachmentUrl || noticeAttachment);
+                        const safeUrl = isSafeMediaUrl(noticeAttachmentUrl)
+                          ? noticeAttachmentUrl.trim()
+                          : '';
+                        if (effectiveType === 'image' && safeUrl) {
+                          return (
+                            <img
+                              src={safeUrl}
+                              alt={noticeAttachment || 'Attachment preview'}
+                              referrerPolicy="no-referrer"
+                              className="w-12 h-9 rounded object-cover border border-slate-200 bg-slate-100 shrink-0"
+                            />
+                          );
+                        }
+                        return <FileText className="w-4 h-4 text-pust-800 shrink-0" />;
+                      })()}
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-slate-900">
+                          {noticeAttachment || noticeAttachmentUrl}
+                        </p>
+                        <p className="text-[10px] text-slate-500 uppercase">
+                          {noticeTypeOverride !== 'auto'
+                            ? noticeTypeOverride
+                            : noticeAttachmentType ||
+                              detectAttachmentType(noticeAttachmentUrl || noticeAttachment)}{' '}
+                          {noticeAttachmentUrl ? '· Link attached' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {isSafeMediaUrl(noticeAttachmentUrl) && (
+                        <a
+                          href={noticeAttachmentUrl.trim()}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-pust-800 hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Open
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNoticeAttachment('');
+                          setNoticeAttachmentUrl('');
+                          setNoticeAttachmentType('');
+                          setNoticeTypeOverride('auto');
+                        }}
+                        className="text-red-700 hover:underline cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1640,39 +1794,76 @@ export function AdminCmsPanel({
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-900">
-                  Homepage Banner Carousel &amp; Photo Captions (ImageKit.io)
+                  Homepage Banner Carousel &amp; Photo Captions
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Upload banner photos to ImageKit.io or paste an ImageKit URL. Multiple slides auto-slide on the homepage with captions.
+                  Upload banner photos to ImageKit.io or add a direct image link. Multiple slides auto-slide on the homepage with captions.
                 </p>
               </div>
-              <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0">
-                <Upload className="w-3.5 h-3.5" />
-                {uploadingBanner ? 'Uploading to ImageKit...' : 'Upload Banner Image'}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  disabled={uploadingBanner}
-                  onChange={handleBannerFileUpload}
-                  className="sr-only"
-                />
-              </label>
+              <div className="inline-flex rounded-lg border border-slate-300 bg-[#F7F7F5] p-0.5 text-[11px] font-medium shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setBannerSourceMode('upload')}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                    bannerSourceMode === 'upload'
+                      ? 'bg-pust-900 text-white'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Upload className="w-3 h-3" />
+                  Upload (ImageKit.io)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBannerSourceMode('link')}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                    bannerSourceMode === 'link'
+                      ? 'bg-pust-900 text-white'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Link2 className="w-3 h-3" />
+                  Direct Image Link
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleAddBannerSlide} className="space-y-3 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
-                    Banner Image URL (ImageKit.io / HTTPS)
+                    {bannerSourceMode === 'upload'
+                      ? 'Upload Banner Image (ImageKit.io)'
+                      : 'Direct Banner Image Link (HTTPS / Local Path)'}
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={bannerUrl}
-                    onChange={(e) => setBannerUrl(e.target.value)}
-                    placeholder="https://ik.imagekit.io/... or upload above"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-                  />
+                  {bannerSourceMode === 'upload' ? (
+                    <div className="flex items-center gap-2">
+                      <label className="flex-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium border border-dashed border-pust-800 bg-[#F7F7F5] text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap">
+                        <Upload className="w-3.5 h-3.5" />
+                        {uploadingBanner
+                          ? 'Uploading to ImageKit...'
+                          : bannerUrl
+                          ? 'Replace Banner Image'
+                          : 'Choose Banner Image (JPG / PNG / WebP)'}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          disabled={uploadingBanner}
+                          onChange={handleBannerFileUpload}
+                          className="sr-only"
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      value={bannerUrl}
+                      onChange={(e) => setBannerUrl(e.target.value)}
+                      placeholder="https://example.edu/images/campus-banner.jpg"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
@@ -1689,6 +1880,37 @@ export function AdminCmsPanel({
                   />
                 </div>
               </div>
+
+              {bannerUrl.trim() && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-[#F7F7F5] p-2.5">
+                  {isSafeMediaUrl(bannerUrl) ? (
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <img
+                        src={bannerUrl.trim()}
+                        alt={bannerAlt || bannerCaption || 'Banner preview'}
+                        referrerPolicy="no-referrer"
+                        className="w-20 h-12 rounded-lg object-cover border border-slate-200 bg-slate-100 shrink-0"
+                      />
+                      <div className="min-w-0 font-mono text-[11px]">
+                        <p className="text-emerald-800 font-semibold">Banner image ready</p>
+                        <p className="text-slate-500 truncate">{bannerUrl.trim()}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] font-mono text-red-700">
+                      Enter a valid image URL starting with https://, http://, or a local / path.
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setBannerUrl('')}
+                    className="text-[11px] font-mono text-red-700 hover:underline cursor-pointer shrink-0"
+                  >
+                    Clear Image
+                  </button>
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <input
                   type="text"
@@ -1800,21 +2022,36 @@ export function AdminCmsPanel({
                   News &amp; Events CMS (Photos, YouTube Videos &amp; Privacy)
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Add event photos via ImageKit.io or embed YouTube video links, and control visibility (Public vs Registered Users Only).
+                  Upload event photos to ImageKit.io, add a direct image link, or embed YouTube videos with Public/Registered privacy.
                 </p>
               </div>
               {galType === 'photo' && (
-                <label className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0">
-                  <Upload className="w-3.5 h-3.5" />
-                  {uploadingGalleryPhoto ? 'Uploading Photo...' : 'Upload Photo to ImageKit.io'}
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    disabled={uploadingGalleryPhoto}
-                    onChange={handleGalleryPhotoUpload}
-                    className="sr-only"
-                  />
-                </label>
+                <div className="inline-flex rounded-lg border border-slate-300 bg-[#F7F7F5] p-0.5 text-[11px] font-medium shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setGalPhotoSourceMode('upload')}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                      galPhotoSourceMode === 'upload'
+                        ? 'bg-pust-900 text-white'
+                        : 'text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload (ImageKit.io)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGalPhotoSourceMode('link')}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+                      galPhotoSourceMode === 'link'
+                        ? 'bg-pust-900 text-white'
+                        : 'text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Link2 className="w-3 h-3" />
+                    Direct Image Link
+                  </button>
+                </div>
               )}
             </div>
 
@@ -1865,19 +2102,33 @@ export function AdminCmsPanel({
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <input
-                  type="text"
-                  required
-                  value={galUrl}
-                  onChange={(e) => setGalUrl(e.target.value)}
-                  placeholder={
-                    galType === 'video'
-                      ? 'YouTube Link (https://www.youtube.com/watch?v=... or https://youtu.be/...)'
-                      : 'Photo URL (upload above to ImageKit.io or paste URL)'
-                  }
-                  className="sm:col-span-5 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+                {galType === 'photo' && galPhotoSourceMode === 'upload' ? (
+                  <label className="sm:col-span-5 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium border border-dashed border-pust-800 bg-[#F7F7F5] text-pust-900 hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap">
+                    <Upload className="w-3.5 h-3.5" />
+                    {uploadingGalleryPhoto ? 'Uploading Photo...' : 'Upload Photo to ImageKit.io'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      disabled={uploadingGalleryPhoto}
+                      onChange={handleGalleryPhotoUpload}
+                      className="sr-only"
+                    />
+                  </label>
+                ) : (
+                  <input
+                    type="text"
+                    required
+                    value={galUrl}
+                    onChange={(e) => setGalUrl(e.target.value)}
+                    placeholder={
+                      galType === 'video'
+                        ? 'YouTube Link (https://www.youtube.com/watch?v=... or https://youtu.be/...)'
+                        : 'https://example.edu/images/event-photo.jpg'
+                    }
+                    className="sm:col-span-5 px-3 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                )}
                 <input
                   type="text"
                   required
@@ -1893,6 +2144,36 @@ export function AdminCmsPanel({
                   className="sm:col-span-2 px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
                 />
               </div>
+
+              {galType === 'photo' && galUrl.trim() && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-[#F7F7F5] p-2.5">
+                  {isSafeMediaUrl(galUrl) ? (
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <img
+                        src={galUrl.trim()}
+                        alt={galTitle || 'Event photo preview'}
+                        referrerPolicy="no-referrer"
+                        className="w-16 h-11 rounded-lg object-cover border border-slate-200 bg-slate-100 shrink-0"
+                      />
+                      <div className="min-w-0 font-mono text-[11px]">
+                        <p className="text-emerald-800 font-semibold">Event photo ready</p>
+                        <p className="text-slate-500 truncate">{galUrl.trim()}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] font-mono text-red-700">
+                      Enter a valid image link starting with https://, http://, or a local / path.
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setGalUrl('')}
+                    className="text-[11px] font-mono text-red-700 hover:underline cursor-pointer shrink-0"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
 
               {galType === 'video' && galUrl.trim() && (
                 <div className="text-[11px] font-mono">
