@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { BookOpen, Check, Copy, Trash2 } from 'lucide-react';
+import { BookOpen, Check, Copy, Pin, PinOff, Trash2 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
 import type {
   AboutContentRecord,
@@ -13,6 +13,7 @@ import type {
   InquiryRecord,
   NoticeBoardScope,
   NoticeCategory,
+  NoticeRecord,
   NoticeVisibility,
   PaymentGatewayConfig,
   SignupTokenRecord,
@@ -35,6 +36,7 @@ interface AdminCmsPanelProps {
   aboutSections: AboutContentRecord[];
   vcProfiles: ViceChancellorRecord[];
   galleryItems: GalleryItemRecord[];
+  notices?: NoticeRecord[];
   onNoticesChange: () => Promise<void>;
   onCmsChange: () => Promise<void>;
 }
@@ -45,6 +47,7 @@ export function AdminCmsPanel({
   aboutSections,
   vcProfiles,
   galleryItems,
+  notices = [],
   onNoticesChange,
   onCmsChange,
 }: AdminCmsPanelProps) {
@@ -145,6 +148,10 @@ export function AdminCmsPanel({
   const [noticeAttachment, setNoticeAttachment] = useState('');
   const [noticeSummary, setNoticeSummary] = useState('');
   const [noticeBody, setNoticeBody] = useState('');
+  const [noticePinned, setNoticePinned] = useState(false);
+  const [publishingNotice, setPublishingNotice] = useState(false);
+  const [noticeActionId, setNoticeActionId] = useState<string | null>(null);
+  const [noticeFilterQuery, setNoticeFilterQuery] = useState('');
 
   // Admin About CMS
   const [aboutSlug, setAboutSlug] = useState<AboutContentRecord['slug']>('our-university');
@@ -264,29 +271,89 @@ export function AdminCmsPanel({
     e.preventDefault();
     setError(null);
     setFeedback(null);
+    const trimmedRef = noticeRef.trim();
+    const trimmedTitle = noticeTitle.trim();
+    const trimmedDept = noticeDept.trim();
+    const trimmedSummary = noticeSummary.trim();
+    const trimmedBody = noticeBody.trim();
+
+    if (trimmedRef.length < 2 || trimmedTitle.length < 3 || trimmedDept.length < 2) {
+      setError('Memo reference, circular title, and unit/department code are required.');
+      return;
+    }
+    if (trimmedSummary.length < 3 || trimmedBody.length < 5) {
+      setError('Please enter an executive summary (3+ chars) and circular details (5+ chars).');
+      return;
+    }
+    if (noticeScope === 'course' && !noticeTargetCourse.trim()) {
+      setError('Target Course Code is required for course-scoped notices.');
+      return;
+    }
+
+    setPublishingNotice(true);
     try {
       await pustApi.createNotice({
-        referenceNo: noticeRef,
-        title: noticeTitle,
+        referenceNo: trimmedRef,
+        title: trimmedTitle,
         category: noticeCat,
-        departmentCode: noticeDept,
+        departmentCode: trimmedDept,
         boardScope: noticeScope,
         visibility: noticeVisibility,
         targetSession: noticeTargetSession.trim() || undefined,
         targetCourseCode: noticeTargetCourse.trim() || undefined,
         attachmentName: noticeAttachment.trim() || undefined,
-        summary: noticeSummary,
-        body: noticeBody,
+        summary: trimmedSummary,
+        body: trimmedBody,
+        pinned: noticePinned,
       });
-      setFeedback(`Published ${noticeVisibility} ${noticeScope} notice "${noticeTitle}".`);
+      setFeedback(`Published ${noticeVisibility} ${noticeScope} notice "${trimmedTitle}".`);
       setNoticeRef('');
       setNoticeTitle('');
+      setNoticeTargetSession('');
+      setNoticeTargetCourse('');
       setNoticeAttachment('');
       setNoticeSummary('');
       setNoticeBody('');
+      setNoticePinned(false);
       await onNoticesChange();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to publish notice.');
+    } finally {
+      setPublishingNotice(false);
+    }
+  }
+
+  async function handleTogglePinNotice(notice: NoticeRecord) {
+    setError(null);
+    setFeedback(null);
+    setNoticeActionId(notice.id);
+    try {
+      await pustApi.updateNotice(notice.id, { pinned: !notice.pinned });
+      setFeedback(
+        !notice.pinned
+          ? `Pinned "${notice.title}" to top of Notice Board.`
+          : `Unpinned "${notice.title}".`
+      );
+      await onNoticesChange();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update notice pin status.');
+    } finally {
+      setNoticeActionId(null);
+    }
+  }
+
+  async function handleDeleteNotice(notice: NoticeRecord) {
+    setError(null);
+    setFeedback(null);
+    setNoticeActionId(notice.id);
+    try {
+      await pustApi.deleteNotice(notice.id);
+      setFeedback(`Removed circular "${notice.title}".`);
+      await onNoticesChange();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to delete notice.');
+    } finally {
+      setNoticeActionId(null);
     }
   }
 
@@ -496,7 +563,11 @@ export function AdminCmsPanel({
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveSubTab(tab.id)}
+                  onClick={() => {
+                    setActiveSubTab(tab.id);
+                    setError(null);
+                    setFeedback(null);
+                  }}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
                       ? 'border-pust-900 bg-pust-900 text-white'
@@ -558,140 +629,364 @@ export function AdminCmsPanel({
         </div>
       )}
 
-      {/* 1. Role-Scoped Notice Board Publisher */}
-      {activeSubTab === 'notices' && user.role !== 'student' && (
-        <form
-          onSubmit={handleCreateNotice}
-          className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4"
-        >
-          <div className="border-b border-slate-200 pb-3">
-            <h3 className="font-serif text-lg font-medium text-slate-900">{noticeHeading}</h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <input
-              type="text"
-              required
-              value={noticeRef}
-              onChange={(e) => setNoticeRef(e.target.value)}
-              placeholder="Memo Ref (PUST/2026/...)"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-            <select
-              value={noticeScope}
-              onChange={(e) => setNoticeScope(e.target.value as NoticeBoardScope)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+      {/* 1. Role-Scoped Notice Board Publisher & Registry */}
+      {activeSubTab === 'notices' && user.role !== 'student' && (() => {
+        const isExecutiveCentral = ['admin', 'registrar', 'vc'].includes(user.role);
+        const centralUnitDefaults = new Set([
+          'REG',
+          'REGISTRAR',
+          'ADMIN',
+          'ADMISSION',
+          'CONTROLLER',
+          'IQAC',
+          'PR',
+          'LIB',
+          'HALL',
+          'PROCTOR',
+        ]);
+        const managedNotices = notices.filter((n) => {
+          const matchesRole =
+            isExecutiveCentral || n.departmentCode === user.departmentCode;
+          const q = noticeFilterQuery.trim().toLowerCase();
+          const matchesQuery =
+            !q ||
+            n.title.toLowerCase().includes(q) ||
+            n.referenceNo.toLowerCase().includes(q) ||
+            n.departmentCode.toLowerCase().includes(q);
+          return matchesRole && matchesQuery;
+        });
+
+        return (
+          <div className="space-y-6">
+            <form
+              onSubmit={handleCreateNotice}
+              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4"
             >
-              {['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(user.role) && (
-                <option value="central">Central Notice Board</option>
+              <div className="border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="font-serif text-lg font-medium text-slate-900">{noticeHeading}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Published circulars appear immediately on the University Notice Board and targeted member portals.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Memo Ref
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    minLength={2}
+                    value={noticeRef}
+                    onChange={(e) => setNoticeRef(e.target.value)}
+                    placeholder="PUST/REG/2026/..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Notice Board Scope
+                  </label>
+                  <select
+                    value={noticeScope}
+                    onChange={(e) => {
+                      const nextScope = e.target.value as NoticeBoardScope;
+                      setNoticeScope(nextScope);
+                      if (isExecutiveCentral) {
+                        if (nextScope === 'central' && !centralUnitDefaults.has(noticeDept)) {
+                          setNoticeDept('REG');
+                        } else if (nextScope !== 'central' && centralUnitDefaults.has(noticeDept)) {
+                          setNoticeDept(departments[0]?.code || 'CSE');
+                        }
+                      }
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  >
+                    {['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(user.role) && (
+                      <option value="central">Central Notice Board</option>
+                    )}
+                    {(isExecutiveCentral || user.role === 'chairman' || user.role === 'teacher') && (
+                      <option value="department">Department Notice Board</option>
+                    )}
+                    {(isExecutiveCentral || user.role === 'teacher') && (
+                      <option value="course">Course &amp; Session Notice</option>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Visibility
+                  </label>
+                  <select
+                    value={noticeVisibility}
+                    onChange={(e) => setNoticeVisibility(e.target.value as NoticeVisibility)}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  >
+                    <option value="public">Public (Everyone)</option>
+                    <option value="registered">Registered Members Only</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={noticeCat}
+                    onChange={(e) => setNoticeCat(e.target.value as NoticeCategory)}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  >
+                    {(
+                      [
+                        'General',
+                        'Admission',
+                        'Academic',
+                        'Examination',
+                        'Result',
+                        'Course',
+                        'Job & Tender',
+                        'NOC & Orders',
+                        'Press Release',
+                      ] as NoticeCategory[]
+                    ).map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    Circular Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    minLength={3}
+                    value={noticeTitle}
+                    onChange={(e) => setNoticeTitle(e.target.value)}
+                    placeholder="Official Circular Title"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                    {noticeScope === 'central' ? 'Issuing Unit Code' : 'Target Department'}
+                  </label>
+                  {isExecutiveCentral && noticeScope !== 'central' ? (
+                    <select
+                      value={noticeDept}
+                      onChange={(e) => setNoticeDept(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                    >
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.code}>
+                          {d.code} — {d.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      required
+                      minLength={2}
+                      disabled={user.role === 'chairman' || user.role === 'teacher'}
+                      value={noticeDept}
+                      onChange={(e) => setNoticeDept(e.target.value)}
+                      placeholder="Unit / Dept Code (e.g. REG, ADMIN, CSE)"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                  )}
+                </div>
+              </div>
+              {(noticeScope === 'department' || noticeScope === 'course') && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    value={noticeTargetSession}
+                    onChange={(e) => setNoticeTargetSession(e.target.value)}
+                    placeholder="Optional Target Session (e.g. 2022-23)"
+                    className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                  <input
+                    type="text"
+                    required={noticeScope === 'course'}
+                    value={noticeTargetCourse}
+                    onChange={(e) => setNoticeTargetCourse(e.target.value)}
+                    placeholder="Target Course Code (required for Course scope)"
+                    className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
               )}
-              {(user.role === 'chairman' || user.role === 'teacher') && (
-                <option value="department">Department Notice Board</option>
+              <div>
+                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                  Executive Summary
+                </label>
+                <input
+                  type="text"
+                  required
+                  minLength={3}
+                  value={noticeSummary}
+                  onChange={(e) => setNoticeSummary(e.target.value)}
+                  placeholder="One-line executive summary shown on notice cards"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+              <div>
+                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                  Attachment Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={noticeAttachment}
+                  onChange={(e) => setNoticeAttachment(e.target.value)}
+                  placeholder="Optional Attachment Name (e.g. Exam-Schedule-2026.pdf)"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+              <div>
+                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                  Full Circular Details
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  minLength={5}
+                  value={noticeBody}
+                  onChange={(e) => setNoticeBody(e.target.value)}
+                  placeholder="Full circular details and instructions..."
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                {['admin', 'registrar', 'vc', 'chairman'].includes(user.role) ? (
+                  <label className="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={noticePinned}
+                      onChange={(e) => setNoticePinned(e.target.checked)}
+                    />
+                    Pin circular to top of Notice Board
+                  </label>
+                ) : (
+                  <span />
+                )}
+                <button
+                  type="submit"
+                  disabled={publishingNotice}
+                  className="px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  {publishingNotice ? 'Publishing Circular...' : 'Publish Official Circular'}
+                </button>
+              </div>
+            </form>
+
+            {/* Published Circulars Registry & Management */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div>
+                  <h3 className="font-serif text-lg font-medium text-slate-900 tabular-nums">
+                    Published Circulars ({managedNotices.length})
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Verify live circulars, pin featured announcements, or remove outdated notices.
+                  </p>
+                </div>
+                <input
+                  type="search"
+                  value={noticeFilterQuery}
+                  onChange={(e) => setNoticeFilterQuery(e.target.value)}
+                  placeholder="Filter by title, memo ref, or unit..."
+                  className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800 w-full sm:w-64"
+                />
+              </div>
+
+              {managedNotices.length === 0 ? (
+                <p className="text-xs text-slate-600 p-4 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                  No circulars match your current filter.
+                </p>
+              ) : (
+                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-[420px] overflow-y-auto">
+                  {managedNotices.map((n) => {
+                    const canManage =
+                      user.role === 'admin' ||
+                      user.role === 'registrar' ||
+                      (user.role === 'chairman' && n.departmentCode === user.departmentCode);
+                    const canPin =
+                      canManage || user.role === 'vc';
+                    const busy = noticeActionId === n.id;
+                    return (
+                      <div
+                        key={n.id}
+                        className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
+                      >
+                        <div className="space-y-1 min-w-0">
+                          <p className="font-mono text-[11px] text-pust-800 tabular-nums flex flex-wrap items-center gap-1.5">
+                            <span>{n.publishedAt}</span>
+                            <span>· {n.referenceNo}</span>
+                            <span>· {n.category}</span>
+                            <span>· {n.departmentCode}</span>
+                            <span className="uppercase">· {n.boardScope}</span>
+                            {n.visibility === 'registered' && (
+                              <span className="font-semibold text-amber-800">· REGISTERED ONLY</span>
+                            )}
+                            {n.pinned && (
+                              <span className="px-1.5 py-0.5 rounded bg-pust-50 border border-pust-200 text-pust-900 font-semibold">
+                                PINNED
+                              </span>
+                            )}
+                          </p>
+                          <p className="font-medium text-sm text-slate-900">{n.title}</p>
+                          <p className="text-slate-600 line-clamp-1">{n.summary}</p>
+                        </div>
+
+                        {(canPin || canManage) && (
+                          <div className="flex items-center gap-2 shrink-0">
+                            {canPin && (
+                              <button
+                                type="button"
+                                disabled={busy}
+                                onClick={() => handleTogglePinNotice(n)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                              >
+                                {n.pinned ? (
+                                  <>
+                                    <PinOff className="w-3.5 h-3.5" />
+                                    Unpin
+                                  </>
+                                ) : (
+                                  <>
+                                    <Pin className="w-3.5 h-3.5" />
+                                    Pin
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            {canManage && (
+                              <button
+                                type="button"
+                                disabled={busy}
+                                onClick={() => handleDeleteNotice(n)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 bg-white text-red-700 hover:bg-red-50 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-              {user.role === 'teacher' && (
-                <option value="course">Teacher Course &amp; Session Notice</option>
-              )}
-            </select>
-            <select
-              value={noticeVisibility}
-              onChange={(e) => setNoticeVisibility(e.target.value as NoticeVisibility)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
-            >
-              <option value="public">Public (Everyone)</option>
-              <option value="registered">Registered Members Only</option>
-            </select>
-            <select
-              value={noticeCat}
-              onChange={(e) => setNoticeCat(e.target.value as NoticeCategory)}
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
-            >
-              {(
-                [
-                  'General',
-                  'Admission',
-                  'Academic',
-                  'Examination',
-                  'Result',
-                  'Course',
-                  'Job & Tender',
-                  'NOC & Orders',
-                  'Press Release',
-                ] as NoticeCategory[]
-              ).map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input
-              type="text"
-              required
-              value={noticeTitle}
-              onChange={(e) => setNoticeTitle(e.target.value)}
-              placeholder="Circular Title"
-              className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-            <input
-              type="text"
-              required
-              disabled={user.role === 'chairman' || user.role === 'teacher'}
-              value={noticeDept}
-              onChange={(e) => setNoticeDept(e.target.value)}
-              placeholder="Unit / Dept Code"
-              className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] disabled:opacity-75 focus:outline-none focus:border-pust-800"
-            />
-          </div>
-          {(noticeScope === 'department' || noticeScope === 'course') && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
-                type="text"
-                value={noticeTargetSession}
-                onChange={(e) => setNoticeTargetSession(e.target.value)}
-                placeholder="Optional Target Session (e.g. 2022-23)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-              <input
-                type="text"
-                required={noticeScope === 'course'}
-                value={noticeTargetCourse}
-                onChange={(e) => setNoticeTargetCourse(e.target.value)}
-                placeholder="Target Course Code (required for Course scope)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-              />
             </div>
-          )}
-          <input
-            type="text"
-            required
-            value={noticeSummary}
-            onChange={(e) => setNoticeSummary(e.target.value)}
-            placeholder="One-line executive summary"
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-          />
-          <input
-            type="text"
-            value={noticeAttachment}
-            onChange={(e) => setNoticeAttachment(e.target.value)}
-            placeholder="Optional Attachment Name (e.g. Exam-Schedule-2026.pdf)"
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-          />
-          <textarea
-            rows={3}
-            required
-            value={noticeBody}
-            onChange={(e) => setNoticeBody(e.target.value)}
-            placeholder="Full circular details..."
-            className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
-          />
-          <button
-            type="submit"
-            className="px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
-          >
-            Publish Official Circular
-          </button>
-        </form>
-      )}
+          </div>
+        );
+      })()}
 
       {/* 2. Student Portal Signup Tokens & User Approvals (Admin & Chairman) */}
       {activeSubTab === 'approvals' && (user.role === 'admin' || user.role === 'chairman') && (

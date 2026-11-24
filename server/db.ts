@@ -410,7 +410,9 @@ class PustRepository {
     let items = await this.getAll('notices', this.notices);
     items.sort((a, b) => {
       if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
-      return b.publishedAt.localeCompare(a.publishedAt);
+      const dateCmp = b.publishedAt.localeCompare(a.publishedAt);
+      if (dateCmp !== 0) return dateCmp;
+      return (b.createdAt || '').localeCompare(a.createdAt || '');
     });
 
     if (!opts.isAuthenticated) {
@@ -448,11 +450,20 @@ class PustRepository {
     return items;
   }
 
+  async findNoticeById(id: string): Promise<NoticeRecord | null> {
+    const items = await this.getAll('notices', this.notices);
+    return items.find((n) => n.id === id) ?? null;
+  }
+
   createNotice = (input: Omit<NoticeRecord, 'id'>) =>
     this.insertItem('notices', this.notices, {
       id: `notice-${crypto.randomUUID()}`,
+      createdAt: new Date().toISOString(),
       ...input,
     });
+
+  updateNotice = (id: string, patch: Partial<NoticeRecord>) =>
+    this.updateItem('notices', this.notices, id, patch);
 
   deleteNotice = (id: string) => this.removeItem('notices', this.notices, id);
 

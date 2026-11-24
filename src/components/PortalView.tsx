@@ -118,7 +118,7 @@ export function PortalView({
   onCmsChange,
   onBackToSite,
 }: PortalViewProps) {
-  const { navigateTo } = usePust();
+  const { navigateTo, setActiveNotice } = usePust();
 
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
@@ -235,6 +235,7 @@ export function PortalView({
     if (!user) return [];
     return notices
       .filter((n) => {
+        if (['admin', 'registrar', 'vc'].includes(user.role)) return true;
         if (n.boardScope === 'central') return true;
         if (n.departmentCode === user.departmentCode) {
           if (!n.targetSession || !user.session) return true;
@@ -242,7 +243,7 @@ export function PortalView({
         }
         return false;
       })
-      .slice(0, 5);
+      .slice(0, 6);
   }, [notices, user]);
 
   function handleDigitalFileAttach(e: ChangeEvent<HTMLInputElement>) {
@@ -1663,7 +1664,12 @@ export function PortalView({
                   ) : (
                     <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
                       {targetedNotifications.map((n) => (
-                        <div key={n.id} className="p-3.5 space-y-1 text-sm hover:bg-[#F7F7F5] transition-colors">
+                        <button
+                          key={n.id}
+                          type="button"
+                          onClick={() => setActiveNotice(n)}
+                          className="w-full text-left p-3.5 space-y-1 text-sm hover:bg-[#F7F7F5] transition-colors cursor-pointer"
+                        >
                           <p className="font-mono text-[11px] text-pust-800 tabular-nums">
                             {n.publishedAt} · {n.category} · {n.departmentCode}
                             {n.targetSession ? ` · Session ${n.targetSession}` : ''}
@@ -1671,7 +1677,7 @@ export function PortalView({
                           </p>
                           <p className="font-medium text-slate-900">{n.title}</p>
                           <p className="text-xs text-slate-600">{n.summary}</p>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -2083,6 +2089,7 @@ export function PortalView({
               aboutSections={aboutSections}
               vcProfiles={vcProfiles}
               galleryItems={galleryItems}
+              notices={notices}
               onNoticesChange={onNoticesChange}
               onCmsChange={onCmsChange}
             />

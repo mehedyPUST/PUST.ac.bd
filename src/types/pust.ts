@@ -137,6 +137,7 @@ export interface NoticeRecord {
   pinned?: boolean;
   authorName: string;
   authorRole: UserRole;
+  createdAt?: string;
 }
 
 export interface ChairmanSealJson {

@@ -110,6 +110,12 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
+  updateNotice: (id: string, payload: { pinned: boolean }) =>
+    apiFetch<{ notice: NoticeRecord }>(`/api/notices/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
   deleteNotice: (id: string) =>
     apiFetch<{ deleted: boolean }>(`/api/notices/${encodeURIComponent(id)}`, {
       method: 'DELETE',

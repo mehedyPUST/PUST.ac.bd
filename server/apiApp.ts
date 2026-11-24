@@ -68,8 +68,8 @@ const adminPasscodeSchema = z.object({
 });
 
 const createNoticeSchema = z.object({
-  referenceNo: z.string().trim().min(4).max(40),
-  title: z.string().trim().min(5).max(180),
+  referenceNo: z.string().trim().min(2, 'Memo reference must be at least 2 characters.').max(60),
+  title: z.string().trim().min(3, 'Circular title must be at least 3 characters.').max(200),
   category: z.enum([
     'General',
     'Admission',
@@ -81,14 +81,14 @@ const createNoticeSchema = z.object({
     'NOC & Orders',
     'Press Release',
   ]),
-  departmentCode: z.string().trim().min(2).max(24),
+  departmentCode: z.string().trim().min(2, 'Unit / Department code must be at least 2 characters.').max(24),
   boardScope: z.enum(['central', 'department', 'course']).default('central'),
   visibility: z.enum(['public', 'registered']).default('public'),
   targetSession: z.string().trim().max(20).optional(),
   targetCourseCode: z.string().trim().max(20).optional(),
   attachmentName: z.string().trim().max(120).optional(),
-  summary: z.string().trim().min(10).max(320),
-  body: z.string().trim().min(20).max(3000),
+  summary: z.string().trim().min(3, 'Executive summary must be at least 3 characters.').max(320),
+  body: z.string().trim().min(5, 'Circular details must be at least 5 characters.').max(5000),
   pinned: z.boolean().optional(),
 });
 
@@ -482,13 +482,19 @@ export function mountApiRoutes(app: Express): void {
     async (req: AuthenticatedRequest, res) => {
       const parsed = createNoticeSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json({ error: 'Please complete all notice fields.' });
+        const firstIssue = parsed.error.issues[0];
+        res.status(400).json({
+          error: firstIssue?.message || 'Please complete all notice fields.',
+        });
         return;
       }
 
       const actor = req.authUser!;
+      const isExecutiveCentral = ['admin', 'registrar', 'vc'].includes(actor.role);
+      const isCentralUnit = ['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(actor.role);
+
       if (parsed.data.boardScope === 'central') {
-        if (!['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(actor.role)) {
+        if (!isCentralUnit) {
           res.status(403).json({
             error: 'Only Admin or authorized central offices can publish to the Central Notice Board.',
           });
@@ -496,8 +502,9 @@ export function mountApiRoutes(app: Express): void {
         }
       } else if (parsed.data.boardScope === 'department') {
         if (
-          (actor.role !== 'chairman' && actor.role !== 'teacher') ||
-          parsed.data.departmentCode !== actor.departmentCode
+          !isExecutiveCentral &&
+          ((actor.role !== 'chairman' && actor.role !== 'teacher') ||
+            parsed.data.departmentCode !== actor.departmentCode)
         ) {
           res.status(403).json({
             error: 'You may only publish departmental notices for your assigned department.',
@@ -505,9 +512,9 @@ export function mountApiRoutes(app: Express): void {
           return;
         }
       } else if (parsed.data.boardScope === 'course') {
-        if (actor.role !== 'teacher' || !parsed.data.targetCourseCode) {
+        if ((!isExecutiveCentral && actor.role !== 'teacher') || !parsed.data.targetCourseCode) {
           res.status(403).json({
-            error: 'Course-targeted notices require a teacher role and target course code.',
+            error: 'Course-targeted notices require a target course code and authorized role.',
           });
           return;
         }
@@ -529,11 +536,55 @@ export function mountApiRoutes(app: Express): void {
     }
   );
 
+  app.patch(
+    '/api/notices/:id',
+    requireRoles('admin', 'registrar', 'vc', 'chairman'),
+    async (req: AuthenticatedRequest, res) => {
+      const parsed = z.object({ pinned: z.boolean() }).safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: 'Invalid notice update payload.' });
+        return;
+      }
+      const existing = await pustRepo.findNoticeById(String(req.params.id));
+      if (!existing) {
+        res.status(404).json({ error: 'Notice not found.' });
+        return;
+      }
+      if (
+        req.authUser!.role === 'chairman' &&
+        existing.departmentCode !== req.authUser!.departmentCode
+      ) {
+        res.status(403).json({ error: 'Chairmen may only manage notices in their department.' });
+        return;
+      }
+      const updated = await pustRepo.updateNotice(existing.id, { pinned: parsed.data.pinned });
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        parsed.data.pinned ? 'Pinned notice' : 'Unpinned notice',
+        existing.referenceNo
+      );
+      res.json({ notice: updated });
+    }
+  );
+
   app.delete(
     '/api/notices/:id',
     requireRoles('admin', 'registrar', 'chairman'),
     async (req: AuthenticatedRequest, res) => {
-      const deleted = await pustRepo.deleteNotice(String(req.params.id));
+      const existing = await pustRepo.findNoticeById(String(req.params.id));
+      if (!existing) {
+        res.status(404).json({ error: 'Notice not found.' });
+        return;
+      }
+      if (
+        req.authUser!.role === 'chairman' &&
+        existing.departmentCode !== req.authUser!.departmentCode
+      ) {
+        res.status(403).json({ error: 'Chairmen may only delete notices in their department.' });
+        return;
+      }
+      const deleted = await pustRepo.deleteNotice(existing.id);
       if (!deleted) {
         res.status(404).json({ error: 'Notice not found.' });
         return;
@@ -542,7 +593,7 @@ export function mountApiRoutes(app: Express): void {
         req.authUser!.name,
         req.authUser!.role,
         'Deleted notice',
-        String(req.params.id)
+        existing.referenceNo
       );
       res.json({ deleted: true });
     }
