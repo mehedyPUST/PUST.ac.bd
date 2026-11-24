@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -29,6 +30,7 @@ import { ResilientImage } from './ResilientImage';
 import type {
   AboutContentRecord,
   DepartmentRecord,
+  DigitalFormItem,
   FacultyName,
   GalleryItemRecord,
   InquiryRecord,
@@ -52,44 +54,6 @@ const FACULTY_FILTERS: Array<{ label: string; value: 'All' | FacultyName }> = [
   { label: 'Life & Earth Science', value: 'Faculty of Life and Earth Science' },
 ];
 
-const FACULTY_DEANS: Array<{
-  faculty: FacultyName;
-  dean: string;
-  email: string;
-  code: string;
-}> = [
-  {
-    faculty: 'Faculty of Engineering and Technology',
-    dean: 'Prof. Dr. Md. Anwar Hossain',
-    email: 'dean.et@pust.ac.bd',
-    code: 'FET · 7 Departments',
-  },
-  {
-    faculty: 'Faculty of Science',
-    dean: 'Prof. Dr. Md. Shamim Reza',
-    email: 'dean.s@pust.ac.bd',
-    code: 'FS · 5 Departments',
-  },
-  {
-    faculty: 'Faculty of Business Studies',
-    dean: 'Prof. Dr. Md. Hasebur Rahman',
-    email: 'dean.bs@pust.ac.bd',
-    code: 'FBS · 2 Departments',
-  },
-  {
-    faculty: 'Faculty of Humanities and Social Science',
-    dean: 'Prof. Dr. Mir Humayun Kabir',
-    email: 'dean.hss@pust.ac.bd',
-    code: 'FHSS · 6 Departments',
-  },
-  {
-    faculty: 'Faculty of Life and Earth Science',
-    dean: 'Prof. Dr. Mohammad Najmul Islam',
-    email: 'dean.les@pust.ac.bd',
-    code: 'FLES · 1 Department',
-  },
-];
-
 const NOTICE_FILTERS: Array<'All' | NoticeCategory> = [
   'All',
   'General',
@@ -103,161 +67,6 @@ const NOTICE_FILTERS: Array<'All' | NoticeCategory> = [
   'Course',
 ];
 
-interface DigitalFormDef {
-  code: string;
-  title: string;
-  office: string;
-  note: string;
-  portalTarget: string;
-  portalLabel: string;
-  fields: string[];
-}
-
-const DOWNLOAD_FORMS: DigitalFormDef[] = [
-  {
-    code: 'PUST-REG-01',
-    title: 'Admission Verification & Token Request Form',
-    office: 'Office of the Registrar / Department Chairman',
-    note: 'Digital token issuance and document verification handled inside Campus Portal.',
-    portalTarget: '/portal',
-    portalLabel: 'Activate via Portal Token',
-    fields: [
-      'Applicant Full Name (as per SSC/HSC)',
-      'GST Unit & Admission Roll Number',
-      'Department Allocated & Session',
-      'Academic ID / Temporary Reference',
-      'Digital Document Verification Packet Hash',
-    ],
-  },
-  {
-    code: 'PUST-LIB-02',
-    title: 'Central Library Membership & Card Requisition Form',
-    office: 'Department Chairman Seal + Central Library',
-    note: 'Forwarded digitally with Chairman official seal and signature JSON.',
-    portalTarget: '/portal?tab=library',
-    portalLabel: 'Start Library Application',
-    fields: [
-      'Student Name & Academic ID',
-      'Department Code & Academic Session',
-      'Chairman Digital Seal JSON Endorsement',
-      'Central Library Verification Officer',
-      'Linked Digital / Physical Library Card Ref',
-    ],
-  },
-  {
-    code: 'PUST-HALL-03',
-    title: 'Residential Hall Seat Application & Clearance Form',
-    office: 'Provost Office (July 06 Hall & Dormitories)',
-    note: 'Check vacancy circulars, hall dues, and clearance references in Campus Portal.',
-    portalTarget: '/portal?tab=halls',
-    portalLabel: 'Apply / Clear Hall Dues',
-    fields: [
-      'Student Name, Academic ID & Department',
-      'Preferred Residential Hall (July 06 Hall / Dormitories)',
-      'Permanent District & Residential Statement',
-      'Hall Financial Receipt & Clearance Reference',
-      'Provost / House Tutor Seat Allotment Endorsement',
-    ],
-  },
-  {
-    code: 'PUST-EX-04',
-    title: 'Semester Examination Form Fill-up & Admit Card Application',
-    office: 'Department Chairman & Controller of Examinations',
-    note: 'Enforces automatic Hall clearance check and online payment receipt.',
-    portalTarget: '/portal?tab=exams',
-    portalLabel: 'Open Exam Form Fill-up',
-    fields: [
-      'Student Name, Academic ID & Semester',
-      'Registered Course Codes & Credit Total',
-      'Verified Hall Financial Clearance Status',
-      'Digital Checkout Receipt (SSLCommerz / Bangla QR / MFS)',
-      'Chairman Digital Admit Card Verification',
-    ],
-  },
-  {
-    code: 'PUST-CERT-05',
-    title: 'Provisional / Temporary Certificate & 4-Office Clearance Form',
-    office: 'Chairman, Hall, Library, Proctor & Admin Office',
-    note: 'Track real-time 4-office clearances and download verified Temporary Certificate.',
-    portalTarget: '/portal?tab=certificates',
-    portalLabel: 'Start Certificate Clearance',
-    fields: [
-      'Graduating Student Name & Academic ID',
-      '8-Semester Completion & Final CGPA Verification',
-      'Certificate Fee Payment Receipt Reference',
-      '4-Office Clearances (Chairman, Hall, Library, Proctor)',
-      'Central Admin Certificate Serial & Public Verify Hash',
-    ],
-  },
-];
-
-const ACADEMIC_CALENDAR_2026 = [
-  { term: 'Academic Session 2025–2026 (UG)', event: 'Orientation & Formal Class Commencement', date: '2026-07-15' },
-  { term: 'Bi-Semester Teaching Period', event: 'Mid-Term Assessments & Course Add/Drop Window', date: '2026-09-20' },
-  { term: 'Postgraduate & Exam Cycle', event: 'M.Sc. / M.Engg. Admissions (CSE/ICE) & Exam Form Fill-up', date: '2026-11-16' },
-  { term: 'Semester-I Final Examinations', event: 'Term-End Final Examinations Across 21 Departments', date: '2026-12-06' },
-  { term: 'Convocation Milestone', event: 'First University Convocation at Rajapur Campus', date: '2027-03-15' },
-];
-
-const UNIVERSITY_MILESTONES = [
-  {
-    year: '15 July 2001',
-    title: 'University Act Enacted',
-    detail: 'Parliament passes Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001).',
-  },
-  {
-    year: '5 June 2008',
-    title: 'Curriculum Inaugurated',
-    detail: 'Academic program formally inaugurated alongside Government Gazette operationalization on 12 October 2008.',
-  },
-  {
-    year: '2009',
-    title: 'Inaugural 140 Students',
-    detail: 'First academic batch enrolled across CSE, EEE, Mathematics, and Business Administration.',
-  },
-  {
-    year: '2026',
-    title: '5 Faculties · 21 Departments',
-    detail: 'Nearly 5,000 scholars and 185 faculty members on the 30-acre Rajapur digital campus.',
-  },
-  {
-    year: '15 Mar 2027',
-    title: 'First Convocation',
-    detail: 'Historic First Convocation scheduled on the Rajapur Ceremonial Pavilion.',
-  },
-];
-
-const DEGREE_PROGRAMS = [
-  {
-    level: 'Undergraduate Honors & Engineering',
-    degrees: 'B.Sc. (Engg.), B.Arch., B.Pharm. (Hons.), B.Sc. (Hons.), B.B.A., B.A. (Hons.), B.S.S.',
-    duration: '4 Years / 8 Semesters (B.Arch.: 5 Years / 10 Semesters)',
-    credits: '140 – 195 Credit Hours',
-    entry: 'Bangladesh GST Integrated Admission Test (Units A, B, C)',
-  },
-  {
-    level: 'Graduate & Master Programs',
-    degrees: 'M.Sc. (Engg.), M.Sc., M.Pharm., M.B.A., M.A., M.S.S.',
-    duration: '1 – 1.5 Years (2 – 3 Semesters)',
-    credits: '36 – 45 Credit Hours (Thesis & Non-Thesis Tracks)',
-    entry: 'Departmental Postgraduate Selection & Merit Verification',
-  },
-  {
-    level: 'Doctoral & Research Fellowships',
-    degrees: 'M.Phil. & Ph.D.',
-    duration: '2 – 5 Years Full-Time / Part-Time Research',
-    credits: 'Coursework + Original Dissertation Defense',
-    entry: 'Academic Council & Advanced Research Committee Approval',
-  },
-  {
-    level: 'Evening & Executive Cohorts',
-    degrees: 'EMBA & Evening M.Sc. in Applied Engineering',
-    duration: '2 Years (Weekend / Evening Schedule)',
-    credits: '48 – 60 Credit Hours',
-    entry: 'Working Professionals & Industry Sponsored Track',
-  },
-];
-
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -266,7 +75,7 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function downloadPrintableFormHtml(form: DigitalFormDef) {
+function downloadPrintableFormHtml(form: DigitalFormItem) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const rows = form.fields
     .map(
@@ -368,6 +177,7 @@ export function PublicSubPages({
   onSelectNotice,
   onSubmitInquiry,
 }: PublicSubPagesProps) {
+  const resolved = resolveUniversityContent(profile);
   const [selectedFaculty, setSelectedFaculty] = useState<'All' | FacultyName>('All');
   const [deptQuery, setDeptQuery] = useState('');
   const [selectedNoticeCat, setSelectedNoticeCat] = useState<'All' | NoticeCategory>(() =>
@@ -378,7 +188,7 @@ export function PublicSubPages({
   const [galleryCategory, setGalleryCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
-  const [previewForm, setPreviewForm] = useState<DigitalFormDef | null>(null);
+  const [previewForm, setPreviewForm] = useState<DigitalFormItem | null>(null);
 
   useEffect(() => {
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
@@ -623,9 +433,10 @@ export function PublicSubPages({
 
             <div className="lg:col-span-5 space-y-5">
               <ResilientImage
-                src={GROUNDS_IMAGE}
+                src={resolved.aboutExtras.campusImage || GROUNDS_IMAGE}
+                fallbackSrc={GROUNDS_IMAGE}
                 alt="PUST Rajapur Campus"
-                caption="Rajapur Campus Quadrangle along the Dhaka–Pabna Highway."
+                caption={resolved.aboutExtras.campusCaption}
                 className="w-full aspect-[4/3] object-cover"
               />
               <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
@@ -659,13 +470,20 @@ export function PublicSubPages({
           </div>
 
           {/* Institutional Chronological Milestones */}
-          <div className="pt-8 border-t border-slate-200 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Institutional Chronology
-            </p>
+          <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                Institutional Chronology
+              </p>
+              <EditTriggerButton
+                target={{ kind: 'milestones' }}
+                label="Edit Milestones & Photo"
+                variant="compact"
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px rounded-2xl border border-slate-200 bg-slate-200 overflow-hidden">
-              {UNIVERSITY_MILESTONES.map((m) => (
-                <div key={m.year} className="p-5 space-y-1.5 bg-[#F7F7F5]">
+              {resolved.aboutExtras.milestones.map((m, idx) => (
+                <div key={`${m.year}-${idx}`} className="p-5 space-y-1.5 bg-[#F7F7F5]">
                   <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                     {m.year}
                   </p>
@@ -725,11 +543,18 @@ export function PublicSubPages({
           </div>
 
           {route === '/academics/programs' ? (
-            <div className="space-y-8">
+            <div className="editable-region space-y-8">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'degree-programs' }}
+                  label="Edit Programs"
+                  variant="compact"
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {DEGREE_PROGRAMS.map((prog) => (
+                {resolved.academicExtras.degreePrograms.map((prog, idx) => (
                   <div
-                    key={prog.level}
+                    key={`${prog.level}-${idx}`}
                     className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-3"
                   >
                     <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
@@ -774,8 +599,15 @@ export function PublicSubPages({
               </div>
             </div>
           ) : route === '/academics/faculty' ? (
-            <div className="space-y-8">
-              {FACULTY_DEANS.map((fac) => {
+            <div className="editable-region space-y-8">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'faculty-deans' }}
+                  label="Edit Faculty Deans"
+                  variant="compact"
+                />
+              </div>
+              {resolved.academicExtras.facultyDeans.map((fac) => {
                 const facDepts = departments.filter((d) => d.faculty === fac.faculty);
                 return (
                   <div
@@ -831,7 +663,7 @@ export function PublicSubPages({
               })}
             </div>
           ) : route === '/academics/forms-download' ? (
-            <div className="space-y-5">
+            <div className="editable-region space-y-5">
               <div className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
@@ -842,18 +674,25 @@ export function PublicSubPages({
                     workflow directly inside the PUST Campus Portal.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/verify')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  Verify Issued Documents
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <EditTriggerButton
+                    target={{ kind: 'download-forms' }}
+                    label="Edit Forms"
+                    variant="compact"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/verify')}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    Verify Issued Documents
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
-                {DOWNLOAD_FORMS.map((form) => (
+                {resolved.academicExtras.downloadForms.map((form) => (
                   <div
                     key={form.code}
                     className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F7F7F5]/60 transition-colors"
@@ -896,146 +735,130 @@ export function PublicSubPages({
               </div>
             </div>
           ) : route === '/academics/calendar' ? (
-            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-              {ACADEMIC_CALENDAR_2026.map((row) => (
-                <div
-                  key={row.event}
-                  className="p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-baseline"
-                >
-                  <p className="sm:col-span-3 font-mono text-xs text-pust-800 tabular-nums">
-                    {row.date}
-                  </p>
-                  <p className="sm:col-span-5 font-medium text-slate-900">{row.event}</p>
-                  <p className="sm:col-span-4 text-xs text-slate-600 sm:text-right">{row.term}</p>
-                </div>
-              ))}
+            <div className="editable-region space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'academic-calendar' }}
+                  label="Edit Calendar"
+                  variant="compact"
+                />
+              </div>
+              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                {resolved.academicExtras.academicCalendar.map((row, idx) => (
+                  <div
+                    key={`${row.event}-${idx}`}
+                    className="p-5 grid grid-cols-1 sm:grid-cols-12 gap-3 items-baseline"
+                  >
+                    <p className="sm:col-span-3 font-mono text-xs text-pust-800 tabular-nums">
+                      {row.date}
+                    </p>
+                    <p className="sm:col-span-5 font-medium text-slate-900">{row.event}</p>
+                    <p className="sm:col-span-4 text-xs text-slate-600 sm:text-right">{row.term}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : route === '/academics/scholarship' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  title: 'PUST Merit & Dean’s List Scholarship',
-                  detail:
-                    'Awarded per semester to top CGPA achievers in each of the 21 academic departments based on published examination results.',
-                },
-                {
-                  title: 'UGC & Government Stipend Programs',
-                  detail:
-                    'Need-based and research stipends administered via the Student Advisor Office and Registrar desk.',
-                },
-                {
-                  title: 'Prime Minister / ICT Innovation Fellowships',
-                  detail:
-                    'Research grants supporting M.Sc., M.Phil., and thesis undergraduates in Engineering and Applied Sciences.',
-                },
-                {
-                  title: 'Residential Fee Waiver Assistance',
-                  detail:
-                    'Financial waivers coordinated between July 06 Hall / dormitories and the Student Welfare Directorate.',
-                },
-              ].map((s) => (
-                <div key={s.title} className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2">
-                  <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
-                  <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
-                </div>
-              ))}
+            <div className="editable-region space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'scholarships' }}
+                  label="Edit Scholarships"
+                  variant="compact"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {resolved.academicExtras.scholarships.map((s, idx) => (
+                  <div
+                    key={`${s.title}-${idx}`}
+                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
+                  >
+                    <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
+                    <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : route === '/academics/seminars' ? (
-            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
-              {[
-                {
-                  date: '2026-12-03',
-                  host: 'IQAC & ICT Cell',
-                  title: 'Outcome-Based Education (OBE) & Digital Assessment Symposium',
-                },
-                {
-                  date: '2026-12-18',
-                  host: 'Faculty of Engineering & Technology',
-                  title: '2nd Regional Workshop on Smart Grid, VLSI & River Basin Geotechnics',
-                },
-                {
-                  date: '2027-01-14',
-                  host: 'Department of Pharmacy & Chemistry',
-                  title: 'Phytochemistry & Sustainable Nanomaterials Research Colloquium',
-                },
-              ].map((sem) => (
-                <div key={sem.title} className="p-5 space-y-1">
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
-                    {sem.date} · {sem.host}
-                  </p>
-                  <h2 className="font-serif text-lg font-medium text-slate-900">{sem.title}</h2>
-                </div>
-              ))}
+            <div className="editable-region space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'seminars' }}
+                  label="Edit Seminars"
+                  variant="compact"
+                />
+              </div>
+              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
+                {resolved.upcomingSeminars.map((sem) => (
+                  <div key={sem.id} className="p-5 space-y-1">
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      {sem.date} · {sem.organizer}
+                    </p>
+                    <h2 className="font-serif text-lg font-medium text-slate-900">{sem.title}</h2>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : route === '/academics/deans' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  faculty: 'Faculty of Engineering and Technology',
-                  dean: 'Prof. Dr. Md. Anwar Hossain',
-                  email: 'dean.et@pust.ac.bd',
-                  depts: 'CSE, EEE, EECE, ICE, Civil Engineering, Architecture, URP',
-                },
-                {
-                  faculty: 'Faculty of Science',
-                  dean: 'Prof. Dr. Md. Shamim Reza',
-                  email: 'dean.s@pust.ac.bd',
-                  depts: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics and Data Science',
-                },
-                {
-                  faculty: 'Faculty of Business Studies',
-                  dean: 'Prof. Dr. Md. Hasebur Rahman',
-                  email: 'dean.bs@pust.ac.bd',
-                  depts: 'Business Administration, Tourism & Hospitality Management',
-                },
-                {
-                  faculty: 'Faculty of Humanities and Social Science',
-                  dean: 'Prof. Dr. Mir Humayun Kabir',
-                  email: 'dean.hss@pust.ac.bd',
-                  depts: 'Economics, Bangla, Social Work, English, Public Administration, History',
-                },
-                {
-                  faculty: 'Faculty of Life and Earth Science',
-                  dean: 'Prof. Dr. Mohammad Najmul Islam',
-                  email: 'dean.les@pust.ac.bd',
-                  depts: 'Geography and Environment',
-                },
-              ].map((d) => (
-                <div key={d.faculty} className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-1.5">
-                  <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                    {d.faculty}
-                  </p>
-                  <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
-                  <p className="font-mono text-xs text-pust-800">{d.email}</p>
-                  <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
-                </div>
-              ))}
+            <div className="editable-region space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'faculty-deans' }}
+                  label="Edit Deans"
+                  variant="compact"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {resolved.academicExtras.facultyDeans.map((d) => (
+                  <div
+                    key={d.faculty}
+                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-1.5"
+                  >
+                    <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
+                      {d.faculty}
+                    </p>
+                    <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
+                    <p className="font-mono text-xs text-pust-800">{d.email}</p>
+                    <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : route === '/academics/chairmen' ? (
-            <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
-              {departments.map((d) => (
-                <div
-                  key={d.id}
-                  className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                >
-                  <div>
-                    <p className="font-mono text-xs text-pust-800">
-                      {d.code} · {d.faculty}
-                    </p>
-                    <p className="font-serif text-lg font-medium text-slate-900">
-                      Department of {d.name}
-                    </p>
+            <div className="editable-region space-y-4">
+              <div className="flex justify-end empty:hidden">
+                <EditTriggerButton
+                  target={{ kind: 'department', department: null }}
+                  label="Add Department"
+                  icon="add"
+                  variant="compact"
+                />
+              </div>
+              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
+                {departments.map((d) => (
+                  <div
+                    key={d.id}
+                    className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                  >
+                    <div>
+                      <p className="font-mono text-xs text-pust-800">
+                        {d.code} · {d.faculty}
+                      </p>
+                      <p className="font-serif text-lg font-medium text-slate-900">
+                        Department of {d.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+                      <EditTriggerButton
+                        target={{ kind: 'department', department: d }}
+                        label="Edit"
+                        variant="compact"
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
-                    <EditTriggerButton
-                      target={{ kind: 'department', department: d }}
-                      label="Edit"
-                      variant="compact"
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           ) : route === '/academics/journals' || route === '/academics/publications' ? (
             <ResearchSection
@@ -1048,7 +871,7 @@ export function PublicSubPages({
             />
           ) : (
             // Default /academics & /academics/departments
-            <div className="space-y-6">
+            <div className="editable-region space-y-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-1.5">
                   {FACULTY_FILTERS.map((tab) => (
@@ -1067,15 +890,23 @@ export function PublicSubPages({
                   ))}
                 </div>
 
-                <div className="relative w-full lg:w-72">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="search"
-                    value={deptQuery}
-                    onChange={(e) => setDeptQuery(e.target.value)}
-                    placeholder="Filter 21 departments..."
-                    className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                  <EditTriggerButton
+                    target={{ kind: 'department', department: null }}
+                    label="Add Department"
+                    icon="add"
+                    variant="compact"
                   />
+                  <div className="relative w-full lg:w-72">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="search"
+                      value={deptQuery}
+                      onChange={(e) => setDeptQuery(e.target.value)}
+                      placeholder="Filter 21 departments..."
+                      className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1262,9 +1093,16 @@ export function PublicSubPages({
       <main className="flex-1 bg-[#F7F7F5]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Admissions 2026–2027
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                {resolved.admissionsConfig.kicker}
+              </p>
+              <EditTriggerButton
+                target={{ kind: 'admissions-info' }}
+                label="Edit Admissions Info"
+                variant="compact"
+              />
+            </div>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {admissionTabs.find((t) => t.route === route)?.label || 'Admissions'}
             </h1>
@@ -1328,60 +1166,49 @@ export function PublicSubPages({
               </div>
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="editable-region space-y-10">
               <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl border border-slate-200 bg-white divide-y md:divide-y-0 md:divide-x divide-slate-200 overflow-hidden shadow-xs">
-                <div className="p-6 space-y-1.5">
-                  <p className="font-mono text-xs text-pust-800">GST UNIT A · SCIENCE &amp; ENGG.</p>
-                  <p className="font-serif text-lg font-medium text-slate-900">13 Departments</p>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    CSE, EEE, EECE, ICE, CE, Architecture (with drawing test), URP, Mathematics,
-                    Physics, Pharmacy, Chemistry, Statistics &amp; Data Science, Geography &amp;
-                    Environment.
-                  </p>
-                </div>
-                <div className="p-6 space-y-1.5">
-                  <p className="font-mono text-xs text-pust-800">GST UNIT B · HUMANITIES</p>
-                  <p className="font-serif text-lg font-medium text-slate-900">6 Departments</p>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Economics (Math eligibility), Bangla, Social Work, English (min. 20% English
-                    score), Public Administration (min. 20% English score), and History.
-                  </p>
-                </div>
-                <div className="p-6 space-y-1.5">
-                  <p className="font-mono text-xs text-pust-800">GST UNIT C · BUSINESS</p>
-                  <p className="font-serif text-lg font-medium text-slate-900">2 Departments</p>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Business Administration (BBA) &amp; Tourism and Hospitality Management (THM).
-                  </p>
-                </div>
+                {resolved.admissionsConfig.gstUnits.map((unit, idx) => (
+                  <div key={`${unit.unitLabel}-${idx}`} className="p-6 space-y-1.5">
+                    <p className="font-mono text-xs text-pust-800">{unit.unitLabel}</p>
+                    <p className="font-serif text-lg font-medium text-slate-900">
+                      {unit.deptCountLabel}
+                    </p>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {unit.departmentsText}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-5 space-y-6">
                   <p className="text-[15px] text-slate-700 leading-relaxed">
                     {route === '/admissions/graduate'
-                      ? 'Graduate programs (M.Sc. Engg., M.Engg., M.Sc., M.Pharm., M.B.A., M.A., M.S.S.) and M.Phil./Ph.D. admissions are coordinated departmentally (e.g., CSE & ICE postgraduate cohorts) under Academic Council rules.'
+                      ? resolved.admissionsConfig.gradText
                       : route === '/admissions/evening-programs'
-                      ? 'Evening professional tracks including Executive MBA (EMBA) and Applied Engineering postgraduate cohorts offer weekend and evening schedules for working professionals.'
-                      : 'Undergraduate admissions into all 21 departments follow the centralized Bangladesh GST Integrated Admission Test (Units A, B, and C)—PUST holds no separate university test, aside from Architecture aptitude drawing evaluation.'}
+                      ? resolved.admissionsConfig.eveningText
+                      : resolved.admissionsConfig.undergradText}
                   </p>
 
                   <dl className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm bg-white px-5 overflow-hidden">
                     <div className="py-3.5 flex justify-between gap-4">
                       <dt className="text-slate-600">Total Undergraduate Intake</dt>
                       <dd className="font-mono tabular-nums font-medium text-slate-900">
-                        830+ – 920 Seats / Session
+                        {resolved.admissionsConfig.totalIntakeLabel}
                       </dd>
                     </div>
                     <div className="py-3.5 flex justify-between gap-4">
                       <dt className="text-slate-600">Admitted Student Signup</dt>
                       <dd className="text-right font-medium text-pust-800">
-                        Via Dept. Portal Token
+                        {resolved.admissionsConfig.signupMethodLabel}
                       </dd>
                     </div>
                     <div className="py-3.5 flex justify-between gap-4">
                       <dt className="text-slate-600">Registrar Admissions Desk</dt>
-                      <dd className="font-mono text-pust-800">registrar@pust.ac.bd</dd>
+                      <dd className="font-mono text-pust-800">
+                        {resolved.admissionsConfig.deskEmail}
+                      </dd>
                     </div>
                   </dl>
 
@@ -1602,103 +1429,23 @@ export function PublicSubPages({
 
   // 4. FACILITIES PAGES (/facilities/*)
   if (route.startsWith('/facilities')) {
-    const facTabs: Array<{
-      label: string;
-      route: AppRoute;
-      title: string;
-      body: string;
-      img: string;
-      hours: string;
-      location: string;
-      portalRoute: string;
-      highlights: string[];
-    }> = [
-      {
-        label: 'Library',
-        route: '/facilities/library',
-        title: 'Central Library & Information Center (CLIC)',
-        body: 'Managed by Additional Librarian Md. Hafizur Rahaman Mollah (clic@pust.ac.bd), the Central Library houses academic and reference books across all 5 faculties plus registered campus-IP access to IEEE Xplore, SpringerLink, and ACM Digital Library. Students apply in the Campus Portal with Department Chairman digital seal JSON for Digital and Physical Library Cards.',
-        img: LIBRARY_IMAGE,
-        hours: 'Sun–Thu · 08:30–21:00 BST',
-        location: 'Central Library Complex · clic@pust.ac.bd',
-        portalRoute: '/portal?tab=library',
-        highlights: [
-          'Chairman-sealed digital membership approval workflow',
-          'Linked Digital & Physical Library Card ID issuance',
-          'Faculty-wise textbook stacks, thesis archive & e-journals',
-        ],
-      },
-      {
-        label: 'Transport',
-        route: '/facilities/transport',
-        title: 'University Transportation Pool',
-        body: 'Administered by Dr. Mir Humayun Kabir (transport@pust.ac.bd, +8802588845650), the Transportation Pool operates university-owned and contracted buses connecting Rajapur Campus with Pabna Town, Central Terminal, Edward College, and highway corridors for students, faculty, and officers.',
-        img: GROUNDS_IMAGE,
-        hours: 'Sun–Thu · 07:15–18:30 BST',
-        location: 'Transport Pool · +8802588845650 · transport@pust.ac.bd',
-        portalRoute: '/portal',
-        highlights: [
-          'Dedicated student, teacher & officer shuttle schedules',
-          'Pabna Town, Terminal, Edward College & Highway corridors',
-          'Convocation & semester examination special bus dispatch',
-        ],
-      },
-      {
-        label: 'Residence',
-        route: '/facilities/residence',
-        title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
-        body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
-        img: GROUNDS_IMAGE,
-        hours: '24/7 Provost & House Tutor Duty',
-        location: 'North Residential Precinct, Rajapur',
-        portalRoute: '/portal?tab=halls',
-        highlights: [
-          'July 06 Hall, Swadhinota Hall, Matribhasha Hall & Ganatantra Hall',
-          'Full retained seat allotment & change history per student ID',
-          'Mandatory Hall dues clearance synced directly with Exam Portal',
-        ],
-      },
-      {
-        label: 'Medical',
-        route: '/facilities/medical',
-        title: 'PUST Medical Section & Health Center',
-        body: 'Staffed by Deputy Chief Medical Officers Dr. Md. Rafiqul Islam and Dr. Nasrin Sultana (medicalsection@pust.ac.bd, +8802588844975), the PUST Medical Center provides primary healthcare, outpatient consultations, essential medications, and 24/7 ambulance referral for residential students, faculty, and staff.',
-        img: LAB_IMAGE,
-        hours: 'Outpatient Sun–Thu · 24/7 Ambulance',
-        location: 'Medical Center · +8802588844975 · medicalsection@pust.ac.bd',
-        portalRoute: '/portal',
-        highlights: [
-          'Deputy Chief Medical Officers & campus nursing unit',
-          'Free primary consultation, first aid & dispensary services',
-          '24/7 emergency ambulance referral to Pabna General Hospital',
-        ],
-      },
-      {
-        label: 'ICT Sheba',
-        route: '/facilities/ict-sheba',
-        title: 'ICT Cell & ICT Sheba Portal',
-        body: 'Directed by Dr. Md. Abdur Rahim (ictdirector@pust.ac.bd), the ICT Cell maintains PUST’s campus fiber-optic backbone, high-speed Wi-Fi across academic & residential wings, institutional @pust.ac.bd accounts, and automated portal clearance infrastructure.',
-        img: LAB_IMAGE,
-        hours: 'Sun–Thu · 09:00–17:00 BST',
-        location: 'ICT Cell Wing · ictdirector@pust.ac.bd',
-        portalRoute: '/portal',
-        highlights: [
-          'University-wide fiber backbone & campus Wi-Fi network',
-          'Institutional @pust.ac.bd account & signup token provisioning',
-          'Digital admit card & 4-office certificate workflow support',
-        ],
-      },
-    ];
-
+    const facTabs = resolved.facilitiesConfig;
     const currentFac = facTabs.find((f) => f.route === route) || facTabs[0];
 
     return (
       <main className="flex-1 bg-white">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
+        <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Campus Facilities &amp; Student Services
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                Campus Facilities &amp; Student Services
+              </p>
+              <EditTriggerButton
+                target={{ kind: 'facility', route: currentFac.route }}
+                label="Edit Facility Page"
+                variant="compact"
+              />
+            </div>
             <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
               {currentFac.title}
             </h1>
@@ -1739,8 +1486,8 @@ export function PublicSubPages({
                   Key Capabilities
                 </p>
                 <ul className="space-y-2 text-sm text-slate-700 list-disc pl-5">
-                  {currentFac.highlights.map((h) => (
-                    <li key={h}>{h}</li>
+                  {currentFac.highlights.map((h, idx) => (
+                    <li key={`${h}-${idx}`}>{h}</li>
                   ))}
                 </ul>
               </div>
@@ -1756,6 +1503,7 @@ export function PublicSubPages({
             <div className="lg:col-span-6">
               <ResilientImage
                 src={currentFac.img}
+                fallbackSrc={GROUNDS_IMAGE}
                 alt={currentFac.title}
                 caption={currentFac.title}
                 className="w-full aspect-[4/3] object-cover"

@@ -14,12 +14,14 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
+import { CampusMapSection } from './CampusMapSection';
 import { EditTriggerButton } from './EditTriggerButton';
 import { HeroSummarySkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
@@ -65,29 +67,6 @@ const NOTICE_CATS: Array<'All' | NoticeRecord['category']> = [
   'General',
 ];
 
-const UPCOMING_CAMPUS_EVENTS = [
-  {
-    date: '2026-12-03',
-    organizer: 'IQAC & ICT Cell',
-    title: 'Outcome-Based Education (OBE) & Digital Assessment Symposium',
-  },
-  {
-    date: '2026-12-18',
-    organizer: 'Faculty of Engineering & Technology',
-    title: '2nd Regional Workshop on Smart Grid, VLSI & River Basin Geotechnics',
-  },
-  {
-    date: '2027-01-14',
-    organizer: 'Dept. of Pharmacy & Chemistry',
-    title: 'Phytochemistry & Sustainable Nanomaterials Research Colloquium',
-  },
-  {
-    date: '2027-03-15',
-    organizer: 'Office of the Vice-Chancellor',
-    title: 'Historic First University Convocation at Rajapur Ceremonial Pavilion',
-  },
-];
-
 export function HomePage({
   heroImage,
   bannerSlides = [],
@@ -99,6 +78,12 @@ export function HomePage({
   notices,
   onSelectNotice,
 }: HomePageProps) {
+  const {
+    institutionalLinksEyebrow,
+    institutionalLinksHeading,
+    institutionalLinks,
+    upcomingSeminars,
+  } = resolveUniversityContent(profile);
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
   const [noticeCategory, setNoticeCategory] =
     useState<'All' | NoticeRecord['category']>('All');
@@ -204,7 +189,7 @@ export function HomePage({
   return (
     <main className="flex-1 bg-[#F7F7F5]">
       {/* 1. Banner */}
-      <section id="banner" className="bg-[#F7F7F5] border-b border-slate-200 scroll-mt-28">
+      <section id="banner" className="editable-region bg-[#F7F7F5] border-b border-slate-200 scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-6 flex flex-col justify-between py-2">
@@ -560,10 +545,18 @@ export function HomePage({
             )}
 
             {showPreviousVcs && (
-              <div className="pt-6 border-t border-slate-200 space-y-3">
-                <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
-                  Former Vice-Chancellors Chronological Archive
-                </p>
+              <div className="editable-region pt-6 border-t border-slate-200 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-xs uppercase tracking-widest text-slate-600">
+                    Former Vice-Chancellors Chronological Archive
+                  </p>
+                  <EditTriggerButton
+                    target={{ kind: 'vc', vcId: 'new-former' }}
+                    label="Add Former VC"
+                    icon="add"
+                    variant="compact"
+                  />
+                </div>
                 <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden">
                   {previousVcs.map((vc) => (
                     <div
@@ -574,9 +567,16 @@ export function HomePage({
                         <p className="font-serif font-medium text-slate-900">{vc.name}</p>
                         <p className="text-xs text-slate-500">{vc.message}</p>
                       </div>
-                      <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
-                        {vc.tenure}
-                      </span>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap">
+                          {vc.tenure}
+                        </span>
+                        <EditTriggerButton
+                          target={{ kind: 'vc', vcId: vc.id }}
+                          label="Edit"
+                          variant="compact"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -729,52 +729,28 @@ export function HomePage({
             </div>
           </div>
 
-          <div className="lg:col-span-5 space-y-5">
-            <div className="pb-4 border-b border-slate-200">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                Digital Services &amp; Directory
-              </p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
-                Institutional Sections
-              </h2>
+          <div className="editable-region lg:col-span-5 space-y-5">
+            <div className="pb-4 border-b border-slate-200 flex items-end justify-between gap-3">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  {institutionalLinksEyebrow}
+                </p>
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+                  {institutionalLinksHeading}
+                </h2>
+              </div>
+              <EditTriggerButton
+                target={{ kind: 'institutional-links' }}
+                label="Edit Links"
+                variant="compact"
+              />
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
               <div className="divide-y divide-slate-200">
-                {[
-                  {
-                    route: '/portal' as AppRoute,
-                    title: 'Digital Campus Portal & Workflows',
-                    desc: 'Online fee checkout, Hall seat allotment & clearance, Library QR cards, Admit cards & 4-office Certificates.',
-                  },
-                  {
-                    route: '/verify' as AppRoute,
-                    title: 'Public Document Verification Registry',
-                    desc: 'Verify issued Certificates, Admit Cards, Hall Clearances, Library Cards & Payment Receipts.',
-                  },
-                  {
-                    route: '/governance/pust-act' as AppRoute,
-                    title: 'Governance & Statutory Bodies',
-                    desc: 'PUST Act (Act No. 43 of 2001), Regent Board, Academic Council, Finance Committee & Ordinance.',
-                  },
-                  {
-                    route: '/administration' as AppRoute,
-                    title: 'University Administration & Offices',
-                    desc: 'Vice-Chancellor Office, Registrar, Treasurer, Proctor, Student Advisor, ICT Cell & APA.',
-                  },
-                  {
-                    route: '/academics/departments' as AppRoute,
-                    title: '5 Faculties & 21 Academic Departments',
-                    desc: 'Programs, calendars, deans, chairmen, scholarships, forms & faculty research.',
-                  },
-                  {
-                    route: '/admissions' as AppRoute,
-                    title: 'Admissions 2026–2027 & Tracker',
-                    desc: 'Undergraduate (GST), Graduate, Evening Programs, Inquiry Desk & Live Status Tracker.',
-                  },
-                ].map((item) => (
+                {institutionalLinks.map((item) => (
                   <Link
-                    key={item.route}
+                    key={item.id}
                     href={item.route}
                     className="w-full text-left px-5 py-4 hover:bg-pust-50/40 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
                   >
@@ -1019,21 +995,28 @@ export function HomePage({
           </div>
 
           {/* Scheduled University Seminars & Milestones */}
-          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+          <div className="editable-region rounded-2xl border border-slate-200 bg-white overflow-hidden">
             <div className="px-6 py-4 bg-[#FAF8F4] border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Upcoming Seminars, Workshops &amp; Academic Milestones
               </p>
-              <Link
-                href="/academics/seminars"
-                className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap"
-              >
-                All Seminars &amp; Workshops →
-              </Link>
+              <div className="flex items-center gap-3">
+                <EditTriggerButton
+                  target={{ kind: 'seminars' }}
+                  label="Edit Seminars"
+                  variant="compact"
+                />
+                <Link
+                  href="/academics/seminars"
+                  className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap"
+                >
+                  All Seminars &amp; Workshops →
+                </Link>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-200">
-              {UPCOMING_CAMPUS_EVENTS.map((ev) => (
-                <div key={ev.title} className="p-5 space-y-1.5">
+              {upcomingSeminars.map((ev) => (
+                <div key={ev.id} className="p-5 space-y-1.5">
                   <p className="font-mono text-xs text-pust-800 tabular-nums">
                     {ev.date} · {ev.organizer}
                   </p>
@@ -1046,6 +1029,9 @@ export function HomePage({
           </div>
         </div>
       </section>
+
+      {/* 6. Interactive Campus Map & Building Directory */}
+      <CampusMapSection />
 
       {/* Media Preview Modal */}
       {activeMedia && (() => {

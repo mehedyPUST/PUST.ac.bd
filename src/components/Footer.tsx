@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { formatFooterDescription, resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -12,10 +13,17 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   const { profile } = usePust();
+  const { footerConfig } = resolveUniversityContent(profile);
+  const resolvedDescription = formatFooterDescription(
+    footerConfig.description,
+    profile?.facultiesCount ?? 5,
+    profile?.departmentsCount ?? 21
+  );
+
   return (
     <footer
       id="footer"
-      className="bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden"
+      className="editable-region bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
@@ -24,58 +32,38 @@ export function Footer({ onNavigate }: FooterProps) {
             <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
-                Est. 2008 · Rajapur, Pabna
+                {footerConfig.tagline}
               </p>
               <h2 className="font-serif text-lg font-medium text-white">
                 Pabna University of Science and Technology
               </h2>
             </div>
           </div>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            A public university in Bangladesh advancing engineering, pure and applied sciences,
-            business, and humanities across {profile?.facultiesCount ?? 5} faculties and{' '}
-            {profile?.departmentsCount ?? 21} academic departments.
-          </p>
-          <div className="pt-1">
+          <p className="text-sm text-slate-300 leading-relaxed">{resolvedDescription}</p>
+          <div className="pt-1 flex flex-wrap items-center gap-2 empty:hidden">
             <EditTriggerButton
               target={{ kind: 'hero-profile' }}
               label="Edit University Stats"
               variant="dark"
             />
+            <EditTriggerButton
+              target={{ kind: 'footer-config' }}
+              label="Edit Footer & Contact"
+              variant="dark"
+            />
           </div>
           <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
-            <a
-              href="https://pust.ac.bd/"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-amber-300 transition-colors"
-            >
-              Official Site
-            </a>
-            <a
-              href="https://www.facebook.com/pust.ac.bd"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-amber-300 transition-colors"
-            >
-              Facebook
-            </a>
-            <a
-              href="https://www.youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-amber-300 transition-colors"
-            >
-              YouTube
-            </a>
-            <a
-              href="https://www.linkedin.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-amber-300 transition-colors"
-            >
-              LinkedIn
-            </a>
+            {footerConfig.socialLinks.map((social) => (
+              <a
+                key={`${social.label}-${social.url}`}
+                href={social.url}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-amber-300 transition-colors"
+              >
+                {social.label}
+              </a>
+            ))}
           </div>
         </div>
 
@@ -85,15 +73,8 @@ export function Footer({ onNavigate }: FooterProps) {
             Quick Links
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
-            {[
-              { label: 'Our University', route: '/about/our-university' as AppRoute },
-              { label: 'History and Plans', route: '/about/history' as AppRoute },
-              { label: 'Notice Board', route: '/notices' as AppRoute },
-              { label: 'Recent Publications', route: '/academics/publications' as AppRoute },
-              { label: 'News & Events', route: '/gallery' as AppRoute },
-              { label: 'Verify Documents', route: '/verify' as AppRoute },
-            ].map((item) => (
-              <li key={item.route}>
+            {footerConfig.quickLinks.map((item) => (
+              <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
                   onClick={() => onNavigate?.(item.route)}
@@ -112,15 +93,8 @@ export function Footer({ onNavigate }: FooterProps) {
             Governance &amp; Admin
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
-            {[
-              { label: 'PUST Act (2001)', route: '/governance/pust-act' as AppRoute },
-              { label: 'Regent Board', route: '/governance/regent-board' as AppRoute },
-              { label: 'Academic Council', route: '/governance/academic-council' as AppRoute },
-              { label: 'Academic Ordinance', route: '/governance/academic-ordinance' as AppRoute },
-              { label: 'VC Office', route: '/administration/vc-office' as AppRoute },
-              { label: 'Registrar Office', route: '/administration/registrar-office' as AppRoute },
-            ].map((item) => (
-              <li key={item.route}>
+            {footerConfig.governanceLinks.map((item) => (
+              <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
                   onClick={() => onNavigate?.(item.route)}
@@ -139,15 +113,8 @@ export function Footer({ onNavigate }: FooterProps) {
             Digital Services
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
-            {[
-              { label: '21 Departments', route: '/academics/departments' as AppRoute },
-              { label: 'Academic Calendar', route: '/academics/calendar' as AppRoute },
-              { label: 'Digital Forms', route: '/academics/forms-download' as AppRoute },
-              { label: 'Central Library', route: '/facilities/library' as AppRoute },
-              { label: 'Residence & Halls', route: '/facilities/residence' as AppRoute },
-              { label: 'Campus Portal', route: '/portal' as AppRoute },
-            ].map((item) => (
-              <li key={item.route}>
+            {footerConfig.serviceLinks.map((item) => (
+              <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
                   onClick={() => onNavigate?.(item.route)}
@@ -166,31 +133,29 @@ export function Footer({ onNavigate }: FooterProps) {
             Contact
           </p>
           <p className="leading-relaxed text-slate-300">
-            Rajapur, Gayeshpur, Pabna-6600, Bangladesh
-            <br />
-            Dhaka–Pabna Highway, 3 km east of Pabna town
+            {footerConfig.addressLines.map((line, idx) => (
+              <span key={`${line}-${idx}`}>
+                {idx > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </p>
-          <p className="font-mono pt-1 tabular-nums">
-            VC: +8802588842379
-            <br />
-            vc@pust.ac.bd
-          </p>
-          <p className="font-mono tabular-nums">
-            Registrar: +8802588845193
-            <br />
-            registrar@pust.ac.bd
-          </p>
-          <p className="font-mono tabular-nums">
-            Controller: +8802588844965
-            <br />
-            controller@pust.ac.bd
-          </p>
+          {footerConfig.contacts.map((c, idx) => (
+            <p
+              key={`${c.label}-${idx}`}
+              className={`font-mono tabular-nums ${idx === 0 ? 'pt-1' : ''}`}
+            >
+              {c.label}: {c.phone}
+              <br />
+              {c.email}
+            </p>
+          ))}
         </div>
       </div>
 
       <div className="border-t border-pust-900 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-300">
-          <p>© 2026 Pabna University of Science and Technology (PUST). All rights reserved.</p>
+          <p>{footerConfig.copyrightText}</p>
           <p className="font-mono tabular-nums">
             First Convocation: {profile?.convocationDate ?? '15 March 2027'} · Rajapur Campus
           </p>

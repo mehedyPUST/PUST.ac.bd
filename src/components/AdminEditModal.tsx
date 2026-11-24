@@ -3,7 +3,11 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { DEFAULT_NAVBAR_TAGLINE } from '../lib/cmsDefaults';
 import { detectAttachmentType } from '../lib/media';
+import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilitiesEditors';
+import { CampusAndGovernanceEditors } from './admin-edit/CampusAndGovernanceEditors';
+import { HomeAndFooterEditors } from './admin-edit/HomeAndFooterEditors';
 import type {
   AboutContentRecord,
   AdministrativeUnit,
@@ -100,6 +104,7 @@ export function AdminEditModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // 1. Hero & Profile stats state
+  const [navbarTagline, setNavbarTagline] = useState('');
   const [heroEyebrow, setHeroEyebrow] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
@@ -169,6 +174,7 @@ export function AdminEditModal({
   const [journalsList, setJournalsList] = useState<JournalRecord[]>([]);
 
   // 9. Department state
+  const [deptCode, setDeptCode] = useState('');
   const [deptName, setDeptName] = useState('');
   const [deptFaculty, setDeptFaculty] = useState<FacultyName>('Faculty of Engineering and Technology');
   const [deptEstablished, setDeptEstablished] = useState(2008);
@@ -196,6 +202,7 @@ export function AdminEditModal({
     setUploading(false);
 
     if (target.kind === 'hero-profile') {
+      setNavbarTagline(profile?.navbarTagline || DEFAULT_NAVBAR_TAGLINE);
       setHeroEyebrow(
         profile?.heroEyebrow ||
           `Rajapur, Pabna-6600 · First Convocation: ${profile?.convocationDate ?? '15 March 2027'}`
@@ -231,14 +238,27 @@ export function AdminEditModal({
         setSlideAlt('');
       }
     } else if (target.kind === 'vc') {
-      const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
-      setVcName(currentVc?.name || '');
-      setVcTenure(currentVc?.tenure || '');
-      setVcEmail(currentVc?.email || '');
-      setVcPhone(currentVc?.phone || '');
-      setVcPhotoUrl(currentVc?.photoUrl || '');
-      setVcMessage(currentVc?.message || '');
-      setVcPromoteNew(false);
+      if (target.vcId === 'new-former') {
+        setVcName('');
+        setVcTenure('');
+        setVcEmail('vc@pust.ac.bd');
+        setVcPhone('+8802588842379');
+        setVcPhotoUrl('');
+        setVcMessage('');
+        setVcPromoteNew(false);
+      } else {
+        const selectedVc =
+          (target.vcId ? vcProfiles.find((v) => v.id === target.vcId) : undefined) ||
+          vcProfiles.find((v) => v.isCurrent) ||
+          vcProfiles[0];
+        setVcName(selectedVc?.name || '');
+        setVcTenure(selectedVc?.tenure || '');
+        setVcEmail(selectedVc?.email || '');
+        setVcPhone(selectedVc?.phone || '');
+        setVcPhotoUrl(selectedVc?.photoUrl || '');
+        setVcMessage(selectedVc?.message || '');
+        setVcPromoteNew(false);
+      }
     } else if (target.kind === 'about') {
       const sec = aboutSections.find((s) => s.slug === target.slug) || aboutSections[0];
       setAboutSlug(target.slug);
@@ -317,16 +337,31 @@ export function AdminEditModal({
       setJournalsList(structuredClone(profile?.journals || []));
     } else if (target.kind === 'department') {
       const d = target.department;
-      setDeptName(d.name);
-      setDeptFaculty(d.faculty);
-      setDeptEstablished(d.established);
-      setDeptChairman(d.chairmanName);
-      setDeptIntake(d.intakeSeats);
-      setDeptBuilding(d.building);
-      setDeptDegreesText(d.degrees.join(', '));
-      setDeptSummary(d.summary);
-      setDeptResearchText(d.researchFocus.join('\n'));
-      setDeptLabsText(d.laboratories.join('\n'));
+      if (d) {
+        setDeptCode(d.code);
+        setDeptName(d.name);
+        setDeptFaculty(d.faculty);
+        setDeptEstablished(d.established);
+        setDeptChairman(d.chairmanName);
+        setDeptIntake(d.intakeSeats);
+        setDeptBuilding(d.building);
+        setDeptDegreesText(d.degrees.join(', '));
+        setDeptSummary(d.summary);
+        setDeptResearchText(d.researchFocus.join('\n'));
+        setDeptLabsText(d.laboratories.join('\n'));
+      } else {
+        setDeptCode('');
+        setDeptName('');
+        setDeptFaculty('Faculty of Engineering and Technology');
+        setDeptEstablished(new Date().getFullYear());
+        setDeptChairman('');
+        setDeptIntake(40);
+        setDeptBuilding('Academic Building I');
+        setDeptDegreesText('B.Sc. (Hons.)');
+        setDeptSummary('');
+        setDeptResearchText('');
+        setDeptLabsText('');
+      }
     } else if (target.kind === 'leadership') {
       const list = structuredClone(profile?.leadership || []);
       setLeadershipList(list);
@@ -421,6 +456,18 @@ export function AdminEditModal({
     }
   }
 
+  async function handleSaveProfilePatch(patch: Partial<UniversityProfile>) {
+    await pustApi.updateUniversityProfile(patch);
+    await onRefreshProfile();
+  }
+
+  const editingVcRecord =
+    target.kind === 'vc' && target.vcId && target.vcId !== 'new-former'
+      ? vcProfiles.find((v) => v.id === target.vcId)
+      : undefined;
+  const isEditingFormerVc = Boolean(editingVcRecord && !editingVcRecord.isCurrent);
+  const isCreatingFormerVc = target.kind === 'vc' && target.vcId === 'new-former';
+
   async function handleDeleteEntity() {
     if (!target) return;
     setSaving(true);
@@ -438,6 +485,12 @@ export function AdminEditModal({
       } else if (target.kind === 'publication' && target.publication) {
         await pustApi.deletePublication(target.publication.id);
         await onRefreshPublications();
+      } else if (target.kind === 'department' && target.department) {
+        await pustApi.deleteDepartment(target.department.id);
+        await onRefreshDepartments();
+      } else if (target.kind === 'vc' && isEditingFormerVc && editingVcRecord) {
+        await pustApi.deleteViceChancellorById(editingVcRecord.id);
+        await onRefreshProfile();
       }
       onClose();
     } catch (err) {
@@ -456,6 +509,7 @@ export function AdminEditModal({
     try {
       if (target.kind === 'hero-profile') {
         await pustApi.updateUniversityProfile({
+          navbarTagline: navbarTagline.trim(),
           heroEyebrow: heroEyebrow.trim(),
           heroTitle: heroTitle.trim(),
           heroSubtitle: heroSubtitle.trim(),
@@ -484,15 +538,35 @@ export function AdminEditModal({
         }
         await onRefreshProfile();
       } else if (target.kind === 'vc') {
-        await pustApi.updateViceChancellor({
-          name: vcName.trim(),
-          tenure: vcTenure.trim(),
-          email: vcEmail.trim(),
-          phone: vcPhone.trim(),
-          photoUrl: vcPhotoUrl.trim(),
-          message: vcMessage.trim(),
-          promoteNewVc: vcPromoteNew,
-        });
+        if (isCreatingFormerVc) {
+          await pustApi.createFormerViceChancellor({
+            name: vcName.trim(),
+            tenure: vcTenure.trim(),
+            email: vcEmail.trim(),
+            phone: vcPhone.trim(),
+            photoUrl: vcPhotoUrl.trim() || undefined,
+            message: vcMessage.trim(),
+          });
+        } else if (isEditingFormerVc && editingVcRecord) {
+          await pustApi.updateViceChancellorById(editingVcRecord.id, {
+            name: vcName.trim(),
+            tenure: vcTenure.trim(),
+            email: vcEmail.trim(),
+            phone: vcPhone.trim(),
+            photoUrl: vcPhotoUrl.trim() || undefined,
+            message: vcMessage.trim(),
+          });
+        } else {
+          await pustApi.updateViceChancellor({
+            name: vcName.trim(),
+            tenure: vcTenure.trim(),
+            email: vcEmail.trim(),
+            phone: vcPhone.trim(),
+            photoUrl: vcPhotoUrl.trim(),
+            message: vcMessage.trim(),
+            promoteNewVc: vcPromoteNew,
+          });
+        }
         await onRefreshProfile();
       } else if (target.kind === 'about') {
         await pustApi.upsertAboutSection({
@@ -609,18 +683,34 @@ export function AdminEditModal({
           .map((s) => s.trim())
           .filter(Boolean);
 
-        await pustApi.updateDepartment(target.department.id, {
-          name: deptName.trim(),
-          faculty: deptFaculty,
-          established: Number(deptEstablished),
-          chairmanName: deptChairman.trim(),
-          intakeSeats: Number(deptIntake),
-          building: deptBuilding.trim(),
-          degrees: degrees.length > 0 ? degrees : target.department.degrees,
-          summary: deptSummary.trim(),
-          researchFocus: researchFocus.length > 0 ? researchFocus : target.department.researchFocus,
-          laboratories: laboratories.length > 0 ? laboratories : target.department.laboratories,
-        });
+        if (target.department) {
+          await pustApi.updateDepartment(target.department.id, {
+            name: deptName.trim(),
+            faculty: deptFaculty,
+            established: Number(deptEstablished),
+            chairmanName: deptChairman.trim(),
+            intakeSeats: Number(deptIntake),
+            building: deptBuilding.trim(),
+            degrees: degrees.length > 0 ? degrees : target.department.degrees,
+            summary: deptSummary.trim(),
+            researchFocus: researchFocus.length > 0 ? researchFocus : target.department.researchFocus,
+            laboratories: laboratories.length > 0 ? laboratories : target.department.laboratories,
+          });
+        } else {
+          await pustApi.createDepartment({
+            code: deptCode.trim().toUpperCase(),
+            name: deptName.trim(),
+            faculty: deptFaculty,
+            established: Number(deptEstablished),
+            chairmanName: deptChairman.trim(),
+            intakeSeats: Number(deptIntake),
+            building: deptBuilding.trim(),
+            degrees: degrees.length > 0 ? degrees : ['B.Sc. (Hons.)'],
+            summary: deptSummary.trim(),
+            researchFocus: researchFocus.length > 0 ? researchFocus : ['Applied Research'],
+            laboratories: laboratories.length > 0 ? laboratories : ['Departmental Research Laboratory'],
+          });
+        }
         await onRefreshDepartments();
       } else if (target.kind === 'leadership') {
         await pustApi.updateUniversityProfile({
@@ -657,17 +747,41 @@ export function AdminEditModal({
     (target.kind === 'banner' && bannerMode === 'edit' && bannerSlides.length > 1) ||
     (target.kind === 'notice' && Boolean(target.notice)) ||
     (target.kind === 'gallery' && Boolean(target.item)) ||
-    (target.kind === 'publication' && Boolean(target.publication));
+    (target.kind === 'publication' && Boolean(target.publication)) ||
+    (target.kind === 'department' && Boolean(target.department)) ||
+    (target.kind === 'vc' && isEditingFormerVc);
+
+  const isModularTarget =
+    target.kind === 'institutional-links' ||
+    target.kind === 'seminars' ||
+    target.kind === 'verify-page' ||
+    target.kind === 'footer-config' ||
+    target.kind === 'campus-building' ||
+    target.kind === 'governance' ||
+    target.kind === 'apa-benchmarks' ||
+    target.kind === 'milestones' ||
+    target.kind === 'degree-programs' ||
+    target.kind === 'faculty-deans' ||
+    target.kind === 'academic-calendar' ||
+    target.kind === 'scholarships' ||
+    target.kind === 'download-forms' ||
+    target.kind === 'research-infra' ||
+    target.kind === 'admissions-info' ||
+    target.kind === 'facility';
 
   const modalTitle =
     target.kind === 'hero-profile'
-      ? 'Edit Homepage Hero & University Profile Stats'
+      ? 'Edit Homepage Hero, Navbar Tagline & Stats'
       : target.kind === 'banner'
       ? bannerMode === 'create'
         ? 'Add Homepage Banner Slide'
         : 'Edit Homepage Banner Carousel'
       : target.kind === 'vc'
-      ? 'Edit Honorable Vice-Chancellor Profile & Address'
+      ? isCreatingFormerVc
+        ? 'Add Former Vice-Chancellor to Archive'
+        : isEditingFormerVc
+        ? `Edit Former Vice-Chancellor · ${editingVcRecord?.name || ''}`
+        : 'Edit Honorable Vice-Chancellor Profile & Address'
       : target.kind === 'about'
       ? 'Edit About PUST Content'
       : target.kind === 'notice'
@@ -685,10 +799,44 @@ export function AdminEditModal({
       : target.kind === 'journals'
       ? 'Manage Official PUST Journals'
       : target.kind === 'department'
-      ? `Edit Department · ${target.department.code}`
+      ? target.department
+        ? `Edit Department · ${target.department.code}`
+        : 'Create New Academic Department'
       : target.kind === 'leadership'
       ? 'Edit Executive Administration Directory'
-      : 'Edit Statutory & Administrative Units';
+      : target.kind === 'unit'
+      ? 'Edit Statutory & Administrative Units'
+      : target.kind === 'institutional-links'
+      ? 'Edit Institutional Sections & Quick Links'
+      : target.kind === 'seminars'
+      ? 'Manage Upcoming Seminars & Milestones'
+      : target.kind === 'campus-building'
+      ? 'Edit Interactive Campus Map & Building Directory'
+      : target.kind === 'governance'
+      ? 'Edit Statutory Governance & Ordinances'
+      : target.kind === 'apa-benchmarks'
+      ? 'Edit Administration Showcase & APA Benchmarks'
+      : target.kind === 'milestones'
+      ? 'Edit Campus Photo & Institutional Milestones'
+      : target.kind === 'degree-programs'
+      ? 'Edit Academic Degree Programs'
+      : target.kind === 'faculty-deans'
+      ? 'Edit Faculty Deans Directory'
+      : target.kind === 'academic-calendar'
+      ? 'Edit Academic Calendar'
+      : target.kind === 'scholarships'
+      ? 'Manage Scholarships & Fellowships'
+      : target.kind === 'download-forms'
+      ? 'Manage Printable & Digital Portal Forms'
+      : target.kind === 'research-infra'
+      ? 'Edit Research Infrastructure Showcase'
+      : target.kind === 'admissions-info'
+      ? 'Edit Admissions 2026–2027 & GST Tracks'
+      : target.kind === 'facility'
+      ? 'Edit Campus Facilities & Services'
+      : target.kind === 'verify-page'
+      ? 'Edit Public Document Verification Page'
+      : 'Edit Global Footer, Contacts & Links';
 
   return (
     <div
@@ -724,6 +872,64 @@ export function AdminEditModal({
           </button>
         </div>
 
+        {isModularTarget ? (
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {error && (
+              <div className="p-3.5 rounded-lg border border-red-200 bg-red-50 text-sm text-red-900">
+                {error}
+              </div>
+            )}
+            {(target.kind === 'institutional-links' ||
+              target.kind === 'seminars' ||
+              target.kind === 'verify-page' ||
+              target.kind === 'footer-config') && (
+              <HomeAndFooterEditors
+                key={`${target.kind}`}
+                target={target}
+                profile={profile}
+                saving={saving}
+                setSaving={setSaving}
+                setError={setError}
+                onSaveProfile={handleSaveProfilePatch}
+                onClose={onClose}
+              />
+            )}
+            {(target.kind === 'campus-building' ||
+              target.kind === 'governance' ||
+              target.kind === 'apa-benchmarks') && (
+              <CampusAndGovernanceEditors
+                key={`${target.kind}-${target.kind === 'campus-building' ? target.buildingId || '' : target.kind === 'governance' ? target.tab : ''}`}
+                target={target}
+                profile={profile}
+                saving={saving}
+                setSaving={setSaving}
+                setError={setError}
+                onSaveProfile={handleSaveProfilePatch}
+                onClose={onClose}
+              />
+            )}
+            {(target.kind === 'milestones' ||
+              target.kind === 'degree-programs' ||
+              target.kind === 'faculty-deans' ||
+              target.kind === 'academic-calendar' ||
+              target.kind === 'scholarships' ||
+              target.kind === 'download-forms' ||
+              target.kind === 'research-infra' ||
+              target.kind === 'admissions-info' ||
+              target.kind === 'facility') && (
+              <AcademicAndFacilitiesEditors
+                key={`${target.kind}-${target.kind === 'facility' ? target.route || '' : ''}`}
+                target={target}
+                profile={profile}
+                saving={saving}
+                setSaving={setSaving}
+                setError={setError}
+                onSaveProfile={handleSaveProfilePatch}
+                onClose={onClose}
+              />
+            )}
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
           {error && (
             <div className="p-3.5 rounded-lg border border-red-200 bg-red-50 text-sm text-red-900">
@@ -734,6 +940,16 @@ export function AdminEditModal({
           {/* 1. HERO & PROFILE STATS */}
           {target.kind === 'hero-profile' && (
             <div className="space-y-4">
+              <div>
+                <label className={LABEL_CLASS}>Top Navbar Tagline</label>
+                <input
+                  type="text"
+                  required
+                  value={navbarTagline}
+                  onChange={(e) => setNavbarTagline(e.target.value)}
+                  className={INPUT_CLASS}
+                />
+              </div>
               <div>
                 <label className={LABEL_CLASS}>Hero Eyebrow / Location Line</label>
                 <input
@@ -1029,9 +1245,13 @@ export function AdminEditModal({
               </div>
 
               <div>
-                <label className={LABEL_CLASS}>Welcome Address / Message</label>
+                <label className={LABEL_CLASS}>
+                  {isCreatingFormerVc || isEditingFormerVc
+                    ? 'Tenure Summary / Historical Note'
+                    : 'Welcome Address / Message'}
+                </label>
                 <textarea
-                  rows={8}
+                  rows={isCreatingFormerVc || isEditingFormerVc ? 4 : 8}
                   required
                   value={vcMessage}
                   onChange={(e) => setVcMessage(e.target.value)}
@@ -1039,18 +1259,20 @@ export function AdminEditModal({
                 />
               </div>
 
-              <label className="flex items-center gap-2.5 text-xs text-slate-700 bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={vcPromoteNew}
-                  onChange={(e) => setVcPromoteNew(e.target.checked)}
-                  className="rounded border-slate-300"
-                />
-                <span>
-                  Appoint as a <strong>new Vice-Chancellor</strong> and archive the current VC into
-                  the Former Vice-Chancellors list.
-                </span>
-              </label>
+              {!isCreatingFormerVc && !isEditingFormerVc && (
+                <label className="flex items-center gap-2.5 text-xs text-slate-700 bg-amber-50 border border-amber-200 rounded-lg p-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={vcPromoteNew}
+                    onChange={(e) => setVcPromoteNew(e.target.checked)}
+                    className="rounded border-slate-300"
+                  />
+                  <span>
+                    Appoint as a <strong>new Vice-Chancellor</strong> and archive the current VC into
+                    the Former Vice-Chancellors list.
+                  </span>
+                </label>
+              )}
             </div>
           )}
 
@@ -1594,6 +1816,18 @@ export function AdminEditModal({
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
+                  <label className={LABEL_CLASS}>Department Code</label>
+                  <input
+                    type="text"
+                    required
+                    disabled={Boolean(target.department)}
+                    value={deptCode}
+                    onChange={(e) => setDeptCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. CSE"
+                    className={`${INPUT_CLASS} font-mono uppercase disabled:opacity-60`}
+                  />
+                </div>
+                <div>
                   <label className={LABEL_CLASS}>Department Name</label>
                   <input
                     type="text"
@@ -2041,6 +2275,7 @@ export function AdminEditModal({
             </div>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

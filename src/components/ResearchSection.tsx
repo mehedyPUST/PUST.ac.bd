@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { EditTriggerButton } from './EditTriggerButton';
+import { usePust } from './PustContext';
 import { ResilientImage } from './ResilientImage';
 import type { JournalRecord, PublicationRecord } from '../types/pust';
 
@@ -22,6 +24,8 @@ export function ResearchSection({
   groundsImage,
   focus = 'publications',
 }: ResearchSectionProps) {
+  const { profile } = usePust();
+  const { academicExtras } = resolveUniversityContent(profile);
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
 
   const deptFilters = ['ALL', ...Array.from(new Set(publications.map((p) => p.departmentCode)))];
@@ -151,89 +155,58 @@ export function ResearchSection({
         </div>
 
         {/* Campus Facilities, Library & Student Life */}
-        <div id="campus" className="pt-12 border-t border-slate-200 space-y-10">
+        <div id="campus" className="editable-region pt-12 border-t border-slate-200 space-y-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                Research Infrastructure
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  Research Infrastructure
+                </p>
+                <EditTriggerButton
+                  target={{ kind: 'research-infra' }}
+                  label="Edit Infrastructure"
+                  variant="compact"
+                />
+              </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
                 Central Library, Laboratories &amp; Residential Halls
               </h2>
             </div>
             <div className="lg:col-span-5">
               <p className="text-sm text-slate-600 leading-relaxed">
-                Serving nearly 5,000 students across academic blocks, the Central Library &amp;
-                Information Center, July 06 Hall &amp; dormitories, Medical Center, Transport Pool,
-                and active student chapters including IEEE PUST SB.
+                {academicExtras.researchIntro}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
-              <ResilientImage
-                src={labImage}
-                alt="Students collaborating in a PUST engineering and instrumentation laboratory"
-                caption="Fig. 2 — Applied Engineering & Instrumentation Laboratories."
-                className="w-full aspect-[4/3] object-cover"
-              />
-              <div>
-                <p className="font-mono text-xs text-pust-800">
-                  IIED &amp; Research Cell · 30+ Departmental Labs
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
-                  Engineering &amp; Scientific Laboratories
-                </h3>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Hands-on facilities for VLSI, THz wireless communications, deep learning,
-                  supercapacitor synthesis, pharmaceutical HPLC, and river-basin geotechnics.
-                </p>
-              </div>
-            </article>
-
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
-              <ResilientImage
-                src={libraryImage}
-                alt="PUST Central Library study hall and digital archive"
-                caption="Fig. 3 — Central Library & Information Center Reading Floor."
-                className="w-full aspect-[4/3] object-cover"
-              />
-              <div>
-                <p className="font-mono text-xs text-pust-800 tabular-nums">
-                  Central Library · Sun–Thu 08:30–21:00 BST
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
-                  Central Library &amp; Digital Subscriptions
-                </h3>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Print monograph collections paired with institutional journal access to IEEE
-                  Xplore, SpringerLink, ACM Digital Library, and quiet thesis research floors.
-                </p>
-              </div>
-            </article>
-
-            <article className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4">
-              <ResilientImage
-                src={groundsImage}
-                alt="PUST Rajapur campus courtyard and residential halls at golden hour"
-                caption="Fig. 4 — Rajapur Campus Quadrangle & Residential Precinct."
-                className="w-full aspect-[4/3] object-cover"
-              />
-              <div>
-                <p className="font-mono text-xs text-pust-800">
-                  July 06 · Swadhinota · Matribhasha · Ganatantra
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
-                  Residential Halls, Medical &amp; Transport
-                </h3>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Residential accommodation across Male and Female Halls, PUST Medical Section
-                  (+8802588844975), ICT Cell, Student Advisor Office, and Transportation Pool bus
-                  routes (+8802588845650).
-                </p>
-              </div>
-            </article>
+            {academicExtras.researchInfraCards.map((card, idx) => {
+              const fallbackImg =
+                idx === 0 ? labImage : idx === 1 ? libraryImage : groundsImage;
+              return (
+                <article
+                  key={card.id}
+                  className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4"
+                >
+                  <ResilientImage
+                    src={card.imageUrl || fallbackImg}
+                    fallbackSrc={fallbackImg}
+                    alt={card.title}
+                    caption={card.caption}
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                  <div>
+                    <p className="font-mono text-xs text-pust-800">{card.tag}</p>
+                    <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                      {card.description}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </div>

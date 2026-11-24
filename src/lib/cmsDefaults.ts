@@ -1,0 +1,1137 @@
+import type {
+  AboutExtrasConfig,
+  AcademicExtrasConfig,
+  AdminShowcaseConfig,
+  AdmissionsConfig,
+  CampusBuildingItem,
+  CampusMapMeta,
+  FacilityItemConfig,
+  FooterConfig,
+  GovernanceContent,
+  InstitutionalLinkItem,
+  SeminarItem,
+  UniversityProfile,
+  VerifyPageConfig,
+} from '../types/pust';
+
+export const DEFAULT_NAVBAR_TAGLINE = 'Est. 2008 · Rajapur, Pabna';
+
+export const DEFAULT_INSTITUTIONAL_LINKS_EYEBROW = 'Digital Services & Directory';
+export const DEFAULT_INSTITUTIONAL_LINKS_HEADING = 'Institutional Sections';
+
+export const DEFAULT_INSTITUTIONAL_LINKS: InstitutionalLinkItem[] = [
+  {
+    id: 'link-portal',
+    route: '/portal',
+    title: 'Digital Campus Portal & Workflows',
+    desc: 'Online fee checkout, Hall seat allotment & clearance, Library QR cards, Admit cards & 4-office Certificates.',
+  },
+  {
+    id: 'link-verify',
+    route: '/verify',
+    title: 'Public Document Verification Registry',
+    desc: 'Verify issued Certificates, Admit Cards, Hall Clearances, Library Cards & Payment Receipts.',
+  },
+  {
+    id: 'link-governance',
+    route: '/governance/pust-act',
+    title: 'Governance & Statutory Bodies',
+    desc: 'PUST Act (Act No. 43 of 2001), Regent Board, Academic Council, Finance Committee & Ordinance.',
+  },
+  {
+    id: 'link-admin',
+    route: '/administration',
+    title: 'University Administration & Offices',
+    desc: 'Vice-Chancellor Office, Registrar, Treasurer, Proctor, Student Advisor, ICT Cell & APA.',
+  },
+  {
+    id: 'link-depts',
+    route: '/academics/departments',
+    title: '5 Faculties & 21 Academic Departments',
+    desc: 'Programs, calendars, deans, chairmen, scholarships, forms & faculty research.',
+  },
+  {
+    id: 'link-admissions',
+    route: '/admissions',
+    title: 'Admissions 2026–2027 & Tracker',
+    desc: 'Undergraduate (GST), Graduate, Evening Programs, Inquiry Desk & Live Status Tracker.',
+  },
+];
+
+export const DEFAULT_UPCOMING_SEMINARS: SeminarItem[] = [
+  {
+    id: 'sem-1',
+    date: '2026-12-03',
+    organizer: 'IQAC & ICT Cell',
+    title: 'Outcome-Based Education (OBE) & Digital Assessment Symposium',
+  },
+  {
+    id: 'sem-2',
+    date: '2026-12-18',
+    organizer: 'Faculty of Engineering & Technology',
+    title: '2nd Regional Workshop on Smart Grid, VLSI & River Basin Geotechnics',
+  },
+  {
+    id: 'sem-3',
+    date: '2027-01-14',
+    organizer: 'Dept. of Pharmacy & Chemistry',
+    title: 'Phytochemistry & Sustainable Nanomaterials Research Colloquium',
+  },
+  {
+    id: 'sem-4',
+    date: '2027-03-15',
+    organizer: 'Office of the Vice-Chancellor',
+    title: 'Historic First University Convocation at Rajapur Ceremonial Pavilion',
+  },
+];
+
+export const DEFAULT_CAMPUS_MAP_META: CampusMapMeta = {
+  eyebrow: 'Rajapur 30-Acre Masterplan · Interactive Campus Directory',
+  title: 'Interactive Campus Map & Building Guide',
+  subtitle:
+    'Click any building name directly on the campus plan or directory bar below to inspect offices, visiting hours, and photography.',
+  coordinates: 'N ↑ · 24.0130° N, 89.2797° E',
+};
+
+export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
+  {
+    id: 'admin-bhaban',
+    code: 'A-01',
+    name: 'Administrative Building',
+    shortName: 'Admin Building',
+    zone: 'Administration',
+    gridRef: 'South-Central Axis · Grid C4',
+    xPercent: 48,
+    yPercent: 67,
+    photo: '/src/assets/images/pust_admin_building_1795441924646.jpg',
+    caption: 'Fig. M1 — Administrative Building housing VC, Registrar & Examination Offices.',
+    summary:
+      'Central governance hub of the Rajapur campus situated directly north of the Main Gate promenade. Houses executive offices, statutory committee rooms, and student certificate verification counters.',
+    offices:
+      'VC Office, Pro-VC, Treasurer (+8802588844963), Registrar, Controller (+8802588844965), ICT Cell',
+    hours: 'Sun – Thu · 09:00 – 17:00',
+    facilities: 'Regent Board Hall, Transcript Counter, Automated Fee Desk',
+    route: '/administration/vc-office',
+    routeLabel: 'Explore Administration',
+  },
+  {
+    id: 'academic-1',
+    code: 'AC-01',
+    name: 'Academic Building I (Core Bhaban)',
+    shortName: 'Academic Bldg I',
+    zone: 'Academic',
+    gridRef: 'Central Quad West · Grid B3',
+    xPercent: 25,
+    yPercent: 47,
+    photo: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
+    caption: 'Fig. M2 — Main Academic Promenade and Academic Building I.',
+    summary:
+      'Founding multi-story academic complex supporting Faculty of Science (including Pharmacy), Faculty of Business Studies, Humanities & Social Science, and Geography & Environment.',
+    offices:
+      'Mathematics, Physics, Pharmacy, Chemistry, Statistics, BBA, THM, Economics, Bangla, English, SW, PA, History, GE',
+    hours: 'Sun – Thu · 08:30 – 17:30',
+    facilities: 'Multimedia Lecture Halls, Seminar Libraries, Faculty Lounge',
+    route: '/academics/departments',
+    routeLabel: 'View All 21 Departments',
+  },
+  {
+    id: 'wazed-bhaban',
+    code: 'AC-02',
+    name: 'Dr. M. A. Wazed Miah Engineering Bhaban',
+    shortName: 'Wazed Engineering Bhaban',
+    zone: 'Academic',
+    gridRef: 'West Research Wing · Grid A2',
+    xPercent: 22,
+    yPercent: 23,
+    photo: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    caption: 'Fig. M3 — Engineering & Applied Science Research Laboratories.',
+    summary:
+      'Dedicated engineering and technology complex equipped with high-performance computing clusters, VLSI & THz microwave testbeds, architecture design studios, and structural materials labs.',
+    offices: 'CSE, EEE, EECE, ICE, CE, Architecture, URP, IQAC & RTTC Research Labs',
+    hours: 'Sun – Thu · 08:30 – 18:00 (Labs by schedule)',
+    facilities: '30+ Research Labs, High-Speed Campus Fiber Node, Robotics Studio',
+    route: '/academics/faculty',
+    routeLabel: 'Explore 5 Faculties',
+  },
+  {
+    id: 'central-library',
+    code: 'LB-01',
+    name: 'Central Library & Information Center (CLIC)',
+    shortName: 'Central Library',
+    zone: 'Library & Culture',
+    gridRef: 'Central Quad North · Grid C2',
+    xPercent: 51,
+    yPercent: 41,
+    photo: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    caption: 'Fig. M4 — Central Library Reading Floor and Digital Archive.',
+    summary:
+      'Academic and research hub (clic@pust.ac.bd) managed by Additional Librarian Md. Hafizur Rahaman Mollah with faculty-wise monograph collections, thesis archives, and institutional IEEE/SpringerLink access.',
+    offices: 'Librarian Office (clic@pust.ac.bd), Circulation & Digital Card Desk, Archive',
+    hours: 'Sun – Thu · 08:30 – 21:00',
+    facilities: 'Faculty Book Collections, E-Journal IP Bays, Digital Library Card Portal',
+    route: '/facilities/library',
+    routeLabel: 'Library Services',
+  },
+  {
+    id: 'convocation-plaza',
+    code: 'CU-01',
+    name: 'Central Auditorium & Independence Plaza',
+    shortName: 'Auditorium & Plaza',
+    zone: 'Library & Culture',
+    gridRef: 'East Cultural Axis · Grid D3',
+    xPercent: 76,
+    yPercent: 45,
+    photo: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    caption: 'Fig. M5 — Convocation Grounds and Central Ceremonial Pavilion.',
+    summary:
+      'Ceremonial cultural precinct anchoring Shaheed Minar, Mukta Mancha, and the main auditorium grounds—designated venue for national academic symposia and the First Convocation (15 March 2027).',
+    offices: 'Auditorium Management, Cultural Affairs & Convocation Secretariat',
+    hours: 'Daily · 08:00 – 20:00 (Event schedules)',
+    facilities: 'Main Assembly Grounds, Exhibition Lawn, Media Briefing Stage',
+    route: '/gallery',
+    routeLabel: 'Campus Events Gallery',
+  },
+  {
+    id: 'residential-halls',
+    code: 'RH-01',
+    name: 'Residential Halls Precinct (July 06, Swadhinota, Matribhasha & Ganatantra)',
+    shortName: 'Residential Halls',
+    zone: 'Residential & Wellness',
+    gridRef: 'North Campus Sector · Grid D1',
+    xPercent: 62,
+    yPercent: 18,
+    photo: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    caption: 'Fig. M6 — Residential Halls Precinct and Landscaped Quadrangle.',
+    summary:
+      'Gated northern residential zone encompassing July 06 Hall (Male Hall-1), Swadhinota Hall (Male Hall-2), Matribhasha Hall (Female Hall-1), and Ganatantra Hall (Female Hall-2) with dining commons and reading rooms.',
+    offices:
+      'Provosts: Md. Al-Fahad Bhuiyan, Dr. Md. Kamruzzaman, Dr. Rebeka Sultana Rekha, Laila Arzumand Banu',
+    hours: '24/7 Residential Access · Office 09:00 – 17:00',
+    facilities: 'Student Dormitories, Hall Dining, Reading Rooms, Online Dues Clearance',
+    route: '/facilities/residence',
+    routeLabel: 'Halls & Residence Details',
+  },
+  {
+    id: 'medical-tsc',
+    code: 'SW-01',
+    name: 'TSC, Cafeteria & Medical Center',
+    shortName: 'TSC & Medical Center',
+    zone: 'Residential & Wellness',
+    gridRef: 'East Lawn Sector · Grid D4',
+    xPercent: 77,
+    yPercent: 69,
+    photo: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
+    caption: 'Fig. M7 — Teacher-Student Center (TSC) & Campus Medical Pavilion.',
+    summary:
+      'Integrated student life and wellness pavilion connecting the Student Advisor Office (Dr. Md. Rashedul Haque), Central Cafeteria, student club rooms, and the Medical Center (+8802588844975, medicalsection@pust.ac.bd).',
+    offices:
+      'Medical Center (Dr. Md. Rafiqul Islam & Dr. Nasrin Sultana), Student Advisor (director.sao@pust.ac.bd)',
+    hours: 'Medical: Sun–Thu (24/7 Ambulance) · TSC: 08:00 – 21:00',
+    facilities: 'Outpatient Clinic, Student Lounge, Campus Dining & Transport Pool (+8802588845650)',
+    route: '/facilities/medical',
+    routeLabel: 'Medical & Student Care',
+  },
+];
+
+export const DEFAULT_GOVERNANCE_CONTENT: GovernanceContent = {
+  officialActUrl: 'https://bdlaws.minlaw.gov.bd/act-details-872.html',
+  actIntro:
+    'Pabna University of Science and Technology operates as a public statutory university under the Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001), passed by the Parliament of Bangladesh on 15 July 2001 and brought into force by Government Gazette notification on 12 October 2008. Under Section 3 of the Act, the university is constituted as a body corporate comprising the Chancellor, Vice-Chancellor, Treasurer, Regent Board, and Academic Council.',
+  actClauses: [
+    {
+      clause: 'Section 3 · Incorporation & Statutory Constitution',
+      detail:
+        'Establishes Pabna University of Science and Technology as a statutory body corporate with perpetual succession, common seal, and academic seat in Pabna.',
+    },
+    {
+      clause: 'Officers of the University',
+      detail:
+        'Defines the statutory powers and duties of the Chancellor, Vice-Chancellor, Pro-Vice-Chancellor, Treasurer, Registrar, Deans, Chairmen, Proctor, Librarian, and Controller of Examinations.',
+    },
+    {
+      clause: 'Authorities of the University',
+      detail:
+        'Constitutes the Regent Board, Academic Council, Finance Committee, Planning & Development Committee, Faculties, and Selection Boards with statutory quorum rules.',
+    },
+    {
+      clause: 'Statutes, Ordinances & Regulations',
+      detail:
+        'Empowers the Regent Board and Academic Council to promulgate university statutes, semester academic ordinances, hall codes, and examination regulations.',
+    },
+  ],
+  actCitations: [
+    { label: 'Enabling Legislation', value: 'Act No. 43 of 2001' },
+    { label: 'Date Passed', value: '15 July 2001' },
+    { label: 'Gazette Effective Date', value: '12 October 2008' },
+    { label: 'Chancellor', value: 'Hon’ble President of Bangladesh' },
+    { label: 'Regulatory Liaison', value: 'UGC of Bangladesh' },
+  ],
+  regentBoardMembers: [
+    {
+      seat: 'Chairman (Ex-Officio)',
+      designation: 'Vice-Chancellor, Pabna University of Science and Technology',
+      term: 'Statutory',
+    },
+    {
+      seat: 'Member (Ex-Officio)',
+      designation: 'Pro-Vice-Chancellor, Pabna University of Science and Technology',
+      term: 'Statutory',
+    },
+    {
+      seat: 'Member (Ex-Officio)',
+      designation: 'Treasurer, Pabna University of Science and Technology',
+      term: 'Statutory',
+    },
+    {
+      seat: 'Government Representatives',
+      designation:
+        'Senior Officials Nominated by the Ministry of Education & Ministry of Science and Technology',
+      term: '3 Years',
+    },
+    {
+      seat: 'UGC Representative',
+      designation: 'Nominee of the University Grants Commission (UGC) of Bangladesh',
+      term: '3 Years',
+    },
+    {
+      seat: 'Deans & Professors',
+      designation: 'Faculty Deans and Senior Professors Nominated Under the PUST Act',
+      term: '2 Years',
+    },
+    {
+      seat: 'Secretary (Ex-Officio)',
+      designation: 'Registrar, Pabna University of Science and Technology',
+      term: 'Statutory',
+    },
+  ],
+  regentFunctions: [
+    'Approves university statutes, administrative policies, and institutional budgets submitted by the Finance Committee.',
+    'Ratifies decisions of the Academic Council regarding establishment of new faculties, departments, institutes, and research centers.',
+    'Approves appointments of faculty members and Class-I administrative officers upon recommendation of statutory Selection Boards.',
+    'Oversees university campus masterplans, residential halls, and Convocation resolutions.',
+  ],
+  academicCouncilIntro:
+    'Chaired by the Vice-Chancellor with the Registrar acting as Secretary, the Academic Council comprises the Pro-Vice-Chancellor, all Deans of the 5 Faculties, Chairmen of the 21 academic departments, senior professors, and external academic experts. It maintains the academic integrity of all undergraduate, postgraduate, and doctoral programs.',
+  academicCouncilCards: [
+    {
+      title: 'Curriculum & OBE Approval',
+      detail:
+        'Reviews and approves Outcome-Based Education (OBE) syllabi, credit structures, and course prerequisites recommended by Faculty Boards.',
+    },
+    {
+      title: 'Examination & Result Ratification',
+      detail:
+        'Appoints examination committees, approves moderation norms, and ratifies semester examination results prior to publication.',
+    },
+    {
+      title: 'Research & Doctoral Degrees',
+      detail:
+        'Establishes M.Phil. and Ph.D. supervision guidelines, thesis evaluation panels, and research fellowship standards.',
+    },
+    {
+      title: 'Academic Calendar & Admission Policy',
+      detail:
+        'Determines GST undergraduate admission unit allocations, intake seats (920+), and annual academic schedules.',
+    },
+  ],
+  academicCouncilStructure: [
+    { label: 'Chairperson', value: 'Vice-Chancellor' },
+    { label: 'Faculties Represented', value: '5 Faculties' },
+    { label: 'Academic Departments', value: '21 Departments' },
+    { label: 'Member-Secretary', value: 'Registrar' },
+  ],
+  financeCommitteeIntro:
+    'Constituted under Section 24 of the PUST Act, the Finance Committee advises the Regent Board on all fiscal matters of the university—ensuring transparent allocation of UGC recurring grants, development project funds, residential hall revenues, and student welfare endowments.',
+  financeCommitteeScopes: [
+    {
+      scope: 'Annual & Revised Budget Scrutiny',
+      desc: 'Examines annual revenue and expenditure estimates prepared by the Treasurer and Director of Accounts prior to submission to the Regent Board and UGC.',
+    },
+    {
+      scope: 'Digital Fee & Gateway Reconciliation',
+      desc: 'Monitors semester examination fees, hall seat charges, library fines, and certificate fees collected through automated bank and mobile-banking gateways.',
+    },
+    {
+      scope: 'Statutory Audit & APA Compliance',
+      desc: 'Reviews external observations by the Education Audit Directorate and enforces Public Procurement Rules (PPR) across laboratory and campus works.',
+    },
+  ],
+  financeCommitteeLeadership: [
+    { label: 'Chair / Convener', value: 'Treasurer / Vice-Chancellor' },
+    { label: 'Fiscal Cycle', value: 'July 01 – June 30' },
+    { label: 'Accounts Administration', value: 'Office of the Treasurer' },
+    { label: 'Procurement Framework', value: 'e-GP & PPR Rules' },
+  ],
+  ordinanceIntro:
+    'All undergraduate and postgraduate degree programs at PUST follow the UGC-aligned bi-semester credit-hour system. Students must maintain minimum attendance, clear all Residential Hall dues prior to examination form fill-up, and earn passing grade points in all required courses.',
+  ordinanceRules: [
+    {
+      label: 'Standard Undergraduate Duration',
+      value: '4 Years · 8 Semesters (5 Yrs / 10 Sem for B.Arch.)',
+    },
+    {
+      label: 'Minimum Attendance Requirement',
+      value: '75% (Non-collegiate 60%–74%)',
+    },
+    {
+      label: 'Minimum Passing SGPA / CGPA',
+      value: '2.00 (Degree Conferral)',
+    },
+    {
+      label: 'Exam Clearance Gate',
+      value: 'Hall Dues Clearance Required Before Admit Card',
+    },
+  ],
+  gradingScale: [
+    { range: '80% and above', letter: 'A+', gp: '4.00', remarks: 'Outstanding' },
+    { range: '75% to < 80%', letter: 'A', gp: '3.75', remarks: 'Excellent' },
+    { range: '70% to < 75%', letter: 'A-', gp: '3.50', remarks: 'Very Good' },
+    { range: '65% to < 70%', letter: 'B+', gp: '3.25', remarks: 'Good' },
+    { range: '60% to < 65%', letter: 'B', gp: '3.00', remarks: 'Satisfactory' },
+    { range: '55% to < 60%', letter: 'B-', gp: '2.75', remarks: 'Above Average' },
+    { range: '50% to < 55%', letter: 'C+', gp: '2.50', remarks: 'Average' },
+    { range: '45% to < 50%', letter: 'C', gp: '2.25', remarks: 'Below Average' },
+    { range: '40% to < 45%', letter: 'D', gp: '2.00', remarks: 'Pass' },
+    { range: 'Below 40%', letter: 'F', gp: '0.00', remarks: 'Fail' },
+  ],
+};
+
+export const DEFAULT_ADMIN_SHOWCASE: AdminShowcaseConfig = {
+  buildingImage: '/src/assets/images/pust_admin_building_1795441924646.jpg',
+  buildingCaption: 'Fig. 1 — Administrative Building & Central Executive Complex, Rajapur Campus, Pabna.',
+  charterTag: 'Act No. 43 of 2001',
+  accountabilityCycle: 'APA FY 2026–2027 · UGC',
+  apaFyLabel: 'FY 2026–2027 · University Grants Commission (UGC)',
+  apaBenchmarks: [
+    {
+      code: '01. E-Governance & Service',
+      title: '100% Digital Clearance',
+      detail:
+        '4-office certificate workflow, residential hall dues, and CLIC library card issuance tracked end-to-end with verifiable timestamps.',
+    },
+    {
+      code: '02. Academic Quality (IQAC)',
+      title: '21 OBE Curricula Active',
+      detail:
+        'Continuous self-assessment, outcome-based curriculum auditing, and faculty pedagogy workshops across all 5 faculties.',
+    },
+    {
+      code: '03. National Integrity Strategy',
+      title: 'Transparent Procurement',
+      detail:
+        'National e-GP compliance, quarterly Citizen’s Charter disclosures, and statutory audit committee reporting.',
+    },
+  ],
+};
+
+export const DEFAULT_ABOUT_EXTRAS: AboutExtrasConfig = {
+  campusImage: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+  campusCaption: 'Rajapur Campus Quadrangle along the Dhaka–Pabna Highway.',
+  milestones: [
+    {
+      year: '15 July 2001',
+      title: 'University Act Enacted',
+      detail:
+        'Parliament passes Pabna University of Science and Technology Act, 2001 (Act No. 43 of 2001).',
+    },
+    {
+      year: '5 June 2008',
+      title: 'Curriculum Inaugurated',
+      detail:
+        'Academic program formally inaugurated alongside Government Gazette operationalization on 12 October 2008.',
+    },
+    {
+      year: '2009',
+      title: 'Inaugural 140 Students',
+      detail:
+        'First academic batch enrolled across CSE, EEE, Mathematics, and Business Administration.',
+    },
+    {
+      year: '2026',
+      title: '5 Faculties · 21 Departments',
+      detail:
+        'Nearly 5,000 scholars and 185 faculty members on the 30-acre Rajapur digital campus.',
+    },
+    {
+      year: '15 Mar 2027',
+      title: 'First Convocation',
+      detail: 'Historic First Convocation scheduled on the Rajapur Ceremonial Pavilion.',
+    },
+  ],
+};
+
+export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
+  degreePrograms: [
+    {
+      level: 'Undergraduate Honors & Engineering',
+      degrees: 'B.Sc. (Engg.), B.Arch., B.Pharm. (Hons.), B.Sc. (Hons.), B.B.A., B.A. (Hons.), B.S.S.',
+      duration: '4 Years / 8 Semesters (B.Arch.: 5 Years / 10 Semesters)',
+      credits: '140 – 195 Credit Hours',
+      entry: 'Bangladesh GST Integrated Admission Test (Units A, B, C)',
+    },
+    {
+      level: 'Graduate & Master Programs',
+      degrees: 'M.Sc. (Engg.), M.Sc., M.Pharm., M.B.A., M.A., M.S.S.',
+      duration: '1 – 1.5 Years (2 – 3 Semesters)',
+      credits: '36 – 45 Credit Hours (Thesis & Non-Thesis Tracks)',
+      entry: 'Departmental Postgraduate Selection & Merit Verification',
+    },
+    {
+      level: 'Doctoral & Research Fellowships',
+      degrees: 'M.Phil. & Ph.D.',
+      duration: '2 – 5 Years Full-Time / Part-Time Research',
+      credits: 'Coursework + Original Dissertation Defense',
+      entry: 'Academic Council & Advanced Research Committee Approval',
+    },
+    {
+      level: 'Evening & Executive Cohorts',
+      degrees: 'EMBA & Evening M.Sc. in Applied Engineering',
+      duration: '2 Years (Weekend / Evening Schedule)',
+      credits: '48 – 60 Credit Hours',
+      entry: 'Working Professionals & Industry Sponsored Track',
+    },
+  ],
+  facultyDeans: [
+    {
+      faculty: 'Faculty of Engineering and Technology',
+      dean: 'Prof. Dr. Md. Anwar Hossain',
+      email: 'dean.et@pust.ac.bd',
+      code: 'FET · 7 Departments',
+      depts: 'CSE, EEE, EECE, ICE, Civil Engineering, Architecture, URP',
+    },
+    {
+      faculty: 'Faculty of Science',
+      dean: 'Prof. Dr. Md. Shamim Reza',
+      email: 'dean.s@pust.ac.bd',
+      code: 'FS · 5 Departments',
+      depts: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics and Data Science',
+    },
+    {
+      faculty: 'Faculty of Business Studies',
+      dean: 'Prof. Dr. Md. Hasebur Rahman',
+      email: 'dean.bs@pust.ac.bd',
+      code: 'FBS · 2 Departments',
+      depts: 'Business Administration, Tourism & Hospitality Management',
+    },
+    {
+      faculty: 'Faculty of Humanities and Social Science',
+      dean: 'Prof. Dr. Mir Humayun Kabir',
+      email: 'dean.hss@pust.ac.bd',
+      code: 'FHSS · 6 Departments',
+      depts: 'Economics, Bangla, Social Work, English, Public Administration, History',
+    },
+    {
+      faculty: 'Faculty of Life and Earth Science',
+      dean: 'Prof. Dr. Mohammad Najmul Islam',
+      email: 'dean.les@pust.ac.bd',
+      code: 'FLES · 1 Department',
+      depts: 'Geography and Environment',
+    },
+  ],
+  academicCalendar: [
+    {
+      term: 'Academic Session 2025–2026 (UG)',
+      event: 'Orientation & Formal Class Commencement',
+      date: '2026-07-15',
+    },
+    {
+      term: 'Bi-Semester Teaching Period',
+      event: 'Mid-Term Assessments & Course Add/Drop Window',
+      date: '2026-09-20',
+    },
+    {
+      term: 'Postgraduate & Exam Cycle',
+      event: 'M.Sc. / M.Engg. Admissions (CSE/ICE) & Exam Form Fill-up',
+      date: '2026-11-16',
+    },
+    {
+      term: 'Semester-I Final Examinations',
+      event: 'Term-End Final Examinations Across 21 Departments',
+      date: '2026-12-06',
+    },
+    {
+      term: 'Convocation Milestone',
+      event: 'First University Convocation at Rajapur Campus',
+      date: '2027-03-15',
+    },
+  ],
+  scholarships: [
+    {
+      title: 'PUST Merit & Dean’s List Scholarship',
+      detail:
+        'Awarded per semester to top CGPA achievers in each of the 21 academic departments based on published examination results.',
+    },
+    {
+      title: 'UGC & Government Stipend Programs',
+      detail:
+        'Need-based and research stipends administered via the Student Advisor Office and Registrar desk.',
+    },
+    {
+      title: 'Prime Minister / ICT Innovation Fellowships',
+      detail:
+        'Research grants supporting M.Sc., M.Phil., and thesis undergraduates in Engineering and Applied Sciences.',
+    },
+    {
+      title: 'Residential Fee Waiver Assistance',
+      detail:
+        'Financial waivers coordinated between July 06 Hall / dormitories and the Student Welfare Directorate.',
+    },
+  ],
+  downloadForms: [
+    {
+      code: 'PUST-REG-01',
+      title: 'Admission Verification & Token Request Form',
+      office: 'Office of the Registrar / Department Chairman',
+      note: 'Digital token issuance and document verification handled inside Campus Portal.',
+      portalTarget: '/portal',
+      portalLabel: 'Activate via Portal Token',
+      fields: [
+        'Applicant Full Name (as per SSC/HSC)',
+        'GST Unit & Admission Roll Number',
+        'Department Allocated & Session',
+        'Academic ID / Temporary Reference',
+        'Digital Document Verification Packet Hash',
+      ],
+    },
+    {
+      code: 'PUST-LIB-02',
+      title: 'Central Library Membership & Card Requisition Form',
+      office: 'Department Chairman Seal + Central Library',
+      note: 'Forwarded digitally with Chairman official seal and signature JSON.',
+      portalTarget: '/portal?tab=library',
+      portalLabel: 'Start Library Application',
+      fields: [
+        'Student Name & Academic ID',
+        'Department Code & Academic Session',
+        'Chairman Digital Seal JSON Endorsement',
+        'Central Library Verification Officer',
+        'Linked Digital / Physical Library Card Ref',
+      ],
+    },
+    {
+      code: 'PUST-HALL-03',
+      title: 'Residential Hall Seat Application & Clearance Form',
+      office: 'Provost Office (July 06 Hall & Dormitories)',
+      note: 'Check vacancy circulars, hall dues, and clearance references in Campus Portal.',
+      portalTarget: '/portal?tab=halls',
+      portalLabel: 'Apply / Clear Hall Dues',
+      fields: [
+        'Student Name, Academic ID & Department',
+        'Preferred Residential Hall (July 06 Hall / Dormitories)',
+        'Permanent District & Residential Statement',
+        'Hall Financial Receipt & Clearance Reference',
+        'Provost / House Tutor Seat Allotment Endorsement',
+      ],
+    },
+    {
+      code: 'PUST-EX-04',
+      title: 'Semester Examination Form Fill-up & Admit Card Application',
+      office: 'Department Chairman & Controller of Examinations',
+      note: 'Enforces automatic Hall clearance check and online payment receipt.',
+      portalTarget: '/portal?tab=exams',
+      portalLabel: 'Open Exam Form Fill-up',
+      fields: [
+        'Student Name, Academic ID & Semester',
+        'Registered Course Codes & Credit Total',
+        'Verified Hall Financial Clearance Status',
+        'Digital Checkout Receipt (SSLCommerz / Bangla QR / MFS)',
+        'Chairman Digital Admit Card Verification',
+      ],
+    },
+    {
+      code: 'PUST-CERT-05',
+      title: 'Provisional / Temporary Certificate & 4-Office Clearance Form',
+      office: 'Chairman, Hall, Library, Proctor & Admin Office',
+      note: 'Track real-time 4-office clearances and download verified Temporary Certificate.',
+      portalTarget: '/portal?tab=certificates',
+      portalLabel: 'Start Certificate Clearance',
+      fields: [
+        'Graduating Student Name & Academic ID',
+        '8-Semester Completion & Final CGPA Verification',
+        'Certificate Fee Payment Receipt Reference',
+        '4-Office Clearances (Chairman, Hall, Library, Proctor)',
+        'Central Admin Certificate Serial & Public Verify Hash',
+      ],
+    },
+  ],
+  researchIntro:
+    'Serving nearly 5,000 students across academic blocks, the Central Library & Information Center, July 06 Hall & dormitories, Medical Center, Transport Pool, and active student chapters including IEEE PUST SB.',
+  researchInfraCards: [
+    {
+      id: 'infra-labs',
+      tag: 'IIED & Research Cell · 30+ Departmental Labs',
+      title: 'Engineering & Scientific Laboratories',
+      description:
+        'Hands-on facilities for VLSI, THz wireless communications, deep learning, supercapacitor synthesis, pharmaceutical HPLC, and river-basin geotechnics.',
+      imageUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+      caption: 'Fig. 2 — Applied Engineering & Instrumentation Laboratories.',
+    },
+    {
+      id: 'infra-library',
+      tag: 'Central Library · Sun–Thu 08:30–21:00 BST',
+      title: 'Central Library & Digital Subscriptions',
+      description:
+        'Print monograph collections paired with institutional journal access to IEEE Xplore, SpringerLink, ACM Digital Library, and quiet thesis research floors.',
+      imageUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
+      caption: 'Fig. 3 — Central Library & Information Center Reading Floor.',
+    },
+    {
+      id: 'infra-halls',
+      tag: 'July 06 · Swadhinota · Matribhasha · Ganatantra',
+      title: 'Residential Halls, Medical & Transport',
+      description:
+        'Residential accommodation across Male and Female Halls, PUST Medical Section (+8802588844975), ICT Cell, Student Advisor Office, and Transportation Pool bus routes (+8802588845650).',
+      imageUrl: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+      caption: 'Fig. 4 — Rajapur Campus Quadrangle & Residential Precinct.',
+    },
+  ],
+};
+
+export const DEFAULT_ADMISSIONS_CONFIG: AdmissionsConfig = {
+  kicker: 'Admissions 2026–2027',
+  gstUnits: [
+    {
+      unitLabel: 'GST UNIT A · SCIENCE & ENGG.',
+      deptCountLabel: '13 Departments',
+      departmentsText:
+        'CSE, EEE, EECE, ICE, CE, Architecture (with drawing test), URP, Mathematics, Physics, Pharmacy, Chemistry, Statistics & Data Science, Geography & Environment.',
+    },
+    {
+      unitLabel: 'GST UNIT B · HUMANITIES',
+      deptCountLabel: '6 Departments',
+      departmentsText:
+        'Economics (Math eligibility), Bangla, Social Work, English (min. 20% English score), Public Administration (min. 20% English score), and History.',
+    },
+    {
+      unitLabel: 'GST UNIT C · BUSINESS',
+      deptCountLabel: '2 Departments',
+      departmentsText:
+        'Business Administration (BBA) & Tourism and Hospitality Management (THM).',
+    },
+  ],
+  undergradText:
+    'Undergraduate admissions into all 21 departments follow the centralized Bangladesh GST Integrated Admission Test (Units A, B, and C)—PUST holds no separate university test, aside from Architecture aptitude drawing evaluation.',
+  gradText:
+    'Graduate programs (M.Sc. Engg., M.Engg., M.Sc., M.Pharm., M.B.A., M.A., M.S.S.) and M.Phil./Ph.D. admissions are coordinated departmentally (e.g., CSE & ICE postgraduate cohorts) under Academic Council rules.',
+  eveningText:
+    'Evening professional tracks including Executive MBA (EMBA) and Applied Engineering postgraduate cohorts offer weekend and evening schedules for working professionals.',
+  totalIntakeLabel: '830+ – 920 Seats / Session',
+  signupMethodLabel: 'Via Dept. Portal Token',
+  deskEmail: 'registrar@pust.ac.bd',
+};
+
+export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
+  {
+    label: 'Library',
+    route: '/facilities/library',
+    title: 'Central Library & Information Center (CLIC)',
+    body: 'Managed by Additional Librarian Md. Hafizur Rahaman Mollah (clic@pust.ac.bd), the Central Library houses academic and reference books across all 5 faculties plus registered campus-IP access to IEEE Xplore, SpringerLink, and ACM Digital Library. Students apply in the Campus Portal with Department Chairman digital seal JSON for Digital and Physical Library Cards.',
+    img: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    hours: 'Sun–Thu · 08:30–21:00 BST',
+    location: 'Central Library Complex · clic@pust.ac.bd',
+    portalRoute: '/portal?tab=library',
+    highlights: [
+      'Chairman-sealed digital membership approval workflow',
+      'Linked Digital & Physical Library Card ID issuance',
+      'Faculty-wise textbook stacks, thesis archive & e-journals',
+    ],
+  },
+  {
+    label: 'Transport',
+    route: '/facilities/transport',
+    title: 'University Transportation Pool',
+    body: 'Administered by Dr. Mir Humayun Kabir (transport@pust.ac.bd, +8802588845650), the Transportation Pool operates university-owned and contracted buses connecting Rajapur Campus with Pabna Town, Central Terminal, Edward College, and highway corridors for students, faculty, and officers.',
+    img: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    hours: 'Sun–Thu · 07:15–18:30 BST',
+    location: 'Transport Pool · +8802588845650 · transport@pust.ac.bd',
+    portalRoute: '/portal',
+    highlights: [
+      'Dedicated student, teacher & officer shuttle schedules',
+      'Pabna Town, Terminal, Edward College & Highway corridors',
+      'Convocation & semester examination special bus dispatch',
+    ],
+  },
+  {
+    label: 'Residence',
+    route: '/facilities/residence',
+    title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
+    body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
+    img: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    hours: '24/7 Provost & House Tutor Duty',
+    location: 'North Residential Precinct, Rajapur',
+    portalRoute: '/portal?tab=halls',
+    highlights: [
+      'July 06 Hall, Swadhinota Hall, Matribhasha Hall & Ganatantra Hall',
+      'Full retained seat allotment & change history per student ID',
+      'Mandatory Hall dues clearance synced directly with Exam Portal',
+    ],
+  },
+  {
+    label: 'Medical',
+    route: '/facilities/medical',
+    title: 'PUST Medical Section & Health Center',
+    body: 'Staffed by Deputy Chief Medical Officers Dr. Md. Rafiqul Islam and Dr. Nasrin Sultana (medicalsection@pust.ac.bd, +8802588844975), the PUST Medical Center provides primary healthcare, outpatient consultations, essential medications, and 24/7 ambulance referral for residential students, faculty, and staff.',
+    img: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
+    hours: 'Outpatient Sun–Thu · 24/7 Ambulance',
+    location: 'Medical Center · +8802588844975 · medicalsection@pust.ac.bd',
+    portalRoute: '/portal',
+    highlights: [
+      'Deputy Chief Medical Officers & campus nursing unit',
+      'Free primary consultation, first aid & dispensary services',
+      '24/7 emergency ambulance referral to Pabna General Hospital',
+    ],
+  },
+  {
+    label: 'ICT Sheba',
+    route: '/facilities/ict-sheba',
+    title: 'ICT Cell & ICT Sheba Portal',
+    body: 'Directed by Dr. Md. Abdur Rahim (ictdirector@pust.ac.bd), the ICT Cell maintains PUST’s campus fiber-optic backbone, high-speed Wi-Fi across academic & residential wings, institutional @pust.ac.bd accounts, and automated portal clearance infrastructure.',
+    img: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    hours: 'Sun–Thu · 09:00–17:00 BST',
+    location: 'ICT Cell Wing · ictdirector@pust.ac.bd',
+    portalRoute: '/portal',
+    highlights: [
+      'University-wide fiber backbone & campus Wi-Fi network',
+      'Institutional @pust.ac.bd account & signup token provisioning',
+      'Digital admit card & 4-office certificate workflow support',
+    ],
+  },
+];
+
+export const DEFAULT_VERIFY_PAGE_CONFIG: VerifyPageConfig = {
+  kicker: 'Public Authenticity Registry',
+  title: 'Digital Document & Receipt Verification',
+  subtitle:
+    'Verify Temporary Certificates, Examination Admit Cards, Residential Hall Clearances, Digital Library Cards, Chairman Seals, and official Payment Receipts issued through the PUST Digital Campus Portal.',
+  sampleSerials: [
+    { label: 'Temporary Certificate', code: 'PUST-CERT-CSE-2026A1' },
+    { label: 'Semester Admit Card', code: 'ADMIT-CSE-220101-4' },
+    { label: 'Hall Financial Clearance', code: 'PUST-HALL-CLR-2026-091' },
+    { label: 'Digital Library Card', code: 'PUST-LIB-CSE-220101' },
+    { label: 'Payment Receipt', code: 'PUST-RCPT-2026-091' },
+  ],
+  employerCardTitle: 'For Employers & External Institutions',
+  employerCardBody:
+    'Every Temporary Certificate and Provisional Transcript issued through PUST includes a unique serial and SHA-256 verification digest reflected immediately in this registry.',
+  portalCardTitle: 'Need to Apply or Download Your Copy?',
+  portalCardBody:
+    'Sign in to the Digital Campus Portal to settle fees, view admit cards, print hall clearances, or download certificates.',
+};
+
+export const DEFAULT_FOOTER_CONFIG: FooterConfig = {
+  tagline: 'Est. 2008 · Rajapur, Pabna',
+  description:
+    'A public university in Bangladesh advancing engineering, pure and applied sciences, business, and humanities across {facultiesCount} faculties and {departmentsCount} academic departments.',
+  socialLinks: [
+    { label: 'Official Site', url: 'https://pust.ac.bd/' },
+    { label: 'Facebook', url: 'https://www.facebook.com/pust.ac.bd' },
+    { label: 'YouTube', url: 'https://www.youtube.com' },
+    { label: 'LinkedIn', url: 'https://www.linkedin.com' },
+  ],
+  quickLinks: [
+    { label: 'Our University', route: '/about/our-university' },
+    { label: 'History and Plans', route: '/about/history' },
+    { label: 'Notice Board', route: '/notices' },
+    { label: 'Recent Publications', route: '/academics/publications' },
+    { label: 'News & Events', route: '/gallery' },
+    { label: 'Verify Documents', route: '/verify' },
+  ],
+  governanceLinks: [
+    { label: 'PUST Act (2001)', route: '/governance/pust-act' },
+    { label: 'Regent Board', route: '/governance/regent-board' },
+    { label: 'Academic Council', route: '/governance/academic-council' },
+    { label: 'Academic Ordinance', route: '/governance/academic-ordinance' },
+    { label: 'VC Office', route: '/administration/vc-office' },
+    { label: 'Registrar Office', route: '/administration/registrar-office' },
+  ],
+  serviceLinks: [
+    { label: '21 Departments', route: '/academics/departments' },
+    { label: 'Academic Calendar', route: '/academics/calendar' },
+    { label: 'Digital Forms', route: '/academics/forms-download' },
+    { label: 'Central Library', route: '/facilities/library' },
+    { label: 'Residence & Halls', route: '/facilities/residence' },
+    { label: 'Campus Portal', route: '/portal' },
+  ],
+  addressLines: [
+    'Rajapur, Gayeshpur, Pabna-6600, Bangladesh',
+    'Dhaka–Pabna Highway, 3 km east of Pabna town',
+  ],
+  contacts: [
+    { label: 'VC', phone: '+8802588842379', email: 'vc@pust.ac.bd' },
+    { label: 'Registrar', phone: '+8802588845193', email: 'registrar@pust.ac.bd' },
+    { label: 'Controller', phone: '+8802588844965', email: 'controller@pust.ac.bd' },
+  ],
+  copyrightText: '© 2026 Pabna University of Science and Technology (PUST). All rights reserved.',
+};
+
+export interface ResolvedUniversityContent {
+  navbarTagline: string;
+  institutionalLinksEyebrow: string;
+  institutionalLinksHeading: string;
+  institutionalLinks: InstitutionalLinkItem[];
+  upcomingSeminars: SeminarItem[];
+  campusMapMeta: CampusMapMeta;
+  campusBuildings: CampusBuildingItem[];
+  governanceContent: GovernanceContent;
+  adminShowcase: AdminShowcaseConfig;
+  aboutExtras: AboutExtrasConfig;
+  academicExtras: AcademicExtrasConfig;
+  admissionsConfig: AdmissionsConfig;
+  facilitiesConfig: FacilityItemConfig[];
+  verifyPageConfig: VerifyPageConfig;
+  footerConfig: FooterConfig;
+}
+
+export function resolveUniversityContent(
+  profile: Partial<UniversityProfile> | null | undefined
+): ResolvedUniversityContent {
+  const gov = profile?.governanceContent;
+  const admin = profile?.adminShowcase;
+  const about = profile?.aboutExtras;
+  const acad = profile?.academicExtras;
+  const adm = profile?.admissionsConfig;
+  const ver = profile?.verifyPageConfig;
+  const foot = profile?.footerConfig;
+  const mapMeta = profile?.campusMapMeta;
+
+  return {
+    navbarTagline: profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE,
+    institutionalLinksEyebrow:
+      profile?.institutionalLinksEyebrow?.trim() || DEFAULT_INSTITUTIONAL_LINKS_EYEBROW,
+    institutionalLinksHeading:
+      profile?.institutionalLinksHeading?.trim() || DEFAULT_INSTITUTIONAL_LINKS_HEADING,
+    institutionalLinks:
+      profile?.institutionalLinks && profile.institutionalLinks.length > 0
+        ? profile.institutionalLinks
+        : DEFAULT_INSTITUTIONAL_LINKS,
+    upcomingSeminars:
+      profile?.upcomingSeminars && profile.upcomingSeminars.length > 0
+        ? profile.upcomingSeminars
+        : DEFAULT_UPCOMING_SEMINARS,
+    campusMapMeta: {
+      eyebrow: mapMeta?.eyebrow?.trim() || DEFAULT_CAMPUS_MAP_META.eyebrow,
+      title: mapMeta?.title?.trim() || DEFAULT_CAMPUS_MAP_META.title,
+      subtitle: mapMeta?.subtitle?.trim() || DEFAULT_CAMPUS_MAP_META.subtitle,
+      coordinates: mapMeta?.coordinates?.trim() || DEFAULT_CAMPUS_MAP_META.coordinates,
+    },
+    campusBuildings:
+      profile?.campusBuildings && profile.campusBuildings.length > 0
+        ? profile.campusBuildings
+        : DEFAULT_CAMPUS_BUILDINGS,
+    governanceContent: {
+      officialActUrl: gov?.officialActUrl?.trim() || DEFAULT_GOVERNANCE_CONTENT.officialActUrl,
+      actIntro: gov?.actIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.actIntro,
+      actClauses:
+        gov?.actClauses && gov.actClauses.length > 0
+          ? gov.actClauses
+          : DEFAULT_GOVERNANCE_CONTENT.actClauses,
+      actCitations:
+        gov?.actCitations && gov.actCitations.length > 0
+          ? gov.actCitations
+          : DEFAULT_GOVERNANCE_CONTENT.actCitations,
+      regentBoardMembers:
+        gov?.regentBoardMembers && gov.regentBoardMembers.length > 0
+          ? gov.regentBoardMembers
+          : DEFAULT_GOVERNANCE_CONTENT.regentBoardMembers,
+      regentFunctions:
+        gov?.regentFunctions && gov.regentFunctions.length > 0
+          ? gov.regentFunctions
+          : DEFAULT_GOVERNANCE_CONTENT.regentFunctions,
+      academicCouncilIntro:
+        gov?.academicCouncilIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.academicCouncilIntro,
+      academicCouncilCards:
+        gov?.academicCouncilCards && gov.academicCouncilCards.length > 0
+          ? gov.academicCouncilCards
+          : DEFAULT_GOVERNANCE_CONTENT.academicCouncilCards,
+      academicCouncilStructure:
+        gov?.academicCouncilStructure && gov.academicCouncilStructure.length > 0
+          ? gov.academicCouncilStructure
+          : DEFAULT_GOVERNANCE_CONTENT.academicCouncilStructure,
+      financeCommitteeIntro:
+        gov?.financeCommitteeIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.financeCommitteeIntro,
+      financeCommitteeScopes:
+        gov?.financeCommitteeScopes && gov.financeCommitteeScopes.length > 0
+          ? gov.financeCommitteeScopes
+          : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeScopes,
+      financeCommitteeLeadership:
+        gov?.financeCommitteeLeadership && gov.financeCommitteeLeadership.length > 0
+          ? gov.financeCommitteeLeadership
+          : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeLeadership,
+      ordinanceIntro: gov?.ordinanceIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.ordinanceIntro,
+      ordinanceRules:
+        gov?.ordinanceRules && gov.ordinanceRules.length > 0
+          ? gov.ordinanceRules
+          : DEFAULT_GOVERNANCE_CONTENT.ordinanceRules,
+      gradingScale:
+        gov?.gradingScale && gov.gradingScale.length > 0
+          ? gov.gradingScale
+          : DEFAULT_GOVERNANCE_CONTENT.gradingScale,
+    },
+    adminShowcase: {
+      buildingImage: admin?.buildingImage?.trim() || DEFAULT_ADMIN_SHOWCASE.buildingImage,
+      buildingCaption: admin?.buildingCaption?.trim() || DEFAULT_ADMIN_SHOWCASE.buildingCaption,
+      charterTag: admin?.charterTag?.trim() || DEFAULT_ADMIN_SHOWCASE.charterTag,
+      accountabilityCycle:
+        admin?.accountabilityCycle?.trim() || DEFAULT_ADMIN_SHOWCASE.accountabilityCycle,
+      apaFyLabel: admin?.apaFyLabel?.trim() || DEFAULT_ADMIN_SHOWCASE.apaFyLabel,
+      apaBenchmarks:
+        admin?.apaBenchmarks && admin.apaBenchmarks.length > 0
+          ? admin.apaBenchmarks
+          : DEFAULT_ADMIN_SHOWCASE.apaBenchmarks,
+    },
+    aboutExtras: {
+      campusImage: about?.campusImage?.trim() || DEFAULT_ABOUT_EXTRAS.campusImage,
+      campusCaption: about?.campusCaption?.trim() || DEFAULT_ABOUT_EXTRAS.campusCaption,
+      milestones:
+        about?.milestones && about.milestones.length > 0
+          ? about.milestones
+          : DEFAULT_ABOUT_EXTRAS.milestones,
+    },
+    academicExtras: {
+      degreePrograms:
+        acad?.degreePrograms && acad.degreePrograms.length > 0
+          ? acad.degreePrograms
+          : DEFAULT_ACADEMIC_EXTRAS.degreePrograms,
+      facultyDeans:
+        acad?.facultyDeans && acad.facultyDeans.length > 0
+          ? acad.facultyDeans
+          : DEFAULT_ACADEMIC_EXTRAS.facultyDeans,
+      academicCalendar:
+        acad?.academicCalendar && acad.academicCalendar.length > 0
+          ? acad.academicCalendar
+          : DEFAULT_ACADEMIC_EXTRAS.academicCalendar,
+      scholarships:
+        acad?.scholarships && acad.scholarships.length > 0
+          ? acad.scholarships
+          : DEFAULT_ACADEMIC_EXTRAS.scholarships,
+      downloadForms:
+        acad?.downloadForms && acad.downloadForms.length > 0
+          ? acad.downloadForms
+          : DEFAULT_ACADEMIC_EXTRAS.downloadForms,
+      researchIntro: acad?.researchIntro?.trim() || DEFAULT_ACADEMIC_EXTRAS.researchIntro,
+      researchInfraCards:
+        acad?.researchInfraCards && acad.researchInfraCards.length > 0
+          ? acad.researchInfraCards
+          : DEFAULT_ACADEMIC_EXTRAS.researchInfraCards,
+    },
+    admissionsConfig: {
+      kicker: adm?.kicker?.trim() || DEFAULT_ADMISSIONS_CONFIG.kicker,
+      gstUnits:
+        adm?.gstUnits && adm.gstUnits.length > 0
+          ? adm.gstUnits
+          : DEFAULT_ADMISSIONS_CONFIG.gstUnits,
+      undergradText: adm?.undergradText?.trim() || DEFAULT_ADMISSIONS_CONFIG.undergradText,
+      gradText: adm?.gradText?.trim() || DEFAULT_ADMISSIONS_CONFIG.gradText,
+      eveningText: adm?.eveningText?.trim() || DEFAULT_ADMISSIONS_CONFIG.eveningText,
+      totalIntakeLabel:
+        adm?.totalIntakeLabel?.trim() || DEFAULT_ADMISSIONS_CONFIG.totalIntakeLabel,
+      signupMethodLabel:
+        adm?.signupMethodLabel?.trim() || DEFAULT_ADMISSIONS_CONFIG.signupMethodLabel,
+      deskEmail: adm?.deskEmail?.trim() || DEFAULT_ADMISSIONS_CONFIG.deskEmail,
+    },
+    facilitiesConfig:
+      profile?.facilitiesConfig && profile.facilitiesConfig.length > 0
+        ? profile.facilitiesConfig
+        : DEFAULT_FACILITIES_CONFIG,
+    verifyPageConfig: {
+      kicker: ver?.kicker?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.kicker,
+      title: ver?.title?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.title,
+      subtitle: ver?.subtitle?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.subtitle,
+      sampleSerials:
+        ver?.sampleSerials && ver.sampleSerials.length > 0
+          ? ver.sampleSerials
+          : DEFAULT_VERIFY_PAGE_CONFIG.sampleSerials,
+      employerCardTitle:
+        ver?.employerCardTitle?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.employerCardTitle,
+      employerCardBody:
+        ver?.employerCardBody?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.employerCardBody,
+      portalCardTitle: ver?.portalCardTitle?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.portalCardTitle,
+      portalCardBody: ver?.portalCardBody?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.portalCardBody,
+    },
+    footerConfig: {
+      tagline: foot?.tagline?.trim() || DEFAULT_FOOTER_CONFIG.tagline,
+      description: foot?.description?.trim() || DEFAULT_FOOTER_CONFIG.description,
+      socialLinks:
+        foot?.socialLinks && foot.socialLinks.length > 0
+          ? foot.socialLinks
+          : DEFAULT_FOOTER_CONFIG.socialLinks,
+      quickLinks:
+        foot?.quickLinks && foot.quickLinks.length > 0
+          ? foot.quickLinks
+          : DEFAULT_FOOTER_CONFIG.quickLinks,
+      governanceLinks:
+        foot?.governanceLinks && foot.governanceLinks.length > 0
+          ? foot.governanceLinks
+          : DEFAULT_FOOTER_CONFIG.governanceLinks,
+      serviceLinks:
+        foot?.serviceLinks && foot.serviceLinks.length > 0
+          ? foot.serviceLinks
+          : DEFAULT_FOOTER_CONFIG.serviceLinks,
+      addressLines:
+        foot?.addressLines && foot.addressLines.length > 0
+          ? foot.addressLines
+          : DEFAULT_FOOTER_CONFIG.addressLines,
+      contacts:
+        foot?.contacts && foot.contacts.length > 0
+          ? foot.contacts
+          : DEFAULT_FOOTER_CONFIG.contacts,
+      copyrightText: foot?.copyrightText?.trim() || DEFAULT_FOOTER_CONFIG.copyrightText,
+    },
+  };
+}
+
+export function formatFooterDescription(
+  template: string,
+  facultiesCount = 5,
+  departmentsCount = 21
+): string {
+  return template
+    .replace(/\{facultiesCount\}/g, String(facultiesCount))
+    .replace(/\{departmentsCount\}/g, String(departmentsCount));
+}
+
+export function clampMapPercent(value: number): number {
+  if (!Number.isFinite(value)) return 50;
+  return Math.min(95, Math.max(5, Math.round(value)));
+}
+
+export function moveArrayItem<T>(items: T[], index: number, direction: -1 | 1): T[] {
+  const nextIndex = index + direction;
+  if (index < 0 || index >= items.length || nextIndex < 0 || nextIndex >= items.length) {
+    return items;
+  }
+  const copy = [...items];
+  const [item] = copy.splice(index, 1);
+  copy.splice(nextIndex, 0, item);
+  return copy;
+}
+
+export function resolveContextualEditTarget(
+  route: string
+): { label: string; targetKind: string } | null {
+  if (route === '/verify') return { label: 'Edit Verify Page', targetKind: 'verify-page' };
+  if (route.startsWith('/governance'))
+    return { label: 'Edit Governance Section', targetKind: 'governance' };
+  if (route.startsWith('/admissions'))
+    return { label: 'Edit Admissions Info', targetKind: 'admissions-info' };
+  if (route.startsWith('/facilities'))
+    return { label: 'Edit Facility Page', targetKind: 'facility' };
+  if (route.startsWith('/about')) return { label: 'Edit About & Milestones', targetKind: 'about' };
+  if (route === '/academics/programs')
+    return { label: 'Edit Programs', targetKind: 'degree-programs' };
+  if (route === '/academics/faculty' || route === '/academics/deans')
+    return { label: 'Edit Faculty Deans', targetKind: 'faculty-deans' };
+  if (route === '/academics/calendar')
+    return { label: 'Edit Academic Calendar', targetKind: 'academic-calendar' };
+  if (route === '/academics/scholarship')
+    return { label: 'Edit Scholarships', targetKind: 'scholarships' };
+  if (route === '/academics/forms-download')
+    return { label: 'Edit Download Forms', targetKind: 'download-forms' };
+  if (route === '/academics/seminars')
+    return { label: 'Edit Seminars', targetKind: 'seminars' };
+  if (route === '/academics/publications' || route === '/academics/journals')
+    return { label: 'Edit Research Infra', targetKind: 'research-infra' };
+  if (route.startsWith('/administration'))
+    return { label: 'Edit Admin & APA', targetKind: 'apa-benchmarks' };
+  return null;
+}

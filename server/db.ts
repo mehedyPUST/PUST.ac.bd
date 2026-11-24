@@ -332,8 +332,21 @@ class PustRepository {
 
   // Departments & Publications
   listDepartments = () => this.getAll('departments', this.departments);
+  createDepartment = async (input: Omit<DepartmentRecord, 'id'>): Promise<DepartmentRecord> => {
+    const existing = await this.listDepartments();
+    const normalizedCode = input.code.trim().toUpperCase();
+    if (existing.some((d) => d.code.toUpperCase() === normalizedCode)) {
+      throw new Error('DUPLICATE_DEPT_CODE');
+    }
+    return this.insertItem('departments', this.departments, {
+      id: `dept-${normalizedCode.toLowerCase().replace(/[^a-z0-9]/g, '')}-${crypto.randomUUID().slice(0, 6)}`,
+      ...input,
+      code: normalizedCode,
+    });
+  };
   updateDepartment = (id: string, patch: Partial<DepartmentRecord>) =>
     this.updateItem('departments', this.departments, id, patch);
+  deleteDepartment = (id: string) => this.removeItem('departments', this.departments, id);
 
   listPublications = () => this.getAll('publications', this.publications);
   createPublication = (input: Omit<PublicationRecord, 'id'>) =>
@@ -429,6 +442,54 @@ class PustRepository {
       }
       await this.updateItem('vc_profiles', this.vcProfiles, current.id, patch);
     }
+    return this.listViceChancellors();
+  }
+
+  async createFormerViceChancellor(input: {
+    name: string;
+    tenure: string;
+    email: string;
+    phone: string;
+    message: string;
+    photoUrl?: string;
+  }): Promise<ViceChancellorRecord[]> {
+    const list = await this.listViceChancellors();
+    const minOrder = list.reduce((min, v) => Math.min(min, v.orderIndex), 1);
+    await this.insertItem('vc_profiles', this.vcProfiles, {
+      id: `vc-${crypto.randomUUID()}`,
+      name: input.name,
+      title: 'Former Vice-Chancellor',
+      tenure: input.tenure,
+      email: input.email,
+      phone: input.phone,
+      message: input.message,
+      ...(input.photoUrl ? { photoUrl: input.photoUrl } : {}),
+      isCurrent: false,
+      orderIndex: minOrder - 1,
+    });
+    return this.listViceChancellors();
+  }
+
+  async updateViceChancellorById(
+    id: string,
+    patch: Partial<Omit<ViceChancellorRecord, 'id' | 'isCurrent'>>
+  ): Promise<ViceChancellorRecord[] | null> {
+    const list = await this.listViceChancellors();
+    const target = list.find((v) => v.id === id);
+    if (!target) return null;
+    await this.updateItem('vc_profiles', this.vcProfiles, id, {
+      ...patch,
+      ...(patch.photoUrl !== undefined ? { photoUrl: patch.photoUrl || undefined } : {}),
+    });
+    return this.listViceChancellors();
+  }
+
+  async deleteViceChancellorById(id: string): Promise<ViceChancellorRecord[] | 'IS_CURRENT' | null> {
+    const list = await this.listViceChancellors();
+    const target = list.find((v) => v.id === id);
+    if (!target) return null;
+    if (target.isCurrent) return 'IS_CURRENT';
+    await this.removeItem('vc_profiles', this.vcProfiles, id);
     return this.listViceChancellors();
   }
 

@@ -620,8 +620,41 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
+  createFormerViceChancellor: (payload: {
+    name: string;
+    tenure: string;
+    email: string;
+    phone: string;
+    message: string;
+    photoUrl?: string;
+  }) =>
+    apiFetch<{ profiles: ViceChancellorRecord[] }>('/api/portal/cms/vice-chancellor', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateViceChancellorById: (
+    id: string,
+    payload: Partial<Omit<ViceChancellorRecord, 'id' | 'isCurrent'>>
+  ) =>
+    apiFetch<{ profiles: ViceChancellorRecord[] }>(
+      `/api/portal/cms/vice-chancellor/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  deleteViceChancellorById: (id: string) =>
+    apiFetch<{ profiles: ViceChancellorRecord[] }>(
+      `/api/portal/cms/vice-chancellor/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+      }
+    ),
+
   uploadMediaToImageKit: (payload: {
-    purpose: 'banner' | 'notice' | 'gallery';
+    purpose: 'banner' | 'notice' | 'gallery' | 'cms';
     fileName: string;
     mimeType: string;
     dataBase64: string;
@@ -714,10 +747,21 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
+  createDepartment: (payload: Omit<DepartmentRecord, 'id'>) =>
+    apiFetch<{ department: DepartmentRecord }>('/api/portal/cms/departments', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
   updateDepartment: (id: string, payload: Partial<Omit<DepartmentRecord, 'id' | 'code'>>) =>
     apiFetch<{ department: DepartmentRecord }>(`/api/portal/cms/departments/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
+    }),
+
+  deleteDepartment: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/cms/departments/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
     }),
 
   createPublication: (payload: Omit<PublicationRecord, 'id'>) =>

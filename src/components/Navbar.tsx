@@ -3,13 +3,24 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Eye, Menu, Pencil, Plus, X } from 'lucide-react';
+import {
+  DEFAULT_NAVBAR_TAGLINE,
+  resolveContextualEditTarget,
+} from '../lib/cmsDefaults';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
-import type { AuthUser, EditModalTarget } from '../types/pust';
+import type {
+  AboutContentRecord,
+  AuthUser,
+  EditModalTarget,
+  GovernanceTabKind,
+  UniversityProfile,
+} from '../types/pust';
 import { PustCrest } from './PustCrest';
 
 interface NavbarProps {
   route: AppRoute;
   user: AuthUser | null;
+  profile?: UniversityProfile | null;
   editMode?: boolean;
   onToggleEditMode?: () => void;
   onOpenEditModal?: (target: EditModalTarget) => void;
@@ -22,12 +33,14 @@ const HOME_SUBTOPICS = [
   { label: 'Notice Board', href: '/#notice-board' },
   { label: 'Recent Publications', href: '/#recent-publications' },
   { label: 'News and Events', href: '/#news-events' },
+  { label: 'Campus Map', href: '/#campus-map' },
   { label: 'Footer', href: '/#footer' },
 ];
 
 export function Navbar({
   route,
   user,
+  profile,
   editMode = false,
   onToggleEditMode,
   onOpenEditModal,
@@ -116,13 +129,28 @@ export function Navbar({
                 }}
                 className="font-serif text-base sm:text-xl lg:text-[26px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
               >
-                Pabna University of Science and Technology
+                <span className="sm:hidden">PUST</span>
+                <span className="hidden sm:inline">Pabna University of Science and Technology</span>
               </Link>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="hidden xl:inline font-mono text-[11px] uppercase tracking-widest text-pust-200">
-                  Est. 2008 · Rajapur, Pabna
-                </span>
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="hidden xl:inline-flex items-center gap-1.5">
+                  <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
+                    {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
+                  </span>
+                  {user?.role === 'admin' && editMode && onOpenEditModal && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'hero-profile' })}
+                      aria-label="Edit navbar tagline and hero profile"
+                      title="Edit Tagline & Profile"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-semibold hover:bg-amber-300 cursor-pointer"
+                    >
+                      <Pencil className="w-2.5 h-2.5" />
+                      Edit
+                    </button>
+                  )}
+                </div>
 
                 {/* Mobile Admin Edit Mode Toggle */}
                 {user?.role === 'admin' && onToggleEditMode && (
@@ -149,13 +177,18 @@ export function Navbar({
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
                   }}
-                  className="lg:hidden px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
-                  {route === '/portal'
-                    ? 'Public Site'
-                    : user
-                    ? `${user.name.split(' ')[0]} · Portal`
-                    : 'Portal'}
+                  {route === '/portal' ? (
+                    'Public Site'
+                  ) : user ? (
+                    <>
+                      <span className="sm:hidden">Portal</span>
+                      <span className="hidden sm:inline">{`${user.name.split(' ')[0]} · Portal`}</span>
+                    </>
+                  ) : (
+                    'Portal'
+                  )}
                 </Link>
                 <button
                   type="button"
@@ -559,51 +592,139 @@ export function Navbar({
       </div>
 
       {/* Slim Active Admin Edit Mode Banner */}
-      {user?.role === 'admin' && editMode && (
-        <div className="border-t border-amber-300 bg-amber-50 text-amber-950">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
-              <span className="font-semibold">Admin Edit Mode Active</span>
-              <span className="hidden sm:inline text-amber-900">
-                — Click any inline Edit button across sections, cards, notices, departments, or
-                banners to modify it directly.
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {onOpenEditModal && (
-                <>
+      {user?.role === 'admin' && editMode && (() => {
+        const contextual = resolveContextualEditTarget(route);
+        function openContextual() {
+          if (!contextual || !onOpenEditModal) return;
+          const k = contextual.targetKind;
+          if (k === 'governance') {
+            const tab: GovernanceTabKind =
+              route === '/governance/regent-board'
+                ? 'regent-board'
+                : route === '/governance/academic-council'
+                ? 'academic-council'
+                : route === '/governance/finance-committee'
+                ? 'finance-committee'
+                : route === '/governance/academic-ordinance'
+                ? 'academic-ordinance'
+                : 'pust-act';
+            onOpenEditModal({ kind: 'governance', tab });
+          } else if (k === 'about') {
+            const slug: AboutContentRecord['slug'] =
+              route === '/about/history'
+                ? 'history'
+                : route === '/about/mission-vision'
+                ? 'mission-vision'
+                : route === '/about/plans'
+                ? 'plans'
+                : 'our-university';
+            onOpenEditModal({ kind: 'about', slug });
+          } else if (k === 'facility') {
+            onOpenEditModal({ kind: 'facility', route });
+          } else if (
+            k === 'verify-page' ||
+            k === 'admissions-info' ||
+            k === 'degree-programs' ||
+            k === 'faculty-deans' ||
+            k === 'academic-calendar' ||
+            k === 'scholarships' ||
+            k === 'download-forms' ||
+            k === 'seminars' ||
+            k === 'research-infra' ||
+            k === 'apa-benchmarks'
+          ) {
+            onOpenEditModal({ kind: k });
+          }
+        }
+
+        return (
+          <div className="border-t border-amber-300 bg-amber-50 text-amber-950">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+                <span className="font-semibold">Admin Edit Mode Active</span>
+                <span className="hidden 2xl:inline text-amber-900">
+                  — Click any inline Edit trigger across sections, cards, maps, governance, or
+                  footer to modify directly.
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {onOpenEditModal && (
+                  <>
+                    {contextual && (
+                      <button
+                        type="button"
+                        onClick={openContextual}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-400 border border-amber-500 text-slate-950 font-semibold hover:bg-amber-300 cursor-pointer"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        {contextual.label}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'hero-profile' })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Hero &amp; Tagline
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'banner' })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Banners
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'notice', notice: null })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      New Notice
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'campus-building' })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Campus Map
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'seminars' })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Seminars
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'footer-config' })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Footer
+                    </button>
+                  </>
+                )}
+                {onToggleEditMode && (
                   <button
                     type="button"
-                    onClick={() => onOpenEditModal({ kind: 'notice', notice: null })}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
+                    onClick={onToggleEditMode}
+                    className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold hover:bg-slate-800 cursor-pointer"
                   >
-                    <Plus className="w-3 h-3" />
-                    New Notice
+                    Done Editing
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => onOpenEditModal({ kind: 'banner' })}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 cursor-pointer"
-                  >
-                    <Pencil className="w-3 h-3" />
-                    Banners
-                  </button>
-                </>
-              )}
-              {onToggleEditMode && (
-                <button
-                  type="button"
-                  onClick={onToggleEditMode}
-                  className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold hover:bg-slate-800 cursor-pointer"
-                >
-                  Done Editing
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Responsive Mobile Navigation */}
       {mobileMenuOpen && (

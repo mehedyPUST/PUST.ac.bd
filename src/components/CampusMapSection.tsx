@@ -3,170 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Compass, MapPin } from 'lucide-react';
-import type { AppRoute } from '../lib/routes';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
+import type { CampusZoneType } from '../types/pust';
+import { EditTriggerButton } from './EditTriggerButton';
+import { usePust } from './PustContext';
 import { ResilientImage } from './ResilientImage';
 
-type CampusZone =
-  | 'All'
-  | 'Administration'
-  | 'Academic'
-  | 'Library & Culture'
-  | 'Residential & Wellness';
-
-interface CampusBuilding {
-  id: string;
-  code: string;
-  name: string;
-  shortName: string;
-  zone: Exclude<CampusZone, 'All'>;
-  gridRef: string;
-  xPercent: number;
-  yPercent: number;
-  photo: string;
-  caption: string;
-  summary: string;
-  offices: string;
-  hours: string;
-  facilities: string;
-  route: AppRoute;
-  routeLabel: string;
-}
-
-const BUILDINGS: CampusBuilding[] = [
-  {
-    id: 'admin-bhaban',
-    code: 'A-01',
-    name: 'Administrative Building',
-    shortName: 'Admin Building',
-    zone: 'Administration',
-    gridRef: 'South-Central Axis · Grid C4',
-    xPercent: 48,
-    yPercent: 67,
-    photo: '/src/assets/images/pust_admin_building_1795441924646.jpg',
-    caption: 'Fig. M1 — Administrative Building housing VC, Registrar & Examination Offices.',
-    summary:
-      'Central governance hub of the Rajapur campus situated directly north of the Main Gate promenade. Houses executive offices, statutory committee rooms, and student certificate verification counters.',
-    offices: 'VC Office, Pro-VC, Treasurer (+8802588844963), Registrar, Controller (+8802588844965), ICT Cell',
-    hours: 'Sun – Thu · 09:00 – 17:00',
-    facilities: 'Regent Board Hall, Transcript Counter, Automated Fee Desk',
-    route: '/administration/vc-office',
-    routeLabel: 'Explore Administration',
-  },
-  {
-    id: 'academic-1',
-    code: 'AC-01',
-    name: 'Academic Building I (Core Bhaban)',
-    shortName: 'Academic Bldg I',
-    zone: 'Academic',
-    gridRef: 'Central Quad West · Grid B3',
-    xPercent: 25,
-    yPercent: 47,
-    photo: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
-    caption: 'Fig. M2 — Main Academic Promenade and Academic Building I.',
-    summary:
-      'Founding multi-story academic complex supporting Faculty of Science (including Pharmacy), Faculty of Business Studies, Humanities & Social Science, and Geography & Environment.',
-    offices: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics, BBA, THM, Economics, Bangla, English, SW, PA, History, GE',
-    hours: 'Sun – Thu · 08:30 – 17:30',
-    facilities: 'Multimedia Lecture Halls, Seminar Libraries, Faculty Lounge',
-    route: '/academics/departments',
-    routeLabel: 'View All 21 Departments',
-  },
-  {
-    id: 'wazed-bhaban',
-    code: 'AC-02',
-    name: 'Dr. M. A. Wazed Miah Engineering Bhaban',
-    shortName: 'Wazed Engineering Bhaban',
-    zone: 'Academic',
-    gridRef: 'West Research Wing · Grid A2',
-    xPercent: 22,
-    yPercent: 23,
-    photo: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
-    caption: 'Fig. M3 — Engineering & Applied Science Research Laboratories.',
-    summary:
-      'Dedicated engineering and technology complex equipped with high-performance computing clusters, VLSI & THz microwave testbeds, architecture design studios, and structural materials labs.',
-    offices: 'CSE, EEE, EECE, ICE, CE, Architecture, URP, IQAC & RTTC Research Labs',
-    hours: 'Sun – Thu · 08:30 – 18:00 (Labs by schedule)',
-    facilities: '30+ Research Labs, High-Speed Campus Fiber Node, Robotics Studio',
-    route: '/academics/faculty',
-    routeLabel: 'Explore 5 Faculties',
-  },
-  {
-    id: 'central-library',
-    code: 'LB-01',
-    name: 'Central Library & Information Center (CLIC)',
-    shortName: 'Central Library',
-    zone: 'Library & Culture',
-    gridRef: 'Central Quad North · Grid C2',
-    xPercent: 51,
-    yPercent: 41,
-    photo: '/src/assets/images/pust_central_library_1795431408614.jpg',
-    caption: 'Fig. M4 — Central Library Reading Floor and Digital Archive.',
-    summary:
-      'Academic and research hub (clic@pust.ac.bd) managed by Additional Librarian Md. Hafizur Rahaman Mollah with faculty-wise monograph collections, thesis archives, and institutional IEEE/SpringerLink access.',
-    offices: 'Librarian Office (clic@pust.ac.bd), Circulation & Digital Card Desk, Archive',
-    hours: 'Sun – Thu · 08:30 – 21:00',
-    facilities: 'Faculty Book Collections, E-Journal IP Bays, Digital Library Card Portal',
-    route: '/facilities/library',
-    routeLabel: 'Library Services',
-  },
-  {
-    id: 'convocation-plaza',
-    code: 'CU-01',
-    name: 'Central Auditorium & Independence Plaza',
-    shortName: 'Auditorium & Plaza',
-    zone: 'Library & Culture',
-    gridRef: 'East Cultural Axis · Grid D3',
-    xPercent: 76,
-    yPercent: 45,
-    photo: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
-    caption: 'Fig. M5 — Convocation Grounds and Central Ceremonial Pavilion.',
-    summary:
-      'Ceremonial cultural precinct anchoring Shaheed Minar, Mukta Mancha, and the main auditorium grounds—designated venue for national academic symposia and the First Convocation (15 March 2027).',
-    offices: 'Auditorium Management, Cultural Affairs & Convocation Secretariat',
-    hours: 'Daily · 08:00 – 20:00 (Event schedules)',
-    facilities: 'Main Assembly Grounds, Exhibition Lawn, Media Briefing Stage',
-    route: '/gallery',
-    routeLabel: 'Campus Events Gallery',
-  },
-  {
-    id: 'residential-halls',
-    code: 'RH-01',
-    name: 'Residential Halls Precinct (July 06, Swadhinota, Matribhasha & Ganatantra)',
-    shortName: 'Residential Halls',
-    zone: 'Residential & Wellness',
-    gridRef: 'North Campus Sector · Grid D1',
-    xPercent: 62,
-    yPercent: 18,
-    photo: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
-    caption: 'Fig. M6 — Residential Halls Precinct and Landscaped Quadrangle.',
-    summary:
-      'Gated northern residential zone encompassing July 06 Hall (Male Hall-1), Swadhinota Hall (Male Hall-2), Matribhasha Hall (Female Hall-1), and Ganatantra Hall (Female Hall-2) with dining commons and reading rooms.',
-    offices: 'Provosts: Md. Al-Fahad Bhuiyan, Dr. Md. Kamruzzaman, Dr. Rebeka Sultana Rekha, Laila Arzumand Banu',
-    hours: '24/7 Residential Access · Office 09:00 – 17:00',
-    facilities: 'Student Dormitories, Hall Dining, Reading Rooms, Online Dues Clearance',
-    route: '/facilities/residence',
-    routeLabel: 'Halls & Residence Details',
-  },
-  {
-    id: 'medical-tsc',
-    code: 'SW-01',
-    name: 'TSC, Cafeteria & Medical Center',
-    shortName: 'TSC & Medical Center',
-    zone: 'Residential & Wellness',
-    gridRef: 'East Lawn Sector · Grid D4',
-    xPercent: 77,
-    yPercent: 69,
-    photo: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
-    caption: 'Fig. M7 — Teacher-Student Center (TSC) & Campus Medical Pavilion.',
-    summary:
-      'Integrated student life and wellness pavilion connecting the Student Advisor Office (Dr. Md. Rashedul Haque), Central Cafeteria, student club rooms, and the Medical Center (+8802588844975, medicalsection@pust.ac.bd).',
-    offices: 'Medical Center (Dr. Md. Rafiqul Islam & Dr. Nasrin Sultana), Student Advisor (director.sao@pust.ac.bd)',
-    hours: 'Medical: Sun–Thu (24/7 Ambulance) · TSC: 08:00 – 21:00',
-    facilities: 'Outpatient Clinic, Student Lounge, Campus Dining & Transport Pool (+8802588845650)',
-    route: '/facilities/medical',
-    routeLabel: 'Medical & Student Care',
-  },
-];
+type CampusZone = 'All' | CampusZoneType;
 
 const ZONES: CampusZone[] = [
   'All',
@@ -177,18 +20,27 @@ const ZONES: CampusZone[] = [
 ];
 
 export function CampusMapSection() {
+  const { profile } = usePust();
+  const { campusMapMeta, campusBuildings } = resolveUniversityContent(profile);
   const [selectedZone, setSelectedZone] = useState<CampusZone>('All');
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string>(BUILDINGS[0].id);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>(
+    campusBuildings[0]?.id || 'admin-bhaban'
+  );
 
   const filteredBuildings =
-    selectedZone === 'All' ? BUILDINGS : BUILDINGS.filter((b) => b.zone === selectedZone);
+    selectedZone === 'All'
+      ? campusBuildings
+      : campusBuildings.filter((b) => b.zone === selectedZone);
 
   const activeBuilding =
-    BUILDINGS.find((b) => b.id === selectedBuildingId) || filteredBuildings[0] || BUILDINGS[0];
+    campusBuildings.find((b) => b.id === selectedBuildingId) ||
+    filteredBuildings[0] ||
+    campusBuildings[0];
 
   function handleZoneChange(zone: CampusZone) {
     setSelectedZone(zone);
-    const matching = zone === 'All' ? BUILDINGS : BUILDINGS.filter((b) => b.zone === zone);
+    const matching =
+      zone === 'All' ? campusBuildings : campusBuildings.filter((b) => b.zone === zone);
     if (matching.length > 0 && !matching.some((b) => b.id === selectedBuildingId)) {
       setSelectedBuildingId(matching[0].id);
     }
@@ -198,51 +50,55 @@ export function CampusMapSection() {
     <section
       id="campus-map"
       aria-labelledby="campus-map-heading"
-      className="bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16"
+      className="editable-region bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Rajapur 30-Acre Masterplan · Interactive Campus Directory
+              {campusMapMeta.eyebrow}
             </p>
             <h2
               id="campus-map-heading"
               className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1"
             >
-              Interactive Campus Map &amp; Building Guide
+              {campusMapMeta.title}
             </h2>
-            <p className="text-sm text-slate-600 mt-1.5 max-w-2xl">
-              Click any building name directly on the campus plan or directory bar below to inspect
-              offices, visiting hours, and photography.
-            </p>
+            <p className="text-sm text-slate-600 mt-1.5 max-w-2xl">{campusMapMeta.subtitle}</p>
           </div>
 
-          <div
-            role="group"
-            aria-label="Filter campus buildings by precinct"
-            className="flex flex-wrap gap-1.5"
-          >
-            {ZONES.map((zone) => {
-              const active = selectedZone === zone;
-              return (
-                <button
-                  key={zone}
-                  type="button"
-                  onClick={() => handleZoneChange(zone)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    active
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-900'
-                  }`}
-                >
-                  {zone === 'All' ? 'All Precincts' : zone}
-                </button>
-              );
-            })}
+          <div className="flex flex-wrap items-center gap-2">
+            <EditTriggerButton
+              target={{ kind: 'campus-building', buildingId: activeBuilding?.id }}
+              label="Edit Map & Buildings"
+              variant="compact"
+            />
+            <div
+              role="group"
+              aria-label="Filter campus buildings by precinct"
+              className="flex flex-wrap gap-1.5"
+            >
+              {ZONES.map((zone) => {
+                const active = selectedZone === zone;
+                return (
+                  <button
+                    key={zone}
+                    type="button"
+                    onClick={() => handleZoneChange(zone)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      active
+                        ? 'bg-pust-900 text-white'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-900'
+                    }`}
+                  >
+                    {zone === 'All' ? 'All Precincts' : zone}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          </div>
+        </div>
 
         {/* 12-Column Interactive Blueprint + Selected Building Detail Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
@@ -465,11 +321,11 @@ export function CampusMapSection() {
               {/* Top-Right Compass / Scale Overlay */}
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 absolute top-3 right-3 font-mono text-[10px] text-slate-600">
                 <Compass className="w-3.5 h-3.5 text-pust-800" />
-                <span>N ↑ · 24.0130° N, 89.2797° E</span>
+                <span>{campusMapMeta.coordinates}</span>
               </div>
 
               {/* Interactive Clickable Building Name Hotspots */}
-              {BUILDINGS.map((b) => {
+              {campusBuildings.map((b) => {
                 const isSelected = activeBuilding.id === b.id;
                 const isInZone =
                   selectedZone === 'All' || b.zone === selectedZone;
@@ -553,9 +409,16 @@ export function CampusMapSection() {
 
                 <div className="p-6 space-y-4">
                   <div>
-                    <p className="font-mono text-xs text-pust-800 tabular-nums">
-                      {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
-                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
+                      </p>
+                      <EditTriggerButton
+                        target={{ kind: 'campus-building', buildingId: activeBuilding.id }}
+                        label="Edit Building"
+                        variant="compact"
+                      />
+                    </div>
                     <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
                       {activeBuilding.name}
                     </h3>
@@ -597,7 +460,8 @@ export function CampusMapSection() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <span className="font-mono text-[11px] text-slate-500 tabular-nums">
-                  {BUILDINGS.findIndex((b) => b.id === activeBuilding.id) + 1} / {BUILDINGS.length}
+                  {campusBuildings.findIndex((b) => b.id === activeBuilding.id) + 1} /{' '}
+                  {campusBuildings.length}
                 </span>
               </div>
             </article>

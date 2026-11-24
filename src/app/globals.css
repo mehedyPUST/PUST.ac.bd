@@ -64,6 +64,17 @@
   }
 }
 
+[data-edit-mode="true"] .editable-region {
+  outline: 1.5px dashed rgba(217, 119, 6, 0.45);
+  outline-offset: 4px;
+  border-radius: 0.75rem;
+  transition: outline-color 150ms ease, background-color 150ms ease;
+}
+
+[data-edit-mode="true"] .editable-region:hover {
+  outline-color: rgba(180, 83, 9, 0.85);
+}
+
 @media print {
   body {
     background: #ffffff !important;

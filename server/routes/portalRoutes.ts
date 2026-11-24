@@ -216,6 +216,57 @@ const galleryUpdateSchema = z.object({
   visibility: z.enum(['public', 'registered']).optional(),
 });
 
+const safeMediaField = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2000)
+  .refine(isSafeMediaUrl, 'Media or link URL must be a valid https://, http://, or relative / path.');
+
+const safeLinkField = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2000)
+  .refine(isSafeMediaUrl, 'URL must be a valid https://, http://, or relative / path.');
+
+const formerVcCreateSchema = z.object({
+  name: z.string().trim().min(3).max(100),
+  tenure: z.string().trim().min(3).max(60),
+  email: z.string().trim().email().max(120).or(z.literal('—')),
+  phone: z.string().trim().min(1).max(40),
+  message: z.string().trim().min(5).max(8000),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be a valid https://, http://, or local asset path.')
+    .optional(),
+});
+
+const vcByIdUpdateSchema = z.object({
+  name: z.string().trim().min(3).max(100).optional(),
+  title: z.string().trim().min(2).max(100).optional(),
+  tenure: z.string().trim().min(3).max(60).optional(),
+  email: z.string().trim().max(120).optional(),
+  phone: z.string().trim().min(1).max(40).optional(),
+  message: z.string().trim().min(5).max(8000).optional(),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be a valid https://, http://, or local asset path.')
+    .optional(),
+});
+
+const FACULTIES_ENUM = z.enum([
+  'Faculty of Engineering and Technology',
+  'Faculty of Science',
+  'Faculty of Business Studies',
+  'Faculty of Humanities and Social Science',
+  'Faculty of Life and Earth Science',
+]);
+
 const profileUpdateSchema = z.object({
   establishedYear: z.number().int().min(1900).max(2100).optional(),
   campusAcres: z.number().min(1).max(10000).optional(),
@@ -224,6 +275,7 @@ const profileUpdateSchema = z.object({
   facultyMembersCount: z.number().int().min(1).max(10000).optional(),
   studentsCount: z.number().int().min(1).max(500000).optional(),
   convocationDate: z.string().trim().min(3).max(80).optional(),
+  navbarTagline: z.string().trim().min(2).max(120).optional(),
   heroEyebrow: z.string().trim().max(240).optional(),
   heroTitle: z.string().trim().min(5).max(240).optional(),
   heroSubtitle: z.string().trim().min(10).max(1000).optional(),
@@ -266,19 +318,298 @@ const profileUpdateSchema = z.object({
     )
     .max(30)
     .optional(),
+  institutionalLinksEyebrow: z.string().trim().min(2).max(120).optional(),
+  institutionalLinksHeading: z.string().trim().min(2).max(120).optional(),
+  institutionalLinks: z
+    .array(
+      z.object({
+        id: z.string().trim().min(1).max(60),
+        route: safeLinkField,
+        title: z.string().trim().min(2).max(160),
+        desc: z.string().trim().min(4).max(400),
+      })
+    )
+    .max(20)
+    .optional(),
+  upcomingSeminars: z
+    .array(
+      z.object({
+        id: z.string().trim().min(1).max(60),
+        date: z.string().trim().min(3).max(40),
+        organizer: z.string().trim().min(2).max(160),
+        title: z.string().trim().min(3).max(240),
+      })
+    )
+    .max(30)
+    .optional(),
+  campusMapMeta: z
+    .object({
+      eyebrow: z.string().trim().min(2).max(160),
+      title: z.string().trim().min(2).max(160),
+      subtitle: z.string().trim().min(5).max(500),
+      coordinates: z.string().trim().min(2).max(100),
+    })
+    .optional(),
+  campusBuildings: z
+    .array(
+      z.object({
+        id: z.string().trim().min(1).max(60),
+        code: z.string().trim().min(1).max(20),
+        name: z.string().trim().min(2).max(160),
+        shortName: z.string().trim().min(2).max(80),
+        zone: z.enum(['Administration', 'Academic', 'Library & Culture', 'Residential & Wellness']),
+        gridRef: z.string().trim().min(2).max(100),
+        xPercent: z.number().min(0).max(100),
+        yPercent: z.number().min(0).max(100),
+        photo: safeMediaField,
+        caption: z.string().trim().min(2).max(240),
+        summary: z.string().trim().min(5).max(1000),
+        offices: z.string().trim().min(2).max(500),
+        hours: z.string().trim().min(2).max(120),
+        facilities: z.string().trim().min(2).max(500),
+        route: safeLinkField,
+        routeLabel: z.string().trim().min(2).max(80),
+      })
+    )
+    .max(25)
+    .optional(),
+  governanceContent: z
+    .object({
+      officialActUrl: safeLinkField,
+      actIntro: z.string().trim().min(10).max(3000),
+      actClauses: z
+        .array(z.object({ clause: z.string().trim().min(2).max(200), detail: z.string().trim().min(5).max(1000) }))
+        .max(20),
+      actCitations: z
+        .array(z.object({ label: z.string().trim().min(2).max(120), value: z.string().trim().min(1).max(160) }))
+        .max(15),
+      regentBoardMembers: z
+        .array(
+          z.object({
+            seat: z.string().trim().min(2).max(160),
+            designation: z.string().trim().min(2).max(300),
+            term: z.string().trim().min(1).max(60),
+          })
+        )
+        .max(30),
+      regentFunctions: z.array(z.string().trim().min(5).max(500)).max(20),
+      academicCouncilIntro: z.string().trim().min(10).max(3000),
+      academicCouncilCards: z
+        .array(z.object({ title: z.string().trim().min(2).max(160), detail: z.string().trim().min(5).max(800) }))
+        .max(20),
+      academicCouncilStructure: z
+        .array(z.object({ label: z.string().trim().min(2).max(120), value: z.string().trim().min(1).max(160) }))
+        .max(15),
+      financeCommitteeIntro: z.string().trim().min(10).max(3000),
+      financeCommitteeScopes: z
+        .array(z.object({ scope: z.string().trim().min(2).max(160), desc: z.string().trim().min(5).max(800) }))
+        .max(20),
+      financeCommitteeLeadership: z
+        .array(z.object({ label: z.string().trim().min(2).max(120), value: z.string().trim().min(1).max(160) }))
+        .max(15),
+      ordinanceIntro: z.string().trim().min(10).max(3000),
+      ordinanceRules: z
+        .array(z.object({ label: z.string().trim().min(2).max(160), value: z.string().trim().min(1).max(240) }))
+        .max(20),
+      gradingScale: z
+        .array(
+          z.object({
+            range: z.string().trim().min(2).max(80),
+            letter: z.string().trim().min(1).max(10),
+            gp: z.string().trim().min(1).max(10),
+            remarks: z.string().trim().min(1).max(60),
+          })
+        )
+        .max(20),
+    })
+    .optional(),
+  adminShowcase: z
+    .object({
+      buildingImage: safeMediaField,
+      buildingCaption: z.string().trim().min(2).max(240),
+      charterTag: z.string().trim().min(2).max(100),
+      accountabilityCycle: z.string().trim().min(2).max(100),
+      apaFyLabel: z.string().trim().min(2).max(160),
+      apaBenchmarks: z
+        .array(
+          z.object({
+            code: z.string().trim().min(2).max(120),
+            title: z.string().trim().min(2).max(160),
+            detail: z.string().trim().min(5).max(800),
+          })
+        )
+        .max(15),
+    })
+    .optional(),
+  aboutExtras: z
+    .object({
+      campusImage: safeMediaField,
+      campusCaption: z.string().trim().min(2).max(240),
+      milestones: z
+        .array(
+          z.object({
+            year: z.string().trim().min(2).max(40),
+            title: z.string().trim().min(2).max(160),
+            detail: z.string().trim().min(5).max(500),
+          })
+        )
+        .max(25),
+    })
+    .optional(),
+  academicExtras: z
+    .object({
+      degreePrograms: z
+        .array(
+          z.object({
+            level: z.string().trim().min(2).max(160),
+            degrees: z.string().trim().min(2).max(300),
+            duration: z.string().trim().min(2).max(160),
+            credits: z.string().trim().min(2).max(160),
+            entry: z.string().trim().min(2).max(240),
+          })
+        )
+        .max(15),
+      facultyDeans: z
+        .array(
+          z.object({
+            faculty: FACULTIES_ENUM,
+            dean: z.string().trim().min(2).max(140),
+            email: z.string().trim().email().max(120),
+            code: z.string().trim().min(2).max(80),
+            depts: z.string().trim().min(2).max(400),
+          })
+        )
+        .max(15),
+      academicCalendar: z
+        .array(
+          z.object({
+            term: z.string().trim().min(2).max(140),
+            event: z.string().trim().min(2).max(240),
+            date: z.string().trim().min(2).max(60),
+          })
+        )
+        .max(30),
+      scholarships: z
+        .array(z.object({ title: z.string().trim().min(2).max(180), detail: z.string().trim().min(5).max(600) }))
+        .max(20),
+      downloadForms: z
+        .array(
+          z.object({
+            code: z.string().trim().min(2).max(40),
+            title: z.string().trim().min(2).max(200),
+            office: z.string().trim().min(2).max(200),
+            note: z.string().trim().min(2).max(400),
+            portalTarget: safeLinkField,
+            portalLabel: z.string().trim().min(2).max(100),
+            fields: z.array(z.string().trim().min(2).max(200)).max(15),
+          })
+        )
+        .max(20),
+      researchIntro: z.string().trim().min(5).max(1000),
+      researchInfraCards: z
+        .array(
+          z.object({
+            id: z.string().trim().min(1).max(60),
+            tag: z.string().trim().min(2).max(140),
+            title: z.string().trim().min(2).max(160),
+            description: z.string().trim().min(5).max(800),
+            imageUrl: safeMediaField,
+            caption: z.string().trim().min(2).max(240),
+          })
+        )
+        .max(12),
+    })
+    .optional(),
+  admissionsConfig: z
+    .object({
+      kicker: z.string().trim().min(2).max(120),
+      gstUnits: z
+        .array(
+          z.object({
+            unitLabel: z.string().trim().min(2).max(120),
+            deptCountLabel: z.string().trim().min(2).max(80),
+            departmentsText: z.string().trim().min(4).max(600),
+          })
+        )
+        .max(10),
+      undergradText: z.string().trim().min(10).max(1000),
+      gradText: z.string().trim().min(10).max(1000),
+      eveningText: z.string().trim().min(10).max(1000),
+      totalIntakeLabel: z.string().trim().min(2).max(120),
+      signupMethodLabel: z.string().trim().min(2).max(120),
+      deskEmail: z.string().trim().email().max(120),
+    })
+    .optional(),
+  facilitiesConfig: z
+    .array(
+      z.object({
+        label: z.string().trim().min(2).max(80),
+        route: safeLinkField,
+        title: z.string().trim().min(2).max(200),
+        body: z.string().trim().min(10).max(2500),
+        img: safeMediaField,
+        hours: z.string().trim().min(2).max(120),
+        location: z.string().trim().min(2).max(200),
+        portalRoute: safeLinkField,
+        highlights: z.array(z.string().trim().min(2).max(240)).max(10),
+      })
+    )
+    .max(15)
+    .optional(),
+  verifyPageConfig: z
+    .object({
+      kicker: z.string().trim().min(2).max(120),
+      title: z.string().trim().min(2).max(180),
+      subtitle: z.string().trim().min(10).max(800),
+      sampleSerials: z
+        .array(z.object({ label: z.string().trim().min(2).max(100), code: z.string().trim().min(2).max(80) }))
+        .max(12),
+      employerCardTitle: z.string().trim().min(2).max(160),
+      employerCardBody: z.string().trim().min(5).max(600),
+      portalCardTitle: z.string().trim().min(2).max(160),
+      portalCardBody: z.string().trim().min(5).max(600),
+    })
+    .optional(),
+  footerConfig: z
+    .object({
+      tagline: z.string().trim().min(2).max(140),
+      description: z.string().trim().min(10).max(800),
+      socialLinks: z.array(z.object({ label: z.string().trim().min(1).max(60), url: safeLinkField })).max(10),
+      quickLinks: z.array(z.object({ label: z.string().trim().min(1).max(80), route: safeLinkField })).max(12),
+      governanceLinks: z.array(z.object({ label: z.string().trim().min(1).max(80), route: safeLinkField })).max(12),
+      serviceLinks: z.array(z.object({ label: z.string().trim().min(1).max(80), route: safeLinkField })).max(12),
+      addressLines: z.array(z.string().trim().min(2).max(200)).max(6),
+      contacts: z
+        .array(
+          z.object({
+            label: z.string().trim().min(1).max(60),
+            phone: z.string().trim().min(3).max(40),
+            email: z.string().trim().email().max(120),
+          })
+        )
+        .max(8),
+      copyrightText: z.string().trim().min(4).max(240),
+    })
+    .optional(),
+});
+
+const departmentCreateSchema = z.object({
+  code: z.string().trim().min(2).max(16),
+  name: z.string().trim().min(2).max(160),
+  faculty: FACULTIES_ENUM,
+  established: z.number().int().min(1950).max(2100),
+  degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12),
+  intakeSeats: z.number().int().min(5).max(1000),
+  building: z.string().trim().min(2).max(140),
+  chairmanName: z.string().trim().min(2).max(120),
+  summary: z.string().trim().min(10).max(2000),
+  researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
+  laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
 });
 
 const departmentUpdateSchema = z.object({
   name: z.string().trim().min(2).max(160).optional(),
-  faculty: z
-    .enum([
-      'Faculty of Engineering and Technology',
-      'Faculty of Science',
-      'Faculty of Business Studies',
-      'Faculty of Humanities and Social Science',
-      'Faculty of Life and Earth Science',
-    ])
-    .optional(),
+  faculty: FACULTIES_ENUM.optional(),
   established: z.number().int().min(1950).max(2100).optional(),
   degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12).optional(),
   intakeSeats: z.number().int().min(5).max(1000).optional(),
@@ -326,7 +657,7 @@ const bannerReorderSchema = z.object({
 });
 
 const mediaUploadSchema = z.object({
-  purpose: z.enum(['banner', 'notice', 'gallery']),
+  purpose: z.enum(['banner', 'notice', 'gallery', 'cms']),
   fileName: z.string().trim().min(1).max(160),
   mimeType: z.string().trim().min(3).max(100),
   dataBase64: z.string().min(8).max(14_000_000),
@@ -1741,6 +2072,65 @@ portalRouter.put(
   }
 );
 
+portalRouter.post(
+  '/cms/vice-chancellor',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = formerVcCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message || 'Complete all Former VC fields.' });
+      return;
+    }
+    const profiles = await pustRepo.createFormerViceChancellor({
+      name: parsed.data.name,
+      tenure: parsed.data.tenure,
+      email: parsed.data.email || '—',
+      phone: parsed.data.phone,
+      message: parsed.data.message,
+      photoUrl: parsed.data.photoUrl,
+    });
+    await pustRepo.logAudit(req.authUser!.name, 'admin', 'Added Former Vice-Chancellor to Archive', parsed.data.name);
+    res.status(201).json({ profiles });
+  }
+);
+
+portalRouter.patch(
+  '/cms/vice-chancellor/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = vcByIdUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid Vice-Chancellor update.' });
+      return;
+    }
+    const profiles = await pustRepo.updateViceChancellorById(String(req.params.id), parsed.data);
+    if (!profiles) {
+      res.status(404).json({ error: 'Vice-Chancellor record not found.' });
+      return;
+    }
+    await pustRepo.logAudit(req.authUser!.name, 'admin', 'Updated Vice-Chancellor Archive Entry', String(req.params.id));
+    res.json({ profiles });
+  }
+);
+
+portalRouter.delete(
+  '/cms/vice-chancellor/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const result = await pustRepo.deleteViceChancellorById(String(req.params.id));
+    if (result === null) {
+      res.status(404).json({ error: 'Vice-Chancellor record not found.' });
+      return;
+    }
+    if (result === 'IS_CURRENT') {
+      res.status(409).json({ error: 'Cannot delete the active Vice-Chancellor record.' });
+      return;
+    }
+    await pustRepo.logAudit(req.authUser!.name, 'admin', 'Removed Former Vice-Chancellor Entry', String(req.params.id));
+    res.json({ profiles: result });
+  }
+);
+
 const ALLOWED_IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const ALLOWED_NOTICE_MIMES = new Set([
   'image/jpeg',
@@ -1770,8 +2160,8 @@ portalRouter.post('/media/upload', requireAuth, async (req: AuthenticatedRequest
   const { purpose, fileName, mimeType, dataBase64 } = parsed.data;
   const actor = req.authUser!;
 
-  if ((purpose === 'banner' || purpose === 'gallery') && actor.role !== 'admin') {
-    res.status(403).json({ error: 'Only Admin Office may upload homepage banner or gallery media.' });
+  if ((purpose === 'banner' || purpose === 'gallery' || purpose === 'cms') && actor.role !== 'admin') {
+    res.status(403).json({ error: 'Only Admin Office may upload homepage banner, gallery, or CMS media.' });
     return;
   }
   if (purpose === 'notice' && !NOTICE_PUBLISHER_ROLES.has(actor.role)) {
@@ -1982,6 +2372,36 @@ portalRouter.put('/cms/profile', requireRoles('admin'), async (req: Authenticate
   res.json({ profile });
 });
 
+portalRouter.post(
+  '/cms/departments',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = departmentCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message || 'Complete all required department fields.',
+      });
+      return;
+    }
+    try {
+      const department = await pustRepo.createDepartment(parsed.data);
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        'admin',
+        'Created Department Directory Entry',
+        `${department.code} — ${department.name}`
+      );
+      res.status(201).json({ department });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'DUPLICATE_DEPT_CODE') {
+        res.status(409).json({ error: 'A department with this short code already exists.' });
+        return;
+      }
+      throw err;
+    }
+  }
+);
+
 portalRouter.patch(
   '/cms/departments/:id',
   requireRoles('admin'),
@@ -2005,6 +2425,25 @@ portalRouter.patch(
       `${department.code} — ${department.name}`
     );
     res.json({ department });
+  }
+);
+
+portalRouter.delete(
+  '/cms/departments/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const ok = await pustRepo.deleteDepartment(String(req.params.id));
+    if (!ok) {
+      res.status(404).json({ error: 'Department not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Deleted Department Directory Entry',
+      String(req.params.id)
+    );
+    res.json({ deleted: true });
   }
 );
 

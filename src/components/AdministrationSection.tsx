@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Copy, Mail, Phone, Search, X } from 'lucide-react';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
@@ -15,7 +16,6 @@ import type {
 
 const VC_PORTRAIT_IMAGE = '/src/assets/images/VC_Sir_PUST_2026.JPG';
 const VC_PORTRAIT_FALLBACK = 'https://pust.ac.bd/includes/images/messages_pic/VC_Sir_PUST_2026.JPG';
-const ADMIN_BUILDING_IMAGE = '/src/assets/images/pust_admin_building_1795441924646.jpg';
 
 interface AdministrationSectionProps {
   route: AppRoute;
@@ -153,6 +153,8 @@ export function AdministrationSection({
     return <PageHeaderAndSectionSkeleton />;
   }
 
+  const { adminShowcase } = resolveUniversityContent(profile);
+
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
   const previousVcs = vcProfiles
     .filter((v) => !v.isCurrent)
@@ -193,14 +195,21 @@ export function AdministrationSection({
   return (
     <div className="bg-[#FAF8F4]">
       {/* Band 1: Institutional Masthead, Architectural Anchor & Sub-Navigation */}
-      <section className="border-b border-slate-200">
+      <section className="editable-region border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10 lg:pt-14 lg:pb-12 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-7 flex flex-col justify-between gap-6">
               <div className="space-y-4">
-                <p className="text-xs font-medium text-pust-800">
-                  Administration &amp; Executive Governance · PUST Act No. 43 of 2001
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs font-medium text-pust-800">
+                    Administration &amp; Executive Governance · PUST Act No. 43 of 2001
+                  </p>
+                  <EditTriggerButton
+                    target={{ kind: 'apa-benchmarks' }}
+                    label="Edit Showcase & APA"
+                    variant="compact"
+                  />
+                </div>
                 <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-medium tracking-tight text-slate-900 max-w-2xl">
                   {activeOffice
                     ? activeOffice.highlight
@@ -272,10 +281,10 @@ export function AdministrationSection({
 
             <div className="lg:col-span-5">
               <ResilientImage
-                src={ADMIN_BUILDING_IMAGE}
+                src={adminShowcase.buildingImage}
                 fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
                 alt="Administrative Building at Pabna University of Science and Technology"
-                caption="Fig. 1 — Administrative Building & Central Executive Complex, Rajapur Campus, Pabna."
+                caption={adminShowcase.buildingCaption}
                 containerClassName="h-full flex flex-col"
                 className="w-full h-full min-h-[240px] lg:min-h-[300px] aspect-[4/3] object-cover"
                 priority
@@ -288,7 +297,7 @@ export function AdministrationSection({
             <div className="px-5 py-4">
               <dt className="text-xs text-slate-500">Statutory Charter</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                Act No. 43 of 2001 · Est. {profile.establishedYear}
+                {adminShowcase.charterTag} · Est. {profile.establishedYear}
               </dd>
             </div>
             <div className="px-5 py-4">
@@ -306,7 +315,7 @@ export function AdministrationSection({
             <div className="px-5 py-4">
               <dt className="text-xs text-slate-500">Accountability Cycle</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-pust-900 mt-1">
-                APA FY 2026–2027 · UGC
+                {adminShowcase.accountabilityCycle}
               </dd>
             </div>
           </dl>
@@ -423,28 +432,43 @@ export function AdministrationSection({
               )}
 
               {showPreviousVcs && (
-                <div className="pt-8 border-t border-slate-200 space-y-4">
-                  <div className="flex items-baseline justify-between gap-2">
+                <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-serif text-xl font-medium text-slate-900">
                       Former Vice-Chancellors Chronological Archive
                     </h3>
-                    <span className="font-mono text-xs text-slate-500 tabular-nums">
-                      2008 – Present
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs text-slate-500 tabular-nums">
+                        2008 – Present
+                      </span>
+                      <EditTriggerButton
+                        target={{ kind: 'vc', vcId: 'new-former' }}
+                        label="Add Former VC"
+                        icon="add"
+                        variant="compact"
+                      />
+                    </div>
                   </div>
                   <div className="divide-y divide-slate-200 border-y border-slate-200">
                     {previousVcs.map((vc) => (
                       <div
                         key={vc.id}
-                        className="py-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2"
+                        className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                       >
                         <div className="space-y-1">
                           <p className="font-serif text-base font-medium text-slate-900">{vc.name}</p>
                           <p className="text-xs text-slate-600 leading-relaxed">{vc.message}</p>
                         </div>
-                        <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap shrink-0">
-                          {vc.tenure}
-                        </span>
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap">
+                            {vc.tenure}
+                          </span>
+                          <EditTriggerButton
+                            target={{ kind: 'vc', vcId: vc.id }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -594,7 +618,7 @@ export function AdministrationSection({
 
       {/* Band 4: Annual Performance Agreement (APA) & Integrity Benchmarks */}
       {(route === '/administration/apa' || route === '/administration') && (
-        <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
+        <section className="editable-region bg-white border-b border-slate-200 py-14 lg:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-4">
               <div className="space-y-1">
@@ -605,48 +629,31 @@ export function AdministrationSection({
                   Annual Performance Agreement (APA) Benchmarks
                 </h2>
               </div>
-              <span className="font-mono text-xs text-slate-600 tabular-nums">
-                FY 2026–2027 · University Grants Commission (UGC)
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="font-mono text-xs text-slate-600 tabular-nums">
+                  {adminShowcase.apaFyLabel}
+                </span>
+                <EditTriggerButton
+                  target={{ kind: 'apa-benchmarks' }}
+                  label="Edit APA & Benchmarks"
+                  variant="compact"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
-              <div className="py-4 md:py-0 md:pr-8 space-y-2">
-                <p className="font-mono text-xs font-medium text-pust-800">
-                  01. E-Governance &amp; Service
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900">
-                  100% Digital Clearance
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  4-office certificate workflow, residential hall dues, and CLIC library card
-                  issuance tracked end-to-end with verifiable timestamps.
-                </p>
-              </div>
-              <div className="py-4 md:py-0 md:px-8 space-y-2">
-                <p className="font-mono text-xs font-medium text-pust-800">
-                  02. Academic Quality (IQAC)
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900">
-                  21 OBE Curricula Active
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Continuous self-assessment, outcome-based curriculum auditing, and faculty
-                  pedagogy workshops across all 5 faculties.
-                </p>
-              </div>
-              <div className="py-4 md:py-0 md:pl-8 space-y-2">
-                <p className="font-mono text-xs font-medium text-pust-800">
-                  03. National Integrity Strategy
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900">
-                  Transparent Procurement
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  National e-GP compliance, quarterly Citizen’s Charter disclosures, and statutory
-                  audit committee reporting.
-                </p>
-              </div>
+              {adminShowcase.apaBenchmarks.map((item, idx) => (
+                <div
+                  key={`${item.code}-${idx}`}
+                  className={`py-4 md:py-0 space-y-2 ${
+                    idx === 0 ? 'md:pr-8' : idx === 1 ? 'md:px-8' : 'md:pl-8'
+                  }`}
+                >
+                  <p className="font-mono text-xs font-medium text-pust-800">{item.code}</p>
+                  <h3 className="font-serif text-xl font-medium text-slate-900">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{item.detail}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

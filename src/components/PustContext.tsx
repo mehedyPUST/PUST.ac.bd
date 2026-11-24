@@ -143,16 +143,31 @@ export function PustShell({
   const [activeNotice, setActiveNotice] = useState<NoticeRecord | null>(null);
   const [editMode, setEditModeState] = useState(false);
   const [editTarget, setEditTarget] = useState<EditModalTarget | null>(null);
+  const [authResolved, setAuthResolved] = useState(false);
 
   const isAdmin = user?.role === 'admin';
   const effectiveEditMode = isAdmin && editMode;
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !authResolved) return;
     if (!isAdmin) {
       setEditModeState(false);
       setEditTarget(null);
+      try {
+        window.sessionStorage.removeItem('pust_admin_edit_mode');
+      } catch {
+        // ignore storage errors
+      }
+      return;
     }
-  }, [isAdmin]);
+    try {
+      if (window.sessionStorage.getItem('pust_admin_edit_mode') === '1') {
+        setEditModeState(true);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [isAdmin, authResolved]);
 
   const setEditMode = useCallback(
     (enabled: boolean) => {
@@ -161,13 +176,38 @@ export function PustShell({
         return;
       }
       setEditModeState(enabled);
+      if (typeof window !== 'undefined') {
+        try {
+          if (enabled) {
+            window.sessionStorage.setItem('pust_admin_edit_mode', '1');
+          } else {
+            window.sessionStorage.removeItem('pust_admin_edit_mode');
+          }
+        } catch {
+          // ignore storage errors
+        }
+      }
     },
     [isAdmin]
   );
 
   const toggleEditMode = useCallback(() => {
     if (!isAdmin) return;
-    setEditModeState((prev) => !prev);
+    setEditModeState((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        try {
+          if (next) {
+            window.sessionStorage.setItem('pust_admin_edit_mode', '1');
+          } else {
+            window.sessionStorage.removeItem('pust_admin_edit_mode');
+          }
+        } catch {
+          // ignore storage errors
+        }
+      }
+      return next;
+    });
   }, [isAdmin]);
 
   const openEditModal = useCallback(
@@ -281,17 +321,24 @@ export function PustShell({
         setPublications(pubRes.publications);
         setNotices(noticeRes.notices);
         setUser(meRes.user);
+        setAuthResolved(true);
         setBootstrapStatus(statusRes);
         if (meRes.user) {
           const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
           if (active) setBookmarks(bmRes.bookmarks);
         }
       } catch (err) {
-        if (active && !initialData) {
-          setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
+        if (active) {
+          setAuthResolved(true);
+          if (!initialData) {
+            setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
+          }
         }
       } finally {
-        if (active) setLoadingData(false);
+        if (active) {
+          setAuthResolved(true);
+          setLoadingData(false);
+        }
       }
     }
     bootstrap();
@@ -430,10 +477,14 @@ export function PustShell({
     <SkeletonTheme baseColor="#E2E8F0" highlightColor="#F8FAFC" borderRadius={8}>
       <MotionConfig reducedMotion="user">
         <PustContext.Provider value={value}>
-          <div className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900">
+          <div
+            data-edit-mode={effectiveEditMode ? 'true' : undefined}
+            className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900"
+          >
             <Navbar
               route={route}
               user={user}
+              profile={profile}
               editMode={effectiveEditMode}
               onToggleEditMode={toggleEditMode}
               onOpenEditModal={openEditModal}

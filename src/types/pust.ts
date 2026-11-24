@@ -448,6 +448,210 @@ export interface AdministrativeUnit {
   description: string;
 }
 
+export interface InstitutionalLinkItem {
+  id: string;
+  route: string;
+  title: string;
+  desc: string;
+}
+
+export interface SeminarItem {
+  id: string;
+  date: string;
+  organizer: string;
+  title: string;
+}
+
+export type CampusZoneType =
+  | 'Administration'
+  | 'Academic'
+  | 'Library & Culture'
+  | 'Residential & Wellness';
+
+export interface CampusBuildingItem {
+  id: string;
+  code: string;
+  name: string;
+  shortName: string;
+  zone: CampusZoneType;
+  gridRef: string;
+  xPercent: number;
+  yPercent: number;
+  photo: string;
+  caption: string;
+  summary: string;
+  offices: string;
+  hours: string;
+  facilities: string;
+  route: string;
+  routeLabel: string;
+}
+
+export interface CampusMapMeta {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  coordinates: string;
+}
+
+export interface GovernanceContent {
+  officialActUrl: string;
+  actIntro: string;
+  actClauses: Array<{ clause: string; detail: string }>;
+  actCitations: Array<{ label: string; value: string }>;
+  regentBoardMembers: Array<{ seat: string; designation: string; term: string }>;
+  regentFunctions: string[];
+  academicCouncilIntro: string;
+  academicCouncilCards: Array<{ title: string; detail: string }>;
+  academicCouncilStructure: Array<{ label: string; value: string }>;
+  financeCommitteeIntro: string;
+  financeCommitteeScopes: Array<{ scope: string; desc: string }>;
+  financeCommitteeLeadership: Array<{ label: string; value: string }>;
+  ordinanceIntro: string;
+  ordinanceRules: Array<{ label: string; value: string }>;
+  gradingScale: Array<{ range: string; letter: string; gp: string; remarks: string }>;
+}
+
+export interface AdminShowcaseConfig {
+  buildingImage: string;
+  buildingCaption: string;
+  charterTag: string;
+  accountabilityCycle: string;
+  apaFyLabel: string;
+  apaBenchmarks: Array<{ code: string; title: string; detail: string }>;
+}
+
+export interface MilestoneItem {
+  year: string;
+  title: string;
+  detail: string;
+}
+
+export interface AboutExtrasConfig {
+  campusImage: string;
+  campusCaption: string;
+  milestones: MilestoneItem[];
+}
+
+export interface DegreeProgramItem {
+  level: string;
+  degrees: string;
+  duration: string;
+  credits: string;
+  entry: string;
+}
+
+export interface FacultyDeanItem {
+  faculty: FacultyName;
+  dean: string;
+  email: string;
+  code: string;
+  depts: string;
+}
+
+export interface AcademicCalendarItem {
+  term: string;
+  event: string;
+  date: string;
+}
+
+export interface ScholarshipItem {
+  title: string;
+  detail: string;
+}
+
+export interface DigitalFormItem {
+  code: string;
+  title: string;
+  office: string;
+  note: string;
+  portalTarget: string;
+  portalLabel: string;
+  fields: string[];
+}
+
+export interface ResearchInfraCard {
+  id: string;
+  tag: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  caption: string;
+}
+
+export interface AcademicExtrasConfig {
+  degreePrograms: DegreeProgramItem[];
+  facultyDeans: FacultyDeanItem[];
+  academicCalendar: AcademicCalendarItem[];
+  scholarships: ScholarshipItem[];
+  downloadForms: DigitalFormItem[];
+  researchIntro: string;
+  researchInfraCards: ResearchInfraCard[];
+}
+
+export interface AdmissionsUnitCard {
+  unitLabel: string;
+  deptCountLabel: string;
+  departmentsText: string;
+}
+
+export interface AdmissionsConfig {
+  kicker: string;
+  gstUnits: AdmissionsUnitCard[];
+  undergradText: string;
+  gradText: string;
+  eveningText: string;
+  totalIntakeLabel: string;
+  signupMethodLabel: string;
+  deskEmail: string;
+}
+
+export interface FacilityItemConfig {
+  label: string;
+  route: string;
+  title: string;
+  body: string;
+  img: string;
+  hours: string;
+  location: string;
+  portalRoute: string;
+  highlights: string[];
+}
+
+export interface VerifyPageConfig {
+  kicker: string;
+  title: string;
+  subtitle: string;
+  sampleSerials: Array<{ label: string; code: string }>;
+  employerCardTitle: string;
+  employerCardBody: string;
+  portalCardTitle: string;
+  portalCardBody: string;
+}
+
+export interface FooterLinkItem {
+  label: string;
+  route: string;
+}
+
+export interface FooterContactItem {
+  label: string;
+  phone: string;
+  email: string;
+}
+
+export interface FooterConfig {
+  tagline: string;
+  description: string;
+  socialLinks: Array<{ label: string; url: string }>;
+  quickLinks: FooterLinkItem[];
+  governanceLinks: FooterLinkItem[];
+  serviceLinks: FooterLinkItem[];
+  addressLines: string[];
+  contacts: FooterContactItem[];
+  copyrightText: string;
+}
+
 export interface UniversityProfile {
   establishedYear: number;
   campusAcres: number;
@@ -456,26 +660,64 @@ export interface UniversityProfile {
   facultyMembersCount: number;
   studentsCount: number;
   convocationDate: string;
+  navbarTagline?: string;
   heroEyebrow?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   leadership: LeadershipOfficer[];
   units: AdministrativeUnit[];
   journals: JournalRecord[];
+  institutionalLinksHeading?: string;
+  institutionalLinksEyebrow?: string;
+  institutionalLinks?: InstitutionalLinkItem[];
+  upcomingSeminars?: SeminarItem[];
+  campusMapMeta?: CampusMapMeta;
+  campusBuildings?: CampusBuildingItem[];
+  governanceContent?: GovernanceContent;
+  adminShowcase?: AdminShowcaseConfig;
+  aboutExtras?: AboutExtrasConfig;
+  academicExtras?: AcademicExtrasConfig;
+  admissionsConfig?: AdmissionsConfig;
+  facilitiesConfig?: FacilityItemConfig[];
+  verifyPageConfig?: VerifyPageConfig;
+  footerConfig?: FooterConfig;
 }
+
+export type GovernanceTabKind =
+  | 'pust-act'
+  | 'regent-board'
+  | 'academic-council'
+  | 'finance-committee'
+  | 'academic-ordinance';
 
 export type EditModalTarget =
   | { kind: 'hero-profile' }
   | { kind: 'banner'; slideId?: string }
-  | { kind: 'vc' }
+  | { kind: 'vc'; vcId?: string }
   | { kind: 'about'; slug: AboutContentRecord['slug'] }
   | { kind: 'notice'; notice?: NoticeRecord | null }
   | { kind: 'gallery'; item?: GalleryItemRecord | null }
   | { kind: 'publication'; publication?: PublicationRecord | null }
   | { kind: 'journals' }
-  | { kind: 'department'; department: DepartmentRecord }
+  | { kind: 'department'; department: DepartmentRecord | null }
   | { kind: 'leadership'; officerIndex?: number }
-  | { kind: 'unit'; unitCode?: string };
+  | { kind: 'unit'; unitCode?: string }
+  | { kind: 'institutional-links' }
+  | { kind: 'seminars' }
+  | { kind: 'campus-building'; buildingId?: string }
+  | { kind: 'governance'; tab: GovernanceTabKind }
+  | { kind: 'apa-benchmarks' }
+  | { kind: 'milestones' }
+  | { kind: 'degree-programs' }
+  | { kind: 'faculty-deans' }
+  | { kind: 'academic-calendar' }
+  | { kind: 'scholarships' }
+  | { kind: 'download-forms' }
+  | { kind: 'research-infra' }
+  | { kind: 'admissions-info' }
+  | { kind: 'facility'; route?: string }
+  | { kind: 'verify-page' }
+  | { kind: 'footer-config' };
 
 export interface InquiryRecord {
   id: string;

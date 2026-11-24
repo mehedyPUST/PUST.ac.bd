@@ -11,19 +11,16 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { VerificationLookupResult } from '../types/pust';
+import { EditTriggerButton } from './EditTriggerButton';
+import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
 import { VerificationQrSvg } from './portal/DigitalDocumentModal';
 
-const QUICK_SAMPLE_SERIALS: Array<{ label: string; code: string }> = [
-  { label: 'Temporary Certificate', code: 'PUST-CERT-CSE-2026A1' },
-  { label: 'Semester Admit Card', code: 'ADMIT-CSE-220101-4' },
-  { label: 'Hall Financial Clearance', code: 'PUST-HALL-CLR-2026-091' },
-  { label: 'Digital Library Card', code: 'PUST-LIB-CSE-220101' },
-  { label: 'Payment Receipt', code: 'PUST-RCPT-2026-091' },
-];
-
 export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => void }) {
+  const { profile } = usePust();
+  const { verifyPageConfig } = resolveUniversityContent(profile);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerificationLookupResult | null>(null);
@@ -74,17 +71,22 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
-      <header className="border-b border-slate-200 pb-8 print:hidden">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-800">
-          Public Authenticity Registry
-        </p>
+      <header className="editable-region border-b border-slate-200 pb-8 print:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-800">
+            {verifyPageConfig.kicker}
+          </p>
+          <EditTriggerButton
+            target={{ kind: 'verify-page' }}
+            label="Edit Verify Page"
+            variant="compact"
+          />
+        </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
-          Digital Document & Receipt Verification
+          {verifyPageConfig.title}
         </h1>
         <p className="text-sm sm:text-base text-slate-600 max-w-2xl mt-3 leading-relaxed">
-          Verify Temporary Certificates, Examination Admit Cards, Residential Hall Clearances,
-          Digital Library Cards, Chairman Seals, and official Payment Receipts issued through the PUST
-          Digital Campus Portal.
+          {verifyPageConfig.subtitle}
         </p>
       </header>
 
@@ -116,15 +118,15 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             Verify Issued Registry Records
           </p>
           <div className="flex flex-wrap gap-2">
-            {QUICK_SAMPLE_SERIALS.map((item) => (
+            {verifyPageConfig.sampleSerials.map((item) => (
               <button
-                key={item.code}
+                key={`${item.label}-${item.code}`}
                 type="button"
                 onClick={() => {
                   setQuery(item.code);
                   runVerification(item.code);
                 }}
-                className="text-left px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-pust-700 hover:bg-pust-50/50 transition-colors"
+                className="text-left px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-pust-700 hover:bg-pust-50/50 transition-colors cursor-pointer"
               >
                 <span className="block text-[11px] text-slate-500">{item.label}</span>
                 <span className="font-mono text-xs font-medium text-pust-900">{item.code}</span>
@@ -247,32 +249,30 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
 
       {/* Helpful footer bridge */}
       {!result && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden">
+        <div className="editable-region grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden">
           <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2">
             <FileCheck2 className="w-5 h-5 text-pust-800" />
             <h3 className="font-serif text-lg font-medium text-slate-900">
-              For Employers & External Institutions
+              {verifyPageConfig.employerCardTitle}
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Every Temporary Certificate and Provisional Transcript issued through PUST includes a
-              unique serial and SHA-256 verification digest reflected immediately in this registry.
+              {verifyPageConfig.employerCardBody}
             </p>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between gap-3">
             <div className="space-y-1.5">
               <h3 className="font-serif text-lg font-medium text-slate-900">
-                Need to Apply or Download Your Copy?
+                {verifyPageConfig.portalCardTitle}
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Sign in to the Digital Campus Portal to settle fees, view admit cards, print hall
-                clearances, or download certificates.
+                {verifyPageConfig.portalCardBody}
               </p>
             </div>
             {onNavigate && (
               <button
                 type="button"
                 onClick={() => onNavigate('/portal')}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-900 hover:underline self-start"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-900 hover:underline self-start cursor-pointer"
               >
                 Open Campus Portal <ArrowRight className="w-3.5 h-3.5" />
               </button>

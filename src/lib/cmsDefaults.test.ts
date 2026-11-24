@@ -1,0 +1,106 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  clampMapPercent,
+  DEFAULT_ABOUT_EXTRAS,
+  DEFAULT_ACADEMIC_EXTRAS,
+  DEFAULT_ADMIN_SHOWCASE,
+  DEFAULT_ADMISSIONS_CONFIG,
+  DEFAULT_CAMPUS_BUILDINGS,
+  DEFAULT_CAMPUS_MAP_META,
+  DEFAULT_FACILITIES_CONFIG,
+  DEFAULT_FOOTER_CONFIG,
+  DEFAULT_GOVERNANCE_CONTENT,
+  DEFAULT_INSTITUTIONAL_LINKS,
+  DEFAULT_NAVBAR_TAGLINE,
+  DEFAULT_UPCOMING_SEMINARS,
+  DEFAULT_VERIFY_PAGE_CONFIG,
+  formatFooterDescription,
+  moveArrayItem,
+  resolveContextualEditTarget,
+  resolveUniversityContent,
+} from './cmsDefaults';
+
+test('resolveUniversityContent falls back to all institutional defaults when profile is null', () => {
+  const resolved = resolveUniversityContent(null);
+  assert.equal(resolved.navbarTagline, DEFAULT_NAVBAR_TAGLINE);
+  assert.equal(resolved.institutionalLinks.length, DEFAULT_INSTITUTIONAL_LINKS.length);
+  assert.equal(resolved.upcomingSeminars.length, DEFAULT_UPCOMING_SEMINARS.length);
+  assert.equal(resolved.campusMapMeta.title, DEFAULT_CAMPUS_MAP_META.title);
+  assert.equal(resolved.campusBuildings.length, DEFAULT_CAMPUS_BUILDINGS.length);
+  assert.equal(resolved.governanceContent.regentBoardMembers.length, DEFAULT_GOVERNANCE_CONTENT.regentBoardMembers.length);
+  assert.equal(resolved.adminShowcase.apaBenchmarks.length, DEFAULT_ADMIN_SHOWCASE.apaBenchmarks.length);
+  assert.equal(resolved.aboutExtras.milestones.length, DEFAULT_ABOUT_EXTRAS.milestones.length);
+  assert.equal(resolved.academicExtras.facultyDeans.length, DEFAULT_ACADEMIC_EXTRAS.facultyDeans.length);
+  assert.equal(resolved.admissionsConfig.gstUnits.length, DEFAULT_ADMISSIONS_CONFIG.gstUnits.length);
+  assert.equal(resolved.facilitiesConfig.length, DEFAULT_FACILITIES_CONFIG.length);
+  assert.equal(resolved.verifyPageConfig.sampleSerials.length, DEFAULT_VERIFY_PAGE_CONFIG.sampleSerials.length);
+  assert.equal(resolved.footerConfig.quickLinks.length, DEFAULT_FOOTER_CONFIG.quickLinks.length);
+});
+
+test('resolveUniversityContent preserves partial nested overrides without erasing sibling fields', () => {
+  const resolved = resolveUniversityContent({
+    navbarTagline: 'Est. 2008 · Rajapur Campus, Pabna',
+    governanceContent: {
+      ...DEFAULT_GOVERNANCE_CONTENT,
+      actIntro: 'Updated PUST Act statutory summary.',
+    },
+    footerConfig: {
+      ...DEFAULT_FOOTER_CONFIG,
+      tagline: 'Custom Footer Tagline',
+    },
+  });
+
+  assert.equal(resolved.navbarTagline, 'Est. 2008 · Rajapur Campus, Pabna');
+  assert.equal(resolved.governanceContent.actIntro, 'Updated PUST Act statutory summary.');
+  assert.equal(
+    resolved.governanceContent.gradingScale.length,
+    DEFAULT_GOVERNANCE_CONTENT.gradingScale.length
+  );
+  assert.equal(resolved.footerConfig.tagline, 'Custom Footer Tagline');
+  assert.equal(resolved.footerConfig.contacts.length, DEFAULT_FOOTER_CONFIG.contacts.length);
+});
+
+test('formatFooterDescription replaces dynamic faculty and department count placeholders', () => {
+  const formatted = formatFooterDescription(
+    'Advancing research across {facultiesCount} faculties and {departmentsCount} departments.',
+    6,
+    24
+  );
+  assert.equal(formatted, 'Advancing research across 6 faculties and 24 departments.');
+});
+
+test('clampMapPercent constrains coordinates safely between 5 and 95', () => {
+  assert.equal(clampMapPercent(-10), 5);
+  assert.equal(clampMapPercent(120), 95);
+  assert.equal(clampMapPercent(47.6), 48);
+  assert.equal(clampMapPercent(Number.NaN), 50);
+});
+
+test('moveArrayItem reorders elements safely and preserves length', () => {
+  const original = ['A', 'B', 'C'];
+  assert.deepEqual(moveArrayItem(original, 0, 1), ['B', 'A', 'C']);
+  assert.deepEqual(moveArrayItem(original, 2, -1), ['A', 'C', 'B']);
+  assert.deepEqual(moveArrayItem(original, 0, -1), ['A', 'B', 'C']);
+  assert.deepEqual(moveArrayItem(original, 2, 1), ['A', 'B', 'C']);
+});
+
+test('resolveContextualEditTarget maps public routes to accurate contextual editors', () => {
+  assert.deepEqual(resolveContextualEditTarget('/verify'), {
+    label: 'Edit Verify Page',
+    targetKind: 'verify-page',
+  });
+  assert.deepEqual(resolveContextualEditTarget('/governance/regent-board'), {
+    label: 'Edit Governance Section',
+    targetKind: 'governance',
+  });
+  assert.deepEqual(resolveContextualEditTarget('/facilities/library'), {
+    label: 'Edit Facility Page',
+    targetKind: 'facility',
+  });
+  assert.deepEqual(resolveContextualEditTarget('/academics/deans'), {
+    label: 'Edit Faculty Deans',
+    targetKind: 'faculty-deans',
+  });
+  assert.equal(resolveContextualEditTarget('/portal'), null);
+});
