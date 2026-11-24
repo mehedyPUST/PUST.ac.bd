@@ -225,7 +225,7 @@ export function HomePage({
                   {missionVision.title}
                 </p>
                 <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
-                  {missionVision.body}
+                  {missionVision.body.replace(/^Our Mission\s*\n/i, '')}
                 </p>
               </div>
             )}

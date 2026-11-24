@@ -319,7 +319,15 @@ export const SEED_ABOUT_SECTIONS: AboutContentRecord[] = [
     id: 'about-mission',
     slug: 'mission-vision',
     title: 'Mission & Vision',
-    body: 'Mission: To establish PUST as an exceptional public academic university in Bangladesh that extends quality higher education, delivers advanced practical knowledge, invents new technologies through fundamental and specialized research for domestic and global needs, and cultivates skilled human resources grounded in moral standards and humanistic values to drive sustainable industrial and socio-economic development.\n\nVision: To pioneer new ideas and drive innovative research in science, engineering, and interdisciplinary scholarship through efficient, ethical graduates equipped to lead in the 21st century.',
+    body: `Our Mission
+The general mission of Pabna University of Science and Technology is to establish the good academic public University in Bangladesh and also promote higher education at national as well as international level. However, some specific missions are:
+• To extend quality higher education and acquire advanced practical knowledge
+• To invent new technologies through fundamental and other research for home and abroad
+• To create highly skilled human resources in numerous branches of science and technology having progressive knowledge, moral and humanistic values.
+• To perform a leading role in the innovation of science and technology for sustainable industrial and socio-economic growth of ‘Smart Bangladesh’.
+
+Our Vision
+"To create new ideas and conduct innovative research in science and technology, led by highly skilled, trained, efficient, and practiced graduates to serve the nation and the world in the 21st century".`,
     updatedAt: '2026-11-23',
   },
   {

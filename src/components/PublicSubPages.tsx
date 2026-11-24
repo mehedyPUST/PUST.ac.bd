@@ -508,9 +508,60 @@ export function PublicSubPages({
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <div className="lg:col-span-7 space-y-6">
-              <p className="text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
-                {activeSection?.body}
-              </p>
+              {activeSlug === 'mission-vision' && activeSection?.body ? (
+                <div className="space-y-6">
+                  {(() => {
+                    const parts = activeSection.body.split(/\n\s*Our Vision\s*\n/i);
+                    const missionPart = (parts[0] || '').replace(/^Our Mission\s*\n/i, '').trim();
+                    const visionPart = (parts[1] || '').trim();
+                    const missionLines = missionPart
+                      .split('\n')
+                      .map((l) => l.trim())
+                      .filter(Boolean);
+                    const introLines = missionLines.filter((l) => !l.startsWith('•'));
+                    const bulletLines = missionLines
+                      .filter((l) => l.startsWith('•'))
+                      .map((l) => l.replace(/^•\s*/, ''));
+
+                    return (
+                      <>
+                        <div className="space-y-3">
+                          <h2 className="font-serif text-2xl font-medium text-slate-900">
+                            Our Mission
+                          </h2>
+                          {introLines.map((line, i) => (
+                            <p key={i} className="text-base leading-[1.8] text-slate-700">
+                              {line}
+                            </p>
+                          ))}
+                          {bulletLines.length > 0 && (
+                            <ul className="list-disc pl-5 space-y-2.5 text-base leading-[1.75] text-slate-700 pt-1">
+                              {bulletLines.map((item, i) => (
+                                <li key={i}>{item}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+
+                        {visionPart && (
+                          <div className="pt-5 border-t border-slate-200 space-y-3">
+                            <h2 className="font-serif text-2xl font-medium text-slate-900">
+                              Our Vision
+                            </h2>
+                            <blockquote className="rounded-xl border border-pust-200 bg-pust-50/50 p-5 font-serif text-lg italic leading-relaxed text-slate-900">
+                              {visionPart}
+                            </blockquote>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <p className="text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
+                  {activeSection?.body}
+                </p>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                 {aboutSections.map((sec) => (
