@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Eye, Menu, Pencil, Plus, X } from 'lucide-react';
+import { ChevronDown, Eye, Menu, Pencil, Plus, Search, X } from 'lucide-react';
 import {
   DEFAULT_NAVBAR_TAGLINE,
   resolveContextualEditTarget,
@@ -15,6 +15,7 @@ import type {
   GovernanceTabKind,
   UniversityProfile,
 } from '../types/pust';
+import { GlobalSearchBar } from './GlobalSearchBar';
 import { PustCrest } from './PustCrest';
 
 interface NavbarProps {
@@ -48,12 +49,14 @@ export function Navbar({
 }: NavbarProps) {
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
   }, [route]);
 
   useEffect(() => {
@@ -66,6 +69,7 @@ export function Navbar({
       if (e.key === 'Escape') {
         setHoveredGroup(null);
         setMobileMenuOpen(false);
+        setMobileSearchOpen(false);
       }
     }
     document.addEventListener('mousedown', handleOutside);
@@ -79,6 +83,7 @@ export function Navbar({
   function go(target: AppRoute | string) {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
     onNavigate(target);
   }
 
@@ -119,23 +124,24 @@ export function Navbar({
 
           {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band */}
+            {/* Tier 1: University Title Band + Site-Wide Search */}
             <div className="h-14 sm:h-[60px] px-3.5 sm:px-6 flex items-center justify-between gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
                   setHoveredGroup(null);
                   setMobileMenuOpen(false);
+                  setMobileSearchOpen(false);
                 }}
-                className="font-serif text-base sm:text-xl lg:text-[26px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                className="font-serif text-base sm:text-xl lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
               >
                 <span className="sm:hidden">PUST</span>
                 <span className="hidden sm:inline">Pabna University of Science and Technology</span>
               </Link>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <div className="hidden xl:inline-flex items-center gap-1.5">
-                  <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="hidden 2xl:inline-flex items-center gap-1.5">
+                  <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
                     {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                   </span>
                   {user?.role === 'admin' && editMode && onOpenEditModal && (
@@ -151,6 +157,27 @@ export function Navbar({
                     </button>
                   )}
                 </div>
+
+                {/* Desktop Site-Wide Search Bar */}
+                <div className="hidden lg:block">
+                  <GlobalSearchBar variant="desktop" />
+                </div>
+
+                {/* Mobile Search Toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileSearchOpen((prev) => !prev);
+                    setMobileMenuOpen(false);
+                  }}
+                  aria-label="Toggle site search"
+                  aria-expanded={mobileSearchOpen}
+                  className={`lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
+                    mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
+                  }`}
+                >
+                  {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+                </button>
 
                 {/* Mobile Admin Edit Mode Toggle */}
                 {user?.role === 'admin' && onToggleEditMode && (
@@ -176,6 +203,7 @@ export function Navbar({
                   onClick={() => {
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
+                    setMobileSearchOpen(false);
                   }}
                   className="lg:hidden px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
@@ -192,7 +220,10 @@ export function Navbar({
                 </Link>
                 <button
                   type="button"
-                  onClick={() => setMobileMenuOpen((prev) => !prev)}
+                  onClick={() => {
+                    setMobileMenuOpen((prev) => !prev);
+                    setMobileSearchOpen(false);
+                  }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
                   className="lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
@@ -726,9 +757,26 @@ export function Navbar({
         );
       })()}
 
+      {/* Expandable Mobile / Tablet Search Strip */}
+      {mobileSearchOpen && (
+        <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3">
+          <GlobalSearchBar
+            variant="mobile"
+            autoFocus
+            onActionComplete={() => setMobileSearchOpen(false)}
+          />
+        </div>
+      )}
+
       {/* Responsive Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-200 bg-white max-h-[80vh] overflow-y-auto px-4 py-3 space-y-1 text-sm">
+          <div className="pb-2.5 mb-1 border-b border-slate-100">
+            <GlobalSearchBar
+              variant="mobile"
+              onActionComplete={() => setMobileMenuOpen(false)}
+            />
+          </div>
           <div className="border-b border-slate-100">
             <div className="flex items-center justify-between">
               <button
