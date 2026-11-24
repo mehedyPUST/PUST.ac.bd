@@ -480,11 +480,12 @@ export function CampusMapSection() {
                     type="button"
                     onClick={() => setSelectedBuildingId(b.id)}
                     aria-pressed={isSelected}
+                    aria-label={b.name}
                     style={{
                       left: `${b.xPercent}%`,
                       top: `${b.yPercent}%`,
                     }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                       isSelected
                         ? 'z-20 bg-pust-900 text-white border-pust-950 shadow-md scale-[1.03]'
                         : isInZone
@@ -497,7 +498,8 @@ export function CampusMapSection() {
                         isSelected ? 'text-pust-200' : 'text-pust-800'
                       }`}
                     />
-                    <span>{b.shortName}</span>
+                    <span className="font-mono sm:hidden">{b.code}</span>
+                    <span className="hidden sm:inline">{b.shortName}</span>
                   </button>
                 );
               })}
@@ -566,7 +568,7 @@ export function CampusMapSection() {
                       <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                         Offices &amp; Academic Units
                       </dt>
-                      <dd className="text-slate-800 font-medium text-justify">{activeBuilding.offices}</dd>
+                      <dd className="text-slate-800 font-medium leading-relaxed">{activeBuilding.offices}</dd>
                     </div>
                     <div className="py-2.5 flex justify-between gap-4">
                       <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 shrink-0">
@@ -580,7 +582,7 @@ export function CampusMapSection() {
                       <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                         Key Facilities
                       </dt>
-                      <dd className="text-slate-700 text-justify">{activeBuilding.facilities}</dd>
+                      <dd className="text-slate-700 leading-relaxed">{activeBuilding.facilities}</dd>
                     </div>
                   </dl>
                 </div>

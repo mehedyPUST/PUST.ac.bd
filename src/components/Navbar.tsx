@@ -20,13 +20,28 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    setHoveredGroup(null);
+    setMobileMenuOpen(false);
+  }, [route]);
+
+  useEffect(() => {
     function handleOutside(e: MouseEvent) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setHoveredGroup(null);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setHoveredGroup(null);
+        setMobileMenuOpen(false);
+      }
+    }
     document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   function go(target: AppRoute) {
@@ -140,7 +155,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               Academics
             </Link>
             {hoveredGroup === 'academic' && (
-              <div className="absolute left-0 top-full pt-1.5 w-[420px] z-50">
+              <div className="absolute left-0 top-full pt-1.5 w-[420px] max-w-[calc(100vw-2rem)] z-50">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
                   {academicGroup.items.map((item) => (
                     <Link
@@ -218,7 +233,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               Campus &amp; Admin
             </Link>
             {hoveredGroup === 'campus' && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-1.5 w-[540px] z-50">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-1.5 w-[540px] max-w-[calc(100vw-2rem)] z-50">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-3 grid grid-cols-3 gap-3">
                   <div>
                     <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-pust-800">
@@ -334,7 +349,8 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation menu"
-            className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-pust-900 cursor-pointer"
+            aria-expanded={mobileMenuOpen}
+            className="lg:hidden min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 hover:text-pust-900 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

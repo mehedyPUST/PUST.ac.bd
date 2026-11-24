@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import {
   AlertCircle,
@@ -362,6 +362,18 @@ export function PublicSubPages({
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormDef | null>(null);
 
+  useEffect(() => {
+    if (!activeMedia && !previewForm) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setActiveMedia(null);
+        setPreviewForm(null);
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [activeMedia, previewForm]);
+
   const [inqName, setInqName] = useState('');
   const [inqEmail, setInqEmail] = useState('');
   const [inqPhone, setInqPhone] = useState('');
@@ -617,9 +629,9 @@ export function PublicSubPages({
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Institutional Chronology
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] divide-y sm:divide-y-0 sm:divide-x divide-slate-200 overflow-hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px rounded-2xl border border-slate-200 bg-slate-200 overflow-hidden">
               {UNIVERSITY_MILESTONES.map((m) => (
-                <div key={m.year} className="p-5 space-y-1.5">
+                <div key={m.year} className="p-5 space-y-1.5 bg-[#F7F7F5]">
                   <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                     {m.year}
                   </p>
@@ -748,13 +760,13 @@ export function PublicSubPages({
                         <span className="font-mono text-pust-800">{fac.email}</span>
                       </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
                       {facDepts.map((dept) => (
                         <button
                           key={dept.id}
                           type="button"
                           onClick={() => onSelectDepartment(dept)}
-                          className="text-left p-5 hover:bg-pust-50/40 transition-colors space-y-1.5 border-b border-slate-200 cursor-pointer"
+                          className="text-left p-5 bg-white hover:bg-pust-50/40 transition-colors space-y-1.5 cursor-pointer"
                         >
                           <p className="font-mono text-xs text-pust-800 tabular-nums">
                             {dept.code} · {dept.intakeSeats} Seats
@@ -1717,6 +1729,7 @@ export function PublicSubPages({
                   <ResilientImage
                     src={item.mediaUrl}
                     alt={item.title}
+                    containerClassName="w-full h-full"
                     className="w-full h-full object-cover"
                   />
                   {item.mediaType === 'video' && (
@@ -1849,7 +1862,7 @@ export function PublicSubPages({
         </div>
 
         {filteredNotices.length === 0 ? (
-          <div className="py-10 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 p-6 text-center space-y-3">
+          <div className="py-10 px-6 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
             <p>No notices match the selected filter criteria.</p>
             <button
               type="button"

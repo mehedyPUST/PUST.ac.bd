@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Bookmark, Check, Printer, Trash2, X } from 'lucide-react';
 import type { AuthUser, NoticeRecord } from '../types/pust';
@@ -23,6 +24,15 @@ export function NoticeModal({
   onDeleteNotice,
   onOpenPortal,
 }: NoticeModalProps) {
+  useEffect(() => {
+    if (!notice) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [notice, onClose]);
+
   if (!notice) return null;
 
   return (

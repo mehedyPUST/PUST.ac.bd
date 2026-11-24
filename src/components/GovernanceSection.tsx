@@ -146,10 +146,6 @@ export function GovernanceSection({ route, onNavigate }: GovernanceSectionProps)
               <Link
                 key={tab.route}
                 href={tab.route}
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate(tab.route);
-                }}
                 className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'bg-pust-900 text-white'

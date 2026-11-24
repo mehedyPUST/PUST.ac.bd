@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Bookmark, Check, X } from 'lucide-react';
 import type { AuthUser, DepartmentRecord } from '../types/pust';
@@ -21,6 +22,15 @@ export function DepartmentModal({
   onToggleBookmark,
   onOpenPortal,
 }: DepartmentModalProps) {
+  useEffect(() => {
+    if (!department) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [department, onClose]);
+
   if (!department) return null;
 
   return (
@@ -96,7 +106,7 @@ export function DepartmentModal({
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
                 {department.researchFocus.map((topic) => (
-                  <li key={topic} className="pb-2 border-b border-slate-100 last:border-b-0 text-justify">
+                  <li key={topic} className="pb-2 border-b border-slate-100 last:border-b-0 leading-relaxed">
                     {topic}
                   </li>
                 ))}
@@ -109,7 +119,7 @@ export function DepartmentModal({
               </h4>
               <ul className="space-y-2 text-sm text-slate-800">
                 {department.laboratories.map((lab) => (
-                  <li key={lab} className="pb-2 border-b border-slate-100 last:border-b-0 text-justify">
+                  <li key={lab} className="pb-2 border-b border-slate-100 last:border-b-0 leading-relaxed">
                     {lab}
                   </li>
                 ))}

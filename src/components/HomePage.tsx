@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -80,6 +80,15 @@ export function HomePage({
   const [galleryCategory, setGalleryCategory] =
     useState<'All' | GalleryItemRecord['category']>('All');
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
+
+  useEffect(() => {
+    if (!activeMedia) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setActiveMedia(null);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [activeMedia]);
 
   const filteredNotices =
     noticeCategory === 'All'
@@ -184,18 +193,17 @@ export function HomePage({
                 {profile?.facultyMembersCount ?? 185} Faculty · ~{profile?.studentsCount?.toLocaleString() ?? '4,800'} Students
               </dd>
             </div>
-            <Link
-              href="/verify"
-              className="px-5 py-4 bg-pust-950 hover:bg-pust-900 text-white transition-colors block"
-            >
-              <dt className="text-xs uppercase tracking-wider text-pust-200 flex items-center justify-between">
-                <span>Public Registry</span>
-                <FileCheck2 className="w-3.5 h-3.5" />
-              </dt>
-              <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1">
-                Verify Certificates &amp; Receipts →
-              </dd>
-            </Link>
+            <div className="bg-pust-950 hover:bg-pust-900 text-white transition-colors">
+              <Link href="/verify" className="block h-full px-5 py-4">
+                <dt className="text-xs uppercase tracking-wider text-pust-200 flex items-center justify-between">
+                  <span>Public Registry</span>
+                  <FileCheck2 className="w-3.5 h-3.5" />
+                </dt>
+                <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1">
+                  Verify Certificates &amp; Receipts →
+                </dd>
+              </Link>
+            </div>
           </dl>
         </div>
       </section>
@@ -659,10 +667,11 @@ export function HomePage({
                 onClick={() => setActiveMedia(item)}
                 className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
               >
-                <div className="relative overflow-hidden bg-slate-900 aspect-[4/3]">
+                <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
                   <ResilientImage
                     src={item.mediaUrl}
                     alt={item.title}
+                    containerClassName="w-full h-full"
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
                   />
                   {item.mediaType === 'video' && (
