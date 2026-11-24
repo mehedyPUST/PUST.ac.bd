@@ -75,19 +75,45 @@ export function usePust(): PustContextValue {
   return ctx;
 }
 
-export function PustShell({ children }: { children: ReactNode }) {
+export interface PustInitialData {
+  profile: UniversityProfile;
+  aboutSections: AboutContentRecord[];
+  vcProfiles: ViceChancellorRecord[];
+  galleryItems: GalleryItemRecord[];
+  departments: DepartmentRecord[];
+  publications: PublicationRecord[];
+  notices: NoticeRecord[];
+}
+
+export function PustShell({
+  children,
+  initialData,
+}: {
+  children: ReactNode;
+  initialData?: PustInitialData;
+}) {
   const pathname = usePathname() || '/';
   const router = useRouter();
   const route = parseRouteFromPath(pathname);
 
-  const [profile, setProfile] = useState<UniversityProfile | null>(null);
-  const [aboutSections, setAboutSections] = useState<AboutContentRecord[]>([]);
-  const [vcProfiles, setVcProfiles] = useState<ViceChancellorRecord[]>([]);
-  const [galleryItems, setGalleryItems] = useState<GalleryItemRecord[]>([]);
-  const [departments, setDepartments] = useState<DepartmentRecord[]>([]);
-  const [publications, setPublications] = useState<PublicationRecord[]>([]);
-  const [notices, setNotices] = useState<NoticeRecord[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
+  const [profile, setProfile] = useState<UniversityProfile | null>(initialData?.profile ?? null);
+  const [aboutSections, setAboutSections] = useState<AboutContentRecord[]>(
+    initialData?.aboutSections ?? []
+  );
+  const [vcProfiles, setVcProfiles] = useState<ViceChancellorRecord[]>(
+    initialData?.vcProfiles ?? []
+  );
+  const [galleryItems, setGalleryItems] = useState<GalleryItemRecord[]>(
+    initialData?.galleryItems ?? []
+  );
+  const [departments, setDepartments] = useState<DepartmentRecord[]>(
+    initialData?.departments ?? []
+  );
+  const [publications, setPublications] = useState<PublicationRecord[]>(
+    initialData?.publications ?? []
+  );
+  const [notices, setNotices] = useState<NoticeRecord[]>(initialData?.notices ?? []);
+  const [loadingData, setLoadingData] = useState(!initialData);
   const [dataError, setDataError] = useState<string | null>(null);
 
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -136,7 +162,9 @@ export function PustShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     async function bootstrap() {
-      setLoadingData(true);
+      if (!initialData) {
+        setLoadingData(true);
+      }
       setDataError(null);
       try {
         const [profileRes, deptRes, pubRes, noticeRes, meRes, statusRes] = await Promise.all([
@@ -162,7 +190,7 @@ export function PustShell({ children }: { children: ReactNode }) {
           if (active) setBookmarks(bmRes.bookmarks);
         }
       } catch (err) {
-        if (active) {
+        if (active && !initialData) {
           setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
         }
       } finally {
@@ -173,7 +201,7 @@ export function PustShell({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialData]);
 
   const bookmarkedIds = useMemo(() => new Set(bookmarks.map((b) => b.itemId)), [bookmarks]);
 

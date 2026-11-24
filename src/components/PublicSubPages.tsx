@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import {
   AlertCircle,
   ArrowRight,
@@ -490,10 +491,9 @@ export function PublicSubPages({
                 { label: 'Mission and Vision', route: '/about/mission-vision' as AppRoute },
                 { label: 'Strategic Plans', route: '/about/plans' as AppRoute },
               ].map((tab) => (
-                <button
+                <Link
                   key={tab.route}
-                  type="button"
-                  onClick={() => onNavigate(tab.route)}
+                  href={tab.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route || (route === '/about' && tab.route === '/about/our-university')
                       ? 'bg-pust-900 text-white'
@@ -501,7 +501,7 @@ export function PublicSubPages({
                   }`}
                 >
                   {tab.label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -611,10 +611,9 @@ export function PublicSubPages({
             </h1>
             <div className="flex flex-wrap gap-2">
               {academicSubTabs.map((tab) => (
-                <button
+                <Link
                   key={tab.route}
-                  type="button"
-                  onClick={() => onNavigate(tab.route)}
+                  href={tab.route}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route ||
                     (route === '/academics' && tab.route === '/academics/departments')
@@ -623,7 +622,7 @@ export function PublicSubPages({
                   }`}
                 >
                   {tab.label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -1139,10 +1138,9 @@ export function PublicSubPages({
             </h1>
             <div className="flex flex-wrap gap-2">
               {admissionTabs.map((t) => (
-                <button
+                <Link
                   key={t.route}
-                  type="button"
-                  onClick={() => onNavigate(t.route)}
+                  href={t.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route
                       ? 'bg-pust-900 text-white'
@@ -1150,7 +1148,7 @@ export function PublicSubPages({
                   }`}
                 >
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -1549,10 +1547,9 @@ export function PublicSubPages({
             </h1>
             <div className="flex flex-wrap gap-2">
               {facTabs.map((f) => (
-                <button
+                <Link
                   key={f.route}
-                  type="button"
-                  onClick={() => onNavigate(f.route)}
+                  href={f.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
                       ? 'bg-pust-900 text-white'
@@ -1560,7 +1557,7 @@ export function PublicSubPages({
                   }`}
                 >
                   {f.label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>

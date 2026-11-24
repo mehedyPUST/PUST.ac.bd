@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import { ArrowRight, Compass, MapPin } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 import { ResilientImage } from './ResilientImage';
@@ -177,9 +176,6 @@ const ZONES: CampusZone[] = [
   'Residential & Wellness',
 ];
 
-const EASE_EDITORIAL = [0.22, 1, 0.36, 1] as const;
-const VIEWPORT_ONCE = { once: true, amount: 0.12 } as const;
-
 export function CampusMapSection() {
   const [selectedZone, setSelectedZone] = useState<CampusZone>('All');
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>(BUILDINGS[0].id);
@@ -206,13 +202,7 @@ export function CampusMapSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={VIEWPORT_ONCE}
-          transition={{ duration: 0.48, ease: EASE_EDITORIAL }}
-          className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5"
-        >
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               Rajapur 30-Acre Masterplan · Interactive Campus Directory
@@ -252,18 +242,12 @@ export function CampusMapSection() {
               );
             })}
           </div>
-        </motion.div>
+          </div>
 
         {/* 12-Column Interactive Blueprint + Selected Building Detail Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left: Interactive Architectural Blueprint */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT_ONCE}
-            transition={{ duration: 0.5, delay: 0.06, ease: EASE_EDITORIAL }}
-            className="lg:col-span-7 flex flex-col gap-4"
-          >
+          <div className="lg:col-span-7 flex flex-col gap-4">
             <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-slate-200 overflow-hidden select-none shadow-xs">
               {/* Architectural Blueprint SVG Layer */}
               <svg
@@ -551,23 +535,11 @@ export function CampusMapSection() {
                 })}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right: Active Building Photo & Architectural Dossier */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={VIEWPORT_ONCE}
-            transition={{ duration: 0.5, delay: 0.12, ease: EASE_EDITORIAL }}
-            className="lg:col-span-5 flex"
-          >
-            <motion.article
-              key={activeBuilding.id}
-              initial={{ opacity: 0.4, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.18 }}
-              className="w-full rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between overflow-hidden"
-            >
+          <div className="lg:col-span-5 flex">
+            <article className="w-full rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between overflow-hidden">
               <div>
                 <ResilientImage
                   src={activeBuilding.photo}
@@ -626,8 +598,8 @@ export function CampusMapSection() {
                   {BUILDINGS.findIndex((b) => b.id === activeBuilding.id) + 1} / {BUILDINGS.length}
                 </span>
               </div>
-            </motion.article>
-          </motion.div>
+            </article>
+          </div>
         </div>
       </div>
     </section>

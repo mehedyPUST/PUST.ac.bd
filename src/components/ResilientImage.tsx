@@ -10,6 +10,7 @@ interface ResilientImageProps {
   caption?: string;
   className?: string;
   containerClassName?: string;
+  priority?: boolean;
 }
 
 export function ResilientImage({
@@ -19,6 +20,7 @@ export function ResilientImage({
   caption,
   className = 'w-full h-full object-cover',
   containerClassName = '',
+  priority = false,
 }: ResilientImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
@@ -43,6 +45,8 @@ export function ResilientImage({
           <img
             src={currentSrc}
             alt={alt}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
             referrerPolicy="no-referrer"
             onError={handleError}
             className={className}

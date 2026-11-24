@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import type { AppRoute } from '../lib/routes';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
@@ -88,9 +89,8 @@ export function AdministrationSection({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onNavigate('/administration')}
+          <Link
+            href="/administration"
             className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               route === '/administration'
                 ? 'bg-pust-900 text-white'
@@ -98,12 +98,11 @@ export function AdministrationSection({
             }`}
           >
             Overview
-          </button>
+          </Link>
           {OFFICE_SUBROUTES.map((item) => (
-            <button
+            <Link
               key={item.route}
-              type="button"
-              onClick={() => onNavigate(item.route)}
+              href={item.route}
               className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 route === item.route
                   ? 'bg-pust-900 text-white'
@@ -111,7 +110,7 @@ export function AdministrationSection({
               }`}
             >
               {item.label}
-            </button>
+            </Link>
           ))}
         </div>
       </div>
