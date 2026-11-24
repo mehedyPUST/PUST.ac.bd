@@ -70,375 +70,436 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-40 bg-white border-b border-slate-200 print:hidden"
+      className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        {/* Zone 1: Brand Crest & Title */}
-        <Link
-          href="/"
-          onClick={() => {
-            setHoveredGroup(null);
-            setMobileMenuOpen(false);
-          }}
-          title="Pabna University of Science and Technology"
-          className="inline-flex items-center gap-2 font-serif text-sm font-semibold tracking-tight text-slate-900 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
-        >
-          <PustCrest size={34} className="shrink-0" />
-          <span className="hidden xl:inline">Pabna University of Science &amp; Technology</span>
-          <span className="xl:hidden">PUST</span>
-        </Link>
+      <div className="relative">
+        {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-14 sm:h-[60px] bg-pust-900"
+        />
 
-        {/* Zone 2: Desktop Single-Row Nav Links & Sub-Topic Menus */}
-        <nav
-          aria-label="Primary navigation"
-          className="hidden lg:flex items-center gap-3 xl:gap-3.5 text-[13px] font-medium text-slate-700"
-        >
-          {/* Home */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('home')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'home' ? null : prev))}
-          >
-            <Link
-              href="/"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route === '/' ? 'text-pust-900 font-semibold' : 'hover:text-pust-900'
-              }`}
-            >
-              Home
-            </Link>
-            {hoveredGroup === 'home' && (
-              <div className="absolute left-0 top-full pt-1.5 w-60 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {HOME_SUBTOPICS.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setHoveredGroup(null)}
-                      className="block rounded-lg px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-pust-900 transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* About */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('about')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'about' ? null : prev))}
-          >
-            <Link
-              href="/about"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/about') ? 'text-pust-900 font-semibold' : 'hover:text-pust-900'
-              }`}
-            >
-              About
-            </Link>
-            {hoveredGroup === 'about' && (
-              <div className="absolute left-0 top-full pt-1.5 w-56 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {aboutGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Governance */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('governance')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'governance' ? null : prev))}
-          >
-            <Link
-              href="/governance"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/governance')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Governance
-            </Link>
-            {hoveredGroup === 'governance' && (
-              <div className="absolute left-0 top-full pt-1.5 w-60 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {governanceGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route ||
-                        (route === '/governance/university-act' &&
-                          item.route === '/governance/pust-act')
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Administration */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('administration')}
-            onMouseLeave={() =>
-              setHoveredGroup((prev) => (prev === 'administration' ? null : prev))
-            }
-          >
-            <Link
-              href="/administration"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/administration')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Administration
-            </Link>
-            {hoveredGroup === 'administration' && (
-              <div className="absolute left-0 top-full pt-1.5 w-[440px] max-w-[calc(100vw-2rem)] z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
-                  {adminGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Academic */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('academic')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'academic' ? null : prev))}
-          >
-            <Link
-              href="/academics"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/academics')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Academic
-            </Link>
-            {hoveredGroup === 'academic' && (
-              <div className="absolute right-0 top-full pt-1.5 w-[420px] max-w-[calc(100vw-2rem)] z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
-                  {academicGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Facilities */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('facilities')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'facilities' ? null : prev))}
-          >
-            <Link
-              href="/facilities"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/facilities')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Facilities
-            </Link>
-            {hoveredGroup === 'facilities' && (
-              <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {facilitiesGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Notices */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('notices')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'notices' ? null : prev))}
-          >
-            <Link
-              href="/notices"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/notices')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Notices
-            </Link>
-            {hoveredGroup === 'notices' && (
-              <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {noticesGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Admission */}
-          <div
-            className="relative"
-            onMouseEnter={() => setHoveredGroup('admission')}
-            onMouseLeave={() => setHoveredGroup((prev) => (prev === 'admission' ? null : prev))}
-          >
-            <Link
-              href="/admissions"
-              onClick={() => setHoveredGroup(null)}
-              className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-                route.startsWith('/admissions')
-                  ? 'text-pust-900 font-semibold'
-                  : 'hover:text-pust-900'
-              }`}
-            >
-              Admission
-            </Link>
-            {hoveredGroup === 'admission' && (
-              <div className="absolute right-0 top-full pt-1.5 w-56 z-50">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
-                  {admissionGroup.items.map((item) => (
-                    <Link
-                      key={item.route}
-                      href={item.route}
-                      onClick={() => setHoveredGroup(null)}
-                      className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
-                        route === item.route
-                          ? 'bg-pust-50 text-pust-900 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Verify (standalone link) */}
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+          {/* Left Column: Spanning Official University Crest Box */}
           <Link
-            href="/verify"
-            onClick={() => setHoveredGroup(null)}
-            className={`inline-block py-2 transition-colors whitespace-nowrap shrink-0 ${
-              route === '/verify' ? 'text-pust-900 font-semibold' : 'hover:text-pust-900'
-            }`}
-          >
-            Verify
-          </Link>
-        </nav>
-
-        {/* Zone 3: Primary CTA (Portal) + Mobile Trigger */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Link
-            href={route === '/portal' ? '/' : '/portal'}
+            href="/"
             onClick={() => {
               setHoveredGroup(null);
               setMobileMenuOpen(false);
             }}
-            className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+            title="Pabna University of Science and Technology"
+            className="relative z-10 bg-white px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-center shrink-0 border-r border-slate-100 hover:opacity-95 transition-opacity"
           >
-            {route === '/portal'
-              ? 'Public Website'
-              : user
-              ? `${user.name.split(' ')[0]} · Portal`
-              : 'Portal'}
+            <PustCrest size={44} className="lg:hidden" />
+            <PustCrest size={78} className="hidden lg:block" />
           </Link>
 
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={mobileMenuOpen}
-            className="lg:hidden min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 hover:text-pust-900 cursor-pointer"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            {/* Tier 1: University Title Band */}
+            <div className="h-14 sm:h-[60px] px-3.5 sm:px-6 flex items-center justify-between gap-3 text-white">
+              <Link
+                href="/"
+                onClick={() => {
+                  setHoveredGroup(null);
+                  setMobileMenuOpen(false);
+                }}
+                className="font-serif text-base sm:text-xl lg:text-[26px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+              >
+                Pabna University of Science and Technology
+              </Link>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden xl:inline font-mono text-[11px] uppercase tracking-widest text-pust-200">
+                  Est. 2008 · Rajapur, Pabna
+                </span>
+
+                {/* Mobile Portal CTA & Menu Trigger */}
+                <Link
+                  href={route === '/portal' ? '/' : '/portal'}
+                  onClick={() => {
+                    setHoveredGroup(null);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="lg:hidden px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                >
+                  {route === '/portal'
+                    ? 'Public Site'
+                    : user
+                    ? `${user.name.split(' ')[0]} · Portal`
+                    : 'Portal'}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen((prev) => !prev)}
+                  aria-label="Toggle navigation menu"
+                  aria-expanded={mobileMenuOpen}
+                  className="lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
+                >
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Tier 2: Desktop Navigation Links Strip */}
+            <div className="hidden lg:flex h-11 px-4 sm:px-6 bg-white items-center justify-between gap-4">
+              <nav
+                aria-label="Primary navigation"
+                className="flex items-center gap-4 xl:gap-6 text-[13.5px] font-medium text-slate-800"
+              >
+                {/* Home */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('home')}
+                  onMouseLeave={() => setHoveredGroup((prev) => (prev === 'home' ? null : prev))}
+                >
+                  <Link
+                    href="/"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route === '/'
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Home
+                  </Link>
+                  {hoveredGroup === 'home' && (
+                    <div className="absolute left-0 top-full pt-1 w-60 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {HOME_SUBTOPICS.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setHoveredGroup(null)}
+                            className="block rounded-lg px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-pust-900 transition-colors"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Governance */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('governance')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'governance' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/governance"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/governance')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Governance
+                  </Link>
+                  {hoveredGroup === 'governance' && (
+                    <div className="absolute left-0 top-full pt-1 w-60 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {governanceGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route ||
+                              (route === '/governance/university-act' &&
+                                item.route === '/governance/pust-act')
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* About */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('about')}
+                  onMouseLeave={() => setHoveredGroup((prev) => (prev === 'about' ? null : prev))}
+                >
+                  <Link
+                    href="/about"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/about')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    About
+                  </Link>
+                  {hoveredGroup === 'about' && (
+                    <div className="absolute left-0 top-full pt-1 w-56 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {aboutGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Administration */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('administration')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'administration' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/administration"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/administration')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Administration
+                  </Link>
+                  {hoveredGroup === 'administration' && (
+                    <div className="absolute left-0 top-full pt-1 w-[440px] max-w-[calc(100vw-2rem)] z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
+                        {adminGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Academic */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('academic')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'academic' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/academics"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/academics')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Academic
+                  </Link>
+                  {hoveredGroup === 'academic' && (
+                    <div className="absolute left-0 top-full pt-1 w-[420px] max-w-[calc(100vw-2rem)] z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
+                        {academicGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Facilities */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('facilities')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'facilities' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/facilities"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/facilities')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Facilities
+                  </Link>
+                  {hoveredGroup === 'facilities' && (
+                    <div className="absolute right-0 top-full pt-1 w-56 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {facilitiesGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Notices */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('notices')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'notices' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/notices"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/notices')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Notices
+                  </Link>
+                  {hoveredGroup === 'notices' && (
+                    <div className="absolute right-0 top-full pt-1 w-56 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {noticesGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Admission */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setHoveredGroup('admission')}
+                  onMouseLeave={() =>
+                    setHoveredGroup((prev) => (prev === 'admission' ? null : prev))
+                  }
+                >
+                  <Link
+                    href="/admissions"
+                    onClick={() => setHoveredGroup(null)}
+                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      route.startsWith('/admissions')
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                    }`}
+                  >
+                    Admission
+                  </Link>
+                  {hoveredGroup === 'admission' && (
+                    <div className="absolute right-0 top-full pt-1 w-56 z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                        {admissionGroup.items.map((item) => (
+                          <Link
+                            key={item.route}
+                            href={item.route}
+                            onClick={() => setHoveredGroup(null)}
+                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                              route === item.route
+                                ? 'bg-pust-50 text-pust-900 font-semibold'
+                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Verify */}
+                <Link
+                  href="/verify"
+                  onClick={() => setHoveredGroup(null)}
+                  className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    route === '/verify'
+                      ? 'border-pust-800 text-pust-900 font-semibold'
+                      : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                  }`}
+                >
+                  Verify
+                </Link>
+              </nav>
+
+              {/* Desktop Portal Action */}
+              <Link
+                href={route === '/portal' ? '/' : '/portal'}
+                onClick={() => {
+                  setHoveredGroup(null);
+                  setMobileMenuOpen(false);
+                }}
+                className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+              >
+                {route === '/portal'
+                  ? 'Public Website'
+                  : user
+                  ? `${user.name.split(' ')[0]} · Portal`
+                  : 'Portal'}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 

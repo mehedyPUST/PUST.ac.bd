@@ -152,7 +152,7 @@ export function HomePage({
   return (
     <main className="flex-1 bg-[#F7F7F5]">
       {/* 1. Banner */}
-      <section id="banner" className="bg-[#F7F7F5] border-b border-slate-200 scroll-mt-16">
+      <section id="banner" className="bg-[#F7F7F5] border-b border-slate-200 scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-6 flex flex-col justify-between py-2">
@@ -248,7 +248,7 @@ export function HomePage({
       {/* 2. Vice-Chancellor's Welcome Message */}
       <section
         id="vc-message"
-        className="bg-white border-b border-slate-200 py-14 lg:py-16 scroll-mt-16"
+        className="bg-white border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           {/* Left Sticky Column: VC Portrait, Desk Dossier & About PUST Summary */}
@@ -417,7 +417,7 @@ export function HomePage({
       {/* 3. Notice Board */}
       <section
         id="notice-board"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16 scroll-mt-16"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-5">
@@ -588,7 +588,7 @@ export function HomePage({
       {/* 4. Recent Publications */}
       <section
         id="recent-publications"
-        className="bg-white border-t border-b border-slate-200 py-14 lg:py-16 scroll-mt-16"
+        className="bg-white border-t border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-6">
@@ -688,7 +688,7 @@ export function HomePage({
       {/* 5. News and Events */}
       <section
         id="news-events"
-        className="bg-[#F7F7F5] py-14 lg:py-16 scroll-mt-16"
+        className="bg-[#F7F7F5] py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200">

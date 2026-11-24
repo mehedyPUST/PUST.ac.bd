@@ -77,16 +77,6 @@ export interface NavGroup {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    id: 'about',
-    label: 'About',
-    defaultRoute: '/about',
-    items: [
-      { label: 'Our University', route: '/about/our-university' },
-      { label: 'Mission & Vision', route: '/about/mission-vision' },
-      { label: 'History and Plans', route: '/about/history' },
-    ],
-  },
-  {
     id: 'governance',
     label: 'Governance',
     defaultRoute: '/governance',
@@ -96,6 +86,16 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Academic Council', route: '/governance/academic-council' },
       { label: 'Finance Committee', route: '/governance/finance-committee' },
       { label: 'Academic Ordinance', route: '/governance/academic-ordinance' },
+    ],
+  },
+  {
+    id: 'about',
+    label: 'About',
+    defaultRoute: '/about',
+    items: [
+      { label: 'Our University', route: '/about/our-university' },
+      { label: 'Mission & Vision', route: '/about/mission-vision' },
+      { label: 'History and Plans', route: '/about/history' },
     ],
   },
   {
