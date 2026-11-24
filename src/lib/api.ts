@@ -490,16 +490,24 @@ export const pustApi = {
       }
     ),
 
+  getExamStudentContext: (academicId: string) =>
+    apiFetch<{ student: StudentRecord; previousResults: ExamResultRecord[] }>(
+      `/api/portal/exams/student-context/${encodeURIComponent(academicId.trim())}`
+    ),
+
   publishExamResult: (payload: {
     academicId: string;
     semester: number;
     promotionMode: 'auto' | 'manual_promoted' | 'manual_repeat';
     courses: Array<{ code: string; title: string; credits: number; marks: number }>;
   }) =>
-    apiFetch<{ result: ExamResultRecord; pendingChairmanReview?: boolean }>('/api/portal/exams/results', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    apiFetch<{ result: ExamResultRecord; pendingChairmanReview?: boolean; cumulativeCgpa?: number }>(
+      '/api/portal/exams/results',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
 
   approvePendingExamResult: (
     id: string,

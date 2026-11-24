@@ -908,6 +908,40 @@ portalRouter.get('/exams/overview', requireAuth, async (req: AuthenticatedReques
   });
 });
 
+portalRouter.get(
+  '/exams/student-context/:academicId',
+  requireRoles('teacher', 'chairman', 'admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const academicId = String(req.params.academicId || '').trim();
+    if (!academicId) {
+      res.status(400).json({ error: 'Student academic ID is required.' });
+      return;
+    }
+
+    const student = await pustRepo.findStudentByAcademicId(academicId);
+    if (!student) {
+      res.status(404).json({ error: `No student found with Academic ID "${academicId}".` });
+      return;
+    }
+
+    if (
+      (req.authUser!.role === 'teacher' || req.authUser!.role === 'chairman') &&
+      student.departmentCode !== req.authUser!.departmentCode
+    ) {
+      res.status(403).json({
+        error: `Access restricted: Student ${student.academicId} belongs to ${student.departmentCode}, outside your department (${req.authUser!.departmentCode}).`,
+      });
+      return;
+    }
+
+    const previousResults = (await pustRepo.listExamResults())
+      .filter((r) => r.academicId === student.academicId && r.published)
+      .sort((a, b) => a.semester - b.semester);
+
+    res.json({ student, previousResults });
+  }
+);
+
 portalRouter.post(
   '/exams/courses',
   requireRoles('admin', 'chairman'),
@@ -1163,8 +1197,9 @@ portalRouter.post(
       publishedAt: new Date().toISOString().slice(0, 10),
     });
 
+    let cumulativeCgpa: number | undefined;
     if (publishImmediately) {
-      const cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, sgpa);
+      cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, sgpa);
       await pustRepo.updateStudentById(stu.id, {
         ...(promotionStatus.startsWith('Promoted')
           ? {
@@ -1200,7 +1235,11 @@ portalRouter.post(
       );
     }
 
-    res.status(201).json({ result, pendingChairmanReview: !publishImmediately });
+    res.status(201).json({
+      result,
+      pendingChairmanReview: !publishImmediately,
+      ...(cumulativeCgpa !== undefined ? { cumulativeCgpa } : {}),
+    });
   }
 );
 

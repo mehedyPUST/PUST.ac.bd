@@ -8,6 +8,7 @@ import {
   FileCheck2,
   Plus,
   Printer,
+  Search,
   Trash2,
 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
@@ -24,6 +25,7 @@ import type {
   ExamResultRecord,
   HallDueRecord,
   PaymentGatewayConfig,
+  StudentRecord,
 } from '../../types/pust';
 
 interface ExamPanelProps {
@@ -117,10 +119,16 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
   // Teacher / Chairman / Admin Multi-Course Gradebook Entry
   const [resAcademicId, setResAcademicId] = useState('');
-  const [resSemester, setResSemester] = useState(6);
+  const [resYear, setResYear] = useState(3);
+  const [resTermSem, setResTermSem] = useState(1);
   const [resPromoMode, setResPromoMode] = useState<'auto' | 'manual_promoted' | 'manual_repeat'>(
     'auto'
   );
+  const [retrievedStudent, setRetrievedStudent] = useState<StudentRecord | null>(null);
+  const [previousStudentResults, setPreviousStudentResults] = useState<ExamResultRecord[]>([]);
+  const [studentLookupLoading, setStudentLookupLoading] = useState(false);
+  const [studentLookupError, setStudentLookupError] = useState<string | null>(null);
+  const [publishingResult, setPublishingResult] = useState(false);
   const [courseRows, setCourseRows] = useState<GradeRowInput[]>([
     { key: 'row-1', code: 'CSE-3201', title: 'Operating Systems', credits: 3, marks: 82 },
     { key: 'row-2', code: 'CSE-3203', title: 'Computer Networks', credits: 3, marks: 76 },
@@ -207,30 +215,171 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
   const activeCircular = circulars.find((c) => c.id === selectedCircularId) || circulars[0];
 
-  const deptCourses = useMemo(
-    () =>
-      user.role === 'teacher' || user.role === 'chairman'
-        ? courses.filter((c) => c.departmentCode === user.departmentCode)
-        : courses,
-    [courses, user.role, user.departmentCode]
+  const computedResSemester = (resYear - 1) * 2 + resTermSem;
+
+  const fetchStudentContext = useCallback(
+    async (academicIdInput: string, syncTermAndCourses: boolean) => {
+      const trimmed = academicIdInput.trim();
+      if (trimmed.length < 3) {
+        setRetrievedStudent(null);
+        setPreviousStudentResults([]);
+        setStudentLookupError(null);
+        setStudentLookupLoading(false);
+        return;
+      }
+
+      setStudentLookupLoading(true);
+      setStudentLookupError(null);
+      try {
+        const data = await pustApi.getExamStudentContext(trimmed);
+        setRetrievedStudent(data.student);
+        setPreviousStudentResults(data.previousResults);
+        setStudentLookupError(null);
+
+        if (syncTermAndCourses) {
+          const targetSem = Math.max(1, Math.min(10, data.student.currentSemester || 1));
+          setResYear(Math.ceil(targetSem / 2));
+          setResTermSem(targetSem % 2 === 1 ? 1 : 2);
+        }
+      } catch (err) {
+        setRetrievedStudent(null);
+        setPreviousStudentResults([]);
+        setStudentLookupError(err instanceof Error ? err.message : 'Student lookup failed.');
+      } finally {
+        setStudentLookupLoading(false);
+      }
+    },
+    []
   );
 
-  const estimatedSgpa = useMemo(() => {
-    let totalCr = 0;
-    let totalPts = 0;
-    for (const row of courseRows) {
-      const cr = Number(row.credits) || 0;
-      const { gp } = computePustGrade(row.marks);
-      totalCr += cr;
-      totalPts += cr * gp;
+  useEffect(() => {
+    if (!['teacher', 'chairman', 'admin'].includes(user.role)) return;
+    const trimmed = resAcademicId.trim();
+    if (trimmed.length < 3) {
+      setRetrievedStudent(null);
+      setPreviousStudentResults([]);
+      setStudentLookupError(null);
+      setStudentLookupLoading(false);
+      return;
     }
-    return totalCr > 0 ? totalPts / totalCr : 0;
-  }, [courseRows]);
+
+    let cancelled = false;
+    setStudentLookupLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const data = await pustApi.getExamStudentContext(trimmed);
+        if (cancelled) return;
+        setRetrievedStudent(data.student);
+        setPreviousStudentResults(data.previousResults);
+        setStudentLookupError(null);
+
+        const targetSem = Math.max(1, Math.min(10, data.student.currentSemester || 1));
+        setResYear(Math.ceil(targetSem / 2));
+        setResTermSem(targetSem % 2 === 1 ? 1 : 2);
+      } catch (err) {
+        if (cancelled) return;
+        setRetrievedStudent(null);
+        setPreviousStudentResults([]);
+        setStudentLookupError(err instanceof Error ? err.message : 'Student lookup failed.');
+      } finally {
+        if (!cancelled) setStudentLookupLoading(false);
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [resAcademicId, user.role]);
+
+  const deptCourses = useMemo(() => {
+    if (retrievedStudent) {
+      return courses.filter((c) => c.departmentCode === retrievedStudent.departmentCode);
+    }
+    return user.role === 'teacher' || user.role === 'chairman'
+      ? courses.filter((c) => c.departmentCode === user.departmentCode)
+      : courses;
+  }, [courses, retrievedStudent, user.role, user.departmentCode]);
+
+  const matchingGradebookTermCourses = useMemo(() => {
+    const deptCode = retrievedStudent?.departmentCode || (user.departmentCode !== 'ADMIN' ? user.departmentCode : '');
+    if (!deptCode) return [];
+    const exactSessionAndSem = courses.filter(
+      (c) =>
+        c.departmentCode === deptCode &&
+        c.semester === computedResSemester &&
+        (!retrievedStudent || c.session === retrievedStudent.session)
+    );
+    if (exactSessionAndSem.length > 0) return exactSessionAndSem;
+    return courses.filter((c) => c.departmentCode === deptCode && c.semester === computedResSemester);
+  }, [courses, retrievedStudent, user.departmentCode, computedResSemester]);
+
+  useEffect(() => {
+    if (!retrievedStudent) return;
+    if (matchingGradebookTermCourses.length > 0) {
+      setCourseRows(
+        matchingGradebookTermCourses.map((c, idx) => ({
+          key: `row-${c.id}-${idx}`,
+          code: c.code,
+          title: c.title,
+          credits: c.credits,
+          marks: 75,
+        }))
+      );
+    }
+  }, [retrievedStudent, computedResSemester, matchingGradebookTermCourses]);
 
   const totalGradebookCredits = useMemo(
     () => courseRows.reduce((sum, r) => sum + (Number(r.credits) || 0), 0),
     [courseRows]
   );
+
+  const currentWeightedPoints = useMemo(() => {
+    let totalPts = 0;
+    for (const row of courseRows) {
+      const cr = Number(row.credits) || 0;
+      const { gp } = computePustGrade(row.marks);
+      totalPts += cr * gp;
+    }
+    return totalPts;
+  }, [courseRows]);
+
+  const estimatedSgpa = useMemo(
+    () => (totalGradebookCredits > 0 ? currentWeightedPoints / totalGradebookCredits : 0),
+    [currentWeightedPoints, totalGradebookCredits]
+  );
+
+  const priorResultsForCgpa = useMemo(
+    () => previousStudentResults.filter((r) => r.semester !== computedResSemester),
+    [previousStudentResults, computedResSemester]
+  );
+
+  const existingSameSemesterResult = useMemo(
+    () => previousStudentResults.find((r) => r.semester === computedResSemester) ?? null,
+    [previousStudentResults, computedResSemester]
+  );
+
+  const previousStandingStats = useMemo(() => {
+    let credits = 0;
+    let weighted = 0;
+    for (const r of priorResultsForCgpa) {
+      for (const c of r.courses) {
+        credits += Number(c.credits) || 0;
+        weighted += (Number(c.gradePoint) || 0) * (Number(c.credits) || 0);
+      }
+    }
+    return {
+      credits,
+      weighted,
+      cgpa: credits > 0 ? weighted / credits : null,
+    };
+  }, [priorResultsForCgpa]);
+
+  const projectedCombinedCredits = previousStandingStats.credits + totalGradebookCredits;
+  const projectedCumulativeCgpa = useMemo(() => {
+    if (projectedCombinedCredits <= 0) return 0;
+    return (previousStandingStats.weighted + currentWeightedPoints) / projectedCombinedCredits;
+  }, [previousStandingStats.weighted, currentWeightedPoints, projectedCombinedCredits]);
 
   function handleSelectCircular(id: string) {
     setSelectedCircularId(id);
@@ -433,31 +582,44 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       return;
     }
 
+    setPublishingResult(true);
     try {
       const res = await pustApi.publishExamResult({
         academicId: resAcademicId.trim(),
-        semester: Number(resSemester),
+        semester: computedResSemester,
         promotionMode: resPromoMode,
         courses: sanitized,
       });
 
+      const yearLabel = ACADEMIC_YEARS.find((y) => y.value === resYear)?.label ?? `${resYear}`;
+      const semLabel = YEAR_SEMESTERS.find((s) => s.value === resTermSem)?.label ?? `${resTermSem}`;
+
       if (res.pendingChairmanReview) {
         setFeedback(
-          `Submitted Semester ${res.result.semester} marksheet for ${res.result.academicId} to Chairman verification queue (Calculated SGPA ${res.result.sgpa.toFixed(
+          `Submitted ${yearLabel} Year, ${semLabel} Semester marksheet for ${res.result.studentName} (${res.result.academicId}) to Chairman verification queue (SGPA ${res.result.sgpa.toFixed(
             2
           )}).`
         );
       } else {
+        const cgpaText =
+          typeof res.cumulativeCgpa === 'number'
+            ? ` · Updated CGPA ${res.cumulativeCgpa.toFixed(2)}`
+            : '';
         setFeedback(
-          `Published Semester ${res.result.semester} result for ${res.result.academicId}: SGPA ${res.result.sgpa.toFixed(
+          `Published ${yearLabel} Year, ${semLabel} Semester result for ${res.result.studentName} (${res.result.academicId}): SGPA ${res.result.sgpa.toFixed(
             2
-          )} (${res.result.promotionStatus}).`
+          )}${cgpaText} (${res.result.promotionStatus}).`
         );
       }
       setResAcademicId('');
+      setRetrievedStudent(null);
+      setPreviousStudentResults([]);
+      setStudentLookupError(null);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to submit exam result.');
+    } finally {
+      setPublishingResult(false);
     }
   }
 
@@ -1368,9 +1530,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           onSubmit={handlePublishResult}
           className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs"
         >
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-pust-800">
+              <p className="text-xs font-semibold text-pust-800">
                 {user.role === 'teacher'
                   ? 'Step 1 · Teacher Marksheet Preparation'
                   : 'Direct Result Entry & Publication'}
@@ -1380,58 +1542,120 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               </h3>
               <p className="text-xs text-slate-600 mt-0.5">
                 {user.role === 'teacher'
-                  ? 'Submitted marksheets enter the Chairman Verification Queue before official publication.'
-                  : 'Enter multi-course marks under the PUST 4.00 grading scale and publish directly.'}
+                  ? 'Retrieve a student by Academic ID, choose Year & Semester, and submit marks for Chairman review.'
+                  : 'Retrieve a student by Academic ID, enter semester marks, and calculate live SGPA & cumulative CGPA.'}
               </p>
             </div>
-            <div className="px-4 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200 text-right font-mono tabular-nums">
-              <span className="block text-[10px] uppercase tracking-wider text-slate-500">
-                Live Estimated SGPA
-              </span>
-              <span className="text-lg font-semibold text-pust-900">
-                {estimatedSgpa.toFixed(2)}{' '}
-                <span className="text-xs font-normal text-slate-500">
-                  ({totalGradebookCredits} Cr)
+            <div className="flex flex-wrap items-center gap-3 font-mono tabular-nums">
+              <div className="px-4 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200 text-right">
+                <span className="block text-[11px] text-slate-500">
+                  This Semester GPA
                 </span>
-              </span>
+                <span className="text-lg font-semibold text-pust-900">
+                  {estimatedSgpa.toFixed(2)}{' '}
+                  <span className="text-xs font-normal text-slate-500">
+                    ({totalGradebookCredits} Cr)
+                  </span>
+                </span>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200 text-right">
+                <span className="block text-[11px] text-slate-500">
+                  CGPA (With Prev.)
+                </span>
+                <span className="text-lg font-semibold text-slate-900">
+                  {projectedCumulativeCgpa.toFixed(2)}{' '}
+                  <span className="text-xs font-normal text-slate-500">
+                    ({projectedCombinedCredits} Cr)
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div className="sm:col-span-4">
+              <label
+                htmlFor="gradebook-academic-id"
+                className="block text-xs font-medium text-slate-700 mb-1"
+              >
                 Student Academic ID
               </label>
-              <input
-                type="text"
-                required
-                value={resAcademicId}
-                onChange={(e) => setResAcademicId(e.target.value)}
-                placeholder="e.g. 220101"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-              />
+              <div className="flex items-stretch rounded-lg border border-slate-300 bg-[#F7F7F5] focus-within:bg-white focus-within:border-pust-800 overflow-hidden">
+                <input
+                  id="gradebook-academic-id"
+                  type="text"
+                  required
+                  value={resAcademicId}
+                  onChange={(e) => setResAcademicId(e.target.value)}
+                  placeholder="e.g. 220101"
+                  className="w-full min-w-0 px-3 py-2 text-xs font-mono bg-transparent text-slate-900 focus:outline-none tabular-nums"
+                />
+                <button
+                  type="button"
+                  onClick={() => fetchStudentContext(resAcademicId, true)}
+                  disabled={studentLookupLoading || resAcademicId.trim().length < 3}
+                  className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-pust-900 bg-pust-50 border-l border-slate-300 hover:bg-pust-100 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  {studentLookupLoading ? 'Loading' : 'Retrieve'}
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
-                Semester (1–10)
+
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="gradebook-year"
+                className="block text-xs font-medium text-slate-700 mb-1"
+              >
+                Year
               </label>
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={resSemester}
-                onChange={(e) => setResSemester(Number(e.target.value))}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
-              />
+              <select
+                id="gradebook-year"
+                value={resYear}
+                onChange={(e) => setResYear(Number(e.target.value))}
+                className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              >
+                {ACADEMIC_YEARS.map((yr) => (
+                  <option key={yr.value} value={yr.value}>
+                    {yr.label} Year
+                  </option>
+                ))}
+              </select>
             </div>
-            <div>
-              <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="gradebook-term-semester"
+                className="block text-xs font-medium text-slate-700 mb-1"
+              >
+                Semester
+              </label>
+              <select
+                id="gradebook-term-semester"
+                value={resTermSem}
+                onChange={(e) => setResTermSem(Number(e.target.value))}
+                className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              >
+                {YEAR_SEMESTERS.map((sem) => (
+                  <option key={sem.value} value={sem.value}>
+                    {sem.label} Semester
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="gradebook-promo"
+                className="block text-xs font-medium text-slate-700 mb-1"
+              >
                 Promotion Policy
               </label>
               <select
+                id="gradebook-promo"
                 value={resPromoMode}
                 onChange={(e) => setResPromoMode(e.target.value as typeof resPromoMode)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+                className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
               >
                 <option value="auto">Auto Promotion Check (SGPA &gt;= 2.00)</option>
                 <option value="manual_promoted">Manual Override — Promoted</option>
@@ -1440,12 +1664,118 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </div>
           </div>
 
+          {/* Retrieved Student Basic Information & Previous Semester Record */}
+          {studentLookupLoading && (
+            <div className="px-4 py-3 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs font-mono text-slate-600">
+              Retrieving student record for Academic ID {resAcademicId.trim()}...
+            </div>
+          )}
+
+          {!studentLookupLoading && studentLookupError && (
+            <div className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-800">
+              {studentLookupError}
+            </div>
+          )}
+
+          {!studentLookupLoading && retrievedStudent && (
+            <div className="px-4 py-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex flex-wrap items-baseline gap-2 text-sm">
+                  <span className="font-semibold text-slate-900">{retrievedStudent.name}</span>
+                  <span className="text-slate-400" aria-hidden="true">·</span>
+                  <span className="font-mono text-xs font-semibold text-pust-900 tabular-nums">
+                    ID {retrievedStudent.academicId}
+                  </span>
+                  <span className="text-slate-400" aria-hidden="true">·</span>
+                  <span className="text-xs text-slate-700">
+                    {departments.find((d) => d.code === retrievedStudent.departmentCode)?.name ??
+                      retrievedStudent.departmentCode}{' '}
+                    ({retrievedStudent.departmentCode})
+                  </span>
+                  <span className="text-slate-400" aria-hidden="true">·</span>
+                  <span className="font-mono text-xs text-slate-600 tabular-nums">
+                    Session {retrievedStudent.session}
+                  </span>
+                </div>
+                <span className="font-mono text-xs font-semibold text-slate-800 tabular-nums">
+                  Recorded CGPA: {retrievedStudent.cgpa.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-600 tabular-nums">
+                <span>Current Semester: {retrievedStudent.currentSemester}</span>
+                <span aria-hidden="true">·</span>
+                <span>Completed Semesters: {retrievedStudent.completedSemesters}</span>
+                <span aria-hidden="true">·</span>
+                <span>Hall: {retrievedStudent.hallName}</span>
+                <span aria-hidden="true">·</span>
+                <span>Disciplinary Standing: {retrievedStudent.disciplinaryStatus}</span>
+                <span aria-hidden="true">·</span>
+                <span>Email: {retrievedStudent.email}</span>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                {priorResultsForCgpa.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] text-slate-700 tabular-nums">
+                    <span className="font-semibold text-slate-800">Previous Semesters:</span>
+                    {priorResultsForCgpa.map((r, i) => {
+                      const cr = r.courses.reduce((s, c) => s + (Number(c.credits) || 0), 0);
+                      return (
+                        <span key={r.id}>
+                          {i > 0 && <span className="mr-2 text-slate-400">·</span>}
+                          Sem {r.semester}: {r.sgpa.toFixed(2)} ({cr} Cr)
+                        </span>
+                      );
+                    })}
+                    <span className="text-slate-400" aria-hidden="true">·</span>
+                    <span className="font-semibold text-pust-900">
+                      Prev CGPA {previousStandingStats.cgpa?.toFixed(2)} ({previousStandingStats.credits} Cr)
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-slate-500">
+                    No prior published semester marksheets in gradebook yet (this semester establishes cumulative CGPA).
+                  </span>
+                )}
+
+                {existingSameSemesterResult && (
+                  <span className="text-[11px] font-medium text-amber-800 tabular-nums">
+                    Note: Semester {computedResSemester} already has a published result (SGPA{' '}
+                    {existingSameSemesterResult.sgpa.toFixed(2)}).
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Quick Pick Courses from Catalog */}
-          {deptCourses.length > 0 && (
-            <div className="space-y-1.5">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                Quick-Add From Course Catalog
-              </p>
+          {(deptCourses.length > 0 || matchingGradebookTermCourses.length > 0) && (
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs font-medium text-slate-700">
+                  Quick-Add From Course Catalog
+                  {retrievedStudent ? ` (${retrievedStudent.departmentCode})` : ''}
+                </p>
+                {matchingGradebookTermCourses.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCourseRows(
+                        matchingGradebookTermCourses.map((c, idx) => ({
+                          key: `row-${c.id}-${Date.now()}-${idx}`,
+                          code: c.code,
+                          title: c.title,
+                          credits: c.credits,
+                          marks: 75,
+                        }))
+                      )
+                    }
+                    className="text-xs font-medium text-pust-800 hover:text-pust-950 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    Load Semester {computedResSemester} Courses ({matchingGradebookTermCourses.length})
+                  </button>
+                )}
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {deptCourses.map((c) => {
                   const already = courseRows.some(
@@ -1472,7 +1802,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </div>
           )}
 
-          {/* Dynamic Multi-Course Table */}
+          {/* Dynamic Multi-Course Table (This Semester Result) */}
           <div className="rounded-xl border border-slate-200 overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
@@ -1564,6 +1894,44 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </table>
           </div>
 
+          {/* Live Term GPA & Combined CGPA Breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 py-3 rounded-xl border border-slate-200 bg-[#F7F7F5] font-mono tabular-nums">
+            <div>
+              <span className="block text-[11px] text-slate-500">
+                {ACADEMIC_YEARS.find((y) => y.value === resYear)?.label} Year ·{' '}
+                {YEAR_SEMESTERS.find((s) => s.value === resTermSem)?.label} Sem (Sem{' '}
+                {computedResSemester})
+              </span>
+              <span className="text-sm font-semibold text-pust-900">
+                This Semester GPA: {estimatedSgpa.toFixed(2)}{' '}
+                <span className="text-xs font-normal text-slate-500">
+                  ({totalGradebookCredits} Cr)
+                </span>
+              </span>
+            </div>
+            <div>
+              <span className="block text-[11px] text-slate-500">
+                Previous Semesters ({priorResultsForCgpa.length} sem)
+              </span>
+              <span className="text-sm font-semibold text-slate-800">
+                {previousStandingStats.cgpa !== null
+                  ? `${previousStandingStats.cgpa.toFixed(2)} (${previousStandingStats.credits} Cr)`
+                  : 'No prior record'}
+              </span>
+            </div>
+            <div>
+              <span className="block text-[11px] text-slate-500">
+                CGPA (With Previous Semesters)
+              </span>
+              <span className="text-sm font-semibold text-slate-900">
+                {projectedCumulativeCgpa.toFixed(2)}{' '}
+                <span className="text-xs font-normal text-slate-500">
+                  ({projectedCombinedCredits} Total Cr)
+                </span>
+              </span>
+            </div>
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               type="button"
@@ -1575,9 +1943,12 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+              disabled={publishingResult}
+              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
-              {user.role === 'teacher'
+              {publishingResult
+                ? 'Saving Result...'
+                : user.role === 'teacher'
                 ? 'Submit Marksheet for Chairman Review'
                 : 'Calculate SGPA & Publish Result'}
             </button>
