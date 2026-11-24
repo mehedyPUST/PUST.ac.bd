@@ -104,7 +104,7 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-14 sm:h-[60px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-12 lg:h-[60px] bg-pust-900"
         />
 
         <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
@@ -114,18 +114,19 @@ export function Navbar({
             onClick={() => {
               setHoveredGroup(null);
               setMobileMenuOpen(false);
+              setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 bg-white px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-center shrink-0"
+            className="relative z-10 bg-white px-2 py-1 lg:px-4 lg:py-2 flex items-center justify-center shrink-0"
           >
-            <PustCrest size={44} className="lg:hidden" />
-            <PustCrest size={78} className="hidden lg:block" />
+            <PustCrest size={34} className="lg:hidden" />
+            <PustCrest size={72} className="hidden lg:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-14 sm:h-[60px] px-3.5 sm:px-6 flex items-center justify-between gap-3 text-white">
+            <div className="h-12 lg:h-[60px] px-3 lg:px-6 flex items-center justify-between gap-2.5 lg:gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -133,7 +134,7 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-base sm:text-xl lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                className="font-serif text-base sm:text-lg lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
               >
                 <span className="sm:hidden">PUST</span>
                 <span className="hidden sm:inline">Pabna University of Science and Technology</span>
