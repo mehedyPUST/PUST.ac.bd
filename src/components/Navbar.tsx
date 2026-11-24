@@ -88,7 +88,7 @@ export function Navbar({ route, user, onNavigate }: NavbarProps) {
               setMobileMenuOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 bg-white px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-center shrink-0 border-r border-slate-100 hover:opacity-95 transition-opacity"
+            className="relative z-10 bg-white px-2.5 sm:px-4 py-1.5 sm:py-2 flex items-center justify-center shrink-0"
           >
             <PustCrest size={44} className="lg:hidden" />
             <PustCrest size={78} className="hidden lg:block" />

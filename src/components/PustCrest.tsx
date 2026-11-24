@@ -20,7 +20,7 @@ export function PustCrest({
   if (variant === 'light') {
     return (
       <span
-        className={`inline-flex items-center justify-center rounded-xl bg-white/95 p-1 shadow-xs ring-1 ring-white/20 shrink-0 ${className}`}
+        className={`inline-flex items-center justify-center rounded-xl bg-white p-1 shadow-xs ring-1 ring-white/20 shrink-0 ${className}`}
       >
         <Image
           src={pustLogo}
