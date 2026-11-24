@@ -104,10 +104,10 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-12 lg:h-[60px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-10 lg:h-[60px] bg-pust-900"
         />
 
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Spanning Official University Crest Box */}
           <Link
             href="/"
@@ -117,16 +117,16 @@ export function Navbar({
               setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 bg-white px-2 py-1 lg:px-4 lg:py-2 flex items-center justify-center shrink-0"
+            className="relative z-10 bg-white px-1.5 py-1 lg:px-4 lg:py-2 flex items-center justify-center shrink-0"
           >
-            <PustCrest size={34} className="lg:hidden" />
+            <PustCrest size={26} className="lg:hidden" />
             <PustCrest size={72} className="hidden lg:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title + Tier 2 Navigation Bar */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-12 lg:h-[60px] px-3 lg:px-6 flex items-center justify-between gap-2.5 lg:gap-3 text-white">
+            <div className="h-10 lg:h-[60px] px-2.5 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -134,13 +134,13 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-base sm:text-lg lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                className="font-serif text-sm sm:text-base lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
               >
                 <span className="sm:hidden">PUST</span>
                 <span className="hidden sm:inline">Pabna University of Science and Technology</span>
               </Link>
 
-              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 <div className="hidden 2xl:inline-flex items-center gap-1.5">
                   <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
                     {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
@@ -173,7 +173,7 @@ export function Navbar({
                   }}
                   aria-label="Toggle site search"
                   aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
+                  className={`lg:hidden w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors cursor-pointer ${
                     mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
@@ -187,13 +187,13 @@ export function Navbar({
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
                     title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`lg:hidden inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950'
                         : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
                     }`}
                   >
-                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                    {editMode ? <Eye className="w-3 h-3" /> : <Pencil className="w-3 h-3" />}
                     <span>{editMode ? 'Editing' : 'Edit'}</span>
                   </button>
                 )}
@@ -206,7 +206,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -227,9 +227,9 @@ export function Navbar({
                   }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className="lg:hidden min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
+                  className="lg:hidden w-8 h-8 inline-flex items-center justify-center rounded-md text-white hover:bg-pust-800 cursor-pointer"
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
                 </button>
               </div>
             </div>
