@@ -106,11 +106,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [circDept, setCircDept] = useState(
     user.departmentCode === 'ADMIN' ? 'CSE' : user.departmentCode
   );
-  const [circSem, setCircSem] = useState(6);
+  const [circYear, setCircYear] = useState(3);
+  const [circTermSem, setCircTermSem] = useState(2);
   const [circSession, setCircSession] = useState('2022-23');
   const [circDeadline, setCircDeadline] = useState('2026-12-10');
   const [circFee, setCircFee] = useState(1450);
   const [circCourseCodes, setCircCourseCodes] = useState<string[]>([]);
+  const [showAllDeptCourses, setShowAllDeptCourses] = useState(false);
+  const [publishingCircular, setPublishingCircular] = useState(false);
 
   // Teacher / Chairman / Admin Multi-Course Gradebook Entry
   const [resAcademicId, setResAcademicId] = useState('');
@@ -156,16 +159,35 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     if (user.role === 'chairman' && user.departmentCode && user.departmentCode !== 'ADMIN') {
       setCourseDept(user.departmentCode);
       setCircDept(user.departmentCode);
-    } else if (!courseDept && departments.length > 0) {
-      setCourseDept(departments[0].code);
+    } else if (departments.length > 0) {
+      if (!courseDept) setCourseDept(departments[0].code);
+      if (!circDept) setCircDept(departments[0].code);
     }
-  }, [user.role, user.departmentCode, departments, courseDept]);
+  }, [user.role, user.departmentCode, departments, courseDept, circDept]);
 
   const courseDeptPrefix = (courseDept || 'CSE')
     .replace(/[^A-Za-z]/g, '')
     .slice(0, 3)
     .toUpperCase();
   const computedCourseSemester = (courseYear - 1) * 2 + courseTermSem;
+  const computedCircSemester = (circYear - 1) * 2 + circTermSem;
+
+  const circularVisibleCourses = useMemo(
+    () =>
+      showAllDeptCourses
+        ? courses
+        : courses.filter((c) => c.departmentCode === circDept),
+    [courses, circDept, showAllDeptCourses]
+  );
+
+  const selectedCircularCredits = useMemo(
+    () =>
+      circCourseCodes.reduce((sum, code) => {
+        const match = courses.find((c) => c.code === code);
+        return sum + (match?.credits ?? 0);
+      }, 0),
+    [circCourseCodes, courses]
+  );
 
   const activeCircular = circulars.find((c) => c.id === selectedCircularId) || circulars[0];
 
@@ -207,9 +229,26 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   }
 
   function toggleCircularCourse(code: string) {
-    setCircCourseCodes((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
-    );
+    setCircCourseCodes((prev) => {
+      if (prev.includes(code)) return prev.filter((c) => c !== code);
+      if (prev.length >= 15) return prev;
+      return [...prev, code];
+    });
+  }
+
+  function handleSelectTermCircularCourses() {
+    const termMatches = courses
+      .filter(
+        (c) =>
+          c.departmentCode === circDept &&
+          (c.semester === computedCircSemester || c.session === circSession)
+      )
+      .map((c) => c.code);
+    const fallbackDept = courses
+      .filter((c) => c.departmentCode === circDept)
+      .map((c) => c.code);
+    const picked = (termMatches.length > 0 ? termMatches : fallbackDept).slice(0, 15);
+    setCircCourseCodes(picked);
   }
 
   function addCatalogCourseRow(course: CourseRecord) {
@@ -300,21 +339,35 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
+
+    if (circCourseCodes.length === 0) {
+      setError('Select at least one eligible course for this examination circular.');
+      return;
+    }
+
+    setPublishingCircular(true);
     try {
       const res = await pustApi.createExamCircular({
-        title: circTitle,
+        title: circTitle.trim(),
         departmentCode: circDept,
-        semester: Number(circSem),
+        semester: computedCircSemester,
         session: circSession,
         deadline: circDeadline,
-        feeBdt: Number(circFee),
+        feeBdt: Math.round(Number(circFee)),
         eligibleCourseCodes: circCourseCodes,
       });
-      setFeedback(`Published Examination Circular "${res.circular.title}".`);
+      const yearLabel = ACADEMIC_YEARS.find((y) => y.value === circYear)?.label ?? `${circYear}`;
+      const semLabel = YEAR_SEMESTERS.find((s) => s.value === circTermSem)?.label ?? `${circTermSem}`;
+      setFeedback(
+        `Published Examination Circular "${res.circular.title}" (${yearLabel} Year, ${semLabel} Semester · ${res.circular.session}).`
+      );
       setCircTitle('');
+      setCircCourseCodes([]);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to publish exam circular.');
+    } finally {
+      setPublishingCircular(false);
     }
   }
 
@@ -915,96 +968,270 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
           <form
             onSubmit={handleCreateExamCircular}
-            className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs"
+            className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
           >
-            <h3 className="font-serif text-lg font-medium text-slate-900">
-              Publish Exam Form Fill-up Circular
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <input
-                type="text"
-                required
-                value={circTitle}
-                onChange={(e) => setCircTitle(e.target.value)}
-                placeholder="Exam Circular Title"
-                className="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
-              />
-              <select
-                value={circDept}
-                disabled={user.role === 'chairman'}
-                onChange={(e) => setCircDept(e.target.value)}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
-              >
-                {departments.map((d) => (
-                  <option key={d.id} value={d.code}>
-                    {d.code}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                min={100}
-                value={circFee}
-                onChange={(e) => setCircFee(Number(e.target.value))}
-                placeholder="Fee BDT"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={circSem}
-                onChange={(e) => setCircSem(Number(e.target.value))}
-                placeholder="Semester"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] tabular-nums"
-              />
-              <input
-                type="text"
-                value={circSession}
-                onChange={(e) => setCircSession(e.target.value)}
-                placeholder="Session (e.g. 2022-23)"
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
-              />
-              <input
-                type="date"
-                value={circDeadline}
-                onChange={(e) => setCircDeadline(e.target.value)}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
-              />
-            </div>
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">
-                Assign Eligible Courses
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="font-serif text-lg font-medium text-slate-900">
+                Publish Exam Form Fill-up Circular
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Configure examination metadata, fee schedule, deadline, and eligible courses.
               </p>
-              <div className="flex flex-wrap gap-1.5">
-                {courses.map((c) => {
-                  const active = circCourseCodes.includes(c.code);
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => toggleCircularCourse(c.code)}
-                      className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        active
-                          ? 'bg-pust-900 text-white border-pust-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
-                      }`}
-                    >
-                      {c.code}
-                    </button>
-                  );
-                })}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div className="sm:col-span-7">
+                <label
+                  htmlFor="circ-title"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Circular Title
+                </label>
+                <input
+                  id="circ-title"
+                  type="text"
+                  required
+                  minLength={5}
+                  maxLength={180}
+                  value={circTitle}
+                  onChange={(e) => setCircTitle(e.target.value)}
+                  placeholder="e.g. B.Sc. Engineering 3rd Year 2nd Semester Exam 2026"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                />
+              </div>
+
+              <div className="sm:col-span-5">
+                <label
+                  htmlFor="circ-dept"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Department Name
+                </label>
+                <select
+                  id="circ-dept"
+                  value={circDept}
+                  disabled={user.role === 'chairman'}
+                  onChange={(e) => {
+                    setCircDept(e.target.value);
+                    setCircCourseCodes([]);
+                  }}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
+                >
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.code}>
+                      {d.name} ({d.code})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={circCourseCodes.length === 0}
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Publish Exam Circular
-            </button>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label
+                  htmlFor="circ-session"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Session
+                </label>
+                <select
+                  id="circ-session"
+                  value={circSession}
+                  onChange={(e) => setCircSession(e.target.value)}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                >
+                  {ACADEMIC_SESSIONS.map((sess) => (
+                    <option key={sess} value={sess}>
+                      {sess}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="circ-year"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Year
+                </label>
+                <select
+                  id="circ-year"
+                  value={circYear}
+                  onChange={(e) => setCircYear(Number(e.target.value))}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                >
+                  {ACADEMIC_YEARS.map((yr) => (
+                    <option key={yr.value} value={yr.value}>
+                      {yr.label} Year
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="circ-term-semester"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Semester
+                </label>
+                <select
+                  id="circ-term-semester"
+                  value={circTermSem}
+                  onChange={(e) => setCircTermSem(Number(e.target.value))}
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                >
+                  {YEAR_SEMESTERS.map((sem) => (
+                    <option key={sem.value} value={sem.value}>
+                      {sem.label} Semester
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="circ-fee"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Exam Registration Fee (BDT)
+                </label>
+                <div className="flex items-stretch rounded-lg border border-slate-300 bg-[#F7F7F5] focus-within:bg-white focus-within:border-pust-800 overflow-hidden">
+                  <span className="inline-flex items-center px-3 py-2 font-mono text-xs font-semibold text-pust-900 bg-pust-50 border-r border-slate-300 select-none shrink-0">
+                    ৳
+                  </span>
+                  <input
+                    id="circ-fee"
+                    type="number"
+                    min={100}
+                    max={25000}
+                    step={50}
+                    required
+                    value={circFee}
+                    onChange={(e) => setCircFee(Number(e.target.value))}
+                    className="w-full min-w-0 px-3 py-2 font-mono text-xs bg-transparent text-slate-900 focus:outline-none tabular-nums"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="circ-deadline"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Submission Deadline
+                </label>
+                <input
+                  id="circ-deadline"
+                  type="date"
+                  required
+                  value={circDeadline}
+                  onChange={(e) => setCircDeadline(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                />
+              </div>
+            </div>
+
+            <div className="pt-1 border-t border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-medium text-slate-700">
+                  Eligible Courses ({circCourseCodes.length}/15 selected)
+                </span>
+                <div className="flex flex-wrap items-center gap-3 text-xs">
+                  <button
+                    type="button"
+                    onClick={handleSelectTermCircularCourses}
+                    className="font-medium text-pust-800 hover:text-pust-950 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    Auto-pick {circDept}
+                  </button>
+                  {user.role === 'admin' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllDeptCourses((prev) => !prev)}
+                      className="text-slate-600 hover:text-slate-900 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      {showAllDeptCourses ? `Only ${circDept}` : 'Show all depts'}
+                    </button>
+                  )}
+                  {circCourseCodes.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCircCourseCodes([])}
+                      className="text-slate-500 hover:text-red-700 hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {circularVisibleCourses.length === 0 ? (
+                <p className="text-xs text-slate-500 py-2">
+                  No courses assigned under {circDept} yet. Add a course on the left or show all
+                  departments.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {circularVisibleCourses.map((c) => {
+                    const active = circCourseCodes.includes(c.code);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleCircularCourse(c.code)}
+                        aria-pressed={active}
+                        className={`flex items-center justify-between gap-2 px-3 py-2 text-left rounded-lg border transition-colors cursor-pointer ${
+                          active
+                            ? 'bg-pust-900 text-white border-pust-900'
+                            : 'bg-[#F7F7F5] text-slate-800 border-slate-200 hover:border-pust-700'
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <span className="block font-mono text-xs font-semibold truncate">
+                            {c.code}
+                          </span>
+                          <span
+                            className={`block text-[11px] truncate ${
+                              active ? 'text-white/80' : 'text-slate-500'
+                            }`}
+                          >
+                            {c.title}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-mono text-[11px] tabular-nums shrink-0 ${
+                            active ? 'text-white/90' : 'text-slate-500'
+                          }`}
+                        >
+                          {c.credits} Cr
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-slate-500 tabular-nums">
+                <span>Semester {computedCircSemester}/10</span>
+                <span aria-hidden="true">·</span>
+                <span>{circCourseCodes.length} course(s)</span>
+                <span aria-hidden="true">·</span>
+                <span>{selectedCircularCredits} Cr</span>
+              </div>
+              <button
+                type="submit"
+                disabled={publishingCircular || circCourseCodes.length === 0}
+                className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                {publishingCircular ? 'Publishing...' : 'Publish Exam Circular'}
+              </button>
+            </div>
           </form>
         </div>
       )}
