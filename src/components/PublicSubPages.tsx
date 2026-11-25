@@ -354,9 +354,16 @@ export function PublicSubPages({
     const activeSection =
       aboutSections.find((s) => s.slug === activeSlug) || aboutSections[0];
 
+    const aboutTabs: Array<{ label: string; route: AppRoute; slug: string }> = [
+      { label: 'Our University', route: '/about/our-university', slug: 'our-university' },
+      { label: 'Mission & Vision', route: '/about/mission-vision', slug: 'mission-vision' },
+      { label: 'History', route: '/about/history', slug: 'history' },
+      { label: 'Strategic Plans', route: '/about/plans', slug: 'plans' },
+    ];
+
     return (
       <main className="flex-1 bg-white">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
               About Pabna University of Science &amp; Technology
@@ -371,16 +378,12 @@ export function PublicSubPages({
               />
             </div>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
-              {[
-                { label: 'Our University', route: '/about/our-university' as AppRoute },
-                { label: 'Mission & Vision', route: '/about/mission-vision' as AppRoute },
-                { label: 'History and Plans', route: '/about/history' as AppRoute },
-              ].map((tab) => (
+              {aboutTabs.map((tab) => (
                 <Link
                   key={tab.route}
                   href={tab.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    route === tab.route || (route === '/about' && tab.route === '/about/our-university')
+                    activeSlug === tab.slug
                       ? 'bg-pust-900 text-white'
                       : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
@@ -391,144 +394,142 @@ export function PublicSubPages({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            <div className="lg:col-span-7 space-y-6">
-              {activeSlug === 'mission-vision' && activeSection?.body ? (
-                <div className="space-y-6">
-                  {(() => {
-                    const parts = activeSection.body.split(/\n\s*Our Vision\s*\n/i);
-                    const missionPart = (parts[0] || '').replace(/^Our Mission\s*\n/i, '').trim();
-                    const visionPart = (parts[1] || '').trim();
-                    const missionLines = missionPart
-                      .split('\n')
-                      .map((l) => l.trim())
-                      .filter(Boolean);
-                    const introLines = missionLines.filter((l) => !l.startsWith('•'));
-                    const bulletLines = missionLines
-                      .filter((l) => l.startsWith('•'))
-                      .map((l) => l.replace(/^•\s*/, ''));
+          {activeSlug === 'mission-vision' && activeSection?.body ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              {(() => {
+                const parts = activeSection.body.split(/\n\s*Our Vision\s*\n/i);
+                const missionPart = (parts[0] || '').replace(/^Our Mission\s*\n/i, '').trim();
+                const visionPart = (parts[1] || '').trim();
+                const missionLines = missionPart
+                  .split('\n')
+                  .map((l) => l.trim())
+                  .filter(Boolean);
+                const introLines = missionLines.filter((l) => !l.startsWith('•'));
+                const bulletLines = missionLines
+                  .filter((l) => l.startsWith('•'))
+                  .map((l) => l.replace(/^•\s*/, ''));
 
-                    return (
-                      <>
-                        <div className="space-y-3">
-                          <h2 className="font-serif text-2xl font-medium text-slate-900">
-                            Our Mission
-                          </h2>
-                          {introLines.map((line, i) => (
-                            <p key={i} className="text-base leading-[1.8] text-slate-700">
-                              {line}
-                            </p>
+                return (
+                  <>
+                    <div className="lg:col-span-7 space-y-4">
+                      <h2 className="font-serif text-2xl font-medium text-slate-900">
+                        Our Mission
+                      </h2>
+                      {introLines.map((line, i) => (
+                        <p key={i} className="text-base leading-[1.8] text-slate-700">
+                          {line}
+                        </p>
+                      ))}
+                      {bulletLines.length > 0 && (
+                        <ul className="list-disc pl-5 space-y-2.5 text-base leading-[1.75] text-slate-700 pt-1">
+                          {bulletLines.map((item, i) => (
+                            <li key={i}>{item}</li>
                           ))}
-                          {bulletLines.length > 0 && (
-                            <ul className="list-disc pl-5 space-y-2.5 text-base leading-[1.75] text-slate-700 pt-1">
-                              {bulletLines.map((item, i) => (
-                                <li key={i}>{item}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
+                        </ul>
+                      )}
+                    </div>
 
-                        {visionPart && (
-                          <div className="pt-5 border-t border-slate-200 space-y-3">
-                            <h2 className="font-serif text-2xl font-medium text-slate-900">
-                              Our Vision
-                            </h2>
-                            <blockquote className="rounded-xl border border-pust-200 bg-pust-50/50 p-5 font-serif text-lg italic leading-relaxed text-slate-900">
-                              {visionPart}
-                            </blockquote>
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              ) : (
+                    {visionPart && (
+                      <div className="lg:col-span-5 space-y-3">
+                        <h2 className="font-serif text-2xl font-medium text-slate-900">
+                          Our Vision
+                        </h2>
+                        <blockquote className="rounded-2xl border border-pust-200 bg-pust-50/50 p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-900">
+                          {visionPart}
+                        </blockquote>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          ) : activeSlug === 'our-university' ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              <div className="lg:col-span-7">
                 <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection?.body}
                 </p>
-              )}
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
-                {aboutSections.map((sec) => (
-                  <button
-                    key={sec.id}
-                    type="button"
-                    onClick={() => onNavigate(`/about/${sec.slug}` as AppRoute)}
-                    className={`text-left p-4 rounded-xl border transition-colors cursor-pointer ${
-                      sec.slug === activeSlug
-                        ? 'border-pust-800 bg-pust-50/50'
-                        : 'border-slate-200 bg-[#F7F7F5] hover:border-pust-700/50'
-                    }`}
-                  >
-                    <p className="font-serif text-base font-medium text-slate-900">{sec.title}</p>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-2">{sec.body}</p>
-                  </button>
+              <div className="lg:col-span-5 space-y-5">
+                <div className="editable-region space-y-2">
+                  <div className="flex justify-end empty:hidden">
+                    <EditTriggerButton
+                      target={{ kind: 'milestones' }}
+                      label="Edit Campus Photo"
+                      variant="compact"
+                    />
+                  </div>
+                  <ResilientImage
+                    src={resolved.aboutExtras.campusImage || GROUNDS_IMAGE}
+                    fallbackSrc={GROUNDS_IMAGE}
+                    alt="PUST Rajapur Campus"
+                    caption={resolved.aboutExtras.campusCaption}
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                </div>
+                <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-slate-600">Established</dt>
+                    <dd className="font-mono font-medium sm:text-right">
+                      {profile?.establishedYear ?? 2008} (Act No. 43 of 2001)
+                    </dd>
+                  </div>
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-slate-600">Campus Area</dt>
+                    <dd className="font-mono font-medium sm:text-right">
+                      {profile?.campusAcres ?? 30} Acres · Rajapur, Pabna
+                    </dd>
+                  </div>
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-slate-600">Faculties &amp; Departments</dt>
+                    <dd className="font-mono font-medium sm:text-right">
+                      {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21}{' '}
+                      Departments
+                    </dd>
+                  </div>
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-slate-600">First Convocation</dt>
+                    <dd className="font-mono font-semibold text-pust-800 sm:text-right">
+                      {profile?.convocationDate ?? '15 March 2027'}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-4xl">
+              <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
+                {activeSection?.body}
+              </p>
+            </div>
+          )}
+
+          {activeSlug === 'history' && (
+            <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  Institutional Chronology
+                </p>
+                <EditTriggerButton
+                  target={{ kind: 'milestones' }}
+                  label="Edit Milestones & Photo"
+                  variant="compact"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px rounded-2xl border border-slate-200 bg-slate-200 overflow-hidden">
+                {resolved.aboutExtras.milestones.map((m, idx) => (
+                  <div key={`${m.year}-${idx}`} className="p-5 space-y-1.5 bg-[#F7F7F5]">
+                    <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
+                      {m.year}
+                    </p>
+                    <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
+                    <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
+                  </div>
                 ))}
               </div>
             </div>
-
-            <div className="lg:col-span-5 space-y-5">
-              <ResilientImage
-                src={resolved.aboutExtras.campusImage || GROUNDS_IMAGE}
-                fallbackSrc={GROUNDS_IMAGE}
-                alt="PUST Rajapur Campus"
-                caption={resolved.aboutExtras.campusCaption}
-                className="w-full aspect-[4/3] object-cover"
-              />
-              <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
-                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                  <dt className="text-slate-600">Established</dt>
-                  <dd className="font-mono font-medium sm:text-right">
-                    {profile?.establishedYear ?? 2008} (Act No. 43 of 2001)
-                  </dd>
-                </div>
-                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                  <dt className="text-slate-600">Campus Area</dt>
-                  <dd className="font-mono font-medium sm:text-right">
-                    {profile?.campusAcres ?? 30} Acres · Rajapur, Pabna
-                  </dd>
-                </div>
-                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                  <dt className="text-slate-600">Faculties &amp; Departments</dt>
-                  <dd className="font-mono font-medium sm:text-right">
-                    {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21}{' '}
-                    Departments
-                  </dd>
-                </div>
-                <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                  <dt className="text-slate-600">First Convocation</dt>
-                  <dd className="font-mono font-semibold text-pust-800 sm:text-right">
-                    {profile?.convocationDate ?? '15 March 2027'}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Institutional Chronological Milestones */}
-          <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                Institutional Chronology
-              </p>
-              <EditTriggerButton
-                target={{ kind: 'milestones' }}
-                label="Edit Milestones & Photo"
-                variant="compact"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px rounded-2xl border border-slate-200 bg-slate-200 overflow-hidden">
-              {resolved.aboutExtras.milestones.map((m, idx) => (
-                <div key={`${m.year}-${idx}`} className="p-5 space-y-1.5 bg-[#F7F7F5]">
-                  <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
-                    {m.year}
-                  </p>
-                  <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
-                  <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </section>
       </main>
     );

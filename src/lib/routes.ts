@@ -95,7 +95,8 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Our University', route: '/about/our-university' },
       { label: 'Mission & Vision', route: '/about/mission-vision' },
-      { label: 'History and Plans', route: '/about/history' },
+      { label: 'History', route: '/about/history' },
+      { label: 'Strategic Plans', route: '/about/plans' },
     ],
   },
   {
