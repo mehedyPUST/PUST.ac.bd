@@ -14,8 +14,6 @@ import {
   ExternalLink,
   FileDown,
   FileText,
-  LayoutGrid,
-  List,
   Mail,
   Phone,
   PlayCircle,
@@ -214,22 +212,11 @@ export function PublicSubPages({
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormItem | null>(null);
   const [formFieldValues, setFormFieldValues] = useState<Record<string, string>>({});
-  const [deptViewMode, setDeptViewMode] = useState<'cards' | 'chairmen'>(() =>
-    route === '/academics/chairmen' ? 'chairmen' : 'cards'
-  );
   const [officialFormCat, setOfficialFormCat] = useState<
     'All' | OfficialFormItem['category']
   >('All');
   const [officialFormQuery, setOfficialFormQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (route === '/academics/chairmen') {
-      setDeptViewMode('chairmen');
-    } else if (route === '/academics/departments' || route === '/academics') {
-      setDeptViewMode('cards');
-    }
-  }, [route]);
 
   async function handleCopyContact(val: string) {
     try {
@@ -616,10 +603,6 @@ export function PublicSubPages({
       departments.some((d) => (d.facultyCount ?? 0) > 0)
         ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
         : profile?.facultyMembersCount ?? 212;
-    const totalResearchOutputs =
-      departments.some((d) => (d.researchTotal ?? 0) > 0)
-        ? departments.reduce((sum, d) => sum + (d.researchTotal ?? 0), 0)
-        : 3934;
 
     return (
       <main className="flex-1 bg-white">
@@ -628,7 +611,7 @@ export function PublicSubPages({
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                  Academic Affairs &amp; Research
+                  Academic Affairs
                 </p>
                 <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
                   {activeHeading}
@@ -636,7 +619,7 @@ export function PublicSubPages({
               </div>
               <p className="font-mono text-xs text-slate-600 tabular-nums">
                 {profile?.facultiesCount ?? 5} Faculties · {departments.length || 21} Departments ·{' '}
-                {totalFacultyMembers} Faculty · {totalResearchOutputs.toLocaleString()} Research Works
+                {totalFacultyMembers} Faculty
               </p>
             </div>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
@@ -798,14 +781,14 @@ export function PublicSubPages({
                     <div className="px-6 py-5 border-b border-slate-200/80 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                       <div className="lg:col-span-6 space-y-1.5">
                         <p className="font-mono text-xs text-pust-800 tabular-nums">
-                          {fac.code}
+                          {fac.code.split('·')[0].trim()} · {facDepts.length}{' '}
+                          {facDepts.length === 1 ? 'Department' : 'Departments'}
                           {facTeachers > 0 ? ` · ${facTeachers} Faculty` : ''}
                           {facWorks > 0 ? ` · ${facWorks.toLocaleString()} Research Works` : ''}
                         </p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
                           {fac.faculty}
                         </h2>
-                        <p className="text-xs text-slate-600">Departments: {fac.depts}</p>
                       </div>
 
                       <div className="lg:col-span-6 lg:border-l lg:border-slate-200/80 lg:pl-6 space-y-1.5 text-xs">
@@ -866,43 +849,33 @@ export function PublicSubPages({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200/80">
-                      {facDepts.map((dept) => (
-                        <div
-                          key={dept.id}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => onSelectDepartment(dept)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              onSelectDepartment(dept);
-                            }
-                          }}
-                          className="text-left p-5 bg-white/95 hover:bg-pust-50/50 transition-colors space-y-1.5 cursor-pointer group"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="font-mono text-xs text-pust-800 tabular-nums">
-                              {dept.officialCode ? `#${dept.officialCode} · ` : ''}
-                              {dept.code}
-                              {dept.facultyCount ? ` · ${dept.facultyCount} Faculty` : ''}
-                              {` · ${dept.intakeSeats} Seats`}
-                            </p>
-                            <EditTriggerButton
-                              target={{ kind: 'department', department: dept }}
-                              label="Edit"
-                              variant="compact"
-                            />
-                          </div>
-                          <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                    <div className="px-6 py-4 bg-white/95 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {facDepts.map((dept) => (
+                          <button
+                            key={dept.id}
+                            type="button"
+                            onClick={() => onSelectDepartment(dept)}
+                            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-800 hover:border-pust-700 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
+                          >
+                            <span className="font-mono text-pust-800 mr-1.5 tabular-nums">
+                              {dept.officialCode || dept.code}
+                            </span>
                             {dept.name}
-                          </h3>
-                          <p className="text-xs text-slate-500">
-                            Chair: {dept.chairmanName}
-                            {dept.researchTotal ? ` · ${dept.researchTotal} Works` : ''}
-                          </p>
-                        </div>
-                      ))}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFaculty(fac.faculty);
+                          onNavigate('/academics/departments');
+                        }}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0 self-start sm:self-center cursor-pointer"
+                      >
+                        Directory
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </MotionCard>
                 );
@@ -1298,203 +1271,176 @@ export function PublicSubPages({
               showInfrastructure={false}
             />
           ) : (
-            // Unified Departments & Chairmen Directory (/academics, /academics/departments, /academics/chairmen)
-            <div className="editable-region space-y-6">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {FACULTY_FILTERS.map((tab) => (
-                    <button
-                      key={tab.value}
-                      type="button"
-                      onClick={() => setSelectedFaculty(tab.value)}
-                      className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                        selectedFaculty === tab.value
-                          ? 'bg-pust-900 text-white'
-                          : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
+            // Unified Faculty-Grouped Departments & Chairmen Directory (/academics, /academics/departments, /academics/chairmen)
+            (() => {
+              const knownFacultyOrder = FACULTY_FILTERS.filter((f) => f.value !== 'All').map(
+                (f) => f.value as string
+              );
+              const allFacultyNames = Array.from(
+                new Set([
+                  ...knownFacultyOrder,
+                  ...filteredDepartments.map((d) => d.faculty),
+                ])
+              );
+              const groupedFaculties = allFacultyNames
+                .map((facultyName) => ({
+                  facultyName,
+                  depts: filteredDepartments.filter((d) => d.faculty === facultyName),
+                }))
+                .filter((g) => g.depts.length > 0);
 
-                <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                  <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setDeptViewMode('cards')}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                        deptViewMode === 'cards'
-                          ? 'bg-white text-pust-900 shadow-xs font-semibold'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <LayoutGrid className="w-3.5 h-3.5" />
-                      Cards View
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeptViewMode('chairmen')}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-                        deptViewMode === 'chairmen'
-                          ? 'bg-white text-pust-900 shadow-xs font-semibold'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <List className="w-3.5 h-3.5" />
-                      Chairmen Directory
-                    </button>
-                  </div>
+              return (
+                <div className="editable-region space-y-8">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex flex-wrap gap-1.5">
+                      {FACULTY_FILTERS.map((tab) => (
+                        <button
+                          key={tab.value}
+                          type="button"
+                          onClick={() => setSelectedFaculty(tab.value)}
+                          className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            selectedFaculty === tab.value
+                              ? 'bg-pust-900 text-white'
+                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
 
-                  <EditTriggerButton
-                    target={{ kind: 'department', department: null }}
-                    label="Add Department"
-                    icon="add"
-                    variant="compact"
-                  />
+                    <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                      <EditTriggerButton
+                        target={{ kind: 'department', department: null }}
+                        label="Add Department"
+                        icon="add"
+                        variant="compact"
+                      />
 
-                  <div className="relative flex-1 sm:w-64 lg:w-64">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="search"
-                      value={deptQuery}
-                      onChange={(e) => setDeptQuery(e.target.value)}
-                      placeholder="Filter 21 depts or chairmen..."
-                      className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {loadingData ? (
-                <CardsGridSkeleton count={6} />
-              ) : dataError ? (
-                <div className="p-6 rounded-xl border border-red-200 bg-red-50 text-sm text-red-800">
-                  {dataError}
-                </div>
-              ) : filteredDepartments.length === 0 ? (
-                <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
-                  <p className="text-sm text-slate-700">
-                    No academic departments or chairmen match your current search or faculty filter.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedFaculty('All');
-                      setDeptQuery('');
-                    }}
-                    className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
-                  >
-                    Reset Department Filters
-                  </button>
-                </div>
-              ) : deptViewMode === 'chairmen' ? (
-                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-                  {filteredDepartments.map((d) => (
-                    <div
-                      key={d.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onSelectDepartment(d)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onSelectDepartment(d);
-                        }
-                      }}
-                      className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-pust-50/40 transition-colors cursor-pointer group"
-                    >
-                      <div>
-                        <p className="font-mono text-xs text-pust-800 tabular-nums">
-                          {d.officialCode ? `Code ${d.officialCode} · ` : ''}
-                          {d.code} · {d.faculty}
-                          {d.facultyCount ? ` · ${d.facultyCount} Faculty` : ''}
-                          {d.researchTotal ? ` · ${d.researchTotal} Works` : ''}
-                        </p>
-                        <p className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
-                          Department of {d.name}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3 shrink-0">
-                        <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
-                        <span className="text-xs font-semibold text-pust-800 group-hover:underline whitespace-nowrap">
-                          Prospectus →
-                        </span>
-                        <EditTriggerButton
-                          target={{ kind: 'department', department: d }}
-                          label="Edit"
-                          variant="compact"
+                      <div className="relative flex-1 sm:w-64 lg:w-64">
+                        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="search"
+                          value={deptQuery}
+                          onChange={(e) => setDeptQuery(e.target.value)}
+                          placeholder="Search department, code, or chair..."
+                          aria-label="Search departments"
+                          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filteredDepartments.map((dept, idx) => {
-                    const deptGradient =
-                      dept.faculty === 'Faculty of Engineering and Technology'
-                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
-                        : dept.faculty === 'Faculty of Science'
-                        ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
-                        : dept.faculty === 'Faculty of Business Studies'
-                        ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
-                        : dept.faculty === 'Faculty of Humanities and Social Science'
-                        ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/50'
-                        : 'card-gradient-parchment border-slate-200 hover:border-sage-600/50';
-                    return (
-                      <MotionCard
-                        key={dept.id}
-                        delay={(idx % 6) * 0.03}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => onSelectDepartment(dept)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            onSelectDepartment(dept);
-                          }
+                  </div>
+
+                  {loadingData ? (
+                    <CardsGridSkeleton count={6} />
+                  ) : dataError ? (
+                    <div className="p-6 rounded-xl border border-red-200 bg-red-50 text-sm text-red-800">
+                      {dataError}
+                    </div>
+                  ) : groupedFaculties.length === 0 ? (
+                    <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
+                      <p className="text-sm text-slate-700">
+                        No academic departments match your current search or faculty filter.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFaculty('All');
+                          setDeptQuery('');
                         }}
-                        className={`text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer`}
+                        className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
                       >
-                        <div className="p-6 flex-1 flex flex-col justify-between gap-4">
-                          <div>
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="font-mono text-xs text-pust-800 tabular-nums">
-                                {dept.officialCode ? `#${dept.officialCode} · ` : ''}
-                                {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
+                        Reset Department Filters
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-10">
+                      {groupedFaculties.map(({ facultyName, depts }) => {
+                        const groupTeachers = depts.reduce(
+                          (sum, d) => sum + (d.facultyCount ?? 0),
+                          0
+                        );
+                        const deptGradient =
+                          facultyName === 'Faculty of Engineering and Technology'
+                            ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
+                            : facultyName === 'Faculty of Science'
+                            ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
+                            : facultyName === 'Faculty of Business Studies'
+                            ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
+                            : facultyName === 'Faculty of Humanities and Social Science'
+                            ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/50'
+                            : 'card-gradient-parchment border-slate-200 hover:border-sage-600/50';
+
+                        return (
+                          <div key={facultyName} className="space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 pb-2.5 border-b border-slate-200">
+                              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
+                                {facultyName}
+                              </h2>
+                              <p className="font-mono text-xs text-slate-600 tabular-nums shrink-0">
+                                {depts.length} {depts.length === 1 ? 'Department' : 'Departments'}
+                                {groupTeachers > 0 ? ` · ${groupTeachers} Faculty` : ''}
                               </p>
-                              <EditTriggerButton
-                                target={{ kind: 'department', department: dept }}
-                                label="Edit"
-                                variant="compact"
-                              />
                             </div>
-                            <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-pust-900 transition-colors">
-                              {dept.name}
-                            </h2>
-                            <p className="text-xs text-slate-500 mt-1">Chair: {dept.chairmanName}</p>
-                            <p className="text-sm text-slate-700 mt-3 leading-relaxed line-clamp-2">
-                              {dept.summary}
-                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {depts.map((dept, idx) => (
+                                <MotionCard
+                                  key={dept.id}
+                                  delay={(idx % 6) * 0.03}
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={() => onSelectDepartment(dept)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      onSelectDepartment(dept);
+                                    }
+                                  }}
+                                  className={`text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer`}
+                                >
+                                  <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                                    <div className="space-y-1.5">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <p className="font-mono text-xs text-pust-800 tabular-nums">
+                                          {dept.officialCode ? `Code ${dept.officialCode} · ` : ''}
+                                          {dept.code}
+                                        </p>
+                                        <EditTriggerButton
+                                          target={{ kind: 'department', department: dept }}
+                                          label="Edit"
+                                          variant="compact"
+                                        />
+                                      </div>
+                                      <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors leading-snug">
+                                        {dept.name}
+                                      </h3>
+                                    </div>
+
+                                    <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-3 text-xs">
+                                      <span className="text-slate-600 truncate">
+                                        Chair:{' '}
+                                        <span className="font-medium text-slate-900">
+                                          {dept.chairmanName}
+                                        </span>
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums shrink-0">
+                                        {dept.facultyCount ? `${dept.facultyCount} Faculty` : ''}
+                                        <ArrowRight className="w-3.5 h-3.5 text-pust-800 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                      </span>
+                                    </div>
+                                  </div>
+                                </MotionCard>
+                              ))}
+                            </div>
                           </div>
-                          <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-xs text-slate-600">
-                            <span className="truncate font-mono text-[11px] tabular-nums">
-                              {dept.facultyCount ? `${dept.facultyCount} Faculty` : dept.degrees[0]}
-                              {dept.researchTotal ? ` · ${dept.researchTotal} Works` : ''}
-                            </span>
-                            <span className="font-semibold text-pust-800 inline-flex items-center gap-1 group-hover:underline shrink-0">
-                              Prospectus
-                              <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
-                            </span>
-                          </div>
-                        </div>
-                      </MotionCard>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()
           )}
         </section>
 
