@@ -264,7 +264,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 13;
+    const INSTITUTIONAL_SEED_VERSION = 16;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {

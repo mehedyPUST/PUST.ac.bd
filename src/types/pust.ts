@@ -109,6 +109,19 @@ export interface DepartmentPersonRecord {
   qualification?: string;
   researchArea?: string;
   totalPublications?: number;
+  education?: string[];
+  teachingExperience?: string[];
+  administrativeExperience?: string[];
+  researchInterests?: string[];
+  activeResearchProjects?: string[];
+  previousResearchProjects?: string[];
+  externalAffiliations?: string[];
+  awards?: string[];
+  journalArticles?: string[];
+  conferenceProceedings?: string[];
+  conductedCourses?: string[];
+  graduateSupervision?: string[];
+  conferencesAttended?: string[];
 }
 
 export interface DepartmentRecord {

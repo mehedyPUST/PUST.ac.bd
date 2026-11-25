@@ -633,12 +633,25 @@ const departmentPersonSchema = z.object({
     .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be a valid https://, http://, or local asset path.')
     .optional(),
   officeLocation: z.string().trim().max(240).optional(),
-  bio: z.string().trim().max(2000).optional(),
+  bio: z.string().trim().max(4000).optional(),
   phones: z.array(contactDetailSchema).max(6),
   emails: z.array(contactDetailSchema).max(6),
   qualification: z.string().trim().max(400).optional(),
   researchArea: z.string().trim().max(400).optional(),
   totalPublications: z.number().int().min(0).max(5000).optional(),
+  education: z.array(z.string().trim().max(500)).max(25).optional(),
+  teachingExperience: z.array(z.string().trim().max(500)).max(30).optional(),
+  administrativeExperience: z.array(z.string().trim().max(500)).max(30).optional(),
+  researchInterests: z.array(z.string().trim().max(200)).max(40).optional(),
+  activeResearchProjects: z.array(z.string().trim().max(500)).max(25).optional(),
+  previousResearchProjects: z.array(z.string().trim().max(500)).max(40).optional(),
+  externalAffiliations: z.array(z.string().trim().max(500)).max(30).optional(),
+  awards: z.array(z.string().trim().max(500)).max(40).optional(),
+  journalArticles: z.array(z.string().trim().max(1000)).max(300).optional(),
+  conferenceProceedings: z.array(z.string().trim().max(1000)).max(150).optional(),
+  conductedCourses: z.array(z.string().trim().max(240)).max(50).optional(),
+  graduateSupervision: z.array(z.string().trim().max(500)).max(60).optional(),
+  conferencesAttended: z.array(z.string().trim().max(1000)).max(150).optional(),
 });
 
 const departmentCreateSchema = z.object({

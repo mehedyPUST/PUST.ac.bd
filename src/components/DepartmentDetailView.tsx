@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import {
   ArrowLeft,
   ArrowUpRight,
+  Award,
   BookOpen,
   Bookmark,
   Building2,
@@ -13,6 +14,7 @@ import {
   Copy,
   FileText,
   FlaskConical,
+  Globe,
   GraduationCap,
   Mail,
   MapPin,
@@ -351,7 +353,7 @@ function PersonProfileCard({
               {person.qualification && (
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
                   <dt className="text-slate-500 shrink-0">Qualification</dt>
-                  <dd className="text-slate-800 sm:text-right leading-relaxed">
+                  <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
                     {person.qualification}
                   </dd>
                 </div>
@@ -359,7 +361,7 @@ function PersonProfileCard({
               {person.researchArea && (
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
                   <dt className="text-slate-500 shrink-0">Research Area</dt>
-                  <dd className="text-slate-800 sm:text-right leading-relaxed">
+                  <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
                     {person.researchArea}
                   </dd>
                 </div>
@@ -408,8 +410,12 @@ function PersonProfileModal({
   onClose: () => void;
 }) {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const [showAllArticles, setShowAllArticles] = useState(false);
+  const [showAllConferences, setShowAllConferences] = useState(false);
 
   useEffect(() => {
+    setShowAllArticles(false);
+    setShowAllConferences(false);
     if (!activeProfile) return;
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -428,6 +434,25 @@ function PersonProfileModal({
   const { person, roleCategory } = activeProfile;
   const isOfficer = roleCategory === 'Department Officer';
   const officeLocation = person.officeLocation || `${department.building}, Rajapur Campus`;
+  const hasRichDossier =
+    Boolean(person.bio) ||
+    (person.education && person.education.length > 0) ||
+    (person.teachingExperience && person.teachingExperience.length > 0) ||
+    (person.administrativeExperience && person.administrativeExperience.length > 0) ||
+    (person.researchInterests && person.researchInterests.length > 0) ||
+    (person.activeResearchProjects && person.activeResearchProjects.length > 0) ||
+    (person.previousResearchProjects && person.previousResearchProjects.length > 0) ||
+    (person.externalAffiliations && person.externalAffiliations.length > 0) ||
+    (person.awards && person.awards.length > 0) ||
+    (person.journalArticles && person.journalArticles.length > 0) ||
+    (person.conferenceProceedings && person.conferenceProceedings.length > 0) ||
+    (person.conductedCourses && person.conductedCourses.length > 0) ||
+    (person.graduateSupervision && person.graduateSupervision.length > 0) ||
+    (person.conferencesAttended && person.conferencesAttended.length > 0);
+  const journalArticles = person.journalArticles ?? [];
+  const visibleArticles = showAllArticles ? journalArticles : journalArticles.slice(0, 6);
+  const conferencesAttended = person.conferencesAttended ?? [];
+  const visibleConferences = showAllConferences ? conferencesAttended : conferencesAttended.slice(0, 6);
 
   async function handleCopyEmail(email: string) {
     try {
@@ -453,7 +478,9 @@ function PersonProfileModal({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className={`w-full ${
+          hasRichDossier ? 'max-w-3xl' : 'max-w-2xl'
+        } rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Dossier Header */}
@@ -525,9 +552,9 @@ function PersonProfileModal({
           </dl>
 
           {person.bio && (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Profile Overview
+                Biography
               </h3>
               <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
             </div>
@@ -561,6 +588,187 @@ function PersonProfileModal({
                   </div>
                 )}
               </dl>
+            </div>
+          )}
+
+          {/* Education */}
+          {person.education && person.education.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Education ({person.education.length})
+              </h3>
+              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                {person.education.map((item, idx) => (
+                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                    <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Teaching Experience */}
+          {person.teachingExperience && person.teachingExperience.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Teaching Experience ({person.teachingExperience.length})
+              </h3>
+              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                {person.teachingExperience.map((item, idx) => (
+                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                    <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Administrative Experience */}
+          {person.administrativeExperience && person.administrativeExperience.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Administrative &amp; Other Experience ({person.administrativeExperience.length})
+              </h3>
+              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                {person.administrativeExperience.map((item, idx) => (
+                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                    <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Research Interests */}
+          {person.researchInterests && person.researchInterests.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Research Interests ({person.researchInterests.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {person.researchInterests.map((interest, idx) => (
+                  <div
+                    key={`${interest}-${idx}`}
+                    className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-[#FAF8F4] text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+                  >
+                    <FlaskConical className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                    <span>{interest}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Active & Previous Research Projects */}
+          {((person.activeResearchProjects && person.activeResearchProjects.length > 0) ||
+            (person.previousResearchProjects && person.previousResearchProjects.length > 0)) && (
+            <div className="space-y-4">
+              {person.activeResearchProjects && person.activeResearchProjects.length > 0 && (
+                <div className="space-y-2.5">
+                  <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                    Active Research Projects ({person.activeResearchProjects.length})
+                  </h3>
+                  <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-sm">
+                    {person.activeResearchProjects.map((proj, idx) => (
+                      <li key={`${proj}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                        <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+                        <span>{proj}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {person.previousResearchProjects && person.previousResearchProjects.length > 0 && (
+                <div className="space-y-2.5">
+                  <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                    Previous Research Projects ({person.previousResearchProjects.length})
+                  </h3>
+                  <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                    {person.previousResearchProjects.map((proj, idx) => (
+                      <li key={`${proj}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                        <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                        <span>{proj}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* External Affiliations */}
+          {person.externalAffiliations && person.externalAffiliations.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                External Affiliations ({person.externalAffiliations.length})
+              </h3>
+              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                {person.externalAffiliations.map((item, idx) => (
+                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                    <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Awards & Recognition */}
+          {person.awards && person.awards.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Awards &amp; Recognition ({person.awards.length})
+              </h3>
+              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-sm">
+                {person.awards.map((item, idx) => (
+                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
+                    <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Conducted Courses */}
+          {person.conductedCourses && person.conductedCourses.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Conducted Courses ({person.conductedCourses.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {person.conductedCourses.map((course, idx) => (
+                  <div
+                    key={`${course}-${idx}`}
+                    className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+                  >
+                    <Bookmark className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
+                    <span>{course}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Graduate Supervision */}
+          {person.graduateSupervision && person.graduateSupervision.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Graduate Supervision ({person.graduateSupervision.length})
+              </h3>
+              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
+                {person.graduateSupervision.map((thesis, idx) => (
+                  <li key={`${thesis}-${idx}`} className="px-4 py-3 flex items-start gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                      {String(idx + 1).padStart(2, '0')}.
+                    </span>
+                    <span className="text-slate-800 leading-relaxed">{thesis}</span>
+                  </li>
+                ))}
+              </ol>
             </div>
           )}
 
@@ -633,7 +841,90 @@ function PersonProfileModal({
             )}
           </div>
 
-          {/* Indexed Publications */}
+          {/* Journal Articles */}
+          {journalArticles.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                  Journal Articles ({journalArticles.length})
+                </h3>
+                {journalArticles.length > 6 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllArticles((prev) => !prev)}
+                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+                  >
+                    {showAllArticles
+                      ? 'Show fewer articles'
+                      : `Show all ${journalArticles.length} articles`}
+                  </button>
+                )}
+              </div>
+              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-[13px]">
+                {visibleArticles.map((article, idx) => (
+                  <li key={`${idx}-${article.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                      {String(idx + 1).padStart(2, '0')}.
+                    </span>
+                    <span className="text-slate-800 leading-relaxed break-words">{article}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Conference Proceedings */}
+          {person.conferenceProceedings && person.conferenceProceedings.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Conference Proceedings ({person.conferenceProceedings.length})
+              </h3>
+              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
+                {person.conferenceProceedings.map((item, idx) => (
+                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
+                      {String(idx + 1).padStart(2, '0')}.
+                    </span>
+                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Conferences & Seminars Attended */}
+          {conferencesAttended.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                  Conferences &amp; Seminars Attended ({conferencesAttended.length})
+                </h3>
+                {conferencesAttended.length > 6 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllConferences((prev) => !prev)}
+                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+                  >
+                    {showAllConferences
+                      ? 'Show fewer conferences'
+                      : `Show all ${conferencesAttended.length} entries`}
+                  </button>
+                )}
+              </div>
+              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
+                {visibleConferences.map((item, idx) => (
+                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
+                      {String(idx + 1).padStart(2, '0')}.
+                    </span>
+                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Indexed Departmental Publications */}
           {matchedPublications.length > 0 && (
             <div className="space-y-3">
               <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
