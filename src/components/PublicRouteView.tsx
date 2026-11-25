@@ -16,7 +16,6 @@ export function PublicRouteView() {
     dataError,
     retryLoad,
     navigateTo,
-    setActiveDepartment,
     setActiveNotice,
     submitInquiry,
   } = usePust();
@@ -34,7 +33,9 @@ export function PublicRouteView() {
       dataError={dataError}
       onRetry={retryLoad}
       onNavigate={navigateTo}
-      onSelectDepartment={setActiveDepartment}
+      onSelectDepartment={(dept) =>
+        navigateTo(`/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`)
+      }
       onSelectNotice={setActiveNotice}
       onSubmitInquiry={submitInquiry}
     />

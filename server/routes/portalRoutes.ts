@@ -616,31 +616,64 @@ const profileUpdateSchema = z.object({
     .optional(),
 });
 
+const contactDetailSchema = z.object({
+  value: z.string().trim().min(2).max(160),
+  type: z.enum(['Personal', 'Office']),
+});
+
+const departmentPersonSchema = z.object({
+  id: z.string().trim().min(1).max(80),
+  name: z.string().trim().min(2).max(140),
+  designation: z.string().trim().min(2).max(140),
+  onStudyLeave: z.boolean().optional(),
+  phones: z.array(contactDetailSchema).max(6),
+  emails: z.array(contactDetailSchema).max(6),
+  qualification: z.string().trim().max(400).optional(),
+  researchArea: z.string().trim().max(400).optional(),
+  totalPublications: z.number().int().min(0).max(5000).optional(),
+});
+
 const departmentCreateSchema = z.object({
   code: z.string().trim().min(2).max(16),
+  officialCode: z.string().trim().max(16).optional(),
   name: z.string().trim().min(2).max(160),
   faculty: FACULTIES_ENUM,
   established: z.number().int().min(1950).max(2100),
   degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12),
   intakeSeats: z.number().int().min(5).max(1000),
+  facultyCount: z.number().int().min(0).max(500).optional(),
   building: z.string().trim().min(2).max(140),
   chairmanName: z.string().trim().min(2).max(120),
+  contactPhone: z.string().trim().max(60).optional(),
+  contactEmail: z.string().trim().max(120).optional(),
   summary: z.string().trim().min(10).max(2000),
   researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
   laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
+  chairmanProfile: departmentPersonSchema.optional(),
+  facultyMembers: z.array(departmentPersonSchema).max(100).optional(),
+  contractualFacultyMembers: z.array(departmentPersonSchema).max(50).optional(),
+  officers: z.array(departmentPersonSchema).max(50).optional(),
 });
 
 const departmentUpdateSchema = z.object({
+  officialCode: z.string().trim().max(16).optional(),
   name: z.string().trim().min(2).max(160).optional(),
   faculty: FACULTIES_ENUM.optional(),
   established: z.number().int().min(1950).max(2100).optional(),
   degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12).optional(),
   intakeSeats: z.number().int().min(5).max(1000).optional(),
+  facultyCount: z.number().int().min(0).max(500).optional(),
   building: z.string().trim().min(2).max(140).optional(),
   chairmanName: z.string().trim().min(2).max(120).optional(),
+  contactPhone: z.string().trim().max(60).optional(),
+  contactEmail: z.string().trim().max(120).optional(),
   summary: z.string().trim().min(10).max(2000).optional(),
   researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
   laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
+  chairmanProfile: departmentPersonSchema.optional(),
+  facultyMembers: z.array(departmentPersonSchema).max(100).optional(),
+  contractualFacultyMembers: z.array(departmentPersonSchema).max(50).optional(),
+  officers: z.array(departmentPersonSchema).max(50).optional(),
 });
 
 const publicationSchema = z.object({

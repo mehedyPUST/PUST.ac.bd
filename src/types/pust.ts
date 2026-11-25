@@ -91,6 +91,23 @@ export interface CourseRecord {
   teacherEmail?: string;
 }
 
+export interface ContactDetailItem {
+  value: string;
+  type: 'Personal' | 'Office';
+}
+
+export interface DepartmentPersonRecord {
+  id: string;
+  name: string;
+  designation: string;
+  onStudyLeave?: boolean;
+  phones: ContactDetailItem[];
+  emails: ContactDetailItem[];
+  qualification?: string;
+  researchArea?: string;
+  totalPublications?: number;
+}
+
 export interface DepartmentRecord {
   id: string;
   code: string;
@@ -104,9 +121,15 @@ export interface DepartmentRecord {
   researchTotal?: number;
   building: string;
   chairmanName: string;
+  contactPhone?: string;
+  contactEmail?: string;
   summary: string;
   researchFocus: string[];
   laboratories: string[];
+  chairmanProfile?: DepartmentPersonRecord;
+  facultyMembers?: DepartmentPersonRecord[];
+  contractualFacultyMembers?: DepartmentPersonRecord[];
+  officers?: DepartmentPersonRecord[];
 }
 
 export type NoticeCategory =

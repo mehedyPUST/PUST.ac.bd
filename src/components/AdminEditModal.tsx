@@ -174,10 +174,14 @@ export function AdminEditModal({
 
   // 9. Department state
   const [deptCode, setDeptCode] = useState('');
+  const [deptOfficialCode, setDeptOfficialCode] = useState('');
   const [deptName, setDeptName] = useState('');
   const [deptFaculty, setDeptFaculty] = useState<FacultyName>('Faculty of Engineering and Technology');
   const [deptEstablished, setDeptEstablished] = useState(2008);
   const [deptChairman, setDeptChairman] = useState('');
+  const [deptContactPhone, setDeptContactPhone] = useState('');
+  const [deptContactEmail, setDeptContactEmail] = useState('');
+  const [deptFacultyCount, setDeptFacultyCount] = useState<string>('');
   const [deptIntake, setDeptIntake] = useState(40);
   const [deptBuilding, setDeptBuilding] = useState('');
   const [deptDegreesText, setDeptDegreesText] = useState('');
@@ -330,10 +334,14 @@ export function AdminEditModal({
       const d = target.department;
       if (d) {
         setDeptCode(d.code);
+        setDeptOfficialCode(d.officialCode || '');
         setDeptName(d.name);
         setDeptFaculty(d.faculty);
         setDeptEstablished(d.established);
         setDeptChairman(d.chairmanName);
+        setDeptContactPhone(d.contactPhone || '');
+        setDeptContactEmail(d.contactEmail || '');
+        setDeptFacultyCount(d.facultyCount !== undefined ? String(d.facultyCount) : '');
         setDeptIntake(d.intakeSeats);
         setDeptBuilding(d.building);
         setDeptDegreesText(d.degrees.join(', '));
@@ -342,10 +350,14 @@ export function AdminEditModal({
         setDeptLabsText(d.laboratories.join('\n'));
       } else {
         setDeptCode('');
+        setDeptOfficialCode('');
         setDeptName('');
         setDeptFaculty('Faculty of Engineering and Technology');
         setDeptEstablished(new Date().getFullYear());
         setDeptChairman('');
+        setDeptContactPhone('');
+        setDeptContactEmail('');
+        setDeptFacultyCount('');
         setDeptIntake(40);
         setDeptBuilding('Academic Building I');
         setDeptDegreesText('B.Sc. (Hons.)');
@@ -674,12 +686,21 @@ export function AdminEditModal({
           .map((s) => s.trim())
           .filter(Boolean);
 
+        const parsedFacultyCount =
+          deptFacultyCount.trim() !== '' && Number.isFinite(Number(deptFacultyCount))
+            ? Number(deptFacultyCount)
+            : undefined;
+
         if (target.department) {
           await pustApi.updateDepartment(target.department.id, {
+            ...(deptOfficialCode.trim() ? { officialCode: deptOfficialCode.trim() } : {}),
             name: deptName.trim(),
             faculty: deptFaculty,
             established: Number(deptEstablished),
             chairmanName: deptChairman.trim(),
+            ...(deptContactPhone.trim() ? { contactPhone: deptContactPhone.trim() } : {}),
+            ...(deptContactEmail.trim() ? { contactEmail: deptContactEmail.trim() } : {}),
+            ...(parsedFacultyCount !== undefined ? { facultyCount: parsedFacultyCount } : {}),
             intakeSeats: Number(deptIntake),
             building: deptBuilding.trim(),
             degrees: degrees.length > 0 ? degrees : target.department.degrees,
@@ -690,10 +711,14 @@ export function AdminEditModal({
         } else {
           await pustApi.createDepartment({
             code: deptCode.trim().toUpperCase(),
+            ...(deptOfficialCode.trim() ? { officialCode: deptOfficialCode.trim() } : {}),
             name: deptName.trim(),
             faculty: deptFaculty,
             established: Number(deptEstablished),
             chairmanName: deptChairman.trim(),
+            ...(deptContactPhone.trim() ? { contactPhone: deptContactPhone.trim() } : {}),
+            ...(deptContactEmail.trim() ? { contactEmail: deptContactEmail.trim() } : {}),
+            ...(parsedFacultyCount !== undefined ? { facultyCount: parsedFacultyCount } : {}),
             intakeSeats: Number(deptIntake),
             building: deptBuilding.trim(),
             degrees: degrees.length > 0 ? degrees : ['B.Sc. (Hons.)'],
@@ -1870,6 +1895,47 @@ export function AdminEditModal({
                     value={deptEstablished}
                     onChange={(e) => setDeptEstablished(Number(e.target.value))}
                     className={INPUT_CLASS}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>Official Dept Code</label>
+                  <input
+                    type="text"
+                    value={deptOfficialCode}
+                    onChange={(e) => setDeptOfficialCode(e.target.value)}
+                    placeholder="e.g. 07"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>Total Teachers</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={deptFacultyCount}
+                    onChange={(e) => setDeptFacultyCount(e.target.value)}
+                    placeholder="e.g. 14"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>Department Office Phone</label>
+                  <input
+                    type="text"
+                    value={deptContactPhone}
+                    onChange={(e) => setDeptContactPhone(e.target.value)}
+                    placeholder="+8802588844898"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>Department Office Email</label>
+                  <input
+                    type="email"
+                    value={deptContactEmail}
+                    onChange={(e) => setDeptContactEmail(e.target.value)}
+                    placeholder="chairman.phy@pust.ac.bd"
+                    className={`${INPUT_CLASS} font-mono`}
                   />
                 </div>
                 <div>

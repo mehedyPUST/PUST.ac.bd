@@ -264,7 +264,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 5;
+    const INSTITUTIONAL_SEED_VERSION = 6;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
@@ -322,6 +322,14 @@ class PustRepository {
               summary: dept.summary,
               researchFocus: dept.researchFocus,
               laboratories: dept.laboratories,
+              ...(dept.contactPhone !== undefined ? { contactPhone: dept.contactPhone } : {}),
+              ...(dept.contactEmail !== undefined ? { contactEmail: dept.contactEmail } : {}),
+              ...(dept.chairmanProfile !== undefined ? { chairmanProfile: dept.chairmanProfile } : {}),
+              ...(dept.facultyMembers !== undefined ? { facultyMembers: dept.facultyMembers } : {}),
+              ...(dept.contractualFacultyMembers !== undefined
+                ? { contractualFacultyMembers: dept.contractualFacultyMembers }
+                : {}),
+              ...(dept.officers !== undefined ? { officers: dept.officers } : {}),
             },
           },
           { upsert: true }

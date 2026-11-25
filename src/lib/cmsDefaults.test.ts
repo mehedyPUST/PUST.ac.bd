@@ -104,3 +104,14 @@ test('resolveContextualEditTarget maps public routes to accurate contextual edit
   });
   assert.equal(resolveContextualEditTarget('/portal'), null);
 });
+
+test('parseRouteFromPath and getBreadcrumbsForPath support individual department pages', async () => {
+  const { parseRouteFromPath, getBreadcrumbsForPath } = await import('./routes');
+  assert.equal(parseRouteFromPath('/academics/departments/phy'), '/academics/departments');
+  assert.deepEqual(getBreadcrumbsForPath('/academics/departments/phy'), [
+    { label: 'Home', href: '/' },
+    { label: 'Academics', href: '/academics' },
+    { label: 'Departments', href: '/academics/departments' },
+    { label: 'Department of PHY' },
+  ]);
+});

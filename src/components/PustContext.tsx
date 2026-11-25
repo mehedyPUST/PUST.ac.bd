@@ -474,7 +474,7 @@ export function PustShell({
             />
             <Breadcrumb />
             <div className="flex-1 flex flex-col">
-              <PageReveal routeKey={route}>{children}</PageReveal>
+              <PageReveal routeKey={pathname}>{children}</PageReveal>
             </div>
             <Footer onNavigate={navigateTo} />
           </div>

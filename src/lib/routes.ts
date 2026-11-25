@@ -186,6 +186,9 @@ const ALL_VALID_ROUTES = new Set<AppRoute>([
 
 export function parseRouteFromPath(pathname: string): AppRoute {
   const clean = (pathname.replace(/\/+$/, '') || '/') as AppRoute;
+  if (clean.startsWith('/academics/departments/')) {
+    return '/academics/departments';
+  }
   return ALL_VALID_ROUTES.has(clean) ? clean : '/';
 }
 
@@ -263,6 +266,14 @@ export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
   if (clean === '/academics/departments' || clean === '/academics/chairmen') {
     crumbs.push({ label: 'Academics', href: '/academics' });
     crumbs.push({ label: 'Departments' });
+    return crumbs;
+  }
+
+  if (clean.startsWith('/academics/departments/')) {
+    const deptCode = decodeURIComponent(clean.slice('/academics/departments/'.length)).toUpperCase();
+    crumbs.push({ label: 'Academics', href: '/academics' });
+    crumbs.push({ label: 'Departments', href: '/academics/departments' });
+    crumbs.push({ label: `Department of ${deptCode}` });
     return crumbs;
   }
 

@@ -101,7 +101,6 @@ export function GlobalSearchBar({
     profile,
     aboutSections,
     navigateTo,
-    setActiveDepartment,
     setActiveNotice,
   } = usePust();
 
@@ -491,7 +490,7 @@ export function GlobalSearchBar({
     setQuery('');
     onActionComplete?.();
     if (entry.department) {
-      setActiveDepartment(entry.department);
+      navigateTo(`/academics/departments/${encodeURIComponent(entry.department.code.toLowerCase())}`);
     } else if (entry.notice) {
       setActiveNotice(entry.notice);
     } else if (entry.route) {
