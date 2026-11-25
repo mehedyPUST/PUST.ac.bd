@@ -618,7 +618,7 @@ const profileUpdateSchema = z.object({
 
 const contactDetailSchema = z.object({
   value: z.string().trim().min(2).max(160),
-  type: z.enum(['Personal', 'Office']),
+  type: z.enum(['Personal', 'Office', 'IP Phone']),
 });
 
 const departmentPersonSchema = z.object({
@@ -626,6 +626,14 @@ const departmentPersonSchema = z.object({
   name: z.string().trim().min(2).max(140),
   designation: z.string().trim().min(2).max(140),
   onStudyLeave: z.boolean().optional(),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be a valid https://, http://, or local asset path.')
+    .optional(),
+  officeLocation: z.string().trim().max(240).optional(),
+  bio: z.string().trim().max(2000).optional(),
   phones: z.array(contactDetailSchema).max(6),
   emails: z.array(contactDetailSchema).max(6),
   qualification: z.string().trim().max(400).optional(),

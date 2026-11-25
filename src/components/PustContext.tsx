@@ -332,17 +332,21 @@ export function PustShell({
   const handleToggleBookmarkDepartment = useCallback(
     async (dept: DepartmentRecord) => {
       if (!user) return;
-      if (bookmarkedIds.has(dept.id)) {
-        await pustApi.removeBookmark(dept.id);
-      } else {
-        await pustApi.addBookmark({
-          itemType: 'department',
-          itemId: dept.id,
-          title: `Department of ${dept.name} (${dept.code})`,
-          subtitle: dept.faculty,
-        });
+      try {
+        if (bookmarkedIds.has(dept.id)) {
+          await pustApi.removeBookmark(dept.id);
+        } else {
+          await pustApi.addBookmark({
+            itemType: 'department',
+            itemId: dept.id,
+            title: `Department of ${dept.name} (${dept.code})`,
+            subtitle: dept.faculty,
+          });
+        }
+        await loadBookmarks();
+      } catch (err) {
+        setDataError(err instanceof Error ? err.message : 'Unable to update department bookmark.');
       }
-      await loadBookmarks();
     },
     [user, bookmarkedIds, loadBookmarks]
   );
@@ -350,26 +354,34 @@ export function PustShell({
   const handleToggleBookmarkNotice = useCallback(
     async (notice: NoticeRecord) => {
       if (!user) return;
-      if (bookmarkedIds.has(notice.id)) {
-        await pustApi.removeBookmark(notice.id);
-      } else {
-        await pustApi.addBookmark({
-          itemType: 'notice',
-          itemId: notice.id,
-          title: notice.title,
-          subtitle: `${notice.referenceNo} · ${notice.publishedAt}`,
-        });
+      try {
+        if (bookmarkedIds.has(notice.id)) {
+          await pustApi.removeBookmark(notice.id);
+        } else {
+          await pustApi.addBookmark({
+            itemType: 'notice',
+            itemId: notice.id,
+            title: notice.title,
+            subtitle: `${notice.referenceNo} · ${notice.publishedAt}`,
+          });
+        }
+        await loadBookmarks();
+      } catch (err) {
+        setDataError(err instanceof Error ? err.message : 'Unable to update notice bookmark.');
       }
-      await loadBookmarks();
     },
     [user, bookmarkedIds, loadBookmarks]
   );
 
   const handleDeleteNotice = useCallback(
     async (id: string) => {
-      await pustApi.deleteNotice(id);
-      setActiveNotice(null);
-      await loadNotices();
+      try {
+        await pustApi.deleteNotice(id);
+        setActiveNotice(null);
+        await loadNotices();
+      } catch (err) {
+        setDataError(err instanceof Error ? err.message : 'Unable to remove notice.');
+      }
     },
     [loadNotices]
   );

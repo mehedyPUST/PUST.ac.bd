@@ -264,7 +264,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 6;
+    const INSTITUTIONAL_SEED_VERSION = 7;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
@@ -825,15 +825,15 @@ class PustRepository {
     return list.some((u) => u.role === 'admin' && u.approvalStatus === 'approved');
   }
 
+  async findUserById(id: string): Promise<StoredUser | null> {
+    const list = await this.getAll('users', this.users);
+    return list.find((u) => u.id === id) ?? null;
+  }
+
   async findUserByEmail(email: string): Promise<StoredUser | null> {
     const normalized = email.trim().toLowerCase();
     const list = await this.getAll('users', this.users);
     return list.find((u) => u.email === normalized) ?? null;
-  }
-
-  async findUserById(id: string): Promise<StoredUser | null> {
-    const list = await this.getAll('users', this.users);
-    return list.find((u) => u.id === id) ?? null;
   }
 
   async listUsers(): Promise<AuthUser[]> {

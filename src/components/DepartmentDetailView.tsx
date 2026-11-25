@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'motion/react';
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -9,27 +10,83 @@ import {
   Bookmark,
   Building2,
   Check,
+  Copy,
   FileText,
   FlaskConical,
   GraduationCap,
   Mail,
+  MapPin,
   Phone,
   Search,
   Sparkles,
   UserCheck,
+  UserRound,
   Users,
+  X,
 } from 'lucide-react';
 import type {
   DepartmentPersonRecord,
   DepartmentRecord,
+  PublicationRecord,
 } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard } from './MotionPrimitives';
 import { usePust } from './PustContext';
 
+type PersonRoleCategory =
+  | 'Chairman'
+  | 'Faculty Member'
+  | 'Faculty Member (Contractual)'
+  | 'Department Officer';
+
+interface ActiveProfileState {
+  person: DepartmentPersonRecord;
+  roleCategory: PersonRoleCategory;
+}
+
+const PORTRAIT_SENIOR_PROF =
+  '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg';
+const PORTRAIT_MALE_SCHOLAR =
+  '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg';
+const PORTRAIT_FEMALE_PROF =
+  '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg';
+const PORTRAIT_YOUNG_LECTURER =
+  '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg';
+const PORTRAIT_OFFICER =
+  '/src/assets/images/officer_portrait_admin_1795622513333.jpg';
+
+const FEMALE_NAME_HINTS = [
+  'tahmina',
+  'laila',
+  'sabba',
+  'maliha',
+  'nadia',
+  'rosni',
+  'asma',
+  'rebeka',
+  'shahanaz',
+  'naima',
+  'tasnim',
+  'nahar',
+  'arzumand',
+  'banu',
+  'nishat',
+  'afrin',
+  'hoque',
+  'ruhi',
+  'fatema',
+  'nusrat',
+  'sultana',
+  'farhana',
+  'sharmeen',
+  'khatun',
+  'begum',
+  'akter',
+];
+
 function getInitials(name: string): string {
   const cleaned = name
-    .replace(/\b(Prof\.?|Dr\.?|Md\.?|Mst\.?|Engr\.?)\b/gi, '')
+    .replace(/\b(Prof\.?|Dr\.?|Md\.?|Mst\.?|Engr\.?|A\.H\.M\.?|T\.H\.M\.?|S\.M\.?)\b/gi, '')
     .trim();
   const parts = cleaned.split(/\s+/).filter(Boolean);
   if (parts.length === 0) return 'PU';
@@ -37,14 +94,128 @@ function getInitials(name: string): string {
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
-function PersonProfileCard({
+function sanitizeTelHref(rawPhone: string): string {
+  const withoutNotes = rawPhone.replace(/\([^)]*\)/g, '').trim();
+  const digits = withoutNotes.replace(/[^+\d]/g, '');
+  return digits || rawPhone.replace(/\s+/g, '');
+}
+
+function resolvePersonPortrait(
+  person: DepartmentPersonRecord,
+  roleCategory: PersonRoleCategory
+): string {
+  if (person.photoUrl && person.photoUrl.trim()) {
+    return person.photoUrl.trim();
+  }
+  const lowerName = person.name.toLowerCase();
+  if (FEMALE_NAME_HINTS.some((hint) => lowerName.includes(hint))) {
+    return PORTRAIT_FEMALE_PROF;
+  }
+  if (roleCategory === 'Department Officer') {
+    return PORTRAIT_OFFICER;
+  }
+  const lowerDesig = person.designation.toLowerCase();
+  if (
+    roleCategory === 'Chairman' ||
+    (lowerDesig.includes('professor') &&
+      !lowerDesig.includes('associate') &&
+      !lowerDesig.includes('assistant'))
+  ) {
+    return PORTRAIT_SENIOR_PROF;
+  }
+  if (lowerDesig.includes('associate professor')) {
+    return PORTRAIT_MALE_SCHOLAR;
+  }
+  return PORTRAIT_YOUNG_LECTURER;
+}
+
+function matchPersonPublications(
+  personName: string,
+  deptPublications: PublicationRecord[]
+): PublicationRecord[] {
+  const cleanedTokens = personName
+    .replace(/\b(Prof\.?|Dr\.?|Md\.?|Mst\.?|Engr\.?)\b/gi, '')
+    .replace(/[.,]/g, ' ')
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((token) => token.length >= 3);
+
+  if (cleanedTokens.length === 0) return [];
+  const lastName = cleanedTokens[cleanedTokens.length - 1];
+  const firstMeaningful = cleanedTokens[0];
+
+  return deptPublications.filter((pub) => {
+    const authorsLower = pub.authors.toLowerCase();
+    if (authorsLower.includes(cleanedTokens.join(' '))) return true;
+    if (lastName.length >= 4 && authorsLower.includes(lastName)) {
+      if (cleanedTokens.length === 1) return true;
+      return (
+        authorsLower.includes(firstMeaningful) ||
+        authorsLower.includes(`${firstMeaningful[0]}.`) ||
+        authorsLower.includes(` ${firstMeaningful[0]} `)
+      );
+    }
+    return false;
+  });
+}
+
+function PersonThumbnail({
   person,
-  accentClass,
-  delay = 0,
+  roleCategory,
+  size = 'sm',
 }: {
   person: DepartmentPersonRecord;
+  roleCategory: PersonRoleCategory;
+  size?: 'sm' | 'lg';
+}) {
+  const portraitSrc = resolvePersonPortrait(person, roleCategory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const hasError = failedSrc === portraitSrc;
+
+  const sizeClass =
+    size === 'lg'
+      ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl text-2xl'
+      : 'w-14 h-14 sm:w-16 sm:h-16 rounded-xl text-base';
+
+  if (hasError || !portraitSrc) {
+    return (
+      <div
+        className={`${sizeClass} bg-pust-900 text-white font-serif font-semibold flex items-center justify-center shrink-0 shadow-xs border border-pust-800`}
+        aria-hidden="true"
+      >
+        {getInitials(person.name)}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${sizeClass} overflow-hidden border border-slate-200/90 bg-slate-100 shrink-0 shadow-xs`}
+    >
+      <img
+        src={portraitSrc}
+        alt={`Portrait of ${person.name}`}
+        referrerPolicy="no-referrer"
+        onError={() => setFailedSrc(portraitSrc)}
+        className="w-full h-full object-cover object-top"
+      />
+    </div>
+  );
+}
+
+function PersonProfileCard({
+  person,
+  roleCategory,
+  accentClass,
+  delay = 0,
+  onViewProfile,
+}: {
+  person: DepartmentPersonRecord;
+  roleCategory: PersonRoleCategory;
   accentClass: string;
   delay?: number;
+  onViewProfile: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
   const hasPersonalInfo =
     Boolean(person.qualification) ||
@@ -57,25 +228,21 @@ function PersonProfileCard({
       className={`rounded-2xl border ${accentClass} p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-5`}
     >
       <div className="space-y-4">
-        {/* Identity Header */}
-        <div className="flex items-start gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-pust-900 text-white font-serif text-base font-semibold flex items-center justify-center shrink-0 shadow-xs">
-            {getInitials(person.name)}
-          </div>
+        {/* Identity Header with Small Framed Photo */}
+        <div className="flex items-start gap-4">
+          <PersonThumbnail person={person} roleCategory={roleCategory} size="sm" />
           <div className="min-w-0 flex-1">
             <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 leading-snug">
               {person.name}
             </h3>
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-              <p className="text-xs sm:text-sm font-medium text-pust-900">
-                {person.designation}
+            <p className="text-xs sm:text-sm font-medium text-pust-900 mt-0.5 leading-snug">
+              {person.designation}
+            </p>
+            {person.onStudyLeave && (
+              <p className="font-mono text-[11px] text-amber-800 mt-1">
+                Status · On Study Leave
               </p>
-              {person.onStudyLeave && (
-                <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
-                  Study Leave
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
@@ -89,7 +256,7 @@ function PersonProfileCard({
               {person.phones.map((phone, idx) => (
                 <div key={`${phone.value}-${idx}`} className="flex items-center justify-between gap-3">
                   <a
-                    href={`tel:${phone.value.replace(/\s+/g, '')}`}
+                    href={`tel:${sanitizeTelHref(phone.value)}`}
                     className="inline-flex items-center gap-2 font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums min-w-0 truncate"
                   >
                     <Phone className="w-3.5 h-3.5 text-pust-700 shrink-0" />
@@ -153,7 +320,318 @@ function PersonProfileCard({
           </div>
         )}
       </div>
+
+      {/* Card Footer Action: View Profile */}
+      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3">
+        <span className="font-mono text-[11px] text-slate-500 truncate">
+          {roleCategory}
+        </span>
+        <button
+          type="button"
+          onClick={() => onViewProfile(person, roleCategory)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+        >
+          <UserRound className="w-3.5 h-3.5 shrink-0" />
+          View Profile
+          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+        </button>
+      </div>
     </MotionCard>
+  );
+}
+
+function PersonProfileModal({
+  activeProfile,
+  department,
+  deptPublications,
+  onClose,
+}: {
+  activeProfile: ActiveProfileState | null;
+  department: DepartmentRecord;
+  deptPublications: PublicationRecord[];
+  onClose: () => void;
+}) {
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [activeProfile, onClose]);
+
+  const matchedPublications = useMemo(() => {
+    if (!activeProfile) return [];
+    return matchPersonPublications(activeProfile.person.name, deptPublications);
+  }, [activeProfile, deptPublications]);
+
+  if (!activeProfile) return null;
+
+  const { person, roleCategory } = activeProfile;
+  const isOfficer = roleCategory === 'Department Officer';
+  const officeLocation = person.officeLocation || `${department.building}, Rajapur Campus`;
+
+  async function handleCopyEmail(email: string) {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(email);
+      window.setTimeout(() => {
+        setCopiedEmail((prev) => (prev === email ? null : prev));
+      }, 1800);
+    } catch {
+      // Clipboard unavailable in restricted context
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="person-profile-modal-title"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18 }}
+        className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Dossier Header */}
+        <div className="px-5 sm:px-7 py-5 sm:py-6 border-b border-slate-200 bg-[#FAF8F4] flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 min-w-0">
+            <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
+            <div className="min-w-0 space-y-1">
+              <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
+                {department.code} · {roleCategory}
+              </p>
+              <h2
+                id="person-profile-modal-title"
+                className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 leading-tight"
+              >
+                {person.name}
+              </h2>
+              <p className="text-sm font-medium text-pust-900">{person.designation}</p>
+              <p className="text-xs text-slate-600">
+                Department of {department.name} · {department.faculty}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close profile dossier"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body Content */}
+        <div className="p-5 sm:p-7 space-y-6">
+          {/* Quick Fact Ribbon */}
+          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl bg-[#F7F7F5] border border-slate-200 p-4 text-sm">
+            <div>
+              <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                Department &amp; Wing
+              </dt>
+              <dd className="text-slate-900 mt-1 font-medium inline-flex items-start gap-1.5 text-xs sm:text-[13px]">
+                <MapPin className="w-3.5 h-3.5 text-pust-800 shrink-0 mt-0.5" />
+                <span>{officeLocation}</span>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                Duty Status
+              </dt>
+              <dd className="text-slate-900 mt-1 font-medium text-xs sm:text-[13px]">
+                {person.onStudyLeave
+                  ? 'On Approved Study Leave'
+                  : person.designation.includes('(PRL)')
+                  ? 'Post-Retirement Leave (PRL)'
+                  : 'Active Departmental Service'}
+              </dd>
+            </div>
+            {!isOfficer && person.totalPublications !== undefined && (
+              <div>
+                <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                  Total Publications
+                </dt>
+                <dd className="font-mono text-lg font-semibold text-pust-900 tabular-nums mt-0.5">
+                  {person.totalPublications}
+                </dd>
+              </div>
+            )}
+          </dl>
+
+          {person.bio && (
+            <div className="space-y-1.5">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Profile Overview
+              </h3>
+              <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
+            </div>
+          )}
+
+          {/* Academic / Service Details */}
+          {(person.qualification || person.researchArea) && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                {isOfficer ? 'Academic & Service Qualifications' : 'Academic & Research Profile'}
+              </h3>
+              <dl className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-sm">
+                {person.qualification && (
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs font-medium text-slate-500 shrink-0">
+                      Qualification
+                    </dt>
+                    <dd className="text-slate-900 sm:text-right leading-relaxed">
+                      {person.qualification}
+                    </dd>
+                  </div>
+                )}
+                {person.researchArea && (
+                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs font-medium text-slate-500 shrink-0">
+                      Research Area
+                    </dt>
+                    <dd className="text-slate-900 sm:text-right leading-relaxed">
+                      {person.researchArea}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          )}
+
+          {/* Contact Directory */}
+          <div className="space-y-3">
+            <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+              Official &amp; Personal Contacts
+            </h3>
+            {person.phones.length === 0 && person.emails.length === 0 ? (
+              <p className="text-xs text-slate-600 rounded-xl border border-slate-200 bg-[#F7F7F5] px-4 py-3">
+                Direct personal contacts have not been listed. Use the departmental office contact
+                {department.contactEmail ? ` (${department.contactEmail})` : ''} for inquiries.
+              </p>
+            ) : (
+              <div className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
+                {person.phones.map((phone, idx) => (
+                  <div
+                    key={`${phone.value}-${idx}`}
+                    className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+                  >
+                    <a
+                      href={`tel:${sanitizeTelHref(phone.value)}`}
+                      className="inline-flex items-center gap-2 font-mono text-slate-900 hover:text-pust-900 hover:underline tabular-nums"
+                    >
+                      <Phone className="w-4 h-4 text-pust-700 shrink-0" />
+                      <span>{phone.value}</span>
+                    </a>
+                    <span className="font-mono text-xs text-slate-500">{phone.type}</span>
+                  </div>
+                ))}
+                {person.emails.map((email, idx) => {
+                  const isCopied = copiedEmail === email.value;
+                  return (
+                    <div
+                      key={`${email.value}-${idx}`}
+                      className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+                    >
+                      <a
+                        href={`mailto:${email.value}`}
+                        className="inline-flex items-center gap-2 font-mono text-lapis-900 hover:text-pust-900 hover:underline break-all min-w-0"
+                      >
+                        <Mail className="w-4 h-4 text-lapis-700 shrink-0" />
+                        <span>{email.value}</span>
+                      </a>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span className="font-mono text-xs text-slate-500">{email.type}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyEmail(email.value)}
+                          aria-label={`Copy ${email.value}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-200 bg-[#FAF8F4] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-700" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              Copy
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Indexed Publications */}
+          {matchedPublications.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Indexed Departmental Publications ({matchedPublications.length})
+              </h3>
+              <div className="space-y-2.5">
+                {matchedPublications.map((pub) => (
+                  <div
+                    key={pub.id}
+                    className="p-4 rounded-xl border border-slate-200 bg-[#FAF8F4] space-y-1.5"
+                  >
+                    <p className="font-mono text-[11px] text-pust-800">
+                      {pub.year} · {pub.domain}
+                    </p>
+                    <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                      {pub.title}
+                    </h4>
+                    <p className="text-xs text-slate-600">{pub.authors}</p>
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-0.5">
+                      <span className="text-slate-500">{pub.venue}</span>
+                      {pub.url && (
+                        <a
+                          href={pub.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
+                        >
+                          DOI
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Modal Footer */}
+          <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-mono text-[11px] text-slate-500">
+              PUST {department.code} Directory Record
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              Close Profile
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -180,6 +658,7 @@ export function DepartmentDetailView({
   const [designationFilter, setDesignationFilter] = useState<string>('All');
   const [memberQuery, setMemberQuery] = useState('');
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
+  const [activeProfile, setActiveProfile] = useState<ActiveProfileState | null>(null);
 
   const normalizedCode = code.trim().toUpperCase();
   const department =
@@ -293,6 +772,13 @@ export function DepartmentDetailView({
       : [],
   };
 
+  function handleOpenProfile(
+    person: DepartmentPersonRecord,
+    roleCategory: PersonRoleCategory
+  ) {
+    setActiveProfile({ person, roleCategory });
+  }
+
   async function handleToggleBookmark() {
     if (!department || bookmarkBusy) return;
     if (!user) {
@@ -390,7 +876,9 @@ export function DepartmentDetailView({
             <div className="lg:col-span-7 flex flex-col">
               <PersonProfileCard
                 person={chairman}
+                roleCategory="Chairman"
                 accentClass="card-gradient-crimson border-pust-200/90 h-full"
+                onViewProfile={handleOpenProfile}
               />
             </div>
 
@@ -414,7 +902,7 @@ export function DepartmentDetailView({
                         <dt className="text-slate-600">Contact</dt>
                         <dd className="font-mono font-semibold text-slate-900 tabular-nums text-right">
                           <a
-                            href={`tel:${department.contactPhone.replace(/\s+/g, '')}`}
+                            href={`tel:${sanitizeTelHref(department.contactPhone)}`}
                             className="hover:text-pust-900 hover:underline"
                           >
                             {department.contactPhone}
@@ -562,12 +1050,14 @@ export function DepartmentDetailView({
                 <PersonProfileCard
                   key={member.id}
                   person={member}
+                  roleCategory="Faculty Member"
                   delay={(idx % 6) * 0.03}
                   accentClass={
                     idx % 2 === 0
                       ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
                       : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
                   }
+                  onViewProfile={handleOpenProfile}
                 />
               ))}
             </div>
@@ -599,8 +1089,10 @@ export function DepartmentDetailView({
                 <PersonProfileCard
                   key={member.id}
                   person={member}
+                  roleCategory="Faculty Member (Contractual)"
                   delay={idx * 0.03}
                   accentClass="card-gradient-gold border-gold-200/80"
+                  onViewProfile={handleOpenProfile}
                 />
               ))}
             </div>
@@ -632,8 +1124,10 @@ export function DepartmentDetailView({
                 <PersonProfileCard
                   key={officer.id}
                   person={officer}
+                  roleCategory="Department Officer"
                   delay={idx * 0.03}
                   accentClass="card-gradient-parchment border-slate-200 hover:border-pust-600/40"
+                  onViewProfile={handleOpenProfile}
                 />
               ))}
             </div>
@@ -756,6 +1250,13 @@ export function DepartmentDetailView({
           </div>
         )}
       </section>
+
+      <PersonProfileModal
+        activeProfile={activeProfile}
+        department={department}
+        deptPublications={deptPublications}
+        onClose={() => setActiveProfile(null)}
+      />
     </main>
   );
 }

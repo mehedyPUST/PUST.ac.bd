@@ -93,7 +93,7 @@ export interface CourseRecord {
 
 export interface ContactDetailItem {
   value: string;
-  type: 'Personal' | 'Office';
+  type: 'Personal' | 'Office' | 'IP Phone';
 }
 
 export interface DepartmentPersonRecord {
@@ -101,6 +101,9 @@ export interface DepartmentPersonRecord {
   name: string;
   designation: string;
   onStudyLeave?: boolean;
+  photoUrl?: string;
+  officeLocation?: string;
+  bio?: string;
   phones: ContactDetailItem[];
   emails: ContactDetailItem[];
   qualification?: string;
