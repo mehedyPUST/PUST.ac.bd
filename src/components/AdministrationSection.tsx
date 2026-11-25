@@ -131,7 +131,7 @@ export function AdministrationSection({
 }: AdministrationSectionProps) {
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('All');
   const [directoryQuery, setDirectoryQuery] = useState('');
-  const [showPreviousVcs, setShowPreviousVcs] = useState(true);
+  const [showPreviousVcs, setShowPreviousVcs] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   const activeOffice = OFFICE_SUBROUTES.find((o) => o.route === route);

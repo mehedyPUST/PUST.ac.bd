@@ -84,7 +84,7 @@ export function HomePage({
     institutionalLinks,
     upcomingSeminars,
   } = resolveUniversityContent(profile);
-  const [showPreviousVcs, setShowPreviousVcs] = useState(true);
+  const [showPreviousVcs, setShowPreviousVcs] = useState(false);
   const [noticeCategory, setNoticeCategory] =
     useState<'All' | NoticeRecord['category']>('All');
   const [pubDeptFilter, setPubDeptFilter] = useState<string>('ALL');
