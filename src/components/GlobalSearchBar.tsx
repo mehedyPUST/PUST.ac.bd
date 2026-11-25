@@ -32,17 +32,14 @@ interface SearchEntry {
 }
 
 const STATIC_RESOURCE_ENRICHMENTS: Partial<Record<string, string>> = {
-  '/academics/departments': '21 departments cse eee eece ice ce arch urp math physics pharmacy chemistry statistics bba thm economics bangla social work english public administration history geography',
-  '/academics/programs': 'undergraduate bsc ba bba bpharm barch graduate msc ma mba mpa degree credit curriculum',
-  '/academics/faculty': '5 faculties engineering science business humanities social science life earth deans',
-  '/academics/forms-download': 'forms download fillable form print html transcript testimonial temporary certificate id card readmission clearance syllabus',
-  '/academics/calendar': 'academic calendar 2026 2027 ics export add to calendar semester exam schedule deadlines midterm final classes vacation holiday',
+  '/academics/departments': '21 departments chairmen directory prospectus cse eee eece ice ce arch urp math physics pharmacy chemistry statistics bba thm economics bangla social work english public administration history geography',
+  '/academics/programs': 'undergraduate bsc ba bba bpharm barch b.u.r.p graduate msc ma mba m.pharm mphil phd emba iied institute degree credit curriculum',
+  '/academics/faculty': '5 faculties all deans leadership engineering science business humanities social science life earth dean.et dean.s dean.bs dean.hss dean.les email phone',
+  '/academics/forms-download': 'forms download official pdf docx fillable form print html transcript testimonial temporary certificate id card readmission clearance syllabus',
+  '/academics/calendar': 'academic calendar 2026 2027 20 weeks 14 weeks semester ics export add to calendar exam schedule deadlines midterm final classes vacation holiday',
   '/academics/scholarship': 'scholarship stipend fellowship merit need financial aid waiver tuition',
   '/academics/seminars': 'seminars workshops colloquium conference symposium research event iqac ics calendar',
-  '/academics/deans': 'all deans faculty leadership dean.et dean.s dean.bs dean.hss dean.les email',
-  '/academics/chairmen': 'all chairmen department heads chairperson directory prospectus',
-  '/academics/journals': 'pust studies jhss jbs issn journal periodical call for papers',
-  '/academics/publications': 'peer reviewed research papers articles ieee springer faculty publications citation',
+  '/academics/publications': 'peer reviewed research papers articles journals pust studies jhss jbs issn ieee elsevier doi faculty publications 3934 works citation',
   '/admissions': 'gst admission 2026 2027 undergraduate unit a b c architecture eligibility checker gpa inquiry status tracker',
   '/admissions/undergraduate': 'gst unit a b c undergraduate eligibility checker gpa criteria architecture drawing',
   '/admissions/graduate': 'msc meng mba graduate admission circular postgraduate',
@@ -286,7 +283,7 @@ export function GlobalSearchBar({
         subtitle: `Official PUST Journal · ${j.issn} · ${j.currentIssue}`,
         keywords: `${j.title} ${j.issn} ${j.scope} ${j.currentIssue} journal`.toLowerCase(),
         rankBoost: 7,
-        route: '/academics/journals',
+        route: '/academics/publications',
       });
     }
 
@@ -320,9 +317,9 @@ export function GlobalSearchBar({
         group: 'Academic & Campus Resources',
         title: `${dean.dean} — Dean, ${dean.faculty}`,
         subtitle: `${dean.code} · ${dean.email}`,
-        keywords: `${dean.dean} ${dean.faculty} ${dean.email} ${dean.depts} dean`.toLowerCase(),
+        keywords: `${dean.dean} ${dean.faculty} ${dean.email} ${dean.depts} ${dean.qualification || ''} ${dean.researchArea || ''} dean`.toLowerCase(),
         rankBoost: 6,
-        route: '/academics/deans',
+        route: '/academics/faculty',
       });
     }
 

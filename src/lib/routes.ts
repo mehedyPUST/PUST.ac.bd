@@ -121,16 +121,13 @@ export const NAV_GROUPS: NavGroup[] = [
     defaultRoute: '/academics',
     items: [
       { label: 'Academic Programs', route: '/academics/programs' },
-      { label: 'Faculty', route: '/academics/faculty' },
-      { label: 'Departments', route: '/academics/departments' },
-      { label: 'Forms Download', route: '/academics/forms-download' },
+      { label: 'Faculties & Deans', route: '/academics/faculty' },
+      { label: 'Departments & Chairmen', route: '/academics/departments' },
       { label: 'Academic Calendar', route: '/academics/calendar' },
-      { label: 'Scholarship', route: '/academics/scholarship' },
+      { label: 'Forms Download', route: '/academics/forms-download' },
+      { label: 'Scholarships', route: '/academics/scholarship' },
       { label: 'Seminars & Workshops', route: '/academics/seminars' },
-      { label: 'All Dean', route: '/academics/deans' },
-      { label: 'All Chairman', route: '/academics/chairmen' },
-      { label: 'PUST Journals', route: '/academics/journals' },
-      { label: 'Publications', route: '/academics/publications' },
+      { label: 'Journals & Research', route: '/academics/publications' },
     ],
   },
   {
@@ -181,6 +178,9 @@ const ALL_VALID_ROUTES = new Set<AppRoute>([
   '/portal',
   '/about/plans',
   '/governance/university-act',
+  '/academics/deans',
+  '/academics/chairmen',
+  '/academics/journals',
   ...NAV_GROUPS.flatMap((g) => [g.defaultRoute, ...g.items.map((i) => i.route)]),
 ]);
 
@@ -237,6 +237,24 @@ export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
   if (clean === '/governance/university-act' || clean === '/governance/pust-act') {
     crumbs.push({ label: 'Governance', href: '/governance' });
     crumbs.push({ label: 'PUST Act' });
+    return crumbs;
+  }
+
+  if (clean === '/academics/deans') {
+    crumbs.push({ label: 'Academics', href: '/academics' });
+    crumbs.push({ label: 'Faculties & Deans' });
+    return crumbs;
+  }
+
+  if (clean === '/academics/chairmen') {
+    crumbs.push({ label: 'Academics', href: '/academics' });
+    crumbs.push({ label: 'Departments & Chairmen' });
+    return crumbs;
+  }
+
+  if (clean === '/academics/journals') {
+    crumbs.push({ label: 'Academics', href: '/academics' });
+    crumbs.push({ label: 'Journals & Research' });
     return crumbs;
   }
 

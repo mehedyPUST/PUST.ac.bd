@@ -335,10 +335,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 ))}
               </dl>
               <Link
-                href="/academics/deans"
+                href="/academics/faculty"
                 className="inline-block text-xs font-semibold text-pust-800 hover:underline"
               >
-                View All Faculty Deans &amp; Chairmen →
+                View All Faculty Deans &amp; Departments →
               </Link>
             </div>
           </div>

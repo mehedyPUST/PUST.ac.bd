@@ -238,7 +238,7 @@ export function HomePage({
                     `Established in ${
                       profile?.establishedYear ?? 2008
                     } beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and ${
-                      profile?.facultyMembersCount ?? 185
+                      profile?.facultyMembersCount ?? 212
                     } faculty members across ${profile?.facultiesCount ?? 5} faculties, ${
                       profile?.departmentsCount ?? 21
                     } academic departments, and end-to-end digital workflows.`}
@@ -407,7 +407,7 @@ export function HomePage({
             <div className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors">
               <dt className="text-xs uppercase tracking-wider text-gold-800 font-medium">Community</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                {profile?.facultyMembersCount ?? 185} Faculty · ~{profile?.studentsCount?.toLocaleString() ?? '4,800'} Students
+                {profile?.facultyMembersCount ?? 212} Faculty · ~{profile?.studentsCount?.toLocaleString() ?? '4,800'} Students
               </dd>
             </div>
             <div className="bg-pust-950 hover:bg-pust-900 text-white transition-colors group">

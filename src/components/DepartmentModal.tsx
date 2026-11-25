@@ -82,14 +82,16 @@ export function DepartmentModal({
 
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm">
             <div>
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
+              <dt className="text-xs uppercase tracking-wider text-slate-500">Established &amp; Dept Code</dt>
               <dd className="font-mono tabular-nums text-slate-900 mt-0.5 font-medium">
                 {department.established}
+                {department.officialCode ? ` · Code ${department.officialCode}` : ''}
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Annual Intake</dt>
+              <dt className="text-xs uppercase tracking-wider text-slate-500">Faculty &amp; Annual Intake</dt>
               <dd className="font-mono tabular-nums text-slate-900 mt-0.5 font-medium">
+                {department.facultyCount ? `${department.facultyCount} Faculty · ` : ''}
                 {department.intakeSeats} Undergraduate Seats
               </dd>
             </div>
@@ -98,8 +100,17 @@ export function DepartmentModal({
               <dd className="text-slate-900 mt-0.5 font-medium">{department.degrees.join(' · ')}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Location</dt>
-              <dd className="text-slate-900 mt-0.5 font-medium">{department.building}, Rajapur Campus</dd>
+              <dt className="text-xs uppercase tracking-wider text-slate-500">
+                {department.researchTotal !== undefined ? 'Campus Wing & Research Index' : 'Location'}
+              </dt>
+              <dd className="text-slate-900 mt-0.5 font-medium">
+                {department.building}, Rajapur Campus
+                {department.researchTotal !== undefined && (
+                  <span className="block font-mono text-xs text-pust-800 mt-0.5 tabular-nums">
+                    {department.researchTotal.toLocaleString()} Indexed Works
+                  </span>
+                )}
+              </dd>
             </div>
           </dl>
 

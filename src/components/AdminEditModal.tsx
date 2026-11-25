@@ -113,7 +113,7 @@ export function AdminEditModal({
   const [campusAcres, setCampusAcres] = useState(30);
   const [facultiesCount, setFacultiesCount] = useState(5);
   const [departmentsCount, setDepartmentsCount] = useState(21);
-  const [facultyMembersCount, setFacultyMembersCount] = useState(185);
+  const [facultyMembersCount, setFacultyMembersCount] = useState(212);
   const [studentsCount, setStudentsCount] = useState(4800);
 
   // 2. Banner slide state
@@ -212,14 +212,14 @@ export function AdminEditModal({
       );
       setHeroSubtitle(
         profile?.heroSubtitle ||
-          `Established in ${profile?.establishedYear ?? 2008} beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and ${profile?.facultyMembersCount ?? 185} faculty members across ${profile?.facultiesCount ?? 5} faculties, ${profile?.departmentsCount ?? 21} academic departments, and end-to-end digital workflows.`
+          `Established in ${profile?.establishedYear ?? 2008} beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and ${profile?.facultyMembersCount ?? 212} faculty members across ${profile?.facultiesCount ?? 5} faculties, ${profile?.departmentsCount ?? 21} academic departments, and end-to-end digital workflows.`
       );
       setConvocationDate(profile?.convocationDate || '15 March 2027');
       setEstablishedYear(profile?.establishedYear ?? 2008);
       setCampusAcres(profile?.campusAcres ?? 30);
       setFacultiesCount(profile?.facultiesCount ?? 5);
       setDepartmentsCount(profile?.departmentsCount ?? 21);
-      setFacultyMembersCount(profile?.facultyMembersCount ?? 185);
+      setFacultyMembersCount(profile?.facultyMembersCount ?? 212);
       setStudentsCount(profile?.studentsCount ?? 4800);
     } else if (target.kind === 'banner') {
       const slide =

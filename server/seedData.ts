@@ -27,7 +27,7 @@ export const SEED_UNIVERSITY_PROFILE: UniversityProfile = {
   campusAcres: 30,
   facultiesCount: 5,
   departmentsCount: 21,
-  facultyMembersCount: 185,
+  facultyMembersCount: 212,
   studentsCount: 4800,
   convocationDate: '15 March 2027',
   leadership: [
@@ -317,7 +317,7 @@ export const SEED_ABOUT_SECTIONS: AboutContentRecord[] = [
     id: 'about-university',
     slug: 'our-university',
     title: 'Our University',
-    body: 'Pabna University of Science and Technology (PUST) is a government-financed public university situated at Rajapur in Gayeshpur Union, Pabna Sadar Upazila—approximately 3 kilometers east of Pabna town alongside the Dhaka–Pabna highway. Operating across a 30-acre (12-hectare) landscaped campus with multi-storied academic complexes, research laboratories, Central Library & Information Center, Medical Center, and residential halls, PUST serves roughly 4,800–5,000 scholars supported by 185 faculty members across 5 faculties and 21 departments.',
+    body: 'Pabna University of Science and Technology (PUST) is a government-financed public university situated at Rajapur in Gayeshpur Union, Pabna Sadar Upazila—approximately 3 kilometers east of Pabna town alongside the Dhaka–Pabna highway. Operating across a 30-acre (12-hectare) landscaped campus with multi-storied academic complexes, research laboratories, Central Library & Information Center, Medical Center, and residential halls, PUST serves roughly 4,800–5,000 scholars supported by 212 faculty members across 5 faculties and 21 departments.',
     updatedAt: '2026-11-23',
   },
   {
@@ -973,6 +973,42 @@ export const SEED_INQUIRIES: InquiryRecord[] = [
 
 export const SEED_PUBLICATIONS: PublicationRecord[] = [
   {
+    id: 'pub-7',
+    title:
+      'Psychological determinants of transport mode choice: A comprehensive dataset from Pabna Municipality, Bangladesh',
+    authors:
+      'Md. Nayem Hossain, Nakib Aman, Md. Rakibul Islam Sabbir, Md. Rashedul Haque, Md. Tahidul Islam',
+    departmentCode: 'CSE',
+    domain: 'Transport Informatics & Survey Dataset',
+    year: 2026,
+    venue: 'Data in Brief (Elsevier Q1), Vol. 65, 112570',
+    doi: '10.1016/j.dib.2026.112570',
+    url: 'https://doi.org/10.1016/j.dib.2026.112570',
+  },
+  {
+    id: 'pub-8',
+    title:
+      'A Novel PneumoniaNet Framework Integrating Explainable AI for Pediatric Pneumonia Detection from Chest X-rays',
+    authors: 'S. S. Arjon, T. Yasmin, A. K. Mondol, N. Aman, S. Mahmood',
+    departmentCode: 'CSE',
+    domain: 'Explainable Medical AI & Imaging',
+    year: 2026,
+    venue: 'Artificial Intelligence and Applications (Q1)',
+    doi: '10.47852/bonviewAIA62028511',
+    url: 'https://doi.org/10.47852/bonviewAIA62028511',
+  },
+  {
+    id: 'pub-9',
+    title: 'Descriptor: Bangla Audio Spoofing With Four Conditions and Real Speech (BAS4R)',
+    authors: 'A. A. Ahmad, N. Aman, D. K. Dutta, M. A. Wadud',
+    departmentCode: 'CSE',
+    domain: 'Speech Security & Audio Forensics',
+    year: 2026,
+    venue: 'IEEE Data Descriptions',
+    doi: '10.1109/IEEEDATA.2026.3703743',
+    url: 'https://doi.org/10.1109/IEEEDATA.2026.3703743',
+  },
+  {
     id: 'pub-1',
     title:
       'Facile synthesis of PPy-NiO-MoO3 composites with superb thermal stability, high reusability for MB degradation, and efficient supercapacitors',
@@ -981,7 +1017,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'CHEM',
     domain: 'Materials Chemistry & Energy Storage',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (133 CHEM Outputs)',
   },
   {
     id: 'pub-2',
@@ -991,7 +1027,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'PHY',
     domain: 'Condensed Matter & Optoelectronics',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (359 PHY Outputs)',
   },
   {
     id: 'pub-3',
@@ -1001,7 +1037,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'CSE',
     domain: 'Deep Learning & Healthcare IoT',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (318 CSE Outputs)',
   },
   {
     id: 'pub-4',
@@ -1012,7 +1048,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'EECE',
     domain: '6G THz & Wireless Communications',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (463 EECE Outputs)',
   },
   {
     id: 'pub-5',
@@ -1022,7 +1058,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'ICE',
     domain: 'Agricultural Computer Vision',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (350 ICE Outputs)',
   },
   {
     id: 'pub-6',
@@ -1032,7 +1068,7 @@ export const SEED_PUBLICATIONS: PublicationRecord[] = [
     departmentCode: 'BBA',
     domain: 'Sustainable Finance & Development Economics',
     year: 2026,
-    venue: 'PUST Faculty Research Index',
+    venue: 'PUST Faculty Research Index (274 BBA Outputs)',
   },
 ];
 
@@ -1040,11 +1076,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-cse',
     code: 'CSE',
+    officialCode: '01',
     name: 'Computer Science and Engineering',
     faculty: 'Faculty of Engineering and Technology',
     established: 2008,
-    degrees: ['B.Sc. Engg.', 'M.Sc. Engg.', 'M.Engg.', 'M.Phil'],
+    degrees: ['B.Sc. (Engg.)', 'M.Sc. (Engg.)', 'M.Engg.', 'M.Phil'],
     intakeSeats: 40,
+    facultyCount: 11,
+    researchTotal: 318,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. Md. Abdur Rahim',
     summary:
@@ -1055,11 +1094,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-eee',
     code: 'EEE',
+    officialCode: '02',
     name: 'Electrical and Electronic Engineering',
     faculty: 'Faculty of Engineering and Technology',
     established: 2008,
-    degrees: ['B.Sc. Engg.', 'M.Sc. Engg.'],
+    degrees: ['B.Sc. (Engg.)', 'M.Sc. (Engg.)'],
     intakeSeats: 40,
+    facultyCount: 16,
+    researchTotal: 519,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. T. H. M. Sumon Rashid',
     summary:
@@ -1070,11 +1112,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-eece',
     code: 'EECE',
+    officialCode: '05',
     name: 'Electrical, Electronic and Communication Engineering',
     faculty: 'Faculty of Engineering and Technology',
     established: 2010,
-    degrees: ['B.Sc. Engg.', 'M.Sc. Engg.'],
+    degrees: ['B.Sc. (Engg.)', 'M.Sc. (Engg.)'],
     intakeSeats: 40,
+    facultyCount: 11,
+    researchTotal: 463,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. Md. Najmul Hossain',
     summary:
@@ -1085,11 +1130,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-ice',
     code: 'ICE',
+    officialCode: '06',
     name: 'Information and Communication Engineering',
     faculty: 'Faculty of Engineering and Technology',
     established: 2013,
-    degrees: ['B.Sc. Engg.', 'M.Sc. Engg.', 'M.Engg.'],
+    degrees: ['B.Sc. (Engg.)', 'M.Sc. (Engg.)', 'M.Engg.'],
     intakeSeats: 40,
+    facultyCount: 12,
+    researchTotal: 350,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. Md. Anwar Hossain',
     summary:
@@ -1100,11 +1148,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-ce',
     code: 'CE',
+    officialCode: '11',
     name: 'Civil Engineering',
     faculty: 'Faculty of Engineering and Technology',
     established: 2014,
-    degrees: ['B.Sc. Engg.'],
+    degrees: ['B.Sc. (Engg.)'],
     intakeSeats: 40,
+    facultyCount: 10,
+    researchTotal: 131,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. Tahmina Tasnim Nahar',
     summary:
@@ -1115,11 +1166,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-arch',
     code: 'ARCH',
+    officialCode: '12',
     name: 'Architecture',
     faculty: 'Faculty of Engineering and Technology',
     established: 2015,
-    degrees: ['B.Arch'],
+    degrees: ['B.Arch.'],
     intakeSeats: 30,
+    facultyCount: 9,
+    researchTotal: 32,
     building: 'Architecture Design Studio Complex',
     chairmanName: 'Laila Arzumand Banu',
     summary:
@@ -1130,11 +1184,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-urp',
     code: 'URP',
+    officialCode: '17',
     name: 'Urban and Regional Planning',
     faculty: 'Faculty of Engineering and Technology',
     established: 2015,
-    degrees: ['B.URP', 'M.URP'],
-    intakeSeats: 30,
+    degrees: ['B.U.R.P.', 'M.U.R.P.'],
+    intakeSeats: 40,
+    facultyCount: 8,
+    researchTotal: 109,
     building: 'Dr. M. A. Wazed Miah Engineering Bhaban',
     chairmanName: 'Dr. Md. Ashrafuzzaman Pramanik',
     summary:
@@ -1145,11 +1202,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-math',
     code: 'MATH',
+    officialCode: '03',
     name: 'Mathematics',
     faculty: 'Faculty of Science',
     established: 2008,
     degrees: ['B.Sc. (Hons.)', 'M.Sc.', 'M.Phil'],
     intakeSeats: 50,
+    facultyCount: 14,
+    researchTotal: 458,
     building: 'Academic Building I (Science Wing)',
     chairmanName: 'Dr. Md. Fazlul Hoque',
     summary:
@@ -1160,11 +1220,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-phy',
     code: 'PHY',
+    officialCode: '07',
     name: 'Physics',
     faculty: 'Faculty of Science',
     established: 2010,
     degrees: ['B.Sc. (Hons.)', 'M.Sc.', 'M.Phil'],
     intakeSeats: 40,
+    facultyCount: 14,
+    researchTotal: 359,
     building: 'Academic Building I (Science Wing)',
     chairmanName: 'Dr. Md. Khairul Alam',
     summary:
@@ -1175,11 +1238,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-phar',
     code: 'PHAR',
+    officialCode: '13',
     name: 'Pharmacy',
     faculty: 'Faculty of Science',
     established: 2012,
-    degrees: ['B.Pharm (Hons.)', 'M.Pharm'],
+    degrees: ['B.Pharm. (Professional)', 'M.Pharm.'],
     intakeSeats: 40,
+    facultyCount: 11,
+    researchTotal: 179,
     building: 'Academic Building I (Life & Science Wing)',
     chairmanName: 'Dr. Md. Shamim Reza',
     summary:
@@ -1190,11 +1256,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-chem',
     code: 'CHEM',
+    officialCode: '14',
     name: 'Chemistry',
     faculty: 'Faculty of Science',
     established: 2012,
     degrees: ['B.Sc. (Hons.)', 'M.Sc.'],
     intakeSeats: 40,
+    facultyCount: 11,
+    researchTotal: 133,
     building: 'Academic Building I (Science Wing)',
     chairmanName: 'Ratan Kumar Paul',
     summary:
@@ -1205,11 +1274,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-sds',
     code: 'SDS',
+    officialCode: '16',
     name: 'Statistics and Data Science',
     faculty: 'Faculty of Science',
     established: 2015,
     degrees: ['B.Sc. (Hons.)', 'M.Sc.'],
     intakeSeats: 40,
+    facultyCount: 10,
+    researchTotal: 119,
     building: 'Academic Building I (Science Wing)',
     chairmanName: 'Dr. Sabba Ruhi',
     summary:
@@ -1220,11 +1292,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-bba',
     code: 'BBA',
+    officialCode: '04',
     name: 'Business Administration',
     faculty: 'Faculty of Business Studies',
     established: 2008,
     degrees: ['B.B.A.', 'M.B.A.', 'EMBA'],
     intakeSeats: 40,
+    facultyCount: 11,
+    researchTotal: 274,
     building: 'Academic Building I (Business Studies Wing)',
     chairmanName: 'Dr. Md. Kamruzzaman',
     summary:
@@ -1235,11 +1310,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-thm',
     code: 'THM',
+    officialCode: '21',
     name: 'Tourism and Hospitality Management',
     faculty: 'Faculty of Business Studies',
     established: 2018,
     degrees: ['B.B.A.', 'M.B.A.'],
     intakeSeats: 40,
+    facultyCount: 7,
+    researchTotal: 72,
     building: 'Academic Building I (Business Studies Wing)',
     chairmanName: 'Md. Ashikur Rahman Avi',
     summary:
@@ -1250,11 +1328,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-econ',
     code: 'ECON',
+    officialCode: '08',
     name: 'Economics',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2010,
     degrees: ['B.S.S. (Hons.)', 'M.S.S.'],
     intakeSeats: 40,
+    facultyCount: 12,
+    researchTotal: 55,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Dr. Mir Khaled Iqbal Chowdhury',
     summary:
@@ -1265,11 +1346,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-bng',
     code: 'BNG',
+    officialCode: '10',
     name: 'Bangla',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2011,
     degrees: ['B.A. (Hons.)', 'M.A.'],
     intakeSeats: 40,
+    facultyCount: 7,
+    researchTotal: 85,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Dr. Mir Humayun Kabir',
     summary:
@@ -1280,11 +1364,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-sw',
     code: 'SW',
+    officialCode: '15',
     name: 'Social Work',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2013,
     degrees: ['B.S.S. (Hons.)', 'M.S.S.'],
     intakeSeats: 40,
+    facultyCount: 4,
+    researchTotal: 15,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Dr. Md. Jahidul Islam',
     summary:
@@ -1295,11 +1382,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-eng',
     code: 'ENG',
+    officialCode: '18',
     name: 'English',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2014,
     degrees: ['B.A. (Hons.)', 'M.A.'],
     intakeSeats: 40,
+    facultyCount: 10,
+    researchTotal: 52,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Dr. Md. Mokarrom Hossain',
     summary:
@@ -1310,11 +1400,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-pa',
     code: 'PA',
+    officialCode: '19',
     name: 'Public Administration',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2015,
     degrees: ['B.S.S. (Hons.)', 'M.S.S.'],
     intakeSeats: 40,
+    facultyCount: 9,
+    researchTotal: 16,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Md. Al-Fahad Bhuiyan',
     summary:
@@ -1325,11 +1418,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-hist',
     code: 'HIST',
+    officialCode: '20',
     name: 'History',
     faculty: 'Faculty of Humanities and Social Science',
     established: 2018,
     degrees: ['B.A. (Hons.)', 'M.A.'],
     intakeSeats: 40,
+    facultyCount: 8,
+    researchTotal: 55,
     building: 'Academic Building I (Humanities Wing)',
     chairmanName: 'Dr. Md. Habibullah',
     summary:
@@ -1340,11 +1436,14 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
   {
     id: 'dept-ge',
     code: 'GE',
+    officialCode: '09',
     name: 'Geography and Environment',
     faculty: 'Faculty of Life and Earth Science',
     established: 2014,
     degrees: ['B.Sc. (Hons.)', 'M.Sc.'],
     intakeSeats: 40,
+    facultyCount: 7,
+    researchTotal: 140,
     building: 'Academic Building I (Life & Earth Science Wing)',
     chairmanName: 'Dr. Mohammad Najmul Islam',
     summary:

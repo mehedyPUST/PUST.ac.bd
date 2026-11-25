@@ -11,8 +11,11 @@ import {
   CheckCircle2,
   Clock,
   Copy,
+  ExternalLink,
   FileDown,
   FileText,
+  LayoutGrid,
+  List,
   Mail,
   Phone,
   PlayCircle,
@@ -29,7 +32,7 @@ import {
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
-import { AcademicCalendarHighlights, AcademicCalendarView } from './AcademicCalendarView';
+import { AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
 import { MotionCard } from './MotionPrimitives';
@@ -50,6 +53,7 @@ import type {
   InquiryRecord,
   NoticeCategory,
   NoticeRecord,
+  OfficialFormItem,
   PublicationRecord,
   PublicStatusLookupResult,
   UniversityProfile,
@@ -210,9 +214,22 @@ export function PublicSubPages({
   const [activeMedia, setActiveMedia] = useState<GalleryItemRecord | null>(null);
   const [previewForm, setPreviewForm] = useState<DigitalFormItem | null>(null);
   const [formFieldValues, setFormFieldValues] = useState<Record<string, string>>({});
-  const [chairmanFacultyFilter, setChairmanFacultyFilter] = useState<'All' | FacultyName>('All');
-  const [chairmanQuery, setChairmanQuery] = useState<string>('');
+  const [deptViewMode, setDeptViewMode] = useState<'cards' | 'chairmen'>(() =>
+    route === '/academics/chairmen' ? 'chairmen' : 'cards'
+  );
+  const [officialFormCat, setOfficialFormCat] = useState<
+    'All' | OfficialFormItem['category']
+  >('All');
+  const [officialFormQuery, setOfficialFormQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (route === '/academics/chairmen') {
+      setDeptViewMode('chairmen');
+    } else if (route === '/academics/departments' || route === '/academics') {
+      setDeptViewMode('cards');
+    }
+  }, [route]);
 
   async function handleCopyContact(val: string) {
     try {
@@ -272,6 +289,7 @@ export function PublicSubPages({
         !q ||
         d.name.toLowerCase().includes(q) ||
         d.code.toLowerCase().includes(q) ||
+        (d.officialCode || '').toLowerCase().includes(q) ||
         d.faculty.toLowerCase().includes(q) ||
         d.chairmanName.toLowerCase().includes(q);
       return matchesFaculty && matchesQuery;
@@ -554,45 +572,92 @@ export function PublicSubPages({
 
   // 2. ACADEMIC PAGES (/academics/*)
   if (route.startsWith('/academics')) {
-    const academicSubTabs: Array<{ label: string; route: AppRoute }> = [
+    const academicSubTabs: Array<{
+      label: string;
+      route: AppRoute;
+      matchRoutes?: AppRoute[];
+    }> = [
       { label: 'Academic Programs', route: '/academics/programs' },
-      { label: 'Faculty', route: '/academics/faculty' },
-      { label: 'Departments', route: '/academics/departments' },
-      { label: 'Forms Download', route: '/academics/forms-download' },
+      {
+        label: 'Faculties & Deans',
+        route: '/academics/faculty',
+        matchRoutes: ['/academics/faculty', '/academics/deans'],
+      },
+      {
+        label: 'Departments & Chairmen',
+        route: '/academics/departments',
+        matchRoutes: ['/academics', '/academics/departments', '/academics/chairmen'],
+      },
       { label: 'Academic Calendar', route: '/academics/calendar' },
-      { label: 'Scholarship', route: '/academics/scholarship' },
+      { label: 'Forms Download', route: '/academics/forms-download' },
+      { label: 'Scholarships', route: '/academics/scholarship' },
       { label: 'Seminars & Workshops', route: '/academics/seminars' },
-      { label: 'All Dean', route: '/academics/deans' },
-      { label: 'All Chairman', route: '/academics/chairmen' },
-      { label: 'PUST Journals', route: '/academics/journals' },
-      { label: 'Publications', route: '/academics/publications' },
+      {
+        label: 'Journals & Research',
+        route: '/academics/publications',
+        matchRoutes: ['/academics/publications', '/academics/journals'],
+      },
     ];
+
+    const isFacultiesView = route === '/academics/faculty' || route === '/academics/deans';
+    const isResearchView = route === '/academics/journals' || route === '/academics/publications';
+    const activeHeading =
+      route === '/academics/deans'
+        ? 'Faculties & Deans'
+        : route === '/academics/chairmen'
+        ? 'Departments & Chairmen'
+        : route === '/academics/journals'
+        ? 'Journals & Research'
+        : route === '/academics'
+        ? 'Departments & Chairmen'
+        : academicSubTabs.find((t) => t.route === route)?.label || 'Academic Directory';
+
+    const totalFacultyMembers =
+      departments.some((d) => (d.facultyCount ?? 0) > 0)
+        ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
+        : profile?.facultyMembersCount ?? 212;
+    const totalResearchOutputs =
+      departments.some((d) => (d.researchTotal ?? 0) > 0)
+        ? departments.reduce((sum, d) => sum + (d.researchTotal ?? 0), 0)
+        : 3934;
 
     return (
       <main className="flex-1 bg-white">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="border-b border-slate-200 pb-6 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-              Academic Affairs &amp; Research
-            </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
-              {academicSubTabs.find((t) => t.route === route)?.label || 'Academic Directory'}
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  Academic Affairs &amp; Research
+                </p>
+                <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
+                  {activeHeading}
+                </h1>
+              </div>
+              <p className="font-mono text-xs text-slate-600 tabular-nums">
+                {profile?.facultiesCount ?? 5} Faculties · {departments.length || 21} Departments ·{' '}
+                {totalFacultyMembers} Faculty · {totalResearchOutputs.toLocaleString()} Research Works
+              </p>
+            </div>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
-              {academicSubTabs.map((tab) => (
-                <Link
-                  key={tab.route}
-                  href={tab.route}
-                  className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    route === tab.route ||
-                    (route === '/academics' && tab.route === '/academics/departments')
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
+              {academicSubTabs.map((tab) => {
+                const isActive = tab.matchRoutes
+                  ? tab.matchRoutes.includes(route)
+                  : route === tab.route;
+                return (
+                  <Link
+                    key={tab.route}
+                    href={tab.route}
+                    className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'bg-pust-900 text-white'
+                        : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -620,11 +685,13 @@ export function PublicSubPages({
                       {prog.duration}
                     </p>
                     <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
-                    <p className="text-sm font-medium text-slate-800">{prog.degrees}</p>
+                    <p className="text-sm font-medium text-slate-800 leading-relaxed">
+                      {prog.degrees}
+                    </p>
                     <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
                       <div className="flex justify-between gap-4">
                         <dt className="text-slate-500">Credit Structure</dt>
-                        <dd className="font-mono text-slate-900">{prog.credits}</dd>
+                        <dd className="font-mono text-slate-900 text-right">{prog.credits}</dd>
                       </div>
                       <div className="flex justify-between gap-4">
                         <dt className="text-slate-500">Admission Pathway</dt>
@@ -634,6 +701,33 @@ export function PublicSubPages({
                   </MotionCard>
                 ))}
               </div>
+
+              {/* Official PUST Specialized Institute (IIED) */}
+              <div className="card-gradient-sage rounded-2xl border border-sage-200/80 p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-1.5 max-w-3xl">
+                  <p className="font-mono text-xs uppercase tracking-widest text-sage-800">
+                    University Institute · pust.ac.bd/academic/Institute
+                  </p>
+                  <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
+                    Institute of Innovation and Entrepreneurship Development (IIED)
+                  </h2>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    Dedicated PUST institute advancing applied technology transfer, startup incubation,
+                    interdisciplinary policy research, and industry-academia collaboration across
+                    engineering, science, and business faculties.
+                  </p>
+                </div>
+                <a
+                  href="https://pust.ac.bd/academic/Institute"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg border border-sage-600/40 bg-white text-sage-900 hover:border-sage-700 hover:bg-sage-50 whitespace-nowrap shrink-0 self-start lg:self-center"
+                >
+                  Official IIED Portal
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
               <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
                 <p className="text-sm text-slate-700">
                   All degree programs operate under the Outcome-Based Education (OBE) framework and
@@ -664,40 +758,115 @@ export function PublicSubPages({
                 </div>
               </div>
             </div>
-          ) : route === '/academics/faculty' ? (
+          ) : isFacultiesView ? (
             <div className="editable-region space-y-8">
-              <div className="flex justify-end empty:hidden">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  Unified directory of all 5 Academic Faculties, Dean profiles (verified via{' '}
+                  <span className="font-mono text-xs">pust.ac.bd</span>), and their 21 constituent
+                  departments.
+                </p>
                 <EditTriggerButton
                   target={{ kind: 'faculty-deans' }}
                   label="Edit Faculty Deans"
                   variant="compact"
                 />
               </div>
-              {resolved.academicExtras.facultyDeans.map((fac) => {
+
+              {resolved.academicExtras.facultyDeans.map((fac, idx) => {
                 const facDepts = departments.filter((d) => d.faculty === fac.faculty);
+                const facTeachers = facDepts.reduce((s, d) => s + (d.facultyCount ?? 0), 0);
+                const facWorks = facDepts.reduce((s, d) => s + (d.researchTotal ?? 0), 0);
+                const isCopied = copiedContact === fac.email;
+                const facGradient =
+                  idx === 0
+                    ? 'card-gradient-lapis border-lapis-200/80'
+                    : idx === 1
+                    ? 'card-gradient-sage border-sage-200/80'
+                    : idx === 2
+                    ? 'card-gradient-gold border-gold-200/80'
+                    : idx === 3
+                    ? 'card-gradient-crimson border-pust-200/80'
+                    : 'card-gradient-parchment border-slate-200';
+
                 return (
-                  <div
+                  <MotionCard
                     key={fac.faculty}
-                    className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
+                    delay={idx * 0.04}
+                    className={`rounded-2xl border ${facGradient} overflow-hidden shadow-xs`}
                   >
-                    <div className="px-6 py-4 bg-[#F7F7F5] border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div>
-                        <p className="font-mono text-xs text-pust-800">{fac.code}</p>
+                    <div className="px-6 py-5 border-b border-slate-200/80 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                      <div className="lg:col-span-6 space-y-1.5">
+                        <p className="font-mono text-xs text-pust-800 tabular-nums">
+                          {fac.code}
+                          {facTeachers > 0 ? ` · ${facTeachers} Faculty` : ''}
+                          {facWorks > 0 ? ` · ${facWorks.toLocaleString()} Research Works` : ''}
+                        </p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
                           {fac.faculty}
                         </h2>
+                        <p className="text-xs text-slate-600">Departments: {fac.depts}</p>
                       </div>
-                      <p className="text-xs text-slate-600">
-                        Dean: <span className="font-medium text-slate-900">{fac.dean}</span> ·{' '}
-                        <a
-                          href={`mailto:${fac.email}`}
-                          className="font-mono text-pust-800 hover:underline"
-                        >
-                          {fac.email}
-                        </a>
-                      </p>
+
+                      <div className="lg:col-span-6 lg:border-l lg:border-slate-200/80 lg:pl-6 space-y-1.5 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-sm font-serif font-medium text-slate-900">
+                            Dean: {fac.dean}
+                          </p>
+                          {typeof fac.publicationCount === 'number' && (
+                            <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
+                              {fac.publicationCount} Dean Publications
+                            </span>
+                          )}
+                        </div>
+                        {fac.qualification && (
+                          <p className="text-slate-700 leading-relaxed">{fac.qualification}</p>
+                        )}
+                        {fac.researchArea && (
+                          <p className="text-slate-600 leading-relaxed">
+                            Research Focus: <span className="text-slate-800">{fac.researchArea}</span>
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 pt-1">
+                          <a
+                            href={`mailto:${fac.email}`}
+                            className="inline-flex items-center gap-1.5 font-mono text-xs text-pust-800 hover:underline"
+                          >
+                            <Mail className="w-3.5 h-3.5 shrink-0" />
+                            {fac.email}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyContact(fac.email)}
+                            aria-label={`Copy ${fac.email}`}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="w-3 h-3 text-emerald-700" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                Copy
+                              </>
+                            )}
+                          </button>
+                          {fac.phone && (
+                            <a
+                              href={`tel:${fac.phone}`}
+                              className="inline-flex items-center gap-1 font-mono text-xs text-slate-700 hover:text-pust-900"
+                            >
+                              <Phone className="w-3.5 h-3.5 shrink-0" />
+                              {fac.phone}
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200/80">
                       {facDepts.map((dept) => (
                         <div
                           key={dept.id}
@@ -710,11 +879,14 @@ export function PublicSubPages({
                               onSelectDepartment(dept);
                             }
                           }}
-                          className="text-left p-5 bg-white hover:bg-pust-50/40 transition-colors space-y-1.5 cursor-pointer"
+                          className="text-left p-5 bg-white/95 hover:bg-pust-50/50 transition-colors space-y-1.5 cursor-pointer group"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-mono text-xs text-pust-800 tabular-nums">
-                              {dept.code} · {dept.intakeSeats} Seats
+                              {dept.officialCode ? `#${dept.officialCode} · ` : ''}
+                              {dept.code}
+                              {dept.facultyCount ? ` · ${dept.facultyCount} Faculty` : ''}
+                              {` · ${dept.intakeSeats} Seats`}
                             </p>
                             <EditTriggerButton
                               target={{ kind: 'department', department: dept }}
@@ -722,93 +894,288 @@ export function PublicSubPages({
                               variant="compact"
                             />
                           </div>
-                          <h3 className="font-serif text-lg font-medium text-slate-900">
+                          <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                             {dept.name}
                           </h3>
-                          <p className="text-xs text-slate-500">Chair: {dept.chairmanName}</p>
+                          <p className="text-xs text-slate-500">
+                            Chair: {dept.chairmanName}
+                            {dept.researchTotal ? ` · ${dept.researchTotal} Works` : ''}
+                          </p>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </MotionCard>
                 );
               })}
             </div>
           ) : route === '/academics/forms-download' ? (
-            <div className="editable-region space-y-5">
-              <div className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                    100% Paperless &amp; Printable Forms Hub
-                  </p>
-                  <p className="text-sm text-slate-700 mt-1">
-                    Preview official HTML printable copies or launch the live digital submission
-                    workflow directly inside the PUST Campus Portal.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <EditTriggerButton
-                    target={{ kind: 'download-forms' }}
-                    label="Edit Forms"
-                    variant="compact"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('/verify')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    Verify Issued Documents
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
+            (() => {
+              const officialForms = resolved.academicExtras.officialForms || [];
+              const officialCategories: Array<'All' | OfficialFormItem['category']> = [
+                'All',
+                'Student & Academic',
+                'Faculty, Officer & Leave',
+                'Accounts & Transport',
+              ];
+              const qForm = officialFormQuery.trim().toLowerCase();
+              const visibleOfficialForms = officialForms.filter((item) => {
+                const matchesCat =
+                  officialFormCat === 'All' || item.category === officialFormCat;
+                const matchesQ =
+                  !qForm ||
+                  item.title.toLowerCase().includes(qForm) ||
+                  item.category.toLowerCase().includes(qForm) ||
+                  String(item.serial).includes(qForm);
+                return matchesCat && matchesQ;
+              });
 
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
-                {resolved.academicExtras.downloadForms.map((form) => (
-                  <div
-                    key={form.code}
-                    className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F7F7F5]/60 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <p className="font-mono text-xs text-pust-800 font-semibold">{form.code}</p>
-                      <h2 className="font-serif text-lg font-medium text-slate-900">{form.title}</h2>
-                      <p className="text-xs text-slate-600">
-                        {form.office} — {form.note}
+              return (
+                <div className="editable-region space-y-8">
+                  <div className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
+                        100% Paperless &amp; Official Download Hub
+                      </p>
+                      <p className="text-sm text-slate-700 mt-1">
+                        Fill interactive digital portal forms online or download official PUST PDF and
+                        DOCX forms published by the Registrar &amp; Controller of Examinations.
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <EditTriggerButton
+                        target={{ kind: 'download-forms' }}
+                        label="Edit Forms"
+                        variant="compact"
+                      />
                       <button
                         type="button"
-                        onClick={() => openFillableForm(form)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                        onClick={() => onNavigate('/verify')}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        <FileText className="w-3.5 h-3.5" />
-                        Fill &amp; Print Form
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => downloadPrintableFormHtml(form)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
-                      >
-                        <FileDown className="w-3.5 h-3.5" />
-                        Blank HTML
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onNavigate(form.portalTarget)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
-                      >
-                        {form.portalLabel}
+                        Verify Issued Documents
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  {/* Section 1: Interactive Fillable & Portal Workflows */}
+                  <div className="space-y-3">
+                    <h2 className="font-serif text-xl font-medium text-slate-900">
+                      Interactive Fillable &amp; Portal Workflows
+                    </h2>
+                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
+                      {resolved.academicExtras.downloadForms.map((form) => (
+                        <div
+                          key={form.code}
+                          className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F7F7F5]/60 transition-colors"
+                        >
+                          <div className="space-y-1">
+                            <p className="font-mono text-xs text-pust-800 font-semibold">
+                              {form.code}
+                            </p>
+                            <h3 className="font-serif text-lg font-medium text-slate-900">
+                              {form.title}
+                            </h3>
+                            <p className="text-xs text-slate-600">
+                              {form.office} — {form.note}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => openFillableForm(form)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              Fill &amp; Print Form
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => downloadPrintableFormHtml(form)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                            >
+                              <FileDown className="w-3.5 h-3.5" />
+                              Blank HTML
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => onNavigate(form.portalTarget)}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                            >
+                              {form.portalLabel}
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section 2: Official PUST PDF/DOCX Forms Directory */}
+                  {officialForms.length > 0 && (
+                    <div className="space-y-4 pt-4 border-t border-slate-200">
+                      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-xs uppercase tracking-widest text-lapis-700">
+                            Direct Official Files (pust.ac.bd)
+                          </p>
+                          <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-1">
+                            Official PUST Printable &amp; Editable Forms Archive
+                          </h2>
+                        </div>
+                        <a
+                          href="https://pust.ac.bd/academic/form_download"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                        >
+                          Full Official Archive (29 Forms)
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0">
+                          {officialCategories.map((cat) => (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => setOfficialFormCat(cat)}
+                              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                                officialFormCat === cat
+                                  ? 'bg-pust-900 text-white'
+                                  : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="relative w-full lg:w-64 shrink-0">
+                          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          <input
+                            type="search"
+                            value={officialFormQuery}
+                            onChange={(e) => setOfficialFormQuery(e.target.value)}
+                            placeholder="Filter official PDF/DOCX forms..."
+                            aria-label="Filter official forms"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {visibleOfficialForms.length === 0 ? (
+                        <div className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-2">
+                          <p className="text-sm text-slate-600">
+                            No official form matched your selected category or search query.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOfficialFormCat('All');
+                              setOfficialFormQuery('');
+                            }}
+                            className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                          >
+                            Reset Form Filters
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                          {visibleOfficialForms.map((item) => (
+                            <div
+                              key={`${item.serial}-${item.title}`}
+                              className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF8F4] transition-colors"
+                            >
+                              <div className="space-y-0.5 min-w-0">
+                                <p className="font-mono text-[11px] text-slate-500 tabular-nums">
+                                  Form #{String(item.serial).padStart(2, '0')} · {item.category}
+                                </p>
+                                <h3 className="text-sm font-medium text-slate-900">
+                                  {item.title}
+                                </h3>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                {item.pdfUrl && (
+                                  <a
+                                    href={item.pdfUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-pust-300 bg-pust-50/70 text-pust-900 hover:bg-pust-100 whitespace-nowrap"
+                                  >
+                                    <FileDown className="w-3.5 h-3.5" />
+                                    PDF
+                                  </a>
+                                )}
+                                {item.docUrl && (
+                                  <a
+                                    href={item.docUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-lapis-200 bg-lapis-50/70 text-lapis-900 hover:bg-lapis-100 whitespace-nowrap"
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    DOCX
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()
           ) : route === '/academics/calendar' ? (
-            <AcademicCalendarView items={resolved.academicExtras.academicCalendar} />
+            <div className="space-y-6">
+              <div className="card-gradient-parchment rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                      Official Bi-Semester Ordinance (pust.ac.bd)
+                    </p>
+                    <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900 mt-0.5">
+                      20-Week Semester Distribution (Semester-I &amp; Semester-II)
+                    </h2>
+                  </div>
+                  <span className="font-mono text-xs text-slate-600">
+                    Each Academic Year = 2 Semesters × 20 Weeks
+                  </span>
+                </div>
+                <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-200/80 text-xs">
+                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                    <dt className="text-slate-500">Class Teaching</dt>
+                    <dd className="font-mono text-base font-semibold text-slate-900 tabular-nums mt-0.5">
+                      14 Weeks
+                    </dd>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                    <dt className="text-slate-500">Exam Preparation</dt>
+                    <dd className="font-mono text-base font-semibold text-slate-900 tabular-nums mt-0.5">
+                      2 Weeks
+                    </dd>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                    <dt className="text-slate-500">Final Examinations</dt>
+                    <dd className="font-mono text-base font-semibold text-pust-900 tabular-nums mt-0.5">
+                      3 Weeks
+                    </dd>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                    <dt className="text-slate-500">Semester Break</dt>
+                    <dd className="font-mono text-base font-semibold text-sage-800 tabular-nums mt-0.5">
+                      1 Week
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              <AcademicCalendarView items={resolved.academicExtras.academicCalendar} />
+            </div>
           ) : route === '/academics/scholarship' ? (
-            <div className="editable-region space-y-4">
+            <div className="editable-region space-y-6">
               <div className="flex justify-end empty:hidden">
                 <EditTriggerButton
                   target={{ kind: 'scholarships' }}
@@ -828,45 +1195,72 @@ export function PublicSubPages({
                   </MotionCard>
                 ))}
               </div>
-            </div>
-          ) : route === '/academics/seminars' ? (
-            <div className="editable-region space-y-4">
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                <EditTriggerButton
-                  target={{ kind: 'seminars' }}
-                  label="Edit Seminars"
-                  variant="compact"
-                />
+              <div className="p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                <div className="space-y-1">
+                  <p className="font-mono uppercase tracking-wider text-pust-800 font-semibold">
+                    Scholarship &amp; Financial Aid Coordination
+                  </p>
+                  <p className="text-slate-700 leading-relaxed">
+                    Applications and verification are processed through Departmental Chairmen and the
+                    Office of the Student Advisor (<span className="font-mono">director.sao@pust.ac.bd</span> ·{' '}
+                    <span className="font-mono">+8801715048250</span>).
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={() =>
-                    downloadIcsCalendar(
-                      resolved.upcomingSeminars.map((sem) => ({
-                        uid: `pust-sem-${sem.id}`,
-                        title: sem.title,
-                        date: sem.date,
-                        description: `Organized by ${sem.organizer}`,
-                      })),
-                      'PUST-Seminars-Workshops.ics'
-                    )
-                  }
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                  onClick={() => onNavigate('/administration/student-advisor-office')}
+                  className="px-4 py-2 font-semibold rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <CalendarPlus className="w-3.5 h-3.5" />
-                  Export Seminars (.ics)
+                  Student Advisor Office →
                 </button>
               </div>
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
-                {resolved.upcomingSeminars.map((sem) => (
-                  <div
+            </div>
+          ) : route === '/academics/seminars' ? (
+            <div className="editable-region space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  Upcoming university symposia, IQAC curriculum workshops, and departmental colloquia.
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <EditTriggerButton
+                    target={{ kind: 'seminars' }}
+                    label="Edit Seminars"
+                    variant="compact"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      downloadIcsCalendar(
+                        resolved.upcomingSeminars.map((sem) => ({
+                          uid: `pust-sem-${sem.id}`,
+                          title: sem.title,
+                          date: sem.date,
+                          description: `Organized by ${sem.organizer}`,
+                        })),
+                        'PUST-Seminars-Workshops.ics'
+                      )
+                    }
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <CalendarPlus className="w-3.5 h-3.5" />
+                    Export Seminars (.ics)
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {resolved.upcomingSeminars.map((sem, idx) => (
+                  <MotionCard
                     key={sem.id}
-                    className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    delay={idx * 0.04}
+                    className="p-5 sm:p-6 rounded-2xl border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/45 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     <div className="space-y-1">
-                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      <p className="font-mono text-xs text-lapis-800 font-semibold tabular-nums">
                         {sem.date} · {sem.organizer}
                       </p>
-                      <h2 className="font-serif text-lg font-medium text-slate-900">{sem.title}</h2>
+                      <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900">
+                        {sem.title}
+                      </h2>
                     </div>
                     <button
                       type="button"
@@ -883,194 +1277,28 @@ export function PublicSubPages({
                           `PUST-Seminar-${sem.date}.ics`
                         )
                       }
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
                     >
                       <CalendarPlus className="w-3.5 h-3.5" />
                       Add (.ics)
                     </button>
-                  </div>
+                  </MotionCard>
                 ))}
               </div>
             </div>
-          ) : route === '/academics/deans' ? (
-            <div className="editable-region space-y-4">
-              <div className="flex justify-end empty:hidden">
-                <EditTriggerButton
-                  target={{ kind: 'faculty-deans' }}
-                  label="Edit Deans"
-                  variant="compact"
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resolved.academicExtras.facultyDeans.map((d, idx) => {
-                  const isCopied = copiedContact === d.email;
-                  return (
-                    <MotionCard
-                      key={d.faculty}
-                      delay={idx * 0.04}
-                      className="p-6 rounded-2xl border border-pust-200/80 card-gradient-crimson hover:border-pust-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
-                    >
-                      <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                        {d.faculty}
-                      </p>
-                      <h2 className="font-serif text-xl font-medium text-slate-900">{d.dean}</h2>
-                      <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
-                        <a
-                          href={`mailto:${d.email}`}
-                          className="inline-flex items-center gap-1.5 font-mono text-xs text-pust-800 hover:underline"
-                        >
-                          <Mail className="w-3.5 h-3.5 shrink-0" />
-                          {d.email}
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyContact(d.email)}
-                          aria-label={`Copy ${d.email}`}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-700" />
-                              Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
-                    </MotionCard>
-                  );
-                })}
-              </div>
-            </div>
-          ) : route === '/academics/chairmen' ? (
-            (() => {
-              const qChair = chairmanQuery.trim().toLowerCase();
-              const visibleChairmen = departments.filter((d) => {
-                const matchesFac =
-                  chairmanFacultyFilter === 'All' || d.faculty === chairmanFacultyFilter;
-                const matchesQ =
-                  !qChair ||
-                  d.name.toLowerCase().includes(qChair) ||
-                  d.code.toLowerCase().includes(qChair) ||
-                  d.chairmanName.toLowerCase().includes(qChair) ||
-                  d.faculty.toLowerCase().includes(qChair);
-                return matchesFac && matchesQ;
-              });
-
-              return (
-                <div className="editable-region space-y-5">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex flex-wrap gap-1.5">
-                      {FACULTY_FILTERS.map((tab) => (
-                        <button
-                          key={tab.value}
-                          type="button"
-                          onClick={() => setChairmanFacultyFilter(tab.value)}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            chairmanFacultyFilter === tab.value
-                              ? 'bg-pust-900 text-white'
-                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
-                          }`}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                      <EditTriggerButton
-                        target={{ kind: 'department', department: null }}
-                        label="Add Department"
-                        icon="add"
-                        variant="compact"
-                      />
-                      <div className="relative w-full sm:w-64">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <input
-                          type="search"
-                          value={chairmanQuery}
-                          onChange={(e) => setChairmanQuery(e.target.value)}
-                          placeholder="Search chairman or dept..."
-                          className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {visibleChairmen.length === 0 ? (
-                    <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-2">
-                      <p className="text-sm text-slate-600">
-                        No department chairman matched your filter.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setChairmanFacultyFilter('All');
-                          setChairmanQuery('');
-                        }}
-                        className="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
-                      >
-                        Reset Filter
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
-                      {visibleChairmen.map((d) => (
-                        <div
-                          key={d.id}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => onSelectDepartment(d)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              onSelectDepartment(d);
-                            }
-                          }}
-                          className="p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-pust-50/40 transition-colors cursor-pointer group"
-                        >
-                          <div>
-                            <p className="font-mono text-xs text-pust-800">
-                              {d.code} · {d.faculty}
-                            </p>
-                            <p className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
-                              Department of {d.name}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
-                            <span className="text-xs font-semibold text-pust-800 group-hover:underline whitespace-nowrap">
-                              Prospectus →
-                            </span>
-                            <EditTriggerButton
-                              target={{ kind: 'department', department: d }}
-                              label="Edit"
-                              variant="compact"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()
-          ) : route === '/academics/journals' || route === '/academics/publications' ? (
+          ) : isResearchView ? (
             <ResearchSection
               publications={publications}
               journals={profile?.journals ?? []}
+              departments={departments}
               labImage={LAB_IMAGE}
               libraryImage={LIBRARY_IMAGE}
               groundsImage={GROUNDS_IMAGE}
               focus={route === '/academics/journals' ? 'journals' : 'publications'}
+              showInfrastructure={false}
             />
           ) : (
-            // Default /academics & /academics/departments
+            // Unified Departments & Chairmen Directory (/academics, /academics/departments, /academics/chairmen)
             <div className="editable-region space-y-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-1.5">
@@ -1091,19 +1319,47 @@ export function PublicSubPages({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                  <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setDeptViewMode('cards')}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                        deptViewMode === 'cards'
+                          ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      Cards View
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeptViewMode('chairmen')}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                        deptViewMode === 'chairmen'
+                          ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <List className="w-3.5 h-3.5" />
+                      Chairmen Directory
+                    </button>
+                  </div>
+
                   <EditTriggerButton
                     target={{ kind: 'department', department: null }}
                     label="Add Department"
                     icon="add"
                     variant="compact"
                   />
-                  <div className="relative w-full lg:w-72">
+
+                  <div className="relative flex-1 sm:w-64 lg:w-64">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="search"
                       value={deptQuery}
                       onChange={(e) => setDeptQuery(e.target.value)}
-                      placeholder="Filter 21 departments..."
+                      placeholder="Filter 21 depts or chairmen..."
                       className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
@@ -1119,7 +1375,7 @@ export function PublicSubPages({
               ) : filteredDepartments.length === 0 ? (
                 <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
                   <p className="text-sm text-slate-700">
-                    No academic departments match your current search or faculty filter.
+                    No academic departments or chairmen match your current search or faculty filter.
                   </p>
                   <button
                     type="button"
@@ -1131,6 +1387,47 @@ export function PublicSubPages({
                   >
                     Reset Department Filters
                   </button>
+                </div>
+              ) : deptViewMode === 'chairmen' ? (
+                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                  {filteredDepartments.map((d) => (
+                    <div
+                      key={d.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onSelectDepartment(d)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onSelectDepartment(d);
+                        }
+                      }}
+                      className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-pust-50/40 transition-colors cursor-pointer group"
+                    >
+                      <div>
+                        <p className="font-mono text-xs text-pust-800 tabular-nums">
+                          {d.officialCode ? `Code ${d.officialCode} · ` : ''}
+                          {d.code} · {d.faculty}
+                          {d.facultyCount ? ` · ${d.facultyCount} Faculty` : ''}
+                          {d.researchTotal ? ` · ${d.researchTotal} Works` : ''}
+                        </p>
+                        <p className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
+                          Department of {d.name}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 shrink-0">
+                        <p className="text-sm font-medium text-slate-800">{d.chairmanName}</p>
+                        <span className="text-xs font-semibold text-pust-800 group-hover:underline whitespace-nowrap">
+                          Prospectus →
+                        </span>
+                        <EditTriggerButton
+                          target={{ kind: 'department', department: d }}
+                          label="Edit"
+                          variant="compact"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1164,6 +1461,7 @@ export function PublicSubPages({
                           <div>
                             <div className="flex items-start justify-between gap-2">
                               <p className="font-mono text-xs text-pust-800 tabular-nums">
+                                {dept.officialCode ? `#${dept.officialCode} · ` : ''}
                                 {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
                               </p>
                               <EditTriggerButton
@@ -1180,9 +1478,12 @@ export function PublicSubPages({
                               {dept.summary}
                             </p>
                           </div>
-                          <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-600">
-                            <span>{dept.degrees.join(' / ')}</span>
-                            <span className="font-semibold text-pust-800 inline-flex items-center gap-1 group-hover:underline">
+                          <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-xs text-slate-600">
+                            <span className="truncate font-mono text-[11px] tabular-nums">
+                              {dept.facultyCount ? `${dept.facultyCount} Faculty` : dept.degrees[0]}
+                              {dept.researchTotal ? ` · ${dept.researchTotal} Works` : ''}
+                            </span>
+                            <span className="font-semibold text-pust-800 inline-flex items-center gap-1 group-hover:underline shrink-0">
                               Prospectus
                               <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                             </span>
@@ -1193,8 +1494,6 @@ export function PublicSubPages({
                   })}
                 </div>
               )}
-
-              <AcademicCalendarHighlights items={resolved.academicExtras.academicCalendar} />
             </div>
           )}
         </section>

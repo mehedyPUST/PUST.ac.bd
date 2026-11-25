@@ -177,7 +177,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 3;
+    const INSTITUTIONAL_SEED_VERSION = 4;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
@@ -185,6 +185,47 @@ class PustRepository {
         await db.collection('about_sections').updateOne(
           { id: section.id },
           { $set: section },
+          { upsert: true }
+        );
+      }
+
+      for (const dept of SEED_DEPARTMENTS) {
+        const {
+          officialCode,
+          facultyCount,
+          researchTotal,
+          intakeSeats,
+          degrees,
+          ...restDept
+        } = dept;
+        await db.collection('departments').updateOne(
+          { id: dept.id },
+          {
+            $set: {
+              officialCode,
+              facultyCount,
+              researchTotal,
+              intakeSeats,
+              degrees,
+            },
+            $setOnInsert: restDept,
+          },
+          { upsert: true }
+        );
+      }
+
+      for (const pub of SEED_PUBLICATIONS) {
+        const { doi, url, venue, ...restPub } = pub;
+        const pubSet: Record<string, unknown> = {};
+        if (doi !== undefined) pubSet.doi = doi;
+        if (url !== undefined) pubSet.url = url;
+        if (venue !== undefined) pubSet.venue = venue;
+        await db.collection('publications').updateOne(
+          { id: pub.id },
+          {
+            ...(Object.keys(pubSet).length > 0 ? { $set: pubSet } : {}),
+            $setOnInsert: restPub,
+          },
           { upsert: true }
         );
       }
@@ -218,6 +259,11 @@ class PustRepository {
           );
         }
       }
+
+      await db.collection('university_profile').updateOne(
+        { id: 'main', facultyMembersCount: 185 },
+        { $set: { facultyMembersCount: SEED_UNIVERSITY_PROFILE.facultyMembersCount } }
+      );
 
       await seedMetaCol.updateOne(
         { id: 'institutional_content' },

@@ -94,11 +94,14 @@ export interface CourseRecord {
 export interface DepartmentRecord {
   id: string;
   code: string;
+  officialCode?: string;
   name: string;
   faculty: FacultyName;
   established: number;
   degrees: string[];
   intakeSeats: number;
+  facultyCount?: number;
+  researchTotal?: number;
   building: string;
   chairmanName: string;
   summary: string;
@@ -423,6 +426,8 @@ export interface PublicationRecord {
   domain: string;
   year: number;
   venue: string;
+  doi?: string;
+  url?: string;
 }
 
 export interface JournalRecord {
@@ -547,6 +552,11 @@ export interface FacultyDeanItem {
   email: string;
   code: string;
   depts: string;
+  phone?: string;
+  personalEmail?: string;
+  qualification?: string;
+  researchArea?: string;
+  publicationCount?: number;
 }
 
 export type AcademicCalendarCategory = 'exam' | 'holiday' | 'deadline' | 'academic';
@@ -576,6 +586,14 @@ export interface DigitalFormItem {
   fields: string[];
 }
 
+export interface OfficialFormItem {
+  serial: number;
+  title: string;
+  category: 'Student & Academic' | 'Faculty, Officer & Leave' | 'Accounts & Transport';
+  pdfUrl?: string;
+  docUrl?: string;
+}
+
 export interface ResearchInfraCard {
   id: string;
   tag: string;
@@ -591,6 +609,7 @@ export interface AcademicExtrasConfig {
   academicCalendar: AcademicCalendarItem[];
   scholarships: ScholarshipItem[];
   downloadForms: DigitalFormItem[];
+  officialForms?: OfficialFormItem[];
   researchIntro: string;
   researchInfraCards: ResearchInfraCard[];
 }

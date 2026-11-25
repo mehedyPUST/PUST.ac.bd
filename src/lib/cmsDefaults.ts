@@ -9,6 +9,7 @@ import type {
   FooterConfig,
   GovernanceContent,
   InstitutionalLinkItem,
+  OfficialFormItem,
   SeminarItem,
   UniversityProfile,
   VerifyPageConfig,
@@ -450,7 +451,7 @@ export const DEFAULT_ABOUT_EXTRAS: AboutExtrasConfig = {
       year: '2026',
       title: '5 Faculties · 21 Departments',
       detail:
-        'Nearly 5,000 scholars and 185 faculty members on the 30-acre Rajapur digital campus.',
+        'Nearly 5,000 scholars and 212 faculty members on the 30-acre Rajapur digital campus.',
     },
     {
       year: '15 Mar 2027',
@@ -460,18 +461,139 @@ export const DEFAULT_ABOUT_EXTRAS: AboutExtrasConfig = {
   ],
 };
 
+export const DEFAULT_OFFICIAL_FORMS: OfficialFormItem[] = [
+  {
+    serial: 1,
+    title: 'Institutional Email Opening Form (Only for Students)',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/WOP_Form_for%20students%20August_2026_V5.pdf',
+  },
+  {
+    serial: 2,
+    title: 'Institutional Email Opening Form (Teachers & Officers)',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/WOP_Form_for%20teacher_officers_Agust_2026.pdf',
+  },
+  {
+    serial: 3,
+    title: 'Personal Information Adding / Correction on Website Form (Teachers & Officers)',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/Personal%20Information%20Adding%20Form_August2026.pdf',
+  },
+  {
+    serial: 7,
+    title: 'Student Clearance Form — Provisional / Original Certificate (শিক্ষার্থী ক্লিয়ারেন্স ফরম-সার্টিফিকেট)',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%AB%E0%A6%BF%E0%A6%95%E0%A7%87%E0%A6%9F.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%AB%E0%A6%BF%E0%A6%95%E0%A7%87%E0%A6%9F.docx',
+  },
+  {
+    serial: 8,
+    title: 'Student Clearance Form — Admission Cancellation (ভর্তি বাতিল)',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%AD%E0%A6%B0%E0%A7%8D%E0%A6%A4%E0%A6%BF%20%E0%A6%AC%E0%A6%BE%E0%A6%A4%E0%A6%BF%E0%A6%B2.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%AD%E0%A6%B0%E0%A7%8D%E0%A6%A4%E0%A6%BF%20%E0%A6%AC%E0%A6%BE%E0%A6%A4%E0%A6%BF%E0%A6%B2.docx',
+  },
+  {
+    serial: 9,
+    title: 'Student Clearance Form — Caution Money Refund (জামানত)',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%9C%E0%A6%BE%E0%A6%AE%E0%A6%BE%E0%A6%A8%E0%A6%A4.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6%B7%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%A5%E0%A7%80%20%E0%A6%95%E0%A7%8D%E0%A6%B2%E0%A6%BF%E0%A7%9F%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%A8%E0%A7%8D%E0%A6%B8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE-%E0%A6%9C%E0%A6%BE%E0%A6%AE%E0%A6%BE%E0%A6%A8%E0%A6%A4.docx',
+  },
+  {
+    serial: 10,
+    title: 'Migration / Medium of Instruction Certificate Application Form',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%AE%E0%A6%BE%E0%A6%87%E0%A6%97%E0%A7%8D%E0%A6%B0%E0%A7%87%E0%A6%B6%E0%A6%A8-%E0%A6%AE%E0%A6%BF%E0%A6%A1%E0%A6%BF%E0%A7%9F%E0%A6%BE%20%E0%A6%85%E0%A6%AB%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%95%E0%A6%B6%E0%A6%A8%20%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%AB%E0%A6%BF%E0%A6%95%E0%A7%87%E0%A6%9F%E0%A7%87%E0%A6%B0%20%E0%A6%86%E0%A6%AC%E0%A7%87%E0%A6%A6%E0%A6%A8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%AE%E0%A6%BE%E0%A6%87%E0%A6%97%E0%A7%8D%E0%A6%B0%E0%A7%87%E0%A6%B6%E0%A6%A8-%E0%A6%AE%E0%A6%BF%E0%A6%A1%E0%A6%BF%E0%A7%9F%E0%A6%BE%20%E0%A6%85%E0%A6%AB%20%E0%A6%87%E0%A6%A8%E0%A6%B8%E0%A7%8D%E0%A6%9F%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%95%E0%A6%B6%E0%A6%A8%20%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%9F%E0%A6%BF%E0%A6%AB%E0%A6%BF%E0%A6%95%E0%A7%87%E0%A6%9F%E0%A7%87%E0%A6%B0%20%E0%A6%86%E0%A6%AC%E0%A7%87%E0%A6%A6%E0%A6%A8%20%E0%A6%AB%E0%A6%B0%E0%A6%AE.docx',
+  },
+  {
+    serial: 21,
+    title: 'No Objection Certificate (NOC) Sample Format',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/NOC%20Sample%20Format%20(2).pdf',
+  },
+  {
+    serial: 22,
+    title: 'Duplicate Registration Card or Name Correction Form',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/Duplicate%20registration%20card%20or%20name%20correction_form.pdf',
+  },
+  {
+    serial: 23,
+    title: 'Dormitory / Residential Hall Application Form',
+    category: 'Student & Academic',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/Dorm_Application%20form.pdf',
+  },
+  {
+    serial: 25,
+    title: 'Virtual Class Room Requisition Form',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/Virtual_Class_Room_Requisition_Form.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/Virtual_Class_Room_Requisition_Form.docx',
+  },
+  {
+    serial: 26,
+    title: 'Smart ID Card Registration Form (Officers & Staffs)',
+    category: 'Faculty, Officer & Leave',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/Smart_ID_Card_Officer_Staff_Form.docx',
+  },
+  {
+    serial: 27,
+    title: 'Smart ID Card Registration Form (Teachers)',
+    category: 'Faculty, Officer & Leave',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/Smart_ID_Card_Teacher_Form.docx',
+  },
+  {
+    serial: 28,
+    title: 'Job Application Form (Officers & Staff)',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/PUST-Application-Form-Officers-Staff.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/PUST-Application-Form-Officers-Staff.doc',
+  },
+  {
+    serial: 29,
+    title: 'Job & Upgradation Application Form (Teachers)',
+    category: 'Faculty, Officer & Leave',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/PUST_Recruitment_Upgradation_Form1.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/PUST_Recruitment_Upgradation_Form1.docx',
+  },
+  {
+    serial: 16,
+    title: 'University Transport / Vehicle Requisition Form (গাড়ী ব্যবহারের ফরমায়েশপত্র)',
+    category: 'Accounts & Transport',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%97%E0%A6%BE%E0%A7%9C%E0%A7%80%20%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%AC%E0%A6%B9%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%B0%20%E0%A6%AB%E0%A6%B0%E0%A6%AE%E0%A6%BE%E0%A7%9F%E0%A7%87%E0%A6%B6%E0%A6%AA%E0%A6%A4%E0%A7%8D%E0%A6%B0.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%97%E0%A6%BE%E0%A7%9C%E0%A7%80%20%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%AC%E0%A6%B9%E0%A6%BE%E0%A6%B0%E0%A7%87%E0%A6%B0%20%E0%A6%AB%E0%A6%B0%E0%A6%AE%E0%A6%BE%E0%A7%9F%E0%A7%87%E0%A6%B6%E0%A6%AA%E0%A6%A4%E0%A7%8D%E0%A6%B0.docx',
+  },
+  {
+    serial: 12,
+    title: 'Travel Allowance (TA/DA) Bill Form (ভ্রমণ ভাতা বিল ফরম)',
+    category: 'Accounts & Transport',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%AD%E0%A7%8D%E0%A6%B0%E0%A6%AE%E0%A6%A3%20%E0%A6%AD%E0%A6%BE%E0%A6%A4%E0%A6%BE%20%E0%A6%AC%E0%A6%BF%E0%A6%B2%20%E0%A6%AB%E0%A6%B0%E0%A6%AE.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%AD%E0%A7%8D%E0%A6%B0%E0%A6%AE%E0%A6%A3%20%E0%A6%AD%E0%A6%BE%E0%A6%A4%E0%A6%BE%20%E0%A6%AC%E0%A6%BF%E0%A6%B2%20%E0%A6%AB%E0%A6%B0%E0%A6%AE.docx',
+  },
+  {
+    serial: 19,
+    title: 'Temporary Advance Adjustment Top-Sheet (অস্থায়ী অগ্রিম সমন্বয়ের টপশীট)',
+    category: 'Accounts & Transport',
+    pdfUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%85%E0%A6%B8%E0%A7%8D%E0%A6%A5%E0%A6%BE%E0%A6%AF%E0%A6%BC%E0%A7%80%20%E0%A6%85%E0%A6%97%E0%A7%8D%E0%A6%B0%E0%A6%BF%E0%A6%AE%20%E0%A6%B8%E0%A6%AE%E0%A6%A8%E0%A7%8D%E0%A6%AC%E0%A6%AF%E0%A6%BC%E0%A7%87%E0%A6%B0%20%E0%A6%9F%E0%A6%AA%E0%A6%B6%E0%A7%80%E0%A6%9F_up.pdf',
+    docUrl: 'https://pust.ac.bd/includes/images/forms/%E0%A6%85%E0%A6%B8%E0%A7%8D%E0%A6%A5%E0%A6%BE%E0%A6%AF%E0%A6%BC%E0%A7%80%20%E0%A6%85%E0%A6%97%E0%A7%8D%E0%A6%B0%E0%A6%BF%E0%A6%AE%20%E0%A6%B8%E0%A6%AE%E0%A6%A8%E0%A7%8D%E0%A6%AC%E0%A6%AF%E0%A6%BC%E0%A7%87%E0%A6%B0%20%E0%A6%9F%E0%A6%AA%E0%A6%B6%E0%A7%80%E0%A6%9F_up.docx',
+  },
+];
+
 export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
   degreePrograms: [
     {
       level: 'Undergraduate Honors & Engineering',
-      degrees: 'B.Sc. (Engg.), B.Arch., B.Pharm. (Hons.), B.Sc. (Hons.), B.B.A., B.A. (Hons.), B.S.S.',
-      duration: '4 Years / 8 Semesters (B.Arch.: 5 Years / 10 Semesters)',
+      degrees: 'B.Sc. (Engineering), B.Sc. (Honours), B.B.A., B.U.R.P., B.Arch., B.Pharm. (Professional), B.A. (Honours), B.S.S. (Honours)',
+      duration: '4 Years / 8 Semesters (B.Arch. & B.Pharm.: 5 Years / 10 Semesters)',
       credits: '140 – 195 Credit Hours',
       entry: 'Bangladesh GST Integrated Admission Test (Units A, B, C)',
     },
     {
       level: 'Graduate & Master Programs',
-      degrees: 'M.Sc. (Engg.), M.Sc., M.Pharm., M.B.A., M.A., M.S.S.',
+      degrees: 'M.Sc. (Engineering), M. Engineering, M.Sc., M.Pharm., M.B.A. (Regular), M.A., M.S.S.',
       duration: '1 – 1.5 Years (2 – 3 Semesters)',
       credits: '36 – 45 Credit Hours (Thesis & Non-Thesis Tracks)',
       entry: 'Departmental Postgraduate Selection & Merit Verification',
@@ -485,7 +607,7 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
     },
     {
       level: 'Evening & Executive Cohorts',
-      degrees: 'EMBA & Evening M.Sc. in Applied Engineering',
+      degrees: 'Executive MBA (EMBA) & Evening M.Sc. / M.Engg.',
       duration: '2 Years (Weekend / Evening Schedule)',
       credits: '48 – 60 Credit Hours',
       entry: 'Working Professionals & Industry Sponsored Track',
@@ -496,35 +618,57 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
       faculty: 'Faculty of Engineering and Technology',
       dean: 'Prof. Dr. Md. Anwar Hossain',
       email: 'dean.et@pust.ac.bd',
-      code: 'FET · 7 Departments',
+      phone: '+8801717330923',
+      personalEmail: 'manwar.ice@gmail.com',
+      qualification: 'Ph.D. in ICE (PUST), M.Phil. (PUST), B.Sc. & M.Sc. in ICE (RU)',
+      researchArea: 'Image Processing, Deep Learning',
+      publicationCount: 54,
+      code: 'FET · 7 Departments (Codes 01, 02, 05, 06, 11, 12, 17)',
       depts: 'CSE, EEE, EECE, ICE, Civil Engineering, Architecture, URP',
     },
     {
       faculty: 'Faculty of Science',
       dean: 'Prof. Dr. Md. Shamim Reza',
       email: 'dean.s@pust.ac.bd',
-      code: 'FS · 5 Departments',
+      phone: '+8801717725553',
+      personalEmail: 'mshamim.pust@gmail.com',
+      qualification: 'Ph.D., Peking University (China)',
+      researchArea: 'Statistical Learning & Intelligent Information Processing, Deep Learning, Medical Imaging',
+      publicationCount: 35,
+      code: 'FS · 5 Departments (Codes 03, 07, 13, 14, 16)',
       depts: 'Mathematics, Physics, Pharmacy, Chemistry, Statistics and Data Science',
     },
     {
       faculty: 'Faculty of Business Studies',
       dean: 'Prof. Dr. Md. Hasebur Rahman',
       email: 'dean.bs@pust.ac.bd',
-      code: 'FBS · 2 Departments',
+      phone: '+8801718293000',
+      personalEmail: 'hasebur7208@gmail.com',
+      qualification: 'BBA (Honours in Management), MBA (RU)',
+      researchArea: 'Work Motivation, Job Satisfaction, OCB, Entrepreneurship, HRM',
+      publicationCount: 40,
+      code: 'FBS · 2 Departments (Codes 04, 21)',
       depts: 'Business Administration, Tourism & Hospitality Management',
     },
     {
       faculty: 'Faculty of Humanities and Social Science',
       dean: 'Prof. Dr. Mir Humayun Kabir',
       email: 'dean.hss@pust.ac.bd',
-      code: 'FHSS · 6 Departments',
+      phone: '+8801716383136',
+      qualification: 'M.Phil., Ph.D. (University of Dhaka)',
+      researchArea: 'Bangla Drama and Short Story',
+      publicationCount: 19,
+      code: 'FHSS · 6 Departments (Codes 08, 10, 15, 18, 19, 20)',
       depts: 'Economics, Bangla, Social Work, English, Public Administration, History',
     },
     {
       faculty: 'Faculty of Life and Earth Science',
       dean: 'Prof. Dr. Mohammad Najmul Islam',
       email: 'dean.les@pust.ac.bd',
-      code: 'FLES · 1 Department',
+      qualification: 'Ph.D. (Kyoto University, Japan), JSPS Fellow',
+      researchArea: 'Disaster Risk Management, Climate Change Impacts, River & Floodplain Management, IWRM, Socio-hydrology',
+      publicationCount: 41,
+      code: 'FLES · 1 Department (Code 09)',
       depts: 'Geography and Environment',
     },
   ],
@@ -828,6 +972,7 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
       ],
     },
   ],
+  officialForms: DEFAULT_OFFICIAL_FORMS,
   researchIntro:
     'Serving nearly 5,000 students across academic blocks, the Central Library & Information Center, July 06 Hall & dormitories, Medical Center, Transport Pool, and active student chapters including IEEE PUST SB.',
   researchInfraCards: [
@@ -1166,10 +1311,16 @@ export function resolveUniversityContent(
         acad?.degreePrograms && acad.degreePrograms.length > 0
           ? acad.degreePrograms
           : DEFAULT_ACADEMIC_EXTRAS.degreePrograms,
-      facultyDeans:
+      facultyDeans: (
         acad?.facultyDeans && acad.facultyDeans.length > 0
           ? acad.facultyDeans
-          : DEFAULT_ACADEMIC_EXTRAS.facultyDeans,
+          : DEFAULT_ACADEMIC_EXTRAS.facultyDeans
+      ).map((dean) => {
+        const base = DEFAULT_ACADEMIC_EXTRAS.facultyDeans.find(
+          (d) => d.faculty === dean.faculty
+        );
+        return base ? { ...base, ...dean } : dean;
+      }),
       academicCalendar:
         acad?.academicCalendar && acad.academicCalendar.length > 0
           ? acad.academicCalendar
@@ -1182,6 +1333,10 @@ export function resolveUniversityContent(
         acad?.downloadForms && acad.downloadForms.length > 0
           ? acad.downloadForms
           : DEFAULT_ACADEMIC_EXTRAS.downloadForms,
+      officialForms:
+        acad?.officialForms && acad.officialForms.length > 0
+          ? acad.officialForms
+          : DEFAULT_OFFICIAL_FORMS,
       researchIntro: acad?.researchIntro?.trim() || DEFAULT_ACADEMIC_EXTRAS.researchIntro,
       researchInfraCards:
         acad?.researchInfraCards && acad.researchInfraCards.length > 0
