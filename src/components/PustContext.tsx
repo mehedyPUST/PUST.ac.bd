@@ -156,6 +156,7 @@ export function PustShell({
   const [isTransitionPending, startTransition] = useTransition();
   const [pendingTarget, setPendingTarget] = useState<string | null>(null);
   const prevPathnameRef = useRef(pathname);
+  const mountedRef = useRef(true);
   const isNavigating = isTransitionPending || pendingTarget !== null;
   const [queryClient] = useState(
     () =>
@@ -253,15 +254,38 @@ export function PustShell({
     setEditTarget(null);
   }, []);
 
+  const scrollToHashId = useCallback((hashId: string) => {
+    if (typeof window === 'undefined' || !hashId) return;
+    const cleanId = decodeURIComponent(hashId.replace(/^#/, ''));
+    if (!cleanId) return;
+    let attempts = 0;
+    const tryScroll = () => {
+      const targetEl = document.getElementById(cleanId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (attempts < 8) {
+        attempts += 1;
+        window.setTimeout(tryScroll, 80);
+      }
+    };
+    window.requestAnimationFrame(tryScroll);
+  }, []);
+
   useEffect(() => {
     setPendingTarget(null);
     if (prevPathnameRef.current !== pathname) {
       prevPathnameRef.current = pathname;
       if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'auto' });
+        if (window.location.hash) {
+          scrollToHashId(window.location.hash);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
       }
     }
-  }, [pathname]);
+  }, [pathname, scrollToHashId]);
 
   useEffect(() => {
     if (!pendingTarget) return;
@@ -284,18 +308,41 @@ export function PustShell({
 
   const navigateTo = useCallback(
     (target: AppRoute | string) => {
-      if (target === pathname) {
+      let targetPath = target;
+      let targetSearch = '';
+      let targetHash = '';
+      try {
+        const parsed = new URL(target, 'http://localhost');
+        targetPath = parsed.pathname || '/';
+        targetSearch = parsed.search || '';
+        targetHash = parsed.hash ? parsed.hash.slice(1) : '';
+      } catch {
+        // Fallback if target cannot be parsed as URL
+      }
+
+      if (targetPath === pathname) {
         if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'auto' });
+          const currentSearch = window.location.search || '';
+          if (targetSearch !== currentSearch || (targetHash && `#${targetHash}` !== window.location.hash)) {
+            startTransition(() => {
+              router.push(target);
+            });
+          }
+          if (targetHash) {
+            scrollToHashId(targetHash);
+          } else if (targetSearch === currentSearch) {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+          }
         }
         return;
       }
+
       setPendingTarget(target);
       startTransition(() => {
         router.push(target);
       });
     },
-    [router, pathname, startTransition]
+    [router, pathname, startTransition, scrollToHashId]
   );
 
   const loadCmsProfile = useCallback(async () => {
@@ -351,6 +398,7 @@ export function PustShell({
           pustApi.getMe(),
           pustApi.getBootstrapStatus(),
         ]);
+        if (!mountedRef.current) return;
         setProfile(profileRes.profile ?? null);
         setAboutSections(Array.isArray(profileRes.aboutSections) ? profileRes.aboutSections : []);
         setVcProfiles(Array.isArray(profileRes.vcProfiles) ? profileRes.vcProfiles : []);
@@ -364,6 +412,7 @@ export function PustShell({
         setBootstrapStatus(statusRes);
         if (meRes.user) {
           const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
+          if (!mountedRef.current) return;
           setBookmarks(bmRes.bookmarks);
         }
       } else {
@@ -371,37 +420,49 @@ export function PustShell({
           pustApi.getMe(),
           pustApi.getBootstrapStatus(),
         ]);
+        if (!mountedRef.current) return;
         setUser(meRes.user);
         setAuthResolved(true);
         setBootstrapStatus(statusRes);
         if (meRes.user) {
-          const [bmRes, noticeRes] = await Promise.all([
+          const [bmRes, noticeRes, profileRes] = await Promise.all([
             pustApi.getBookmarks().catch(() => ({ bookmarks: [] })),
             pustApi.getNotices().catch(() => null),
+            pustApi.getUniversityProfile().catch(() => null),
           ]);
+          if (!mountedRef.current) return;
           setBookmarks(bmRes.bookmarks);
           if (noticeRes && Array.isArray(noticeRes.notices)) {
             setNotices(noticeRes.notices);
           }
+          if (profileRes) {
+            if (profileRes.profile) setProfile(profileRes.profile);
+            if (Array.isArray(profileRes.aboutSections)) setAboutSections(profileRes.aboutSections);
+            if (Array.isArray(profileRes.vcProfiles)) setVcProfiles(profileRes.vcProfiles);
+            if (Array.isArray(profileRes.galleryItems)) setGalleryItems(profileRes.galleryItems);
+            if (Array.isArray(profileRes.bannerSlides)) setBannerSlides(profileRes.bannerSlides);
+          }
         }
       }
     } catch (err) {
+      if (!mountedRef.current) return;
       setAuthResolved(true);
       setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
     } finally {
-      setAuthResolved(true);
-      setLoadingData(false);
+      if (mountedRef.current) {
+        setAuthResolved(true);
+        setLoadingData(false);
+      }
     }
   }, [initialData]);
 
   const retryLoad = useCallback(() => bootstrapData(true), [bootstrapData]);
 
   useEffect(() => {
-    let active = true;
-    if (!active) return;
-    bootstrapData(!initialData);
+    mountedRef.current = true;
+    void bootstrapData(!initialData);
     return () => {
-      active = false;
+      mountedRef.current = false;
     };
   }, [initialData, bootstrapData]);
 

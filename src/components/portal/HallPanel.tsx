@@ -217,7 +217,7 @@ export function HallPanel({ user }: HallPanelProps) {
         { label: 'Clearance Reference', value: d.clearanceRef },
         { label: 'Residential Hall', value: d.hallName },
         { label: 'Fee Description', value: d.feeTitle },
-        { label: 'Settled Amount', value: `BDT ${d.amountBdt.toLocaleString()}` },
+        { label: 'Settled Amount', value: `BDT ${d.amountBdt.toLocaleString('en-US')}` },
         {
           label: 'Payment & Receipt',
           value: d.receiptNo
@@ -567,7 +567,7 @@ export function HallPanel({ user }: HallPanelProps) {
                       {d.feeTitle} · {d.hallName}
                     </p>
                     <p className="font-mono text-xs text-slate-500 tabular-nums mt-0.5">
-                      {d.studentName} ({d.academicId}) · ৳{d.amountBdt.toLocaleString()} ·{' '}
+                      {d.studentName} ({d.academicId}) · ৳{d.amountBdt.toLocaleString('en-US')} ·{' '}
                       <span
                         className={`font-semibold ${
                           d.status === 'Cleared'
@@ -600,7 +600,7 @@ export function HallPanel({ user }: HallPanelProps) {
                         className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
-                        Pay Online (৳{d.amountBdt.toLocaleString()})
+                        Pay Online (৳{d.amountBdt.toLocaleString('en-US')})
                       </button>
                     )}
 

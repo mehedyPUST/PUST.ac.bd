@@ -23,6 +23,25 @@ export function Footer({ onNavigate }: FooterProps) {
       )
     : '';
 
+  function handleLinkClick(
+    e: React.MouseEvent<HTMLAnchorElement>,
+    target: string
+  ) {
+    if (
+      !onNavigate ||
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+    e.preventDefault();
+    onNavigate(target);
+  }
+
   return (
     <footer
       id="footer"
@@ -94,7 +113,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
-                  onClick={() => onNavigate?.(item.route)}
+                  onClick={(e) => handleLinkClick(e, item.route)}
                   className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}
@@ -114,7 +133,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
-                  onClick={() => onNavigate?.(item.route)}
+                  onClick={(e) => handleLinkClick(e, item.route)}
                   className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}
@@ -134,7 +153,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
-                  onClick={() => onNavigate?.(item.route)}
+                  onClick={(e) => handleLinkClick(e, item.route)}
                   className="text-slate-300 hover:text-white transition-colors"
                 >
                   {item.label}

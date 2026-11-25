@@ -107,7 +107,7 @@ export function DepartmentModal({
                 {department.building}, Rajapur Campus
                 {department.researchTotal !== undefined && (
                   <span className="block font-mono text-xs text-pust-800 mt-0.5 tabular-nums">
-                    {department.researchTotal.toLocaleString()} Indexed Works
+                    {department.researchTotal.toLocaleString('en-US')} Indexed Works
                   </span>
                 )}
               </dd>

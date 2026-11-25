@@ -219,7 +219,7 @@ export function DigitalCheckoutModal({
                 <div className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
                   <span className="text-slate-500">Amount Paid</span>
                   <span className="font-semibold text-slate-900 tabular-nums">
-                    BDT {receipt.amountBdt.toLocaleString()}
+                    BDT {receipt.amountBdt.toLocaleString('en-US')}
                   </span>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export function DigitalCheckoutModal({
                 <div className="sm:text-right shrink-0">
                   <p className="text-[11px] uppercase tracking-wider text-slate-500">Payable</p>
                   <p className="font-mono text-lg font-semibold text-pust-900 tabular-nums">
-                    ৳{target.amountBdt.toLocaleString()}
+                    ৳{target.amountBdt.toLocaleString('en-US')}
                   </p>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export function DigitalCheckoutModal({
                   ) : (
                     <Receipt className="w-3.5 h-3.5" />
                   )}
-                  {processing ? 'Processing...' : `Pay BDT ${target.amountBdt.toLocaleString()}`}
+                  {processing ? 'Processing...' : `Pay BDT ${target.amountBdt.toLocaleString('en-US')}`}
                 </button>
               </div>
             </form>

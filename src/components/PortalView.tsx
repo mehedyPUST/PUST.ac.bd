@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   AlertCircle,
   ArrowRight,
@@ -218,15 +219,20 @@ export function PortalView({
     }
   }, [user, stuDeptFilter, stuSessionFilter, stuSearch]);
 
+  const searchParams = useSearchParams();
+  const requestedTabParam = searchParams.get('tab') as PortalTab | null;
+
   useEffect(() => {
     if (!user) return;
-    const params = new URLSearchParams(window.location.search);
-    const requestedTab = params.get('tab') as PortalTab | null;
-    if (requestedTab && VALID_PORTAL_TABS.includes(requestedTab)) {
-      setActiveTab(requestedTab);
+    if (requestedTabParam && VALID_PORTAL_TABS.includes(requestedTabParam)) {
+      setActiveTab(requestedTabParam);
     } else {
       setActiveTab('overview');
     }
+  }, [user, requestedTabParam]);
+
+  useEffect(() => {
+    if (!user) return;
     if (user.role === 'chairman' || user.role === 'teacher') {
       setStuDeptFilter(user.departmentCode);
     } else {
@@ -461,7 +467,7 @@ export function PortalView({
         { label: 'Receipt Reference', value: rcpt.receiptNo },
         { label: 'Gateway Transaction ID', value: rcpt.transactionId },
         { label: 'Payment Channel', value: `${rcpt.gatewayName} (${rcpt.accountMask || 'Digital'})` },
-        { label: 'Amount Settled', value: `BDT ${rcpt.amountBdt.toLocaleString()}` },
+        { label: 'Amount Settled', value: `BDT ${rcpt.amountBdt.toLocaleString('en-US')}` },
         { label: 'Target Record ID', value: rcpt.targetId },
       ],
       footerNote: 'Computer-generated digital fee receipt verifiable on the PUST Public Verification Registry.',
@@ -1687,7 +1693,7 @@ export function PortalView({
                           <p className="font-mono text-slate-500 tabular-nums mt-0.5">
                             {r.receiptNo} · {r.gatewayName} ({r.transactionId}) · Paid{' '}
                             <span className="font-semibold text-pust-900">
-                              BDT {r.amountBdt.toLocaleString()}
+                              BDT {r.amountBdt.toLocaleString('en-US')}
                             </span>{' '}
                             on {r.paidAt}
                           </p>

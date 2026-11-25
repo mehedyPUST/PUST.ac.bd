@@ -299,7 +299,7 @@ export function ResearchSection({
                   Official Faculty Publication Index (pust.ac.bd)
                 </p>
                 <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-1 tabular-nums">
-                  {totalResearchOutputs.toLocaleString()} Research Outputs Across {totalFaculty} Faculty Members
+                  {totalResearchOutputs.toLocaleString('en-US')} Research Outputs Across {totalFaculty} Faculty Members
                 </h2>
               </div>
               <a
@@ -337,7 +337,7 @@ export function ResearchSection({
                       {dept.code}
                     </p>
                     <p className="font-mono text-sm font-semibold tabular-nums mt-0.5">
-                      {(dept.researchTotal ?? 0).toLocaleString()}{' '}
+                      {(dept.researchTotal ?? 0).toLocaleString('en-US')}{' '}
                       <span
                         className={`text-[10px] font-normal ${
                           active ? 'text-pust-100' : 'text-slate-500'

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   AlertCircle,
   ArrowRight,
@@ -32,6 +33,10 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   const [hasSearched, setHasSearched] = useState(false);
   const [copiedField, setCopiedField] = useState<'link' | 'hash' | null>(null);
 
+  const searchParams = useSearchParams();
+  const codeParam = searchParams.get('code')?.trim() || '';
+  const lastAutoCodeRef = useRef<string>('');
+
   async function handleCopyText(text: string, field: 'link' | 'hash') {
     try {
       await navigator.clipboard.writeText(text);
@@ -44,7 +49,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
     }
   }
 
-  async function runVerification(rawCode: string) {
+  const runVerification = useCallback(async (rawCode: string) => {
     const clean = rawCode.trim();
     if (clean.length < 4) {
       setError('Enter a valid serial number or SHA-256 verification digest.');
@@ -68,17 +73,15 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    if (code && code.trim().length >= 4) {
-      setQuery(code.trim());
-      runVerification(code.trim());
+    if (codeParam.length >= 4 && codeParam !== lastAutoCodeRef.current) {
+      lastAutoCodeRef.current = codeParam;
+      setQuery(codeParam);
+      void runVerification(codeParam);
     }
-  }, []);
+  }, [codeParam, runVerification]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

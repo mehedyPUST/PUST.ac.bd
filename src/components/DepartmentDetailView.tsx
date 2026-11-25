@@ -2,6 +2,7 @@
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import {
@@ -239,7 +240,15 @@ function PersonThumbnail({
 }) {
   const portraitSrc = resolvePersonPortrait(person, roleCategory);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const hasError = failedSrc === portraitSrc;
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (portraitSrc && img && img.complete && img.naturalWidth === 0) {
+      setFailedSrc(portraitSrc);
+    }
+  }, [portraitSrc]);
 
   const sizeClass =
     size === 'lg'
@@ -262,6 +271,7 @@ function PersonThumbnail({
       className={`${sizeClass} overflow-hidden border border-slate-200/90 bg-slate-100 shrink-0 shadow-xs`}
     >
       <img
+        ref={imgRef}
         src={portraitSrc}
         alt={`Portrait of ${person.name}`}
         referrerPolicy="no-referrer"
@@ -2008,6 +2018,8 @@ export function DepartmentDetailView({
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
   const [activeProfile, setActiveProfile] = useState<ActiveProfileState | null>(null);
 
+  const searchParams = useSearchParams();
+  const requestedProfileId = searchParams.get('profile');
   const queryClient = useQueryClient();
   const normalizedCode = code.trim().toUpperCase();
   const { data: queriedDepartment } = useQuery({
@@ -2098,9 +2110,11 @@ export function DepartmentDetailView({
   );
 
   useEffect(() => {
-    if (!department || typeof window === 'undefined') return;
-    const targetId = new URLSearchParams(window.location.search).get('profile');
-    if (!targetId) return;
+    if (!department) return;
+    if (!requestedProfileId) {
+      setActiveProfile(null);
+      return;
+    }
 
     const chairRecord: DepartmentPersonRecord = department.chairmanProfile ?? {
       id: `${department.id}-chair`,
@@ -2110,25 +2124,27 @@ export function DepartmentDetailView({
       emails: department.contactEmail ? [{ value: department.contactEmail, type: 'Office' }] : [],
     };
 
-    if (chairRecord.id === targetId) {
+    if (chairRecord.id === requestedProfileId) {
       setActiveProfile({ person: chairRecord, roleCategory: 'Chairman' });
       return;
     }
-    const fac = (department.facultyMembers ?? []).find((m) => m.id === targetId);
+    const fac = (department.facultyMembers ?? []).find((m) => m.id === requestedProfileId);
     if (fac) {
       setActiveProfile({ person: fac, roleCategory: 'Faculty Member' });
       return;
     }
-    const cfac = (department.contractualFacultyMembers ?? []).find((m) => m.id === targetId);
+    const cfac = (department.contractualFacultyMembers ?? []).find(
+      (m) => m.id === requestedProfileId
+    );
     if (cfac) {
       setActiveProfile({ person: cfac, roleCategory: 'Faculty Member (Contractual)' });
       return;
     }
-    const off = (department.officers ?? []).find((o) => o.id === targetId);
+    const off = (department.officers ?? []).find((o) => o.id === requestedProfileId);
     if (off) {
       setActiveProfile({ person: off, roleCategory: 'Department Officer' });
     }
-  }, [department]);
+  }, [department, requestedProfileId]);
 
   const handleCloseProfile = useCallback(() => {
     setActiveProfile(null);
@@ -2140,6 +2156,25 @@ export function DepartmentDetailView({
       }
     }
   }, []);
+
+  const liveActiveProfile = useMemo<ActiveProfileState | null>(() => {
+    if (!activeProfile || !department) return activeProfile;
+    const { person, roleCategory } = activeProfile;
+    if (roleCategory === 'Chairman') {
+      const chair = department.chairmanProfile ?? person;
+      return { person: chair, roleCategory };
+    }
+    if (roleCategory === 'Faculty Member') {
+      const found = (department.facultyMembers ?? []).find((m) => m.id === person.id);
+      return found ? { person: found, roleCategory } : null;
+    }
+    if (roleCategory === 'Faculty Member (Contractual)') {
+      const found = (department.contractualFacultyMembers ?? []).find((m) => m.id === person.id);
+      return found ? { person: found, roleCategory } : null;
+    }
+    const found = (department.officers ?? []).find((o) => o.id === person.id);
+    return found ? { person: found, roleCategory } : null;
+  }, [activeProfile, department]);
 
   if (!department) {
     return (
@@ -2178,25 +2213,6 @@ export function DepartmentDetailView({
 
   const isAdmin = user?.role === 'admin';
   const canAdminEdit = editMode && isAdmin;
-
-  const liveActiveProfile = useMemo<ActiveProfileState | null>(() => {
-    if (!activeProfile || !department) return activeProfile;
-    const { person, roleCategory } = activeProfile;
-    if (roleCategory === 'Chairman') {
-      const chair = department.chairmanProfile ?? person;
-      return { person: chair, roleCategory };
-    }
-    if (roleCategory === 'Faculty Member') {
-      const found = (department.facultyMembers ?? []).find((m) => m.id === person.id);
-      return found ? { person: found, roleCategory } : null;
-    }
-    if (roleCategory === 'Faculty Member (Contractual)') {
-      const found = (department.contractualFacultyMembers ?? []).find((m) => m.id === person.id);
-      return found ? { person: found, roleCategory } : null;
-    }
-    const found = (department.officers ?? []).find((o) => o.id === person.id);
-    return found ? { person: found, roleCategory } : null;
-  }, [activeProfile, department]);
 
   async function handleSavePersonInline(
     updatedPerson: DepartmentPersonRecord,
@@ -2449,7 +2465,7 @@ export function DepartmentDetailView({
                       <div className="py-2.5 flex items-center justify-between gap-4">
                         <dt className="text-slate-600">Research Index</dt>
                         <dd className="font-mono font-semibold text-sage-800 tabular-nums text-right">
-                          {department.researchTotal.toLocaleString()} Indexed Works
+                          {department.researchTotal.toLocaleString('en-US')} Indexed Works
                         </dd>
                       </div>
                     )}

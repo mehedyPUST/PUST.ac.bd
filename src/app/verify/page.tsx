@@ -1,5 +1,7 @@
 'use client';
 
+import { Suspense } from 'react';
+import { PageHeaderAndSectionSkeleton } from '../../components/PustSkeletons';
 import { VerifyPage } from '../../components/VerifyPage';
 import { usePust } from '../../components/PustContext';
 
@@ -8,7 +10,9 @@ export default function VerifyRoutePage() {
 
   return (
     <main className="flex-1 bg-[#F7F7F5]">
-      <VerifyPage onNavigate={navigateTo} />
+      <Suspense fallback={<PageHeaderAndSectionSkeleton />}>
+        <VerifyPage onNavigate={navigateTo} />
+      </Suspense>
     </main>
   );
 }

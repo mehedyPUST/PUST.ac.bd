@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Building2 } from 'lucide-react';
 
 interface ResilientImageProps {
@@ -23,10 +23,15 @@ export function ResilientImage({
   priority = false,
 }: ResilientImageProps) {
   const trimmedSrc = src?.trim() || '';
-  const [failed, setFailed] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const failed = Boolean(trimmedSrc) && failedSrc === trimmedSrc;
 
   useEffect(() => {
-    setFailed(false);
+    const img = imgRef.current;
+    if (trimmedSrc && img && img.complete && img.naturalWidth === 0) {
+      setFailedSrc(trimmedSrc);
+    }
   }, [trimmedSrc]);
 
   const showImage = Boolean(trimmedSrc) && !failed;
@@ -36,12 +41,13 @@ export function ResilientImage({
       <div className={`relative w-full h-full overflow-hidden ${frameClassName}`}>
         {showImage ? (
           <img
+            ref={imgRef}
             src={trimmedSrc}
             alt={alt}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
             referrerPolicy="no-referrer"
-            onError={() => setFailed(true)}
+            onError={() => setFailedSrc(trimmedSrc)}
             className={className}
           />
         ) : (

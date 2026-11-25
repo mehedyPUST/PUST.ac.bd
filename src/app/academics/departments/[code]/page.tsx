@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { pustRepo } from '../../../../../server/db';
 import { DepartmentDetailView } from '../../../../components/DepartmentDetailView';
@@ -19,5 +20,9 @@ export default async function DepartmentPage({
     notFound();
   }
 
-  return <DepartmentDetailView code={matched.code} initialDepartment={matched} />;
+  return (
+    <Suspense fallback={null}>
+      <DepartmentDetailView code={matched.code} initialDepartment={matched} />
+    </Suspense>
+  );
 }

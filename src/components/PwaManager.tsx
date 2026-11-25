@@ -17,6 +17,24 @@ export function PwaRegistrar() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+        .catch(() => {});
+      if ('caches' in window) {
+        caches
+          .keys()
+          .then((keys) =>
+            Promise.all(
+              keys.filter((key) => key.startsWith('pust-')).map((key) => caches.delete(key))
+            )
+          )
+          .catch(() => {});
+      }
+      return;
+    }
+
     navigator.serviceWorker
       .register('/sw.js', { scope: '/' })
       .then((registration) => {

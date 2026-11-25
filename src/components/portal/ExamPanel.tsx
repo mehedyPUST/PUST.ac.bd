@@ -671,7 +671,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         { label: 'Total Registered Credits', value: `${app.totalCredits} Credits` },
         {
           label: 'Fee Settlement',
-          value: `BDT ${app.feeBdt.toLocaleString()} · ${app.paymentMethod || 'Digital'} (${
+          value: `BDT ${app.feeBdt.toLocaleString('en-US')} · ${app.paymentMethod || 'Digital'} (${
             app.receiptNo || app.transactionId || 'Verified'
           })`,
         },
@@ -1457,7 +1457,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                       </p>
                       <p className="font-mono text-xs text-slate-500 tabular-nums mt-0.5">
                         {app.studentName} ({app.academicId}) · {app.departmentCode} · Credits{' '}
-                        {app.totalCredits} · Fee ৳{app.feeBdt.toLocaleString()} · Payment:{' '}
+                        {app.totalCredits} · Fee ৳{app.feeBdt.toLocaleString('en-US')} · Payment:{' '}
                         <span
                           className={`font-semibold ${
                             app.paymentStatus === 'Paid' ? 'text-emerald-800' : 'text-amber-800'
@@ -1491,7 +1491,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                           className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
-                          Pay Online (৳{app.feeBdt.toLocaleString()})
+                          Pay Online (৳{app.feeBdt.toLocaleString('en-US')})
                         </button>
                       )}
 

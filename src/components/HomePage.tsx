@@ -310,7 +310,7 @@ export function HomePage({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0.4 }}
                         transition={{ duration: 0.18 }}
-                        className="w-full h-full"
+                        className="absolute inset-0 w-full h-full"
                       >
                         <ResilientImage
                           src={currentSlide.imageUrl}
@@ -457,7 +457,7 @@ export function HomePage({
                   Community
                 </dt>
                 <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
-                  {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString()} Students
+                  {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
                 </dd>
               </div>
               <div className="bg-pust-950 hover:bg-pust-900 text-white transition-colors group">

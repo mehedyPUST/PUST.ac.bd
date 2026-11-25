@@ -406,7 +406,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
-                    Sweep Execution Report · {new Date(sweepReport.ranAt).toLocaleTimeString()}
+                    Sweep Execution Report · {new Date(sweepReport.ranAt).toLocaleTimeString('en-US')}
                   </p>
                   <h3 className="font-serif text-lg font-medium text-slate-900">
                     {sweepReport.processedCount} Advanced · {sweepReport.heldCount} Held

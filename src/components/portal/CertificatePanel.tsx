@@ -166,7 +166,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         { label: 'Credential Type', value: app.certificateType },
         {
           label: 'Fee & Receipt',
-          value: `BDT ${app.feeBdt.toLocaleString()} via ${app.paymentMethod} (${
+          value: `BDT ${app.feeBdt.toLocaleString('en-US')} via ${app.paymentMethod} (${
             app.receiptNo || app.transactionId
           })`,
         },
@@ -311,7 +311,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                 >
                   {student?.allResultsPublished ? 'YES' : 'NO'}
                 </span>{' '}
-                · Official Fee: ৳{feeConfig.certificateFeeBdt.toLocaleString()}
+                · Official Fee: ৳{feeConfig.certificateFeeBdt.toLocaleString('en-US')}
               </p>
             </div>
             <span
@@ -362,7 +362,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Pay Fee &amp; Submit Application (৳{feeConfig.certificateFeeBdt.toLocaleString()})
+                  Pay Fee &amp; Submit Application (৳{feeConfig.certificateFeeBdt.toLocaleString('en-US')})
                 </button>
               </div>
             </div>
@@ -437,7 +437,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                         {app.departmentCode} · {app.session})
                       </p>
                       <p className="font-mono text-xs text-slate-500 tabular-nums">
-                        {app.certificateType} · Paid ৳{app.feeBdt.toLocaleString()} via{' '}
+                        {app.certificateType} · Paid ৳{app.feeBdt.toLocaleString('en-US')} via{' '}
                         {app.paymentMethod} ({app.receiptNo || app.transactionId}) · Status:{' '}
                         <span
                           className={`font-semibold ${

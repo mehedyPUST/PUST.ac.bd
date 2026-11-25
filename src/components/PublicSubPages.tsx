@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
@@ -204,6 +205,7 @@ export function PublicSubPages({
   onSubmitInquiry,
 }: PublicSubPagesProps) {
   const resolved = resolveUniversityContent(profile);
+  const pathname = usePathname() || '/';
   const [selectedFaculty, setSelectedFaculty] = useState<'All' | FacultyName>('All');
   const [deptQuery, setDeptQuery] = useState('');
   const [openingDeptCode, setOpeningDeptCode] = useState<string | null>(null);
@@ -265,8 +267,11 @@ export function PublicSubPages({
 
   useEffect(() => {
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
-    setOpeningDeptCode(null);
   }, [route]);
+
+  useEffect(() => {
+    setOpeningDeptCode(null);
+  }, [pathname]);
 
   useEffect(() => {
     if (!openingDeptCode) return;
@@ -912,7 +917,7 @@ export function PublicSubPages({
                           {fac.code.split('·')[0].trim()} · {facDepts.length}{' '}
                           {facDepts.length === 1 ? 'Department' : 'Departments'}
                           {facTeachers > 0 ? ` · ${facTeachers} Teachers` : ''}
-                          {facWorks > 0 ? ` · ${facWorks.toLocaleString()} Research Works` : ''}
+                          {facWorks > 0 ? ` · ${facWorks.toLocaleString('en-US')} Research Works` : ''}
                         </p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
                           {fac.faculty}
