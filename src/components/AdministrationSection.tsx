@@ -131,7 +131,7 @@ export function AdministrationSection({
 }: AdministrationSectionProps) {
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('All');
   const [directoryQuery, setDirectoryQuery] = useState('');
-  const [showPreviousVcs, setShowPreviousVcs] = useState(false);
+  const [showPreviousVcs, setShowPreviousVcs] = useState(true);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   const activeOffice = OFFICE_SUBROUTES.find((o) => o.route === route);
@@ -325,159 +325,171 @@ export function AdministrationSection({
         </div>
       </section>
 
-      {/* Band 2: Vice-Chancellor's Welcome Address (Editorial Two-Column Reading Canvas) */}
+      {/* Band 2: Vice-Chancellor's Welcome Address & History */}
       <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-            {/* Sticky Portrait & Desk Dossier Column */}
-            <aside className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
-              <ResilientImage
-                src={currentVc?.photoUrl || VC_PORTRAIT_IMAGE}
-                fallbackSrc={VC_PORTRAIT_FALLBACK}
-                alt={currentVc?.name || 'Honorable Vice-Chancellor of PUST'}
-                caption={`Fig. 2 — ${currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}, Honorable Vice-Chancellor.`}
-                className="w-full aspect-[3/4] object-cover object-top"
-              />
-
-              <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
-                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                  <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
-                  <dd className="font-medium text-slate-900 sm:text-right">Honorable Vice-Chancellor</dd>
-                </div>
-                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                  <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
-                  <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
-                    {currentVc?.tenure}
-                  </dd>
-                </div>
-                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                  <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
-                  <dd className="font-mono text-xs sm:text-right min-w-0">
-                    <a
-                      href={`mailto:${currentVc?.email || 'vc@pust.ac.bd'}`}
-                      className="text-pust-900 hover:underline break-all"
-                    >
-                      {currentVc?.email}
-                    </a>
-                  </dd>
-                </div>
-                <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                  <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
-                  <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
-                    <a
-                      href={`tel:${currentVc?.phone || '+8802588842379'}`}
-                      className="hover:text-pust-900"
-                    >
-                      {currentVc?.phone}
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-
-              <button
-                type="button"
-                onClick={() => setShowPreviousVcs((prev) => !prev)}
-                aria-expanded={showPreviousVcs}
-                className="w-full inline-flex items-center justify-between gap-2 px-4 py-2.5 text-xs font-medium rounded-lg border border-slate-300 bg-[#FAF8F4] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer"
-              >
-                <span>Previous Vice-Chancellors ({previousVcs.length})</span>
-                <ChevronDown
-                  className={`w-4 h-4 shrink-0 transition-transform ${
-                    showPreviousVcs ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-            </aside>
-
-            {/* Long-Form Editorial Welcome Message */}
-            <article className="lg:col-span-8 max-w-prose space-y-6">
-              <header className="space-y-2 border-b border-slate-200 pb-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs font-medium text-pust-800">
-                    Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
-                  </p>
-                  <EditTriggerButton
-                    target={{ kind: 'vc' }}
-                    label="Edit VC Profile & Message"
-                    variant="compact"
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          {/* Unified Card: VC Portrait, Office Dossier & Welcome Address */}
+          <article className="editable-region rounded-2xl bg-[#FAF8F4] border border-slate-200 overflow-hidden shadow-xs">
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+              {/* Portrait & Desk Dossier (Left Column inside Card) */}
+              <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 space-y-6">
+                <div className="max-w-[260px] mx-auto lg:max-w-none">
+                  <ResilientImage
+                    src={currentVc?.photoUrl || VC_PORTRAIT_IMAGE}
+                    fallbackSrc={VC_PORTRAIT_FALLBACK}
+                    alt={currentVc?.name || 'Honorable Vice-Chancellor of PUST'}
+                    caption={`Fig. 2 — ${currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}, Honorable Vice-Chancellor.`}
+                    className="w-full aspect-[3/4] object-cover object-top"
                   />
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
-                  {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
-                </h2>
-                <p className="text-sm text-slate-600">
-                  Honorable Vice-Chancellor, Pabna University of Science and Technology
-                </p>
-              </header>
 
-              <div className="space-y-5 text-[15px] sm:text-base leading-[1.8] text-slate-700">
-                {bodyParagraphs.map((paragraph, index) => (
-                  <p
-                    key={index}
-                    className={
-                      index === 0
-                        ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
-                        : ''
-                    }
-                  >
-                    {paragraph}
-                  </p>
-                ))}
+                <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
+                    <dd className="font-medium text-slate-900 sm:text-right">Honorable Vice-Chancellor</dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
+                    <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                      {currentVc?.tenure}
+                    </dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
+                    <dd className="font-mono text-xs sm:text-right min-w-0">
+                      <a
+                        href={`mailto:${currentVc?.email || 'vc@pust.ac.bd'}`}
+                        className="text-pust-900 hover:underline break-all"
+                      >
+                        {currentVc?.email}
+                      </a>
+                    </dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
+                    <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                      <a
+                        href={`tel:${currentVc?.phone || '+8802588842379'}`}
+                        className="hover:text-pust-900"
+                      >
+                        {currentVc?.phone}
+                      </a>
+                    </dd>
+                  </div>
+                </dl>
               </div>
 
-              {closingLine && (
-                <div className="pt-4 border-t border-slate-200 space-y-2">
-                  <p className="font-serif italic text-lg text-slate-900">{closingLine}</p>
-                  <p className="text-sm font-medium text-slate-700">
-                    {currentVc?.name} — Honorable Vice-Chancellor
-                  </p>
-                </div>
-              )}
-
-              {showPreviousVcs && (
-                <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-serif text-xl font-medium text-slate-900">
-                      Former Vice-Chancellors Chronological Archive
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-slate-500 tabular-nums">
-                        2008 – Present
-                      </span>
+              {/* Long-Form Editorial Welcome Message (Right Column inside Card) */}
+              <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
+                <div className="space-y-6">
+                  <header className="space-y-2 border-b border-slate-200 pb-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-xs font-medium text-pust-800">
+                        Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
+                      </p>
                       <EditTriggerButton
-                        target={{ kind: 'vc', vcId: 'new-former' }}
-                        label="Add Former VC"
-                        icon="add"
+                        target={{ kind: 'vc' }}
+                        label="Edit VC Profile & Message"
                         variant="compact"
                       />
                     </div>
-                  </div>
-                  <div className="divide-y divide-slate-200 border-y border-slate-200">
-                    {previousVcs.map((vc) => (
-                      <div
-                        key={vc.id}
-                        className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                    <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
+                      {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
+                    </h2>
+                    <p className="text-sm text-slate-600">
+                      Honorable Vice-Chancellor, Pabna University of Science and Technology
+                    </p>
+                  </header>
+
+                  <div className="space-y-5 flow-root prose-justify text-[15px] sm:text-base leading-[1.8] text-slate-700">
+                    {bodyParagraphs.map((paragraph, index) => (
+                      <p
+                        key={index}
+                        className={
+                          index === 0
+                            ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
+                            : ''
+                        }
                       >
-                        <div className="space-y-1">
-                          <p className="font-serif text-base font-medium text-slate-900">{vc.name}</p>
-                          <p className="text-xs text-slate-600 leading-relaxed">{vc.message}</p>
-                        </div>
-                        <div className="flex items-center gap-2.5 shrink-0">
-                          <span className="font-mono tabular-nums text-xs text-pust-800 whitespace-nowrap">
-                            {vc.tenure}
-                          </span>
-                          <EditTriggerButton
-                            target={{ kind: 'vc', vcId: vc.id }}
-                            label="Edit"
-                            variant="compact"
-                          />
-                        </div>
-                      </div>
+                        {paragraph}
+                      </p>
                     ))}
                   </div>
                 </div>
-              )}
-            </article>
+
+                {closingLine && (
+                  <div className="pt-4 border-t border-slate-200 space-y-2">
+                    <p className="font-serif italic text-lg text-slate-900">{closingLine}</p>
+                    <p className="text-sm font-medium text-slate-700">
+                      {currentVc?.name} — Honorable Vice-Chancellor
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </article>
+
+          {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
+          <div className="editable-region rounded-2xl border border-slate-200 bg-[#F7F7F5] overflow-hidden">
+            <div className="px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
+                  Institutional Leadership Archive · 2008 – Present
+                </p>
+                <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                  Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
+                </h3>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <EditTriggerButton
+                  target={{ kind: 'vc', vcId: 'new-former' }}
+                  label="Add Former VC"
+                  icon="add"
+                  variant="compact"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPreviousVcs((prev) => !prev)}
+                  aria-expanded={showPreviousVcs}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-[#FAF8F4] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  {showPreviousVcs ? 'Hide History' : 'Show History'}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform ${
+                      showPreviousVcs ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {showPreviousVcs && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
+                {previousVcs.map((vc, idx) => (
+                  <div key={vc.id} className="bg-white p-5 space-y-2 flex flex-col justify-between">
+                    <div className="space-y-1.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
+                          {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                        </span>
+                        <EditTriggerButton
+                          target={{ kind: 'vc', vcId: vc.id }}
+                          label="Edit"
+                          variant="compact"
+                        />
+                      </div>
+                      <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                        {vc.name}
+                      </h4>
+                      <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                        {vc.title}
+                      </p>
+                      <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
