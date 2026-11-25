@@ -93,7 +93,7 @@ export interface CourseRecord {
 
 export interface ContactDetailItem {
   value: string;
-  type: 'Personal' | 'Office' | 'IP Phone';
+  type: 'Personal' | 'Office' | 'IP Phone' | 'PABX';
 }
 
 export interface DepartmentPersonRecord {

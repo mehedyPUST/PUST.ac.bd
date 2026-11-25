@@ -618,7 +618,7 @@ const profileUpdateSchema = z.object({
 
 const contactDetailSchema = z.object({
   value: z.string().trim().min(2).max(160),
-  type: z.enum(['Personal', 'Office', 'IP Phone']),
+  type: z.enum(['Personal', 'Office', 'IP Phone', 'PABX']),
 });
 
 const departmentPersonSchema = z.object({

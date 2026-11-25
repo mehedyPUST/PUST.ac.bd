@@ -82,6 +82,22 @@ const FEMALE_NAME_HINTS = [
   'khatun',
   'begum',
   'akter',
+  'akhter',
+  'kaniz',
+  'mousumi',
+  'kumary',
+  'sumi',
+  'marzia',
+  'iffat',
+  'taskin',
+  'turna',
+  'khaleda',
+  'farjana',
+  'humayra',
+  'anjum',
+  'jinnat',
+  'rehana',
+  'munni',
 ];
 
 function getInitials(name: string): string {
