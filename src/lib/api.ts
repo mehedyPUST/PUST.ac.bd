@@ -78,6 +78,11 @@ export const pustApi = {
 
   getDepartments: () => apiFetch<{ departments: DepartmentRecord[] }>('/api/departments'),
 
+  getDepartmentByCode: (code: string) =>
+    apiFetch<{ department: DepartmentRecord }>(
+      `/api/departments/${encodeURIComponent(code.trim().toUpperCase())}`
+    ),
+
   getPublications: () => apiFetch<{ publications: PublicationRecord[] }>('/api/publications'),
 
   getNotices: (params?: {

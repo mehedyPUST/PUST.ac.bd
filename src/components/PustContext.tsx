@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { MotionConfig } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -156,6 +157,18 @@ export function PustShell({
   const [pendingTarget, setPendingTarget] = useState<string | null>(null);
   const prevPathnameRef = useRef(pathname);
   const isNavigating = isTransitionPending || pendingTarget !== null;
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 15 * 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
 
   const isAdmin = user?.role === 'admin';
   const effectiveEditMode = isAdmin && editMode;
@@ -306,7 +319,8 @@ export function PustShell({
     setActiveDepartment((curr) =>
       curr ? res.departments.find((d) => d.id === curr.id) ?? null : null
     );
-  }, []);
+    await queryClient.invalidateQueries({ queryKey: ['department'] });
+  }, [queryClient]);
 
   const loadPublications = useCallback(async () => {
     const res = await pustApi.getPublications();
@@ -536,9 +550,10 @@ export function PustShell({
   );
 
   return (
-    <SkeletonTheme baseColor="#EAE4D8" highlightColor="#FBF9F5" borderRadius={8}>
-      <MotionConfig reducedMotion="user">
-        <PustContext.Provider value={value}>
+    <QueryClientProvider client={queryClient}>
+      <SkeletonTheme baseColor="#EAE4D8" highlightColor="#FBF9F5" borderRadius={8}>
+        <MotionConfig reducedMotion="user">
+          <PustContext.Provider value={value}>
           <div
             data-edit-mode={effectiveEditMode ? 'true' : undefined}
             className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900"
@@ -622,5 +637,6 @@ export function PustShell({
         </PustContext.Provider>
       </MotionConfig>
     </SkeletonTheme>
+    </QueryClientProvider>
   );
 }

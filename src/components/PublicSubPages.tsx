@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   ArrowRight,
@@ -222,9 +223,27 @@ export function PublicSubPages({
   const [officialFormQuery, setOfficialFormQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
 
-  function handleOpenDepartment(dept: DepartmentRecord) {
+  const queryClient = useQueryClient();
+
+  function getDepartmentHref(dept: DepartmentRecord) {
+    return `/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`;
+  }
+
+  function prefetchDepartment(dept: DepartmentRecord) {
+    onPrefetchDepartment?.(dept);
+    const codeKey = dept.code.trim().toUpperCase();
+    void queryClient.prefetchQuery({
+      queryKey: ['department', codeKey],
+      queryFn: async () => {
+        const res = await pustApi.getDepartmentByCode(codeKey);
+        return res.department;
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+  }
+
+  function handleOpenDepartmentLink(dept: DepartmentRecord) {
     setOpeningDeptCode(dept.code);
-    onSelectDepartment(dept);
   }
 
   async function handleCopyContact(val: string) {
@@ -963,13 +982,14 @@ export function PublicSubPages({
                         {facDepts.map((dept) => {
                           const isOpening = openingDeptCode === dept.code;
                           return (
-                            <button
+                            <Link
                               key={dept.id}
-                              type="button"
+                              href={getDepartmentHref(dept)}
+                              prefetch={true}
                               aria-busy={isOpening}
-                              onMouseEnter={() => onPrefetchDepartment?.(dept)}
-                              onFocus={() => onPrefetchDepartment?.(dept)}
-                              onClick={() => handleOpenDepartment(dept)}
+                              onMouseEnter={() => prefetchDepartment(dept)}
+                              onFocus={() => prefetchDepartment(dept)}
+                              onClick={() => handleOpenDepartmentLink(dept)}
                               className={`inline-flex items-center px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                                 isOpening
                                   ? 'border-pust-800 bg-pust-50 text-pust-900'
@@ -983,7 +1003,7 @@ export function PublicSubPages({
                                 {dept.officialCode || dept.code}
                               </span>
                               {dept.name}
-                            </button>
+                            </Link>
                           );
                         })}
                       </div>
@@ -1529,43 +1549,39 @@ export function PublicSubPages({
                                   <MotionCard
                                     key={dept.id}
                                     delay={(idx % 6) * 0.03}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-busy={isOpening}
-                                    onMouseEnter={() => onPrefetchDepartment?.(dept)}
-                                    onFocus={() => onPrefetchDepartment?.(dept)}
-                                    onClick={() => handleOpenDepartment(dept)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        handleOpenDepartment(dept);
-                                      }
-                                    }}
-                                    className={`relative text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer ${
+                                    className={`relative text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group ${
                                       isOpening ? 'ring-2 ring-pust-800/45 border-pust-800' : ''
                                     }`}
                                   >
                                     {isOpening && (
-                                      <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center p-4">
+                                      <div className="absolute inset-0 z-20 bg-white/80 flex items-center justify-center p-4 pointer-events-none">
                                         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white border border-pust-800/30 shadow-md text-xs font-semibold text-pust-900">
                                           <Loader2 className="w-4 h-4 animate-spin text-pust-800 shrink-0" />
                                           <span>Loading {dept.code}...</span>
                                         </div>
                                       </div>
                                     )}
-                                    <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                                    <div className="absolute top-4 right-4 z-10">
+                                      <EditTriggerButton
+                                        target={{ kind: 'department', department: dept }}
+                                        label="Edit"
+                                        variant="compact"
+                                      />
+                                    </div>
+                                    <Link
+                                      href={getDepartmentHref(dept)}
+                                      prefetch={true}
+                                      aria-busy={isOpening}
+                                      onMouseEnter={() => prefetchDepartment(dept)}
+                                      onFocus={() => prefetchDepartment(dept)}
+                                      onClick={() => handleOpenDepartmentLink(dept)}
+                                      className="p-5 flex-1 flex flex-col justify-between gap-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
+                                    >
                                       <div className="space-y-1.5">
-                                        <div className="flex items-start justify-between gap-2">
-                                          <p className="font-mono text-xs text-pust-800 tabular-nums">
-                                            {dept.officialCode ? `${dept.officialCode} · ` : ''}
-                                            {dept.code}
-                                          </p>
-                                          <EditTriggerButton
-                                            target={{ kind: 'department', department: dept }}
-                                            label="Edit"
-                                            variant="compact"
-                                          />
-                                        </div>
+                                        <p className="font-mono text-xs text-pust-800 tabular-nums pr-14">
+                                          {dept.officialCode ? `${dept.officialCode} · ` : ''}
+                                          {dept.code}
+                                        </p>
                                         <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors leading-snug">
                                           {dept.name}
                                         </h3>
@@ -1591,7 +1607,7 @@ export function PublicSubPages({
                                           )}
                                         </span>
                                       </div>
-                                    </div>
+                                    </Link>
                                   </MotionCard>
                                 );
                               })}

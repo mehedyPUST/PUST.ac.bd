@@ -2,6 +2,7 @@
 
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import {
   ArrowLeft,
@@ -2007,12 +2008,23 @@ export function DepartmentDetailView({
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
   const [activeProfile, setActiveProfile] = useState<ActiveProfileState | null>(null);
 
+  const queryClient = useQueryClient();
   const normalizedCode = code.trim().toUpperCase();
+  const { data: queriedDepartment } = useQuery({
+    queryKey: ['department', normalizedCode],
+    queryFn: async () => {
+      const res = await pustApi.getDepartmentByCode(normalizedCode);
+      return res.department;
+    },
+    initialData: initialDepartment,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const contextDept = departments.find((d) => d.code.toUpperCase() === normalizedCode);
   const department =
     contextDept && contextDept.facultyMembers !== undefined
       ? contextDept
-      : initialDepartment ?? contextDept ?? null;
+      : queriedDepartment ?? initialDepartment ?? contextDept ?? null;
 
   const facultyMembers = useMemo(
     () => department?.facultyMembers ?? [],
@@ -2216,7 +2228,10 @@ export function DepartmentDetailView({
       await pustApi.updateDepartment(department.id, { officers: list });
     }
     setActiveProfile({ person: updatedPerson, roleCategory });
-    await loadDepartments();
+    await Promise.all([
+      loadDepartments(),
+      queryClient.invalidateQueries({ queryKey: ['department', normalizedCode] }),
+    ]);
   }
 
   function roleCategoryToGroup(roleCategory: PersonRoleCategory): DepartmentPersonGroup {

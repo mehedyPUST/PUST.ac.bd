@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Compass, Info } from 'lucide-react';
 import type { DepartmentRecord } from '../types/pust';
 
@@ -8,7 +9,7 @@ type GstUnitKey = 'A' | 'B' | 'C';
 
 interface GstEligibilityCheckerProps {
   departments: DepartmentRecord[];
-  onSelectDepartment: (dept: DepartmentRecord) => void;
+  onSelectDepartment?: (dept: DepartmentRecord) => void;
   onPrefillInquiry: (deptCode: string, message: string) => void;
 }
 
@@ -33,7 +34,6 @@ const UNIT_C_CODES = new Set(['BBA', 'THM']);
 
 export function GstEligibilityChecker({
   departments,
-  onSelectDepartment,
   onPrefillInquiry,
 }: GstEligibilityCheckerProps) {
   const [unit, setUnit] = useState<GstUnitKey>('A');
@@ -288,13 +288,13 @@ export function GstEligibilityChecker({
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => onSelectDepartment(dept)}
+                  <Link
+                    href={`/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`}
+                    prefetch={true}
                     className="font-medium text-slate-800 hover:text-pust-900 hover:underline cursor-pointer"
                   >
                     View Prospectus
-                  </button>
+                  </Link>
                   <button
                     type="button"
                     onClick={() =>

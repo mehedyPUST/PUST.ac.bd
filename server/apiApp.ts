@@ -172,6 +172,17 @@ export function mountApiRoutes(app: Express): void {
     res.json({ departments });
   });
 
+  app.get('/api/departments/:code', async (req, res) => {
+    const rawCode = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
+    const code = decodeURIComponent(String(rawCode || '')).trim().toUpperCase();
+    const department = await pustRepo.getDepartmentByCode(code);
+    if (!department) {
+      res.status(404).json({ error: 'Department not found.' });
+      return;
+    }
+    res.json({ department });
+  });
+
   app.get('/api/publications', async (_req, res) => {
     const publications = await pustRepo.listPublications();
     res.json({ publications });
