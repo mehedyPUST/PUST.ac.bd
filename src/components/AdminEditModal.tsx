@@ -862,7 +862,7 @@ export function AdminEditModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-[2px] p-4 sm:p-6"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/65 backdrop-blur-[2px] p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="admin-edit-modal-title"

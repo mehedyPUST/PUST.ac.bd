@@ -19,20 +19,27 @@ import {
   Link2,
   Mail,
   MapPin,
+  Pencil,
   Phone,
+  Plus,
+  Save,
   Search,
   Sparkles,
+  Trash2,
   UserCheck,
   UserRound,
   Users,
   X,
 } from 'lucide-react';
+import { pustApi } from '../lib/api';
 import type {
+  ContactDetailItem,
   DepartmentPersonGroup,
   DepartmentPersonRecord,
   DepartmentRecord,
   PublicationRecord,
 } from '../types/pust';
+import { CmsImageField, INPUT_CLASS, LABEL_CLASS } from './admin-edit/shared';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard } from './MotionPrimitives';
 import { usePust } from './PustContext';
@@ -416,22 +423,171 @@ function PersonProfileCard({
 interface DossierTopicSection {
   key: string;
   title: string;
+  editableKey?: InlineSectionKey;
   rightSlot?: ReactNode;
   content: ReactNode;
 }
+
+type InlineSectionKey =
+  | 'identity'
+  | 'bio'
+  | 'academic-profile'
+  | 'education'
+  | 'teaching-experience'
+  | 'admin-experience'
+  | 'research-interests'
+  | 'active-projects'
+  | 'previous-projects'
+  | 'external-affiliations'
+  | 'awards'
+  | 'conducted-courses'
+  | 'graduate-supervision'
+  | 'contacts'
+  | 'journal-articles'
+  | 'conference-proceedings'
+  | 'book-chapters'
+  | 'conferences-attended';
+
+const PHONE_TYPES: ContactDetailItem['type'][] = ['Personal', 'Office', 'IP Phone', 'PABX'];
+const EMAIL_TYPES: Array<'Personal' | 'Office'> = ['Office', 'Personal'];
+
+function splitEntryLines(text: string): string[] | undefined {
+  const items = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+  return items.length > 0 ? items : undefined;
+}
+
+const LIST_SECTION_META: Array<{
+  key: Exclude<InlineSectionKey, 'identity' | 'bio' | 'academic-profile' | 'contacts'>;
+  field: keyof Pick<
+    DepartmentPersonRecord,
+    | 'education'
+    | 'teachingExperience'
+    | 'administrativeExperience'
+    | 'researchInterests'
+    | 'activeResearchProjects'
+    | 'previousResearchProjects'
+    | 'externalAffiliations'
+    | 'awards'
+    | 'conductedCourses'
+    | 'graduateSupervision'
+    | 'journalArticles'
+    | 'conferenceProceedings'
+    | 'bookChapters'
+    | 'conferencesAttended'
+  >;
+  label: string;
+  placeholder: string;
+}> = [
+  {
+    key: 'education',
+    field: 'education',
+    label: 'Education',
+    placeholder: 'One degree per line, e.g. Ph.D. in Physics (2018), University of Rajshahi',
+  },
+  {
+    key: 'teaching-experience',
+    field: 'teachingExperience',
+    label: 'Teaching Experience',
+    placeholder: 'One appointment per line, e.g. Professor (2023–Present), Dept. of Physics, PUST',
+  },
+  {
+    key: 'admin-experience',
+    field: 'administrativeExperience',
+    label: 'Administrative & Other Experience',
+    placeholder: 'One role per line...',
+  },
+  {
+    key: 'research-interests',
+    field: 'researchInterests',
+    label: 'Research Interests',
+    placeholder: 'One research topic per line...',
+  },
+  {
+    key: 'active-projects',
+    field: 'activeResearchProjects',
+    label: 'Active Research Projects',
+    placeholder: 'One project title/grant per line...',
+  },
+  {
+    key: 'previous-projects',
+    field: 'previousResearchProjects',
+    label: 'Previous Research Projects',
+    placeholder: 'One completed project per line...',
+  },
+  {
+    key: 'external-affiliations',
+    field: 'externalAffiliations',
+    label: 'External Affiliations',
+    placeholder: 'One society, editorial board, or fellowship per line...',
+  },
+  {
+    key: 'awards',
+    field: 'awards',
+    label: 'Awards & Recognition',
+    placeholder: 'One award or scholarship per line...',
+  },
+  {
+    key: 'conducted-courses',
+    field: 'conductedCourses',
+    label: 'Conducted Courses',
+    placeholder: 'One course code/title per line...',
+  },
+  {
+    key: 'graduate-supervision',
+    field: 'graduateSupervision',
+    label: 'Graduate Supervision',
+    placeholder: 'One M.Sc. / M.Phil. / Ph.D. supervision record per line...',
+  },
+  {
+    key: 'journal-articles',
+    field: 'journalArticles',
+    label: 'Journal Articles',
+    placeholder: 'One journal citation per line...',
+  },
+  {
+    key: 'conference-proceedings',
+    field: 'conferenceProceedings',
+    label: 'Conference Proceedings',
+    placeholder: 'One conference paper citation per line...',
+  },
+  {
+    key: 'book-chapters',
+    field: 'bookChapters',
+    label: 'Published Book Chapters',
+    placeholder: 'One book chapter citation per line...',
+  },
+  {
+    key: 'conferences-attended',
+    field: 'conferencesAttended',
+    label: 'Conferences & Seminars Attended',
+    placeholder: 'One conference or seminar per line...',
+  },
+];
 
 function PersonProfileModal({
   activeProfile,
   department,
   deptPublications,
+  isAdmin = false,
   canEdit = false,
+  onToggleEditMode,
+  onSavePerson,
   onEditPerson,
   onClose,
 }: {
   activeProfile: ActiveProfileState | null;
   department: DepartmentRecord;
   deptPublications: PublicationRecord[];
+  isAdmin?: boolean;
   canEdit?: boolean;
+  onToggleEditMode?: () => void;
+  onSavePerson?: (
+    updatedPerson: DepartmentPersonRecord,
+    roleCategory: PersonRoleCategory
+  ) => Promise<void>;
   onEditPerson?: () => void;
   onClose: () => void;
 }) {
@@ -441,8 +597,29 @@ function PersonProfileModal({
   const [showAllArticles, setShowAllArticles] = useState(false);
   const [showAllProceedings, setShowAllProceedings] = useState(false);
   const [showAllConferences, setShowAllConferences] = useState(false);
+  const [editingSection, setEditingSection] = useState<InlineSectionKey | null>(null);
+  const [inlineSaving, setInlineSaving] = useState(false);
+  const [inlineError, setInlineError] = useState<string | null>(null);
+
+  // Inline Identity state
+  const [draftName, setDraftName] = useState('');
+  const [draftDesignation, setDraftDesignation] = useState('');
+  const [draftOffice, setDraftOffice] = useState('');
+  const [draftPhotoUrl, setDraftPhotoUrl] = useState('');
+  const [draftTotalPubs, setDraftTotalPubs] = useState('');
+  const [draftStudyLeave, setDraftStudyLeave] = useState(false);
+
+  // Inline Bio / Academic / List / Contacts state
+  const [draftBio, setDraftBio] = useState('');
+  const [draftQualification, setDraftQualification] = useState('');
+  const [draftResearchArea, setDraftResearchArea] = useState('');
+  const [draftListText, setDraftListText] = useState('');
+  const [draftPhones, setDraftPhones] = useState<ContactDetailItem[]>([]);
+  const [draftEmails, setDraftEmails] = useState<ContactDetailItem[]>([]);
+
   const scrollBodyRef = useRef<HTMLDivElement | null>(null);
   const heroNameRef = useRef<HTMLHeadingElement | null>(null);
+  const activePersonId = activeProfile?.person.id ?? null;
 
   useEffect(() => {
     setShowAllArticles(false);
@@ -450,16 +627,38 @@ function PersonProfileModal({
     setShowAllConferences(false);
     setCopiedLink(false);
     setIsScrolled(false);
+    setEditingSection(null);
+    setInlineError(null);
     if (scrollBodyRef.current) {
       scrollBodyRef.current.scrollTop = 0;
     }
+  }, [activePersonId]);
+
+  useEffect(() => {
+    if (!canEdit) {
+      setEditingSection(null);
+      setInlineError(null);
+    }
+  }, [canEdit]);
+
+  useEffect(() => {
     if (!activeProfile) return;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (document.querySelector('[aria-labelledby="admin-edit-modal-title"]')) {
+          return;
+        }
+        if (editingSection) {
+          setEditingSection(null);
+          setInlineError(null);
+          return;
+        }
+        onClose();
+      }
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [activeProfile, onClose]);
+  }, [activeProfile, editingSection, onClose]);
 
   const matchedPublications = useMemo(() => {
     if (!activeProfile) return [];
@@ -536,247 +735,647 @@ function PersonProfileModal({
     }, 2000);
   }
 
+  function startInlineEdit(sectionKey: InlineSectionKey) {
+    setInlineError(null);
+    if (sectionKey === 'identity') {
+      setDraftName(person.name);
+      setDraftDesignation(person.designation);
+      setDraftOffice(person.officeLocation || '');
+      setDraftPhotoUrl(person.photoUrl || '');
+      setDraftTotalPubs(
+        person.totalPublications !== undefined ? String(person.totalPublications) : ''
+      );
+      setDraftStudyLeave(Boolean(person.onStudyLeave));
+    } else if (sectionKey === 'bio') {
+      setDraftBio(person.bio || '');
+    } else if (sectionKey === 'academic-profile') {
+      setDraftQualification(person.qualification || '');
+      setDraftResearchArea(person.researchArea || '');
+    } else if (sectionKey === 'contacts') {
+      setDraftPhones(structuredClone(person.phones || []));
+      setDraftEmails(structuredClone(person.emails || []));
+    } else {
+      const meta = LIST_SECTION_META.find((item) => item.key === sectionKey);
+      const currentList = meta ? person[meta.field] : undefined;
+      setDraftListText(currentList && currentList.length > 0 ? currentList.join('\n') : '');
+    }
+    setEditingSection(sectionKey);
+  }
+
+  async function saveInlineSection(sectionKey: InlineSectionKey) {
+    if (!onSavePerson) return;
+    setInlineError(null);
+
+    const nextPerson: DepartmentPersonRecord = structuredClone(person);
+
+    if (sectionKey === 'identity') {
+      if (draftName.trim().length < 2 || draftDesignation.trim().length < 2) {
+        setInlineError('Name and designation are required.');
+        return;
+      }
+      nextPerson.name = draftName.trim();
+      nextPerson.designation = draftDesignation.trim();
+      if (draftOffice.trim()) {
+        nextPerson.officeLocation = draftOffice.trim();
+      } else {
+        delete nextPerson.officeLocation;
+      }
+      if (draftPhotoUrl.trim()) {
+        nextPerson.photoUrl = draftPhotoUrl.trim();
+      } else {
+        delete nextPerson.photoUrl;
+      }
+      if (draftTotalPubs.trim() !== '' && Number.isFinite(Number(draftTotalPubs))) {
+        nextPerson.totalPublications = Math.max(0, Math.round(Number(draftTotalPubs)));
+      } else {
+        delete nextPerson.totalPublications;
+      }
+      if (draftStudyLeave) {
+        nextPerson.onStudyLeave = true;
+      } else {
+        delete nextPerson.onStudyLeave;
+      }
+    } else if (sectionKey === 'bio') {
+      if (draftBio.trim()) {
+        nextPerson.bio = draftBio.trim();
+      } else {
+        delete nextPerson.bio;
+      }
+    } else if (sectionKey === 'academic-profile') {
+      if (draftQualification.trim()) {
+        nextPerson.qualification = draftQualification.trim();
+      } else {
+        delete nextPerson.qualification;
+      }
+      if (draftResearchArea.trim()) {
+        nextPerson.researchArea = draftResearchArea.trim();
+      } else {
+        delete nextPerson.researchArea;
+      }
+    } else if (sectionKey === 'contacts') {
+      nextPerson.phones = draftPhones
+        .map((p) => ({ value: p.value.trim(), type: p.type }))
+        .filter((p) => p.value.length >= 2);
+      nextPerson.emails = draftEmails
+        .map((e) => ({ value: e.value.trim(), type: e.type }))
+        .filter((e) => e.value.length >= 2);
+    } else {
+      const meta = LIST_SECTION_META.find((item) => item.key === sectionKey);
+      if (meta) {
+        const parsed = splitEntryLines(draftListText);
+        if (parsed) {
+          nextPerson[meta.field] = parsed;
+        } else {
+          delete nextPerson[meta.field];
+        }
+      }
+    }
+
+    setInlineSaving(true);
+    try {
+      await onSavePerson(nextPerson, roleCategory);
+      setEditingSection(null);
+    } catch (err) {
+      setInlineError(err instanceof Error ? err.message : 'Unable to save changes.');
+    } finally {
+      setInlineSaving(false);
+    }
+  }
+
+  function renderInlineSaveFooter() {
+    return (
+      <div className="pt-3 flex flex-wrap items-center justify-end gap-2">
+        <button
+          type="button"
+          disabled={inlineSaving}
+          onClick={() => {
+            setEditingSection(null);
+            setInlineError(null);
+          }}
+          className="px-3.5 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={inlineSaving}
+          onClick={() => editingSection && saveInlineSection(editingSection)}
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+        >
+          <Save className="w-3.5 h-3.5" />
+          {inlineSaving ? 'Saving...' : 'Save Section'}
+        </button>
+      </div>
+    );
+  }
+
   const topicSections: DossierTopicSection[] = [];
 
-  if (person.bio) {
+  if (person.bio || editingSection === 'bio') {
     topicSections.push({
       key: 'bio',
+      editableKey: 'bio',
       title: 'Biography',
-      content: (
-        <div className="rounded-xl border border-slate-200/85 bg-white px-4 py-3.5">
-          <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
-        </div>
-      ),
+      content:
+        editingSection === 'bio' ? (
+          <div className="rounded-xl border border-amber-300 bg-white p-4 space-y-2">
+            <label className={LABEL_CLASS}>Biography / Academic Summary</label>
+            <textarea
+              rows={4}
+              value={draftBio}
+              onChange={(e) => setDraftBio(e.target.value)}
+              placeholder="Academic background, research focus, and departmental service..."
+              className={INPUT_CLASS}
+            />
+            {renderInlineSaveFooter()}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-slate-200/85 bg-white px-4 py-3.5">
+            <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
+          </div>
+        ),
     });
   }
 
-  if (person.qualification || person.researchArea) {
+  if (person.qualification || person.researchArea || editingSection === 'academic-profile') {
     topicSections.push({
       key: 'academic-profile',
+      editableKey: 'academic-profile',
       title: isOfficer ? 'Academic & Service Qualifications' : 'Academic & Research Profile',
-      content: (
-        <dl className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-sm">
-          {person.qualification && (
-            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
-              <dt className="text-xs font-medium text-slate-500 shrink-0">Qualification</dt>
-              <dd className="text-slate-900 sm:text-right leading-relaxed">{person.qualification}</dd>
+      content:
+        editingSection === 'academic-profile' ? (
+          <div className="rounded-xl border border-amber-300 bg-white p-4 space-y-3">
+            <div>
+              <label className={LABEL_CLASS}>Qualification</label>
+              <input
+                type="text"
+                value={draftQualification}
+                onChange={(e) => setDraftQualification(e.target.value)}
+                placeholder="e.g. Ph.D., M.Sc., B.Sc. (Hons.)"
+                className={INPUT_CLASS}
+              />
             </div>
-          )}
-          {person.researchArea && (
-            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
-              <dt className="text-xs font-medium text-slate-500 shrink-0">Research Area</dt>
-              <dd className="text-slate-900 sm:text-right leading-relaxed">{person.researchArea}</dd>
+            <div>
+              <label className={LABEL_CLASS}>Research Area</label>
+              <input
+                type="text"
+                value={draftResearchArea}
+                onChange={(e) => setDraftResearchArea(e.target.value)}
+                placeholder="e.g. Condensed Matter Physics, Signal Processing"
+                className={INPUT_CLASS}
+              />
             </div>
-          )}
-        </dl>
-      ),
+            {renderInlineSaveFooter()}
+          </div>
+        ) : (
+          <dl className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-sm">
+            {person.qualification && (
+              <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
+                <dt className="text-xs font-medium text-slate-500 shrink-0">Qualification</dt>
+                <dd className="text-slate-900 sm:text-right leading-relaxed">{person.qualification}</dd>
+              </div>
+            )}
+            {person.researchArea && (
+              <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
+                <dt className="text-xs font-medium text-slate-500 shrink-0">Research Area</dt>
+                <dd className="text-slate-900 sm:text-right leading-relaxed">{person.researchArea}</dd>
+              </div>
+            )}
+          </dl>
+        ),
     });
   }
 
-  if (person.education && person.education.length > 0) {
+  function renderListInlineEditor(metaKey: InlineSectionKey) {
+    const meta = LIST_SECTION_META.find((item) => item.key === metaKey);
+    return (
+      <div className="rounded-xl border border-amber-300 bg-white p-4 space-y-2">
+        <label className={LABEL_CLASS}>
+          {meta?.label || 'Entries'} (One Entry Per Line)
+        </label>
+        <textarea
+          rows={5}
+          value={draftListText}
+          onChange={(e) => setDraftListText(e.target.value)}
+          placeholder={meta?.placeholder}
+          className={INPUT_CLASS}
+        />
+        {renderInlineSaveFooter()}
+      </div>
+    );
+  }
+
+  if ((person.education && person.education.length > 0) || editingSection === 'education') {
+    const count = person.education?.length ?? 0;
     topicSections.push({
       key: 'education',
-      title: `Education (${person.education.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.education.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'education',
+      title: count > 0 ? `Education (${count})` : 'Education',
+      content:
+        editingSection === 'education' ? (
+          renderListInlineEditor('education')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.education ?? []).map((item, idx) => (
+              <li
+                key={`${item}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.teachingExperience && person.teachingExperience.length > 0) {
+  if (
+    (person.teachingExperience && person.teachingExperience.length > 0) ||
+    editingSection === 'teaching-experience'
+  ) {
+    const count = person.teachingExperience?.length ?? 0;
     topicSections.push({
       key: 'teaching-experience',
-      title: `Teaching Experience (${person.teachingExperience.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.teachingExperience.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'teaching-experience',
+      title: count > 0 ? `Teaching Experience (${count})` : 'Teaching Experience',
+      content:
+        editingSection === 'teaching-experience' ? (
+          renderListInlineEditor('teaching-experience')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.teachingExperience ?? []).map((item, idx) => (
+              <li
+                key={`${item}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.administrativeExperience && person.administrativeExperience.length > 0) {
+  if (
+    (person.administrativeExperience && person.administrativeExperience.length > 0) ||
+    editingSection === 'admin-experience'
+  ) {
+    const count = person.administrativeExperience?.length ?? 0;
     topicSections.push({
       key: 'admin-experience',
-      title: `Administrative & Other Experience (${person.administrativeExperience.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.administrativeExperience.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'admin-experience',
+      title:
+        count > 0
+          ? `Administrative & Other Experience (${count})`
+          : 'Administrative & Other Experience',
+      content:
+        editingSection === 'admin-experience' ? (
+          renderListInlineEditor('admin-experience')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.administrativeExperience ?? []).map((item, idx) => (
+              <li
+                key={`${item}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.researchInterests && person.researchInterests.length > 0) {
+  if (
+    (person.researchInterests && person.researchInterests.length > 0) ||
+    editingSection === 'research-interests'
+  ) {
+    const count = person.researchInterests?.length ?? 0;
     topicSections.push({
       key: 'research-interests',
-      title: `Research Interests (${person.researchInterests.length})`,
-      content: (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-          {person.researchInterests.map((interest, idx) => (
-            <div
-              key={`${interest}-${idx}`}
-              className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
-            >
-              <FlaskConical className="w-3.5 h-3.5 text-pust-800 shrink-0" />
-              <span>{interest}</span>
-            </div>
-          ))}
-        </div>
-      ),
+      editableKey: 'research-interests',
+      title: count > 0 ? `Research Interests (${count})` : 'Research Interests',
+      content:
+        editingSection === 'research-interests' ? (
+          renderListInlineEditor('research-interests')
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {(person.researchInterests ?? []).map((interest, idx) => (
+              <div
+                key={`${interest}-${idx}`}
+                className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+              >
+                <FlaskConical className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                <span>{interest}</span>
+              </div>
+            ))}
+          </div>
+        ),
     });
   }
 
-  if (person.activeResearchProjects && person.activeResearchProjects.length > 0) {
+  if (
+    (person.activeResearchProjects && person.activeResearchProjects.length > 0) ||
+    editingSection === 'active-projects'
+  ) {
+    const count = person.activeResearchProjects?.length ?? 0;
     topicSections.push({
       key: 'active-projects',
-      title: `Active Research Projects (${person.activeResearchProjects.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.activeResearchProjects.map((proj, idx) => (
-            <li
-              key={`${proj}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-              <span>{proj}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'active-projects',
+      title: count > 0 ? `Active Research Projects (${count})` : 'Active Research Projects',
+      content:
+        editingSection === 'active-projects' ? (
+          renderListInlineEditor('active-projects')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.activeResearchProjects ?? []).map((proj, idx) => (
+              <li
+                key={`${proj}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+                <span>{proj}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.previousResearchProjects && person.previousResearchProjects.length > 0) {
+  if (
+    (person.previousResearchProjects && person.previousResearchProjects.length > 0) ||
+    editingSection === 'previous-projects'
+  ) {
+    const count = person.previousResearchProjects?.length ?? 0;
     topicSections.push({
       key: 'previous-projects',
-      title: `Previous Research Projects (${person.previousResearchProjects.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.previousResearchProjects.map((proj, idx) => (
-            <li
-              key={`${proj}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-              <span>{proj}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'previous-projects',
+      title: count > 0 ? `Previous Research Projects (${count})` : 'Previous Research Projects',
+      content:
+        editingSection === 'previous-projects' ? (
+          renderListInlineEditor('previous-projects')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.previousResearchProjects ?? []).map((proj, idx) => (
+              <li
+                key={`${proj}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                <span>{proj}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.externalAffiliations && person.externalAffiliations.length > 0) {
+  if (
+    (person.externalAffiliations && person.externalAffiliations.length > 0) ||
+    editingSection === 'external-affiliations'
+  ) {
+    const count = person.externalAffiliations?.length ?? 0;
     topicSections.push({
       key: 'external-affiliations',
-      title: `External Affiliations (${person.externalAffiliations.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.externalAffiliations.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'external-affiliations',
+      title: count > 0 ? `External Affiliations (${count})` : 'External Affiliations',
+      content:
+        editingSection === 'external-affiliations' ? (
+          renderListInlineEditor('external-affiliations')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.externalAffiliations ?? []).map((item, idx) => (
+              <li
+                key={`${item}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.awards && person.awards.length > 0) {
+  if ((person.awards && person.awards.length > 0) || editingSection === 'awards') {
+    const count = person.awards?.length ?? 0;
     topicSections.push({
       key: 'awards',
-      title: `Awards & Recognition (${person.awards.length})`,
-      content: (
-        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
-          {person.awards.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
-            >
-              <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
+      editableKey: 'awards',
+      title: count > 0 ? `Awards & Recognition (${count})` : 'Awards & Recognition',
+      content:
+        editingSection === 'awards' ? (
+          renderListInlineEditor('awards')
+        ) : (
+          <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+            {(person.awards ?? []).map((item, idx) => (
+              <li
+                key={`${item}-${idx}`}
+                className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+              >
+                <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ),
     });
   }
 
-  if (person.conductedCourses && person.conductedCourses.length > 0) {
+  if (
+    (person.conductedCourses && person.conductedCourses.length > 0) ||
+    editingSection === 'conducted-courses'
+  ) {
+    const count = person.conductedCourses?.length ?? 0;
     topicSections.push({
       key: 'conducted-courses',
-      title: `Conducted Courses (${person.conductedCourses.length})`,
-      content: (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-          {person.conductedCourses.map((course, idx) => (
-            <div
-              key={`${course}-${idx}`}
-              className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
-            >
-              <Bookmark className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
-              <span>{course}</span>
-            </div>
-          ))}
-        </div>
-      ),
+      editableKey: 'conducted-courses',
+      title: count > 0 ? `Conducted Courses (${count})` : 'Conducted Courses',
+      content:
+        editingSection === 'conducted-courses' ? (
+          renderListInlineEditor('conducted-courses')
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {(person.conductedCourses ?? []).map((course, idx) => (
+              <div
+                key={`${course}-${idx}`}
+                className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+              >
+                <Bookmark className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
+                <span>{course}</span>
+              </div>
+            ))}
+          </div>
+        ),
     });
   }
 
-  if (person.graduateSupervision && person.graduateSupervision.length > 0) {
+  if (
+    (person.graduateSupervision && person.graduateSupervision.length > 0) ||
+    editingSection === 'graduate-supervision'
+  ) {
+    const count = person.graduateSupervision?.length ?? 0;
     topicSections.push({
       key: 'graduate-supervision',
-      title: `Graduate Supervision (${person.graduateSupervision.length})`,
-      content: (
-        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
-          {person.graduateSupervision.map((thesis, idx) => (
-            <li key={`${thesis}-${idx}`} className="px-4 py-3 flex items-start gap-3">
-              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                {String(idx + 1).padStart(2, '0')}.
-              </span>
-              <span className="text-slate-800 leading-relaxed">{thesis}</span>
-            </li>
-          ))}
-        </ol>
-      ),
+      editableKey: 'graduate-supervision',
+      title: count > 0 ? `Graduate Supervision (${count})` : 'Graduate Supervision',
+      content:
+        editingSection === 'graduate-supervision' ? (
+          renderListInlineEditor('graduate-supervision')
+        ) : (
+          <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+            {(person.graduateSupervision ?? []).map((thesis, idx) => (
+              <li key={`${thesis}-${idx}`} className="px-4 py-3 flex items-start gap-3">
+                <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
+                <span className="text-slate-800 leading-relaxed">{thesis}</span>
+              </li>
+            ))}
+          </ol>
+        ),
     });
   }
 
   topicSections.push({
     key: 'contacts',
+    editableKey: 'contacts',
     title: 'Official & Personal Contacts',
     content:
-      person.phones.length === 0 && person.emails.length === 0 ? (
+      editingSection === 'contacts' ? (
+        <div className="rounded-xl border border-amber-300 bg-white p-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Phones ({draftPhones.length})
+                </span>
+                {draftPhones.length < 6 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraftPhones((prev) => [...prev, { value: '', type: 'Personal' }])
+                    }
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Phone
+                  </button>
+                )}
+              </div>
+              {draftPhones.map((phone, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={phone.value}
+                    onChange={(e) =>
+                      setDraftPhones((prev) =>
+                        prev.map((p, i) => (i === idx ? { ...p, value: e.target.value } : p))
+                      )
+                    }
+                    placeholder="+88017..."
+                    className={`${INPUT_CLASS} font-mono text-xs flex-1`}
+                  />
+                  <select
+                    value={phone.type}
+                    onChange={(e) =>
+                      setDraftPhones((prev) =>
+                        prev.map((p, i) =>
+                          i === idx
+                            ? { ...p, type: e.target.value as ContactDetailItem['type'] }
+                            : p
+                        )
+                      )
+                    }
+                    className="px-2 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800"
+                  >
+                    {PHONE_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    aria-label="Remove phone"
+                    onClick={() => setDraftPhones((prev) => prev.filter((_, i) => i !== idx))}
+                    className="p-2 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Emails ({draftEmails.length})
+                </span>
+                {draftEmails.length < 6 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraftEmails((prev) => [...prev, { value: '', type: 'Office' }])
+                    }
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Email
+                  </button>
+                )}
+              </div>
+              {draftEmails.map((email, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <input
+                    type="email"
+                    value={email.value}
+                    onChange={(e) =>
+                      setDraftEmails((prev) =>
+                        prev.map((em, i) => (i === idx ? { ...em, value: e.target.value } : em))
+                      )
+                    }
+                    placeholder="name@pust.ac.bd"
+                    className={`${INPUT_CLASS} font-mono text-xs flex-1`}
+                  />
+                  <select
+                    value={email.type === 'Personal' ? 'Personal' : 'Office'}
+                    onChange={(e) =>
+                      setDraftEmails((prev) =>
+                        prev.map((em, i) =>
+                          i === idx
+                            ? { ...em, type: e.target.value as 'Personal' | 'Office' }
+                            : em
+                        )
+                      )
+                    }
+                    className="px-2 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800"
+                  >
+                    {EMAIL_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    aria-label="Remove email"
+                    onClick={() => setDraftEmails((prev) => prev.filter((_, i) => i !== idx))}
+                    className="p-2 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          {renderInlineSaveFooter()}
+        </div>
+      ) : person.phones.length === 0 && person.emails.length === 0 ? (
         <p className="text-xs text-slate-600 rounded-xl border border-slate-200/85 bg-white px-4 py-3">
           Direct personal contacts have not been listed. Use the departmental office contact
           {department.contactEmail ? ` (${department.contactEmail})` : ''} for inquiries.
@@ -840,12 +1439,16 @@ function PersonProfileModal({
       ),
   });
 
-  if (journalArticles.length > 0) {
+  if (journalArticles.length > 0 || editingSection === 'journal-articles') {
     topicSections.push({
       key: 'journal-articles',
-      title: `Journal Articles (${journalArticles.length})`,
+      editableKey: 'journal-articles',
+      title:
+        journalArticles.length > 0
+          ? `Journal Articles (${journalArticles.length})`
+          : 'Journal Articles',
       rightSlot:
-        journalArticles.length > 6 ? (
+        editingSection !== 'journal-articles' && journalArticles.length > 6 ? (
           <button
             type="button"
             onClick={() => setShowAllArticles((prev) => !prev)}
@@ -856,27 +1459,34 @@ function PersonProfileModal({
               : `Show all ${journalArticles.length} articles`}
           </button>
         ) : undefined,
-      content: (
-        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
-          {visibleArticles.map((article, idx) => (
-            <li key={`${idx}-${article.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                {String(idx + 1).padStart(2, '0')}.
-              </span>
-              <span className="text-slate-800 leading-relaxed break-words">{article}</span>
-            </li>
-          ))}
-        </ol>
-      ),
+      content:
+        editingSection === 'journal-articles' ? (
+          renderListInlineEditor('journal-articles')
+        ) : (
+          <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+            {visibleArticles.map((article, idx) => (
+              <li key={`${idx}-${article.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
+                <span className="text-slate-800 leading-relaxed break-words">{article}</span>
+              </li>
+            ))}
+          </ol>
+        ),
     });
   }
 
-  if (conferenceProceedings.length > 0) {
+  if (conferenceProceedings.length > 0 || editingSection === 'conference-proceedings') {
     topicSections.push({
       key: 'conference-proceedings',
-      title: `Conference Proceedings (${conferenceProceedings.length})`,
+      editableKey: 'conference-proceedings',
+      title:
+        conferenceProceedings.length > 0
+          ? `Conference Proceedings (${conferenceProceedings.length})`
+          : 'Conference Proceedings',
       rightSlot:
-        conferenceProceedings.length > 6 ? (
+        editingSection !== 'conference-proceedings' && conferenceProceedings.length > 6 ? (
           <button
             type="button"
             onClick={() => setShowAllProceedings((prev) => !prev)}
@@ -887,46 +1497,60 @@ function PersonProfileModal({
               : `Show all ${conferenceProceedings.length} proceedings`}
           </button>
         ) : undefined,
-      content: (
-        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
-          {visibleProceedings.map((item, idx) => (
-            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-              <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
-                {String(idx + 1).padStart(2, '0')}.
-              </span>
-              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-            </li>
-          ))}
-        </ol>
-      ),
+      content:
+        editingSection === 'conference-proceedings' ? (
+          renderListInlineEditor('conference-proceedings')
+        ) : (
+          <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+            {visibleProceedings.map((item, idx) => (
+              <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
+                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+              </li>
+            ))}
+          </ol>
+        ),
     });
   }
 
-  if (bookChapters.length > 0) {
+  if (bookChapters.length > 0 || editingSection === 'book-chapters') {
     topicSections.push({
       key: 'book-chapters',
-      title: `Published Book Chapters (${bookChapters.length})`,
-      content: (
-        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
-          {bookChapters.map((item, idx) => (
-            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                {String(idx + 1).padStart(2, '0')}.
-              </span>
-              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-            </li>
-          ))}
-        </ol>
-      ),
+      editableKey: 'book-chapters',
+      title:
+        bookChapters.length > 0
+          ? `Published Book Chapters (${bookChapters.length})`
+          : 'Published Book Chapters',
+      content:
+        editingSection === 'book-chapters' ? (
+          renderListInlineEditor('book-chapters')
+        ) : (
+          <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+            {bookChapters.map((item, idx) => (
+              <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
+                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+              </li>
+            ))}
+          </ol>
+        ),
     });
   }
 
-  if (conferencesAttended.length > 0) {
+  if (conferencesAttended.length > 0 || editingSection === 'conferences-attended') {
     topicSections.push({
       key: 'conferences-attended',
-      title: `Conferences & Seminars Attended (${conferencesAttended.length})`,
+      editableKey: 'conferences-attended',
+      title:
+        conferencesAttended.length > 0
+          ? `Conferences & Seminars Attended (${conferencesAttended.length})`
+          : 'Conferences & Seminars Attended',
       rightSlot:
-        conferencesAttended.length > 6 ? (
+        editingSection !== 'conferences-attended' && conferencesAttended.length > 6 ? (
           <button
             type="button"
             onClick={() => setShowAllConferences((prev) => !prev)}
@@ -937,18 +1561,21 @@ function PersonProfileModal({
               : `Show all ${conferencesAttended.length} entries`}
           </button>
         ) : undefined,
-      content: (
-        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
-          {visibleConferences.map((item, idx) => (
-            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-              <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
-                {String(idx + 1).padStart(2, '0')}.
-              </span>
-              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-            </li>
-          ))}
-        </ol>
-      ),
+      content:
+        editingSection === 'conferences-attended' ? (
+          renderListInlineEditor('conferences-attended')
+        ) : (
+          <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+            {visibleConferences.map((item, idx) => (
+              <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
+                  {String(idx + 1).padStart(2, '0')}.
+                </span>
+                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+              </li>
+            ))}
+          </ol>
+        ),
     });
   }
 
@@ -989,6 +1616,25 @@ function PersonProfileModal({
         </div>
       ),
     });
+  }
+
+  const missingEditableTopics: Array<{ key: InlineSectionKey; label: string }> = [];
+  if (canEdit) {
+    if (!person.bio && editingSection !== 'bio') {
+      missingEditableTopics.push({ key: 'bio', label: 'Biography' });
+    }
+    if (!person.qualification && !person.researchArea && editingSection !== 'academic-profile') {
+      missingEditableTopics.push({
+        key: 'academic-profile',
+        label: 'Qualification & Research Area',
+      });
+    }
+    for (const meta of LIST_SECTION_META) {
+      const existing = person[meta.field];
+      if ((!existing || existing.length === 0) && editingSection !== meta.key) {
+        missingEditableTopics.push({ key: meta.key, label: meta.label });
+      }
+    }
   }
 
   return (
@@ -1034,9 +1680,19 @@ function PersonProfileModal({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {isAdmin && !canEdit && onToggleEditMode && (
+              <button
+                type="button"
+                onClick={onToggleEditMode}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 border border-amber-400 text-amber-950 hover:bg-amber-100 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <Pencil className="w-3.5 h-3.5 shrink-0" />
+                <span>Enable Edit Mode</span>
+              </button>
+            )}
             {canEdit && onEditPerson && (
               <EditTriggerButton
-                label="Edit Profile"
+                label="Edit Full Profile"
                 variant="compact"
                 onClick={onEditPerson}
               />
@@ -1081,29 +1737,116 @@ function PersonProfileModal({
           onScroll={handleBodyScroll}
           className="flex-1 overflow-y-auto overscroll-contain"
         >
+          {inlineError && (
+            <div className="mx-5 sm:mx-8 mt-4 p-3 rounded-lg border border-red-200 bg-red-50 text-xs sm:text-sm text-red-900">
+              {inlineError}
+            </div>
+          )}
+
           {/* Executive Hero Profile Header */}
           <div className="px-5 sm:px-8 py-6 border-b border-slate-200 bg-gradient-to-br from-[#FAF8F4] via-white to-[#F4F7FF] space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 min-w-0">
-              <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
-              <div className="min-w-0 space-y-1.5">
-                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 font-semibold">
-                  {department.code} · {roleCategory}
-                </p>
-                <h2
-                  ref={heroNameRef}
-                  id="person-profile-modal-title"
-                  className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 leading-tight"
-                >
-                  {person.name}
-                </h2>
-                <p className="text-sm sm:text-base font-medium text-pust-900">
-                  {person.designation}
-                </p>
-                <p className="text-xs sm:text-[13px] text-slate-600">
-                  Department of {department.name} · {department.faculty}
-                </p>
+            {editingSection === 'identity' ? (
+              <div className="rounded-xl border border-amber-300 bg-white p-4 sm:p-5 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-mono text-xs uppercase tracking-wider font-semibold text-amber-900">
+                    Edit Profile Identity &amp; Status
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={LABEL_CLASS}>Full Name</label>
+                    <input
+                      type="text"
+                      value={draftName}
+                      onChange={(e) => setDraftName(e.target.value)}
+                      className={INPUT_CLASS}
+                    />
+                  </div>
+                  <div>
+                    <label className={LABEL_CLASS}>Designation</label>
+                    <input
+                      type="text"
+                      value={draftDesignation}
+                      onChange={(e) => setDraftDesignation(e.target.value)}
+                      className={INPUT_CLASS}
+                    />
+                  </div>
+                  <div>
+                    <label className={LABEL_CLASS}>Office / Room Location</label>
+                    <input
+                      type="text"
+                      value={draftOffice}
+                      onChange={(e) => setDraftOffice(e.target.value)}
+                      placeholder={`${department.building}, Rajapur Campus`}
+                      className={INPUT_CLASS}
+                    />
+                  </div>
+                  <div>
+                    <label className={LABEL_CLASS}>Total Publications</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={5000}
+                      value={draftTotalPubs}
+                      onChange={(e) => setDraftTotalPubs(e.target.value)}
+                      className={`${INPUT_CLASS} font-mono`}
+                    />
+                  </div>
+                </div>
+                <CmsImageField
+                  label="Portrait Photo URL"
+                  value={draftPhotoUrl}
+                  onChange={setDraftPhotoUrl}
+                  onError={setInlineError}
+                  placeholder="/src/assets/images/... or https://..."
+                />
+                <div className="flex items-center gap-2.5">
+                  <input
+                    id="inline-study-leave"
+                    type="checkbox"
+                    checked={draftStudyLeave}
+                    onChange={(e) => setDraftStudyLeave(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-pust-900 cursor-pointer"
+                  />
+                  <label htmlFor="inline-study-leave" className="text-xs sm:text-sm text-slate-800 cursor-pointer">
+                    Currently on approved study leave
+                  </label>
+                </div>
+                {renderInlineSaveFooter()}
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 min-w-0">
+                  <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
+                  <div className="min-w-0 space-y-1.5">
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 font-semibold">
+                      {department.code} · {roleCategory}
+                    </p>
+                    <h2
+                      ref={heroNameRef}
+                      id="person-profile-modal-title"
+                      className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 leading-tight"
+                    >
+                      {person.name}
+                    </h2>
+                    <p className="text-sm sm:text-base font-medium text-pust-900">
+                      {person.designation}
+                    </p>
+                    <p className="text-xs sm:text-[13px] text-slate-600">
+                      Department of {department.name} · {department.faculty}
+                    </p>
+                  </div>
+                </div>
+
+                {canEdit && (
+                  <EditTriggerButton
+                    label="Edit Identity"
+                    variant="compact"
+                    onClick={() => startInlineEdit('identity')}
+                  />
+                )}
+              </div>
+            )}
 
             {/* Quick Fact Ribbon */}
             <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl bg-white/90 border border-slate-200/90 p-4 text-sm shadow-2xs">
@@ -1145,6 +1888,8 @@ function PersonProfileModal({
           <div className="p-5 sm:p-8 space-y-5">
             {topicSections.map((section, idx) => {
               const isWarmCrimson = idx % 2 === 0;
+              const isEditingThis =
+                section.editableKey !== undefined && editingSection === section.editableKey;
               return (
                 <section
                   key={section.key}
@@ -1172,25 +1917,64 @@ function PersonProfileModal({
                       />
                       {section.title}
                     </h3>
-                    {section.rightSlot}
+                    <div className="flex items-center gap-2.5">
+                      {section.rightSlot}
+                      {canEdit && section.editableKey && !isEditingThis && (
+                        <EditTriggerButton
+                          label="Edit"
+                          variant="compact"
+                          onClick={() => startInlineEdit(section.editableKey!)}
+                        />
+                      )}
+                    </div>
                   </div>
                   {section.content}
                 </section>
               );
             })}
 
+            {canEdit && missingEditableTopics.length > 0 && (
+              <div className="rounded-2xl border border-dashed border-amber-400/80 bg-amber-50/45 p-4 sm:p-5 space-y-3">
+                <p className="font-mono text-[11px] uppercase tracking-wider font-semibold text-amber-900">
+                  Add Missing Profile Sections
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {missingEditableTopics.map((topic) => (
+                    <button
+                      key={topic.key}
+                      type="button"
+                      onClick={() => startInlineEdit(topic.key)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-amber-300 text-amber-950 hover:bg-amber-100 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      {topic.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Modal Footer */}
             <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <p className="font-mono text-[11px] text-slate-500">
                 PUST {department.code} Directory Record
               </p>
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                Close Profile
-              </button>
+              <div className="flex items-center gap-2.5">
+                {canEdit && onEditPerson && (
+                  <EditTriggerButton
+                    label="Edit All Fields"
+                    variant="default"
+                    onClick={onEditPerson}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Close Profile
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1213,9 +1997,11 @@ export function DepartmentDetailView({
     user,
     bookmarkedIds,
     editMode,
+    toggleEditMode,
     openEditModal,
     navigateTo,
     setActiveNotice,
+    loadDepartments,
     loadBookmarks,
   } = usePust();
 
@@ -1380,7 +2166,60 @@ export function DepartmentDetailView({
       : [],
   };
 
-  const canAdminEdit = editMode && user?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
+  const canAdminEdit = editMode && isAdmin;
+
+  const liveActiveProfile = useMemo<ActiveProfileState | null>(() => {
+    if (!activeProfile || !department) return activeProfile;
+    const { person, roleCategory } = activeProfile;
+    if (roleCategory === 'Chairman') {
+      const chair = department.chairmanProfile ?? person;
+      return { person: chair, roleCategory };
+    }
+    if (roleCategory === 'Faculty Member') {
+      const found = (department.facultyMembers ?? []).find((m) => m.id === person.id);
+      return found ? { person: found, roleCategory } : null;
+    }
+    if (roleCategory === 'Faculty Member (Contractual)') {
+      const found = (department.contractualFacultyMembers ?? []).find((m) => m.id === person.id);
+      return found ? { person: found, roleCategory } : null;
+    }
+    const found = (department.officers ?? []).find((o) => o.id === person.id);
+    return found ? { person: found, roleCategory } : null;
+  }, [activeProfile, department]);
+
+  async function handleSavePersonInline(
+    updatedPerson: DepartmentPersonRecord,
+    roleCategory: PersonRoleCategory
+  ) {
+    if (!department || !canAdminEdit) return;
+    if (roleCategory === 'Chairman') {
+      await pustApi.updateDepartment(department.id, {
+        chairmanName: updatedPerson.name,
+        chairmanProfile: updatedPerson,
+      });
+    } else if (roleCategory === 'Faculty Member') {
+      const list = structuredClone(department.facultyMembers || []);
+      const idx = list.findIndex((m) => m.id === updatedPerson.id);
+      if (idx >= 0) list[idx] = updatedPerson;
+      else list.push(updatedPerson);
+      await pustApi.updateDepartment(department.id, { facultyMembers: list });
+    } else if (roleCategory === 'Faculty Member (Contractual)') {
+      const list = structuredClone(department.contractualFacultyMembers || []);
+      const idx = list.findIndex((m) => m.id === updatedPerson.id);
+      if (idx >= 0) list[idx] = updatedPerson;
+      else list.push(updatedPerson);
+      await pustApi.updateDepartment(department.id, { contractualFacultyMembers: list });
+    } else {
+      const list = structuredClone(department.officers || []);
+      const idx = list.findIndex((o) => o.id === updatedPerson.id);
+      if (idx >= 0) list[idx] = updatedPerson;
+      else list.push(updatedPerson);
+      await pustApi.updateDepartment(department.id, { officers: list });
+    }
+    setActiveProfile({ person: updatedPerson, roleCategory });
+    await loadDepartments();
+  }
 
   function roleCategoryToGroup(roleCategory: PersonRoleCategory): DepartmentPersonGroup {
     if (roleCategory === 'Chairman') return 'chairman';
@@ -1921,16 +2760,17 @@ export function DepartmentDetailView({
       </section>
 
       <PersonProfileModal
-        activeProfile={activeProfile}
+        activeProfile={liveActiveProfile}
         department={department}
         deptPublications={deptPublications}
+        isAdmin={isAdmin}
         canEdit={canAdminEdit}
+        onToggleEditMode={toggleEditMode}
+        onSavePerson={handleSavePersonInline}
         onEditPerson={
-          activeProfile
+          liveActiveProfile
             ? () => {
-                const targetToEdit = activeProfile;
-                handleCloseProfile();
-                handleEditPerson(targetToEdit.person, targetToEdit.roleCategory);
+                handleEditPerson(liveActiveProfile.person, liveActiveProfile.roleCategory);
               }
             : undefined
         }
