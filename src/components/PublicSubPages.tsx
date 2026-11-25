@@ -14,6 +14,7 @@ import {
   ExternalLink,
   FileDown,
   FileText,
+  Loader2,
   Mail,
   Phone,
   PlayCircle,
@@ -162,6 +163,7 @@ interface PublicSubPagesProps {
   dataError: string | null;
   onRetry?: () => void;
   onNavigate: (route: AppRoute | string) => void;
+  onPrefetchDepartment?: (dept: DepartmentRecord) => void;
   onSelectDepartment: (dept: DepartmentRecord) => void;
   onSelectNotice: (notice: NoticeRecord) => void;
   onSubmitInquiry: (payload: {
@@ -195,6 +197,7 @@ export function PublicSubPages({
   dataError,
   onRetry,
   onNavigate,
+  onPrefetchDepartment,
   onSelectDepartment,
   onSelectNotice,
   onSubmitInquiry,
@@ -202,6 +205,7 @@ export function PublicSubPages({
   const resolved = resolveUniversityContent(profile);
   const [selectedFaculty, setSelectedFaculty] = useState<'All' | FacultyName>('All');
   const [deptQuery, setDeptQuery] = useState('');
+  const [openingDeptCode, setOpeningDeptCode] = useState<string | null>(null);
   const [selectedNoticeCat, setSelectedNoticeCat] = useState<'All' | NoticeCategory>(() =>
     getCategoryForNoticeRoute(route)
   );
@@ -217,6 +221,11 @@ export function PublicSubPages({
   >('All');
   const [officialFormQuery, setOfficialFormQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
+
+  function handleOpenDepartment(dept: DepartmentRecord) {
+    setOpeningDeptCode(dept.code);
+    onSelectDepartment(dept);
+  }
 
   async function handleCopyContact(val: string) {
     try {
@@ -237,7 +246,16 @@ export function PublicSubPages({
 
   useEffect(() => {
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
+    setOpeningDeptCode(null);
   }, [route]);
+
+  useEffect(() => {
+    if (!openingDeptCode) return;
+    const timer = window.setTimeout(() => {
+      setOpeningDeptCode(null);
+    }, 15000);
+    return () => window.clearTimeout(timer);
+  }, [openingDeptCode]);
 
   useEffect(() => {
     if (!activeMedia && !previewForm) return;
@@ -942,19 +960,32 @@ export function PublicSubPages({
 
                     <div className="px-6 py-4 bg-white/95 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        {facDepts.map((dept) => (
-                          <button
-                            key={dept.id}
-                            type="button"
-                            onClick={() => onSelectDepartment(dept)}
-                            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-800 hover:border-pust-700 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
-                          >
-                            <span className="font-mono text-pust-800 mr-1.5 tabular-nums">
-                              {dept.officialCode || dept.code}
-                            </span>
-                            {dept.name}
-                          </button>
-                        ))}
+                        {facDepts.map((dept) => {
+                          const isOpening = openingDeptCode === dept.code;
+                          return (
+                            <button
+                              key={dept.id}
+                              type="button"
+                              aria-busy={isOpening}
+                              onMouseEnter={() => onPrefetchDepartment?.(dept)}
+                              onFocus={() => onPrefetchDepartment?.(dept)}
+                              onClick={() => handleOpenDepartment(dept)}
+                              className={`inline-flex items-center px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                                isOpening
+                                  ? 'border-pust-800 bg-pust-50 text-pust-900'
+                                  : 'border-slate-200 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                              }`}
+                            >
+                              {isOpening && (
+                                <Loader2 className="w-3 h-3 animate-spin text-pust-800 mr-1.5 shrink-0" />
+                              )}
+                              <span className="font-mono text-pust-800 mr-1.5 tabular-nums">
+                                {dept.officialCode || dept.code}
+                              </span>
+                              {dept.name}
+                            </button>
+                          );
+                        })}
                       </div>
                       <button
                         type="button"
@@ -1492,54 +1523,78 @@ export function PublicSubPages({
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {depts.map((dept, idx) => (
-                                <MotionCard
-                                  key={dept.id}
-                                  delay={(idx % 6) * 0.03}
-                                  role="button"
-                                  tabIndex={0}
-                                  onClick={() => onSelectDepartment(dept)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                      e.preventDefault();
-                                      onSelectDepartment(dept);
-                                    }
-                                  }}
-                                  className={`text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer`}
-                                >
-                                  <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                                    <div className="space-y-1.5">
-                                      <div className="flex items-start justify-between gap-2">
-                                        <p className="font-mono text-xs text-pust-800 tabular-nums">
-                                          {dept.officialCode ? `${dept.officialCode} · ` : ''}
-                                          {dept.code}
-                                        </p>
-                                        <EditTriggerButton
-                                          target={{ kind: 'department', department: dept }}
-                                          label="Edit"
-                                          variant="compact"
-                                        />
+                              {depts.map((dept, idx) => {
+                                const isOpening = openingDeptCode === dept.code;
+                                return (
+                                  <MotionCard
+                                    key={dept.id}
+                                    delay={(idx % 6) * 0.03}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-busy={isOpening}
+                                    onMouseEnter={() => onPrefetchDepartment?.(dept)}
+                                    onFocus={() => onPrefetchDepartment?.(dept)}
+                                    onClick={() => handleOpenDepartment(dept)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleOpenDepartment(dept);
+                                      }
+                                    }}
+                                    className={`relative text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer ${
+                                      isOpening ? 'ring-2 ring-pust-800/45 border-pust-800' : ''
+                                    }`}
+                                  >
+                                    {isOpening && (
+                                      <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center p-4">
+                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white border border-pust-800/30 shadow-md text-xs font-semibold text-pust-900">
+                                          <Loader2 className="w-4 h-4 animate-spin text-pust-800 shrink-0" />
+                                          <span>Loading {dept.code}...</span>
+                                        </div>
                                       </div>
-                                      <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors leading-snug">
-                                        {dept.name}
-                                      </h3>
-                                    </div>
+                                    )}
+                                    <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                                      <div className="space-y-1.5">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <p className="font-mono text-xs text-pust-800 tabular-nums">
+                                            {dept.officialCode ? `${dept.officialCode} · ` : ''}
+                                            {dept.code}
+                                          </p>
+                                          <EditTriggerButton
+                                            target={{ kind: 'department', department: dept }}
+                                            label="Edit"
+                                            variant="compact"
+                                          />
+                                        </div>
+                                        <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors leading-snug">
+                                          {dept.name}
+                                        </h3>
+                                      </div>
 
-                                    <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-3 text-xs">
-                                      <span className="text-slate-600 truncate">
-                                        Chair:{' '}
-                                        <span className="font-medium text-slate-900">
-                                          {dept.chairmanName}
+                                      <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-3 text-xs">
+                                        <span className="text-slate-600 truncate">
+                                          Chair:{' '}
+                                          <span className="font-medium text-slate-900">
+                                            {dept.chairmanName}
+                                          </span>
                                         </span>
-                                      </span>
-                                      <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums shrink-0">
-                                        {dept.facultyCount ? `${dept.facultyCount} Teachers` : ''}
-                                        <ArrowRight className="w-3.5 h-3.5 text-pust-800 transition-transform duration-200 group-hover:translate-x-0.5" />
-                                      </span>
+                                        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums shrink-0">
+                                          {isOpening
+                                            ? 'Opening...'
+                                            : dept.facultyCount
+                                            ? `${dept.facultyCount} Teachers`
+                                            : ''}
+                                          {isOpening ? (
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-pust-800" />
+                                          ) : (
+                                            <ArrowRight className="w-3.5 h-3.5 text-pust-800 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                          )}
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                </MotionCard>
-                              ))}
+                                  </MotionCard>
+                                );
+                              })}
                             </div>
                           </div>
                         );

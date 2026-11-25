@@ -13,8 +13,7 @@ export default async function DepartmentPage({
   const normalizedCode = decodeURIComponent(code).trim().toUpperCase();
 
   await pustRepo.init();
-  const departments = await pustRepo.listDepartments();
-  const matched = departments.find((d) => d.code.toUpperCase() === normalizedCode);
+  const matched = await pustRepo.getDepartmentByCode(normalizedCode);
 
   if (!matched) {
     notFound();

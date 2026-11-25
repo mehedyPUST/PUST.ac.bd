@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 export function PageReveal({
   children,
@@ -23,27 +23,18 @@ export function MotionReveal({
 export function MotionCard({
   children,
   className = '',
+  delay: _delay,
   interactive = true,
-  onClick,
-  onKeyDown,
-  role,
-  tabIndex,
-}: {
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
   className?: string;
   delay?: number;
   interactive?: boolean;
-  onClick?: () => void;
-  onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void;
-  role?: string;
-  tabIndex?: number;
 }) {
   return (
     <div
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      role={role}
-      tabIndex={tabIndex}
+      {...rest}
       className={interactive ? `card-hover-lift ${className}` : className}
     >
       {children}

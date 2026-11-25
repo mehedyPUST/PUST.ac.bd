@@ -544,6 +544,24 @@ class PustRepository {
     const items = await this.getAll('departments', this.departments);
     return deduplicateDepartments(items);
   };
+  getDepartmentByCode = async (code: string): Promise<DepartmentRecord | null> => {
+    const normalized = code.trim().toUpperCase();
+    if (!normalized) return null;
+    if (this.storageBackend === 'mongodb') {
+      const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const matches = (await this.col<DepartmentRecord>('departments')
+        .find(
+          { code: { $regex: new RegExp(`^${escaped}$`, 'i') } } as never,
+          { projection: { _id: 0 } }
+        )
+        .toArray()) as DepartmentRecord[];
+      if (matches.length === 0) return null;
+      return deduplicateDepartments(matches)[0] ?? null;
+    }
+    const matches = this.departments.filter((d) => d.code.toUpperCase() === normalized);
+    if (matches.length === 0) return null;
+    return deduplicateDepartments(matches)[0] ?? null;
+  };
   createDepartment = async (input: Omit<DepartmentRecord, 'id'>): Promise<DepartmentRecord> => {
     const existing = await this.listDepartments();
     const normalizedCode = input.code.trim().toUpperCase();

@@ -15,6 +15,7 @@ export function PublicRouteView() {
     loadingData,
     dataError,
     retryLoad,
+    prefetchRoute,
     navigateTo,
     setActiveNotice,
     submitInquiry,
@@ -33,6 +34,9 @@ export function PublicRouteView() {
       dataError={dataError}
       onRetry={retryLoad}
       onNavigate={navigateTo}
+      onPrefetchDepartment={(dept) =>
+        prefetchRoute(`/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`)
+      }
       onSelectDepartment={(dept) =>
         navigateTo(`/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`)
       }

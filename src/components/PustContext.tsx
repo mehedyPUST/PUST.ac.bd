@@ -6,10 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  useTransition,
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { MotionConfig } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
@@ -60,6 +63,8 @@ interface PustContextValue {
   openEditModal: (target: EditModalTarget) => void;
   closeEditModal: () => void;
   setUser: (user: AuthUser | null) => void;
+  isNavigating: boolean;
+  prefetchRoute: (target: AppRoute | string) => void;
   navigateTo: (target: AppRoute | string) => void;
   setActiveDepartment: (dept: DepartmentRecord | null) => void;
   setActiveNotice: (notice: NoticeRecord | null) => void;
@@ -147,6 +152,10 @@ export function PustShell({
   const [editMode, setEditModeState] = useState(false);
   const [editTarget, setEditTarget] = useState<EditModalTarget | null>(null);
   const [authResolved, setAuthResolved] = useState(false);
+  const [isTransitionPending, startTransition] = useTransition();
+  const [pendingTarget, setPendingTarget] = useState<string | null>(null);
+  const prevPathnameRef = useRef(pathname);
+  const isNavigating = isTransitionPending || pendingTarget !== null;
 
   const isAdmin = user?.role === 'admin';
   const effectiveEditMode = isAdmin && editMode;
@@ -231,14 +240,49 @@ export function PustShell({
     setEditTarget(null);
   }, []);
 
-  const navigateTo = useCallback(
-    (target: AppRoute | string) => {
-      router.push(target);
+  useEffect(() => {
+    setPendingTarget(null);
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname;
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'auto' });
       }
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!pendingTarget) return;
+    const timer = window.setTimeout(() => {
+      setPendingTarget(null);
+    }, 15000);
+    return () => window.clearTimeout(timer);
+  }, [pendingTarget]);
+
+  const prefetchRoute = useCallback(
+    (target: AppRoute | string) => {
+      try {
+        router.prefetch(target);
+      } catch {
+        // Ignore prefetch errors
+      }
     },
     [router]
+  );
+
+  const navigateTo = useCallback(
+    (target: AppRoute | string) => {
+      if (target === pathname) {
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+        return;
+      }
+      setPendingTarget(target);
+      startTransition(() => {
+        router.push(target);
+      });
+    },
+    [router, pathname, startTransition]
   );
 
   const loadCmsProfile = useCallback(async () => {
@@ -444,6 +488,8 @@ export function PustShell({
       openEditModal,
       closeEditModal,
       setUser,
+      isNavigating,
+      prefetchRoute,
       navigateTo,
       setActiveDepartment,
       setActiveNotice,
@@ -476,6 +522,8 @@ export function PustShell({
       toggleEditMode,
       openEditModal,
       closeEditModal,
+      isNavigating,
+      prefetchRoute,
       navigateTo,
       loadCmsProfile,
       loadNotices,
@@ -495,6 +543,28 @@ export function PustShell({
             data-edit-mode={effectiveEditMode ? 'true' : undefined}
             className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900"
           >
+            {isNavigating && (
+              <>
+                <div
+                  aria-hidden="true"
+                  className="fixed top-0 left-0 right-0 z-[70] h-[3px] bg-pust-900/15 overflow-hidden pointer-events-none"
+                >
+                  <div className="h-full w-1/2 bg-pust-800 animate-pulse" />
+                </div>
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="fixed top-20 left-1/2 -translate-x-1/2 z-[65] pointer-events-none rounded-xl border border-pust-800/30 bg-white shadow-lg px-4 py-2.5 flex items-center gap-2.5 text-xs font-semibold text-slate-900"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin text-pust-800 shrink-0" />
+                  <span>
+                    {pendingTarget?.startsWith('/academics/departments/')
+                      ? 'Loading department page...'
+                      : 'Loading page...'}
+                  </span>
+                </div>
+              </>
+            )}
             <Navbar
               route={route}
               user={user}
