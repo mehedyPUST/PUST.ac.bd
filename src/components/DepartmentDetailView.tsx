@@ -11,7 +11,6 @@ import {
   Bookmark,
   Building2,
   Check,
-  ChevronDown,
   Copy,
   FileText,
   FlaskConical,
@@ -277,12 +276,6 @@ function PersonProfileCard({
   delay?: number;
   onViewProfile: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [isTappedOpen, setIsTappedOpen] = useState(false);
-
-  const isExpanded = isHovered || isFocused || isTappedOpen;
-
   const hasPersonalInfo =
     Boolean(person.qualification) ||
     Boolean(person.researchArea) ||
@@ -291,165 +284,116 @@ function PersonProfileCard({
   return (
     <MotionCard
       delay={delay}
-      className={`rounded-2xl border ${accentClass} p-5 sm:p-6 shadow-xs hover:shadow-md transition-shadow flex flex-col`}
+      className={`rounded-2xl border ${accentClass} p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-5`}
     >
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setIsTappedOpen(false);
-        }}
-        onFocus={() => setIsFocused(true)}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-            setIsFocused(false);
-          }
-        }}
-        onClick={(e) => {
-          const target = e.target as HTMLElement;
-          if (target.closest('a, button')) return;
-          setIsTappedOpen((prev) => !prev);
-        }}
-        className="w-full"
-      >
-        {/* Part 1 (Always Visible on Load): Portrait Photo + Identity */}
-        <div className="flex items-center justify-between gap-3 cursor-pointer">
-          <div className="flex items-center gap-4 min-w-0 flex-1">
-            <PersonThumbnail person={person} roleCategory={roleCategory} size="sm" />
-            <div className="min-w-0 flex-1">
-              <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 leading-snug">
-                {person.name}
-              </h3>
-              <p className="text-xs sm:text-sm font-medium text-pust-900 mt-0.5 leading-snug">
-                {person.designation}
+      <div className="space-y-4">
+        {/* Identity Header with Small Framed Photo */}
+        <div className="flex items-start gap-4">
+          <PersonThumbnail person={person} roleCategory={roleCategory} size="sm" />
+          <div className="min-w-0 flex-1">
+            <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 leading-snug">
+              {person.name}
+            </h3>
+            <p className="text-xs sm:text-sm font-medium text-pust-900 mt-0.5 leading-snug">
+              {person.designation}
+            </p>
+            {person.onStudyLeave && (
+              <p className="font-mono text-[11px] text-amber-800 mt-1">
+                Status · On Study Leave
               </p>
-              {person.onStudyLeave && (
-                <p className="font-mono text-[11px] text-amber-800 mt-1">
-                  Status · On Study Leave
-                </p>
-              )}
-            </div>
+            )}
           </div>
-
-          <button
-            type="button"
-            aria-expanded={isExpanded}
-            aria-label={isExpanded ? `Collapse details for ${person.name}` : `Expand details for ${person.name}`}
-            onClick={() => setIsTappedOpen((prev) => !prev)}
-            className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-slate-400 hover:text-pust-900 hover:bg-white/70 transition-colors shrink-0 cursor-pointer"
-          >
-            <ChevronDown
-              className={`w-4 h-4 transition-transform duration-200 ${
-                isExpanded ? 'rotate-180 text-pust-800' : ''
-              }`}
-            />
-          </button>
         </div>
 
-        {/* Part 2 (Expands Smoothly on Hover / Focus / Tap) */}
-        <div
-          aria-hidden={!isExpanded}
-          className={`grid transition-[grid-template-rows,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'
-          }`}
+        {/* Contact Details */}
+        {(person.phones.length > 0 || person.emails.length > 0) && (
+          <div className="pt-3 border-t border-slate-200/80 space-y-2">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+              Contact Details
+            </p>
+            <div className="space-y-1.5 text-xs sm:text-[13px]">
+              {person.phones.map((phone, idx) => (
+                <div key={`${phone.value}-${idx}`} className="flex items-center justify-between gap-3">
+                  <a
+                    href={`tel:${sanitizeTelHref(phone.value)}`}
+                    className="inline-flex items-center gap-2 font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums min-w-0 truncate"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-pust-700 shrink-0" />
+                    <span className="truncate">{phone.value}</span>
+                  </a>
+                  <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                    ({phone.type})
+                  </span>
+                </div>
+              ))}
+              {person.emails.map((email, idx) => (
+                <div key={`${email.value}-${idx}`} className="flex items-center justify-between gap-3">
+                  <a
+                    href={`mailto:${email.value}`}
+                    className="inline-flex items-center gap-2 font-mono text-slate-800 hover:text-pust-900 hover:underline min-w-0 truncate"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
+                    <span className="truncate">{email.value}</span>
+                  </a>
+                  <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                    ({email.type})
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Personal Information */}
+        {hasPersonalInfo && (
+          <div className="pt-3 border-t border-slate-200/80 space-y-2">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+              Personal Information
+            </p>
+            <dl className="space-y-1.5 text-xs sm:text-[13px]">
+              {person.qualification && (
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
+                  <dt className="text-slate-500 shrink-0">Qualification</dt>
+                  <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
+                    {person.qualification}
+                  </dd>
+                </div>
+              )}
+              {person.researchArea && (
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
+                  <dt className="text-slate-500 shrink-0">Research Area</dt>
+                  <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
+                    {person.researchArea}
+                  </dd>
+                </div>
+              )}
+              {person.totalPublications !== undefined && (
+                <div className="flex items-center justify-between gap-4 pt-1">
+                  <dt className="text-slate-500">Total Publications</dt>
+                  <dd className="font-mono font-semibold text-pust-900 tabular-nums">
+                    {person.totalPublications}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
+      </div>
+
+      {/* Card Footer Action: View Profile */}
+      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3">
+        <span className="font-mono text-[11px] text-slate-500 truncate">
+          {roleCategory}
+        </span>
+        <button
+          type="button"
+          onClick={() => onViewProfile(person, roleCategory)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
         >
-          <div className="overflow-hidden min-h-0">
-            <div className="pt-4 space-y-4">
-              {/* Contact Details */}
-              {(person.phones.length > 0 || person.emails.length > 0) && (
-                <div className="pt-3 border-t border-slate-200/80 space-y-2">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                    Contact Details
-                  </p>
-                  <div className="space-y-1.5 text-xs sm:text-[13px]">
-                    {person.phones.map((phone, idx) => (
-                      <div key={`${phone.value}-${idx}`} className="flex items-center justify-between gap-3">
-                        <a
-                          href={`tel:${sanitizeTelHref(phone.value)}`}
-                          tabIndex={isExpanded ? 0 : -1}
-                          className="inline-flex items-center gap-2 font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums min-w-0 truncate"
-                        >
-                          <Phone className="w-3.5 h-3.5 text-pust-700 shrink-0" />
-                          <span className="truncate">{phone.value}</span>
-                        </a>
-                        <span className="font-mono text-[11px] text-slate-500 shrink-0">
-                          ({phone.type})
-                        </span>
-                      </div>
-                    ))}
-                    {person.emails.map((email, idx) => (
-                      <div key={`${email.value}-${idx}`} className="flex items-center justify-between gap-3">
-                        <a
-                          href={`mailto:${email.value}`}
-                          tabIndex={isExpanded ? 0 : -1}
-                          className="inline-flex items-center gap-2 font-mono text-slate-800 hover:text-pust-900 hover:underline min-w-0 truncate"
-                        >
-                          <Mail className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
-                          <span className="truncate">{email.value}</span>
-                        </a>
-                        <span className="font-mono text-[11px] text-slate-500 shrink-0">
-                          ({email.type})
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Personal Information */}
-              {hasPersonalInfo && (
-                <div className="pt-3 border-t border-slate-200/80 space-y-2">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-                    Personal Information
-                  </p>
-                  <dl className="space-y-1.5 text-xs sm:text-[13px]">
-                    {person.qualification && (
-                      <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
-                        <dt className="text-slate-500 shrink-0">Qualification</dt>
-                        <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
-                          {person.qualification}
-                        </dd>
-                      </div>
-                    )}
-                    {person.researchArea && (
-                      <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4">
-                        <dt className="text-slate-500 shrink-0">Research Area</dt>
-                        <dd className="text-slate-800 sm:text-right leading-relaxed line-clamp-2">
-                          {person.researchArea}
-                        </dd>
-                      </div>
-                    )}
-                    {person.totalPublications !== undefined && (
-                      <div className="flex items-center justify-between gap-4 pt-1">
-                        <dt className="text-slate-500">Total Publications</dt>
-                        <dd className="font-mono font-semibold text-pust-900 tabular-nums">
-                          {person.totalPublications}
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-              )}
-
-              {/* Card Footer Action: View Profile */}
-              <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3">
-                <span className="font-mono text-[11px] text-slate-500 truncate">
-                  {roleCategory}
-                </span>
-                <button
-                  type="button"
-                  tabIndex={isExpanded ? 0 : -1}
-                  onClick={() => onViewProfile(person, roleCategory)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
-                >
-                  <UserRound className="w-3.5 h-3.5 shrink-0" />
-                  View Profile
-                  <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+          <UserRound className="w-3.5 h-3.5 shrink-0" />
+          View Profile
+          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+        </button>
       </div>
     </MotionCard>
   );
@@ -1515,13 +1459,13 @@ export function DepartmentDetailView({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Chairman Card */}
             <div className="lg:col-span-7 flex flex-col">
               <PersonProfileCard
                 person={chairman}
                 roleCategory="Chairman"
-                accentClass="card-gradient-crimson border-pust-200/90"
+                accentClass="card-gradient-crimson border-pust-200/90 h-full"
                 onViewProfile={handleOpenProfile}
               />
             </div>
@@ -1689,7 +1633,7 @@ export function DepartmentDetailView({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filteredFaculty.map((member, idx) => (
                 <PersonProfileCard
                   key={member.id}
@@ -1728,7 +1672,7 @@ export function DepartmentDetailView({
               {department.name}.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {contractualFaculty.map((member, idx) => (
                 <PersonProfileCard
                   key={member.id}
@@ -1763,7 +1707,7 @@ export function DepartmentDetailView({
               Department of {department.name} yet.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {officers.map((officer, idx) => (
                 <PersonProfileCard
                   key={officer.id}
