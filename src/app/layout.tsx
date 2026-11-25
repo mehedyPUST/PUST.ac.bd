@@ -90,13 +90,33 @@ async function loadInitialPublicData(): Promise<PustInitialData | undefined> {
       pustRepo.listNotices({ isAuthenticated: false }),
     ]);
 
+    const departmentSummaries = departments.map((dept) => ({
+      id: dept.id,
+      code: dept.code,
+      officialCode: dept.officialCode,
+      name: dept.name,
+      faculty: dept.faculty,
+      established: dept.established,
+      degrees: dept.degrees,
+      intakeSeats: dept.intakeSeats,
+      facultyCount: dept.facultyCount,
+      building: dept.building,
+      chairmanName: dept.chairmanName,
+      contactPhone: dept.contactPhone,
+      contactEmail: dept.contactEmail,
+      summary: dept.summary,
+      researchFocus: dept.researchFocus,
+      laboratories: dept.laboratories,
+      researchTotal: dept.researchTotal,
+    }));
+
     return {
       profile,
       aboutSections,
       vcProfiles,
       galleryItems: rawGalleryItems.filter((g) => (g.visibility || 'public') === 'public'),
       bannerSlides,
-      departments,
+      departments: departmentSummaries,
       publications,
       notices,
     };

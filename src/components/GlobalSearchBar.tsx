@@ -174,7 +174,10 @@ export function GlobalSearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [variant]);
 
+  const isSearchActive = open || expanded;
+
   const searchIndex = useMemo<SearchEntry[]>(() => {
+    if (!isSearchActive) return [];
     const entries: SearchEntry[] = [];
 
     // 1. Departments
@@ -388,9 +391,12 @@ export function GlobalSearchBar({
     }
 
     return entries;
-  }, [departments, notices, publications, profile, aboutSections]);
+  }, [isSearchActive, departments, notices, publications, profile, aboutSections]);
 
   const { groupedResults, flatResults } = useMemo(() => {
+    if (!isSearchActive) {
+      return { groupedResults: [], flatResults: [] };
+    }
     const trimmed = query.trim().toLowerCase();
 
     if (!trimmed) {
@@ -496,7 +502,7 @@ export function GlobalSearchBar({
       groupedResults: groups,
       flatResults: groups.flatMap((g) => g.items),
     };
-  }, [query, searchIndex, departments, notices]);
+  }, [isSearchActive, query, searchIndex, departments, notices]);
 
   useEffect(() => {
     setActiveIndex(0);

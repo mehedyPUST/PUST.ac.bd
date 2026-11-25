@@ -278,34 +278,54 @@ export function PustShell({
     }
   }, []);
 
-  const bootstrapData = useCallback(async (showSpinner: boolean) => {
-    if (showSpinner) {
+  const bootstrapData = useCallback(async (forceFullRefresh: boolean) => {
+    if (forceFullRefresh) {
       setLoadingData(true);
     }
     setDataError(null);
     try {
-      const [profileRes, deptRes, pubRes, noticeRes, meRes, statusRes] = await Promise.all([
-        pustApi.getUniversityProfile(),
-        pustApi.getDepartments(),
-        pustApi.getPublications(),
-        pustApi.getNotices(),
-        pustApi.getMe(),
-        pustApi.getBootstrapStatus(),
-      ]);
-      setProfile(profileRes.profile ?? null);
-      setAboutSections(Array.isArray(profileRes.aboutSections) ? profileRes.aboutSections : []);
-      setVcProfiles(Array.isArray(profileRes.vcProfiles) ? profileRes.vcProfiles : []);
-      setGalleryItems(Array.isArray(profileRes.galleryItems) ? profileRes.galleryItems : []);
-      setBannerSlides(Array.isArray(profileRes.bannerSlides) ? profileRes.bannerSlides : []);
-      setDepartments(Array.isArray(deptRes.departments) ? deptRes.departments : []);
-      setPublications(Array.isArray(pubRes.publications) ? pubRes.publications : []);
-      setNotices(Array.isArray(noticeRes.notices) ? noticeRes.notices : []);
-      setUser(meRes.user);
-      setAuthResolved(true);
-      setBootstrapStatus(statusRes);
-      if (meRes.user) {
-        const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
-        setBookmarks(bmRes.bookmarks);
+      if (forceFullRefresh || !initialData) {
+        const [profileRes, deptRes, pubRes, noticeRes, meRes, statusRes] = await Promise.all([
+          pustApi.getUniversityProfile(),
+          pustApi.getDepartments(),
+          pustApi.getPublications(),
+          pustApi.getNotices(),
+          pustApi.getMe(),
+          pustApi.getBootstrapStatus(),
+        ]);
+        setProfile(profileRes.profile ?? null);
+        setAboutSections(Array.isArray(profileRes.aboutSections) ? profileRes.aboutSections : []);
+        setVcProfiles(Array.isArray(profileRes.vcProfiles) ? profileRes.vcProfiles : []);
+        setGalleryItems(Array.isArray(profileRes.galleryItems) ? profileRes.galleryItems : []);
+        setBannerSlides(Array.isArray(profileRes.bannerSlides) ? profileRes.bannerSlides : []);
+        setDepartments(Array.isArray(deptRes.departments) ? deptRes.departments : []);
+        setPublications(Array.isArray(pubRes.publications) ? pubRes.publications : []);
+        setNotices(Array.isArray(noticeRes.notices) ? noticeRes.notices : []);
+        setUser(meRes.user);
+        setAuthResolved(true);
+        setBootstrapStatus(statusRes);
+        if (meRes.user) {
+          const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
+          setBookmarks(bmRes.bookmarks);
+        }
+      } else {
+        const [meRes, statusRes] = await Promise.all([
+          pustApi.getMe(),
+          pustApi.getBootstrapStatus(),
+        ]);
+        setUser(meRes.user);
+        setAuthResolved(true);
+        setBootstrapStatus(statusRes);
+        if (meRes.user) {
+          const [bmRes, noticeRes] = await Promise.all([
+            pustApi.getBookmarks().catch(() => ({ bookmarks: [] })),
+            pustApi.getNotices().catch(() => null),
+          ]);
+          setBookmarks(bmRes.bookmarks);
+          if (noticeRes && Array.isArray(noticeRes.notices)) {
+            setNotices(noticeRes.notices);
+          }
+        }
       }
     } catch (err) {
       setAuthResolved(true);
@@ -314,7 +334,7 @@ export function PustShell({
       setAuthResolved(true);
       setLoadingData(false);
     }
-  }, []);
+  }, [initialData]);
 
   const retryLoad = useCallback(() => bootstrapData(true), [bootstrapData]);
 

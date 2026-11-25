@@ -296,7 +296,7 @@ function PersonProfileCard({
   return (
     <MotionCard
       delay={delay}
-      className={`rounded-2xl border ${accentClass} p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-5`}
+      className={`rounded-2xl border ${accentClass} p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-5`}
     >
       <div className="space-y-4">
         {/* Identity Header with Small Framed Photo */}
@@ -1639,21 +1639,18 @@ function PersonProfileModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="person-profile-modal-title"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18 }}
+      <div
         className="w-full max-w-5xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Pinned 1-Line Sticky Top Bar */}
-        <div className="shrink-0 h-14 px-5 sm:px-8 border-b border-slate-200 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 z-20">
+        <div className="shrink-0 h-14 px-5 sm:px-8 border-b border-slate-200 bg-white flex items-center justify-between gap-3 z-20">
           <div className="min-w-0 flex-1 flex items-center gap-2.5">
             {isScrolled ? (
               <p
@@ -1978,7 +1975,7 @@ function PersonProfileModal({
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -2011,10 +2008,11 @@ export function DepartmentDetailView({
   const [activeProfile, setActiveProfile] = useState<ActiveProfileState | null>(null);
 
   const normalizedCode = code.trim().toUpperCase();
+  const contextDept = departments.find((d) => d.code.toUpperCase() === normalizedCode);
   const department =
-    departments.find((d) => d.code.toUpperCase() === normalizedCode) ??
-    initialDepartment ??
-    null;
+    contextDept && contextDept.facultyMembers !== undefined
+      ? contextDept
+      : initialDepartment ?? contextDept ?? null;
 
   const facultyMembers = useMemo(
     () => department?.facultyMembers ?? [],

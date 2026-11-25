@@ -303,13 +303,13 @@ export function HomePage({
                   <div className="w-full h-full min-h-[300px] lg:min-h-[420px] bg-slate-200 animate-pulse" />
                 ) : currentSlide ? (
                   <>
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence initial={false}>
                       <motion.div
                         key={currentSlide.id}
-                        initial={{ opacity: 0.35, scale: 1.01 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0.35 }}
-                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ opacity: 0.4 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0.4 }}
+                        transition={{ duration: 0.18 }}
                         className="w-full h-full"
                       >
                         <ResilientImage
@@ -338,7 +338,7 @@ export function HomePage({
                       type="button"
                       onClick={() => setFullViewSlide(currentSlide)}
                       aria-label={`View full image: ${currentSlide.caption}`}
-                      className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/75 text-white text-xs font-medium border border-white/20 shadow-md backdrop-blur-[2px] opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
+                      className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 text-white text-xs font-medium border border-white/20 shadow-md opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       View Full
@@ -1334,7 +1334,7 @@ export function HomePage({
       {/* Banner Full Image Lightbox Modal */}
       {fullViewSlide && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-xs p-4 sm:p-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 sm:p-8"
           role="dialog"
           aria-modal="true"
           aria-label="Full banner image view"
