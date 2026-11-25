@@ -535,12 +535,12 @@ export function GlobalSearchBar({
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-36 xl:w-48 2xl:w-56 shrink-0' : 'relative w-full'}
+      className={variant === 'desktop' ? 'relative w-52 xl:w-64 shrink-0' : 'relative w-full'}
     >
       <div className="relative flex items-center">
         <Search
           className={`w-3.5 h-3.5 absolute left-2.5 pointer-events-none ${
-            variant === 'desktop' ? 'text-slate-500' : 'text-slate-500'
+            variant === 'desktop' ? 'text-pust-200' : 'text-slate-500'
           }`}
           aria-hidden="true"
         />
@@ -560,10 +560,14 @@ export function GlobalSearchBar({
             if (!open) setOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder={variant === 'desktop' ? 'Search...' : 'Search depts, notices, resources...'}
+          placeholder={
+            variant === 'desktop'
+              ? 'Search depts, notices...'
+              : 'Search depts, notices, resources...'
+          }
           className={`w-full pl-8 pr-8 text-xs rounded-lg border transition-colors focus:outline-none ${
             variant === 'desktop'
-              ? 'py-1.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-200 focus:bg-white focus:border-pust-800 focus:ring-2 focus:ring-pust-700/15'
+              ? 'py-1.5 bg-pust-950/55 text-white placeholder:text-pust-200/80 border-pust-700/75 focus:bg-white focus:text-slate-900 focus:placeholder:text-slate-400 focus:border-white focus:ring-2 focus:ring-white/25'
               : 'py-2.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
           }`}
         />
@@ -576,7 +580,11 @@ export function GlobalSearchBar({
               inputRef.current?.focus();
             }}
             aria-label="Clear search query"
-            className="absolute right-2 p-1 rounded text-slate-400 hover:text-slate-700 cursor-pointer"
+            className={`absolute right-2 p-1 rounded cursor-pointer ${
+              variant === 'desktop'
+                ? 'text-pust-200 hover:text-white'
+                : 'text-slate-400 hover:text-slate-700'
+            }`}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -584,7 +592,7 @@ export function GlobalSearchBar({
           variant === 'desktop' && (
             <kbd
               aria-hidden="true"
-              className="hidden sm:inline-block absolute right-2 px-1.5 py-0.5 font-mono text-[10px] text-slate-500 bg-slate-100 border border-slate-200 rounded"
+              className="hidden sm:inline-block absolute right-2 px-1.5 py-0.5 font-mono text-[10px] text-pust-100 bg-pust-800/80 border border-pust-700 rounded"
             >
               /
             </kbd>

@@ -104,10 +104,10 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-12 sm:h-13 lg:h-[64px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-pust-900"
         />
 
-        <div className="relative max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Official University Crest */}
           <Link
             href="/"
@@ -120,27 +120,35 @@ export function Navbar({
             className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
           >
             <PustCrest size={28} className="lg:hidden" />
-            <PustCrest size={64} className="hidden lg:block xl:hidden" />
-            <PustCrest size={74} className="hidden xl:block" />
+            <PustCrest size={58} className="hidden lg:block xl:hidden" />
+            <PustCrest size={68} className="hidden xl:block" />
           </Link>
 
-          {/* Right Column: Tier 1 University Title (Maximum Space) + Tier 2 Nav & Search */}
+          {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band */}
-            <div className="h-12 sm:h-13 lg:h-[64px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-2 text-white">
-              <Link
-                href="/"
-                onClick={() => {
-                  setHoveredGroup(null);
-                  setMobileMenuOpen(false);
-                  setMobileSearchOpen(false);
-                }}
-                className="flex-1 min-w-0 font-serif text-[12px] leading-[1.15] sm:text-[17px] md:text-[21px] lg:text-[27px] xl:text-[32px] 2xl:text-[36px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors sm:truncate sm:leading-none py-1 line-clamp-2 sm:line-clamp-none"
-              >
-                Pabna University of Science and Technology
-              </Link>
+            {/* Tier 1: University Title Band + Desktop Search */}
+            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-3 text-white">
+              <div className="min-w-0 flex-1 flex items-baseline gap-3">
+                <Link
+                  href="/"
+                  onClick={() => {
+                    setHoveredGroup(null);
+                    setMobileMenuOpen(false);
+                    setMobileSearchOpen(false);
+                  }}
+                  className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                >
+                  <span className="sm:hidden">PUST</span>
+                  <span className="hidden sm:inline">Pabna University of Science and Technology</span>
+                </Link>
+                {profile?.navbarTagline && (
+                  <span className="hidden 2xl:inline text-xs text-pust-200/90 truncate shrink-0">
+                    · {profile.navbarTagline}
+                  </span>
+                )}
+              </div>
 
-              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 {user?.role === 'admin' && editMode && onOpenEditModal && (
                   <button
                     type="button"
@@ -153,6 +161,10 @@ export function Navbar({
                     Edit Title
                   </button>
                 )}
+
+                <div className="hidden lg:block">
+                  <GlobalSearchBar variant="desktop" />
+                </div>
 
                 {/* Mobile Search Toggle */}
                 <button
@@ -227,11 +239,11 @@ export function Navbar({
               </div>
             </div>
 
-            {/* Tier 2: Desktop Navigation Links Strip + Search + Portal */}
-            <div className="hidden lg:flex h-11 px-3 lg:px-5 xl:px-6 bg-white items-center justify-between gap-2 xl:gap-3">
+            {/* Tier 2: Desktop Navigation Links Strip + Portal */}
+            <div className="hidden lg:flex h-11 px-4 lg:px-5 xl:px-6 bg-white items-center justify-between gap-4">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-2 xl:gap-4 2xl:gap-5 text-[12px] xl:text-[13.5px] font-medium text-slate-800"
+                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[13px] xl:text-[13.5px] font-medium text-slate-800"
               >
                 {/* Home */}
                 <div
@@ -569,16 +581,14 @@ export function Navbar({
                 </Link>
               </nav>
 
-              {/* Desktop Site-Wide Search, Admin Edit Mode & Portal Action */}
-              <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
-                <GlobalSearchBar variant="desktop" />
-
+              {/* Desktop Admin Edit Mode & Portal Action */}
+              <div className="flex items-center gap-2 shrink-0">
                 {user?.role === 'admin' && onToggleEditMode && (
                   <button
                     type="button"
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
-                    className={`inline-flex items-center gap-1 px-2 xl:px-2.5 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
                         : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
@@ -604,7 +614,7 @@ export function Navbar({
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
                   }}
-                  className="px-2.5 xl:px-3.5 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal'
                     ? 'Public Website'
@@ -759,7 +769,7 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileSearchOpen(false)}
-            className="fixed inset-x-0 top-12 sm:top-[52px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-11 sm:top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <div className="relative z-10 lg:hidden border-t border-slate-200 bg-white px-3.5 py-3 shadow-md">
             <GlobalSearchBar
@@ -777,11 +787,11 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-x-0 top-12 sm:top-[52px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-11 sm:top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <nav
             aria-label="Mobile navigation"
-            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
+            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-2.75rem)] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
           >
             <div className="pb-2.5 mb-1 border-b border-slate-100">
               <GlobalSearchBar
