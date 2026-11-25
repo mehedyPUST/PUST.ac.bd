@@ -1049,10 +1049,20 @@ function PersonProfileModal({
           <div className="min-w-0 flex-1 flex items-center gap-2.5">
             {isScrolled ? (
               <p
-                title={person.name}
-                className="font-serif text-base sm:text-lg font-semibold text-slate-900 truncate whitespace-nowrap"
+                title={`${person.name} · ${person.designation} · Dept. of ${department.name}`}
+                className="min-w-0 truncate whitespace-nowrap leading-none"
               >
-                {person.name}
+                <span className="font-serif text-base sm:text-lg font-semibold text-slate-900">
+                  {person.name}
+                </span>
+                <span className="hidden sm:inline font-sans text-xs sm:text-[13px] font-medium text-pust-900">
+                  {' · '}
+                  {person.designation}
+                </span>
+                <span className="hidden md:inline font-sans text-xs sm:text-[13px] text-slate-600">
+                  {' · Dept. of '}
+                  {department.name}
+                </span>
               </p>
             ) : (
               <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 font-semibold truncate whitespace-nowrap">
