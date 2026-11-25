@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { pustRepo } from './db';
+import { deduplicateDepartments, pustRepo } from './db';
 import {
   autoClearHallDueIfEnabled,
   autoEvaluateCertificateApplication,
@@ -10,7 +10,7 @@ import {
   runAutomatedOfficeSweep,
 } from './officeAutomation';
 import type { JwtClaims } from './auth';
-import type { ClearanceOfficeKey, OfficeClearanceState } from '../src/types/pust';
+import type { ClearanceOfficeKey, DepartmentRecord, OfficeClearanceState } from '../src/types/pust';
 
 const ADMIN_CLAIMS: JwtClaims = {
   sub: 'usr-admin-test',
@@ -248,4 +248,79 @@ test('updateItem strips undefined keys without corrupting fields or leaving empt
   });
   assert.equal(updated?.vacantSeats, 4);
   assert.equal(updated?.title, 'Test Vacancy Circular');
+});
+
+test('deduplicateDepartments collapses stale duplicate records and keeps canonical official entries sorted', () => {
+  const dupes: DepartmentRecord[] = [
+    {
+      id: 'legacy-sds-1',
+      code: 'SDS',
+      name: 'Statistics and Data Science',
+      faculty: 'Faculty of Science',
+      established: 2015,
+      degrees: [],
+      intakeSeats: 40,
+      building: 'Academic Building I',
+      chairmanName: 'Dr. Md. Sohel Rana',
+      summary: 'Legacy duplicate',
+      researchFocus: [],
+      laboratories: [],
+    },
+    {
+      id: 'dept-chem',
+      code: 'CHEM',
+      officialCode: '14',
+      name: 'Chemistry',
+      faculty: 'Faculty of Science',
+      established: 2012,
+      degrees: ['B.Sc. (Hons.)'],
+      intakeSeats: 40,
+      facultyCount: 11,
+      researchTotal: 133,
+      building: 'Academic Building I',
+      chairmanName: 'Ratan Kumar Paul',
+      summary: 'Canonical',
+      researchFocus: [],
+      laboratories: [],
+    },
+    {
+      id: 'legacy-chem-2',
+      code: 'chem',
+      name: 'Chemistry',
+      faculty: 'Faculty of Science',
+      established: 2012,
+      degrees: [],
+      intakeSeats: 40,
+      building: 'Academic Building I',
+      chairmanName: 'Dr. Md. Faruak Ahmad',
+      summary: 'Legacy duplicate',
+      researchFocus: [],
+      laboratories: [],
+    },
+    {
+      id: 'dept-math',
+      code: 'MATH',
+      officialCode: '03',
+      name: 'Mathematics',
+      faculty: 'Faculty of Science',
+      established: 2008,
+      degrees: ['B.Sc. (Hons.)'],
+      intakeSeats: 50,
+      facultyCount: 14,
+      researchTotal: 458,
+      building: 'Academic Building I',
+      chairmanName: 'Dr. Md. Fazlul Hoque',
+      summary: 'Canonical',
+      researchFocus: [],
+      laboratories: [],
+    },
+  ];
+
+  const clean = deduplicateDepartments(dupes);
+  assert.equal(clean.length, 3);
+  assert.deepEqual(
+    clean.map((d) => d.code),
+    ['MATH', 'CHEM', 'SDS']
+  );
+  assert.equal(clean.find((d) => d.code === 'CHEM')?.chairmanName, 'Ratan Kumar Paul');
 });

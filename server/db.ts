@@ -61,6 +61,34 @@ export interface StoredUser extends AuthUser {
   passwordHash: string;
 }
 
+const CANONICAL_DEPARTMENT_IDS = new Set(SEED_DEPARTMENTS.map((d) => d.id));
+
+function scoreDepartmentRecord(dept: Partial<DepartmentRecord>): number {
+  return (
+    (dept.id && CANONICAL_DEPARTMENT_IDS.has(dept.id) ? 10 : 0) +
+    (dept.officialCode ? 4 : 0) +
+    ((dept.facultyCount ?? 0) > 0 ? 2 : 0) +
+    (dept.researchTotal ? 1 : 0)
+  );
+}
+
+export function deduplicateDepartments(items: DepartmentRecord[]): DepartmentRecord[] {
+  const byKey = new Map<string, DepartmentRecord>();
+  for (const dept of items) {
+    const key = (dept.code || dept.id).trim().toUpperCase();
+    const existing = byKey.get(key);
+    if (!existing || scoreDepartmentRecord(dept) > scoreDepartmentRecord(existing)) {
+      byKey.set(key, dept);
+    }
+  }
+  return Array.from(byKey.values()).sort((a, b) => {
+    const aCode = Number(a.officialCode) || Number.MAX_SAFE_INTEGER;
+    const bCode = Number(b.officialCode) || Number.MAX_SAFE_INTEGER;
+    if (aCode !== bCode) return aCode - bCode;
+    return a.name.localeCompare(b.name);
+  });
+}
+
 class PustRepository {
   private client: MongoClient | null = null;
   private db: Db | null = null;
@@ -104,43 +132,78 @@ class PustRepository {
   };
   private universityProfile: UniversityProfile = structuredClone(SEED_UNIVERSITY_PROFILE);
 
-  private initialized = false;
+  private initPromise: Promise<void> | null = null;
 
   async init(): Promise<void> {
-    if (this.initialized) return;
-    this.initialized = true;
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = (async () => {
+      const uri = process.env.MONGODB_URI?.trim();
+      const dbName = process.env.MONGODB_DB_NAME?.trim() || 'pust_portal';
 
-    const uri = process.env.MONGODB_URI?.trim();
-    const dbName = process.env.MONGODB_DB_NAME?.trim() || 'pust_portal';
+      if (!uri) {
+        this.storageBackend = 'memory';
+        return;
+      }
 
-    if (!uri) {
-      this.storageBackend = 'memory';
-      return;
-    }
-
-    try {
-      const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
-      await client.connect();
-      const db = client.db(dbName);
-      await db.command({ ping: 1 });
-      this.client = client;
-      this.db = db;
-      this.storageBackend = 'mongodb';
-      await this.syncMongoBootstrap(db);
-    } catch (err) {
-      console.warn(
-        '[PUST DB] Could not connect to MONGODB_URI; falling back to preview memory store:',
-        err instanceof Error ? err.message : String(err)
-      );
-      this.client = null;
-      this.db = null;
-      this.storageBackend = 'memory';
-    }
+      try {
+        const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+        await client.connect();
+        const db = client.db(dbName);
+        await db.command({ ping: 1 });
+        this.client = client;
+        this.db = db;
+        this.storageBackend = 'mongodb';
+        await this.syncMongoBootstrap(db);
+      } catch (err) {
+        console.warn(
+          '[PUST DB] Could not connect to MONGODB_URI; falling back to preview memory store:',
+          err instanceof Error ? err.message : String(err)
+        );
+        this.client = null;
+        this.db = null;
+        this.storageBackend = 'memory';
+      }
+    })();
+    return this.initPromise;
   }
 
   private col<T extends { id: string }>(name: string): Collection<T> {
     if (!this.db) throw new Error('MongoDB is not active');
     return this.db.collection<T>(name);
+  }
+
+  private async deduplicateCollectionByField(
+    db: Db,
+    collectionName: string,
+    getKey: (doc: Record<string, unknown>) => string,
+    scoreDoc?: (doc: Record<string, unknown>) => number
+  ): Promise<void> {
+    const docs = await db.collection<Record<string, unknown>>(collectionName).find({}).toArray();
+    if (docs.length <= 1) return;
+
+    const keepers = new Map<string, { doc: Record<string, unknown>; score: number }>();
+    const duplicateObjectIds: unknown[] = [];
+
+    for (const doc of docs) {
+      const key = getKey(doc);
+      if (!key) continue;
+      const score = scoreDoc ? scoreDoc(doc) : 0;
+      const existing = keepers.get(key);
+      if (!existing) {
+        keepers.set(key, { doc, score });
+      } else if (score > existing.score) {
+        duplicateObjectIds.push(existing.doc._id);
+        keepers.set(key, { doc, score });
+      } else {
+        duplicateObjectIds.push(doc._id);
+      }
+    }
+
+    if (duplicateObjectIds.length > 0) {
+      await db
+        .collection(collectionName)
+        .deleteMany({ _id: { $in: duplicateObjectIds as never[] } });
+    }
   }
 
   private async syncMongoBootstrap(db: Db): Promise<void> {
@@ -150,14 +213,38 @@ class PustRepository {
     await db.collection('notices').createIndex({ publishedAt: -1 });
     await db.collection('bookmarks').createIndex({ userId: 1, itemId: 1 }, { unique: true });
 
-    const seedIfEmpty = async <T extends object>(name: string, docs: T[]) => {
+    const seedIfEmpty = async <T extends { id: string }>(name: string, docs: T[]) => {
       const c = db.collection<T>(name);
       if ((await c.countDocuments()) === 0 && docs.length > 0) {
-        await c.insertMany(docs as never[]);
+        await c.bulkWrite(
+          docs.map((doc) => ({
+            updateOne: {
+              filter: { id: doc.id } as never,
+              update: { $setOnInsert: doc } as never,
+              upsert: true,
+            },
+          })),
+          { ordered: false }
+        ).catch(() => undefined);
       }
     };
 
-    await seedIfEmpty('departments', SEED_DEPARTMENTS);
+    const deptCol = db.collection<DepartmentRecord>('departments');
+    if ((await deptCol.countDocuments()) === 0) {
+      await deptCol
+        .bulkWrite(
+          SEED_DEPARTMENTS.map((dept) => ({
+            updateOne: {
+              filter: { code: dept.code } as never,
+              update: { $setOnInsert: dept } as never,
+              upsert: true,
+            },
+          })),
+          { ordered: false }
+        )
+        .catch(() => undefined);
+    }
+
     await seedIfEmpty('publications', SEED_PUBLICATIONS);
     await seedIfEmpty('notices', SEED_NOTICES);
     await seedIfEmpty('students', SEED_STUDENTS);
@@ -177,10 +264,36 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 4;
+    const INSTITUTIONAL_SEED_VERSION = 5;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
+      // Remove any duplicate documents caused by earlier concurrent cold-start seeding
+      await this.deduplicateCollectionByField(
+        db,
+        'departments',
+        (doc) => String(doc.code || doc.id || '').trim().toUpperCase(),
+        (doc) => scoreDepartmentRecord(doc as Partial<DepartmentRecord>)
+      );
+
+      for (const colName of [
+        'about_sections',
+        'vc_profiles',
+        'publications',
+        'notices',
+        'banner_slides',
+        'gallery_items',
+        'courses',
+        'payment_gateways',
+        'exam_circulars',
+        'hall_circulars',
+      ]) {
+        await this.deduplicateCollectionByField(db, colName, (doc) => String(doc.id || '').trim());
+      }
+
+      await db.collection('departments').createIndex({ code: 1 }, { unique: true }).catch(() => undefined);
+      await db.collection('departments').createIndex({ id: 1 }, { unique: true }).catch(() => undefined);
+
       for (const section of SEED_ABOUT_SECTIONS) {
         await db.collection('about_sections').updateOne(
           { id: section.id },
@@ -190,25 +303,26 @@ class PustRepository {
       }
 
       for (const dept of SEED_DEPARTMENTS) {
-        const {
-          officialCode,
-          facultyCount,
-          researchTotal,
-          intakeSeats,
-          degrees,
-          ...restDept
-        } = dept;
         await db.collection('departments').updateOne(
-          { id: dept.id },
+          { $or: [{ id: dept.id }, { code: dept.code }] },
           {
             $set: {
-              officialCode,
-              facultyCount,
-              researchTotal,
-              intakeSeats,
-              degrees,
+              id: dept.id,
+              code: dept.code,
+              officialCode: dept.officialCode,
+              name: dept.name,
+              faculty: dept.faculty,
+              established: dept.established,
+              degrees: dept.degrees,
+              intakeSeats: dept.intakeSeats,
+              facultyCount: dept.facultyCount,
+              researchTotal: dept.researchTotal,
+              building: dept.building,
+              chairmanName: dept.chairmanName,
+              summary: dept.summary,
+              researchFocus: dept.researchFocus,
+              laboratories: dept.laboratories,
             },
-            $setOnInsert: restDept,
           },
           { upsert: true }
         );
@@ -418,7 +532,10 @@ class PustRepository {
   }
 
   // Departments & Publications
-  listDepartments = () => this.getAll('departments', this.departments);
+  listDepartments = async (): Promise<DepartmentRecord[]> => {
+    const items = await this.getAll('departments', this.departments);
+    return deduplicateDepartments(items);
+  };
   createDepartment = async (input: Omit<DepartmentRecord, 'id'>): Promise<DepartmentRecord> => {
     const existing = await this.listDepartments();
     const normalizedCode = input.code.trim().toUpperCase();
