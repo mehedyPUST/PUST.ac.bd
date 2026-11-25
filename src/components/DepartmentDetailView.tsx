@@ -411,10 +411,12 @@ function PersonProfileModal({
 }) {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const [showAllArticles, setShowAllArticles] = useState(false);
+  const [showAllProceedings, setShowAllProceedings] = useState(false);
   const [showAllConferences, setShowAllConferences] = useState(false);
 
   useEffect(() => {
     setShowAllArticles(false);
+    setShowAllProceedings(false);
     setShowAllConferences(false);
     if (!activeProfile) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -446,11 +448,17 @@ function PersonProfileModal({
     (person.awards && person.awards.length > 0) ||
     (person.journalArticles && person.journalArticles.length > 0) ||
     (person.conferenceProceedings && person.conferenceProceedings.length > 0) ||
+    (person.bookChapters && person.bookChapters.length > 0) ||
     (person.conductedCourses && person.conductedCourses.length > 0) ||
     (person.graduateSupervision && person.graduateSupervision.length > 0) ||
     (person.conferencesAttended && person.conferencesAttended.length > 0);
   const journalArticles = person.journalArticles ?? [];
   const visibleArticles = showAllArticles ? journalArticles : journalArticles.slice(0, 6);
+  const conferenceProceedings = person.conferenceProceedings ?? [];
+  const visibleProceedings = showAllProceedings
+    ? conferenceProceedings
+    : conferenceProceedings.slice(0, 6);
+  const bookChapters = person.bookChapters ?? [];
   const conferencesAttended = person.conferencesAttended ?? [];
   const visibleConferences = showAllConferences ? conferencesAttended : conferencesAttended.slice(0, 6);
 
@@ -874,15 +882,47 @@ function PersonProfileModal({
           )}
 
           {/* Conference Proceedings */}
-          {person.conferenceProceedings && person.conferenceProceedings.length > 0 && (
+          {conferenceProceedings.length > 0 && (
             <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Conference Proceedings ({person.conferenceProceedings.length})
-              </h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                  Conference Proceedings ({conferenceProceedings.length})
+                </h3>
+                {conferenceProceedings.length > 6 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllProceedings((prev) => !prev)}
+                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+                  >
+                    {showAllProceedings
+                      ? 'Show fewer proceedings'
+                      : `Show all ${conferenceProceedings.length} proceedings`}
+                  </button>
+                )}
+              </div>
               <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
-                {person.conferenceProceedings.map((item, idx) => (
+                {visibleProceedings.map((item, idx) => (
                   <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
                     <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
+                      {String(idx + 1).padStart(2, '0')}.
+                    </span>
+                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Published Book Chapters */}
+          {bookChapters.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                Published Book Chapters ({bookChapters.length})
+              </h3>
+              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-[13px]">
+                {bookChapters.map((item, idx) => (
+                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
                       {String(idx + 1).padStart(2, '0')}.
                     </span>
                     <span className="text-slate-800 leading-relaxed break-words">{item}</span>

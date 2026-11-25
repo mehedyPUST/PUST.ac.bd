@@ -649,6 +649,7 @@ const departmentPersonSchema = z.object({
   awards: z.array(z.string().trim().max(500)).max(40).optional(),
   journalArticles: z.array(z.string().trim().max(1000)).max(300).optional(),
   conferenceProceedings: z.array(z.string().trim().max(1000)).max(150).optional(),
+  bookChapters: z.array(z.string().trim().max(1000)).max(50).optional(),
   conductedCourses: z.array(z.string().trim().max(240)).max(50).optional(),
   graduateSupervision: z.array(z.string().trim().max(500)).max(60).optional(),
   conferencesAttended: z.array(z.string().trim().max(1000)).max(150).optional(),

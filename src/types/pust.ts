@@ -119,6 +119,7 @@ export interface DepartmentPersonRecord {
   awards?: string[];
   journalArticles?: string[];
   conferenceProceedings?: string[];
+  bookChapters?: string[];
   conductedCourses?: string[];
   graduateSupervision?: string[];
   conferencesAttended?: string[];
