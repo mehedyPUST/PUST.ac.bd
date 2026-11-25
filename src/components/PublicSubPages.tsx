@@ -62,7 +62,7 @@ const LIBRARY_IMAGE = '/src/assets/images/pust_central_library_1795431408614.jpg
 const GROUNDS_IMAGE = '/src/assets/images/pust_campus_grounds_1795431408500.jpg';
 
 const FACULTY_FILTERS: Array<{ label: string; value: 'All' | FacultyName }> = [
-  { label: 'All Faculties', value: 'All' },
+  { label: 'All', value: 'All' },
   { label: 'Engineering & Technology', value: 'Faculty of Engineering and Technology' },
   { label: 'Science', value: 'Faculty of Science' },
   { label: 'Business Studies', value: 'Faculty of Business Studies' },
@@ -564,23 +564,23 @@ export function PublicSubPages({
       route: AppRoute;
       matchRoutes?: AppRoute[];
     }> = [
-      { label: 'Academic Programs', route: '/academics/programs' },
+      { label: 'Programs', route: '/academics/programs' },
       {
         label: 'Faculties & Deans',
         route: '/academics/faculty',
         matchRoutes: ['/academics/faculty', '/academics/deans'],
       },
       {
-        label: 'Departments & Chairmen',
+        label: 'Departments',
         route: '/academics/departments',
         matchRoutes: ['/academics', '/academics/departments', '/academics/chairmen'],
       },
-      { label: 'Academic Calendar', route: '/academics/calendar' },
-      { label: 'Forms Download', route: '/academics/forms-download' },
+      { label: 'Calendar', route: '/academics/calendar' },
+      { label: 'Forms', route: '/academics/forms-download' },
       { label: 'Scholarships', route: '/academics/scholarship' },
-      { label: 'Seminars & Workshops', route: '/academics/seminars' },
+      { label: 'Seminars', route: '/academics/seminars' },
       {
-        label: 'Journals & Research',
+        label: 'Research',
         route: '/academics/publications',
         matchRoutes: ['/academics/publications', '/academics/journals'],
       },
@@ -589,17 +589,23 @@ export function PublicSubPages({
     const isFacultiesView = route === '/academics/faculty' || route === '/academics/deans';
     const isResearchView = route === '/academics/journals' || route === '/academics/publications';
     const activeHeading =
-      route === '/academics/deans'
+      route === '/academics/programs'
+        ? 'Academic Programs'
+        : isFacultiesView
         ? 'Faculties & Deans'
-        : route === '/academics/chairmen'
-        ? 'Departments & Chairmen'
-        : route === '/academics/journals'
+        : route === '/academics/calendar'
+        ? 'Academic Calendar'
+        : route === '/academics/forms-download'
+        ? 'Forms Download'
+        : route === '/academics/scholarship'
+        ? 'Scholarships'
+        : route === '/academics/seminars'
+        ? 'Seminars & Workshops'
+        : isResearchView
         ? 'Journals & Research'
-        : route === '/academics'
-        ? 'Departments & Chairmen'
-        : academicSubTabs.find((t) => t.route === route)?.label || 'Academic Directory';
+        : 'Departments & Chairmen';
 
-    const totalFacultyMembers =
+    const totalTeachers =
       departments.some((d) => (d.facultyCount ?? 0) > 0)
         ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
         : profile?.facultyMembersCount ?? 212;
@@ -619,7 +625,7 @@ export function PublicSubPages({
               </div>
               <p className="font-mono text-xs text-slate-600 tabular-nums">
                 {profile?.facultiesCount ?? 5} Faculties · {departments.length || 21} Departments ·{' '}
-                {totalFacultyMembers} Faculty
+                {totalTeachers} Teachers
               </p>
             </div>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
@@ -631,6 +637,11 @@ export function PublicSubPages({
                   <Link
                     key={tab.route}
                     href={tab.route}
+                    onClick={() => {
+                      if (tab.route === '/academics/departments') {
+                        setSelectedFaculty('All');
+                      }
+                    }}
                     className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
                         ? 'bg-pust-900 text-white'
@@ -783,7 +794,7 @@ export function PublicSubPages({
                         <p className="font-mono text-xs text-pust-800 tabular-nums">
                           {fac.code.split('·')[0].trim()} · {facDepts.length}{' '}
                           {facDepts.length === 1 ? 'Department' : 'Departments'}
-                          {facTeachers > 0 ? ` · ${facTeachers} Faculty` : ''}
+                          {facTeachers > 0 ? ` · ${facTeachers} Teachers` : ''}
                           {facWorks > 0 ? ` · ${facWorks.toLocaleString()} Research Works` : ''}
                         </p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
@@ -1379,7 +1390,7 @@ export function PublicSubPages({
                               </h2>
                               <p className="font-mono text-xs text-slate-600 tabular-nums shrink-0">
                                 {depts.length} {depts.length === 1 ? 'Department' : 'Departments'}
-                                {groupTeachers > 0 ? ` · ${groupTeachers} Faculty` : ''}
+                                {groupTeachers > 0 ? ` · ${groupTeachers} Teachers` : ''}
                               </p>
                             </div>
 
@@ -1425,7 +1436,7 @@ export function PublicSubPages({
                                         </span>
                                       </span>
                                       <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums shrink-0">
-                                        {dept.facultyCount ? `${dept.facultyCount} Faculty` : ''}
+                                        {dept.facultyCount ? `${dept.facultyCount} Teachers` : ''}
                                         <ArrowRight className="w-3.5 h-3.5 text-pust-800 transition-transform duration-200 group-hover:translate-x-0.5" />
                                       </span>
                                     </div>

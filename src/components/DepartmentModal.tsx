@@ -89,9 +89,9 @@ export function DepartmentModal({
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Faculty &amp; Annual Intake</dt>
+              <dt className="text-xs uppercase tracking-wider text-slate-500">Teachers &amp; Annual Intake</dt>
               <dd className="font-mono tabular-nums text-slate-900 mt-0.5 font-medium">
-                {department.facultyCount ? `${department.facultyCount} Faculty · ` : ''}
+                {department.facultyCount ? `${department.facultyCount} Teachers · ` : ''}
                 {department.intakeSeats} Undergraduate Seats
               </dd>
             </div>
