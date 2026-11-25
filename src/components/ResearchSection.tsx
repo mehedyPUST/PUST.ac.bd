@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check, Copy, Search } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionCard } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { ResilientImage } from './ResilientImage';
 import type { JournalRecord, PublicationRecord } from '../types/pust';
@@ -185,12 +186,12 @@ export function ResearchSection({
     <div
       className={`${
         focus === 'journals' ? 'lg:col-span-6' : 'lg:col-span-5'
-      } bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden`}
+      } card-gradient-gold rounded-2xl border border-gold-200/80 shadow-xs hover:border-gold-600/40 transition-colors overflow-hidden`}
     >
       <div className="p-6 sm:p-7 space-y-5">
-        <div className="border-b border-slate-200 pb-4 flex items-end justify-between gap-3">
+        <div className="border-b border-gold-200/70 pb-4 flex items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
               University Periodicals
             </p>
             <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -204,13 +205,13 @@ export function ResearchSection({
           />
         </div>
 
-        <div className="divide-y divide-slate-200">
+        <div className="divide-y divide-gold-200/60">
           {journals.map((journal) => (
             <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
               <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
               <h3 className="font-serif text-lg font-medium text-slate-900">{journal.title}</h3>
               <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
-              <p className="text-xs font-semibold text-pust-800">{journal.currentIssue}</p>
+              <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
             </div>
           ))}
         </div>
@@ -265,20 +266,32 @@ export function ResearchSection({
             {academicExtras.researchInfraCards.map((card, idx) => {
               const fallbackImg =
                 idx === 0 ? labImage : idx === 1 ? libraryImage : groundsImage;
+              const gradientClass =
+                idx === 0
+                  ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                  : idx === 1
+                  ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
+                  : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45';
+              const tagColor =
+                idx === 0 ? 'text-lapis-700' : idx === 1 ? 'text-gold-700' : 'text-sage-700';
+
               return (
-                <article
+                <MotionCard
                   key={card.id}
-                  className="bg-[#F7F7F5] rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-pust-700/50 transition-all space-y-4"
+                  delay={idx * 0.05}
+                  className={`${gradientClass} rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all space-y-4 group`}
                 >
-                  <ResilientImage
-                    src={card.imageUrl || fallbackImg}
-                    fallbackSrc={fallbackImg}
-                    alt={card.title}
-                    caption={card.caption}
-                    className="w-full aspect-[4/3] object-cover"
-                  />
+                  <div className="overflow-hidden rounded-xl">
+                    <ResilientImage
+                      src={card.imageUrl || fallbackImg}
+                      fallbackSrc={fallbackImg}
+                      alt={card.title}
+                      caption={card.caption}
+                      className="w-full aspect-[4/3] object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                    />
+                  </div>
                   <div>
-                    <p className="font-mono text-xs text-pust-800">{card.tag}</p>
+                    <p className={`font-mono text-xs font-medium ${tagColor}`}>{card.tag}</p>
                     <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
                       {card.title}
                     </h3>
@@ -286,7 +299,7 @@ export function ResearchSection({
                       {card.description}
                     </p>
                   </div>
-                </article>
+                </MotionCard>
               );
             })}
           </div>

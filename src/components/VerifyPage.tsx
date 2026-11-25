@@ -17,8 +17,10 @@ import { pustApi } from '../lib/api';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { VerificationLookupResult } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
+import { PortalRecordsSkeleton } from './PustSkeletons';
 import { VerificationQrSvg } from './portal/DigitalDocumentModal';
 
 export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => void }) {
@@ -107,7 +109,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       </header>
 
       {/* Search & Quick Examples */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5 print:hidden">
+      <div className="card-gradient-parchment rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -122,14 +124,14 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-900 text-white text-sm font-semibold hover:bg-pust-950 disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-900 text-white text-sm font-semibold hover:bg-pust-950 hover:-translate-y-0.5 transition-all disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4" />
             {loading ? 'Verifying...' : 'Verify Serial'}
           </button>
         </form>
 
-        <div className="pt-2 border-t border-slate-100 space-y-2">
+        <div className="pt-2 border-t border-slate-200/70 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             Verify Issued Registry Records
           </p>
@@ -142,10 +144,10 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                   setQuery(item.code);
                   runVerification(item.code);
                 }}
-                className="text-left px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-pust-700 hover:bg-pust-50/50 transition-colors cursor-pointer"
+                className="text-left px-3 py-1.5 rounded-lg border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/50 hover:-translate-y-0.5 hover:shadow-xs transition-all cursor-pointer"
               >
-                <span className="block text-[11px] text-slate-500">{item.label}</span>
-                <span className="font-mono text-xs font-medium text-pust-900">{item.code}</span>
+                <span className="block text-[11px] text-slate-600">{item.label}</span>
+                <span className="font-mono text-xs font-medium text-lapis-800">{item.code}</span>
               </button>
             ))}
           </div>
@@ -153,22 +155,27 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       </div>
 
       {/* Results Area */}
-      {hasSearched && error && (
-        <div className="rounded-2xl border border-red-200 bg-red-50/80 p-6 flex items-start gap-3.5">
-          <AlertCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <h2 className="font-serif text-lg font-medium text-red-950">Verification Not Found</h2>
-            <p className="text-sm text-red-800">{error}</p>
-            <p className="text-xs text-red-700 pt-1">
-              Double-check the exact serial code printed beside the QR matrix on the university
-              document.
-            </p>
+      {loading && <PortalRecordsSkeleton rows={3} />}
+
+      {!loading && hasSearched && error && (
+        <MotionReveal>
+          <div className="rounded-2xl border border-red-200 card-gradient-crimson p-6 flex items-start gap-3.5">
+            <AlertCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h2 className="font-serif text-lg font-medium text-red-950">Verification Not Found</h2>
+              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-xs text-red-700 pt-1">
+                Double-check the exact serial code printed beside the QR matrix on the university
+                document.
+              </p>
+            </div>
           </div>
-        </div>
+        </MotionReveal>
       )}
 
-      {result && (
-        <article className="print-only-document bg-white rounded-2xl border border-pust-200 shadow-sm overflow-hidden">
+      {!loading && result && (
+        <MotionReveal>
+          <article className="print-only-document card-gradient-parchment rounded-2xl border border-pust-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 bg-pust-950 text-white flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0" />
@@ -304,6 +311,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             </div>
           </div>
         </article>
+        </MotionReveal>
       )}
 
       {/* Helpful footer bridge */}

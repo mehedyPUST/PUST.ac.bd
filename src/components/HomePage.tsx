@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import {
   getYouTubeEmbedUrl,
@@ -23,7 +24,12 @@ import {
 import type { AppRoute } from '../lib/routes';
 import { CampusMapSection } from './CampusMapSection';
 import { EditTriggerButton } from './EditTriggerButton';
-import { HeroSummarySkeleton } from './PustSkeletons';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
+import {
+  HeroSummarySkeleton,
+  MediaGridSkeleton,
+  NoticeListSkeleton,
+} from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
   AboutContentRecord,
@@ -47,6 +53,7 @@ interface HomePageProps {
   galleryItems: GalleryItemRecord[];
   publications: PublicationRecord[];
   notices: NoticeRecord[];
+  loadingData?: boolean;
   onNavigate: (route: AppRoute | string) => void;
   onSelectNotice: (notice: NoticeRecord) => void;
 }
@@ -67,6 +74,20 @@ const NOTICE_CATS: Array<'All' | NoticeRecord['category']> = [
   'General',
 ];
 
+function getEventGradientClass(category: GalleryItemRecord['category']) {
+  if (category === 'Convocation') return 'card-gradient-gold hover:border-gold-600/40';
+  if (category === 'Academic Event') return 'card-gradient-lapis hover:border-lapis-600/40';
+  if (category === 'Festival') return 'card-gradient-crimson hover:border-pust-600/40';
+  return 'card-gradient-sage hover:border-sage-600/40';
+}
+
+function getEventAccentClass(category: GalleryItemRecord['category']) {
+  if (category === 'Convocation') return 'text-gold-700';
+  if (category === 'Academic Event') return 'text-lapis-700';
+  if (category === 'Festival') return 'text-pust-800';
+  return 'text-sage-700';
+}
+
 export function HomePage({
   heroImage,
   bannerSlides = [],
@@ -76,6 +97,7 @@ export function HomePage({
   galleryItems,
   publications,
   notices,
+  loadingData = false,
   onSelectNotice,
 }: HomePageProps) {
   const {
@@ -226,23 +248,23 @@ export function HomePage({
               <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
                 <Link
                   href="/portal"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 hover:-translate-y-0.5 hover:shadow-md shadow-xs transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   Open Digital Campus Portal
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-800 hover:border-lapis-700 hover:text-lapis-800 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   Explore {profile?.departmentsCount ?? 21} Departments
                 </Link>
                 <Link
                   href="/verify"
-                  className="inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-medium text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   Verify Document
-                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
               </div>
             </div>
@@ -254,21 +276,31 @@ export function HomePage({
               onFocusCapture={() => setBannerPaused(true)}
               onBlurCapture={() => setBannerPaused(false)}
             >
-              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
-                <ResilientImage
-                  key={currentSlide.id}
-                  src={currentSlide.imageUrl}
-                  fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
-                  alt={
-                    currentSlide.alt ||
-                    currentSlide.caption ||
-                    'Pabna University of Science and Technology campus banner'
-                  }
-                  containerClassName="w-full h-full"
-                  frameClassName="bg-slate-900"
-                  className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
-                  priority
-                />
+              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900 shadow-sm">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentSlide.id}
+                    initial={{ opacity: 0.35, scale: 1.01 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0.35 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full h-full"
+                  >
+                    <ResilientImage
+                      src={currentSlide.imageUrl}
+                      fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
+                      alt={
+                        currentSlide.alt ||
+                        currentSlide.caption ||
+                        'Pabna University of Science and Technology campus banner'
+                      }
+                      containerClassName="w-full h-full"
+                      frameClassName="bg-slate-900"
+                      className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
+                      priority
+                    />
+                  </motion.div>
+                </AnimatePresence>
 
                 <EditTriggerButton
                   target={{ kind: 'banner', slideId: currentSlide.id }}
@@ -360,32 +392,33 @@ export function HomePage({
 
           {/* Operational Utility Ribbon */}
           <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-            <div className="px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200">
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Established</dt>
+            <div className="card-gradient-crimson px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200 transition-colors">
+              <dt className="text-xs uppercase tracking-wider text-pust-800 font-medium">Established</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
                 {profile?.establishedYear ?? 2008} · Act No. 43 of 2001
               </dd>
             </div>
-            <div className="px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200">
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Academic Scope</dt>
+            <div className="card-gradient-lapis px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200 transition-colors">
+              <dt className="text-xs uppercase tracking-wider text-lapis-800 font-medium">Academic Scope</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
                 {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21} Departments
               </dd>
             </div>
-            <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200">
-              <dt className="text-xs uppercase tracking-wider text-slate-500">Community</dt>
+            <div className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors">
+              <dt className="text-xs uppercase tracking-wider text-gold-800 font-medium">Community</dt>
               <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
                 {profile?.facultyMembersCount ?? 185} Faculty · ~{profile?.studentsCount?.toLocaleString() ?? '4,800'} Students
               </dd>
             </div>
-            <div className="bg-pust-950 hover:bg-pust-900 text-white transition-colors">
+            <div className="bg-pust-950 hover:bg-pust-900 text-white transition-colors group">
               <Link href="/verify" className="block h-full px-5 py-4">
                 <dt className="text-xs uppercase tracking-wider text-pust-200 flex items-center justify-between">
                   <span>Public Registry</span>
-                  <FileCheck2 className="w-3.5 h-3.5" />
+                  <FileCheck2 className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110" />
                 </dt>
-                <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1">
-                  Verify Certificates &amp; Receipts →
+                <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1 flex items-center gap-1">
+                  <span>Verify Certificates &amp; Receipts</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                 </dd>
               </Link>
             </div>
@@ -400,8 +433,9 @@ export function HomePage({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Credentials & Welcome Message */}
-          <article className="editable-region rounded-2xl bg-[#FAF8F4] border border-slate-200 overflow-hidden shadow-xs">
-            <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          <MotionReveal>
+            <article className="editable-region rounded-2xl card-gradient-parchment border border-slate-200 overflow-hidden shadow-xs hover:border-pust-600/35 hover:shadow-md transition-all duration-200">
+              <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
               {/* Portrait & Office Info (Left Column inside the Card) */}
               <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
                 <div className="space-y-5">
@@ -503,10 +537,11 @@ export function HomePage({
               </div>
             </div>
           </article>
+          </MotionReveal>
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-slate-200 bg-[#F7F7F5] overflow-hidden">
-            <div className="px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="editable-region rounded-2xl border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
+            <div className="px-6 py-4 bg-white/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
                   Institutional Leadership Archive · 2008 – Present
@@ -526,11 +561,11 @@ export function HomePage({
                   type="button"
                   onClick={() => setShowPreviousVcs((prev) => !prev)}
                   aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-[#FAF8F4] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 hover:bg-pust-50/60 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {showPreviousVcs ? 'Hide History' : 'Show History'}
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform ${
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
                       showPreviousVcs ? 'rotate-180' : ''
                     }`}
                   />
@@ -538,89 +573,109 @@ export function HomePage({
               </div>
             </div>
 
-            {showPreviousVcs && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
-                {previousVcs.map((vc, idx) => (
-                  <div key={vc.id} className="bg-white p-5 space-y-2 flex flex-col justify-between">
-                    <div className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
-                          {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                        </span>
-                        <EditTriggerButton
-                          target={{ kind: 'vc', vcId: vc.id }}
-                          label="Edit"
-                          variant="compact"
-                        />
+            <AnimatePresence initial={false}>
+              {showPreviousVcs && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  {previousVcs.map((vc, idx) => (
+                    <MotionCard
+                      key={vc.id}
+                      delay={idx * 0.03}
+                      className="card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
+                            {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                          </span>
+                          <EditTriggerButton
+                            target={{ kind: 'vc', vcId: vc.id }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
+                        <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                          {vc.name}
+                        </h4>
+                        <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                          {vc.title}
+                        </p>
+                        <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
                       </div>
-                      <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                        {vc.name}
-                      </h4>
-                      <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                        {vc.title}
-                      </p>
-                      <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                    </MotionCard>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* About PUST Brief & Sub-Topic Links */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-4 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                    About PUST
-                  </p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
-                    {ourUniversity?.title || 'Our University'}
-                  </h3>
+          <MotionReveal>
+            <div className="rounded-2xl border border-gold-200/80 card-gradient-gold p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start shadow-xs hover:border-gold-600/40 hover:shadow-md transition-all duration-200">
+              <div className="lg:col-span-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
+                      About PUST
+                    </p>
+                    <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
+                      {ourUniversity?.title || 'Our University'}
+                    </h3>
+                  </div>
+                  <EditTriggerButton
+                    target={{ kind: 'about', slug: 'our-university' }}
+                    label="Edit About"
+                    variant="compact"
+                  />
                 </div>
-                <EditTriggerButton
-                  target={{ kind: 'about', slug: 'our-university' }}
-                  label="Edit About"
-                  variant="compact"
-                />
+                <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1 text-xs font-semibold">
+                  <Link
+                    href="/about/our-university"
+                    className="text-pust-900 hover:underline whitespace-nowrap"
+                  >
+                    Our University →
+                  </Link>
+                  <Link
+                    href="/about/mission-vision"
+                    className="text-slate-700 hover:text-pust-900 transition-colors whitespace-nowrap"
+                  >
+                    Mission &amp; Vision
+                  </Link>
+                  <Link
+                    href="/about/history"
+                    className="text-slate-700 hover:text-pust-900 transition-colors whitespace-nowrap"
+                  >
+                    History
+                  </Link>
+                  <Link
+                    href="/about/plans"
+                    className="text-slate-700 hover:text-pust-900 transition-colors whitespace-nowrap"
+                  >
+                    Strategic Plans
+                  </Link>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1 text-xs font-semibold">
-                <Link
-                  href="/about/our-university"
-                  className="text-pust-900 hover:underline whitespace-nowrap"
-                >
-                  Our University →
-                </Link>
-                <Link
-                  href="/about/mission-vision"
-                  className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
-                >
-                  Mission &amp; Vision
-                </Link>
-                <Link
-                  href="/about/history"
-                  className="text-slate-700 hover:text-pust-900 whitespace-nowrap"
-                >
-                  History and Plans
-                </Link>
+              <div className="lg:col-span-8 space-y-3">
+                {ourUniversity ? (
+                  <p className="text-sm leading-relaxed text-slate-700 line-clamp-3">
+                    {ourUniversity.body}
+                  </p>
+                ) : (
+                  <HeroSummarySkeleton />
+                )}
+                {missionVision && (
+                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 pt-3 border-t border-gold-200/70">
+                    {missionVision.body.replace(/^Our Mission\s*\n/i, '')}
+                  </p>
+                )}
               </div>
             </div>
-            <div className="lg:col-span-8 space-y-3">
-              {ourUniversity ? (
-                <p className="text-sm leading-relaxed text-slate-600 line-clamp-3">
-                  {ourUniversity.body}
-                </p>
-              ) : (
-                <HeroSummarySkeleton />
-              )}
-              {missionVision && (
-                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 pt-3 border-t border-slate-200">
-                  {missionVision.body.replace(/^Our Mission\s*\n/i, '')}
-                </p>
-              )}
-            </div>
-          </div>
+          </MotionReveal>
         </div>
       </section>
 
@@ -674,103 +729,107 @@ export function HomePage({
               ))}
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-              <div className="divide-y divide-slate-200">
-                {featuredNotices.length === 0 ? (
-                  <div className="p-8 text-center space-y-3">
-                    <p className="text-sm text-slate-600">
-                      No circulars currently listed under{' '}
-                      <span className="font-medium text-slate-900">{noticeCategory}</span>.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setNoticeCategory('All')}
-                      className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
-                    >
-                      Show All Circulars
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {leadNotice && (
-                      <div
-                        key={leadNotice.id}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => onSelectNotice(leadNotice)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            onSelectNotice(leadNotice);
-                          }
-                        }}
-                        className="w-full text-left p-6 bg-pust-50/35 hover:bg-pust-50/70 transition-colors space-y-2 group cursor-pointer"
+            {loadingData && notices.length === 0 ? (
+              <NoticeListSkeleton rows={4} />
+            ) : (
+              <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+                <div className="divide-y divide-slate-200">
+                  {featuredNotices.length === 0 ? (
+                    <div className="p-8 text-center space-y-3">
+                      <p className="text-sm text-slate-600">
+                        No circulars currently listed under{' '}
+                        <span className="font-medium text-slate-900">{noticeCategory}</span>.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setNoticeCategory('All')}
+                        className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="font-mono text-xs text-slate-500 tabular-nums">
-                            {leadNotice.publishedAt} ·{' '}
-                            <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
-                            {leadNotice.referenceNo}
-                            {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
-                          </p>
-                          <EditTriggerButton
-                            target={{ kind: 'notice', notice: leadNotice }}
-                            label="Edit"
-                            variant="compact"
-                          />
+                        Show All Circulars
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {leadNotice && (
+                        <div
+                          key={leadNotice.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onSelectNotice(leadNotice)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectNotice(leadNotice);
+                            }
+                          }}
+                          className="w-full text-left p-6 card-gradient-crimson hover:brightness-[0.985] transition-all space-y-2 group cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-mono text-xs text-slate-500 tabular-nums">
+                              {leadNotice.publishedAt} ·{' '}
+                              <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
+                              {leadNotice.referenceNo}
+                              {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
+                            </p>
+                            <EditTriggerButton
+                              target={{ kind: 'notice', notice: leadNotice }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
+                          <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                            {leadNotice.title}
+                          </h3>
+                          <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
                         </div>
-                        <h3 className="font-serif text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
-                          {leadNotice.title}
-                        </h3>
-                        <p className="text-sm text-slate-600 leading-relaxed">{leadNotice.summary}</p>
-                      </div>
-                    )}
+                      )}
 
-                    {secondaryNotices.map((notice) => (
-                      <div
-                        key={notice.id}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => onSelectNotice(notice)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            onSelectNotice(notice);
-                          }
-                        }}
-                        className="w-full text-left px-6 py-4 hover:bg-slate-50 transition-colors space-y-1 group cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="font-mono text-xs text-slate-500 tabular-nums">
-                            {notice.publishedAt} ·{' '}
-                            <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
-                            {notice.referenceNo}
-                            {notice.visibility === 'registered' && ' · Campus Members Only'}
+                      {secondaryNotices.map((notice) => (
+                        <div
+                          key={notice.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onSelectNotice(notice)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onSelectNotice(notice);
+                            }
+                          }}
+                          className="w-full text-left px-6 py-4 hover:bg-pust-50/45 transition-colors space-y-1 group cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-mono text-xs text-slate-500 tabular-nums">
+                              {notice.publishedAt} ·{' '}
+                              <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
+                              {notice.referenceNo}
+                              {notice.visibility === 'registered' && ' · Campus Members Only'}
+                            </p>
+                            <EditTriggerButton
+                              target={{ kind: 'notice', notice }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
+                          <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                            {notice.title}
+                          </h3>
+                          <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
+                            {notice.summary}
                           </p>
-                          <EditTriggerButton
-                            target={{ kind: 'notice', notice }}
-                            label="Edit"
-                            variant="compact"
-                          />
                         </div>
-                        <h3 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
-                          {notice.title}
-                        </h3>
-                        <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
-                          {notice.summary}
-                        </p>
-                      </div>
-                    ))}
-                  </>
-                )}
+                      ))}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="editable-region lg:col-span-5 space-y-5">
             <div className="pb-4 border-b border-slate-200 flex items-end justify-between gap-3">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-lapis-700">
                   {institutionalLinksEyebrow}
                 </p>
                 <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
@@ -784,21 +843,21 @@ export function HomePage({
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-              <div className="divide-y divide-slate-200">
+            <div className="rounded-2xl border border-lapis-200/80 card-gradient-lapis shadow-xs overflow-hidden">
+              <div className="divide-y divide-lapis-200/60">
                 {institutionalLinks.map((item) => (
                   <Link
                     key={item.id}
                     href={item.route}
-                    className="w-full text-left px-5 py-4 hover:bg-pust-50/40 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+                    className="w-full text-left px-5 py-4 hover:bg-white/75 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
                   >
                     <div>
-                      <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                      <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-lapis-800 transition-colors">
                         {item.title}
                       </h3>
                       <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{item.desc}</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 transition-colors" />
+                    <ArrowRight className="w-4 h-4 text-lapis-600/70 group-hover:text-lapis-800 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
                   </Link>
                 ))}
               </div>
@@ -864,9 +923,12 @@ export function HomePage({
                 </p>
               ) : (
                 visiblePublications.map((pub) => (
-                  <article key={pub.id} className="py-4 space-y-1.5">
+                  <article
+                    key={pub.id}
+                    className="py-4 px-2 -mx-2 rounded-xl hover:bg-lapis-50/55 transition-colors space-y-1.5"
+                  >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      <p className="font-mono text-xs text-lapis-700 tabular-nums">
                         {pub.departmentCode} · {pub.domain} · {pub.year}
                       </p>
                       <EditTriggerButton
@@ -888,10 +950,10 @@ export function HomePage({
           </div>
 
           {/* Official PUST Journals Sidebar */}
-          <aside className="lg:col-span-5 rounded-2xl border border-slate-200 bg-[#FAF8F4] p-6 sm:p-7 space-y-5">
-            <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+          <aside className="lg:col-span-5 rounded-2xl border border-gold-200/80 card-gradient-gold p-6 sm:p-7 space-y-5 shadow-xs hover:border-gold-600/40 transition-colors">
+            <div className="flex items-end justify-between gap-4 border-b border-gold-200/70 pb-4">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
                   University Periodicals
                 </p>
                 <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -913,7 +975,7 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="divide-y divide-slate-200">
+            <div className="divide-y divide-gold-200/60">
               {(profile?.journals ?? []).map((journal) => (
                 <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
                   <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
@@ -921,7 +983,7 @@ export function HomePage({
                     {journal.title}
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{journal.scope}</p>
-                  <p className="text-xs font-semibold text-pust-800">{journal.currentIssue}</p>
+                  <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
                 </div>
               ))}
             </div>
@@ -968,75 +1030,86 @@ export function HomePage({
               />
               <Link
                 href="/gallery"
-                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0 group"
               >
                 Full Archive
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visibleEvents.slice(0, 4).map((item) => {
-              const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
-              const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
-              return (
-                <div
-                  key={item.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setActiveMedia(item)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setActiveMedia(item);
-                    }
-                  }}
-                  className="text-left rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden"
-                >
-                  <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
-                    <ResilientImage
-                      src={thumbUrl}
-                      fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
-                      alt={item.title}
-                      containerClassName="w-full h-full"
-                      frameClassName="bg-slate-900"
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                    />
-                    <EditTriggerButton
-                      target={{ kind: 'gallery', item }}
-                      label="Edit"
-                      variant="overlay"
-                      className="absolute top-2.5 right-2.5 z-10"
-                    />
-                    {item.mediaType === 'video' && (
-                      <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white pointer-events-none">
-                        <PlayCircle className="w-10 h-10" />
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4 space-y-1 flex-1">
-                    <p className="font-mono text-[11px] text-pust-800 tabular-nums">
-                      {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
-                      {item.eventDate}
-                      {item.visibility === 'registered' && (
-                        <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+          {loadingData && galleryItems.length === 0 ? (
+            <MediaGridSkeleton count={4} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {visibleEvents.slice(0, 4).map((item, idx) => {
+                const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+                const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+                return (
+                  <MotionCard
+                    key={item.id}
+                    delay={idx * 0.04}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setActiveMedia(item)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveMedia(item);
+                      }
+                    }}
+                    className={`text-left rounded-2xl border border-slate-200 ${getEventGradientClass(
+                      item.category
+                    )} shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col overflow-hidden`}
+                  >
+                    <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
+                      <ResilientImage
+                        src={thumbUrl}
+                        fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
+                        alt={item.title}
+                        containerClassName="w-full h-full"
+                        frameClassName="bg-slate-900"
+                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300"
+                      />
+                      <EditTriggerButton
+                        target={{ kind: 'gallery', item }}
+                        label="Edit"
+                        variant="overlay"
+                        className="absolute top-2.5 right-2.5 z-10"
+                      />
+                      {item.mediaType === 'video' && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white pointer-events-none">
+                          <PlayCircle className="w-10 h-10 transition-transform duration-200 group-hover:scale-110" />
+                        </span>
                       )}
-                    </p>
-                    <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                    </div>
+                    <div className="p-4 space-y-1 flex-1">
+                      <p
+                        className={`font-mono text-[11px] tabular-nums font-medium ${getEventAccentClass(
+                          item.category
+                        )}`}
+                      >
+                        {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
+                        {item.eventDate}
+                        {item.visibility === 'registered' && (
+                          <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+                        )}
+                      </p>
+                      <h3 className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-slate-600 line-clamp-2">{item.description}</p>
+                    </div>
+                  </MotionCard>
+                );
+              })}
+            </div>
+          )}
 
           {/* Scheduled University Seminars & Milestones */}
-          <div className="editable-region rounded-2xl border border-slate-200 bg-white overflow-hidden">
-            <div className="px-6 py-4 bg-[#FAF8F4] border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+          <div className="editable-region rounded-2xl border border-sage-200/80 card-gradient-sage overflow-hidden shadow-xs">
+            <div className="px-6 py-4 bg-white/80 border-b border-sage-200/70 flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-xs uppercase tracking-widest text-sage-800">
                 Upcoming Seminars, Workshops &amp; Academic Milestones
               </p>
               <div className="flex items-center gap-3">
@@ -1047,16 +1120,19 @@ export function HomePage({
                 />
                 <Link
                   href="/academics/seminars"
-                  className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap"
+                  className="text-xs font-semibold text-sage-800 hover:text-pust-900 hover:underline whitespace-nowrap"
                 >
                   All Seminars &amp; Workshops →
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-sage-200/70">
               {upcomingSeminars.map((ev) => (
-                <div key={ev.id} className="p-5 space-y-1.5">
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
+                <div
+                  key={ev.id}
+                  className="p-5 space-y-1.5 hover:bg-white/60 transition-colors"
+                >
+                  <p className="font-mono text-xs text-sage-700 tabular-nums">
                     {ev.date} · {ev.organizer}
                   </p>
                   <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">

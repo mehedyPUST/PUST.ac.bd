@@ -3,9 +3,11 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Copy, Mail, Phone, Search, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -329,8 +331,9 @@ export function AdministrationSection({
       <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Office Dossier & Welcome Address */}
-          <article className="editable-region rounded-2xl bg-[#FAF8F4] border border-slate-200 overflow-hidden shadow-xs">
-            <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          <MotionReveal>
+            <article className="editable-region rounded-2xl card-gradient-parchment border border-slate-200 overflow-hidden shadow-xs hover:border-pust-600/35 hover:shadow-md transition-all duration-200">
+              <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
               {/* Portrait & Desk Dossier (Left Column inside Card) */}
               <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 space-y-6">
                 <div className="max-w-[260px] mx-auto lg:max-w-none">
@@ -428,10 +431,11 @@ export function AdministrationSection({
               </div>
             </div>
           </article>
+          </MotionReveal>
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-slate-200 bg-[#F7F7F5] overflow-hidden">
-            <div className="px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="editable-region rounded-2xl border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
+            <div className="px-6 py-4 bg-white/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
                   Institutional Leadership Archive · 2008 – Present
@@ -451,11 +455,11 @@ export function AdministrationSection({
                   type="button"
                   onClick={() => setShowPreviousVcs((prev) => !prev)}
                   aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-[#FAF8F4] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 hover:bg-pust-50/60 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {showPreviousVcs ? 'Hide History' : 'Show History'}
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform ${
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
                       showPreviousVcs ? 'rotate-180' : ''
                     }`}
                   />
@@ -463,33 +467,45 @@ export function AdministrationSection({
               </div>
             </div>
 
-            {showPreviousVcs && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
-                {previousVcs.map((vc, idx) => (
-                  <div key={vc.id} className="bg-white p-5 space-y-2 flex flex-col justify-between">
-                    <div className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
-                          {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                        </span>
-                        <EditTriggerButton
-                          target={{ kind: 'vc', vcId: vc.id }}
-                          label="Edit"
-                          variant="compact"
-                        />
+            <AnimatePresence initial={false}>
+              {showPreviousVcs && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  {previousVcs.map((vc, idx) => (
+                    <MotionCard
+                      key={vc.id}
+                      delay={idx * 0.03}
+                      className="card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
+                            {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                          </span>
+                          <EditTriggerButton
+                            target={{ kind: 'vc', vcId: vc.id }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
+                        <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                          {vc.name}
+                        </h4>
+                        <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                          {vc.title}
+                        </p>
+                        <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
                       </div>
-                      <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                        {vc.name}
-                      </h4>
-                      <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                        {vc.title}
-                      </p>
-                      <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                    </MotionCard>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </section>
@@ -724,17 +740,21 @@ export function AdministrationSection({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredUnits.map((unit) => {
+            {filteredUnits.map((unit, idx) => {
               const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
+              const unitGradient = matchesRoute
+                ? 'card-gradient-crimson border-pust-700/70'
+                : unit.category === 'Statutory Governance'
+                ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
+                : unit.category === 'Specialized Cell & Institute'
+                ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
+                : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50';
 
               return (
-                <div
+                <MotionCard
                   key={unit.code}
-                  className={`p-6 rounded-xl border space-y-2.5 transition-colors ${
-                    matchesRoute
-                      ? 'border-pust-800 bg-pust-50/70'
-                      : 'border-slate-200 bg-white hover:border-pust-700/50'
-                  }`}
+                  delay={idx * 0.025}
+                  className={`p-6 rounded-2xl border space-y-2.5 shadow-xs hover:shadow-md transition-all ${unitGradient}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-mono text-xs text-pust-800">
@@ -748,7 +768,7 @@ export function AdministrationSection({
                   </div>
                   <h3 className="font-serif text-lg font-medium text-slate-900">{unit.name}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">{unit.description}</p>
-                </div>
+                </MotionCard>
               );
             })}
           </div>

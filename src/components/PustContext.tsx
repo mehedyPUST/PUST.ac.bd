@@ -14,6 +14,7 @@ import { MotionConfig } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
 import { parseRouteFromPath, type AppRoute } from '../lib/routes';
+import { PageReveal } from './MotionPrimitives';
 import { OfflineIndicator, PwaRegistrar } from './PwaManager';
 import type {
   AboutContentRecord,
@@ -481,7 +482,7 @@ export function PustShell({
   );
 
   return (
-    <SkeletonTheme baseColor="#E2E8F0" highlightColor="#F8FAFC" borderRadius={8}>
+    <SkeletonTheme baseColor="#EAE4D8" highlightColor="#FBF9F5" borderRadius={8}>
       <MotionConfig reducedMotion="user">
         <PustContext.Provider value={value}>
           <div
@@ -498,7 +499,9 @@ export function PustShell({
               onNavigate={navigateTo}
             />
             <Breadcrumb />
-            <div className="flex-1 flex flex-col">{children}</div>
+            <div className="flex-1 flex flex-col">
+              <PageReveal routeKey={route}>{children}</PageReveal>
+            </div>
             <Footer onNavigate={navigateTo} />
           </div>
 

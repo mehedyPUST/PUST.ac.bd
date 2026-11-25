@@ -8,6 +8,7 @@ import type { AppRoute } from '../lib/routes';
 import type { GovernanceTabKind } from '../types/pust';
 import { CgpaCalculator } from './CgpaCalculator';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 
 interface GovernanceSectionProps {
@@ -143,9 +144,9 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 <p className="text-base leading-[1.8] text-slate-700">
                   {governanceContent.actIntro}
                 </p>
-                <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-[#F7F7F5] overflow-hidden">
+                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 card-gradient-parchment overflow-hidden shadow-xs">
                   {governanceContent.actClauses.map((item, idx) => (
-                    <div key={`${item.clause}-${idx}`} className="p-5 space-y-1.5">
+                    <div key={`${item.clause}-${idx}`} className="p-5 space-y-1.5 hover:bg-white/60 transition-colors">
                       <p className="font-mono text-xs font-semibold text-pust-800">{item.clause}</p>
                       <p className="text-sm text-slate-700 leading-relaxed">{item.detail}</p>
                     </div>
@@ -153,7 +154,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 </div>
               </div>
 
-              <aside className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <aside className="lg:col-span-5 card-gradient-crimson rounded-2xl border border-pust-200/80 shadow-xs overflow-hidden hover:border-pust-600/40 transition-colors">
                 <div className="p-6 space-y-5">
                   <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                     Official Bangladesh Laws Citation
@@ -281,7 +282,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 </div>
               </div>
 
-              <div className="lg:col-span-5 space-y-4 bg-[#F7F7F5] rounded-2xl border border-slate-200 p-6">
+              <MotionReveal className="lg:col-span-5 space-y-4 card-gradient-gold rounded-2xl border border-gold-200/80 p-6 shadow-xs">
                 <h2 className="font-serif text-xl font-medium text-slate-900">
                   Core Executive Functions
                 </h2>
@@ -290,7 +291,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     <li key={idx}>{fn}</li>
                   ))}
                 </ul>
-              </div>
+              </MotionReveal>
             </div>
           </div>
         )}
@@ -306,22 +307,23 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {governanceContent.academicCouncilCards.map((card, idx) => (
-                  <div
+                  <MotionCard
                     key={`${card.title}-${idx}`}
-                    className="p-5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-1.5"
+                    delay={idx * 0.04}
+                    className="p-5 rounded-2xl border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/45 hover:shadow-md space-y-1.5 transition-all"
                   >
                     <h3 className="font-serif text-lg font-medium text-slate-900">{card.title}</h3>
                     <p className="text-xs text-slate-600 leading-relaxed">{card.detail}</p>
-                  </div>
+                  </MotionCard>
                 ))}
               </div>
             </div>
 
-            <div className="lg:col-span-5 rounded-2xl border border-slate-200 bg-white p-6 space-y-4 shadow-xs">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <div className="lg:col-span-5 rounded-2xl border border-gold-200/80 card-gradient-gold p-6 space-y-4 shadow-xs">
+              <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
                 Council Structure
               </p>
-              <dl className="divide-y divide-slate-200 text-sm">
+              <dl className="divide-y divide-gold-200/60 text-sm">
                 {governanceContent.academicCouncilStructure.map((row, idx) => (
                   <div
                     key={`${row.label}-${idx}`}
@@ -351,9 +353,9 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <p className="text-base leading-[1.8] text-slate-700">
                 {governanceContent.financeCommitteeIntro}
               </p>
-              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden">
+              <div className="rounded-2xl divide-y divide-sage-200/70 border border-sage-200/80 card-gradient-sage overflow-hidden shadow-xs">
                 {governanceContent.financeCommitteeScopes.map((item, idx) => (
-                  <div key={`${item.scope}-${idx}`} className="p-5 space-y-1">
+                  <div key={`${item.scope}-${idx}`} className="p-5 space-y-1 hover:bg-white/60 transition-colors">
                     <p className="font-serif text-lg font-medium text-slate-900">{item.scope}</p>
                     <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                   </div>
@@ -361,7 +363,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </div>
             </div>
 
-            <div className="lg:col-span-5 bg-[#F7F7F5] rounded-2xl border border-slate-200 p-6 space-y-4">
+            <div className="lg:col-span-5 card-gradient-parchment rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Committee Leadership
               </p>

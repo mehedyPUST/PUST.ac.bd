@@ -17,6 +17,33 @@
   --color-pust-800: #6A0000;
   --color-pust-900: #520000;
   --color-pust-950: #380000;
+
+  /* Academic Heritage Gold (Convocation, Honors & Institutional Crest) */
+  --color-gold-50: #FFFBF0;
+  --color-gold-100: #FEF1D1;
+  --color-gold-200: #FCE2A3;
+  --color-gold-600: #B45309;
+  --color-gold-700: #92400E;
+  --color-gold-800: #78350F;
+  --color-gold-900: #5C280B;
+
+  /* Academic Lapis (Science, Engineering & Research) */
+  --color-lapis-50: #F4F7FF;
+  --color-lapis-100: #E5EEFF;
+  --color-lapis-200: #C9DCFD;
+  --color-lapis-600: #1D4ED8;
+  --color-lapis-700: #1E40AF;
+  --color-lapis-800: #1E3A8A;
+  --color-lapis-900: #172554;
+
+  /* Rajapur Campus Sage (Grounds, Library, Wellness & Sustainability) */
+  --color-sage-50: #F3FBF7;
+  --color-sage-100: #E0F4E9;
+  --color-sage-200: #BEE6D0;
+  --color-sage-600: #15803D;
+  --color-sage-700: #166534;
+  --color-sage-800: #14532D;
+  --color-sage-900: #0F3D21;
 }
 
 @layer base {
@@ -33,6 +60,38 @@
   h1, h2, h3 {
     text-wrap: balance;
   }
+}
+
+/* Single-color light gradient surfaces for cards (high contrast, subtle hue wash) */
+.card-gradient-crimson {
+  background: linear-gradient(145deg, #ffffff 0%, #fef6f6 52%, #fae8e8 100%);
+}
+
+.card-gradient-gold {
+  background: linear-gradient(145deg, #ffffff 0%, #fffcf2 52%, #fdf0d2 100%);
+}
+
+.card-gradient-lapis {
+  background: linear-gradient(145deg, #ffffff 0%, #f5f8ff 52%, #e7effe 100%);
+}
+
+.card-gradient-sage {
+  background: linear-gradient(145deg, #ffffff 0%, #f4fbf7 52%, #e3f4ea 100%);
+}
+
+.card-gradient-parchment {
+  background: linear-gradient(145deg, #ffffff 0%, #fbf9f4 55%, #f3ece0 100%);
+}
+
+.card-hover-lift {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -10px rgba(15, 23, 42, 0.12), 0 4px 10px -6px rgba(106, 0, 0, 0.08);
 }
 
 .prose-justify {

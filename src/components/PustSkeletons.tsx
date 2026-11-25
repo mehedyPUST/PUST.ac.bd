@@ -8,15 +8,52 @@ export function CardsGridSkeleton({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, idx) => (
         <div
           key={idx}
-          className="bg-white rounded-xl border border-slate-200 p-6 space-y-3"
+          className="card-gradient-lapis rounded-2xl border border-lapis-200/70 p-6 space-y-3 shadow-xs"
         >
           <Skeleton width="42%" height={12} />
           <Skeleton width="82%" height={22} />
           <Skeleton count={2} height={13} />
-          <div className="pt-2 flex justify-between">
+          <div className="pt-2 flex justify-between border-t border-slate-200/60">
             <Skeleton width={90} height={12} />
             <Skeleton width={60} height={12} />
           </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function MediaGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: count }).map((_, idx) => (
+        <div
+          key={idx}
+          className="card-gradient-parchment rounded-2xl border border-slate-200 overflow-hidden shadow-xs"
+        >
+          <Skeleton height={210} borderRadius={0} />
+          <div className="p-4 space-y-2">
+            <Skeleton width="55%" height={11} />
+            <Skeleton width="88%" height={18} />
+            <Skeleton count={2} height={12} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function NoticeListSkeleton({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
+      {Array.from({ length: rows }).map((_, idx) => (
+        <div key={idx} className="p-5 space-y-2.5">
+          <div className="flex justify-between gap-4">
+            <Skeleton width="46%" height={12} />
+            <Skeleton width={70} height={12} />
+          </div>
+          <Skeleton width="78%" height={20} />
+          <Skeleton width="92%" height={13} />
         </div>
       ))}
     </div>
@@ -32,7 +69,7 @@ export function PageHeaderAndSectionSkeleton() {
         <Skeleton width="70%" height={16} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+        <div className="lg:col-span-5 card-gradient-parchment rounded-2xl border border-slate-200 p-6 space-y-4">
           <Skeleton height={240} />
           <Skeleton width="65%" height={22} />
           <Skeleton count={3} height={13} />
@@ -48,12 +85,12 @@ export function PageHeaderAndSectionSkeleton() {
 export function PortalRecordsSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-3">
+      <div className="card-gradient-parchment rounded-2xl border border-slate-200 p-6 space-y-3">
         <Skeleton width={160} height={12} />
         <Skeleton width="45%" height={24} />
         <Skeleton width="80%" height={14} />
       </div>
-      <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white overflow-hidden">
         {Array.from({ length: rows }).map((_, idx) => (
           <div key={idx} className="p-4 space-y-2">
             <div className="flex justify-between gap-4">
@@ -70,7 +107,7 @@ export function PortalRecordsSkeleton({ rows = 3 }: { rows?: number }) {
 
 export function HeroSummarySkeleton() {
   return (
-    <div className="space-y-4 bg-white rounded-xl border border-slate-200 p-6">
+    <div className="space-y-4 card-gradient-gold rounded-2xl border border-gold-200/70 p-6">
       <Skeleton width="38%" height={12} />
       <Skeleton width="76%" height={28} />
       <Skeleton count={3} height={14} />

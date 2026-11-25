@@ -32,7 +32,12 @@ import type { AppRoute } from '../lib/routes';
 import { AcademicCalendarHighlights, AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
-import { CardsGridSkeleton } from './PustSkeletons';
+import { MotionCard } from './MotionPrimitives';
+import {
+  CardsGridSkeleton,
+  MediaGridSkeleton,
+  NoticeListSkeleton,
+} from './PustSkeletons';
 import { PustCrest } from './PustCrest';
 import { ResearchSection } from './ResearchSection';
 import { ResilientImage } from './ResilientImage';
@@ -434,7 +439,7 @@ export function PublicSubPages({
                         <h2 className="font-serif text-2xl font-medium text-slate-900">
                           Our Vision
                         </h2>
-                        <blockquote className="rounded-2xl border border-pust-200 bg-pust-50/50 p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-900">
+                        <blockquote className="rounded-2xl border border-gold-200/80 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-900 shadow-xs">
                           {visionPart}
                         </blockquote>
                       </div>
@@ -468,7 +473,7 @@ export function PublicSubPages({
                     className="w-full aspect-[4/3] object-cover"
                   />
                 </div>
-                <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
+                <dl className="rounded-2xl border border-slate-200 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
                   <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                     <dt className="text-slate-600">Established</dt>
                     <dd className="font-mono font-medium sm:text-right">
@@ -517,16 +522,28 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px rounded-2xl border border-slate-200 bg-slate-200 overflow-hidden">
-                {resolved.aboutExtras.milestones.map((m, idx) => (
-                  <div key={`${m.year}-${idx}`} className="p-5 space-y-1.5 bg-[#F7F7F5]">
-                    <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
-                      {m.year}
-                    </p>
-                    <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
-                    <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {resolved.aboutExtras.milestones.map((m, idx) => {
+                  const milestoneStyle =
+                    idx === 0 || idx === 1
+                      ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                      : idx === 2 || idx === 3
+                      ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                      : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45';
+                  return (
+                    <MotionCard
+                      key={`${m.year}-${idx}`}
+                      delay={idx * 0.04}
+                      className={`p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
+                    >
+                      <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
+                        {m.year}
+                      </p>
+                      <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
+                      <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
+                    </MotionCard>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -590,16 +607,21 @@ export function PublicSubPages({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {resolved.academicExtras.degreePrograms.map((prog, idx) => (
-                  <div
+                  <MotionCard
                     key={`${prog.level}-${idx}`}
-                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-3"
+                    delay={idx * 0.04}
+                    className={`p-6 rounded-2xl border space-y-3 shadow-xs hover:shadow-md transition-all ${
+                      idx % 2 === 0
+                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                        : 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                    }`}
                   >
                     <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
                       {prog.duration}
                     </p>
                     <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
                     <p className="text-sm font-medium text-slate-800">{prog.degrees}</p>
-                    <dl className="pt-3 border-t border-slate-200 space-y-1.5 text-xs">
+                    <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
                       <div className="flex justify-between gap-4">
                         <dt className="text-slate-500">Credit Structure</dt>
                         <dd className="font-mono text-slate-900">{prog.credits}</dd>
@@ -609,7 +631,7 @@ export function PublicSubPages({
                         <dd className="text-right text-slate-800">{prog.entry}</dd>
                       </div>
                     </dl>
-                  </div>
+                  </MotionCard>
                 ))}
               </div>
               <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
@@ -796,13 +818,14 @@ export function PublicSubPages({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {resolved.academicExtras.scholarships.map((s, idx) => (
-                  <div
+                  <MotionCard
                     key={`${s.title}-${idx}`}
-                    className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
+                    delay={idx * 0.04}
+                    className="p-6 rounded-2xl border border-gold-200/80 card-gradient-gold hover:border-gold-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
                   >
                     <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
                     <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
-                  </div>
+                  </MotionCard>
                 ))}
               </div>
             </div>
@@ -879,12 +902,13 @@ export function PublicSubPages({
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resolved.academicExtras.facultyDeans.map((d) => {
+                {resolved.academicExtras.facultyDeans.map((d, idx) => {
                   const isCopied = copiedContact === d.email;
                   return (
-                    <div
+                    <MotionCard
                       key={d.faculty}
-                      className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
+                      delay={idx * 0.04}
+                      className="p-6 rounded-2xl border border-pust-200/80 card-gradient-crimson hover:border-pust-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
                     >
                       <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
                         {d.faculty}
@@ -918,7 +942,7 @@ export function PublicSubPages({
                         </button>
                       </div>
                       <p className="text-xs text-slate-600 pt-1">Departments: {d.depts}</p>
-                    </div>
+                    </MotionCard>
                   );
                 })}
               </div>
@@ -1110,49 +1134,63 @@ export function PublicSubPages({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filteredDepartments.map((dept) => (
-                    <div
-                      key={dept.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => onSelectDepartment(dept)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onSelectDepartment(dept);
-                        }
-                      }}
-                      className="text-left rounded-2xl border border-slate-200 bg-white shadow-xs hover:shadow-md hover:border-pust-700/60 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
-                    >
-                      <div className="p-6 flex-1 flex flex-col justify-between gap-4">
-                        <div>
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="font-mono text-xs text-pust-800 tabular-nums">
-                              {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
+                  {filteredDepartments.map((dept, idx) => {
+                    const deptGradient =
+                      dept.faculty === 'Faculty of Engineering and Technology'
+                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
+                        : dept.faculty === 'Faculty of Science'
+                        ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
+                        : dept.faculty === 'Faculty of Business Studies'
+                        ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
+                        : dept.faculty === 'Faculty of Humanities and Social Science'
+                        ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/50'
+                        : 'card-gradient-parchment border-slate-200 hover:border-sage-600/50';
+                    return (
+                      <MotionCard
+                        key={dept.id}
+                        delay={(idx % 6) * 0.03}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => onSelectDepartment(dept)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSelectDepartment(dept);
+                          }
+                        }}
+                        className={`text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group cursor-pointer`}
+                      >
+                        <div className="p-6 flex-1 flex flex-col justify-between gap-4">
+                          <div>
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="font-mono text-xs text-pust-800 tabular-nums">
+                                {dept.code} · Est. {dept.established} · {dept.intakeSeats} Seats
+                              </p>
+                              <EditTriggerButton
+                                target={{ kind: 'department', department: dept }}
+                                label="Edit"
+                                variant="compact"
+                              />
+                            </div>
+                            <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-pust-900 transition-colors">
+                              {dept.name}
+                            </h2>
+                            <p className="text-xs text-slate-500 mt-1">Chair: {dept.chairmanName}</p>
+                            <p className="text-sm text-slate-700 mt-3 leading-relaxed line-clamp-2">
+                              {dept.summary}
                             </p>
-                            <EditTriggerButton
-                              target={{ kind: 'department', department: dept }}
-                              label="Edit"
-                              variant="compact"
-                            />
                           </div>
-                          <h2 className="font-serif text-xl font-medium text-slate-900 mt-2 group-hover:text-pust-900">
-                            {dept.name}
-                          </h2>
-                          <p className="text-xs text-slate-500 mt-1">Chair: {dept.chairmanName}</p>
-                          <p className="text-sm text-slate-700 mt-3 leading-relaxed line-clamp-2">
-                            {dept.summary}
-                          </p>
+                          <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-600">
+                            <span>{dept.degrees.join(' / ')}</span>
+                            <span className="font-semibold text-pust-800 inline-flex items-center gap-1 group-hover:underline">
+                              Prospectus
+                              <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+                            </span>
+                          </div>
                         </div>
-                        <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
-                          <span>{dept.degrees.join(' / ')}</span>
-                          <span className="font-semibold text-pust-800 group-hover:underline">
-                            Prospectus
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      </MotionCard>
+                    );
+                  })}
                 </div>
               )}
 
@@ -1381,9 +1419,19 @@ export function PublicSubPages({
             </div>
           ) : (
             <div className="editable-region space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 rounded-2xl border border-slate-200 bg-white divide-y md:divide-y-0 md:divide-x divide-slate-200 overflow-hidden shadow-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {resolved.admissionsConfig.gstUnits.map((unit, idx) => (
-                  <div key={`${unit.unitLabel}-${idx}`} className="p-6 space-y-1.5">
+                  <MotionCard
+                    key={`${unit.unitLabel}-${idx}`}
+                    delay={idx * 0.04}
+                    className={`p-6 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${
+                      idx === 0
+                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                        : idx === 1
+                        ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
+                        : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
+                    }`}
+                  >
                     <p className="font-mono text-xs text-pust-800">{unit.unitLabel}</p>
                     <p className="font-serif text-lg font-medium text-slate-900">
                       {unit.deptCountLabel}
@@ -1391,7 +1439,7 @@ export function PublicSubPages({
                     <p className="text-xs text-slate-600 leading-relaxed">
                       {unit.departmentsText}
                     </p>
-                  </div>
+                  </MotionCard>
                 ))}
               </div>
 
@@ -1467,7 +1515,7 @@ export function PublicSubPages({
                   </button>
 
                   {/* Pre-Login Public Inquiry & Account Application Status Tracker */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-xs">
+                  <div className="card-gradient-lapis rounded-2xl border border-lapis-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
                     <div>
                       <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
                         Live Status Tracker
@@ -1719,7 +1767,7 @@ export function PublicSubPages({
             <div className="lg:col-span-6 space-y-6">
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
-              <dl className="rounded-xl border border-slate-200 bg-[#F7F7F5] divide-y divide-slate-200 text-sm overflow-hidden">
+              <dl className="rounded-2xl border border-sage-200/80 card-gradient-sage divide-y divide-sage-200/70 text-sm overflow-hidden shadow-xs">
                 <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Service Hours</dt>
                   <dd className="font-mono font-medium text-slate-900 sm:text-right">{currentFac.hours}</dd>
@@ -1844,62 +1892,75 @@ export function PublicSubPages({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => {
-              const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
-              const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
-              return (
-                <div
-                  key={item.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setActiveMedia(item)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setActiveMedia(item);
-                    }
-                  }}
-                  className="text-left rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-pust-700/60 transition-colors group cursor-pointer flex flex-col overflow-hidden shadow-xs"
-                >
-                  <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
-                    <ResilientImage
-                      src={thumbUrl}
-                      fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
-                      alt={item.title}
-                      containerClassName="w-full h-full"
-                      frameClassName="bg-slate-900"
-                      className="w-full h-full object-cover"
-                    />
-                    {item.mediaType === 'video' && (
-                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
-                        <PlayCircle className="w-10 h-10" />
-                      </span>
-                    )}
-                    <EditTriggerButton
-                      target={{ kind: 'gallery', item }}
-                      label="Edit"
-                      variant="overlay"
-                      className="absolute top-2.5 right-2.5 z-10"
-                    />
-                  </div>
-                  <div className="p-5 space-y-1">
-                    <p className="font-mono text-xs text-pust-800 tabular-nums">
-                      {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
-                      {item.eventDate}
-                      {item.visibility === 'registered' && (
-                        <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+          {loadingData && galleryItems.length === 0 ? (
+            <MediaGridSkeleton count={6} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {items.map((item, idx) => {
+                const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+                const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+                const cardStyle =
+                  item.category === 'Convocation'
+                    ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
+                    : item.category === 'Academic Event'
+                    ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                    : item.category === 'Festival'
+                    ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                    : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45';
+                return (
+                  <MotionCard
+                    key={item.id}
+                    delay={(idx % 6) * 0.03}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setActiveMedia(item)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveMedia(item);
+                      }
+                    }}
+                    className={`text-left rounded-2xl border ${cardStyle} transition-all group cursor-pointer flex flex-col overflow-hidden shadow-xs hover:shadow-md`}
+                  >
+                    <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
+                      <ResilientImage
+                        src={thumbUrl}
+                        fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
+                        alt={item.title}
+                        containerClassName="w-full h-full"
+                        frameClassName="bg-slate-900"
+                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300"
+                      />
+                      {item.mediaType === 'video' && (
+                        <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white">
+                          <PlayCircle className="w-10 h-10 transition-transform duration-200 group-hover:scale-110" />
+                        </span>
                       )}
-                    </p>
-                    <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900">
-                      {item.title}
-                    </h2>
-                    <p className="text-xs text-slate-600">{item.description}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      <EditTriggerButton
+                        target={{ kind: 'gallery', item }}
+                        label="Edit"
+                        variant="overlay"
+                        className="absolute top-2.5 right-2.5 z-10"
+                      />
+                    </div>
+                    <div className="p-5 space-y-1">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
+                        {item.eventDate}
+                        {item.visibility === 'registered' && (
+                          <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+                        )}
+                      </p>
+                      <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                        {item.title}
+                      </h2>
+                      <p className="text-xs text-slate-600">{item.description}</p>
+                    </div>
+                  </MotionCard>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {activeMedia && (() => {
@@ -2073,7 +2134,11 @@ export function PublicSubPages({
           </div>
         </div>
 
-        {filteredNotices.length === 0 ? (
+        {loadingData && notices.length === 0 ? (
+          <div className="mt-6">
+            <NoticeListSkeleton rows={6} />
+          </div>
+        ) : filteredNotices.length === 0 ? (
           <div className="py-10 px-6 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
             <p>No notices match the selected filter criteria.</p>
             <button
@@ -2102,7 +2167,7 @@ export function PublicSubPages({
                     onSelectNotice(notice);
                   }
                 }}
-                className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/35 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
+                className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/45 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
               >
                 <div className="lg:col-span-3 font-mono text-xs text-slate-500 tabular-nums">
                   <span>{notice.publishedAt}</span>

@@ -15,6 +15,7 @@ export default function Home() {
     bannerSlides,
     publications,
     notices,
+    loadingData,
     navigateTo,
     setActiveNotice,
   } = usePust();
@@ -29,6 +30,7 @@ export default function Home() {
       galleryItems={galleryItems}
       publications={publications}
       notices={notices}
+      loadingData={loadingData}
       onNavigate={navigateTo}
       onSelectNotice={setActiveNotice}
     />
