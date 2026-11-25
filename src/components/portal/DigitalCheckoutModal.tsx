@@ -12,7 +12,11 @@ import {
   X,
 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
-import type { PaymentGatewayConfig, PaymentReceiptRecord } from '../../types/pust';
+import type {
+  ClearanceOfficeKey,
+  PaymentGatewayConfig,
+  PaymentReceiptRecord,
+} from '../../types/pust';
 import { VerificationQrSvg } from './DigitalDocumentModal';
 
 export interface CheckoutTarget {
@@ -24,11 +28,22 @@ export interface CheckoutTarget {
   amountBdt: number;
 }
 
+export interface CheckoutAutomationMeta {
+  autoCleared?: boolean;
+  autoIssued?: boolean;
+  holdReason?: string;
+  clearedOffices?: ClearanceOfficeKey[];
+}
+
 interface DigitalCheckoutModalProps {
   target: CheckoutTarget | null;
   gateways: PaymentGatewayConfig[];
   onClose: () => void;
-  onSuccess: (receipt: PaymentReceiptRecord, updatedTarget: unknown) => Promise<void> | void;
+  onSuccess: (
+    receipt: PaymentReceiptRecord,
+    updatedTarget: unknown,
+    meta?: CheckoutAutomationMeta
+  ) => Promise<void> | void;
 }
 
 export function DigitalCheckoutModal({
@@ -45,6 +60,7 @@ export function DigitalCheckoutModal({
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<PaymentReceiptRecord | null>(null);
+  const [autoMeta, setAutoMeta] = useState<CheckoutAutomationMeta | null>(null);
 
   useEffect(() => {
     if (target) {
@@ -54,6 +70,7 @@ export function DigitalCheckoutModal({
       setUseManualRef(false);
       setError(null);
       setReceipt(null);
+      setAutoMeta(null);
     }
   }, [target, gateways]);
 
@@ -93,8 +110,15 @@ export function DigitalCheckoutModal({
             : 'Online Card / NetBank'),
         manualRef: useManualRef ? manualRef.trim() : undefined,
       });
+      const meta: CheckoutAutomationMeta = {
+        autoCleared: res.autoCleared,
+        autoIssued: res.autoIssued,
+        holdReason: res.holdReason,
+        clearedOffices: res.clearedOffices,
+      };
       setReceipt(res.receipt);
-      await onSuccess(res.receipt, res.updatedTarget);
+      setAutoMeta(meta);
+      await onSuccess(res.receipt, res.updatedTarget, meta);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to settle payment.');
     } finally {
@@ -134,11 +158,31 @@ export function DigitalCheckoutModal({
                 <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-sm text-pust-950">
-                    Payment Verified & Settled
+                    Payment Verified &amp; Settled
                   </h3>
                   <p className="text-xs text-pust-800 mt-0.5">
                     Your digital receipt has been recorded in the PUST Finance ledger.
                   </p>
+                  {autoMeta?.autoCleared && (
+                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                      Automated Hall Clearance issued — examination registration unlocked.
+                    </p>
+                  )}
+                  {autoMeta?.autoIssued && (
+                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                      Digital credential auto-issued immediately after automated clearance checks.
+                    </p>
+                  )}
+                  {autoMeta?.clearedOffices && autoMeta.clearedOffices.length > 0 && !autoMeta.autoIssued && (
+                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                      Auto-cleared offices: {autoMeta.clearedOffices.map((o) => o.toUpperCase()).join(', ')}.
+                    </p>
+                  )}
+                  {autoMeta?.holdReason && (
+                    <p className="text-xs font-medium text-amber-900 mt-1">
+                      Automated issuance held: {autoMeta.holdReason}
+                    </p>
+                  )}
                 </div>
               </div>
 

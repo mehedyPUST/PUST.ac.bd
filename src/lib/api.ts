@@ -2,6 +2,9 @@ import type {
   AboutContentRecord,
   AuditLogRecord,
   AuthUser,
+  AutomationOverviewResponse,
+  AutomationRulesConfig,
+  AutomationSweepReport,
   BannerSlideRecord,
   BookmarkRecord,
   BootstrapStatus,
@@ -26,6 +29,7 @@ import type {
   NoticeCategory,
   NoticeRecord,
   NoticeVisibility,
+  OfficeFlowType,
   PaymentGatewayConfig,
   PaymentReceiptRecord,
   PublicationRecord,
@@ -329,7 +333,11 @@ export const pustApi = {
       note?: string;
     }
   ) =>
-    apiFetch<{ application: LibraryApplicationRecord }>(
+    apiFetch<{
+      application: LibraryApplicationRecord;
+      card?: LibraryCardRecord | null;
+      autoIssued?: boolean;
+    }>(
       `/api/portal/library/applications/${encodeURIComponent(id)}/chairman`,
       {
         method: 'PATCH',
@@ -495,7 +503,11 @@ export const pustApi = {
     }),
 
   payExam: (id: string, payload: { paymentMethod: string; transactionId: string }) =>
-    apiFetch<{ application: ExamApplicationRecord }>(
+    apiFetch<{
+      application: ExamApplicationRecord;
+      autoIssued?: boolean;
+      holdReason?: string;
+    }>(
       `/api/portal/exams/applications/${encodeURIComponent(id)}/pay`,
       {
         method: 'POST',
@@ -557,7 +569,11 @@ export const pustApi = {
     paymentMethod: string;
     transactionId: string;
   }) =>
-    apiFetch<{ application: CertificateApplicationRecord }>('/api/portal/certificates/apply', {
+    apiFetch<{
+      application: CertificateApplicationRecord;
+      clearedOffices?: ClearanceOfficeKey[];
+      autoIssued?: boolean;
+    }>('/api/portal/certificates/apply', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
@@ -566,7 +582,7 @@ export const pustApi = {
     id: string,
     payload: { decision: 'approved' | 'declined'; note: string }
   ) =>
-    apiFetch<{ application: CertificateApplicationRecord }>(
+    apiFetch<{ application: CertificateApplicationRecord; autoIssued?: boolean }>(
       `/api/portal/certificates/${encodeURIComponent(id)}/office-review`,
       {
         method: 'PATCH',
@@ -810,11 +826,40 @@ export const pustApi = {
     accountMask?: string;
     manualRef?: string;
   }) =>
-    apiFetch<{ receipt: PaymentReceiptRecord; updatedTarget: unknown }>(
-      '/api/portal/payments/checkout',
+    apiFetch<{
+      receipt: PaymentReceiptRecord;
+      updatedTarget: unknown;
+      autoCleared?: boolean;
+      autoIssued?: boolean;
+      holdReason?: string;
+      clearedOffices?: ClearanceOfficeKey[];
+    }>('/api/portal/payments/checkout', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  // Portal: Automated Office Flow Engine
+  getAutomationOverview: () =>
+    apiFetch<AutomationOverviewResponse>('/api/portal/automation/overview'),
+
+  updateAutomationRules: (payload: Partial<AutomationRulesConfig>) =>
+    apiFetch<{ rules: AutomationRulesConfig }>('/api/portal/automation/config', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  advanceOfficeFlowItem: (payload: { flowType: OfficeFlowType; targetId: string }) =>
+    apiFetch<{ processed: boolean; outcome: 'processed' | 'held'; detail: string }>(
+      '/api/portal/automation/advance',
       {
         method: 'POST',
         body: JSON.stringify(payload),
       }
     ),
+
+  runOfficeAutomationSweep: () =>
+    apiFetch<{ report: AutomationSweepReport }>('/api/portal/automation/sweep', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
 };

@@ -5,6 +5,16 @@ import { requireAuth, requireRoles, wrapRouterAsync, type AuthenticatedRequest, 
 import { pustRepo } from '../db';
 import { isSafeMediaUrl } from '../../src/lib/media';
 import type { ClearanceOfficeKey, OfficeClearanceState, UserRole } from '../../src/types/pust';
+import {
+  autoClearHallDueIfEnabled,
+  autoEvaluateCertificateApplication,
+  autoFinalizeCertificateIfReady,
+  autoIssueAdmitCardIfEligible,
+  autoIssueLibraryCardAfterChairmanSeal,
+  buildOfficeFlowOverview,
+  processSingleFlowItem,
+  runAutomatedOfficeSweep,
+} from '../officeAutomation';
 
 export const portalRouter = wrapRouterAsync(Router());
 
@@ -1068,7 +1078,14 @@ portalRouter.patch(
       'Forwarded library membership with JSON seal',
       target.academicId
     );
-    res.json({ application: updated });
+    const autoResult = await autoIssueLibraryCardAfterChairmanSeal(target.id);
+    const refreshedApp =
+      (await pustRepo.listLibraryApplications()).find((a) => a.id === target.id) || updated;
+    res.json({
+      application: refreshedApp,
+      card: autoResult.card,
+      autoIssued: autoResult.autoIssued,
+    });
   }
 );
 
@@ -1717,7 +1734,12 @@ portalRouter.post(
       transactionId: parsed.data.transactionId,
       paymentStatus: 'Paid',
     });
-    res.json({ application: updated });
+    const admitRes = await autoIssueAdmitCardIfEligible(updated || target);
+    res.json({
+      application: admitRes.application,
+      autoIssued: admitRes.autoIssued,
+      holdReason: admitRes.holdReason,
+    });
   }
 );
 
@@ -1836,11 +1858,19 @@ portalRouter.post(
     let cumulativeCgpa: number | undefined;
     if (publishImmediately) {
       cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, sgpa);
+      const promoted = promotionStatus.startsWith('Promoted');
+      const nextCompleted = promoted
+        ? Math.max(stu.completedSemesters, parsed.data.semester)
+        : stu.completedSemesters;
+      const rules = await pustRepo.getAutomationConfig();
       await pustRepo.updateStudentById(stu.id, {
-        ...(promotionStatus.startsWith('Promoted')
+        ...(promoted
           ? {
               currentSemester: Math.max(stu.currentSemester, parsed.data.semester + 1),
-              completedSemesters: Math.max(stu.completedSemesters, parsed.data.semester),
+              completedSemesters: nextCompleted,
+              ...(nextCompleted >= 8 && rules.autoPromoteGraduatingResults
+                ? { allResultsPublished: true }
+                : {}),
             }
           : {}),
         cgpa: cumulativeCgpa,
@@ -1916,11 +1946,19 @@ portalRouter.patch(
     const stu = await pustRepo.findStudentByAcademicId(target.academicId);
     if (stu) {
       const cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, target.sgpa);
+      const promoted = promotionStatus.startsWith('Promoted');
+      const nextCompleted = promoted
+        ? Math.max(stu.completedSemesters, target.semester)
+        : stu.completedSemesters;
+      const rules = await pustRepo.getAutomationConfig();
       await pustRepo.updateStudentById(stu.id, {
-        ...(promotionStatus.startsWith('Promoted')
+        ...(promoted
           ? {
               currentSemester: Math.max(stu.currentSemester, target.semester + 1),
-              completedSemesters: Math.max(stu.completedSemesters, target.semester),
+              completedSemesters: nextCompleted,
+              ...(nextCompleted >= 8 && rules.autoPromoteGraduatingResults
+                ? { allResultsPublished: true }
+                : {}),
             }
           : {}),
         cgpa: cumulativeCgpa,
@@ -2022,7 +2060,12 @@ portalRouter.post(
       finalAdminStatus: 'waiting_offices',
     });
 
-    res.status(201).json({ application: app });
+    const evalRes = await autoEvaluateCertificateApplication(app.id);
+    res.status(201).json({
+      application: evalRes.application || app,
+      clearedOffices: evalRes.clearedOffices,
+      autoIssued: evalRes.autoIssued,
+    });
   }
 );
 
@@ -2087,7 +2130,14 @@ portalRouter.patch(
       `Certificate ${officeKey} clearance ${parsed.data.decision}`,
       target.academicId
     );
-    res.json({ application: updated });
+    let finalApp = updated;
+    let autoIssued = false;
+    if (allFourApproved && updated) {
+      const fin = await autoFinalizeCertificateIfReady(updated, req.authUser!.name);
+      finalApp = fin.application;
+      autoIssued = fin.issued;
+    }
+    res.json({ application: finalApp, autoIssued });
   }
 );
 
@@ -2773,13 +2823,7 @@ portalRouter.post(
         paidAt: nowDate,
       });
 
-      const updatedTarget = await pustRepo.updateHallDue(due.id, {
-        paymentMethod: gw.code,
-        paymentRef: transactionId,
-        receiptNo,
-        paidAt: nowDate,
-        status: 'Payment Submitted',
-      });
+      const clearedRes = await autoClearHallDueIfEnabled(due, gw.code, transactionId, receiptNo);
 
       await pustRepo.logAudit(
         req.authUser!.name,
@@ -2787,7 +2831,11 @@ portalRouter.post(
         'Completed Hall Fee Digital Payment',
         receiptNo
       );
-      res.status(201).json({ receipt, updatedTarget });
+      res.status(201).json({
+        receipt,
+        updatedTarget: clearedRes.due,
+        autoCleared: clearedRes.autoCleared,
+      });
       return;
     }
 
@@ -2827,13 +2875,20 @@ portalRouter.post(
         paymentStatus: 'Paid',
       });
 
+      const admitRes = await autoIssueAdmitCardIfEligible(updatedTarget || app);
+
       await pustRepo.logAudit(
         req.authUser!.name,
         'student',
         'Completed Examination Fee Digital Payment',
         receiptNo
       );
-      res.status(201).json({ receipt, updatedTarget });
+      res.status(201).json({
+        receipt,
+        updatedTarget: admitRes.application,
+        autoIssued: admitRes.autoIssued,
+        holdReason: admitRes.holdReason,
+      });
       return;
     }
 
@@ -2894,12 +2949,108 @@ portalRouter.post(
       paidAt: nowDate,
     });
 
+    const evalRes = await autoEvaluateCertificateApplication(createdCert.id);
+
     await pustRepo.logAudit(
       req.authUser!.name,
       'student',
       'Submitted Certificate Application & Digital Payment',
       receiptNo
     );
-    res.status(201).json({ receipt, updatedTarget: createdCert });
+    res.status(201).json({
+      receipt,
+      updatedTarget: evalRes.application || createdCert,
+      clearedOffices: evalRes.clearedOffices,
+      autoIssued: evalRes.autoIssued,
+    });
+  }
+);
+
+// 10. Automated Office Flow Engine (Overview, Policy Rules, Single Advance & Batch Sweep)
+const automationConfigSchema = z.object({
+  autoClearPaidHallDues: z.boolean().optional(),
+  autoIssueSealedLibraryCards: z.boolean().optional(),
+  autoIssueAdmitCardsOnPay: z.boolean().optional(),
+  autoVerifyCleanCertOffices: z.boolean().optional(),
+  autoIssueReadyCertificates: z.boolean().optional(),
+  autoPromoteGraduatingResults: z.boolean().optional(),
+});
+
+const automationAdvanceSchema = z.object({
+  flowType: z.enum([
+    'user_approval',
+    'library_seal',
+    'library_verify',
+    'hall_seat',
+    'hall_due',
+    'exam_admit',
+    'exam_result',
+    'cert_office',
+    'cert_final',
+    'inquiry',
+  ]),
+  targetId: z.string().trim().min(1).max(120),
+});
+
+portalRouter.get('/automation/overview', requireAuth, async (req: AuthenticatedRequest, res) => {
+  const overview = await buildOfficeFlowOverview(req.authUser!);
+  res.json(overview);
+});
+
+portalRouter.put(
+  '/automation/config',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = automationConfigSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid automation rules configuration.' });
+      return;
+    }
+    const rules = await pustRepo.updateAutomationConfig(parsed.data);
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Updated Automated Office Flow Rules',
+      Object.entries(parsed.data)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(', ')
+    );
+    res.json({ rules });
+  }
+);
+
+portalRouter.post(
+  '/automation/advance',
+  requireRoles('admin', 'registrar', 'chairman', 'hall', 'library', 'proctor'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = automationAdvanceSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid office flow item payload.' });
+      return;
+    }
+    try {
+      const result = await processSingleFlowItem(
+        req.authUser!,
+        parsed.data.flowType,
+        parsed.data.targetId
+      );
+      res.json(result);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to advance office flow item.';
+      if (message.startsWith('FORBIDDEN:')) {
+        res.status(403).json({ error: message.replace(/^FORBIDDEN:\s*/, '') });
+        return;
+      }
+      res.status(400).json({ error: message });
+    }
+  }
+);
+
+portalRouter.post(
+  '/automation/sweep',
+  requireRoles('admin', 'registrar', 'chairman', 'hall', 'library', 'proctor'),
+  async (req: AuthenticatedRequest, res) => {
+    const report = await runAutomatedOfficeSweep(req.authUser!);
+    res.json({ report });
   }
 );

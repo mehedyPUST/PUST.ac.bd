@@ -28,6 +28,7 @@ import {
   Upload,
   UserCheck,
   Users,
+  Workflow,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { PustCrest } from './PustCrest';
@@ -40,6 +41,7 @@ import { DigitalDocumentModal, type DigitalDocumentData } from './portal/Digital
 import { ExamPanel } from './portal/ExamPanel';
 import { HallPanel } from './portal/HallPanel';
 import { LibraryPanel } from './portal/LibraryPanel';
+import { OfficeFlowPanel } from './portal/OfficeFlowPanel';
 import type {
   AboutContentRecord,
   AuthUser,
@@ -79,6 +81,7 @@ interface PortalViewProps {
 type AuthMode = 'login' | 'student-token' | 'officer' | 'admin-claim' | 'admin-passcode';
 type PortalTab =
   | 'overview'
+  | 'workflow'
   | 'students'
   | 'library'
   | 'halls'
@@ -88,6 +91,7 @@ type PortalTab =
 
 const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
+  'workflow',
   'students',
   'library',
   'halls',
@@ -1300,6 +1304,7 @@ export function PortalView({
       case 'student':
         return [
           { id: 'overview', label: 'My Campus Overview', icon: LayoutDashboard, desc: 'Standing, receipts & alerts' },
+          { id: 'workflow', label: 'Automated Readiness', icon: Workflow, desc: 'Live 6-step clearance checks' },
           { id: 'students', label: 'My Academic Profile', icon: GraduationCap, desc: 'CGPA, hall & documents' },
           { id: 'library', label: 'Library & Digital Card', icon: BookOpen, desc: 'Card, QR & borrowed books' },
           { id: 'halls', label: 'Hall Seat & Dues', icon: Building, desc: 'Vacancies, checkout & clearance' },
@@ -1309,6 +1314,7 @@ export function PortalView({
       case 'teacher':
         return [
           { id: 'overview', label: 'Faculty Overview', icon: LayoutDashboard, desc: 'Assigned courses & alerts' },
+          { id: 'workflow', label: 'Office Flow Status', icon: Workflow, desc: 'Live campus policy triggers' },
           { id: 'students', label: 'Department Class Roster', icon: Users, desc: `${user.departmentCode} student records` },
           { id: 'exams', label: 'Gradebook & Exams', icon: FileSpreadsheet, desc: 'Submit marksheets & courses' },
           { id: 'governance', label: 'Course Notice Publisher', icon: ShieldCheck, desc: 'Course & session circulars' },
@@ -1316,6 +1322,7 @@ export function PortalView({
       case 'chairman':
         return [
           { id: 'overview', label: 'Chairman Desk', icon: LayoutDashboard, desc: `${user.departmentCode} office summary` },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Unified queue & batch sweep' },
           { id: 'students', label: 'Department Students', icon: Users, desc: 'Roster & Chairman remarks' },
           { id: 'library', label: 'Chairman Library Seals', icon: BookOpen, desc: 'Sign & forward applications' },
           { id: 'exams', label: 'Exams, Courses & Results', icon: FileSpreadsheet, desc: 'Admit cards & result review' },
@@ -1325,6 +1332,7 @@ export function PortalView({
       case 'library':
         return [
           { id: 'overview', label: 'Library Overview', icon: LayoutDashboard, desc: 'Card queue & alerts' },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Card & clearance queue sweep' },
           { id: 'library', label: 'Cards & Borrowing Desk', icon: BookOpen, desc: 'Verify seals & checkouts' },
           { id: 'certificates', label: 'Library Clearances', icon: Award, desc: '4-office graduation sign-off' },
           { id: 'governance', label: 'Library Circulars', icon: ShieldCheck, desc: 'Publish library notices' },
@@ -1332,6 +1340,7 @@ export function PortalView({
       case 'hall':
         return [
           { id: 'overview', label: 'Hall Provost Overview', icon: LayoutDashboard, desc: `${user.hallAffiliation} summary` },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Seats, dues & clearances sweep' },
           { id: 'students', label: 'Hall Residents Roster', icon: Users, desc: 'Resident standing & rooms' },
           { id: 'halls', label: 'Seats, Circulars & Dues', icon: Building, desc: 'Allotments & clearances' },
           { id: 'certificates', label: 'Hall Clearances', icon: Award, desc: '4-office graduation sign-off' },
@@ -1340,6 +1349,7 @@ export function PortalView({
       case 'proctor':
         return [
           { id: 'overview', label: 'Proctorial Overview', icon: LayoutDashboard, desc: 'Conduct & clearance queue' },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Proctorial queue & sweep' },
           { id: 'students', label: 'Student Conduct Ledger', icon: Users, desc: 'Disciplinary status & notes' },
           { id: 'certificates', label: 'Proctorial Clearances', icon: Award, desc: '4-office graduation sign-off' },
           { id: 'governance', label: 'Proctorial Notices', icon: ShieldCheck, desc: 'Publish conduct circulars' },
@@ -1348,6 +1358,7 @@ export function PortalView({
       case 'vc':
         return [
           { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, desc: 'Governance metrics & alerts' },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Inquiries & campus automation' },
           { id: 'students', label: 'University Student Directory', icon: Users, desc: 'All departments & sessions' },
           { id: 'governance', label: 'Governance, Notices & Audit', icon: ShieldCheck, desc: 'Circulars, inquiries & logs' },
         ];
@@ -1355,6 +1366,7 @@ export function PortalView({
       default:
         return [
           { id: 'overview', label: 'Admin Command Overview', icon: LayoutDashboard, desc: 'Institution-wide summary' },
+          { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Cross-office sweep & rules' },
           { id: 'students', label: 'All-Dept Student Database', icon: Users, desc: 'Directory & Admin remarks' },
           { id: 'library', label: 'Library Oversight', icon: BookOpen, desc: 'Cards & borrowing ledger' },
           { id: 'halls', label: 'Residential Halls', icon: Building, desc: 'Seats, circulars & dues' },
@@ -2132,6 +2144,10 @@ export function PortalView({
                 </>
               )}
             </div>
+          )}
+
+          {resolvedTab === 'workflow' && (
+            <OfficeFlowPanel user={user} onOpenTab={(tab) => setActiveTab(tab as PortalTab)} />
           )}
 
           {resolvedTab === 'library' && <LibraryPanel user={user} />}

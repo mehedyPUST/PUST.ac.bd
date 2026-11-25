@@ -636,9 +636,14 @@ export function HallPanel({ user }: HallPanelProps) {
         target={checkoutTarget}
         gateways={gateways}
         onClose={() => setCheckoutTarget(null)}
-        onSuccess={async (receipt) => {
+        onSuccess={async (receipt, updatedTarget, meta) => {
+          const updatedDue = updatedTarget as HallDueRecord | undefined;
           setFeedback(
-            `Payment ${receipt.receiptNo} verified via ${receipt.gatewayName}. Awaiting Hall Office clearance confirmation.`
+            meta?.autoCleared || updatedDue?.status === 'Cleared'
+              ? `Payment ${receipt.receiptNo} verified via ${receipt.gatewayName}. Hall Clearance ${
+                  updatedDue?.clearanceRef || ''
+                } auto-issued and examinations unlocked.`
+              : `Payment ${receipt.receiptNo} verified via ${receipt.gatewayName}. Awaiting Hall Office clearance confirmation.`
           );
           await refresh();
         }}

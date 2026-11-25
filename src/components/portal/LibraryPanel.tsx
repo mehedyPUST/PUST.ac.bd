@@ -77,7 +77,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       note: 'Verified bonafide student of department.',
     };
     try {
-      await pustApi.chairmanSealLibrary(app.id, {
+      const res = await pustApi.chairmanSealLibrary(app.id, {
         decision,
         officialSeal: input.officialSeal,
         digitalSignature: input.digitalSignature,
@@ -85,7 +85,9 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       });
       setFeedback(
         decision === 'forward'
-          ? `Forwarded ${app.academicId} to Central Library with verified Chairman JSON seal.`
+          ? res.autoIssued && res.card
+            ? `Chairman SHA-256 seal applied for ${app.academicId} — Digital Library Card ${res.card.digitalCardNo} auto-issued.`
+            : `Forwarded ${app.academicId} to Central Library with verified Chairman JSON seal.`
           : `Declined library application for ${app.academicId}.`
       );
       await refresh();

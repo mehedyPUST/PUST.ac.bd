@@ -4,6 +4,7 @@ import type {
   AboutContentRecord,
   AuditLogRecord,
   AuthUser,
+  AutomationRulesConfig,
   BannerSlideRecord,
   BookmarkRecord,
   CertificateApplicationRecord,
@@ -93,6 +94,14 @@ class PustRepository {
   private auditLogs: AuditLogRecord[] = [];
   private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
   private bookmarks: BookmarkRecord[] = [];
+  private automationConfig: AutomationRulesConfig = {
+    autoClearPaidHallDues: true,
+    autoIssueSealedLibraryCards: true,
+    autoIssueAdmitCardsOnPay: true,
+    autoVerifyCleanCertOffices: true,
+    autoIssueReadyCertificates: true,
+    autoPromoteGraduatingResults: true,
+  };
   private universityProfile: UniversityProfile = structuredClone(SEED_UNIVERSITY_PROFILE);
 
   private initialized = false;
@@ -885,6 +894,33 @@ class PustRepository {
         .updateOne({ id: 'global-fee-config' }, { $set: cfg }, { upsert: true });
     }
     return { ...this.feeConfig };
+  }
+
+  async getAutomationConfig(): Promise<AutomationRulesConfig> {
+    if (this.storageBackend === 'mongodb' && this.db) {
+      const doc = await this.db
+        .collection<AutomationRulesConfig & { id: string }>('automation_config')
+        .findOne({ id: 'global-automation-config' }, { projection: { _id: 0, id: 0 } });
+      if (doc) {
+        return {
+          ...this.automationConfig,
+          ...doc,
+        };
+      }
+    }
+    return { ...this.automationConfig };
+  }
+
+  async updateAutomationConfig(cfg: Partial<AutomationRulesConfig>): Promise<AutomationRulesConfig> {
+    const current = await this.getAutomationConfig();
+    const updated: AutomationRulesConfig = { ...current, ...cfg };
+    this.automationConfig = { ...updated };
+    if (this.storageBackend === 'mongodb' && this.db) {
+      await this.db
+        .collection<AutomationRulesConfig & { id: string }>('automation_config')
+        .updateOne({ id: 'global-automation-config' }, { $set: updated }, { upsert: true });
+    }
+    return { ...this.automationConfig };
   }
 
   // Payment Receipts Ledger

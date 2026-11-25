@@ -265,7 +265,7 @@ export function AdminCmsPanel({
     setVcPhone(currentVc.phone || '+8802588842379');
     setVcTenure(currentVc.tenure || 'September 2024 – Present');
     setVcMsg(currentVc.message || '');
-  }, [currentVc?.id]);
+  }, [currentVc]);
 
   async function handleUserApproval(id: string, status: 'approved' | 'rejected') {
     setError(null);

@@ -2101,10 +2101,23 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         target={checkoutTarget}
         gateways={gateways}
         onClose={() => setCheckoutTarget(null)}
-        onSuccess={async (receipt) => {
-          setFeedback(
-            `Exam fee settled cleanly (${receipt.receiptNo} via ${receipt.gatewayName}). Awaiting Chairman Admit Card verification.`
-          );
+        onSuccess={async (receipt, updatedTarget, meta) => {
+          const updatedApp = updatedTarget as ExamApplicationRecord | undefined;
+          if (meta?.autoIssued || updatedApp?.verificationStatus === 'Approved') {
+            setFeedback(
+              `Exam fee settled (${receipt.receiptNo} via ${receipt.gatewayName}). Admit Card ${
+                updatedApp?.admitCardNo || ''
+              } auto-issued.`
+            );
+          } else if (meta?.holdReason) {
+            setFeedback(
+              `Exam fee settled (${receipt.receiptNo} via ${receipt.gatewayName}). Auto-admit held: ${meta.holdReason}`
+            );
+          } else {
+            setFeedback(
+              `Exam fee settled cleanly (${receipt.receiptNo} via ${receipt.gatewayName}). Awaiting Chairman Admit Card verification.`
+            );
+          }
           await refresh();
         }}
       />

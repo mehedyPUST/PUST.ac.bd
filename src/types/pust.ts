@@ -814,3 +814,86 @@ export interface BootstrapStatus {
   envAdminActive: boolean;
   storageBackend: 'mongodb' | 'memory';
 }
+
+export interface AutomationRulesConfig {
+  autoClearPaidHallDues: boolean;
+  autoIssueSealedLibraryCards: boolean;
+  autoIssueAdmitCardsOnPay: boolean;
+  autoVerifyCleanCertOffices: boolean;
+  autoIssueReadyCertificates: boolean;
+  autoPromoteGraduatingResults: boolean;
+}
+
+export type OfficeFlowType =
+  | 'user_approval'
+  | 'library_seal'
+  | 'library_verify'
+  | 'hall_seat'
+  | 'hall_due'
+  | 'exam_admit'
+  | 'exam_result'
+  | 'cert_office'
+  | 'cert_final'
+  | 'inquiry';
+
+export interface OfficeFlowItem {
+  id: string;
+  targetId: string;
+  flowType: OfficeFlowType;
+  officeLabel: string;
+  title: string;
+  subtitle: string;
+  targetRef: string;
+  departmentCode?: string;
+  stage: string;
+  eligibility: 'ready' | 'held' | 'manual';
+  eligibilityReason: string;
+  actionLabel: string;
+  portalTab: string;
+  createdAt: string;
+}
+
+export interface AutomationSweepAction {
+  flowType: OfficeFlowType;
+  target: string;
+  outcome: 'processed' | 'held';
+  detail: string;
+}
+
+export interface AutomationSweepReport {
+  ranAt: string;
+  actorName: string;
+  actorRole: UserRole;
+  processedCount: number;
+  heldCount: number;
+  actions: AutomationSweepAction[];
+}
+
+export interface StudentReadinessSummary {
+  academicId: string;
+  approvalStatus: ApprovalStatus;
+  hallCleared: boolean;
+  unpaidHallDuesCount: number;
+  hallSeatAssigned: string;
+  libraryCleared: boolean;
+  activeBorrowsCount: number;
+  hasActiveLibraryCard: boolean;
+  proctorCleared: boolean;
+  disciplinaryStatus: StudentRecord['disciplinaryStatus'];
+  completedSemesters: number;
+  allResultsPublished: boolean;
+  graduationReady: boolean;
+}
+
+export interface AutomationOverviewResponse {
+  rules: AutomationRulesConfig;
+  queueItems: OfficeFlowItem[];
+  counts: {
+    total: number;
+    ready: number;
+    held: number;
+    manual: number;
+  };
+  studentReadiness: StudentReadinessSummary | null;
+  recentAuditLogs: AuditLogRecord[];
+}

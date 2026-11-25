@@ -95,8 +95,12 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         ? 'All office records and dues cleared.'
         : 'Pending departmental or office clearance verification.');
     try {
-      await pustApi.reviewCertificateOffice(appId, { decision, note });
-      setFeedback(`Recorded ${decision} office clearance for application.`);
+      const res = await pustApi.reviewCertificateOffice(appId, { decision, note });
+      setFeedback(
+        res.autoIssued && res.application.certificateSerial
+          ? `Recorded ${decision} office clearance — all 4 offices cleared and certificate ${res.application.certificateSerial} auto-issued.`
+          : `Recorded ${decision} office clearance for application.`
+      );
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update office clearance.');
@@ -604,10 +608,23 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         target={checkoutTarget}
         gateways={gateways}
         onClose={() => setCheckoutTarget(null)}
-        onSuccess={async (receipt) => {
-          setFeedback(
-            `Certificate fee paid (${receipt.receiptNo} via ${receipt.gatewayName}). Initiated 4-office clearances across Chairman, Hall, Library, and Proctor.`
-          );
+        onSuccess={async (receipt, updatedTarget, meta) => {
+          const updatedCert = updatedTarget as CertificateApplicationRecord | undefined;
+          if (meta?.autoIssued && updatedCert?.certificateSerial) {
+            setFeedback(
+              `Certificate fee paid (${receipt.receiptNo}). All 4 offices auto-verified cleanly and ${updatedCert.certificateSerial} was auto-issued.`
+            );
+          } else if (meta?.clearedOffices && meta.clearedOffices.length > 0) {
+            setFeedback(
+              `Certificate fee paid (${receipt.receiptNo}). Automated office check cleared ${meta.clearedOffices
+                .map((o) => o.toUpperCase())
+                .join(', ')}; remaining offices notified.`
+            );
+          } else {
+            setFeedback(
+              `Certificate fee paid (${receipt.receiptNo} via ${receipt.gatewayName}). Initiated 4-office clearances across Chairman, Hall, Library, and Proctor.`
+            );
+          }
           await refresh();
         }}
       />
