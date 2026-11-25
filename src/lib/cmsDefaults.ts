@@ -1219,72 +1219,59 @@ export function resolveUniversityContent(
       profile?.institutionalLinksEyebrow?.trim() || DEFAULT_INSTITUTIONAL_LINKS_EYEBROW,
     institutionalLinksHeading:
       profile?.institutionalLinksHeading?.trim() || DEFAULT_INSTITUTIONAL_LINKS_HEADING,
-    institutionalLinks:
-      profile?.institutionalLinks && profile.institutionalLinks.length > 0
-        ? profile.institutionalLinks
-        : DEFAULT_INSTITUTIONAL_LINKS,
-    upcomingSeminars:
-      profile?.upcomingSeminars && profile.upcomingSeminars.length > 0
-        ? profile.upcomingSeminars
-        : DEFAULT_UPCOMING_SEMINARS,
+    institutionalLinks: Array.isArray(profile?.institutionalLinks)
+      ? profile.institutionalLinks
+      : DEFAULT_INSTITUTIONAL_LINKS,
+    upcomingSeminars: Array.isArray(profile?.upcomingSeminars)
+      ? profile.upcomingSeminars
+      : DEFAULT_UPCOMING_SEMINARS,
     campusMapMeta: {
       eyebrow: mapMeta?.eyebrow?.trim() || DEFAULT_CAMPUS_MAP_META.eyebrow,
       title: mapMeta?.title?.trim() || DEFAULT_CAMPUS_MAP_META.title,
       subtitle: mapMeta?.subtitle?.trim() || DEFAULT_CAMPUS_MAP_META.subtitle,
       coordinates: mapMeta?.coordinates?.trim() || DEFAULT_CAMPUS_MAP_META.coordinates,
     },
-    campusBuildings:
-      profile?.campusBuildings && profile.campusBuildings.length > 0
-        ? profile.campusBuildings
-        : DEFAULT_CAMPUS_BUILDINGS,
+    campusBuildings: Array.isArray(profile?.campusBuildings)
+      ? profile.campusBuildings
+      : DEFAULT_CAMPUS_BUILDINGS,
     governanceContent: {
       officialActUrl: gov?.officialActUrl?.trim() || DEFAULT_GOVERNANCE_CONTENT.officialActUrl,
       actIntro: gov?.actIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.actIntro,
-      actClauses:
-        gov?.actClauses && gov.actClauses.length > 0
-          ? gov.actClauses
-          : DEFAULT_GOVERNANCE_CONTENT.actClauses,
-      actCitations:
-        gov?.actCitations && gov.actCitations.length > 0
-          ? gov.actCitations
-          : DEFAULT_GOVERNANCE_CONTENT.actCitations,
-      regentBoardMembers:
-        gov?.regentBoardMembers && gov.regentBoardMembers.length > 0
-          ? gov.regentBoardMembers
-          : DEFAULT_GOVERNANCE_CONTENT.regentBoardMembers,
-      regentFunctions:
-        gov?.regentFunctions && gov.regentFunctions.length > 0
-          ? gov.regentFunctions
-          : DEFAULT_GOVERNANCE_CONTENT.regentFunctions,
+      actClauses: Array.isArray(gov?.actClauses)
+        ? gov.actClauses
+        : DEFAULT_GOVERNANCE_CONTENT.actClauses,
+      actCitations: Array.isArray(gov?.actCitations)
+        ? gov.actCitations
+        : DEFAULT_GOVERNANCE_CONTENT.actCitations,
+      regentBoardMembers: Array.isArray(gov?.regentBoardMembers)
+        ? gov.regentBoardMembers
+        : DEFAULT_GOVERNANCE_CONTENT.regentBoardMembers,
+      regentFunctions: Array.isArray(gov?.regentFunctions)
+        ? gov.regentFunctions
+        : DEFAULT_GOVERNANCE_CONTENT.regentFunctions,
       academicCouncilIntro:
         gov?.academicCouncilIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.academicCouncilIntro,
-      academicCouncilCards:
-        gov?.academicCouncilCards && gov.academicCouncilCards.length > 0
-          ? gov.academicCouncilCards
-          : DEFAULT_GOVERNANCE_CONTENT.academicCouncilCards,
-      academicCouncilStructure:
-        gov?.academicCouncilStructure && gov.academicCouncilStructure.length > 0
-          ? gov.academicCouncilStructure
-          : DEFAULT_GOVERNANCE_CONTENT.academicCouncilStructure,
+      academicCouncilCards: Array.isArray(gov?.academicCouncilCards)
+        ? gov.academicCouncilCards
+        : DEFAULT_GOVERNANCE_CONTENT.academicCouncilCards,
+      academicCouncilStructure: Array.isArray(gov?.academicCouncilStructure)
+        ? gov.academicCouncilStructure
+        : DEFAULT_GOVERNANCE_CONTENT.academicCouncilStructure,
       financeCommitteeIntro:
         gov?.financeCommitteeIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.financeCommitteeIntro,
-      financeCommitteeScopes:
-        gov?.financeCommitteeScopes && gov.financeCommitteeScopes.length > 0
-          ? gov.financeCommitteeScopes
-          : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeScopes,
-      financeCommitteeLeadership:
-        gov?.financeCommitteeLeadership && gov.financeCommitteeLeadership.length > 0
-          ? gov.financeCommitteeLeadership
-          : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeLeadership,
+      financeCommitteeScopes: Array.isArray(gov?.financeCommitteeScopes)
+        ? gov.financeCommitteeScopes
+        : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeScopes,
+      financeCommitteeLeadership: Array.isArray(gov?.financeCommitteeLeadership)
+        ? gov.financeCommitteeLeadership
+        : DEFAULT_GOVERNANCE_CONTENT.financeCommitteeLeadership,
       ordinanceIntro: gov?.ordinanceIntro?.trim() || DEFAULT_GOVERNANCE_CONTENT.ordinanceIntro,
-      ordinanceRules:
-        gov?.ordinanceRules && gov.ordinanceRules.length > 0
-          ? gov.ordinanceRules
-          : DEFAULT_GOVERNANCE_CONTENT.ordinanceRules,
-      gradingScale:
-        gov?.gradingScale && gov.gradingScale.length > 0
-          ? gov.gradingScale
-          : DEFAULT_GOVERNANCE_CONTENT.gradingScale,
+      ordinanceRules: Array.isArray(gov?.ordinanceRules)
+        ? gov.ordinanceRules
+        : DEFAULT_GOVERNANCE_CONTENT.ordinanceRules,
+      gradingScale: Array.isArray(gov?.gradingScale)
+        ? gov.gradingScale
+        : DEFAULT_GOVERNANCE_CONTENT.gradingScale,
     },
     adminShowcase: {
       buildingImage: admin?.buildingImage?.trim() || DEFAULT_ADMIN_SHOWCASE.buildingImage,
@@ -1293,62 +1280,52 @@ export function resolveUniversityContent(
       accountabilityCycle:
         admin?.accountabilityCycle?.trim() || DEFAULT_ADMIN_SHOWCASE.accountabilityCycle,
       apaFyLabel: admin?.apaFyLabel?.trim() || DEFAULT_ADMIN_SHOWCASE.apaFyLabel,
-      apaBenchmarks:
-        admin?.apaBenchmarks && admin.apaBenchmarks.length > 0
-          ? admin.apaBenchmarks
-          : DEFAULT_ADMIN_SHOWCASE.apaBenchmarks,
+      apaBenchmarks: Array.isArray(admin?.apaBenchmarks)
+        ? admin.apaBenchmarks
+        : DEFAULT_ADMIN_SHOWCASE.apaBenchmarks,
     },
     aboutExtras: {
       campusImage: about?.campusImage?.trim() || DEFAULT_ABOUT_EXTRAS.campusImage,
       campusCaption: about?.campusCaption?.trim() || DEFAULT_ABOUT_EXTRAS.campusCaption,
-      milestones:
-        about?.milestones && about.milestones.length > 0
-          ? about.milestones
-          : DEFAULT_ABOUT_EXTRAS.milestones,
+      milestones: Array.isArray(about?.milestones)
+        ? about.milestones
+        : DEFAULT_ABOUT_EXTRAS.milestones,
     },
     academicExtras: {
-      degreePrograms:
-        acad?.degreePrograms && acad.degreePrograms.length > 0
-          ? acad.degreePrograms
-          : DEFAULT_ACADEMIC_EXTRAS.degreePrograms,
-      facultyDeans: (
-        acad?.facultyDeans && acad.facultyDeans.length > 0
-          ? acad.facultyDeans
-          : DEFAULT_ACADEMIC_EXTRAS.facultyDeans
+      degreePrograms: Array.isArray(acad?.degreePrograms)
+        ? acad.degreePrograms
+        : DEFAULT_ACADEMIC_EXTRAS.degreePrograms,
+      facultyDeans: (Array.isArray(acad?.facultyDeans)
+        ? acad.facultyDeans
+        : DEFAULT_ACADEMIC_EXTRAS.facultyDeans
       ).map((dean) => {
         const base = DEFAULT_ACADEMIC_EXTRAS.facultyDeans.find(
           (d) => d.faculty === dean.faculty
         );
         return base ? { ...base, ...dean } : dean;
       }),
-      academicCalendar:
-        acad?.academicCalendar && acad.academicCalendar.length > 0
-          ? acad.academicCalendar
-          : DEFAULT_ACADEMIC_EXTRAS.academicCalendar,
-      scholarships:
-        acad?.scholarships && acad.scholarships.length > 0
-          ? acad.scholarships
-          : DEFAULT_ACADEMIC_EXTRAS.scholarships,
-      downloadForms:
-        acad?.downloadForms && acad.downloadForms.length > 0
-          ? acad.downloadForms
-          : DEFAULT_ACADEMIC_EXTRAS.downloadForms,
-      officialForms:
-        acad?.officialForms && acad.officialForms.length > 0
-          ? acad.officialForms
-          : DEFAULT_OFFICIAL_FORMS,
+      academicCalendar: Array.isArray(acad?.academicCalendar)
+        ? acad.academicCalendar
+        : DEFAULT_ACADEMIC_EXTRAS.academicCalendar,
+      scholarships: Array.isArray(acad?.scholarships)
+        ? acad.scholarships
+        : DEFAULT_ACADEMIC_EXTRAS.scholarships,
+      downloadForms: Array.isArray(acad?.downloadForms)
+        ? acad.downloadForms
+        : DEFAULT_ACADEMIC_EXTRAS.downloadForms,
+      officialForms: Array.isArray(acad?.officialForms)
+        ? acad.officialForms
+        : DEFAULT_OFFICIAL_FORMS,
       researchIntro: acad?.researchIntro?.trim() || DEFAULT_ACADEMIC_EXTRAS.researchIntro,
-      researchInfraCards:
-        acad?.researchInfraCards && acad.researchInfraCards.length > 0
-          ? acad.researchInfraCards
-          : DEFAULT_ACADEMIC_EXTRAS.researchInfraCards,
+      researchInfraCards: Array.isArray(acad?.researchInfraCards)
+        ? acad.researchInfraCards
+        : DEFAULT_ACADEMIC_EXTRAS.researchInfraCards,
     },
     admissionsConfig: {
       kicker: adm?.kicker?.trim() || DEFAULT_ADMISSIONS_CONFIG.kicker,
-      gstUnits:
-        adm?.gstUnits && adm.gstUnits.length > 0
-          ? adm.gstUnits
-          : DEFAULT_ADMISSIONS_CONFIG.gstUnits,
+      gstUnits: Array.isArray(adm?.gstUnits)
+        ? adm.gstUnits
+        : DEFAULT_ADMISSIONS_CONFIG.gstUnits,
       undergradText: adm?.undergradText?.trim() || DEFAULT_ADMISSIONS_CONFIG.undergradText,
       gradText: adm?.gradText?.trim() || DEFAULT_ADMISSIONS_CONFIG.gradText,
       eveningText: adm?.eveningText?.trim() || DEFAULT_ADMISSIONS_CONFIG.eveningText,
@@ -1358,18 +1335,16 @@ export function resolveUniversityContent(
         adm?.signupMethodLabel?.trim() || DEFAULT_ADMISSIONS_CONFIG.signupMethodLabel,
       deskEmail: adm?.deskEmail?.trim() || DEFAULT_ADMISSIONS_CONFIG.deskEmail,
     },
-    facilitiesConfig:
-      profile?.facilitiesConfig && profile.facilitiesConfig.length > 0
-        ? profile.facilitiesConfig
-        : DEFAULT_FACILITIES_CONFIG,
+    facilitiesConfig: Array.isArray(profile?.facilitiesConfig)
+      ? profile.facilitiesConfig
+      : DEFAULT_FACILITIES_CONFIG,
     verifyPageConfig: {
       kicker: ver?.kicker?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.kicker,
       title: ver?.title?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.title,
       subtitle: ver?.subtitle?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.subtitle,
-      sampleSerials:
-        ver?.sampleSerials && ver.sampleSerials.length > 0
-          ? ver.sampleSerials
-          : DEFAULT_VERIFY_PAGE_CONFIG.sampleSerials,
+      sampleSerials: Array.isArray(ver?.sampleSerials)
+        ? ver.sampleSerials
+        : DEFAULT_VERIFY_PAGE_CONFIG.sampleSerials,
       employerCardTitle:
         ver?.employerCardTitle?.trim() || DEFAULT_VERIFY_PAGE_CONFIG.employerCardTitle,
       employerCardBody:
@@ -1380,30 +1355,24 @@ export function resolveUniversityContent(
     footerConfig: {
       tagline: foot?.tagline?.trim() || DEFAULT_FOOTER_CONFIG.tagline,
       description: foot?.description?.trim() || DEFAULT_FOOTER_CONFIG.description,
-      socialLinks:
-        foot?.socialLinks && foot.socialLinks.length > 0
-          ? foot.socialLinks
-          : DEFAULT_FOOTER_CONFIG.socialLinks,
-      quickLinks:
-        foot?.quickLinks && foot.quickLinks.length > 0
-          ? foot.quickLinks
-          : DEFAULT_FOOTER_CONFIG.quickLinks,
-      governanceLinks:
-        foot?.governanceLinks && foot.governanceLinks.length > 0
-          ? foot.governanceLinks
-          : DEFAULT_FOOTER_CONFIG.governanceLinks,
-      serviceLinks:
-        foot?.serviceLinks && foot.serviceLinks.length > 0
-          ? foot.serviceLinks
-          : DEFAULT_FOOTER_CONFIG.serviceLinks,
-      addressLines:
-        foot?.addressLines && foot.addressLines.length > 0
-          ? foot.addressLines
-          : DEFAULT_FOOTER_CONFIG.addressLines,
-      contacts:
-        foot?.contacts && foot.contacts.length > 0
-          ? foot.contacts
-          : DEFAULT_FOOTER_CONFIG.contacts,
+      socialLinks: Array.isArray(foot?.socialLinks)
+        ? foot.socialLinks
+        : DEFAULT_FOOTER_CONFIG.socialLinks,
+      quickLinks: Array.isArray(foot?.quickLinks)
+        ? foot.quickLinks
+        : DEFAULT_FOOTER_CONFIG.quickLinks,
+      governanceLinks: Array.isArray(foot?.governanceLinks)
+        ? foot.governanceLinks
+        : DEFAULT_FOOTER_CONFIG.governanceLinks,
+      serviceLinks: Array.isArray(foot?.serviceLinks)
+        ? foot.serviceLinks
+        : DEFAULT_FOOTER_CONFIG.serviceLinks,
+      addressLines: Array.isArray(foot?.addressLines)
+        ? foot.addressLines
+        : DEFAULT_FOOTER_CONFIG.addressLines,
+      contacts: Array.isArray(foot?.contacts)
+        ? foot.contacts
+        : DEFAULT_FOOTER_CONFIG.contacts,
       copyrightText: foot?.copyrightText?.trim() || DEFAULT_FOOTER_CONFIG.copyrightText,
     },
   };

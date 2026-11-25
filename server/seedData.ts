@@ -1,3 +1,20 @@
+import {
+  DEFAULT_ABOUT_EXTRAS,
+  DEFAULT_ACADEMIC_EXTRAS,
+  DEFAULT_ADMIN_SHOWCASE,
+  DEFAULT_ADMISSIONS_CONFIG,
+  DEFAULT_CAMPUS_BUILDINGS,
+  DEFAULT_CAMPUS_MAP_META,
+  DEFAULT_FACILITIES_CONFIG,
+  DEFAULT_FOOTER_CONFIG,
+  DEFAULT_GOVERNANCE_CONTENT,
+  DEFAULT_INSTITUTIONAL_LINKS,
+  DEFAULT_INSTITUTIONAL_LINKS_EYEBROW,
+  DEFAULT_INSTITUTIONAL_LINKS_HEADING,
+  DEFAULT_NAVBAR_TAGLINE,
+  DEFAULT_UPCOMING_SEMINARS,
+  DEFAULT_VERIFY_PAGE_CONFIG,
+} from '../src/lib/cmsDefaults';
 import type {
   AboutContentRecord,
   BannerSlideRecord,
@@ -23,6 +40,11 @@ import type {
 } from '../src/types/pust';
 
 export const SEED_UNIVERSITY_PROFILE: UniversityProfile = {
+  navbarTagline: DEFAULT_NAVBAR_TAGLINE,
+  heroEyebrow: 'Rajapur, Pabna-6600 · First Convocation: 15 March 2027',
+  heroTitle: 'Advancing Science, Engineering & Human Inquiry from Pabna',
+  heroSubtitle:
+    'Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and 212 faculty members across 5 faculties, 21 academic departments, and end-to-end digital workflows.',
   establishedYear: 2008,
   campusAcres: 30,
   facultiesCount: 5,
@@ -218,6 +240,20 @@ export const SEED_UNIVERSITY_PROFILE: UniversityProfile = {
       currentIssue: 'Annual Peer-Reviewed Volume',
     },
   ],
+  institutionalLinksEyebrow: DEFAULT_INSTITUTIONAL_LINKS_EYEBROW,
+  institutionalLinksHeading: DEFAULT_INSTITUTIONAL_LINKS_HEADING,
+  institutionalLinks: structuredClone(DEFAULT_INSTITUTIONAL_LINKS),
+  upcomingSeminars: structuredClone(DEFAULT_UPCOMING_SEMINARS),
+  campusMapMeta: structuredClone(DEFAULT_CAMPUS_MAP_META),
+  campusBuildings: structuredClone(DEFAULT_CAMPUS_BUILDINGS),
+  governanceContent: structuredClone(DEFAULT_GOVERNANCE_CONTENT),
+  adminShowcase: structuredClone(DEFAULT_ADMIN_SHOWCASE),
+  aboutExtras: structuredClone(DEFAULT_ABOUT_EXTRAS),
+  academicExtras: structuredClone(DEFAULT_ACADEMIC_EXTRAS),
+  admissionsConfig: structuredClone(DEFAULT_ADMISSIONS_CONFIG),
+  facilitiesConfig: structuredClone(DEFAULT_FACILITIES_CONFIG),
+  verifyPageConfig: structuredClone(DEFAULT_VERIFY_PAGE_CONFIG),
+  footerConfig: structuredClone(DEFAULT_FOOTER_CONFIG),
 };
 
 export const SEED_VC_PROFILES: ViceChancellorRecord[] = [

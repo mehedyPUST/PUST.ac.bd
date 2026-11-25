@@ -189,6 +189,20 @@ export function parseRouteFromPath(pathname: string): AppRoute {
   return ALL_VALID_ROUTES.has(clean) ? clean : '/';
 }
 
+export function isValidSectionSlug(
+  section:
+    | 'about'
+    | 'governance'
+    | 'administration'
+    | 'academics'
+    | 'admissions'
+    | 'facilities'
+    | 'notices',
+  slug: string
+): boolean {
+  return ALL_VALID_ROUTES.has(`/${section}/${slug}` as AppRoute);
+}
+
 export interface BreadcrumbItem {
   label: string;
   href?: string;

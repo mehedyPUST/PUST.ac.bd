@@ -13,9 +13,6 @@ interface ResearchSectionProps {
   publications: PublicationRecord[];
   journals: JournalRecord[];
   departments?: DepartmentRecord[];
-  labImage: string;
-  libraryImage: string;
-  groundsImage: string;
   focus?: 'journals' | 'publications';
   showInfrastructure?: boolean;
 }
@@ -24,9 +21,6 @@ export function ResearchSection({
   publications,
   journals,
   departments = [],
-  labImage,
-  libraryImage,
-  groundsImage,
   focus = 'publications',
   showInfrastructure = true,
 }: ResearchSectionProps) {
@@ -40,14 +34,14 @@ export function ResearchSection({
     .filter((d) => (d.researchTotal ?? 0) > 0)
     .sort((a, b) => (b.researchTotal ?? 0) - (a.researchTotal ?? 0));
 
-  const totalResearchOutputs =
-    deptResearchList.length > 0
-      ? deptResearchList.reduce((sum, d) => sum + (d.researchTotal ?? 0), 0)
-      : 3934;
+  const totalResearchOutputs = deptResearchList.reduce(
+    (sum, d) => sum + (d.researchTotal ?? 0),
+    0
+  );
   const totalFaculty =
     departments.some((d) => (d.facultyCount ?? 0) > 0)
       ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
-      : profile?.facultyMembersCount ?? 212;
+      : profile?.facultyMembersCount ?? 0;
 
   const deptFilters = [
     'ALL',
@@ -259,16 +253,22 @@ export function ResearchSection({
           />
         </div>
 
-        <div className="divide-y divide-gold-200/60">
-          {journals.map((journal) => (
-            <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
-              <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
-              <h3 className="font-serif text-lg font-medium text-slate-900">{journal.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
-              <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
-            </div>
-          ))}
-        </div>
+        {journals.length === 0 ? (
+          <p className="text-sm text-slate-600 py-4">
+            No official journals are currently listed in the periodicals directory.
+          </p>
+        ) : (
+          <div className="divide-y divide-gold-200/60">
+            {journals.map((journal) => (
+              <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
+                <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
+                <h3 className="font-serif text-lg font-medium text-slate-900">{journal.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
+                <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="pt-3 border-t border-gold-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
           <span className="text-slate-600">Call for Papers &amp; Editorial Boards</span>
@@ -396,8 +396,6 @@ export function ResearchSection({
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {academicExtras.researchInfraCards.map((card, idx) => {
-                const fallbackImg =
-                  idx === 0 ? labImage : idx === 1 ? libraryImage : groundsImage;
                 const gradientClass =
                   idx === 0
                     ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
@@ -415,8 +413,7 @@ export function ResearchSection({
                   >
                     <div className="overflow-hidden rounded-xl">
                       <ResilientImage
-                        src={card.imageUrl || fallbackImg}
-                        fallbackSrc={fallbackImg}
+                        src={card.imageUrl}
                         alt={card.title}
                         caption={card.caption}
                         className="w-full aspect-[4/3] object-cover group-hover:scale-[1.03] transition-transform duration-300"

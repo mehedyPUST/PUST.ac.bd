@@ -13,13 +13,15 @@ interface FooterProps {
 }
 
 export function Footer({ onNavigate }: FooterProps) {
-  const { profile } = usePust();
+  const { profile, loadingData } = usePust();
   const { footerConfig } = resolveUniversityContent(profile);
-  const resolvedDescription = formatFooterDescription(
-    footerConfig.description,
-    profile?.facultiesCount ?? 5,
-    profile?.departmentsCount ?? 21
-  );
+  const resolvedDescription = profile
+    ? formatFooterDescription(
+        footerConfig.description,
+        profile.facultiesCount,
+        profile.departmentsCount
+      )
+    : '';
 
   return (
     <footer
@@ -32,15 +34,24 @@ export function Footer({ onNavigate }: FooterProps) {
           <div className="flex items-center gap-3">
             <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
-                {footerConfig.tagline}
-              </p>
+              {profile && (
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
+                  {footerConfig.tagline}
+                </p>
+              )}
               <h2 className="font-serif text-lg font-medium text-white">
                 Pabna University of Science and Technology
               </h2>
             </div>
           </div>
-          <p className="text-sm text-slate-300 leading-relaxed">{resolvedDescription}</p>
+          {profile ? (
+            <p className="text-sm text-slate-300 leading-relaxed">{resolvedDescription}</p>
+          ) : loadingData ? (
+            <div className="space-y-2 py-1">
+              <div className="h-3 w-5/6 rounded bg-white/10 animate-pulse" />
+              <div className="h-3 w-2/3 rounded bg-white/10 animate-pulse" />
+            </div>
+          ) : null}
           <div className="pt-1 flex flex-wrap items-center gap-2 empty:hidden">
             <EditTriggerButton
               target={{ kind: 'hero-profile' }}
@@ -53,19 +64,21 @@ export function Footer({ onNavigate }: FooterProps) {
               variant="dark"
             />
           </div>
-          <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
-            {footerConfig.socialLinks.map((social) => (
-              <a
-                key={`${social.label}-${social.url}`}
-                href={social.url}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-amber-300 transition-colors"
-              >
-                {social.label}
-              </a>
-            ))}
-          </div>
+          {profile && footerConfig.socialLinks.length > 0 && (
+            <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
+              {footerConfig.socialLinks.map((social) => (
+                <a
+                  key={`${social.label}-${social.url}`}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-amber-300 transition-colors"
+                >
+                  {social.label}
+                </a>
+              ))}
+            </div>
+          )}
           <div className="pt-2">
             <PwaInstallButton variant="footer" allowGuideFallback />
           </div>
@@ -136,44 +149,54 @@ export function Footer({ onNavigate }: FooterProps) {
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Contact
           </p>
-          <p className="leading-relaxed text-slate-300">
-            {footerConfig.addressLines.map((line, idx) => (
-              <span key={`${line}-${idx}`}>
-                {idx > 0 && <br />}
-                {line}
-              </span>
-            ))}
-          </p>
-          {footerConfig.contacts.map((c, idx) => (
-            <p
-              key={`${c.label}-${idx}`}
-              className={`font-mono tabular-nums ${idx === 0 ? 'pt-1' : ''}`}
-            >
-              {c.label}:{' '}
-              <a
-                href={`tel:${c.phone.replace(/\s+/g, '')}`}
-                className="hover:text-amber-300 transition-colors"
-              >
-                {c.phone}
-              </a>
-              <br />
-              <a
-                href={`mailto:${c.email}`}
-                className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors break-all"
-              >
-                {c.email}
-              </a>
+          {profile ? (
+            <>
+              <p className="leading-relaxed text-slate-300">
+                {footerConfig.addressLines.map((line, idx) => (
+                  <span key={`${line}-${idx}`}>
+                    {idx > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
+              </p>
+              {footerConfig.contacts.map((c, idx) => (
+                <p
+                  key={`${c.label}-${idx}`}
+                  className={`font-mono tabular-nums ${idx === 0 ? 'pt-1' : ''}`}
+                >
+                  {c.label}:{' '}
+                  <a
+                    href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                    className="hover:text-amber-300 transition-colors"
+                  >
+                    {c.phone}
+                  </a>
+                  <br />
+                  <a
+                    href={`mailto:${c.email}`}
+                    className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors break-all"
+                  >
+                    {c.email}
+                  </a>
+                </p>
+              ))}
+            </>
+          ) : (
+            <p className="text-slate-400">
+              {loadingData ? 'Loading directory contacts...' : 'Contact directory unavailable.'}
             </p>
-          ))}
+          )}
         </div>
       </div>
 
       <div className="border-t border-pust-900 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-300">
-          <p>{footerConfig.copyrightText}</p>
-          <p className="font-mono tabular-nums">
-            First Convocation: {profile?.convocationDate ?? '15 March 2027'} · Rajapur Campus
-          </p>
+          <p>{profile ? footerConfig.copyrightText : 'Pabna University of Science and Technology'}</p>
+          {profile?.convocationDate && (
+            <p className="font-mono tabular-nums">
+              First Convocation: {profile.convocationDate} · Rajapur Campus
+            </p>
+          )}
         </div>
       </div>
     </footer>

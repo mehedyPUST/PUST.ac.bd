@@ -11,7 +11,7 @@ export default function NotFound() {
           The requested PUST record or page could not be found
         </h1>
         <p className="text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-          Please return to the university homepage, explore the 21 academic departments, or open the
+          Please return to the university homepage, explore our academic departments, or open the
           Digital Campus Portal.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-3">

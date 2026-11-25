@@ -1,19 +1,15 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { AdministrationRouteView } from '../../../components/SectionRouteViews';
+import { isValidSectionSlug } from '../../../lib/routes';
 
-import { AdministrationSection } from '../../../components/AdministrationSection';
-import { usePust } from '../../../components/PustContext';
-
-export default function AdministrationSubPage() {
-  const { route, profile, vcProfiles, navigateTo } = usePust();
-
-  return (
-    <main className="flex-1 bg-white">
-      <AdministrationSection
-        route={route}
-        profile={profile}
-        vcProfiles={vcProfiles}
-        onNavigate={navigateTo}
-      />
-    </main>
-  );
+export default async function AdministrationSubPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  if (!isValidSectionSlug('administration', slug)) {
+    notFound();
+  }
+  return <AdministrationRouteView />;
 }

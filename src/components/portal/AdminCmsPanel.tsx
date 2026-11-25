@@ -194,15 +194,15 @@ export function AdminCmsPanel({
 
   // Admin About CMS
   const [aboutSlug, setAboutSlug] = useState<AboutContentRecord['slug']>('our-university');
-  const [aboutTitle, setAboutTitle] = useState(aboutSections[0]?.title || 'Our University');
+  const [aboutTitle, setAboutTitle] = useState(aboutSections[0]?.title || '');
   const [aboutBody, setAboutBody] = useState(aboutSections[0]?.body || '');
 
   // Admin Current VC CMS
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
   const [vcName, setVcName] = useState(currentVc?.name || '');
-  const [vcEmail, setVcEmail] = useState(currentVc?.email || 'vc@pust.ac.bd');
-  const [vcPhone, setVcPhone] = useState(currentVc?.phone || '+8802588842379');
-  const [vcTenure, setVcTenure] = useState(currentVc?.tenure || 'September 2024 – Present');
+  const [vcEmail, setVcEmail] = useState(currentVc?.email || '');
+  const [vcPhone, setVcPhone] = useState(currentVc?.phone || '');
+  const [vcTenure, setVcTenure] = useState(currentVc?.tenure || '');
   const [vcMsg, setVcMsg] = useState(currentVc?.message || '');
   const [promoteNewVc, setPromoteNewVc] = useState(false);
 
@@ -222,8 +222,8 @@ export function AdminCmsPanel({
   const [galType, setGalType] = useState<GalleryItemRecord['mediaType']>('photo');
   const [galPhotoSourceMode, setGalPhotoSourceMode] = useState<'upload' | 'link'>('upload');
   const [galVisibility, setGalVisibility] = useState<'public' | 'registered'>('public');
-  const [galUrl, setGalUrl] = useState('/src/assets/images/pust_campus_hero_1795431408503.jpg');
-  const [galDate, setGalDate] = useState('2026-11-20');
+  const [galUrl, setGalUrl] = useState('');
+  const [galDate, setGalDate] = useState('');
   const [uploadingGalleryPhoto, setUploadingGalleryPhoto] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -261,9 +261,9 @@ export function AdminCmsPanel({
   useEffect(() => {
     if (!currentVc) return;
     setVcName(currentVc.name || '');
-    setVcEmail(currentVc.email || 'vc@pust.ac.bd');
-    setVcPhone(currentVc.phone || '+8802588842379');
-    setVcTenure(currentVc.tenure || 'September 2024 – Present');
+    setVcEmail(currentVc.email || '');
+    setVcPhone(currentVc.phone || '');
+    setVcTenure(currentVc.tenure || '');
     setVcMsg(currentVc.message || '');
   }, [currentVc]);
 

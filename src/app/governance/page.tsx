@@ -1,14 +1,5 @@
-'use client';
-
-import { GovernanceSection } from '../../components/GovernanceSection';
-import { usePust } from '../../components/PustContext';
+import { GovernanceRouteView } from '../../components/SectionRouteViews';
 
 export default function GovernancePage() {
-  const { route, navigateTo } = usePust();
-
-  return (
-    <main className="flex-1 bg-white">
-      <GovernanceSection route={route} onNavigate={navigateTo} />
-    </main>
-  );
+  return <GovernanceRouteView />;
 }

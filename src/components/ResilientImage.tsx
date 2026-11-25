@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { Building2 } from 'lucide-react';
 
 interface ResilientImageProps {
-  src: string;
-  fallbackSrc?: string;
+  src?: string;
   alt: string;
   caption?: string;
   className?: string;
@@ -16,7 +15,6 @@ interface ResilientImageProps {
 
 export function ResilientImage({
   src,
-  fallbackSrc,
   alt,
   caption,
   className = 'w-full h-full object-cover',
@@ -24,33 +22,26 @@ export function ResilientImage({
   frameClassName = 'rounded-xl bg-slate-100 border border-slate-200',
   priority = false,
 }: ResilientImageProps) {
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const trimmedSrc = src?.trim() || '';
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setCurrentSrc(src);
     setFailed(false);
-  }, [src]);
+  }, [trimmedSrc]);
 
-  function handleError() {
-    if (fallbackSrc && currentSrc !== fallbackSrc) {
-      setCurrentSrc(fallbackSrc);
-      return;
-    }
-    setFailed(true);
-  }
+  const showImage = Boolean(trimmedSrc) && !failed;
 
   return (
     <figure className={containerClassName}>
       <div className={`relative w-full h-full overflow-hidden ${frameClassName}`}>
-        {!failed ? (
+        {showImage ? (
           <img
-            src={currentSrc}
+            src={trimmedSrc}
             alt={alt}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
             referrerPolicy="no-referrer"
-            onError={handleError}
+            onError={() => setFailed(true)}
             className={className}
           />
         ) : (

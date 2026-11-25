@@ -36,8 +36,10 @@ import { GstEligibilityChecker } from './GstEligibilityChecker';
 import { MotionCard } from './MotionPrimitives';
 import {
   CardsGridSkeleton,
+  HeroSummarySkeleton,
   MediaGridSkeleton,
   NoticeListSkeleton,
+  PageHeaderAndSectionSkeleton,
 } from './PustSkeletons';
 import { PustCrest } from './PustCrest';
 import { ResearchSection } from './ResearchSection';
@@ -56,10 +58,6 @@ import type {
   PublicStatusLookupResult,
   UniversityProfile,
 } from '../types/pust';
-
-const LAB_IMAGE = '/src/assets/images/pust_engineering_lab_1795431408924.jpg';
-const LIBRARY_IMAGE = '/src/assets/images/pust_central_library_1795431408614.jpg';
-const GROUNDS_IMAGE = '/src/assets/images/pust_campus_grounds_1795431408500.jpg';
 
 const FACULTY_FILTERS: Array<{ label: string; value: 'All' | FacultyName }> = [
   { label: 'All', value: 'All' },
@@ -162,6 +160,7 @@ interface PublicSubPagesProps {
   notices: NoticeRecord[];
   loadingData: boolean;
   dataError: string | null;
+  onRetry?: () => void;
   onNavigate: (route: AppRoute | string) => void;
   onSelectDepartment: (dept: DepartmentRecord) => void;
   onSelectNotice: (notice: NoticeRecord) => void;
@@ -194,6 +193,7 @@ export function PublicSubPages({
   notices,
   loadingData,
   dataError,
+  onRetry,
   onNavigate,
   onSelectDepartment,
   onSelectNotice,
@@ -256,8 +256,14 @@ export function PublicSubPages({
   const [inqPhone, setInqPhone] = useState('');
   const [inqProgram, setInqProgram] =
     useState<InquiryRecord['programLevel']>('Undergraduate (GST)');
-  const [inqDept, setInqDept] = useState('CSE');
+  const [inqDept, setInqDept] = useState('');
   const [inqMessage, setInqMessage] = useState('');
+
+  useEffect(() => {
+    if (!inqDept && departments[0]?.code) {
+      setInqDept(departments[0].code);
+    }
+  }, [departments, inqDept]);
   const [inqSubmitting, setInqSubmitting] = useState(false);
   const [inqSuccess, setInqSuccess] = useState<{ referenceCode: string; email: string } | null>(null);
   const [inqError, setInqError] = useState<string | null>(null);
@@ -361,8 +367,7 @@ export function PublicSubPages({
         ? 'plans'
         : 'our-university';
 
-    const activeSection =
-      aboutSections.find((s) => s.slug === activeSlug) || aboutSections[0];
+    const activeSection = aboutSections.find((s) => s.slug === activeSlug) || null;
 
     const aboutTabs: Array<{ label: string; route: AppRoute; slug: string }> = [
       { label: 'Our University', route: '/about/our-university', slug: 'our-university' },
@@ -370,6 +375,8 @@ export function PublicSubPages({
       { label: 'History', route: '/about/history', slug: 'history' },
       { label: 'Strategic Plans', route: '/about/plans', slug: 'plans' },
     ];
+    const activeTabLabel =
+      aboutTabs.find((t) => t.slug === activeSlug)?.label || 'About PUST';
 
     return (
       <main className="flex-1 bg-white">
@@ -380,7 +387,7 @@ export function PublicSubPages({
             </p>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
-                {activeSection?.title || 'Our University'}
+                {activeSection?.title || activeTabLabel}
               </h1>
               <EditTriggerButton
                 target={{ kind: 'about', slug: activeSlug }}
@@ -404,7 +411,24 @@ export function PublicSubPages({
             </div>
           </div>
 
-          {activeSlug === 'mission-vision' && activeSection?.body ? (
+          {loadingData && !activeSection ? (
+            <HeroSummarySkeleton />
+          ) : !activeSection ? (
+            <div className="rounded-2xl border border-slate-200 bg-[#F7F7F5] p-6 space-y-3">
+              <p className="text-sm text-slate-700">
+                {dataError || `Content for "${activeTabLabel}" has not been published yet.`}
+              </p>
+              {dataError && onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                >
+                  Retry Loading
+                </button>
+              )}
+            </div>
+          ) : activeSlug === 'mission-vision' && activeSection.body ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {(() => {
                 const parts = activeSection.body.split(/\n\s*Our Vision\s*\n/i);
@@ -457,65 +481,69 @@ export function PublicSubPages({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7">
                 <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
-                  {activeSection?.body}
+                  {activeSection.body}
                 </p>
               </div>
 
               <div className="lg:col-span-5 space-y-5">
-                <div className="editable-region space-y-2">
-                  <div className="flex justify-end empty:hidden">
-                    <EditTriggerButton
-                      target={{ kind: 'milestones' }}
-                      label="Edit Campus Photo"
-                      variant="compact"
-                    />
-                  </div>
-                  <ResilientImage
-                    src={resolved.aboutExtras.campusImage || GROUNDS_IMAGE}
-                    fallbackSrc={GROUNDS_IMAGE}
-                    alt="PUST Rajapur Campus"
-                    caption={resolved.aboutExtras.campusCaption}
-                    className="w-full aspect-[4/3] object-cover"
-                  />
-                </div>
-                <dl className="rounded-2xl border border-slate-200 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-slate-600">Established</dt>
-                    <dd className="font-mono font-medium sm:text-right">
-                      {profile?.establishedYear ?? 2008} (Act No. 43 of 2001)
-                    </dd>
-                  </div>
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-slate-600">Campus Area</dt>
-                    <dd className="font-mono font-medium sm:text-right">
-                      {profile?.campusAcres ?? 30} Acres · Rajapur, Pabna
-                    </dd>
-                  </div>
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-slate-600">Faculties &amp; Departments</dt>
-                    <dd className="font-mono font-medium sm:text-right">
-                      {profile?.facultiesCount ?? 5} Faculties · {profile?.departmentsCount ?? 21}{' '}
-                      Departments
-                    </dd>
-                  </div>
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-slate-600">First Convocation</dt>
-                    <dd className="font-mono font-semibold text-pust-800 sm:text-right">
-                      {profile?.convocationDate ?? '15 March 2027'}
-                    </dd>
-                  </div>
-                </dl>
+                {profile && (
+                  <>
+                    <div className="editable-region space-y-2">
+                      <div className="flex justify-end empty:hidden">
+                        <EditTriggerButton
+                          target={{ kind: 'milestones' }}
+                          label="Edit Campus Photo"
+                          variant="compact"
+                        />
+                      </div>
+                      <ResilientImage
+                        src={resolved.aboutExtras.campusImage}
+                        alt="PUST Rajapur Campus"
+                        caption={resolved.aboutExtras.campusCaption}
+                        className="w-full aspect-[4/3] object-cover"
+                      />
+                    </div>
+                    <dl className="rounded-2xl border border-slate-200 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
+                      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                        <dt className="text-slate-600">Established</dt>
+                        <dd className="font-mono font-medium sm:text-right">
+                          {profile.establishedYear} (Act No. 43 of 2001)
+                        </dd>
+                      </div>
+                      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                        <dt className="text-slate-600">Campus Area</dt>
+                        <dd className="font-mono font-medium sm:text-right">
+                          {profile.campusAcres} Acres · Rajapur, Pabna
+                        </dd>
+                      </div>
+                      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                        <dt className="text-slate-600">Faculties &amp; Departments</dt>
+                        <dd className="font-mono font-medium sm:text-right">
+                          {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
+                        </dd>
+                      </div>
+                      {profile.convocationDate && (
+                        <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                          <dt className="text-slate-600">First Convocation</dt>
+                          <dd className="font-mono font-semibold text-pust-800 sm:text-right">
+                            {profile.convocationDate}
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  </>
+                )}
               </div>
             </div>
           ) : (
             <div className="max-w-4xl">
               <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
-                {activeSection?.body}
+                {activeSection.body}
               </p>
             </div>
           )}
 
-          {activeSlug === 'history' && (
+          {activeSlug === 'history' && profile && (
             <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
@@ -527,29 +555,33 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                {resolved.aboutExtras.milestones.map((m, idx) => {
-                  const milestoneStyle =
-                    idx === 0 || idx === 1
-                      ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
-                      : idx === 2 || idx === 3
-                      ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                      : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45';
-                  return (
-                    <MotionCard
-                      key={`${m.year}-${idx}`}
-                      delay={idx * 0.04}
-                      className={`p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
-                    >
-                      <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
-                        {m.year}
-                      </p>
-                      <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
-                      <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
-                    </MotionCard>
-                  );
-                })}
-              </div>
+              {resolved.aboutExtras.milestones.length === 0 ? (
+                <p className="text-sm text-slate-600">No chronology milestones published yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {resolved.aboutExtras.milestones.map((m, idx) => {
+                    const milestoneStyle =
+                      idx === 0 || idx === 1
+                        ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                        : idx === 2 || idx === 3
+                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                        : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45';
+                    return (
+                      <MotionCard
+                        key={`${m.year}-${idx}`}
+                        delay={idx * 0.04}
+                        className={`p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
+                      >
+                        <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
+                          {m.year}
+                        </p>
+                        <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
+                        <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
+                      </MotionCard>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </section>
@@ -608,7 +640,16 @@ export function PublicSubPages({
     const totalTeachers =
       departments.some((d) => (d.facultyCount ?? 0) > 0)
         ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
-        : profile?.facultyMembersCount ?? 212;
+        : profile?.facultyMembersCount ?? 0;
+    const summaryParts = [
+      profile?.facultiesCount ? `${profile.facultiesCount} Faculties` : null,
+      departments.length > 0
+        ? `${departments.length} Departments`
+        : profile?.departmentsCount
+        ? `${profile.departmentsCount} Departments`
+        : null,
+      totalTeachers > 0 ? `${totalTeachers} Teachers` : null,
+    ].filter(Boolean);
 
     return (
       <main className="flex-1 bg-white">
@@ -618,10 +659,11 @@ export function PublicSubPages({
               <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
                 {activeHeading}
               </h1>
-              <p className="font-mono text-xs text-slate-600 tabular-nums">
-                {profile?.facultiesCount ?? 5} Faculties · {departments.length || 21} Departments ·{' '}
-                {totalTeachers} Teachers
-              </p>
+              {summaryParts.length > 0 && (
+                <p className="font-mono text-xs text-slate-600 tabular-nums">
+                  {summaryParts.join(' · ')}
+                </p>
+              )}
             </div>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
               {academicSubTabs.map((tab) => {
@@ -650,7 +692,33 @@ export function PublicSubPages({
             </div>
           </div>
 
-          {route === '/academics/programs' ? (
+          {route !== '/academics/departments' &&
+          route !== '/academics' &&
+          route !== '/academics/chairmen' &&
+          !isResearchView &&
+          loadingData &&
+          !profile ? (
+            <CardsGridSkeleton count={4} />
+          ) : route !== '/academics/departments' &&
+            route !== '/academics' &&
+            route !== '/academics/chairmen' &&
+            !isResearchView &&
+            !profile ? (
+            <div className="p-6 rounded-2xl border border-red-200 bg-red-50 space-y-3">
+              <p className="text-sm text-red-800">
+                {dataError || 'Academic configuration data is unavailable.'}
+              </p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                >
+                  Retry Loading
+                </button>
+              )}
+            </div>
+          ) : route === '/academics/programs' ? (
             <div className="editable-region space-y-8">
               <div className="flex justify-end empty:hidden">
                 <EditTriggerButton
@@ -659,37 +727,43 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resolved.academicExtras.degreePrograms.map((prog, idx) => (
-                  <MotionCard
-                    key={`${prog.level}-${idx}`}
-                    delay={idx * 0.04}
-                    className={`p-6 rounded-2xl border space-y-3 shadow-xs hover:shadow-md transition-all ${
-                      idx % 2 === 0
-                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                        : 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
-                    }`}
-                  >
-                    <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                      {prog.duration}
-                    </p>
-                    <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
-                    <p className="text-sm font-medium text-slate-800 leading-relaxed">
-                      {prog.degrees}
-                    </p>
-                    <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
-                      <div className="flex justify-between gap-4">
-                        <dt className="text-slate-500">Credit Structure</dt>
-                        <dd className="font-mono text-slate-900 text-right">{prog.credits}</dd>
-                      </div>
-                      <div className="flex justify-between gap-4">
-                        <dt className="text-slate-500">Admission Pathway</dt>
-                        <dd className="text-right text-slate-800">{prog.entry}</dd>
-                      </div>
-                    </dl>
-                  </MotionCard>
-                ))}
-              </div>
+              {resolved.academicExtras.degreePrograms.length === 0 ? (
+                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                  No academic degree programs have been published yet.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {resolved.academicExtras.degreePrograms.map((prog, idx) => (
+                    <MotionCard
+                      key={`${prog.level}-${idx}`}
+                      delay={idx * 0.04}
+                      className={`p-6 rounded-2xl border space-y-3 shadow-xs hover:shadow-md transition-all ${
+                        idx % 2 === 0
+                          ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                          : 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                      }`}
+                    >
+                      <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
+                        {prog.duration}
+                      </p>
+                      <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
+                      <p className="text-sm font-medium text-slate-800 leading-relaxed">
+                        {prog.degrees}
+                      </p>
+                      <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-slate-500">Credit Structure</dt>
+                          <dd className="font-mono text-slate-900 text-right">{prog.credits}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-slate-500">Admission Pathway</dt>
+                          <dd className="text-right text-slate-800">{prog.entry}</dd>
+                        </div>
+                      </dl>
+                    </MotionCard>
+                  ))}
+                </div>
+              )}
 
               {/* Official PUST Specialized Institute (IIED) */}
               <div className="card-gradient-sage rounded-2xl border border-sage-200/80 p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
@@ -742,7 +816,9 @@ export function PublicSubPages({
                     onClick={() => onNavigate('/academics/departments')}
                     className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
                   >
-                    Browse 21 Departments
+                    {departments.length > 0
+                      ? `Browse ${departments.length} Departments`
+                      : 'Browse Departments'}
                   </button>
                 </div>
               </div>
@@ -751,9 +827,12 @@ export function PublicSubPages({
             <div className="editable-region space-y-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-slate-600">
-                  Unified directory of all 5 Academic Faculties, Dean profiles (verified via{' '}
-                  <span className="font-mono text-xs">pust.ac.bd</span>), and their 21 constituent
-                  departments.
+                  Unified directory of {resolved.academicExtras.facultyDeans.length} Academic
+                  Faculties, Dean profiles (verified via{' '}
+                  <span className="font-mono text-xs">pust.ac.bd</span>), and{' '}
+                  {departments.length > 0
+                    ? `${departments.length} constituent departments.`
+                    : 'constituent departments.'}
                 </p>
                 <EditTriggerButton
                   target={{ kind: 'faculty-deans' }}
@@ -761,6 +840,12 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
+
+              {resolved.academicExtras.facultyDeans.length === 0 && (
+                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                  No faculty dean records have been published yet.
+                </div>
+              )}
 
               {resolved.academicExtras.facultyDeans.map((fac, idx) => {
                 const facDepts = departments.filter((d) => d.faculty === fac.faculty);
@@ -942,8 +1027,13 @@ export function PublicSubPages({
                     <h2 className="font-serif text-xl font-medium text-slate-900">
                       Interactive Fillable &amp; Portal Workflows
                     </h2>
-                    <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
-                      {resolved.academicExtras.downloadForms.map((form) => (
+                    {resolved.academicExtras.downloadForms.length === 0 ? (
+                      <div className="p-6 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                        No interactive fillable forms are currently configured.
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 overflow-hidden bg-white shadow-xs">
+                        {resolved.academicExtras.downloadForms.map((form) => (
                         <div
                           key={form.code}
                           className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F7F7F5]/60 transition-colors"
@@ -987,7 +1077,8 @@ export function PublicSubPages({
                           </div>
                         </div>
                       ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Section 2: Official PUST PDF/DOCX Forms Directory */}
@@ -1162,18 +1253,24 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {resolved.academicExtras.scholarships.map((s, idx) => (
-                  <MotionCard
-                    key={`${s.title}-${idx}`}
-                    delay={idx * 0.04}
-                    className="p-6 rounded-2xl border border-gold-200/80 card-gradient-gold hover:border-gold-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
-                  >
-                    <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
-                    <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
-                  </MotionCard>
-                ))}
-              </div>
+              {resolved.academicExtras.scholarships.length === 0 ? (
+                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                  No scholarship schemes are currently listed.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {resolved.academicExtras.scholarships.map((s, idx) => (
+                    <MotionCard
+                      key={`${s.title}-${idx}`}
+                      delay={idx * 0.04}
+                      className="p-6 rounded-2xl border border-gold-200/80 card-gradient-gold hover:border-gold-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
+                    >
+                      <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
+                      <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
+                    </MotionCard>
+                  ))}
+                </div>
+              )}
               <div className="p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
                 <div className="space-y-1">
                   <p className="font-mono uppercase tracking-wider text-pust-800 font-semibold">
@@ -1206,29 +1303,36 @@ export function PublicSubPages({
                     label="Edit Seminars"
                     variant="compact"
                   />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      downloadIcsCalendar(
-                        resolved.upcomingSeminars.map((sem) => ({
-                          uid: `pust-sem-${sem.id}`,
-                          title: sem.title,
-                          date: sem.date,
-                          description: `Organized by ${sem.organizer}`,
-                        })),
-                        'PUST-Seminars-Workshops.ics'
-                      )
-                    }
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <CalendarPlus className="w-3.5 h-3.5" />
-                    Export Seminars (.ics)
-                  </button>
+                  {resolved.upcomingSeminars.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadIcsCalendar(
+                          resolved.upcomingSeminars.map((sem) => ({
+                            uid: `pust-sem-${sem.id}`,
+                            title: sem.title,
+                            date: sem.date,
+                            description: `Organized by ${sem.organizer}`,
+                          })),
+                          'PUST-Seminars-Workshops.ics'
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <CalendarPlus className="w-3.5 h-3.5" />
+                      Export Seminars (.ics)
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4">
-                {resolved.upcomingSeminars.map((sem, idx) => (
-                  <MotionCard
+              {resolved.upcomingSeminars.length === 0 ? (
+                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                  No upcoming seminars or workshops are scheduled yet.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {resolved.upcomingSeminars.map((sem, idx) => (
+                    <MotionCard
                     key={sem.id}
                     delay={idx * 0.04}
                     className="p-5 sm:p-6 rounded-2xl border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/45 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -1263,16 +1367,14 @@ export function PublicSubPages({
                     </button>
                   </MotionCard>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
           ) : isResearchView ? (
             <ResearchSection
               publications={publications}
               journals={profile?.journals ?? []}
               departments={departments}
-              labImage={LAB_IMAGE}
-              libraryImage={LIBRARY_IMAGE}
-              groundsImage={GROUNDS_IMAGE}
               focus={route === '/academics/journals' ? 'journals' : 'publications'}
               showInfrastructure={false}
             />
@@ -1637,36 +1739,83 @@ export function PublicSubPages({
                   variant="compact"
                 />
               </div>
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
-                {admissionNotices.map((n) => (
-                  <div
-                    key={n.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onSelectNotice(n)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onSelectNotice(n);
-                      }
-                    }}
-                    className="w-full text-left p-5 hover:bg-pust-50/35 cursor-pointer space-y-1"
+              {loadingData && notices.length === 0 ? (
+                <NoticeListSkeleton rows={4} />
+              ) : dataError && notices.length === 0 ? (
+                <div className="p-6 rounded-2xl border border-red-200 bg-red-50 space-y-3">
+                  <p className="text-sm text-red-800">{dataError}</p>
+                  {onRetry && (
+                    <button
+                      type="button"
+                      onClick={onRetry}
+                      className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                    >
+                      Retry Loading
+                    </button>
+                  )}
+                </div>
+              ) : admissionNotices.length === 0 ? (
+                <div className="p-8 rounded-2xl border border-slate-200 bg-white text-center space-y-3">
+                  <p className="text-sm text-slate-600">
+                    No active admission circulars are published right now.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/notices')}
+                    className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800 cursor-pointer"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="font-mono text-xs text-pust-800 tabular-nums">
-                        {n.publishedAt} · {n.referenceNo}
-                      </p>
-                      <EditTriggerButton
-                        target={{ kind: 'notice', notice: n }}
-                        label="Edit"
-                        variant="compact"
-                      />
+                    View General Notice Board
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                  {admissionNotices.map((n) => (
+                    <div
+                      key={n.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onSelectNotice(n)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onSelectNotice(n);
+                        }
+                      }}
+                      className="w-full text-left p-5 hover:bg-pust-50/35 cursor-pointer space-y-1"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="font-mono text-xs text-pust-800 tabular-nums">
+                          {n.publishedAt} · {n.referenceNo}
+                        </p>
+                        <EditTriggerButton
+                          target={{ kind: 'notice', notice: n }}
+                          label="Edit"
+                          variant="compact"
+                        />
+                      </div>
+                      <h2 className="font-serif text-lg font-medium text-slate-900">{n.title}</h2>
+                      <p className="text-sm text-slate-600">{n.summary}</p>
                     </div>
-                    <h2 className="font-serif text-lg font-medium text-slate-900">{n.title}</h2>
-                    <p className="text-sm text-slate-600">{n.summary}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : loadingData && !profile ? (
+            <CardsGridSkeleton count={3} />
+          ) : !profile ? (
+            <div className="p-6 rounded-2xl border border-red-200 bg-red-50 space-y-3">
+              <p className="text-sm text-red-800">
+                {dataError || 'Admissions overview is unavailable right now.'}
+              </p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                >
+                  Retry Loading
+                </button>
+              )}
             </div>
           ) : (
             <div className="editable-region space-y-10">
@@ -1977,8 +2126,64 @@ export function PublicSubPages({
 
   // 4. FACILITIES PAGES (/facilities/*)
   if (route.startsWith('/facilities')) {
+    if (loadingData && !profile) {
+      return (
+        <main className="flex-1 bg-white">
+          <PageHeaderAndSectionSkeleton />
+        </main>
+      );
+    }
+
+    if (!profile) {
+      return (
+        <main className="flex-1 bg-white">
+          <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
+              <h1 className="font-serif text-xl font-medium text-red-950">
+                Campus Facilities Data Unavailable
+              </h1>
+              <p className="text-sm text-red-800">
+                {dataError || 'Unable to load facility pages from the university server.'}
+              </p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                >
+                  Retry Loading
+                </button>
+              )}
+            </div>
+          </section>
+        </main>
+      );
+    }
+
     const facTabs = resolved.facilitiesConfig;
-    const currentFac = facTabs.find((f) => f.route === route) || facTabs[0];
+    const targetFacilityRoute =
+      route === '/facilities' ? facTabs[0]?.route : route;
+    const currentFac = facTabs.find((f) => f.route === targetFacilityRoute);
+
+    if (!currentFac) {
+      return (
+        <main className="flex-1 bg-white">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-6">
+            <div className="rounded-2xl border border-slate-200 bg-[#F7F7F5] p-8 space-y-3">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                Campus Facilities &amp; Student Services
+              </p>
+              <h1 className="font-serif text-2xl font-medium text-slate-900">
+                Facility Information Not Configured
+              </h1>
+              <p className="text-sm text-slate-600">
+                No details have been published for this campus facility yet.
+              </p>
+            </div>
+          </section>
+        </main>
+      );
+    }
 
     return (
       <main className="flex-1 bg-white">
@@ -2081,7 +2286,6 @@ export function PublicSubPages({
             <div className="lg:col-span-6">
               <ResilientImage
                 src={currentFac.img}
-                fallbackSrc={GROUNDS_IMAGE}
                 alt={currentFac.title}
                 caption={currentFac.title}
                 className="w-full aspect-[4/3] object-cover"
@@ -2145,6 +2349,35 @@ export function PublicSubPages({
 
           {loadingData && galleryItems.length === 0 ? (
             <MediaGridSkeleton count={6} />
+          ) : dataError && galleryItems.length === 0 ? (
+            <div className="p-6 rounded-2xl border border-red-200 bg-red-50 space-y-3">
+              <p className="text-sm text-red-800">{dataError}</p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                >
+                  Retry Loading
+                </button>
+              )}
+            </div>
+          ) : items.length === 0 ? (
+            <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
+              <p className="text-sm text-slate-700">
+                No campus photos or videos are available
+                {galleryCategory !== 'All' ? ` under ${galleryCategory}` : ''} yet.
+              </p>
+              {galleryCategory !== 'All' && (
+                <button
+                  type="button"
+                  onClick={() => setGalleryCategory('All')}
+                  className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                >
+                  Show All Media
+                </button>
+              )}
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map((item, idx) => {
@@ -2176,7 +2409,6 @@ export function PublicSubPages({
                     <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
                       <ResilientImage
                         src={thumbUrl}
-                        fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
                         alt={item.title}
                         containerClassName="w-full h-full"
                         frameClassName="bg-slate-900"
@@ -2388,6 +2620,19 @@ export function PublicSubPages({
         {loadingData && notices.length === 0 ? (
           <div className="mt-6">
             <NoticeListSkeleton rows={6} />
+          </div>
+        ) : dataError && notices.length === 0 ? (
+          <div className="p-6 mt-6 rounded-2xl border border-red-200 bg-red-50 space-y-3">
+            <p className="text-sm text-red-800">{dataError}</p>
+            {onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+              >
+                Retry Loading
+              </button>
+            )}
           </div>
         ) : filteredNotices.length === 0 ? (
           <div className="py-10 px-6 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">

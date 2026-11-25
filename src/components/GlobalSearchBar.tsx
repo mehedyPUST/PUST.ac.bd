@@ -39,7 +39,7 @@ const STATIC_RESOURCE_ENRICHMENTS: Partial<Record<string, string>> = {
   '/academics/calendar': 'academic calendar 2026 2027 20 weeks 14 weeks semester ics export add to calendar exam schedule deadlines midterm final classes vacation holiday',
   '/academics/scholarship': 'scholarship stipend fellowship merit need financial aid waiver tuition',
   '/academics/seminars': 'seminars workshops colloquium conference symposium research event iqac ics calendar',
-  '/academics/publications': 'peer reviewed research papers articles journals pust studies jhss jbs issn ieee elsevier doi faculty publications 3934 works citation',
+  '/academics/publications': 'peer reviewed research papers articles journals pust studies jhss jbs issn ieee elsevier doi faculty publications citation',
   '/admissions': 'gst admission 2026 2027 undergraduate unit a b c architecture eligibility checker gpa inquiry status tracker',
   '/admissions/undergraduate': 'gst unit a b c undergraduate eligibility checker gpa criteria architecture drawing',
   '/admissions/graduate': 'msc meng mba graduate admission circular postgraduate',

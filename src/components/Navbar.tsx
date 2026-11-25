@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Eye, Menu, Pencil, Plus, Search, X } from 'lucide-react';
-import {
-  DEFAULT_NAVBAR_TAGLINE,
-  resolveContextualEditTarget,
-} from '../lib/cmsDefaults';
+import { resolveContextualEditTarget } from '../lib/cmsDefaults';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
 import type {
   AboutContentRecord,
@@ -146,9 +143,11 @@ export function Navbar({
 
               <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <div className="hidden 2xl:inline-flex items-center gap-1.5">
-                  <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
-                    {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
-                  </span>
+                  {profile?.navbarTagline?.trim() && (
+                    <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
+                      {profile.navbarTagline.trim()}
+                    </span>
+                  )}
                   {user?.role === 'admin' && editMode && onOpenEditModal && (
                     <button
                       type="button"

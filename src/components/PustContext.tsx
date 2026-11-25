@@ -68,6 +68,7 @@ interface PustContextValue {
   loadDepartments: () => Promise<void>;
   loadPublications: () => Promise<void>;
   loadBookmarks: () => Promise<void>;
+  retryLoad: () => Promise<void>;
   submitInquiry: (payload: {
     fullName: string;
     email: string;
@@ -240,32 +241,14 @@ export function PustShell({
     [router]
   );
 
-  const mergeVcProfiles = useCallback(
-    (incoming: ViceChancellorRecord[], fallback: ViceChancellorRecord[]) => {
-      if (!Array.isArray(incoming) || incoming.length === 0) return fallback;
-      return incoming.map((vc) => {
-        if (vc.message && vc.message.trim().length > 0) return vc;
-        const seeded = fallback.find((f) => f.id === vc.id || (vc.isCurrent && f.isCurrent));
-        return seeded ? { ...vc, message: seeded.message } : vc;
-      });
-    },
-    []
-  );
-
   const loadCmsProfile = useCallback(async () => {
     const profileRes = await pustApi.getUniversityProfile();
-    if (profileRes.profile) setProfile(profileRes.profile);
-    if (Array.isArray(profileRes.aboutSections) && profileRes.aboutSections.length > 0) {
-      setAboutSections(profileRes.aboutSections);
-    }
-    setVcProfiles((prev) => mergeVcProfiles(profileRes.vcProfiles, prev));
-    if (Array.isArray(profileRes.galleryItems)) {
-      setGalleryItems(profileRes.galleryItems);
-    }
-    if (Array.isArray(profileRes.bannerSlides)) {
-      setBannerSlides(profileRes.bannerSlides);
-    }
-  }, [mergeVcProfiles]);
+    setProfile(profileRes.profile ?? null);
+    setAboutSections(Array.isArray(profileRes.aboutSections) ? profileRes.aboutSections : []);
+    setVcProfiles(Array.isArray(profileRes.vcProfiles) ? profileRes.vcProfiles : []);
+    setGalleryItems(Array.isArray(profileRes.galleryItems) ? profileRes.galleryItems : []);
+    setBannerSlides(Array.isArray(profileRes.bannerSlides) ? profileRes.bannerSlides : []);
+  }, []);
 
   const loadNotices = useCallback(async () => {
     const res = await pustApi.getNotices();
@@ -295,65 +278,54 @@ export function PustShell({
     }
   }, []);
 
+  const bootstrapData = useCallback(async (showSpinner: boolean) => {
+    if (showSpinner) {
+      setLoadingData(true);
+    }
+    setDataError(null);
+    try {
+      const [profileRes, deptRes, pubRes, noticeRes, meRes, statusRes] = await Promise.all([
+        pustApi.getUniversityProfile(),
+        pustApi.getDepartments(),
+        pustApi.getPublications(),
+        pustApi.getNotices(),
+        pustApi.getMe(),
+        pustApi.getBootstrapStatus(),
+      ]);
+      setProfile(profileRes.profile ?? null);
+      setAboutSections(Array.isArray(profileRes.aboutSections) ? profileRes.aboutSections : []);
+      setVcProfiles(Array.isArray(profileRes.vcProfiles) ? profileRes.vcProfiles : []);
+      setGalleryItems(Array.isArray(profileRes.galleryItems) ? profileRes.galleryItems : []);
+      setBannerSlides(Array.isArray(profileRes.bannerSlides) ? profileRes.bannerSlides : []);
+      setDepartments(Array.isArray(deptRes.departments) ? deptRes.departments : []);
+      setPublications(Array.isArray(pubRes.publications) ? pubRes.publications : []);
+      setNotices(Array.isArray(noticeRes.notices) ? noticeRes.notices : []);
+      setUser(meRes.user);
+      setAuthResolved(true);
+      setBootstrapStatus(statusRes);
+      if (meRes.user) {
+        const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
+        setBookmarks(bmRes.bookmarks);
+      }
+    } catch (err) {
+      setAuthResolved(true);
+      setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
+    } finally {
+      setAuthResolved(true);
+      setLoadingData(false);
+    }
+  }, []);
+
+  const retryLoad = useCallback(() => bootstrapData(true), [bootstrapData]);
+
   useEffect(() => {
     let active = true;
-    async function bootstrap() {
-      if (!initialData) {
-        setLoadingData(true);
-      }
-      setDataError(null);
-      try {
-        const [profileRes, deptRes, pubRes, noticeRes, meRes, statusRes] = await Promise.all([
-          pustApi.getUniversityProfile(),
-          pustApi.getDepartments(),
-          pustApi.getPublications(),
-          pustApi.getNotices(),
-          pustApi.getMe(),
-          pustApi.getBootstrapStatus(),
-        ]);
-        if (!active) return;
-        if (profileRes.profile) setProfile(profileRes.profile);
-        if (Array.isArray(profileRes.aboutSections) && profileRes.aboutSections.length > 0) {
-          setAboutSections(profileRes.aboutSections);
-        }
-        setVcProfiles((prev) =>
-          mergeVcProfiles(profileRes.vcProfiles, initialData?.vcProfiles ?? prev)
-        );
-        if (Array.isArray(profileRes.galleryItems)) {
-          setGalleryItems(profileRes.galleryItems);
-        }
-        if (Array.isArray(profileRes.bannerSlides)) {
-          setBannerSlides(profileRes.bannerSlides);
-        }
-        setDepartments(deptRes.departments);
-        setPublications(pubRes.publications);
-        setNotices(noticeRes.notices);
-        setUser(meRes.user);
-        setAuthResolved(true);
-        setBootstrapStatus(statusRes);
-        if (meRes.user) {
-          const bmRes = await pustApi.getBookmarks().catch(() => ({ bookmarks: [] }));
-          if (active) setBookmarks(bmRes.bookmarks);
-        }
-      } catch (err) {
-        if (active) {
-          setAuthResolved(true);
-          if (!initialData) {
-            setDataError(err instanceof Error ? err.message : 'Unable to load university records.');
-          }
-        }
-      } finally {
-        if (active) {
-          setAuthResolved(true);
-          setLoadingData(false);
-        }
-      }
-    }
-    bootstrap();
+    if (!active) return;
+    bootstrapData(!initialData);
     return () => {
       active = false;
     };
-  }, [initialData]);
+  }, [initialData, bootstrapData]);
 
   const bookmarkedIds = useMemo(() => new Set(bookmarks.map((b) => b.itemId)), [bookmarks]);
 
@@ -448,6 +420,7 @@ export function PustShell({
       loadDepartments,
       loadPublications,
       loadBookmarks,
+      retryLoad,
       submitInquiry,
     }),
     [
@@ -477,6 +450,7 @@ export function PustShell({
       loadDepartments,
       loadPublications,
       loadBookmarks,
+      retryLoad,
       submitInquiry,
     ]
   );

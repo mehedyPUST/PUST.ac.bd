@@ -1,14 +1,15 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { GovernanceRouteView } from '../../../components/SectionRouteViews';
+import { isValidSectionSlug } from '../../../lib/routes';
 
-import { GovernanceSection } from '../../../components/GovernanceSection';
-import { usePust } from '../../../components/PustContext';
-
-export default function GovernanceSubPage() {
-  const { route, navigateTo } = usePust();
-
-  return (
-    <main className="flex-1 bg-white">
-      <GovernanceSection route={route} onNavigate={navigateTo} />
-    </main>
-  );
+export default async function GovernanceSubPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  if (!isValidSectionSlug('governance', slug)) {
+    notFound();
+  }
+  return <GovernanceRouteView />;
 }

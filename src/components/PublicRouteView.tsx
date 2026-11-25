@@ -14,6 +14,7 @@ export function PublicRouteView() {
     notices,
     loadingData,
     dataError,
+    retryLoad,
     navigateTo,
     setActiveDepartment,
     setActiveNotice,
@@ -31,6 +32,7 @@ export function PublicRouteView() {
       notices={notices}
       loadingData={loadingData}
       dataError={dataError}
+      onRetry={retryLoad}
       onNavigate={navigateTo}
       onSelectDepartment={setActiveDepartment}
       onSelectNotice={setActiveNotice}

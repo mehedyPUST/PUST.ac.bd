@@ -10,6 +10,7 @@ import { CgpaCalculator } from './CgpaCalculator';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
+import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 
 interface GovernanceSectionProps {
   route: AppRoute;
@@ -49,7 +50,7 @@ const GOVERNANCE_TABS: Array<{
     code: 'STATUTORY BODY · SECTION 21',
     heading: 'The Academic Council',
     subtitle:
-      'Principal academic body governing curricula, degree standards, faculties, examinations, research supervision, and departmental ordinances across 21 departments.',
+      'Principal academic body governing curricula, degree standards, faculties, examinations, research supervision, and departmental ordinances across all university departments.',
   },
   {
     route: '/governance/finance-committee',
@@ -72,10 +73,37 @@ const GOVERNANCE_TABS: Array<{
 ];
 
 export function GovernanceSection({ route }: GovernanceSectionProps) {
-  const { profile } = usePust();
-  const { governanceContent } = resolveUniversityContent(profile);
+  const { profile, loadingData, dataError, retryLoad } = usePust();
   const [showActPreview, setShowActPreview] = useState(true);
   const [expandedPreview, setExpandedPreview] = useState(false);
+
+  if (loadingData && !profile) {
+    return <PageHeaderAndSectionSkeleton />;
+  }
+
+  if (!profile) {
+    return (
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
+          <h1 className="font-serif text-xl font-medium text-red-950">
+            Statutory Governance Data Unavailable
+          </h1>
+          <p className="text-sm text-red-800">
+            {dataError || 'Unable to load governance records from the university server.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => retryLoad()}
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+          >
+            Retry Loading
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  const { governanceContent } = resolveUniversityContent(profile);
 
   const activeRoute =
     route === '/governance' || route === '/governance/university-act'
@@ -172,31 +200,33 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                       </div>
                     ))}
                   </dl>
-                  <div className="flex flex-wrap gap-2.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowActPreview((prev) => !prev)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
-                    </button>
-                    <a
-                      href={governanceContent.officialActUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
-                    >
-                      Open Source Page
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
+                  {governanceContent.officialActUrl && (
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowActPreview((prev) => !prev)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
+                      </button>
+                      <a
+                        href={governanceContent.officialActUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
+                      >
+                        Open Source Page
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </aside>
             </div>
 
             {/* Live Embedded Preview of Official Bangladesh Laws Page */}
-            {showActPreview && (
+            {showActPreview && governanceContent.officialActUrl && (
               <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
                 <div className="px-5 py-3.5 border-b border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>

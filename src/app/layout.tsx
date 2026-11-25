@@ -1,19 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
-import { PustShell } from '../components/PustContext';
-import {
-  SEED_ABOUT_SECTIONS,
-  SEED_BANNER_SLIDES,
-  SEED_DEPARTMENTS,
-  SEED_GALLERY_ITEMS,
-  SEED_NOTICES,
-  SEED_PUBLICATIONS,
-  SEED_UNIVERSITY_PROFILE,
-  SEED_VC_PROFILES,
-} from '../../server/seedData';
+import { PustShell, type PustInitialData } from '../components/PustContext';
+import { pustRepo } from '../../server/db';
 import 'react-loading-skeleton/dist/skeleton.css';
 import './globals.css';
+
+export const dynamic = 'force-dynamic';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -74,11 +67,46 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  const initialPublicNotices = SEED_NOTICES.filter((n) => n.visibility === 'public').sort((a, b) => {
-    if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
-    return b.publishedAt.localeCompare(a.publishedAt);
-  });
+async function loadInitialPublicData(): Promise<PustInitialData | undefined> {
+  try {
+    await pustRepo.init();
+    const [
+      profile,
+      aboutSections,
+      vcProfiles,
+      rawGalleryItems,
+      bannerSlides,
+      departments,
+      publications,
+      notices,
+    ] = await Promise.all([
+      pustRepo.getUniversityProfile(),
+      pustRepo.listAboutSections(),
+      pustRepo.listViceChancellors(),
+      pustRepo.listGalleryItems(),
+      pustRepo.listBannerSlides(),
+      pustRepo.listDepartments(),
+      pustRepo.listPublications(),
+      pustRepo.listNotices({ isAuthenticated: false }),
+    ]);
+
+    return {
+      profile,
+      aboutSections,
+      vcProfiles,
+      galleryItems: rawGalleryItems.filter((g) => (g.visibility || 'public') === 'public'),
+      bannerSlides,
+      departments,
+      publications,
+      notices,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const initialData = await loadInitialPublicData();
 
   return (
     <html
@@ -86,22 +114,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}
     >
       <body className="bg-[#FAF8F4] text-slate-900 antialiased selection:bg-pust-800 selection:text-white">
-        <PustShell
-          initialData={{
-            profile: SEED_UNIVERSITY_PROFILE,
-            aboutSections: SEED_ABOUT_SECTIONS,
-            vcProfiles: [...SEED_VC_PROFILES].sort((a, b) => b.orderIndex - a.orderIndex),
-            galleryItems: [...SEED_GALLERY_ITEMS]
-              .filter((g) => (g.visibility || 'public') === 'public')
-              .sort((a, b) => b.eventDate.localeCompare(a.eventDate)),
-            bannerSlides: [...SEED_BANNER_SLIDES].sort((a, b) => a.orderIndex - b.orderIndex),
-            departments: SEED_DEPARTMENTS,
-            publications: SEED_PUBLICATIONS,
-            notices: initialPublicNotices,
-          }}
-        >
-          {children}
-        </PustShell>
+        <PustShell initialData={initialData}>{children}</PustShell>
       </body>
     </html>
   );

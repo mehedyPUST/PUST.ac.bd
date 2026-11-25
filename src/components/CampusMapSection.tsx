@@ -8,6 +8,7 @@ import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { CampusZoneType } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
+import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 
 type CampusZone = 'All' | CampusZoneType;
@@ -21,12 +22,10 @@ const ZONES: CampusZone[] = [
 ];
 
 export function CampusMapSection() {
-  const { profile } = usePust();
+  const { profile, loadingData, dataError, retryLoad } = usePust();
   const { campusMapMeta, campusBuildings } = resolveUniversityContent(profile);
   const [selectedZone, setSelectedZone] = useState<CampusZone>('All');
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string>(
-    campusBuildings[0]?.id || 'admin-bhaban'
-  );
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
 
   const filteredBuildings =
     selectedZone === 'All'
@@ -37,6 +36,63 @@ export function CampusMapSection() {
     campusBuildings.find((b) => b.id === selectedBuildingId) ||
     filteredBuildings[0] ||
     campusBuildings[0];
+
+  if (loadingData && !profile) {
+    return (
+      <section id="campus-map" className="bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16">
+        <PageHeaderAndSectionSkeleton />
+      </section>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <section id="campus-map" className="bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 flex flex-wrap items-center justify-between gap-4">
+            <p className="text-sm text-red-800">
+              {dataError || 'Campus map directory is unavailable.'}
+            </p>
+            <button
+              type="button"
+              onClick={() => retryLoad()}
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!activeBuilding) {
+    return (
+      <section id="campus-map" className="bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1">
+              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                {campusMapMeta.eyebrow}
+              </p>
+              <h2 className="font-serif text-2xl font-medium text-slate-900">
+                {campusMapMeta.title}
+              </h2>
+              <p className="text-sm text-slate-600">
+                No campus buildings have been added to the interactive map yet.
+              </p>
+            </div>
+            <EditTriggerButton
+              target={{ kind: 'campus-building' }}
+              label="Add Campus Building"
+              icon="add"
+              variant="compact"
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   function handleZoneChange(zone: CampusZone) {
     setSelectedZone(zone);

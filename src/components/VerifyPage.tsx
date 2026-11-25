@@ -20,12 +20,11 @@ import { EditTriggerButton } from './EditTriggerButton';
 import { MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
-import { PortalRecordsSkeleton } from './PustSkeletons';
+import { PageHeaderAndSectionSkeleton, PortalRecordsSkeleton } from './PustSkeletons';
 import { VerificationQrSvg } from './portal/DigitalDocumentModal';
 
 export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => void }) {
-  const { profile } = usePust();
-  const { verifyPageConfig } = resolveUniversityContent(profile);
+  const { profile, loadingData, dataError, retryLoad } = usePust();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerificationLookupResult | null>(null);
@@ -86,6 +85,34 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
     runVerification(query);
   }
 
+  if (loadingData && !profile) {
+    return <PageHeaderAndSectionSkeleton />;
+  }
+
+  if (!profile) {
+    return (
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
+          <h1 className="font-serif text-xl font-medium text-red-950">
+            Document Verification Portal Unavailable
+          </h1>
+          <p className="text-sm text-red-800">
+            {dataError || 'Unable to load registry configuration from the university server.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => retryLoad()}
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+          >
+            Retry Loading
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  const { verifyPageConfig } = resolveUniversityContent(profile);
+
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
@@ -131,27 +158,29 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
           </button>
         </form>
 
-        <div className="pt-2 border-t border-slate-200/70 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Verify Issued Registry Records
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {verifyPageConfig.sampleSerials.map((item) => (
-              <button
-                key={`${item.label}-${item.code}`}
-                type="button"
-                onClick={() => {
-                  setQuery(item.code);
-                  runVerification(item.code);
-                }}
-                className="text-left px-3 py-1.5 rounded-lg border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/50 hover:-translate-y-0.5 hover:shadow-xs transition-all cursor-pointer"
-              >
-                <span className="block text-[11px] text-slate-600">{item.label}</span>
-                <span className="font-mono text-xs font-medium text-lapis-800">{item.code}</span>
-              </button>
-            ))}
+        {verifyPageConfig.sampleSerials.length > 0 && (
+          <div className="pt-2 border-t border-slate-200/70 space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Verify Issued Registry Records
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {verifyPageConfig.sampleSerials.map((item) => (
+                <button
+                  key={`${item.label}-${item.code}`}
+                  type="button"
+                  onClick={() => {
+                    setQuery(item.code);
+                    runVerification(item.code);
+                  }}
+                  className="text-left px-3 py-1.5 rounded-lg border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/50 hover:-translate-y-0.5 hover:shadow-xs transition-all cursor-pointer"
+                >
+                  <span className="block text-[11px] text-slate-600">{item.label}</span>
+                  <span className="font-mono text-xs font-medium text-lapis-800">{item.code}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Results Area */}

@@ -8,6 +8,7 @@ import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal } from './MotionPrimitives';
+import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
 import type {
@@ -15,9 +16,6 @@ import type {
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
-
-const VC_PORTRAIT_IMAGE = '/src/assets/images/VC_Sir_PUST_2026.JPG';
-const VC_PORTRAIT_FALLBACK = 'https://pust.ac.bd/includes/images/messages_pic/VC_Sir_PUST_2026.JPG';
 
 interface AdministrationSectionProps {
   route: AppRoute;
@@ -131,6 +129,7 @@ export function AdministrationSection({
   profile,
   vcProfiles,
 }: AdministrationSectionProps) {
+  const { loadingData, dataError, retryLoad } = usePust();
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('All');
   const [directoryQuery, setDirectoryQuery] = useState('');
   const [showPreviousVcs, setShowPreviousVcs] = useState(false);
@@ -151,8 +150,30 @@ export function AdministrationSection({
     );
   }, [profile, directoryQuery]);
 
-  if (!profile) {
+  if (loadingData && !profile) {
     return <PageHeaderAndSectionSkeleton />;
+  }
+
+  if (!profile) {
+    return (
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
+          <h1 className="font-serif text-xl font-medium text-red-950">
+            Administration Data Unavailable
+          </h1>
+          <p className="text-sm text-red-800">
+            {dataError || 'Unable to load administration profile and leadership directory from the university server.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => retryLoad()}
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+          >
+            Retry Loading
+          </button>
+        </div>
+      </section>
+    );
   }
 
   const { adminShowcase } = resolveUniversityContent(profile);
@@ -287,7 +308,6 @@ export function AdministrationSection({
             <div className="lg:col-span-5">
               <ResilientImage
                 src={adminShowcase.buildingImage}
-                fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
                 alt="Administrative Building at Pabna University of Science and Technology"
                 caption={adminShowcase.buildingCaption}
                 containerClassName="h-full flex flex-col"
@@ -331,114 +351,141 @@ export function AdministrationSection({
       <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Office Dossier & Welcome Address */}
-          <MotionReveal>
-            <article className="editable-region rounded-2xl card-gradient-parchment border border-slate-200 overflow-hidden shadow-xs hover:border-pust-600/35 hover:shadow-md transition-all duration-200">
-              <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-              {/* Portrait & Desk Dossier (Left Column inside Card) */}
-              <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 space-y-6">
-                <div className="max-w-[260px] mx-auto lg:max-w-none">
-                  <ResilientImage
-                    src={currentVc?.photoUrl || VC_PORTRAIT_IMAGE}
-                    fallbackSrc={VC_PORTRAIT_FALLBACK}
-                    alt={currentVc?.name || 'Honorable Vice-Chancellor of PUST'}
-                    caption={`Fig. 2 — ${currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}, Honorable Vice-Chancellor.`}
-                    className="w-full aspect-[3/4] object-cover object-top"
-                  />
-                </div>
-
-                <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
-                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
-                    <dd className="font-medium text-slate-900 sm:text-right">Honorable Vice-Chancellor</dd>
-                  </div>
-                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
-                    <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
-                      {currentVc?.tenure}
-                    </dd>
-                  </div>
-                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
-                    <dd className="font-mono text-xs sm:text-right min-w-0">
-                      <a
-                        href={`mailto:${currentVc?.email || 'vc@pust.ac.bd'}`}
-                        className="text-pust-900 hover:underline break-all"
-                      >
-                        {currentVc?.email}
-                      </a>
-                    </dd>
-                  </div>
-                  <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
-                    <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
-                      <a
-                        href={`tel:${currentVc?.phone || '+8802588842379'}`}
-                        className="hover:text-pust-900"
-                      >
-                        {currentVc?.phone}
-                      </a>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-
-              {/* Long-Form Editorial Welcome Message (Right Column inside Card) */}
-              <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
-                <div className="space-y-6">
-                  <header className="space-y-2 border-b border-slate-200 pb-6">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-xs font-medium text-pust-800">
-                        Welcome Message from the Vice-Chancellor · {currentVc?.tenure}
-                      </p>
-                      <EditTriggerButton
-                        target={{ kind: 'vc' }}
-                        label="Edit VC Profile & Message"
-                        variant="compact"
+          {currentVc ? (
+            <MotionReveal>
+              <article className="editable-region rounded-2xl card-gradient-parchment border border-slate-200 overflow-hidden shadow-xs hover:border-pust-600/35 hover:shadow-md transition-all duration-200">
+                <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                  {/* Portrait & Desk Dossier (Left Column inside Card) */}
+                  <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 space-y-6">
+                    <div className="max-w-[260px] mx-auto lg:max-w-none">
+                      <ResilientImage
+                        src={currentVc.photoUrl || ''}
+                        alt={currentVc.name}
+                        caption={`Fig. 2 — ${currentVc.name}, Honorable Vice-Chancellor.`}
+                        className="w-full aspect-[3/4] object-cover object-top"
                       />
                     </div>
-                    <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
-                      {currentVc?.name || 'Prof. Dr. Abul Hasnat Md. Shamim'}
-                    </h2>
-                    <p className="text-sm text-slate-600">
-                      Honorable Vice-Chancellor, Pabna University of Science and Technology
-                    </p>
-                  </header>
 
-                  <div className="space-y-5 flow-root prose-justify text-[15px] sm:text-base leading-[1.8] text-slate-700">
-                    {bodyParagraphs.map((paragraph, index) => (
-                      <p
-                        key={index}
-                        className={
-                          index === 0
-                            ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
-                            : ''
-                        }
-                      >
-                        {paragraph}
-                      </p>
-                    ))}
+                    <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
+                      <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                        <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
+                        <dd className="font-medium text-slate-900 sm:text-right">
+                          {currentVc.title || 'Honorable Vice-Chancellor'}
+                        </dd>
+                      </div>
+                      {currentVc.tenure && (
+                        <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                          <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
+                          <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                            {currentVc.tenure}
+                          </dd>
+                        </div>
+                      )}
+                      {currentVc.email && (
+                        <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                          <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
+                          <dd className="font-mono text-xs sm:text-right min-w-0">
+                            <a
+                              href={`mailto:${currentVc.email}`}
+                              className="text-pust-900 hover:underline break-all"
+                            >
+                              {currentVc.email}
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                      {currentVc.phone && (
+                        <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                          <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
+                          <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                            <a
+                              href={`tel:${currentVc.phone}`}
+                              className="hover:text-pust-900"
+                            >
+                              {currentVc.phone}
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+
+                  {/* Long-Form Editorial Welcome Message (Right Column inside Card) */}
+                  <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
+                    <div className="space-y-6">
+                      <header className="space-y-2 border-b border-slate-200 pb-6">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <p className="text-xs font-medium text-pust-800">
+                            Welcome Message from the Vice-Chancellor
+                            {currentVc.tenure ? ` · ${currentVc.tenure}` : ''}
+                          </p>
+                          <EditTriggerButton
+                            target={{ kind: 'vc' }}
+                            label="Edit VC Profile & Message"
+                            variant="compact"
+                          />
+                        </div>
+                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
+                          {currentVc.name}
+                        </h2>
+                        <p className="text-sm text-slate-600">
+                          Honorable Vice-Chancellor, Pabna University of Science and Technology
+                        </p>
+                      </header>
+
+                      <div className="space-y-5 flow-root prose-justify text-[15px] sm:text-base leading-[1.8] text-slate-700">
+                        {bodyParagraphs.map((paragraph, index) => (
+                          <p
+                            key={index}
+                            className={
+                              index === 0
+                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
+                                : ''
+                            }
+                          >
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+
+                    {closingLine && (
+                      <div className="pt-4 border-t border-slate-200 space-y-2">
+                        <p className="font-serif italic text-lg text-slate-900">{closingLine}</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {currentVc.name} — Honorable Vice-Chancellor
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {closingLine && (
-                  <div className="pt-4 border-t border-slate-200 space-y-2">
-                    <p className="font-serif italic text-lg text-slate-900">{closingLine}</p>
-                    <p className="text-sm font-medium text-slate-700">
-                      {currentVc?.name} — Honorable Vice-Chancellor
-                    </p>
-                  </div>
-                )}
+              </article>
+            </MotionReveal>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-[#FAF8F4] p-8 flex flex-wrap items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h2 className="font-serif text-xl font-medium text-slate-900">
+                  Vice-Chancellor Profile Not Configured
+                </h2>
+                <p className="text-sm text-slate-600">
+                  No current Vice-Chancellor dossier is published in the university directory yet.
+                </p>
               </div>
+              <EditTriggerButton
+                target={{ kind: 'vc' }}
+                label="Add VC Profile"
+                icon="add"
+                variant="compact"
+              />
             </div>
-          </article>
-          </MotionReveal>
+          )}
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
           <div className="editable-region rounded-2xl border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
             <div className="px-6 py-4 bg-white/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
-                  Institutional Leadership Archive · 2008 – Present
+                  Institutional Leadership Archive · {profile.establishedYear} – Present
                 </p>
                 <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
                   Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)

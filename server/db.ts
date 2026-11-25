@@ -284,8 +284,20 @@ class PustRepository {
     }
 
     const profileCol = db.collection<UniversityProfile & { id: string }>('university_profile');
-    if ((await profileCol.countDocuments()) === 0) {
+    const existingProfile = await profileCol.findOne({ id: 'main' });
+    if (!existingProfile) {
       await profileCol.insertOne({ id: 'main', ...structuredClone(SEED_UNIVERSITY_PROFILE) });
+    } else {
+      const missingPatch: Partial<UniversityProfile> = {};
+      const fullSeed = structuredClone(SEED_UNIVERSITY_PROFILE);
+      for (const key of Object.keys(fullSeed) as Array<keyof UniversityProfile>) {
+        if (existingProfile[key] === undefined) {
+          (missingPatch as Record<string, unknown>)[key] = fullSeed[key];
+        }
+      }
+      if (Object.keys(missingPatch).length > 0) {
+        await profileCol.updateOne({ id: 'main' }, { $set: missingPatch });
+      }
     }
   }
 
@@ -434,10 +446,7 @@ class PustRepository {
   deletePublication = (id: string) => this.removeItem('publications', this.publications, id);
 
   // About CMS
-  listAboutSections = async () => {
-    const list = await this.getAll('about_sections', this.aboutSections);
-    return list.length > 0 ? list : [...SEED_ABOUT_SECTIONS];
-  };
+  listAboutSections = () => this.getAll('about_sections', this.aboutSections);
   async upsertAboutSection(
     slug: AboutContentRecord['slug'],
     title: string,
@@ -466,13 +475,7 @@ class PustRepository {
   // Vice-Chancellor Profile & Archive
   async listViceChancellors(): Promise<ViceChancellorRecord[]> {
     const raw = await this.getAll('vc_profiles', this.vcProfiles);
-    const list = raw.length > 0 ? raw : [...SEED_VC_PROFILES];
-    const hydrated = list.map((vc) => {
-      if (vc.message && vc.message.trim().length > 0) return vc;
-      const seeded = SEED_VC_PROFILES.find((s) => s.id === vc.id || (vc.isCurrent && s.isCurrent));
-      return seeded ? { ...vc, message: seeded.message } : vc;
-    });
-    return hydrated.sort((a, b) => b.orderIndex - a.orderIndex);
+    return [...raw].sort((a, b) => b.orderIndex - a.orderIndex);
   }
 
   async updateCurrentViceChancellor(input: {

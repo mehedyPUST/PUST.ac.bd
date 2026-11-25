@@ -3,7 +3,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2, Upload, X } from 'lucide-react';
 import { pustApi } from '../lib/api';
-import { DEFAULT_NAVBAR_TAGLINE } from '../lib/cmsDefaults';
 import { detectAttachmentType } from '../lib/media';
 import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilitiesEditors';
 import { CampusAndGovernanceEditors } from './admin-edit/CampusAndGovernanceEditors';
@@ -109,12 +108,12 @@ export function AdminEditModal({
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [convocationDate, setConvocationDate] = useState('');
-  const [establishedYear, setEstablishedYear] = useState(2008);
-  const [campusAcres, setCampusAcres] = useState(30);
-  const [facultiesCount, setFacultiesCount] = useState(5);
-  const [departmentsCount, setDepartmentsCount] = useState(21);
-  const [facultyMembersCount, setFacultyMembersCount] = useState(212);
-  const [studentsCount, setStudentsCount] = useState(4800);
+  const [establishedYear, setEstablishedYear] = useState(0);
+  const [campusAcres, setCampusAcres] = useState(0);
+  const [facultiesCount, setFacultiesCount] = useState(0);
+  const [departmentsCount, setDepartmentsCount] = useState(0);
+  const [facultyMembersCount, setFacultyMembersCount] = useState(0);
+  const [studentsCount, setStudentsCount] = useState(0);
 
   // 2. Banner slide state
   const [bannerMode, setBannerMode] = useState<'edit' | 'create'>('edit');
@@ -202,25 +201,17 @@ export function AdminEditModal({
     setUploading(false);
 
     if (target.kind === 'hero-profile') {
-      setNavbarTagline(profile?.navbarTagline || DEFAULT_NAVBAR_TAGLINE);
-      setHeroEyebrow(
-        profile?.heroEyebrow ||
-          `Rajapur, Pabna-6600 · First Convocation: ${profile?.convocationDate ?? '15 March 2027'}`
-      );
-      setHeroTitle(
-        profile?.heroTitle || 'Advancing Science, Engineering & Human Inquiry from Pabna'
-      );
-      setHeroSubtitle(
-        profile?.heroSubtitle ||
-          `Established in ${profile?.establishedYear ?? 2008} beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and ${profile?.facultyMembersCount ?? 212} faculty members across ${profile?.facultiesCount ?? 5} faculties, ${profile?.departmentsCount ?? 21} academic departments, and end-to-end digital workflows.`
-      );
-      setConvocationDate(profile?.convocationDate || '15 March 2027');
-      setEstablishedYear(profile?.establishedYear ?? 2008);
-      setCampusAcres(profile?.campusAcres ?? 30);
-      setFacultiesCount(profile?.facultiesCount ?? 5);
-      setDepartmentsCount(profile?.departmentsCount ?? 21);
-      setFacultyMembersCount(profile?.facultyMembersCount ?? 212);
-      setStudentsCount(profile?.studentsCount ?? 4800);
+      setNavbarTagline(profile?.navbarTagline || '');
+      setHeroEyebrow(profile?.heroEyebrow || '');
+      setHeroTitle(profile?.heroTitle || '');
+      setHeroSubtitle(profile?.heroSubtitle || '');
+      setConvocationDate(profile?.convocationDate || '');
+      setEstablishedYear(profile?.establishedYear ?? 0);
+      setCampusAcres(profile?.campusAcres ?? 0);
+      setFacultiesCount(profile?.facultiesCount ?? 0);
+      setDepartmentsCount(profile?.departmentsCount ?? 0);
+      setFacultyMembersCount(profile?.facultyMembersCount ?? 0);
+      setStudentsCount(profile?.studentsCount ?? 0);
     } else if (target.kind === 'banner') {
       const slide =
         bannerSlides.find((s) => s.id === target.slideId) || bannerSlides[0] || null;
@@ -241,8 +232,8 @@ export function AdminEditModal({
       if (target.vcId === 'new-former') {
         setVcName('');
         setVcTenure('');
-        setVcEmail('vc@pust.ac.bd');
-        setVcPhone('+8802588842379');
+        setVcEmail('');
+        setVcPhone('');
         setVcPhotoUrl('');
         setVcMessage('');
         setVcPromoteNew(false);
