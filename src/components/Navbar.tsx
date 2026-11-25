@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Eye, Menu, Pencil, Plus, Search, X } from 'lucide-react';
-import { resolveContextualEditTarget } from '../lib/cmsDefaults';
+import { DEFAULT_NAVBAR_TAGLINE, resolveContextualEditTarget } from '../lib/cmsDefaults';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
 import type {
   AboutContentRecord,
@@ -126,9 +126,9 @@ export function Navbar({
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band + Desktop Search */}
-            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-3 text-white">
-              <div className="min-w-0 flex-1 flex items-baseline gap-3">
+            {/* Tier 1: University Title Band (Left) + Est. Tagline & Icon Search (Far Right) */}
+            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-4 text-white">
+              <div className="min-w-0 flex-1 flex items-center">
                 <Link
                   href="/"
                   onClick={() => {
@@ -141,14 +141,13 @@ export function Navbar({
                   <span className="sm:hidden">PUST</span>
                   <span className="hidden sm:inline">Pabna University of Science and Technology</span>
                 </Link>
-                {profile?.navbarTagline && (
-                  <span className="hidden 2xl:inline text-xs text-pust-200/90 truncate shrink-0">
-                    · {profile.navbarTagline}
-                  </span>
-                )}
               </div>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span className="hidden lg:inline text-xs text-pust-100/90 whitespace-nowrap shrink-0">
+                  {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
+                </span>
+
                 {user?.role === 'admin' && editMode && onOpenEditModal && (
                   <button
                     type="button"

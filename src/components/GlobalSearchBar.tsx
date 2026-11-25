@@ -106,6 +106,7 @@ export function GlobalSearchBar({
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(variant === 'mobile');
   const [activeIndex, setActiveIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,7 +119,16 @@ export function GlobalSearchBar({
     }
   }, [autoFocus]);
 
-  // Global keyboard shortcut: Cmd/Ctrl+K or '/' focuses the desktop search bar
+  useEffect(() => {
+    if (variant === 'desktop' && expanded) {
+      const frame = requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [expanded, variant]);
+
+  // Global keyboard shortcut: Cmd/Ctrl+K or '/' expands & focuses the desktop search bar
   useEffect(() => {
     if (variant !== 'desktop') return;
     function handleGlobalKey(e: KeyboardEvent) {
@@ -131,14 +141,18 @@ export function GlobalSearchBar({
           target.isContentEditable);
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        inputRef.current?.focus();
-        setOpen(true);
-      } else if (e.key === '/' && !isEditable && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        if (inputRef.current && inputRef.current.offsetParent !== null) {
+        if (containerRef.current && containerRef.current.offsetParent !== null) {
           e.preventDefault();
-          inputRef.current.focus();
+          setExpanded(true);
           setOpen(true);
+          requestAnimationFrame(() => inputRef.current?.focus());
+        }
+      } else if (e.key === '/' && !isEditable && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        if (containerRef.current && containerRef.current.offsetParent !== null) {
+          e.preventDefault();
+          setExpanded(true);
+          setOpen(true);
+          requestAnimationFrame(() => inputRef.current?.focus());
         }
       }
     }
@@ -146,16 +160,19 @@ export function GlobalSearchBar({
     return () => document.removeEventListener('keydown', handleGlobalKey);
   }, [variant]);
 
-  // Outside click closes dropdown
+  // Outside click closes dropdown & collapses desktop search back to icon
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
+        if (variant === 'desktop') {
+          setExpanded(false);
+        }
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [variant]);
 
   const searchIndex = useMemo<SearchEntry[]>(() => {
     const entries: SearchEntry[] = [];
@@ -488,6 +505,9 @@ export function GlobalSearchBar({
   function selectEntry(entry: SearchEntry) {
     setOpen(false);
     setQuery('');
+    if (variant === 'desktop') {
+      setExpanded(false);
+    }
     onActionComplete?.();
     if (entry.department) {
       navigateTo(`/academics/departments/${encodeURIComponent(entry.department.code.toLowerCase())}`);
@@ -501,6 +521,9 @@ export function GlobalSearchBar({
   function handleKeyDown(e: ReactKeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') {
       setOpen(false);
+      if (variant === 'desktop') {
+        setExpanded(false);
+      }
       inputRef.current?.blur();
       return;
     }
@@ -532,16 +555,34 @@ export function GlobalSearchBar({
 
   const activeItem = flatResults[activeIndex];
 
+  if (variant === 'desktop' && !expanded) {
+    return (
+      <div ref={containerRef} className="relative shrink-0">
+        <button
+          type="button"
+          onClick={() => {
+            setExpanded(true);
+            setOpen(true);
+          }}
+          aria-label="Open site search"
+          aria-expanded={false}
+          title="Search"
+          className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-white hover:bg-pust-800 transition-colors cursor-pointer"
+        >
+          <Search className="w-[17px] h-[17px]" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-52 xl:w-64 shrink-0' : 'relative w-full'}
+      className={variant === 'desktop' ? 'relative w-56 xl:w-64 shrink-0' : 'relative w-full'}
     >
       <div className="relative flex items-center">
         <Search
-          className={`w-3.5 h-3.5 absolute left-2.5 pointer-events-none ${
-            variant === 'desktop' ? 'text-pust-200' : 'text-slate-500'
-          }`}
+          className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none text-slate-500"
           aria-hidden="true"
         />
         <input
@@ -567,36 +608,28 @@ export function GlobalSearchBar({
           }
           className={`w-full pl-8 pr-8 text-xs rounded-lg border transition-colors focus:outline-none ${
             variant === 'desktop'
-              ? 'py-1.5 bg-pust-950/55 text-white placeholder:text-pust-200/80 border-pust-700/75 focus:bg-white focus:text-slate-900 focus:placeholder:text-slate-400 focus:border-white focus:ring-2 focus:ring-white/25'
+              ? 'py-1.5 bg-white text-slate-900 placeholder:text-slate-400 border-white shadow-xs focus:ring-2 focus:ring-white/30'
               : 'py-2.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
           }`}
         />
 
-        {query ? (
+        {(query || variant === 'desktop') && (
           <button
             type="button"
             onClick={() => {
-              setQuery('');
-              inputRef.current?.focus();
+              if (query) {
+                setQuery('');
+                inputRef.current?.focus();
+              } else if (variant === 'desktop') {
+                setOpen(false);
+                setExpanded(false);
+              }
             }}
-            aria-label="Clear search query"
-            className={`absolute right-2 p-1 rounded cursor-pointer ${
-              variant === 'desktop'
-                ? 'text-pust-200 hover:text-white'
-                : 'text-slate-400 hover:text-slate-700'
-            }`}
+            aria-label={query ? 'Clear search query' : 'Close search'}
+            className="absolute right-2 p-1 rounded text-slate-400 hover:text-slate-700 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
-        ) : (
-          variant === 'desktop' && (
-            <kbd
-              aria-hidden="true"
-              className="hidden sm:inline-block absolute right-2 px-1.5 py-0.5 font-mono text-[10px] text-pust-100 bg-pust-800/80 border border-pust-700 rounded"
-            >
-              /
-            </kbd>
-          )
         )}
       </div>
 
