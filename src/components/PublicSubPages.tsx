@@ -615,14 +615,9 @@ export function PublicSubPages({
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
-                  Academic Affairs
-                </p>
-                <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
-                  {activeHeading}
-                </h1>
-              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+                {activeHeading}
+              </h1>
               <p className="font-mono text-xs text-slate-600 tabular-nums">
                 {profile?.facultiesCount ?? 5} Faculties · {departments.length || 21} Departments ·{' '}
                 {totalTeachers} Teachers
@@ -1414,7 +1409,7 @@ export function PublicSubPages({
                                     <div className="space-y-1.5">
                                       <div className="flex items-start justify-between gap-2">
                                         <p className="font-mono text-xs text-pust-800 tabular-nums">
-                                          {dept.officialCode ? `Code ${dept.officialCode} · ` : ''}
+                                          {dept.officialCode ? `${dept.officialCode} · ` : ''}
                                           {dept.code}
                                         </p>
                                         <EditTriggerButton

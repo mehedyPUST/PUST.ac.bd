@@ -246,9 +246,9 @@ export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
     return crumbs;
   }
 
-  if (clean === '/academics/chairmen') {
+  if (clean === '/academics/departments' || clean === '/academics/chairmen') {
     crumbs.push({ label: 'Academics', href: '/academics' });
-    crumbs.push({ label: 'Departments & Chairmen' });
+    crumbs.push({ label: 'Departments' });
     return crumbs;
   }
 
