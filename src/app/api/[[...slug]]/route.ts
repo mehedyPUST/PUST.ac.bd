@@ -165,7 +165,8 @@ async function handleExpressRequest(request: NextRequest): Promise<Response> {
 
       if (!resolved) {
         resolved = true;
-        const body = chunks.length > 0 ? Buffer.concat(chunks) : null;
+        const nullBody = new Set([101, 204, 205, 304]).has(resMock.statusCode);
+        const body = nullBody ? null : chunks.length > 0 ? Buffer.concat(chunks) : null;
         resolve(
           new Response(body, {
             status: resMock.statusCode,
@@ -176,16 +177,36 @@ async function handleExpressRequest(request: NextRequest): Promise<Response> {
       return resMock;
     };
 
-    app(
-      reqStream as unknown as Parameters<typeof app>[0],
-      resMock as unknown as Parameters<typeof app>[1],
-      () => {
-        if (!resolved) {
-          resolved = true;
-          resolve(Response.json({ error: 'API route not found' }, { status: 404 }));
+    try {
+      app(
+        reqStream as unknown as Parameters<typeof app>[0],
+        resMock as unknown as Parameters<typeof app>[1],
+        (err?: unknown) => {
+          if (!resolved) {
+            resolved = true;
+            if (err) {
+              const status =
+                typeof err === 'object' &&
+                err !== null &&
+                'status' in err &&
+                typeof (err as { status?: unknown }).status === 'number'
+                  ? (err as { status: number }).status
+                  : 500;
+              const message = err instanceof Error ? err.message : 'Internal server error';
+              resolve(Response.json({ error: message }, { status }));
+            } else {
+              resolve(Response.json({ error: 'API route not found' }, { status: 404 }));
+            }
+          }
         }
+      );
+    } catch (err) {
+      if (!resolved) {
+        resolved = true;
+        const message = err instanceof Error ? err.message : 'Internal server error';
+        resolve(Response.json({ error: message }, { status: 500 }));
       }
-    );
+    }
   });
 }
 

@@ -25,6 +25,8 @@ export interface JwtClaims {
   academicId: string;
   session?: string;
   hallAffiliation: string;
+  assignedCourses?: string[];
+  assignedSessions?: string[];
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -66,6 +68,8 @@ export function signAuthToken(user: AuthUser): string {
     academicId: user.academicId,
     session: user.session,
     hallAffiliation: user.hallAffiliation,
+    ...(user.assignedCourses ? { assignedCourses: user.assignedCourses } : {}),
+    ...(user.assignedSessions ? { assignedSessions: user.assignedSessions } : {}),
   };
   return jwt.sign(claims, getJwtSecret(), {
     algorithm: 'HS256',
@@ -216,4 +220,31 @@ export function requireRoles(...allowed: UserRole[]) {
       next();
     });
   };
+}
+
+export function wrapRouterAsync<T extends object>(router: T): T {
+  const methods = ['get', 'post', 'put', 'patch', 'delete'] as const;
+  const r = router as unknown as Record<string, (...args: unknown[]) => unknown>;
+  for (const method of methods) {
+    const original = r[method];
+    if (typeof original !== 'function') continue;
+    r[method] = function wrappedRoute(...args: unknown[]) {
+      const wrappedArgs = args.map((arg) => {
+        if (typeof arg !== 'function' || arg.length >= 4) return arg;
+        const fn = arg as (req: Request, res: Response, next: NextFunction) => unknown;
+        return function asyncHandlerWrapper(req: Request, res: Response, next: NextFunction) {
+          try {
+            const out = fn(req, res, next);
+            if (out && typeof (out as Promise<unknown>).catch === 'function') {
+              (out as Promise<unknown>).catch(next);
+            }
+          } catch (err) {
+            next(err);
+          }
+        };
+      });
+      return original.apply(this, wrappedArgs);
+    };
+  }
+  return router;
 }

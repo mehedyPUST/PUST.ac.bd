@@ -150,6 +150,12 @@ export function PustShell({
   const effectiveEditMode = isAdmin && editMode;
 
   useEffect(() => {
+    if (!user) {
+      setBookmarks([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (typeof window === 'undefined' || !authResolved) return;
     if (!isAdmin) {
       setEditModeState(false);

@@ -149,7 +149,7 @@ export function PortalView({
   const [offRole, setOffRole] = useState<Exclude<UserRole, 'admin' | 'student'>>('teacher');
   const [offDept, setOffDept] = useState('CSE');
   const [offAcademicId, setOffAcademicId] = useState('');
-  const [offHall] = useState('Academic Block');
+  const [offHall, setOffHall] = useState('July 06 Hall');
 
   // Admin Claim / Passcode
   const [adminName, setAdminName] = useState('PUST Admin Office');
@@ -185,6 +185,7 @@ export function PortalView({
     >
   >({});
   const [stuSavedMsg, setStuSavedMsg] = useState<string | null>(null);
+  const [stuErrorMsg, setStuErrorMsg] = useState<string | null>(null);
 
   const loadStudents = useCallback(async () => {
     if (!user) return;
@@ -334,7 +335,7 @@ export function PortalView({
         role: offRole,
         departmentCode: offDept,
         academicId: offAcademicId,
-        hallAffiliation: offHall,
+        hallAffiliation: offRole === 'hall' ? offHall : 'Academic Block',
       });
       setAuthMessage(res.pendingMessage);
       setStatusQuery(offEmail);
@@ -404,17 +405,27 @@ export function PortalView({
   }
 
   async function handleLogout() {
-    await pustApi.logout();
-    onUserChange(null);
-    await Promise.all([onNoticesChange(), onCmsChange()]);
+    try {
+      await pustApi.logout();
+      onUserChange(null);
+      await Promise.all([onNoticesChange(), onCmsChange()]);
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Unable to sign out cleanly.');
+    }
   }
 
   async function handleSaveStudentRecord(stu: StudentRecord) {
     const patch = studentEditNotes[stu.id];
     if (!patch) return;
-    await pustApi.updateStudentRecords(stu.id, patch);
-    setStuSavedMsg(`Updated record for ${stu.name} (${stu.academicId}).`);
-    await loadStudents();
+    setStuErrorMsg(null);
+    setStuSavedMsg(null);
+    try {
+      await pustApi.updateStudentRecords(stu.id, patch);
+      setStuSavedMsg(`Updated record for ${stu.name} (${stu.academicId}).`);
+      await loadStudents();
+    } catch (err) {
+      setStuErrorMsg(err instanceof Error ? err.message : 'Unable to save student record note.');
+    }
   }
 
   const toggleAdmissionDoc = (docLabel: string) => {
@@ -1038,6 +1049,25 @@ export function PortalView({
                       className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] font-mono focus:outline-none focus:border-pust-700 focus:bg-white"
                     />
                   </div>
+                  {offRole === 'hall' && (
+                    <div className="sm:col-span-2">
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-600 mb-1">
+                        Assigned Residential Hall
+                      </label>
+                      <select
+                        value={offHall}
+                        onChange={(e) => setOffHall(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                      >
+                        <option value="July 06 Hall">July 06 Hall</option>
+                        <option value="Male Hall-1">Male Hall-1</option>
+                        <option value="Male Hall-2">Male Hall-2</option>
+                        <option value="Female Hall-1">Female Hall-1</option>
+                        <option value="Female Hall-2">Female Hall-2</option>
+                        <option value="All Halls">Central Hall Administration (All Halls)</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -1956,6 +1986,11 @@ export function PortalView({
                     </div>
                   </div>
 
+                  {stuErrorMsg && (
+                    <div className="p-3 rounded-lg border border-red-200 bg-red-50 text-xs text-red-900">
+                      {stuErrorMsg}
+                    </div>
+                  )}
                   {stuSavedMsg && (
                     <div className="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
                       {stuSavedMsg}

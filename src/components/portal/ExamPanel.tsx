@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   CheckCircle2,
   Clock,
@@ -137,6 +137,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     Record<string, 'auto' | 'manual_promoted' | 'manual_repeat'>
   >({});
 
+  const initializedCircularRef = useRef(false);
+
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -148,7 +150,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       setGateways(data.gateways);
       setHallBlocked(data.hallClearanceBlocked);
       setUnpaidHallDues(data.unpaidHallDues);
-      if (data.circulars.length > 0 && !selectedCircularId) {
+      if (data.circulars.length > 0 && !initializedCircularRef.current) {
+        initializedCircularRef.current = true;
         setSelectedCircularId(data.circulars[0].id);
         setSelectedCourses(data.circulars[0].eligibleCourseCodes);
       }
@@ -157,7 +160,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     } finally {
       setLoading(false);
     }
-  }, [selectedCircularId]);
+  }, []);
 
   useEffect(() => {
     refresh();
@@ -314,9 +317,17 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     return courses.filter((c) => c.departmentCode === deptCode && c.semester === computedResSemester);
   }, [courses, retrievedStudent, user.departmentCode, computedResSemester]);
 
+  const lastGradebookKeyRef = useRef<string>('');
+
   useEffect(() => {
-    if (!retrievedStudent) return;
+    if (!retrievedStudent) {
+      lastGradebookKeyRef.current = '';
+      return;
+    }
+    const key = `${retrievedStudent.id}:${computedResSemester}`;
+    if (lastGradebookKeyRef.current === key) return;
     if (matchingGradebookTermCourses.length > 0) {
+      lastGradebookKeyRef.current = key;
       setCourseRows(
         matchingGradebookTermCourses.map((c, idx) => ({
           key: `row-${c.id}-${idx}`,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { CreditCard, Printer } from 'lucide-react';
 import { pustApi } from '../../lib/api';
 import { usePust } from '../PustContext';
@@ -66,6 +66,8 @@ export function HallPanel({ user }: HallPanelProps) {
   const [dueFeeTitle, setDueFeeTitle] = useState('Semester Residential & Dining Fee');
   const [dueAmount, setDueAmount] = useState(1250);
 
+  const initializedHallCircularRef = useRef(false);
+
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
@@ -74,7 +76,8 @@ export function HallPanel({ user }: HallPanelProps) {
       setApplications(data.applications);
       setDues(data.dues);
       setGateways(data.gateways || []);
-      if (data.circulars.length > 0 && !applyCircularId) {
+      if (data.circulars.length > 0 && !initializedHallCircularRef.current) {
+        initializedHallCircularRef.current = true;
         setApplyCircularId(data.circulars[0].id);
       }
     } catch (err) {
@@ -82,7 +85,7 @@ export function HallPanel({ user }: HallPanelProps) {
     } finally {
       setLoading(false);
     }
-  }, [applyCircularId]);
+  }, []);
 
   useEffect(() => {
     refresh();

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
-import express, { type Express } from 'express';
+import express, { type Express, type NextFunction, type Request, type Response } from 'express';
 import { z } from 'zod';
 import {
   AUTH_COOKIE_NAME,
@@ -15,6 +15,7 @@ import {
   verifyAuthToken,
   verifyPassword,
   verifySameOriginMutation,
+  wrapRouterAsync,
   type AuthenticatedRequest,
 } from './auth';
 import { pustRepo } from './db';
@@ -128,6 +129,7 @@ const bookmarkSchema = z.object({
 });
 
 export function mountApiRoutes(app: Express): void {
+  wrapRouterAsync(app);
   // Scope JSON body parsing, cookies, no-cache headers, and same-origin protection strictly to /api
   app.use('/api', (_req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -257,20 +259,35 @@ export function mountApiRoutes(app: Express): void {
       res.json({ user: null });
       return;
     }
-    res.json({
-      user: {
-        id: claims.sub,
-        name: claims.name,
-        email: claims.email,
-        role: claims.role,
-        approvalStatus: claims.approvalStatus,
-        departmentCode: claims.departmentCode,
-        academicId: claims.academicId,
-        session: claims.session,
-        hallAffiliation: claims.hallAffiliation,
-        createdAt: '',
-      },
-    });
+    if (claims.sub === 'env-admin-office') {
+      res.json({
+        user: {
+          id: claims.sub,
+          name: claims.name,
+          email: claims.email,
+          role: claims.role,
+          approvalStatus: claims.approvalStatus,
+          departmentCode: claims.departmentCode,
+          academicId: claims.academicId,
+          session: claims.session,
+          hallAffiliation: claims.hallAffiliation,
+          assignedCourses: claims.assignedCourses || [],
+          assignedSessions: claims.assignedSessions || [],
+          createdAt: '',
+        },
+      });
+      return;
+    }
+    const liveUser =
+      (await pustRepo.findUserById(claims.sub)) ||
+      (await pustRepo.findUserByEmail(claims.email));
+    if (!liveUser || liveUser.approvalStatus !== 'approved') {
+      clearAuthCookie(req, res);
+      res.json({ user: null });
+      return;
+    }
+    const { passwordHash: _ignored, ...safeUser } = liveUser;
+    res.json({ user: safeUser });
   });
 
   // Student Signup via Unique Portal Token -> Pending Department Chairman Approval
@@ -538,6 +555,12 @@ export function mountApiRoutes(app: Express): void {
           });
           return;
         }
+        if (!isExecutiveCentral && parsed.data.departmentCode !== actor.departmentCode) {
+          res.status(403).json({
+            error: 'You may only publish course notices for your assigned department.',
+          });
+          return;
+        }
       }
 
       const notice = await pustRepo.createNotice({
@@ -571,12 +594,20 @@ export function mountApiRoutes(app: Express): void {
         res.status(404).json({ error: 'Notice not found.' });
         return;
       }
-      if (
-        req.authUser!.role === 'chairman' &&
-        existing.departmentCode !== req.authUser!.departmentCode
-      ) {
-        res.status(403).json({ error: 'Chairmen may only manage notices in their department.' });
-        return;
+      if (req.authUser!.role === 'chairman') {
+        if (existing.departmentCode !== req.authUser!.departmentCode) {
+          res.status(403).json({ error: 'Chairmen may only manage notices in their department.' });
+          return;
+        }
+        if (
+          parsed.data.boardScope === 'central' ||
+          (parsed.data.departmentCode && parsed.data.departmentCode !== req.authUser!.departmentCode)
+        ) {
+          res.status(403).json({
+            error: 'Chairmen cannot reassign notices to the Central board or another department.',
+          });
+          return;
+        }
       }
       const updated = await pustRepo.updateNotice(existing.id, parsed.data);
       const isPinOnly =
@@ -680,6 +711,36 @@ export function mountApiRoutes(app: Express): void {
 
   // Mount all university digital platform workflow routes
   app.use('/api/portal', portalRouter);
+
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'API route not found.' });
+  });
+
+  app.use(
+    '/api',
+    (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      if (res.headersSent) return;
+      const status =
+        typeof err === 'object' &&
+        err !== null &&
+        'status' in err &&
+        typeof (err as { status?: unknown }).status === 'number'
+          ? (err as { status: number }).status
+          : typeof err === 'object' &&
+            err !== null &&
+            'statusCode' in err &&
+            typeof (err as { statusCode?: unknown }).statusCode === 'number'
+          ? (err as { statusCode: number }).statusCode
+          : 500;
+      const message =
+        status === 400 && err instanceof SyntaxError
+          ? 'Invalid JSON request body.'
+          : err instanceof Error && err.message
+          ? err.message
+          : 'Internal server error.';
+      res.status(status).json({ error: message });
+    }
+  );
 }
 
 let cachedApp: Express | null = null;

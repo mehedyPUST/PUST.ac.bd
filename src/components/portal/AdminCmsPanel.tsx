@@ -258,6 +258,15 @@ export function AdminCmsPanel({
     refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    if (!currentVc) return;
+    setVcName(currentVc.name || '');
+    setVcEmail(currentVc.email || 'vc@pust.ac.bd');
+    setVcPhone(currentVc.phone || '+8802588842379');
+    setVcTenure(currentVc.tenure || 'September 2024 – Present');
+    setVcMsg(currentVc.message || '');
+  }, [currentVc?.id]);
+
   async function handleUserApproval(id: string, status: 'approved' | 'rejected') {
     setError(null);
     setFeedback(null);
@@ -1998,9 +2007,13 @@ export function AdminCmsPanel({
                         onClick={async () => {
                           setError(null);
                           setFeedback(null);
-                          await pustApi.deleteBannerSlide(slide.id);
-                          setFeedback('Removed banner slide.');
-                          await onCmsChange();
+                          try {
+                            await pustApi.deleteBannerSlide(slide.id);
+                            setFeedback('Removed banner slide.');
+                            await onCmsChange();
+                          } catch (err) {
+                            setError(err instanceof Error ? err.message : 'Unable to remove banner slide.');
+                          }
                         }}
                         aria-label={`Delete slide ${idx + 1}`}
                         className="p-1.5 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer"
@@ -2243,14 +2256,18 @@ export function AdminCmsPanel({
                         onClick={async () => {
                           setError(null);
                           setFeedback(null);
-                          const nextVis = isRegisteredOnly ? 'public' : 'registered';
-                          await pustApi.updateGalleryItem(item.id, { visibility: nextVis });
-                          setFeedback(
-                            `Set "${item.title}" to ${
-                              nextVis === 'registered' ? 'Registered Users Only' : 'Public'
-                            }.`
-                          );
-                          await onCmsChange();
+                          try {
+                            const nextVis = isRegisteredOnly ? 'public' : 'registered';
+                            await pustApi.updateGalleryItem(item.id, { visibility: nextVis });
+                            setFeedback(
+                              `Set "${item.title}" to ${
+                                nextVis === 'registered' ? 'Registered Users Only' : 'Public'
+                              }.`
+                            );
+                            await onCmsChange();
+                          } catch (err) {
+                            setError(err instanceof Error ? err.message : 'Unable to update gallery visibility.');
+                          }
                         }}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
                       >
@@ -2260,8 +2277,15 @@ export function AdminCmsPanel({
                       <button
                         type="button"
                         onClick={async () => {
-                          await pustApi.deleteGalleryItem(item.id);
-                          await onCmsChange();
+                          setError(null);
+                          setFeedback(null);
+                          try {
+                            await pustApi.deleteGalleryItem(item.id);
+                            setFeedback(`Removed "${item.title}".`);
+                            await onCmsChange();
+                          } catch (err) {
+                            setError(err instanceof Error ? err.message : 'Unable to remove gallery item.');
+                          }
                         }}
                         className="p-1.5 rounded-lg text-red-700 hover:bg-red-50 cursor-pointer"
                         aria-label={`Remove ${item.title}`}

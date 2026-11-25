@@ -256,16 +256,36 @@ class PustRepository {
     id: string,
     patch: Partial<T>
   ): Promise<T | null> {
+    const setFields: Record<string, unknown> = {};
+    const unsetFields: Record<string, 1> = {};
+    for (const [key, value] of Object.entries(patch as Record<string, unknown>)) {
+      if (value === undefined) {
+        unsetFields[key] = 1;
+      } else {
+        setFields[key] = value;
+      }
+    }
+
     if (this.storageBackend === 'mongodb') {
-      await this.col<T>(name).updateOne({ id } as never, { $set: patch } as never);
+      const updateOps: Record<string, unknown> = {};
+      if (Object.keys(setFields).length > 0) updateOps.$set = setFields;
+      if (Object.keys(unsetFields).length > 0) updateOps.$unset = unsetFields;
+      if (Object.keys(updateOps).length > 0) {
+        await this.col<T>(name).updateOne({ id } as never, updateOps as never);
+      }
       const updated = await this.col<T>(name).findOne({ id } as never, {
         projection: { _id: 0 },
       });
       return (updated as T | null) ?? null;
     }
+
     const idx = mem.findIndex((x) => x.id === id);
     if (idx === -1) return null;
-    mem[idx] = { ...mem[idx], ...patch };
+    const next = { ...mem[idx], ...setFields } as Record<string, unknown>;
+    for (const key of Object.keys(unsetFields)) {
+      delete next[key];
+    }
+    mem[idx] = next as T;
     return mem[idx];
   }
 
@@ -628,6 +648,11 @@ class PustRepository {
     return list.find((u) => u.email === normalized) ?? null;
   }
 
+  async findUserById(id: string): Promise<StoredUser | null> {
+    const list = await this.getAll('users', this.users);
+    return list.find((u) => u.id === id) ?? null;
+  }
+
   async listUsers(): Promise<AuthUser[]> {
     const list = await this.getAll('users', this.users);
     return list.map(({ passwordHash: _p, ...safe }) => safe);
@@ -769,6 +794,8 @@ class PustRepository {
       id: `hcirc-${crypto.randomUUID()}`,
       ...input,
     });
+  updateHallCircular = (id: string, patch: Partial<HallCircularRecord>) =>
+    this.updateItem('hall_circulars', this.hallCirculars, id, patch);
 
   listHallApplications = () => this.getAll('hall_applications', this.hallApps);
   createHallApplication = (input: Omit<HallApplicationRecord, 'id' | 'createdAt'>) =>

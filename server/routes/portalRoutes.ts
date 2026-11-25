@@ -1,12 +1,21 @@
 import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
-import { requireAuth, requireRoles, type AuthenticatedRequest } from '../auth';
+import { requireAuth, requireRoles, wrapRouterAsync, type AuthenticatedRequest, type JwtClaims } from '../auth';
 import { pustRepo } from '../db';
 import { isSafeMediaUrl } from '../../src/lib/media';
 import type { ClearanceOfficeKey, OfficeClearanceState, UserRole } from '../../src/types/pust';
 
-export const portalRouter = Router();
+export const portalRouter = wrapRouterAsync(Router());
+
+function isHallOfficerScopedTo(authUser: JwtClaims, hallName: string): boolean {
+  if (authUser.role !== 'hall') return true;
+  const aff = authUser.hallAffiliation?.trim();
+  if (!aff || aff === 'All Halls' || aff === 'Academic Block' || aff === 'Administrative Building') {
+    return true;
+  }
+  return aff === hallName;
+}
 
 const tokenCreateSchema = z.object({
   studentName: z.string().trim().min(2).max(80),
@@ -486,9 +495,13 @@ const profileUpdateSchema = z.object({
             term: z.string().trim().min(2).max(140),
             event: z.string().trim().min(2).max(240),
             date: z.string().trim().min(2).max(60),
+            endDate: z.string().trim().max(60).optional(),
+            category: z.enum(['exam', 'holiday', 'deadline', 'academic']).optional(),
+            venue: z.string().trim().max(160).optional(),
+            details: z.string().trim().max(500).optional(),
           })
         )
-        .max(30),
+        .max(80),
       scholarships: z
         .array(z.object({ title: z.string().trim().min(2).max(180), detail: z.string().trim().min(5).max(600) }))
         .max(20),
@@ -804,8 +817,22 @@ portalRouter.patch(
       res.status(400).json({ error: 'Invalid teacher course/session assignment.' });
       return;
     }
+    const target = await pustRepo.findUserById(String(req.params.id));
+    if (!target || target.role !== 'teacher') {
+      res.status(404).json({ error: 'Teacher account not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode !== req.authUser!.departmentCode
+    ) {
+      res.status(403).json({
+        error: 'Department Chairmen may only assign courses to teachers in their own department.',
+      });
+      return;
+    }
     const updated = await pustRepo.updateTeacherAssignments(
-      String(req.params.id),
+      target.id,
       parsed.data.assignedCourses,
       parsed.data.assignedSessions
     );
@@ -813,6 +840,12 @@ portalRouter.patch(
       res.status(404).json({ error: 'Teacher account not found.' });
       return;
     }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Assigned courses/sessions to teacher',
+      `${target.name} (${target.departmentCode})`
+    );
     res.json({ user: updated });
   }
 );
@@ -893,6 +926,20 @@ portalRouter.patch(
       res.status(400).json({ error: 'Invalid student record update.' });
       return;
     }
+    const allStudents = await pustRepo.listStudents();
+    const target = allStudents.find((s) => s.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Student not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode !== req.authUser!.departmentCode
+    ) {
+      res.status(403).json({ error: 'Chairmen may only update student notes in their own department.' });
+      return;
+    }
+
     const patch: Record<string, unknown> = {};
     if (req.authUser!.role === 'chairman' && parsed.data.chairmanNotes !== undefined) {
       patch.chairmanNotes = parsed.data.chairmanNotes;
@@ -908,7 +955,12 @@ portalRouter.patch(
         patch.disciplinaryNotes = parsed.data.disciplinaryNotes;
       }
     }
-    const updated = await pustRepo.updateStudentById(String(req.params.id), patch);
+    if (Object.keys(patch).length === 0) {
+      res.status(400).json({ error: 'Provide at least one permitted field to update.' });
+      return;
+    }
+
+    const updated = await pustRepo.updateStudentById(target.id, patch);
     if (!updated) {
       res.status(404).json({ error: 'Student not found.' });
       return;
@@ -1045,9 +1097,24 @@ portalRouter.patch(
       return;
     }
 
+    if (target.status === 'approved') {
+      res.status(409).json({ error: 'This library membership application has already been approved.' });
+      return;
+    }
+
     if (!target.chairmanSeal) {
       res.status(409).json({
         error: 'Chairman seal and signature JSON record is required before Library approval.',
+      });
+      return;
+    }
+
+    const existingCard = (await pustRepo.listLibraryCards()).find(
+      (c) => c.academicId === target.academicId && c.status === 'Active'
+    );
+    if (existingCard) {
+      res.status(409).json({
+        error: `An active Digital Library Card (${existingCard.digitalCardNo}) already exists for this student.`,
       });
       return;
     }
@@ -1139,6 +1206,9 @@ portalRouter.get('/halls/overview', requireAuth, async (req: AuthenticatedReques
   if (req.authUser!.role === 'student') {
     apps = apps.filter((a) => a.academicId === req.authUser!.academicId);
     dues = dues.filter((d) => d.academicId === req.authUser!.academicId);
+  } else if (req.authUser!.role === 'hall') {
+    apps = apps.filter((a) => isHallOfficerScopedTo(req.authUser!, a.hallName));
+    dues = dues.filter((d) => isHallOfficerScopedTo(req.authUser!, d.hallName));
   }
   res.json({ circulars, applications: apps, dues, gateways });
 });
@@ -1150,6 +1220,12 @@ portalRouter.post(
     const parsed = hallCircularSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: 'Complete all hall vacancy circular fields.' });
+      return;
+    }
+    if (!isHallOfficerScopedTo(req.authUser!, parsed.data.hallName)) {
+      res.status(403).json({
+        error: `Hall officer access is scoped to ${req.authUser!.hallAffiliation}.`,
+      });
       return;
     }
     const circular = await pustRepo.createHallCircular({
@@ -1173,6 +1249,22 @@ portalRouter.post(
     const circular = (await pustRepo.listHallCirculars()).find((c) => c.id === parsed.data.circularId);
     if (!circular) {
       res.status(404).json({ error: 'Hall vacancy circular not found.' });
+      return;
+    }
+    if (circular.vacantSeats <= 0) {
+      res.status(409).json({ error: 'No vacant seats remain for this circular.' });
+      return;
+    }
+    const existingApp = (await pustRepo.listHallApplications()).find(
+      (a) =>
+        a.academicId === req.authUser!.academicId &&
+        a.circularId === circular.id &&
+        a.status !== 'rejected'
+    );
+    if (existingApp) {
+      res.status(409).json({
+        error: 'You already have an active or approved application for this hall circular.',
+      });
       return;
     }
     const app = await pustRepo.createHallApplication({
@@ -1205,6 +1297,25 @@ portalRouter.patch(
     if (!target) {
       res.status(404).json({ error: 'Hall application not found.' });
       return;
+    }
+    if (!isHallOfficerScopedTo(req.authUser!, target.hallName)) {
+      res.status(403).json({
+        error: `Hall officer access is scoped to ${req.authUser!.hallAffiliation}.`,
+      });
+      return;
+    }
+
+    if (parsed.data.status === 'accepted' && target.status !== 'accepted') {
+      const circular = (await pustRepo.listHallCirculars()).find((c) => c.id === target.circularId);
+      if (circular) {
+        if (circular.vacantSeats <= 0) {
+          res.status(409).json({ error: 'No vacant seats remain in this circular.' });
+          return;
+        }
+        await pustRepo.updateHallCircular(circular.id, {
+          vacantSeats: circular.vacantSeats - 1,
+        });
+      }
     }
 
     const seatHistory = [...target.seatHistory];
@@ -1255,6 +1366,12 @@ portalRouter.patch(
       res.status(404).json({ error: 'Application not found.' });
       return;
     }
+    if (!isHallOfficerScopedTo(req.authUser!, target.hallName)) {
+      res.status(403).json({
+        error: `Hall officer access is scoped to ${req.authUser!.hallAffiliation}.`,
+      });
+      return;
+    }
 
     const seatHistory = [
       ...target.seatHistory,
@@ -1287,6 +1404,12 @@ portalRouter.post(
       res.status(400).json({ error: 'Invalid hall due record.' });
       return;
     }
+    if (!isHallOfficerScopedTo(req.authUser!, parsed.data.hallName)) {
+      res.status(403).json({
+        error: `Hall officer access is scoped to ${req.authUser!.hallAffiliation}.`,
+      });
+      return;
+    }
     const stu = await pustRepo.findStudentByAcademicId(parsed.data.academicId);
     const due = await pustRepo.createHallDue({
       academicId: parsed.data.academicId,
@@ -1315,6 +1438,10 @@ portalRouter.post(
       res.status(404).json({ error: 'Hall fee record not found.' });
       return;
     }
+    if (target.status === 'Cleared' || target.status === 'Payment Submitted') {
+      res.status(409).json({ error: 'Payment has already been submitted or cleared for this hall due.' });
+      return;
+    }
     const updated = await pustRepo.updateHallDue(target.id, {
       paymentMethod: parsed.data.paymentMethod,
       paymentRef: parsed.data.paymentRef,
@@ -1333,6 +1460,16 @@ portalRouter.patch(
     const target = dues.find((d) => d.id === req.params.id);
     if (!target) {
       res.status(404).json({ error: 'Hall due record not found.' });
+      return;
+    }
+    if (!isHallOfficerScopedTo(req.authUser!, target.hallName)) {
+      res.status(403).json({
+        error: `Hall officer access is scoped to ${req.authUser!.hallAffiliation}.`,
+      });
+      return;
+    }
+    if (target.status === 'Cleared') {
+      res.status(409).json({ error: 'This hall due has already been cleared.' });
       return;
     }
     const clearanceRef = `PUST-HALL-CLR-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
@@ -1493,6 +1630,25 @@ portalRouter.post(
       res.status(404).json({ error: 'Examination circular not found.' });
       return;
     }
+    if (circular.departmentCode !== req.authUser!.departmentCode) {
+      res.status(403).json({
+        error: 'You may only apply for examination circulars issued by your own department.',
+      });
+      return;
+    }
+
+    const existingExamApp = (await pustRepo.listExamApplications()).find(
+      (a) =>
+        a.academicId === req.authUser!.academicId &&
+        a.circularId === circular.id &&
+        a.verificationStatus !== 'Rejected'
+    );
+    if (existingExamApp) {
+      res.status(409).json({
+        error: 'You have already submitted an examination application for this circular.',
+      });
+      return;
+    }
 
     // Enforce eligible course restriction
     const eligibleSet = new Set(circular.eligibleCourseCodes);
@@ -1550,6 +1706,10 @@ portalRouter.post(
     const target = apps.find((a) => a.id === req.params.id);
     if (!target || target.academicId !== req.authUser!.academicId) {
       res.status(404).json({ error: 'Examination form not found.' });
+      return;
+    }
+    if (target.paymentStatus === 'Paid') {
+      res.status(409).json({ error: 'Examination fee is already marked Paid.' });
       return;
     }
     const updated = await pustRepo.updateExamApplication(target.id, {
