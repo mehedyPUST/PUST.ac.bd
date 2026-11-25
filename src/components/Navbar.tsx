@@ -104,7 +104,7 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-pust-950 via-pust-800 to-pust-900"
         />
 
         <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
@@ -144,7 +144,7 @@ export function Navbar({
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                <span className="hidden lg:inline text-xs text-pust-100/90 whitespace-nowrap shrink-0">
+                <span className="hidden lg:inline text-xs font-medium text-amber-200 whitespace-nowrap shrink-0">
                   {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                 </span>
 
@@ -242,7 +242,7 @@ export function Navbar({
             <div className="hidden lg:flex h-11 px-4 lg:px-5 xl:px-6 bg-white items-center justify-between gap-4">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[13px] xl:text-[13.5px] font-medium text-slate-800"
+                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[13.5px] xl:text-sm font-medium text-slate-900"
               >
                 {/* Home */}
                 <div

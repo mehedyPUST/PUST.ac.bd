@@ -14,12 +14,12 @@ export function Breadcrumb() {
   }
 
   return (
-    <div className="bg-[#F7F7F5] border-b border-slate-200 print:hidden">
+    <div className="bg-white border-b border-slate-200 print:hidden">
       <nav
         aria-label="Breadcrumb"
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2"
       >
-        <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-600 overflow-x-auto no-scrollbar">
+        <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-700 overflow-x-auto no-scrollbar">
           {crumbs.map((crumb, index) => {
             const isFirst = index === 0;
             const isLast = index === crumbs.length - 1;
@@ -28,7 +28,7 @@ export function Breadcrumb() {
               <li key={`${crumb.label}-${index}`} className="inline-flex items-center gap-1.5">
                 {!isFirst && (
                   <ChevronRight
-                    className="w-3.5 h-3.5 text-slate-400 shrink-0"
+                    className="w-3.5 h-3.5 text-slate-500 shrink-0"
                     aria-hidden="true"
                   />
                 )}
@@ -36,17 +36,17 @@ export function Breadcrumb() {
                 {isLast || !crumb.href ? (
                   <span
                     aria-current="page"
-                    className="font-semibold text-pust-900 whitespace-nowrap truncate max-w-[240px] sm:max-w-none"
+                    className="font-semibold text-pust-800 whitespace-nowrap truncate max-w-[240px] sm:max-w-none"
                   >
                     {crumb.label}
                   </span>
                 ) : (
                   <Link
                     href={crumb.href}
-                    className="inline-flex items-center gap-1.5 text-slate-600 hover:text-pust-900 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 text-slate-700 hover:text-pust-900 hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
                   >
                     {isFirst && (
-                      <Home className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
+                      <Home className="w-3.5 h-3.5 text-pust-800 shrink-0" aria-hidden="true" />
                     )}
                     <span>{crumb.label}</span>
                   </Link>

@@ -224,7 +224,7 @@ export function AdministrationSection({
             <div className="lg:col-span-7 flex flex-col justify-between gap-6">
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-xs font-medium text-pust-800">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-pust-700">
                     Administration &amp; Executive Governance · PUST Act No. 43 of 2001
                   </p>
                   <EditTriggerButton
@@ -233,12 +233,12 @@ export function AdministrationSection({
                     variant="compact"
                   />
                 </div>
-                <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-medium tracking-tight text-slate-900 max-w-2xl">
+                <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
                   {activeOffice
                     ? activeOffice.highlight
                     : 'University Administration & Executive Offices'}
                 </h1>
-                <p className="text-[15px] sm:text-base leading-relaxed text-slate-600 max-w-2xl">
+                <p className="text-[15.5px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
                   {activeOffice
                     ? activeOffice.summary
                     : 'Statutory leadership, executive offices, and accountability units guiding academic governance, faculty administration, and digital public service at Pabna University of Science and Technology.'}
@@ -281,10 +281,10 @@ export function AdministrationSection({
               >
                 <Link
                   href="/administration"
-                  className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                     route === '/administration'
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-800 hover:text-pust-900'
+                      ? 'bg-pust-800 text-white shadow-xs'
+                      : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   Overview
@@ -293,10 +293,10 @@ export function AdministrationSection({
                   <Link
                     key={item.route}
                     href={item.route}
-                    className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                       route === item.route
-                        ? 'bg-pust-900 text-white'
-                        : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-800 hover:text-pust-900'
+                        ? 'bg-pust-800 text-white shadow-xs'
+                        : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                     }`}
                   >
                     {item.label}
@@ -318,28 +318,28 @@ export function AdministrationSection({
           </div>
 
           {/* Operational Leadership Utility Ribbon */}
-          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-slate-200 bg-white divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-amber-900/15 bg-white shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
             <div className="px-5 py-4">
-              <dt className="text-xs text-slate-500">Statutory Charter</dt>
-              <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
+              <dt className="text-xs font-medium text-slate-600">Statutory Charter</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
                 {adminShowcase.charterTag} · Est. {profile.establishedYear}
               </dd>
             </div>
             <div className="px-5 py-4">
-              <dt className="text-xs text-slate-500">Principal Officers</dt>
-              <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
+              <dt className="text-xs font-medium text-slate-600">Principal Officers</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
                 {profile.leadership.length} Executive Offices
               </dd>
             </div>
             <div className="px-5 py-4">
-              <dt className="text-xs text-slate-500">Governance &amp; Units</dt>
-              <dd className="font-mono tabular-nums text-sm font-medium text-slate-900 mt-1">
+              <dt className="text-xs font-medium text-slate-600">Governance &amp; Units</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
                 {profile.units.length} Statutory &amp; Cell Bodies
               </dd>
             </div>
-            <div className="px-5 py-4">
-              <dt className="text-xs text-slate-500">Accountability Cycle</dt>
-              <dd className="font-mono tabular-nums text-sm font-medium text-pust-900 mt-1">
+            <div className="px-5 py-4 bg-gradient-to-br from-pust-50/70 to-amber-50/40">
+              <dt className="text-xs font-medium text-pust-800">Accountability Cycle</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-pust-900 mt-1">
                 {adminShowcase.accountabilityCycle}
               </dd>
             </div>
@@ -368,26 +368,26 @@ export function AdministrationSection({
 
                     <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
                       <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                        <dt className="text-xs text-slate-500 shrink-0">Designation</dt>
-                        <dd className="font-medium text-slate-900 sm:text-right">
+                        <dt className="text-xs font-medium text-slate-600 shrink-0">Designation</dt>
+                        <dd className="font-semibold text-slate-950 sm:text-right">
                           {currentVc.title || 'Honorable Vice-Chancellor'}
                         </dd>
                       </div>
                       {currentVc.tenure && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs text-slate-500 shrink-0">Tenure</dt>
-                          <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                          <dt className="text-xs font-medium text-slate-600 shrink-0">Tenure</dt>
+                          <dd className="font-mono tabular-nums text-xs font-medium text-slate-900 sm:text-right">
                             {currentVc.tenure}
                           </dd>
                         </div>
                       )}
                       {currentVc.email && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs text-slate-500 shrink-0">Direct Email</dt>
+                          <dt className="text-xs font-medium text-slate-600 shrink-0">Direct Email</dt>
                           <dd className="font-mono text-xs sm:text-right min-w-0">
                             <a
                               href={`mailto:${currentVc.email}`}
-                              className="text-pust-900 hover:underline break-all"
+                              className="text-pust-800 font-medium hover:underline break-all"
                             >
                               {currentVc.email}
                             </a>
@@ -396,11 +396,11 @@ export function AdministrationSection({
                       )}
                       {currentVc.phone && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs text-slate-500 shrink-0">Telephone</dt>
-                          <dd className="font-mono tabular-nums text-xs text-slate-800 sm:text-right">
+                          <dt className="text-xs font-medium text-slate-600 shrink-0">Telephone</dt>
+                          <dd className="font-mono tabular-nums text-xs font-medium text-slate-900 sm:text-right">
                             <a
                               href={`tel:${currentVc.phone}`}
-                              className="hover:text-pust-900"
+                              className="hover:text-pust-800"
                             >
                               {currentVc.phone}
                             </a>
@@ -415,7 +415,7 @@ export function AdministrationSection({
                     <div className="space-y-6">
                       <header className="space-y-2 border-b border-slate-200 pb-6">
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-xs font-medium text-pust-800">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-pust-700">
                             Welcome Message from the Vice-Chancellor
                             {currentVc.tenure ? ` · ${currentVc.tenure}` : ''}
                           </p>
@@ -425,21 +425,21 @@ export function AdministrationSection({
                             variant="compact"
                           />
                         </div>
-                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium text-slate-900">
+                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-950">
                           {currentVc.name}
                         </h2>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm font-medium text-slate-700">
                           Honorable Vice-Chancellor, Pabna University of Science and Technology
                         </p>
                       </header>
 
-                      <div className="space-y-5 flow-root prose-justify text-[15px] sm:text-base leading-[1.8] text-slate-700">
+                      <div className="space-y-5 flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-[16.5px] leading-[1.78] text-slate-800">
                         {bodyParagraphs.map((paragraph, index) => (
                           <p
                             key={index}
                             className={
                               index === 0
-                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
+                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
                                 : ''
                             }
                           >
@@ -804,7 +804,7 @@ export function AdministrationSection({
                   className={`p-6 rounded-2xl border space-y-2.5 shadow-xs hover:shadow-md transition-all ${unitGradient}`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-mono text-xs text-pust-800">
+                    <p className="font-mono text-xs font-semibold text-pust-700">
                       {unit.code} · {unit.category}
                     </p>
                     <EditTriggerButton
@@ -813,8 +813,8 @@ export function AdministrationSection({
                       variant="compact"
                     />
                   </div>
-                  <h3 className="font-serif text-lg font-medium text-slate-900">{unit.name}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{unit.description}</p>
+                  <h3 className="font-serif text-lg font-semibold text-slate-950">{unit.name}</h3>
+                  <p className="text-sm text-slate-700 leading-relaxed">{unit.description}</p>
                 </MotionCard>
               );
             })}

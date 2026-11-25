@@ -118,15 +118,15 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
       <div className="border-b border-slate-200 pb-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               Statutory Governance · {activeTab.code}
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
+            <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-1.5 tracking-tight">
               {route === '/governance'
                 ? 'University Governance & Statutory Framework'
                 : activeTab.heading}
             </h1>
-            <p className="text-sm text-slate-600 mt-2 max-w-3xl leading-relaxed">
+            <p className="text-[15px] text-slate-700 mt-2.5 max-w-3xl leading-[1.72]">
               {activeTab.subtitle}
             </p>
           </div>
@@ -147,10 +147,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <Link
                 key={tab.route}
                 href={tab.route}
-                className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-pust-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                    ? 'bg-pust-800 text-white shadow-xs'
+                    : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                 }`}
               >
                 {tab.label}
@@ -166,25 +166,25 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
           <div className="space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7 space-y-5">
-                <h2 className="font-serif text-2xl font-medium text-slate-900">
+                <h2 className="font-serif text-2xl font-semibold text-slate-950">
                   Statutory Mandate Under the PUST Act (Act No. 43 of 2001)
                 </h2>
-                <p className="text-base leading-[1.8] text-slate-700">
+                <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
                   {governanceContent.actIntro}
                 </p>
-                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 card-gradient-parchment overflow-hidden shadow-xs">
+                <div className="rounded-2xl divide-y divide-amber-900/10 border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
                   {governanceContent.actClauses.map((item, idx) => (
-                    <div key={`${item.clause}-${idx}`} className="p-5 space-y-1.5 hover:bg-white/60 transition-colors">
-                      <p className="font-mono text-xs font-semibold text-pust-800">{item.clause}</p>
-                      <p className="text-sm text-slate-700 leading-relaxed">{item.detail}</p>
+                    <div key={`${item.clause}-${idx}`} className="p-5 space-y-1.5 hover:bg-white/75 transition-colors">
+                      <p className="font-mono text-xs font-semibold text-pust-700">{item.clause}</p>
+                      <p className="text-sm text-slate-800 leading-relaxed">{item.detail}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <aside className="lg:col-span-5 card-gradient-crimson rounded-2xl border border-pust-200/80 shadow-xs overflow-hidden hover:border-pust-600/40 transition-colors">
+              <aside className="lg:col-span-5 card-gradient-crimson rounded-2xl border border-pust-200 shadow-xs overflow-hidden hover:border-pust-600/50 transition-colors">
                 <div className="p-6 space-y-5">
-                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                     Official Bangladesh Laws Citation
                   </p>
                   <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
@@ -193,8 +193,8 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                         key={`${item.label}-${idx}`}
                         className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
                       >
-                        <dt className="text-slate-600">{item.label}</dt>
-                        <dd className="font-mono font-medium text-slate-900 sm:text-right break-words">
+                        <dt className="text-slate-700 font-medium">{item.label}</dt>
+                        <dd className="font-mono font-semibold text-slate-950 sm:text-right break-words">
                           {item.value}
                         </dd>
                       </div>
@@ -300,11 +300,11 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                       key={`${m.designation}-${idx}`}
                       className="px-5 py-4 grid grid-cols-1 sm:grid-cols-12 gap-2 items-baseline text-sm"
                     >
-                      <p className="sm:col-span-4 font-mono text-xs font-semibold text-pust-800">
+                      <p className="sm:col-span-4 font-mono text-xs font-semibold text-pust-700">
                         {m.seat}
                       </p>
-                      <p className="sm:col-span-6 text-slate-800">{m.designation}</p>
-                      <p className="sm:col-span-2 sm:text-right font-mono text-xs text-slate-500">
+                      <p className="sm:col-span-6 text-slate-900 font-medium">{m.designation}</p>
+                      <p className="sm:col-span-2 sm:text-right font-mono text-xs font-medium text-slate-600">
                         {m.term}
                       </p>
                     </div>
@@ -312,11 +312,11 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 </div>
               </div>
 
-              <MotionReveal className="lg:col-span-5 space-y-4 card-gradient-gold rounded-2xl border border-gold-200/80 p-6 shadow-xs">
-                <h2 className="font-serif text-xl font-medium text-slate-900">
+              <MotionReveal className="lg:col-span-5 space-y-4 card-gradient-gold rounded-2xl border border-gold-200 p-6 shadow-xs">
+                <h2 className="font-serif text-xl font-semibold text-slate-950">
                   Core Executive Functions
                 </h2>
-                <ul className="space-y-3 text-sm text-slate-700 leading-relaxed list-disc pl-5">
+                <ul className="space-y-3 text-sm text-slate-800 leading-relaxed list-disc pl-5">
                   {governanceContent.regentFunctions.map((fn, idx) => (
                     <li key={idx}>{fn}</li>
                   ))}
@@ -329,10 +329,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
         {activeRoute === '/governance/academic-council' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 space-y-5">
-              <h2 className="font-serif text-2xl font-medium text-slate-900">
+              <h2 className="font-serif text-2xl font-semibold text-slate-950">
                 Mandate &amp; Jurisdiction of the Academic Council
               </h2>
-              <p className="text-base leading-[1.8] text-slate-700">
+              <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
                 {governanceContent.academicCouncilIntro}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -340,27 +340,27 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   <MotionCard
                     key={`${card.title}-${idx}`}
                     delay={idx * 0.04}
-                    className="p-5 rounded-2xl border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/45 hover:shadow-md space-y-1.5 transition-all"
+                    className="p-5 rounded-2xl border border-lapis-200 card-gradient-lapis hover:border-lapis-600/60 hover:shadow-md space-y-1.5 transition-all"
                   >
-                    <h3 className="font-serif text-lg font-medium text-slate-900">{card.title}</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">{card.detail}</p>
+                    <h3 className="font-serif text-lg font-semibold text-slate-950">{card.title}</h3>
+                    <p className="text-xs text-slate-700 leading-relaxed">{card.detail}</p>
                   </MotionCard>
                 ))}
               </div>
             </div>
 
-            <div className="lg:col-span-5 rounded-2xl border border-gold-200/80 card-gradient-gold p-6 space-y-4 shadow-xs">
-              <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
+            <div className="lg:col-span-5 rounded-2xl border border-gold-200 card-gradient-gold p-6 space-y-4 shadow-xs">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
                 Council Structure
               </p>
-              <dl className="divide-y divide-gold-200/60 text-sm">
+              <dl className="divide-y divide-gold-200/70 text-sm">
                 {governanceContent.academicCouncilStructure.map((row, idx) => (
                   <div
                     key={`${row.label}-${idx}`}
                     className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
                   >
-                    <dt className="text-slate-600">{row.label}</dt>
-                    <dd className="font-medium text-slate-900 sm:text-right">{row.value}</dd>
+                    <dt className="text-slate-700">{row.label}</dt>
+                    <dd className="font-semibold text-slate-950 sm:text-right">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -377,24 +377,24 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
         {activeRoute === '/governance/finance-committee' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 space-y-5">
-              <h2 className="font-serif text-2xl font-medium text-slate-900">
+              <h2 className="font-serif text-2xl font-semibold text-slate-950">
                 Financial Stewardship &amp; Audit Oversight
               </h2>
-              <p className="text-base leading-[1.8] text-slate-700">
+              <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
                 {governanceContent.financeCommitteeIntro}
               </p>
-              <div className="rounded-2xl divide-y divide-sage-200/70 border border-sage-200/80 card-gradient-sage overflow-hidden shadow-xs">
+              <div className="rounded-2xl divide-y divide-sage-200/80 border border-sage-200 card-gradient-sage overflow-hidden shadow-xs">
                 {governanceContent.financeCommitteeScopes.map((item, idx) => (
-                  <div key={`${item.scope}-${idx}`} className="p-5 space-y-1 hover:bg-white/60 transition-colors">
-                    <p className="font-serif text-lg font-medium text-slate-900">{item.scope}</p>
-                    <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                  <div key={`${item.scope}-${idx}`} className="p-5 space-y-1 hover:bg-white/75 transition-colors">
+                    <p className="font-serif text-lg font-semibold text-slate-950">{item.scope}</p>
+                    <p className="text-sm text-slate-700 leading-relaxed">{item.desc}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="lg:col-span-5 card-gradient-parchment rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <div className="lg:col-span-5 card-gradient-parchment rounded-2xl border border-amber-900/15 p-6 space-y-4 shadow-xs">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Committee Leadership
               </p>
               <dl className="divide-y divide-slate-200 text-sm">
@@ -403,8 +403,8 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     key={`${row.label}-${idx}`}
                     className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
                   >
-                    <dt className="text-slate-600">{row.label}</dt>
-                    <dd className="font-medium text-slate-900 sm:text-right">{row.value}</dd>
+                    <dt className="text-slate-700">{row.label}</dt>
+                    <dd className="font-semibold text-slate-950 sm:text-right">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -416,21 +416,21 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               <div className="lg:col-span-6 space-y-4">
-                <h2 className="font-serif text-2xl font-medium text-slate-900">
+                <h2 className="font-serif text-2xl font-semibold text-slate-950">
                   Unified 4.00 Grading Scale &amp; Credit Rules
                 </h2>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-[15px] text-slate-700 leading-relaxed">
                   {governanceContent.ordinanceIntro}
                 </p>
 
-                <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-[#F7F7F5] text-sm overflow-hidden">
+                <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 bg-[#FAF7F0] text-sm overflow-hidden">
                   {governanceContent.ordinanceRules.map((rule, idx) => (
                     <div
                       key={`${rule.label}-${idx}`}
                       className="p-4 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
                     >
-                      <span className="text-slate-600">{rule.label}</span>
-                      <span className="font-mono font-medium text-slate-900 sm:text-right">
+                      <span className="text-slate-700">{rule.label}</span>
+                      <span className="font-mono font-semibold text-slate-950 sm:text-right">
                         {rule.value}
                       </span>
                     </div>
@@ -439,14 +439,14 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </div>
 
               <div className="lg:col-span-6 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-                <div className="px-5 py-3.5 border-b border-slate-200 bg-[#F7F7F5]">
-                  <h3 className="font-serif text-lg font-medium text-slate-900">
+                <div className="px-5 py-3.5 border-b border-slate-200 bg-[#F8F5EE]">
+                  <h3 className="font-serif text-lg font-semibold text-slate-950">
                     PUST Official Letter Grade &amp; Grade Point Table
                   </h3>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[480px] text-left text-xs sm:text-sm">
-                    <thead className="border-b border-slate-200 bg-slate-50 font-mono text-xs text-slate-600">
+                    <thead className="border-b border-slate-200 bg-slate-50 font-mono text-xs font-semibold text-slate-700">
                       <tr>
                         <th className="px-4 py-2.5">Numerical Marks</th>
                         <th className="px-4 py-2.5">Letter Grade</th>
@@ -456,17 +456,17 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     </thead>
                     <tbody className="divide-y divide-slate-200">
                       {governanceContent.gradingScale.map((row, idx) => (
-                        <tr key={`${row.letter}-${idx}`}>
-                          <td className="px-4 py-2 font-mono tabular-nums text-slate-700">
+                        <tr key={`${row.letter}-${idx}`} className="hover:bg-slate-50/70">
+                          <td className="px-4 py-2 font-mono tabular-nums text-slate-800">
                             {row.range}
                           </td>
-                          <td className="px-4 py-2 font-mono font-semibold text-pust-800">
+                          <td className="px-4 py-2 font-mono font-semibold text-pust-700">
                             {row.letter}
                           </td>
-                          <td className="px-4 py-2 font-mono tabular-nums text-slate-900">
+                          <td className="px-4 py-2 font-mono font-semibold tabular-nums text-slate-950">
                             {row.gp}
                           </td>
-                          <td className="px-4 py-2 text-slate-600">{row.remarks}</td>
+                          <td className="px-4 py-2 text-slate-700">{row.remarks}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -89,10 +89,10 @@ export function ResearchSection({
       <div className="space-y-4 pb-4 border-b border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               Faculty Research &amp; Periodicals
             </p>
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
               Recent Peer-Reviewed Publications
             </h2>
           </div>
@@ -111,10 +111,10 @@ export function ResearchSection({
                 key={code}
                 type="button"
                 onClick={() => setSelectedDeptFilter(code)}
-                className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedDeptFilter === code
-                    ? 'bg-pust-900 text-white'
-                    : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                    ? 'bg-pust-800 text-white shadow-xs'
+                    : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:text-pust-900 hover:border-pust-700'
                 }`}
               >
                 {code}
@@ -214,10 +214,10 @@ export function ResearchSection({
                     />
                   </div>
                 </div>
-                <h3 className="font-serif text-lg font-medium text-slate-900 leading-snug">
+                <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug">
                   {pub.title}
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   Authors: {pub.authors}
                   {pub.venue ? ` · ${pub.venue}` : ''}
                   {pub.doi ? ` · DOI: ${pub.doi}` : ''}
@@ -234,15 +234,15 @@ export function ResearchSection({
     <div
       className={`${
         focus === 'journals' ? 'lg:col-span-6' : 'lg:col-span-5'
-      } card-gradient-gold rounded-2xl border border-gold-200/80 shadow-xs hover:border-gold-600/40 transition-colors overflow-hidden`}
+      } card-gradient-gold rounded-2xl border border-gold-200 shadow-xs hover:border-gold-600/55 transition-colors overflow-hidden`}
     >
       <div className="p-6 sm:p-7 space-y-5">
-        <div className="border-b border-gold-200/70 pb-4 flex items-end justify-between gap-3">
+        <div className="border-b border-gold-200/80 pb-4 flex items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-gold-700">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
               University Periodicals
             </p>
-            <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+            <h2 className="font-serif text-2xl font-semibold text-slate-950 mt-1">
               Official PUST Journals
             </h2>
           </div>
@@ -254,16 +254,16 @@ export function ResearchSection({
         </div>
 
         {journals.length === 0 ? (
-          <p className="text-sm text-slate-600 py-4">
+          <p className="text-sm text-slate-700 py-4">
             No official journals are currently listed in the periodicals directory.
           </p>
         ) : (
-          <div className="divide-y divide-gold-200/60">
+          <div className="divide-y divide-gold-200/70">
             {journals.map((journal) => (
               <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
-                <p className="font-mono text-xs text-slate-500 tabular-nums">{journal.issn}</p>
-                <h3 className="font-serif text-lg font-medium text-slate-900">{journal.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{journal.scope}</p>
+                <p className="font-mono text-xs font-medium text-slate-600 tabular-nums">{journal.issn}</p>
+                <h3 className="font-serif text-lg font-semibold text-slate-950">{journal.title}</h3>
+                <p className="text-sm text-slate-700 leading-relaxed">{journal.scope}</p>
                 <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
               </div>
             ))}
@@ -291,14 +291,14 @@ export function ResearchSection({
       <div className="space-y-12">
         {/* Verified Institutional Research Output Summary */}
         {deptResearchList.length > 0 && (
-          <div className="card-gradient-lapis rounded-2xl border border-lapis-200/80 p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="card-gradient-lapis rounded-2xl border border-lapis-200 p-5 sm:p-6 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-lapis-700 flex items-center gap-1.5">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700 flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5" />
                   Official Faculty Publication Index (pust.ac.bd)
                 </p>
-                <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-1 tabular-nums">
+                <h2 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 mt-1 tabular-nums">
                   {totalResearchOutputs.toLocaleString('en-US')} Research Outputs Across {totalFaculty} Faculty Members
                 </h2>
               </div>
@@ -325,13 +325,13 @@ export function ResearchSection({
                     }
                     className={`text-left px-3 py-2 rounded-xl border transition-all cursor-pointer ${
                       active
-                        ? 'bg-pust-900 text-white border-pust-900 shadow-xs'
-                        : 'bg-white/85 border-lapis-200/70 text-slate-800 hover:border-pust-700/60 hover:bg-white'
+                        ? 'bg-pust-800 text-white border-pust-800 shadow-xs'
+                        : 'bg-white/95 border-lapis-200 text-slate-900 hover:border-pust-700 hover:bg-white'
                     }`}
                   >
                     <p
                       className={`font-mono text-[11px] font-semibold ${
-                        active ? 'text-pust-200' : 'text-lapis-800'
+                        active ? 'text-amber-200' : 'text-lapis-800'
                       }`}
                     >
                       {dept.code}
@@ -339,8 +339,8 @@ export function ResearchSection({
                     <p className="font-mono text-sm font-semibold tabular-nums mt-0.5">
                       {(dept.researchTotal ?? 0).toLocaleString('en-US')}{' '}
                       <span
-                        className={`text-[10px] font-normal ${
-                          active ? 'text-pust-100' : 'text-slate-500'
+                        className={`text-[10px] font-medium ${
+                          active ? 'text-pust-100' : 'text-slate-600'
                         }`}
                       >
                         works
@@ -383,12 +383,12 @@ export function ResearchSection({
                     variant="compact"
                   />
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+                  <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
                   Central Library, Laboratories &amp; Residential Halls
                 </h2>
               </div>
               <div className="lg:col-span-5">
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-700 leading-relaxed">
                   {academicExtras.researchIntro}
                 </p>
               </div>
@@ -398,10 +398,10 @@ export function ResearchSection({
               {academicExtras.researchInfraCards.map((card, idx) => {
                 const gradientClass =
                   idx === 0
-                    ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                    ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-600/55'
                     : idx === 1
-                    ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
-                    : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45';
+                    ? 'card-gradient-gold border-gold-200 hover:border-gold-600/55'
+                    : 'card-gradient-sage border-sage-200 hover:border-sage-600/55';
                 const tagColor =
                   idx === 0 ? 'text-lapis-700' : idx === 1 ? 'text-gold-700' : 'text-sage-700';
 
@@ -420,11 +420,11 @@ export function ResearchSection({
                       />
                     </div>
                     <div>
-                      <p className={`font-mono text-xs font-medium ${tagColor}`}>{card.tag}</p>
-                      <h3 className="font-serif text-xl font-medium text-slate-900 mt-1">
+                      <p className={`font-mono text-xs font-semibold ${tagColor}`}>{card.tag}</p>
+                      <h3 className="font-serif text-xl font-semibold text-slate-950 mt-1">
                         {card.title}
                       </h3>
-                      <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                      <p className="text-sm text-slate-700 mt-2 leading-relaxed">
                         {card.description}
                       </p>
                     </div>

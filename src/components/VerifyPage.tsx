@@ -121,7 +121,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       {/* Header */}
       <header className="editable-region border-b border-slate-200 pb-8 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-800">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-700">
             {verifyPageConfig.kicker}
           </p>
           <EditTriggerButton
@@ -130,31 +130,31 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             variant="compact"
           />
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
+        <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-2 tracking-tight">
           {verifyPageConfig.title}
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mt-3 leading-relaxed">
+        <p className="text-[15px] sm:text-base text-slate-700 max-w-2xl mt-3 leading-[1.72]">
           {verifyPageConfig.subtitle}
         </p>
       </header>
 
       {/* Search & Quick Examples */}
-      <div className="card-gradient-parchment rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
+      <div className="card-gradient-parchment rounded-2xl border border-amber-900/15 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter serial (e.g. PUST-CERT-CSE-2026A1 or PUST-RCPT-2026-091)"
-              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:font-sans placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
+              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-950 placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-pust-700/25 focus:border-pust-700"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-900 text-white text-sm font-semibold hover:bg-pust-950 hover:-translate-y-0.5 transition-all disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-800 text-white text-sm font-semibold hover:bg-pust-900 shadow-xs hover:-translate-y-0.5 transition-all disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4" />
             {loading ? 'Verifying...' : 'Verify Serial'}
@@ -162,8 +162,8 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
         </form>
 
         {verifyPageConfig.sampleSerials.length > 0 && (
-          <div className="pt-2 border-t border-slate-200/70 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="pt-2 border-t border-slate-200/80 space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-600">
               Verify Issued Registry Records
             </p>
             <div className="flex flex-wrap gap-2">
@@ -175,10 +175,10 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                     setQuery(item.code);
                     runVerification(item.code);
                   }}
-                  className="text-left px-3 py-1.5 rounded-lg border border-lapis-200/80 card-gradient-lapis hover:border-lapis-600/50 hover:-translate-y-0.5 hover:shadow-xs transition-all cursor-pointer"
+                  className="text-left px-3 py-1.5 rounded-lg border border-lapis-200 card-gradient-lapis hover:border-lapis-600/60 hover:-translate-y-0.5 hover:shadow-xs transition-all cursor-pointer"
                 >
-                  <span className="block text-[11px] text-slate-600">{item.label}</span>
-                  <span className="font-mono text-xs font-medium text-lapis-800">{item.code}</span>
+                  <span className="block text-[11px] font-medium text-slate-700">{item.label}</span>
+                  <span className="font-mono text-xs font-semibold text-lapis-800">{item.code}</span>
                 </button>
               ))}
             </div>
@@ -257,14 +257,14 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               <div className="flex items-start gap-4">
                 <PustCrest size={52} className="shrink-0" />
                 <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-pust-800">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-pust-700">
                     {result.documentType}
                   </span>
-                  <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                  <h2 className="font-serif text-2xl font-semibold text-slate-950 mt-1">
                     {result.title}
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Issued by <strong className="text-slate-800">{result.issuedBy}</strong> on{' '}
+                  <p className="text-xs text-slate-600 mt-1">
+                    Issued by <strong className="text-slate-900">{result.issuedBy}</strong> on{' '}
                     <span className="tabular-nums">{result.issuedAt}</span>
                   </p>
                 </div>
@@ -282,20 +282,20 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p className="text-[11px] uppercase tracking-wider text-slate-500">Holder Name</p>
-                <p className="text-sm font-semibold text-slate-900 mt-1">{result.holderName}</p>
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-600">Holder Name</p>
+                <p className="text-sm font-semibold text-slate-950 mt-1">{result.holderName}</p>
               </div>
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p className="text-[11px] uppercase tracking-wider text-slate-500">Academic ID</p>
-                <p className="font-mono text-sm font-semibold text-slate-900 mt-1 tabular-nums">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-600">Academic ID</p>
+                <p className="font-mono text-sm font-semibold text-slate-950 mt-1 tabular-nums">
                   {result.academicId}
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p className="text-[11px] uppercase tracking-wider text-slate-500">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-600">
                   Department / Session
                 </p>
-                <p className="text-sm font-semibold text-slate-900 mt-1">
+                <p className="text-sm font-semibold text-slate-950 mt-1">
                   {result.departmentCode}
                   {result.session ? ` · ${result.session}` : ''}
                 </p>
@@ -308,14 +308,14 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                   key={row.label}
                   className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs"
                 >
-                  <span className="text-slate-500">{row.label}</span>
-                  <span className="font-medium text-slate-900 sm:text-right tabular-nums break-words">
+                  <span className="text-slate-600 font-medium">{row.label}</span>
+                  <span className="font-semibold text-slate-950 sm:text-right tabular-nums break-words">
                     {row.value}
                   </span>
                 </div>
               ))}
               <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-4 text-xs bg-slate-50">
-                <span className="text-slate-500">Integrity Digest</span>
+                <span className="text-slate-600 font-medium">Integrity Digest</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-pust-900 font-medium break-all">
                     {result.verificationHash}

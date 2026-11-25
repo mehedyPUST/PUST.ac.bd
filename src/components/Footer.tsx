@@ -45,7 +45,7 @@ export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer
       id="footer"
-      className="editable-region bg-[#210707] text-slate-200 border-t border-pust-900 print:hidden"
+      className="editable-region bg-gradient-to-b from-[#2E0505] via-[#210404] to-[#150202] text-slate-100 border-t-2 border-pust-700 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
@@ -64,7 +64,7 @@ export function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           {profile ? (
-            <p className="text-sm text-slate-300 leading-relaxed">{resolvedDescription}</p>
+            <p className="text-sm text-slate-200 leading-relaxed">{resolvedDescription}</p>
           ) : loadingData ? (
             <div className="space-y-2 py-1">
               <div className="h-3 w-5/6 rounded bg-white/10 animate-pulse" />
@@ -84,7 +84,7 @@ export function Footer({ onNavigate }: FooterProps) {
             />
           </div>
           {profile && footerConfig.socialLinks.length > 0 && (
-            <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-300">
+            <div className="pt-2 flex flex-wrap gap-4 text-xs text-slate-200">
               {footerConfig.socialLinks.map((social) => (
                 <a
                   key={`${social.label}-${social.url}`}
@@ -114,7 +114,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-300 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -134,7 +134,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-300 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -154,7 +154,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-300 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -164,13 +164,13 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
 
         {/* Contact Information */}
-        <div className="lg:col-span-2 space-y-2 text-xs text-slate-300">
+        <div className="lg:col-span-2 space-y-2 text-xs text-slate-200">
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
             Contact
           </p>
           {profile ? (
             <>
-              <p className="leading-relaxed text-slate-300">
+              <p className="leading-relaxed text-slate-200">
                 {footerConfig.addressLines.map((line, idx) => (
                   <span key={`${line}-${idx}`}>
                     {idx > 0 && <br />}
@@ -193,7 +193,7 @@ export function Footer({ onNavigate }: FooterProps) {
                   <br />
                   <a
                     href={`mailto:${c.email}`}
-                    className="hover:text-amber-300 underline decoration-slate-600 hover:decoration-amber-300 transition-colors break-all"
+                    className="hover:text-amber-300 underline decoration-slate-400 hover:decoration-amber-300 transition-colors break-all"
                   >
                     {c.email}
                   </a>
@@ -201,15 +201,15 @@ export function Footer({ onNavigate }: FooterProps) {
               ))}
             </>
           ) : (
-            <p className="text-slate-400">
+            <p className="text-slate-300">
               {loadingData ? 'Loading directory contacts...' : 'Contact directory unavailable.'}
             </p>
           )}
         </div>
       </div>
 
-      <div className="border-t border-pust-900 bg-black/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-300">
+      <div className="border-t border-pust-800/80 bg-black/35">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-200">
           <p>{profile ? footerConfig.copyrightText : 'Pabna University of Science and Technology'}</p>
           {profile?.convocationDate && (
             <p className="font-mono tabular-nums">

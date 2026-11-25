@@ -59,7 +59,7 @@ export function ResilientImage({
         )}
       </div>
       {caption && (
-        <figcaption className="text-xs font-serif italic text-slate-500 mt-2.5 leading-relaxed">
+        <figcaption className="text-xs font-serif italic text-slate-600 mt-2.5 leading-relaxed">
           {caption}
         </figcaption>
       )}

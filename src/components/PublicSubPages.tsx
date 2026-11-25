@@ -424,11 +424,11 @@ export function PublicSubPages({
       <main className="flex-1 bg-white">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               About Pabna University of Science &amp; Technology
             </p>
             <div className="flex flex-wrap items-start justify-between gap-4">
-              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight">
                 {activeSection?.title || activeTabLabel}
               </h1>
               <EditTriggerButton
@@ -441,10 +441,10 @@ export function PublicSubPages({
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     activeSlug === tab.slug
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-800 text-white shadow-xs'
+                      : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   {tab.label}
@@ -488,16 +488,16 @@ export function PublicSubPages({
                 return (
                   <>
                     <div className="lg:col-span-7 space-y-4">
-                      <h2 className="font-serif text-2xl font-medium text-slate-900">
+                      <h2 className="font-serif text-2xl font-semibold text-slate-950">
                         Our Mission
                       </h2>
                       {introLines.map((line, i) => (
-                        <p key={i} className="text-base leading-[1.8] text-slate-700">
+                        <p key={i} className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
                           {line}
                         </p>
                       ))}
                       {bulletLines.length > 0 && (
-                        <ul className="list-disc pl-5 space-y-2.5 text-base leading-[1.75] text-slate-700 pt-1">
+                        <ul className="list-disc pl-5 space-y-2.5 text-[15.5px] leading-[1.75] text-slate-800 pt-1 max-w-[66ch]">
                           {bulletLines.map((item, i) => (
                             <li key={i}>{item}</li>
                           ))}
@@ -507,10 +507,10 @@ export function PublicSubPages({
 
                     {visionPart && (
                       <div className="lg:col-span-5 space-y-3">
-                        <h2 className="font-serif text-2xl font-medium text-slate-900">
+                        <h2 className="font-serif text-2xl font-semibold text-slate-950">
                           Our Vision
                         </h2>
-                        <blockquote className="rounded-2xl border border-gold-200/80 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-900 shadow-xs">
+                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs">
                           {visionPart}
                         </blockquote>
                       </div>
@@ -522,7 +522,7 @@ export function PublicSubPages({
           ) : activeSlug === 'our-university' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7">
-                <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
+                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
                 </p>
               </div>
@@ -545,29 +545,29 @@ export function PublicSubPages({
                         className="w-full aspect-[4/3] object-cover"
                       />
                     </div>
-                    <dl className="rounded-2xl border border-slate-200 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
+                    <dl className="rounded-2xl border border-amber-900/15 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
                       <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-600">Established</dt>
-                        <dd className="font-mono font-medium sm:text-right">
+                        <dt className="text-slate-700 font-medium">Established</dt>
+                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
                           {profile.establishedYear} (Act No. 43 of 2001)
                         </dd>
                       </div>
                       <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-600">Campus Area</dt>
-                        <dd className="font-mono font-medium sm:text-right">
+                        <dt className="text-slate-700 font-medium">Campus Area</dt>
+                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
                           {profile.campusAcres} Acres · Rajapur, Pabna
                         </dd>
                       </div>
                       <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-600">Faculties &amp; Departments</dt>
-                        <dd className="font-mono font-medium sm:text-right">
+                        <dt className="text-slate-700 font-medium">Faculties &amp; Departments</dt>
+                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
                           {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
                         </dd>
                       </div>
                       {profile.convocationDate && (
                         <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                          <dt className="text-slate-600">First Convocation</dt>
-                          <dd className="font-mono font-semibold text-pust-800 sm:text-right">
+                          <dt className="text-slate-700 font-medium">First Convocation</dt>
+                          <dd className="font-mono font-semibold text-pust-700 sm:text-right">
                             {profile.convocationDate}
                           </dd>
                         </div>
@@ -579,7 +579,7 @@ export function PublicSubPages({
             </div>
           ) : (
             <div className="max-w-4xl">
-              <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
+              <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                 {activeSection.body}
               </p>
             </div>
@@ -698,11 +698,11 @@ export function PublicSubPages({
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight">
                 {activeHeading}
               </h1>
               {summaryParts.length > 0 && (
-                <p className="font-mono text-xs text-slate-600 tabular-nums">
+                <p className="font-mono text-xs font-medium text-slate-700 tabular-nums">
                   {summaryParts.join(' · ')}
                 </p>
               )}
@@ -721,10 +721,10 @@ export function PublicSubPages({
                         setSelectedFaculty('All');
                       }
                     }}
-                    className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-900 text-white'
-                        : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                        ? 'bg-pust-800 text-white shadow-xs'
+                        : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                     }`}
                   >
                     {tab.label}
@@ -1462,10 +1462,10 @@ export function PublicSubPages({
                           key={tab.value}
                           type="button"
                           onClick={() => setSelectedFaculty(tab.value)}
-                          className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                             selectedFaculty === tab.value
-                              ? 'bg-pust-900 text-white'
-                              : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                              ? 'bg-pust-800 text-white shadow-xs'
+                              : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:text-pust-900 hover:border-pust-700'
                           }`}
                         >
                           {tab.label}
@@ -1482,14 +1482,14 @@ export function PublicSubPages({
                       />
 
                       <div className="relative flex-1 sm:w-64 lg:w-64">
-                        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="search"
                           value={deptQuery}
                           onChange={(e) => setDeptQuery(e.target.value)}
                           placeholder="Search department, code, or chair..."
                           aria-label="Search departments"
-                          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#FAF7F0] text-slate-950 focus:outline-none focus:border-pust-700 focus:bg-white"
                         />
                       </div>
                     </div>
@@ -1502,7 +1502,7 @@ export function PublicSubPages({
                       {dataError}
                     </div>
                   ) : groupedFaculties.length === 0 ? (
-                    <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
+                    <div className="p-10 rounded-2xl border border-slate-200 bg-[#FAF7F0] text-center space-y-3">
                       <p className="text-sm text-slate-700">
                         No academic departments match your current search or faculty filter.
                       </p>
@@ -1512,7 +1512,7 @@ export function PublicSubPages({
                           setSelectedFaculty('All');
                           setDeptQuery('');
                         }}
-                        className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                        className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-800 text-white cursor-pointer"
                       >
                         Reset Department Filters
                       </button>
@@ -1526,22 +1526,22 @@ export function PublicSubPages({
                         );
                         const deptGradient =
                           facultyName === 'Faculty of Engineering and Technology'
-                            ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
+                            ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-600/60'
                             : facultyName === 'Faculty of Science'
-                            ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
+                            ? 'card-gradient-sage border-sage-200 hover:border-sage-600/60'
                             : facultyName === 'Faculty of Business Studies'
-                            ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
+                            ? 'card-gradient-gold border-gold-200 hover:border-gold-600/60'
                             : facultyName === 'Faculty of Humanities and Social Science'
-                            ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/50'
-                            : 'card-gradient-parchment border-slate-200 hover:border-sage-600/50';
+                            ? 'card-gradient-crimson border-pust-200 hover:border-pust-600/60'
+                            : 'card-gradient-parchment border-amber-900/15 hover:border-sage-600/60';
 
                         return (
                           <div key={facultyName} className="space-y-4">
                             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 pb-2.5 border-b border-slate-200">
-                              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
+                              <h2 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950">
                                 {facultyName}
                               </h2>
-                              <p className="font-mono text-xs text-slate-600 tabular-nums shrink-0">
+                              <p className="font-mono text-xs font-medium text-slate-600 tabular-nums shrink-0">
                                 {depts.length} {depts.length === 1 ? 'Department' : 'Departments'}
                                 {groupTeachers > 0 ? ` · ${groupTeachers} Teachers` : ''}
                               </p>
@@ -1583,23 +1583,23 @@ export function PublicSubPages({
                                       className="p-5 flex-1 flex flex-col justify-between gap-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
                                     >
                                       <div className="space-y-1.5">
-                                        <p className="font-mono text-xs text-pust-800 tabular-nums pr-14">
+                                        <p className="font-mono text-xs font-semibold text-pust-700 tabular-nums pr-14">
                                           {dept.officialCode ? `${dept.officialCode} · ` : ''}
                                           {dept.code}
                                         </p>
-                                        <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 group-hover:text-pust-900 transition-colors leading-snug">
+                                        <h3 className="font-serif text-lg sm:text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
                                           {dept.name}
                                         </h3>
                                       </div>
 
-                                      <div className="pt-3 border-t border-slate-200/70 flex items-center justify-between gap-3 text-xs">
-                                        <span className="text-slate-600 truncate">
+                                      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3 text-xs">
+                                        <span className="text-slate-700 truncate">
                                           Chair:{' '}
-                                          <span className="font-medium text-slate-900">
+                                          <span className="font-semibold text-slate-950">
                                             {dept.chairmanName}
                                           </span>
                                         </span>
-                                        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums shrink-0">
+                                        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-slate-700 tabular-nums shrink-0">
                                           {isOpening
                                             ? 'Opening...'
                                             : dept.facultyCount
@@ -1608,7 +1608,7 @@ export function PublicSubPages({
                                           {isOpening ? (
                                             <Loader2 className="w-3.5 h-3.5 animate-spin text-pust-800" />
                                           ) : (
-                                            <ArrowRight className="w-3.5 h-3.5 text-pust-800 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                            <ArrowRight className="w-3.5 h-3.5 text-pust-700 transition-transform duration-200 group-hover:translate-x-0.5" />
                                           )}
                                         </span>
                                       </div>
@@ -2607,10 +2607,10 @@ export function PublicSubPages({
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
           <div className="space-y-4">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Central &amp; Department Circulars
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-2">
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-2 tracking-tight">
                 {activeNoticeHeading}
               </h1>
             </div>
@@ -2619,10 +2619,10 @@ export function PublicSubPages({
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-800 text-white shadow-xs'
+                      : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   {tab.label}
@@ -2639,13 +2639,13 @@ export function PublicSubPages({
               variant="compact"
             />
             <div className="relative w-full sm:w-72 shrink-0">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="search"
                 value={noticeQuery}
                 onChange={(e) => setNoticeQuery(e.target.value)}
                 placeholder="Search circulars or memo no."
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
               />
             </div>
           </div>
@@ -2658,10 +2658,10 @@ export function PublicSubPages({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedNoticeCat(cat)}
-                className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
-                    ? 'bg-pust-900 text-white'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                    ? 'bg-pust-800 text-white shadow-xs'
+                    : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                 }`}
               >
                 {cat}
@@ -2681,10 +2681,10 @@ export function PublicSubPages({
                 key={scope.id}
                 type="button"
                 onClick={() => setNoticeBoardScope(scope.id)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
                   noticeBoardScope === scope.id
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white border border-slate-200 text-slate-700'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-white border border-slate-300/80 text-slate-800 hover:border-slate-400'
                 }`}
               >
                 {scope.label}
@@ -2711,7 +2711,7 @@ export function PublicSubPages({
             )}
           </div>
         ) : filteredNotices.length === 0 ? (
-          <div className="py-10 px-6 text-sm text-slate-600 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
+          <div className="py-10 px-6 text-sm text-slate-700 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
             <p>No notices match the selected filter criteria.</p>
             <button
               type="button"
@@ -2720,7 +2720,7 @@ export function PublicSubPages({
                 setNoticeBoardScope('all');
                 setNoticeQuery('');
               }}
-              className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-800 text-white cursor-pointer"
             >
               Reset Notice Filters
             </button>
@@ -2739,26 +2739,26 @@ export function PublicSubPages({
                     onSelectNotice(notice);
                   }
                 }}
-                className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/45 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
+                className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
               >
-                <div className="lg:col-span-3 font-mono text-xs text-slate-500 tabular-nums">
+                <div className="lg:col-span-3 font-mono text-xs text-slate-600 tabular-nums">
                   <span>{notice.publishedAt}</span>
-                  <span className="mx-2">·</span>
-                  <span className="font-semibold text-pust-800">{notice.category}</span>
+                  <span className="mx-2 text-slate-400">·</span>
+                  <span className="font-semibold text-pust-700">{notice.category}</span>
                 </div>
 
                 <div className="lg:col-span-7">
-                  <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
+                  <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
                     {notice.title}
                   </h2>
-                  <p className="text-sm text-slate-600 mt-1 leading-relaxed">{notice.summary}</p>
+                  <p className="text-sm text-slate-700 mt-1 leading-relaxed">{notice.summary}</p>
                 </div>
 
-                <div className="lg:col-span-2 lg:text-right font-mono text-xs text-slate-500 tabular-nums flex lg:flex-col items-center lg:items-end justify-between gap-2">
+                <div className="lg:col-span-2 lg:text-right font-mono text-xs text-slate-600 tabular-nums flex lg:flex-col items-center lg:items-end justify-between gap-2">
                   <div>
                     {notice.referenceNo}
                     {notice.visibility === 'registered' && (
-                      <span className="block text-pust-800 font-semibold mt-0.5">
+                      <span className="block text-pust-700 font-semibold mt-0.5">
                         Registered Only
                       </span>
                     )}

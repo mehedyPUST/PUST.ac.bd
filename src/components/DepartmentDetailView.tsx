@@ -2346,14 +2346,14 @@ export function DepartmentDetailView({
           </div>
 
           <div className="space-y-2.5 max-w-4xl">
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               {department.officialCode ? `Dept Code ${department.officialCode} · ` : ''}
               {department.code} · {department.faculty}
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] font-medium text-slate-900 tracking-tight leading-tight">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] font-semibold text-slate-950 tracking-tight leading-tight">
               Department of {department.name}
             </h1>
-            <p className="text-base text-slate-600 leading-relaxed">
+            <p className="text-[15.5px] sm:text-base text-slate-700 leading-[1.72]">
               {department.summary}
             </p>
           </div>
@@ -2362,10 +2362,10 @@ export function DepartmentDetailView({
         {/* Chairman & Department at a Glance */}
         <div className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-            <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950">
               Teachers of Department of {department.name}
             </h2>
-            <p className="font-mono text-xs text-slate-600 tabular-nums">
+            <p className="font-mono text-xs font-medium text-slate-600 tabular-nums">
               {department.facultyCount
                 ? `Total Teacher: ${department.facultyCount}`
                 : facultyMembers.length > 0
@@ -2391,12 +2391,12 @@ export function DepartmentDetailView({
             <div className="lg:col-span-5">
               <MotionCard
                 delay={0.04}
-                className="rounded-2xl border border-slate-200 card-gradient-parchment p-5 sm:p-6 shadow-xs h-full flex flex-col justify-between space-y-5"
+                className="rounded-2xl border border-amber-900/15 card-gradient-parchment p-5 sm:p-6 shadow-xs h-full flex flex-col justify-between space-y-5"
               >
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-pust-800 shrink-0" />
-                    <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
+                    <Building2 className="w-4 h-4 text-pust-700 shrink-0" />
+                    <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-700">
                       Department at a Glance
                     </h3>
                   </div>
@@ -2404,11 +2404,11 @@ export function DepartmentDetailView({
                   <dl className="divide-y divide-slate-200/80 text-xs sm:text-[13px]">
                     {department.contactPhone && (
                       <div className="py-2.5 flex items-center justify-between gap-4">
-                        <dt className="text-slate-600">Contact</dt>
-                        <dd className="font-mono font-semibold text-slate-900 tabular-nums text-right">
+                        <dt className="text-slate-700 font-medium">Contact</dt>
+                        <dd className="font-mono font-semibold text-slate-950 tabular-nums text-right">
                           <a
                             href={`tel:${sanitizeTelHref(department.contactPhone)}`}
-                            className="hover:text-pust-900 hover:underline"
+                            className="hover:text-pust-800 hover:underline"
                           >
                             {department.contactPhone}
                           </a>
@@ -2417,11 +2417,11 @@ export function DepartmentDetailView({
                     )}
                     {department.contactEmail && (
                       <div className="py-2.5 flex items-center justify-between gap-4">
-                        <dt className="text-slate-600">Email</dt>
-                        <dd className="font-mono font-semibold text-lapis-900 text-right truncate">
+                        <dt className="text-slate-700 font-medium">Email</dt>
+                        <dd className="font-mono font-semibold text-lapis-800 text-right truncate">
                           <a
                             href={`mailto:${department.contactEmail}`}
-                            className="hover:text-pust-900 hover:underline"
+                            className="hover:text-pust-800 hover:underline"
                           >
                             {department.contactEmail}
                           </a>
@@ -2430,21 +2430,21 @@ export function DepartmentDetailView({
                     )}
                     {(department.facultyCount !== undefined || facultyMembers.length > 0) && (
                       <div className="py-2.5 flex items-center justify-between gap-4">
-                        <dt className="text-slate-600">Total Teacher</dt>
-                        <dd className="font-mono font-semibold text-pust-900 tabular-nums text-right">
+                        <dt className="text-slate-700 font-medium">Total Teacher</dt>
+                        <dd className="font-mono font-semibold text-pust-800 tabular-nums text-right">
                           {department.facultyCount ?? facultyMembers.length}
                         </dd>
                       </div>
                     )}
                     <div className="py-2.5 flex items-center justify-between gap-4">
-                      <dt className="text-slate-600">Established &amp; Code</dt>
-                      <dd className="font-mono font-medium text-slate-900 tabular-nums text-right">
+                      <dt className="text-slate-700 font-medium">Established &amp; Code</dt>
+                      <dd className="font-mono font-semibold text-slate-950 tabular-nums text-right">
                         {department.established}
                         {department.officialCode ? ` · Code ${department.officialCode}` : ''}
                       </dd>
                     </div>
                     <div className="py-2.5 flex items-center justify-between gap-4">
-                      <dt className="text-slate-600">Annual Intake</dt>
+                      <dt className="text-slate-700 font-medium">Annual Intake</dt>
                       <dd className="font-mono font-medium text-slate-900 tabular-nums text-right">
                         {department.intakeSeats} Undergraduate Seats
                       </dd>

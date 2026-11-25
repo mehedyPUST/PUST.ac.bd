@@ -113,16 +113,16 @@ export function CampusMapSection() {
         {/* Section Header + Zone Filter */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               {campusMapMeta.eyebrow}
             </p>
             <h2
               id="campus-map-heading"
-              className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1"
+              className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1"
             >
               {campusMapMeta.title}
             </h2>
-            <p className="text-sm text-slate-600 mt-1.5 max-w-2xl">{campusMapMeta.subtitle}</p>
+            <p className="text-sm text-slate-700 mt-1.5 max-w-2xl">{campusMapMeta.subtitle}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -186,7 +186,7 @@ export function CampusMapSection() {
                 </defs>
 
                 {/* Base Drafting Paper */}
-                <rect width="800" height="500" fill="#FCFBF8" />
+                <rect width="800" height="500" fill="#FAF7F0" />
                 <rect width="800" height="500" fill="url(#campus-grid)" />
 
                 {/* Landscaped Campus Grounds Boundary */}
@@ -195,8 +195,8 @@ export function CampusMapSection() {
                   y="24"
                   width="744"
                   height="408"
-                  fill="#F4F1EA"
-                  stroke="#D6D3CD"
+                  fill="#F1ECE1"
+                  stroke="#B8B0A2"
                   strokeWidth="1.5"
                 />
 
@@ -206,23 +206,23 @@ export function CampusMapSection() {
                   y="148"
                   width="290"
                   height="155"
-                  fill="#ECFDF5"
-                  stroke="#A7F3D0"
-                  strokeWidth="1"
+                  fill="#DCFCE7"
+                  stroke="#4ADE80"
+                  strokeWidth="1.2"
                 />
 
                 {/* Campus Lake / Reflecting Pond */}
                 <path
                   d="M 430 100 C 460 88, 520 92, 535 112 C 548 128, 515 142, 470 138 C 430 135, 412 114, 430 100 Z"
-                  fill="#E0F2FE"
-                  stroke="#BAE6FD"
-                  strokeWidth="1.2"
+                  fill="#BAE6FD"
+                  stroke="#0284C7"
+                  strokeWidth="1.4"
                 />
                 <text
                   x="480"
                   y="119"
                   textAnchor="middle"
-                  className="fill-sky-800/70 font-mono text-[9px]"
+                  className="fill-sky-900 font-mono text-[9.5px] font-semibold"
                 >
                   Campus Lake
                 </text>
@@ -233,16 +233,16 @@ export function CampusMapSection() {
                   y="286"
                   width="176"
                   height="112"
-                  fill="#ECFDF5"
-                  stroke="#A7F3D0"
+                  fill="#DCFCE7"
+                  stroke="#22C55E"
                   strokeDasharray="4 3"
-                  strokeWidth="1"
+                  strokeWidth="1.2"
                 />
                 <text
                   x="144"
                   y="346"
                   textAnchor="middle"
-                  className="fill-pust-900/60 font-mono text-[10px]"
+                  className="fill-emerald-950/85 font-mono text-[10px] font-semibold"
                 >
                   Central Playground
                 </text>
@@ -418,9 +418,9 @@ export function CampusMapSection() {
               })}
             </div>
 
-            {/* Direct Clickable Building Directory Grid (Accessible on Desktop & Mobile) */}
-            <div className="rounded-2xl card-gradient-parchment border border-slate-200 p-4 space-y-2.5 shadow-xs">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-600">
+              {/* Direct Clickable Building Directory Grid (Accessible on Desktop & Mobile) */}
+            <div className="rounded-2xl card-gradient-parchment border border-slate-200 p-4 space-y-2.5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
                 Campus Buildings Index ({filteredBuildings.length}) — Click a building name
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -433,14 +433,14 @@ export function CampusMapSection() {
                       onClick={() => setSelectedBuildingId(b.id)}
                       className={`px-3 py-2.5 rounded-lg text-left border transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
-                          ? 'bg-pust-900 text-white border-pust-950 shadow-xs'
-                          : 'bg-white/85 text-slate-800 border-slate-200 hover:border-pust-700 hover:bg-white hover:-translate-y-0.5'
+                          ? 'bg-pust-800 text-white border-pust-950 shadow-sm'
+                          : 'bg-white/90 text-slate-900 border-slate-200 hover:border-pust-700 hover:bg-white hover:-translate-y-0.5'
                       }`}
                     >
                       <span className="text-xs font-medium truncate">{b.name}</span>
                       <span
                         className={`font-mono text-[10px] shrink-0 tabular-nums ${
-                          isSelected ? 'text-pust-200' : 'text-slate-500'
+                          isSelected ? 'text-amber-200 font-semibold' : 'text-slate-600'
                         }`}
                       >
                         {b.code}
@@ -461,7 +461,7 @@ export function CampusMapSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0.4 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full rounded-2xl card-gradient-sage border border-sage-200/80 shadow-xs hover:shadow-md hover:border-sage-600/40 transition-all flex flex-col justify-between overflow-hidden"
+                className="w-full rounded-2xl card-gradient-sage border border-sage-200 shadow-sm hover:shadow-md hover:border-sage-600/50 transition-all flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   <ResilientImage
@@ -475,7 +475,7 @@ export function CampusMapSection() {
                   <div className="p-6 space-y-4">
                     <div>
                       <div className="flex items-center justify-between gap-3">
-                        <p className="font-mono text-xs text-sage-800 tabular-nums">
+                        <p className="font-mono text-xs font-semibold text-sage-800 tabular-nums">
                           {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
                         </p>
                         <EditTriggerButton
@@ -484,33 +484,33 @@ export function CampusMapSection() {
                           variant="compact"
                         />
                       </div>
-                      <h3 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+                      <h3 className="font-serif text-2xl font-semibold text-slate-950 mt-1">
                         {activeBuilding.name}
                       </h3>
                     </div>
 
-                    <p className="text-sm text-slate-700 leading-relaxed">{activeBuilding.summary}</p>
+                    <p className="text-sm text-slate-800 leading-relaxed">{activeBuilding.summary}</p>
 
-                    <dl className="divide-y divide-sage-200/70 border-y border-sage-200/70 text-xs sm:text-sm">
+                    <dl className="divide-y divide-sage-200/80 border-y border-sage-200/80 text-xs sm:text-sm">
                       <div className="py-2.5 space-y-0.5">
-                        <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Offices &amp; Academic Units
                         </dt>
-                        <dd className="text-slate-800 font-medium leading-relaxed">{activeBuilding.offices}</dd>
+                        <dd className="text-slate-900 font-medium leading-relaxed">{activeBuilding.offices}</dd>
                       </div>
                       <div className="py-2.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 shrink-0">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 shrink-0">
                           Visiting Hours
                         </dt>
-                        <dd className="font-mono text-xs text-slate-900 sm:text-right tabular-nums">
+                        <dd className="font-mono text-xs font-medium text-slate-950 sm:text-right tabular-nums">
                           {activeBuilding.hours}
                         </dd>
                       </div>
                       <div className="py-2.5 space-y-0.5">
-                        <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Key Facilities
                         </dt>
-                        <dd className="text-slate-700 leading-relaxed">{activeBuilding.facilities}</dd>
+                        <dd className="text-slate-800 leading-relaxed">{activeBuilding.facilities}</dd>
                       </div>
                     </dl>
                   </div>
@@ -519,12 +519,12 @@ export function CampusMapSection() {
                 <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
                   <Link
                     href={activeBuilding.route}
-                    className="group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap"
+                    className="group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-pust-800 text-white hover:bg-pust-900 transition-colors whitespace-nowrap"
                   >
                     <span>{activeBuilding.routeLabel}</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                   </Link>
-                  <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  <span className="font-mono text-[11px] font-medium text-slate-600 tabular-nums">
                     {campusBuildings.findIndex((b) => b.id === activeBuilding.id) + 1} /{' '}
                     {campusBuildings.length}
                   </span>
