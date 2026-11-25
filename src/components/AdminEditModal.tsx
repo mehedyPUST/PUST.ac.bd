@@ -6,6 +6,7 @@ import { pustApi } from '../lib/api';
 import { detectAttachmentType } from '../lib/media';
 import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilitiesEditors';
 import { CampusAndGovernanceEditors } from './admin-edit/CampusAndGovernanceEditors';
+import { DepartmentPersonEditor } from './admin-edit/DepartmentPersonEditor';
 import { HomeAndFooterEditors } from './admin-edit/HomeAndFooterEditors';
 import type {
   AboutContentRecord,
@@ -768,6 +769,7 @@ export function AdminEditModal({
     (target.kind === 'vc' && isEditingFormerVc);
 
   const isModularTarget =
+    target.kind === 'department-person' ||
     target.kind === 'institutional-links' ||
     target.kind === 'seminars' ||
     target.kind === 'verify-page' ||
@@ -818,6 +820,10 @@ export function AdminEditModal({
       ? target.department
         ? `Edit Department · ${target.department.code}`
         : 'Create New Academic Department'
+      : target.kind === 'department-person'
+      ? target.person
+        ? `Edit Profile · ${target.person.name}`
+        : `Add Member · ${target.department.code}`
       : target.kind === 'leadership'
       ? 'Edit Executive Administration Directory'
       : target.kind === 'unit'
@@ -941,6 +947,19 @@ export function AdminEditModal({
                 setSaving={setSaving}
                 setError={setError}
                 onSaveProfile={handleSaveProfilePatch}
+                onClose={onClose}
+              />
+            )}
+            {target.kind === 'department-person' && (
+              <DepartmentPersonEditor
+                key={`${target.department.id}-${target.group}-${target.person?.id || 'new'}`}
+                department={target.department}
+                group={target.group}
+                person={target.person}
+                saving={saving}
+                setSaving={setSaving}
+                setError={setError}
+                onRefreshDepartments={onRefreshDepartments}
                 onClose={onClose}
               />
             )}

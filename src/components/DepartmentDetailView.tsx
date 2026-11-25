@@ -28,6 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import type {
+  DepartmentPersonGroup,
   DepartmentPersonRecord,
   DepartmentRecord,
   PublicationRecord,
@@ -268,13 +269,17 @@ function PersonProfileCard({
   roleCategory,
   accentClass,
   delay = 0,
+  canEdit = false,
   onViewProfile,
+  onEditPerson,
 }: {
   person: DepartmentPersonRecord;
   roleCategory: PersonRoleCategory;
   accentClass: string;
   delay?: number;
+  canEdit?: boolean;
   onViewProfile: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
+  onEditPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
   const hasPersonalInfo =
     Boolean(person.qualification) ||
@@ -380,20 +385,29 @@ function PersonProfileCard({
         )}
       </div>
 
-      {/* Card Footer Action: View Profile */}
-      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3">
+      {/* Card Footer Action: View Profile & Admin Edit */}
+      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2.5">
         <span className="font-mono text-[11px] text-slate-500 truncate">
           {roleCategory}
         </span>
-        <button
-          type="button"
-          onClick={() => onViewProfile(person, roleCategory)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
-        >
-          <UserRound className="w-3.5 h-3.5 shrink-0" />
-          View Profile
-          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {canEdit && onEditPerson && (
+            <EditTriggerButton
+              label="Edit"
+              variant="compact"
+              onClick={() => onEditPerson(person, roleCategory)}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => onViewProfile(person, roleCategory)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+          >
+            <UserRound className="w-3.5 h-3.5 shrink-0" />
+            View Profile
+            <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+          </button>
+        </div>
       </div>
     </MotionCard>
   );
@@ -410,11 +424,15 @@ function PersonProfileModal({
   activeProfile,
   department,
   deptPublications,
+  canEdit = false,
+  onEditPerson,
   onClose,
 }: {
   activeProfile: ActiveProfileState | null;
   department: DepartmentRecord;
   deptPublications: PublicationRecord[];
+  canEdit?: boolean;
+  onEditPerson?: () => void;
   onClose: () => void;
 }) {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
@@ -1016,6 +1034,13 @@ function PersonProfileModal({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {canEdit && onEditPerson && (
+              <EditTriggerButton
+                label="Edit Profile"
+                variant="compact"
+                onClick={onEditPerson}
+              />
+            )}
             <button
               type="button"
               onClick={handleCopyProfileLink}
@@ -1355,6 +1380,28 @@ export function DepartmentDetailView({
       : [],
   };
 
+  const canAdminEdit = editMode && user?.role === 'admin';
+
+  function roleCategoryToGroup(roleCategory: PersonRoleCategory): DepartmentPersonGroup {
+    if (roleCategory === 'Chairman') return 'chairman';
+    if (roleCategory === 'Faculty Member') return 'faculty';
+    if (roleCategory === 'Faculty Member (Contractual)') return 'contractual';
+    return 'officer';
+  }
+
+  function handleEditPerson(
+    person: DepartmentPersonRecord | null,
+    roleCategory: PersonRoleCategory
+  ) {
+    if (!department || !canAdminEdit) return;
+    openEditModal({
+      kind: 'department-person',
+      department,
+      group: roleCategoryToGroup(roleCategory),
+      person,
+    });
+  }
+
   function handleOpenProfile(
     person: DepartmentPersonRecord,
     roleCategory: PersonRoleCategory
@@ -1466,7 +1513,9 @@ export function DepartmentDetailView({
                 person={chairman}
                 roleCategory="Chairman"
                 accentClass="card-gradient-crimson border-pust-200/90 h-full"
+                canEdit={canAdminEdit}
                 onViewProfile={handleOpenProfile}
+                onEditPerson={handleEditPerson}
               />
             </div>
 
@@ -1569,9 +1618,19 @@ export function DepartmentDetailView({
                   Academic Roster
                 </p>
               </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
-                Faculty Members
-              </h2>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
+                  Faculty Members
+                </h2>
+                {canAdminEdit && (
+                  <EditTriggerButton
+                    icon="add"
+                    label="Add Teacher"
+                    variant="compact"
+                    onClick={() => handleEditPerson(null, 'Faculty Member')}
+                  />
+                )}
+              </div>
             </div>
 
             {facultyMembers.length > 0 && (
@@ -1645,7 +1704,9 @@ export function DepartmentDetailView({
                       ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
                       : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
                   }
+                  canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
+                  onEditPerson={handleEditPerson}
                 />
               ))}
             </div>
@@ -1654,12 +1715,20 @@ export function DepartmentDetailView({
 
         {/* Faculty Members (Contractual) */}
         <div className="space-y-4 pt-2 border-t border-slate-200">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               <GraduationCap className="w-4 h-4 text-gold-700 shrink-0" />
               <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
                 Faculty Members (Contractual)
               </h2>
+              {canAdminEdit && (
+                <EditTriggerButton
+                  icon="add"
+                  label="Add Contractual"
+                  variant="compact"
+                  onClick={() => handleEditPerson(null, 'Faculty Member (Contractual)')}
+                />
+              )}
             </div>
             <span className="font-mono text-xs text-slate-500 tabular-nums">
               {contractualFaculty.length} Listed
@@ -1680,7 +1749,9 @@ export function DepartmentDetailView({
                   roleCategory="Faculty Member (Contractual)"
                   delay={idx * 0.03}
                   accentClass="card-gradient-gold border-gold-200/80"
+                  canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
+                  onEditPerson={handleEditPerson}
                 />
               ))}
             </div>
@@ -1689,12 +1760,20 @@ export function DepartmentDetailView({
 
         {/* Officers */}
         <div className="space-y-4 pt-2 border-t border-slate-200">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               <UserCheck className="w-4 h-4 text-pust-800 shrink-0" />
               <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
                 Officers
               </h2>
+              {canAdminEdit && (
+                <EditTriggerButton
+                  icon="add"
+                  label="Add Officer"
+                  variant="compact"
+                  onClick={() => handleEditPerson(null, 'Department Officer')}
+                />
+              )}
             </div>
             <span className="font-mono text-xs text-slate-500 tabular-nums">
               {officers.length} {officers.length === 1 ? 'Officer' : 'Officers'}
@@ -1715,7 +1794,9 @@ export function DepartmentDetailView({
                   roleCategory="Department Officer"
                   delay={idx * 0.03}
                   accentClass="card-gradient-parchment border-slate-200 hover:border-pust-600/40"
+                  canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
+                  onEditPerson={handleEditPerson}
                 />
               ))}
             </div>
@@ -1843,6 +1924,16 @@ export function DepartmentDetailView({
         activeProfile={activeProfile}
         department={department}
         deptPublications={deptPublications}
+        canEdit={canAdminEdit}
+        onEditPerson={
+          activeProfile
+            ? () => {
+                const targetToEdit = activeProfile;
+                handleCloseProfile();
+                handleEditPerson(targetToEdit.person, targetToEdit.roleCategory);
+              }
+            : undefined
+        }
         onClose={handleCloseProfile}
       />
     </main>

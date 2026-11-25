@@ -755,6 +755,8 @@ export type GovernanceTabKind =
   | 'finance-committee'
   | 'academic-ordinance';
 
+export type DepartmentPersonGroup = 'chairman' | 'faculty' | 'contractual' | 'officer';
+
 export type EditModalTarget =
   | { kind: 'hero-profile' }
   | { kind: 'banner'; slideId?: string }
@@ -765,6 +767,12 @@ export type EditModalTarget =
   | { kind: 'publication'; publication?: PublicationRecord | null }
   | { kind: 'journals' }
   | { kind: 'department'; department: DepartmentRecord | null }
+  | {
+      kind: 'department-person';
+      department: DepartmentRecord;
+      group: DepartmentPersonGroup;
+      person: DepartmentPersonRecord | null;
+    }
   | { kind: 'leadership'; officerIndex?: number }
   | { kind: 'unit'; unitCode?: string }
   | { kind: 'institutional-links' }
