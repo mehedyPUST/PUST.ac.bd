@@ -140,6 +140,7 @@ export interface DepartmentRecord {
   chairmanName: string;
   contactPhone?: string;
   contactEmail?: string;
+  coverImageUrl?: string;
   summary: string;
   researchFocus: string[];
   laboratories: string[];

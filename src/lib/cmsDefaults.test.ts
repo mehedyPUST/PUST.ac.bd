@@ -115,3 +115,53 @@ test('parseRouteFromPath and getBreadcrumbsForPath support individual department
     { label: 'Department of PHY' },
   ]);
 });
+
+test('resolveDepartmentImage resolves all 21 department assets, custom URLs, and safe fallbacks', async () => {
+  const { existsSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { DEPARTMENT_COVER_IMAGES, resolveDepartmentImage } = await import('./departmentMedia');
+
+  const codes = Object.keys(DEPARTMENT_COVER_IMAGES);
+  assert.equal(codes.length, 21);
+
+  for (const code of codes) {
+    const url = resolveDepartmentImage({
+      code,
+      name: code,
+      faculty: 'Faculty of Science',
+    });
+    assert.ok(url.startsWith('/src/assets/images/dept_'), `Expected local dept image for ${code}`);
+    const publicPath = join(process.cwd(), 'public', url);
+    assert.ok(existsSync(publicPath), `Missing public asset file for ${code}: ${publicPath}`);
+  }
+
+  assert.equal(
+    resolveDepartmentImage({
+      code: 'CSE',
+      name: 'Computer Science and Engineering',
+      faculty: 'Faculty of Engineering and Technology',
+      coverImageUrl: 'https://example.edu/cse-lab.jpg',
+    }),
+    'https://example.edu/cse-lab.jpg'
+  );
+
+  assert.equal(
+    resolveDepartmentImage({
+      code: 'CSE',
+      name: 'Computer Science and Engineering',
+      faculty: 'Faculty of Engineering and Technology',
+      coverImageUrl: 'javascript:alert(1)',
+    }),
+    DEPARTMENT_COVER_IMAGES.CSE
+  );
+
+  assert.equal(
+    resolveDepartmentImage({
+      code: 'NEWCHEM',
+      name: 'Applied Chemistry & Polymer Science',
+      faculty: 'Faculty of Engineering and Technology',
+    }),
+    DEPARTMENT_COVER_IMAGES.CHEM
+  );
+});
+

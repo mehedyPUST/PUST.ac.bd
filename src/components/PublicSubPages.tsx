@@ -27,6 +27,7 @@ import {
 import { pustApi } from '../lib/api';
 import { downloadIcsCalendar } from '../lib/calendarExport';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
+import { resolveDepartmentImage } from '../lib/departmentMedia';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -1547,9 +1548,10 @@ export function PublicSubPages({
                               </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                               {depts.map((dept, idx) => {
                                 const isOpening = openingDeptCode === dept.code;
+                                const coverPhoto = resolveDepartmentImage(dept);
                                 return (
                                   <MotionCard
                                     key={dept.id}
@@ -1566,11 +1568,11 @@ export function PublicSubPages({
                                         </div>
                                       </div>
                                     )}
-                                    <div className="absolute top-4 right-4 z-10">
+                                    <div className="absolute top-3 right-3 z-10">
                                       <EditTriggerButton
                                         target={{ kind: 'department', department: dept }}
                                         label="Edit"
-                                        variant="compact"
+                                        variant="overlay"
                                       />
                                     </div>
                                     <Link
@@ -1580,37 +1582,54 @@ export function PublicSubPages({
                                       onMouseEnter={() => prefetchDepartment(dept)}
                                       onFocus={() => prefetchDepartment(dept)}
                                       onClick={() => handleOpenDepartmentLink(dept)}
-                                      className="p-5 flex-1 flex flex-col justify-between gap-4 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
+                                      className="flex-1 flex flex-col justify-between rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
                                     >
-                                      <div className="space-y-1.5">
-                                        <p className="font-mono text-xs font-semibold text-pust-700 tabular-nums pr-14">
-                                          {dept.officialCode ? `${dept.officialCode} · ` : ''}
-                                          {dept.code}
-                                        </p>
-                                        <h3 className="font-serif text-lg sm:text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
-                                          {dept.name}
-                                        </h3>
+                                      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-slate-200/80 bg-slate-100">
+                                        <ResilientImage
+                                          src={coverPhoto}
+                                          alt={`Department of ${dept.name}, PUST`}
+                                          containerClassName="w-full h-full m-0"
+                                          frameClassName="w-full h-full bg-slate-100"
+                                          fallbackMinHeightClassName="min-h-0"
+                                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                        />
+                                        <div
+                                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent"
+                                          aria-hidden="true"
+                                        />
                                       </div>
 
-                                      <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3 text-xs">
-                                        <span className="text-slate-700 truncate">
-                                          Chair:{' '}
-                                          <span className="font-semibold text-slate-950">
-                                            {dept.chairmanName}
+                                      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                                        <div className="space-y-1.5">
+                                          <p className="font-mono text-xs font-semibold text-pust-700 tabular-nums">
+                                            {dept.officialCode ? `${dept.officialCode} · ` : ''}
+                                            {dept.code}
+                                          </p>
+                                          <h3 className="font-serif text-lg sm:text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
+                                            {dept.name}
+                                          </h3>
+                                        </div>
+
+                                        <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3 text-xs">
+                                          <span className="text-slate-700 truncate">
+                                            Chair:{' '}
+                                            <span className="font-semibold text-slate-950">
+                                              {dept.chairmanName}
+                                            </span>
                                           </span>
-                                        </span>
-                                        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-slate-700 tabular-nums shrink-0">
-                                          {isOpening
-                                            ? 'Opening...'
-                                            : dept.facultyCount
-                                            ? `${dept.facultyCount} Teachers`
-                                            : ''}
-                                          {isOpening ? (
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin text-pust-800" />
-                                          ) : (
-                                            <ArrowRight className="w-3.5 h-3.5 text-pust-700 transition-transform duration-200 group-hover:translate-x-0.5" />
-                                          )}
-                                        </span>
+                                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-slate-700 tabular-nums shrink-0">
+                                            {isOpening
+                                              ? 'Opening...'
+                                              : dept.facultyCount
+                                              ? `${dept.facultyCount} Teachers`
+                                              : ''}
+                                            {isOpening ? (
+                                              <Loader2 className="w-3.5 h-3.5 animate-spin text-pust-800" />
+                                            ) : (
+                                              <ArrowRight className="w-3.5 h-3.5 text-pust-700 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                            )}
+                                          </span>
+                                        </div>
                                       </div>
                                     </Link>
                                   </MotionCard>

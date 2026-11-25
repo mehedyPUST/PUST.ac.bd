@@ -10,6 +10,7 @@ interface ResilientImageProps {
   className?: string;
   containerClassName?: string;
   frameClassName?: string;
+  fallbackMinHeightClassName?: string;
   priority?: boolean;
 }
 
@@ -20,6 +21,7 @@ export function ResilientImage({
   className = 'w-full h-full object-cover',
   containerClassName = '',
   frameClassName = 'rounded-xl bg-slate-100 border border-slate-200',
+  fallbackMinHeightClassName = 'min-h-[240px]',
   priority = false,
 }: ResilientImageProps) {
   const trimmedSrc = src?.trim() || '';
@@ -51,9 +53,9 @@ export function ResilientImage({
             className={className}
           />
         ) : (
-          <div className="w-full h-full min-h-[240px] flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-pust-50 to-slate-100 text-pust-800">
-            <Building2 className="w-8 h-8 mb-3 opacity-75" strokeWidth={1.5} />
-            <p className="font-serif text-base font-medium text-slate-900 max-w-xs">{alt}</p>
+          <div className={`w-full h-full ${fallbackMinHeightClassName} flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-pust-50 to-slate-100 text-pust-800`}>
+            <Building2 className="w-8 h-8 mb-2.5 opacity-75" strokeWidth={1.5} />
+            <p className="font-serif text-sm sm:text-base font-medium text-slate-900 max-w-xs">{alt}</p>
             <p className="text-xs text-slate-600 mt-1">Pabna University of Science and Technology</p>
           </div>
         )}

@@ -8,6 +8,7 @@ import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilities
 import { CampusAndGovernanceEditors } from './admin-edit/CampusAndGovernanceEditors';
 import { DepartmentPersonEditor } from './admin-edit/DepartmentPersonEditor';
 import { HomeAndFooterEditors } from './admin-edit/HomeAndFooterEditors';
+import { CmsImageField } from './admin-edit/shared';
 import type {
   AboutContentRecord,
   AdministrativeUnit,
@@ -182,6 +183,7 @@ export function AdminEditModal({
   const [deptChairman, setDeptChairman] = useState('');
   const [deptContactPhone, setDeptContactPhone] = useState('');
   const [deptContactEmail, setDeptContactEmail] = useState('');
+  const [deptCoverImageUrl, setDeptCoverImageUrl] = useState('');
   const [deptFacultyCount, setDeptFacultyCount] = useState<string>('');
   const [deptIntake, setDeptIntake] = useState(40);
   const [deptBuilding, setDeptBuilding] = useState('');
@@ -342,6 +344,7 @@ export function AdminEditModal({
         setDeptChairman(d.chairmanName);
         setDeptContactPhone(d.contactPhone || '');
         setDeptContactEmail(d.contactEmail || '');
+        setDeptCoverImageUrl(d.coverImageUrl || '');
         setDeptFacultyCount(d.facultyCount !== undefined ? String(d.facultyCount) : '');
         setDeptIntake(d.intakeSeats);
         setDeptBuilding(d.building);
@@ -358,6 +361,7 @@ export function AdminEditModal({
         setDeptChairman('');
         setDeptContactPhone('');
         setDeptContactEmail('');
+        setDeptCoverImageUrl('');
         setDeptFacultyCount('');
         setDeptIntake(40);
         setDeptBuilding('Academic Building I');
@@ -701,6 +705,7 @@ export function AdminEditModal({
             chairmanName: deptChairman.trim(),
             ...(deptContactPhone.trim() ? { contactPhone: deptContactPhone.trim() } : {}),
             ...(deptContactEmail.trim() ? { contactEmail: deptContactEmail.trim() } : {}),
+            coverImageUrl: deptCoverImageUrl.trim(),
             ...(parsedFacultyCount !== undefined ? { facultyCount: parsedFacultyCount } : {}),
             intakeSeats: Number(deptIntake),
             building: deptBuilding.trim(),
@@ -719,6 +724,7 @@ export function AdminEditModal({
             chairmanName: deptChairman.trim(),
             ...(deptContactPhone.trim() ? { contactPhone: deptContactPhone.trim() } : {}),
             ...(deptContactEmail.trim() ? { contactEmail: deptContactEmail.trim() } : {}),
+            ...(deptCoverImageUrl.trim() ? { coverImageUrl: deptCoverImageUrl.trim() } : {}),
             ...(parsedFacultyCount !== undefined ? { facultyCount: parsedFacultyCount } : {}),
             intakeSeats: Number(deptIntake),
             building: deptBuilding.trim(),
@@ -1978,6 +1984,13 @@ export function AdminEditModal({
                   className={INPUT_CLASS}
                 />
               </div>
+              <CmsImageField
+                label="Department Card Photo (optional override)"
+                value={deptCoverImageUrl}
+                onChange={setDeptCoverImageUrl}
+                onError={setError}
+                placeholder="Leave blank to use tailored department photo, or paste/upload URL"
+              />
               <div>
                 <label className={LABEL_CLASS}>Department Summary</label>
                 <textarea

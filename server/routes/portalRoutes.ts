@@ -668,6 +668,15 @@ const departmentCreateSchema = z.object({
   chairmanName: z.string().trim().min(2).max(120),
   contactPhone: z.string().trim().max(60).optional(),
   contactEmail: z.string().trim().max(120).optional(),
+  coverImageUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine(
+      (val) => !val || isSafeMediaUrl(val),
+      'Cover image URL must be a valid https://, http://, or local path.'
+    )
+    .optional(),
   summary: z.string().trim().min(10).max(2000),
   researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
   laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20),
@@ -689,6 +698,15 @@ const departmentUpdateSchema = z.object({
   chairmanName: z.string().trim().min(2).max(120).optional(),
   contactPhone: z.string().trim().max(60).optional(),
   contactEmail: z.string().trim().max(120).optional(),
+  coverImageUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine(
+      (val) => !val || isSafeMediaUrl(val),
+      'Cover image URL must be a valid https://, http://, or local path.'
+    )
+    .optional(),
   summary: z.string().trim().min(10).max(2000).optional(),
   researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
   laboratories: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
