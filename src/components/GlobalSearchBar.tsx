@@ -535,11 +535,11 @@ export function GlobalSearchBar({
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-44 xl:w-64 2xl:w-72' : 'relative w-full'}
+      className={variant === 'desktop' ? 'relative w-36 xl:w-48 2xl:w-56 shrink-0' : 'relative w-full'}
     >
       <div className="relative flex items-center">
         <Search
-          className={`w-3.5 h-3.5 absolute left-3 pointer-events-none ${
+          className={`w-3.5 h-3.5 absolute left-2.5 pointer-events-none ${
             variant === 'desktop' ? 'text-slate-500' : 'text-slate-500'
           }`}
           aria-hidden="true"
@@ -560,10 +560,10 @@ export function GlobalSearchBar({
             if (!open) setOpen(true);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Search depts, notices, resources..."
-          className={`w-full pl-8 pr-12 text-xs rounded-lg border transition-colors focus:outline-none ${
+          placeholder={variant === 'desktop' ? 'Search...' : 'Search depts, notices, resources...'}
+          className={`w-full pl-8 pr-8 text-xs rounded-lg border transition-colors focus:outline-none ${
             variant === 'desktop'
-              ? 'py-1.5 bg-white/95 text-slate-900 placeholder:text-slate-500 border-pust-700/40 focus:bg-white focus:border-white focus:ring-2 focus:ring-white/40'
+              ? 'py-1.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-200 focus:bg-white focus:border-pust-800 focus:ring-2 focus:ring-pust-700/15'
               : 'py-2.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
           }`}
         />

@@ -104,10 +104,10 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 lg:h-[60px] bg-pust-900"
+          className="absolute inset-x-0 top-0 h-12 sm:h-13 lg:h-[64px] bg-pust-900"
         />
 
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Official University Crest */}
           <Link
             href="/"
@@ -119,15 +119,15 @@ export function Navbar({
             title="Pabna University of Science and Technology"
             className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
           >
-            <PustCrest size={26} className="lg:hidden" />
+            <PustCrest size={28} className="lg:hidden" />
             <PustCrest size={64} className="hidden lg:block xl:hidden" />
-            <PustCrest size={72} className="hidden xl:block" />
+            <PustCrest size={74} className="hidden xl:block" />
           </Link>
 
-          {/* Right Column: Tier 1 University Title + Site-Wide Search + Mobile Actions */}
+          {/* Right Column: Tier 1 University Title (Maximum Space) + Tier 2 Nav & Search */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-11 lg:h-[60px] pl-2.5 pr-0 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
+            {/* Tier 1: University Title Band */}
+            <div className="h-12 sm:h-13 lg:h-[64px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-2 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -135,37 +135,24 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-base md:text-lg lg:text-[19px] xl:text-[23px] 2xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5 min-w-0"
+                className="flex-1 min-w-0 font-serif text-[12px] leading-[1.15] sm:text-[17px] md:text-[21px] lg:text-[27px] xl:text-[32px] 2xl:text-[36px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors sm:truncate sm:leading-none py-1 line-clamp-2 sm:line-clamp-none"
               >
-                <span className="md:hidden font-semibold tracking-wide">PUST</span>
-                <span className="hidden md:inline">Pabna University of Science and Technology</span>
+                Pabna University of Science and Technology
               </Link>
 
-              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                <div className="hidden 2xl:inline-flex items-center gap-1.5">
-                  {profile?.navbarTagline?.trim() && (
-                    <span className="font-mono text-[11px] uppercase tracking-widest text-pust-200 whitespace-nowrap">
-                      {profile.navbarTagline.trim()}
-                    </span>
-                  )}
-                  {user?.role === 'admin' && editMode && onOpenEditModal && (
-                    <button
-                      type="button"
-                      onClick={() => onOpenEditModal({ kind: 'hero-profile' })}
-                      aria-label="Edit navbar tagline and hero profile"
-                      title="Edit Tagline & Profile"
-                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-semibold hover:bg-amber-300 cursor-pointer"
-                    >
-                      <Pencil className="w-2.5 h-2.5" />
-                      Edit
-                    </button>
-                  )}
-                </div>
-
-                {/* Desktop Site-Wide Search Bar */}
-                <div className="hidden lg:block">
-                  <GlobalSearchBar variant="desktop" />
-                </div>
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                {user?.role === 'admin' && editMode && onOpenEditModal && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenEditModal({ kind: 'hero-profile' })}
+                    aria-label="Edit navbar tagline and hero profile"
+                    title="Edit Tagline & Profile"
+                    className="hidden lg:inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-400 text-slate-950 text-[10px] font-semibold hover:bg-amber-300 cursor-pointer"
+                  >
+                    <Pencil className="w-2.5 h-2.5" />
+                    Edit Title
+                  </button>
+                )}
 
                 {/* Mobile Search Toggle */}
                 <button
@@ -176,11 +163,11 @@ export function Navbar({
                   }}
                   aria-label="Toggle site search"
                   aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                  className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
-                  {mobileSearchOpen ? <X className="w-[18px] h-[18px]" /> : <Search className="w-[18px] h-[18px]" />}
+                  {mobileSearchOpen ? <X className="w-[17px] h-[17px]" /> : <Search className="w-[17px] h-[17px]" />}
                 </button>
 
                 {/* Mobile Admin Edit Mode Toggle */}
@@ -191,7 +178,7 @@ export function Navbar({
                     aria-pressed={editMode}
                     aria-label={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
                     title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden min-h-[36px] min-w-[36px] inline-flex items-center justify-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`lg:hidden min-h-[34px] min-w-[34px] inline-flex items-center justify-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950'
                         : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
@@ -210,7 +197,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden min-h-[34px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -231,7 +218,7 @@ export function Navbar({
                   }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className={`lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                  className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
@@ -240,11 +227,11 @@ export function Navbar({
               </div>
             </div>
 
-            {/* Tier 2: Desktop Navigation Links Strip */}
-            <div className="hidden lg:flex h-11 px-3 xl:px-6 bg-white items-center justify-between gap-2 xl:gap-4">
+            {/* Tier 2: Desktop Navigation Links Strip + Search + Portal */}
+            <div className="hidden lg:flex h-11 px-3 lg:px-5 xl:px-6 bg-white items-center justify-between gap-2 xl:gap-3">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-2.5 xl:gap-5 2xl:gap-6 text-[12.5px] xl:text-[13.5px] font-medium text-slate-800"
+                className="flex items-center gap-2 xl:gap-4 2xl:gap-5 text-[12px] xl:text-[13.5px] font-medium text-slate-800"
               >
                 {/* Home */}
                 <div
@@ -582,14 +569,16 @@ export function Navbar({
                 </Link>
               </nav>
 
-              {/* Desktop Admin Edit Mode & Portal Action */}
+              {/* Desktop Site-Wide Search, Admin Edit Mode & Portal Action */}
               <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
+                <GlobalSearchBar variant="desktop" />
+
                 {user?.role === 'admin' && onToggleEditMode && (
                   <button
                     type="button"
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
-                    className={`inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`inline-flex items-center gap-1 px-2 xl:px-2.5 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
                         : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
@@ -598,7 +587,7 @@ export function Navbar({
                     {editMode ? (
                       <>
                         <Eye className="w-3.5 h-3.5" />
-                        <span>Exit Edit Mode</span>
+                        <span>Exit Edit</span>
                       </>
                     ) : (
                       <>
@@ -770,7 +759,7 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileSearchOpen(false)}
-            className="fixed inset-x-0 top-11 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-12 sm:top-[52px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <div className="relative z-10 lg:hidden border-t border-slate-200 bg-white px-3.5 py-3 shadow-md">
             <GlobalSearchBar
@@ -788,11 +777,11 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-x-0 top-11 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-12 sm:top-[52px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <nav
             aria-label="Mobile navigation"
-            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-2.75rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
+            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
           >
             <div className="pb-2.5 mb-1 border-b border-slate-100">
               <GlobalSearchBar

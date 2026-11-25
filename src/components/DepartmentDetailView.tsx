@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import {
@@ -16,6 +16,7 @@ import {
   FlaskConical,
   Globe,
   GraduationCap,
+  Link2,
   Mail,
   MapPin,
   Phone,
@@ -398,6 +399,13 @@ function PersonProfileCard({
   );
 }
 
+interface DossierTopicSection {
+  key: string;
+  title: string;
+  rightSlot?: ReactNode;
+  content: ReactNode;
+}
+
 function PersonProfileModal({
   activeProfile,
   department,
@@ -410,14 +418,23 @@ function PersonProfileModal({
   onClose: () => void;
 }) {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [showAllArticles, setShowAllArticles] = useState(false);
   const [showAllProceedings, setShowAllProceedings] = useState(false);
   const [showAllConferences, setShowAllConferences] = useState(false);
+  const scrollBodyRef = useRef<HTMLDivElement | null>(null);
+  const heroNameRef = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
     setShowAllArticles(false);
     setShowAllProceedings(false);
     setShowAllConferences(false);
+    setCopiedLink(false);
+    setIsScrolled(false);
+    if (scrollBodyRef.current) {
+      scrollBodyRef.current.scrollTop = 0;
+    }
     if (!activeProfile) return;
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -431,27 +448,20 @@ function PersonProfileModal({
     return matchPersonPublications(activeProfile.person.name, deptPublications);
   }, [activeProfile, deptPublications]);
 
+  function handleBodyScroll() {
+    const scroller = scrollBodyRef.current;
+    const heroName = heroNameRef.current;
+    if (!scroller || !heroName) return;
+    const scrollerRect = scroller.getBoundingClientRect();
+    const nameRect = heroName.getBoundingClientRect();
+    setIsScrolled(nameRect.bottom <= scrollerRect.top + 8);
+  }
+
   if (!activeProfile) return null;
 
   const { person, roleCategory } = activeProfile;
   const isOfficer = roleCategory === 'Department Officer';
   const officeLocation = person.officeLocation || `${department.building}, Rajapur Campus`;
-  const hasRichDossier =
-    Boolean(person.bio) ||
-    (person.education && person.education.length > 0) ||
-    (person.teachingExperience && person.teachingExperience.length > 0) ||
-    (person.administrativeExperience && person.administrativeExperience.length > 0) ||
-    (person.researchInterests && person.researchInterests.length > 0) ||
-    (person.activeResearchProjects && person.activeResearchProjects.length > 0) ||
-    (person.previousResearchProjects && person.previousResearchProjects.length > 0) ||
-    (person.externalAffiliations && person.externalAffiliations.length > 0) ||
-    (person.awards && person.awards.length > 0) ||
-    (person.journalArticles && person.journalArticles.length > 0) ||
-    (person.conferenceProceedings && person.conferenceProceedings.length > 0) ||
-    (person.bookChapters && person.bookChapters.length > 0) ||
-    (person.conductedCourses && person.conductedCourses.length > 0) ||
-    (person.graduateSupervision && person.graduateSupervision.length > 0) ||
-    (person.conferencesAttended && person.conferencesAttended.length > 0);
   const journalArticles = person.journalArticles ?? [];
   const visibleArticles = showAllArticles ? journalArticles : journalArticles.slice(0, 6);
   const conferenceProceedings = person.conferenceProceedings ?? [];
@@ -462,21 +472,510 @@ function PersonProfileModal({
   const conferencesAttended = person.conferencesAttended ?? [];
   const visibleConferences = showAllConferences ? conferencesAttended : conferencesAttended.slice(0, 6);
 
-  async function handleCopyEmail(email: string) {
+  async function copyToClipboard(text: string): Promise<boolean> {
     try {
-      await navigator.clipboard.writeText(email);
-      setCopiedEmail(email);
-      window.setTimeout(() => {
-        setCopiedEmail((prev) => (prev === email ? null : prev));
-      }, 1800);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
     } catch {
-      // Clipboard unavailable in restricted context
+      // Fall through to execCommand fallback
     }
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return copied;
+    } catch {
+      return false;
+    }
+  }
+
+  async function handleCopyEmail(email: string) {
+    const ok = await copyToClipboard(email);
+    if (!ok) return;
+    setCopiedEmail(email);
+    window.setTimeout(() => {
+      setCopiedEmail((prev) => (prev === email ? null : prev));
+    }, 1800);
+  }
+
+  async function handleCopyProfileLink() {
+    const url = `${window.location.origin}/academics/departments/${encodeURIComponent(
+      department.code
+    )}?profile=${encodeURIComponent(person.id)}`;
+    const ok = await copyToClipboard(url);
+    if (!ok) return;
+    setCopiedLink(true);
+    window.setTimeout(() => {
+      setCopiedLink(false);
+    }, 2000);
+  }
+
+  const topicSections: DossierTopicSection[] = [];
+
+  if (person.bio) {
+    topicSections.push({
+      key: 'bio',
+      title: 'Biography',
+      content: (
+        <div className="rounded-xl border border-slate-200/85 bg-white px-4 py-3.5">
+          <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
+        </div>
+      ),
+    });
+  }
+
+  if (person.qualification || person.researchArea) {
+    topicSections.push({
+      key: 'academic-profile',
+      title: isOfficer ? 'Academic & Service Qualifications' : 'Academic & Research Profile',
+      content: (
+        <dl className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-sm">
+          {person.qualification && (
+            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
+              <dt className="text-xs font-medium text-slate-500 shrink-0">Qualification</dt>
+              <dd className="text-slate-900 sm:text-right leading-relaxed">{person.qualification}</dd>
+            </div>
+          )}
+          {person.researchArea && (
+            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-6">
+              <dt className="text-xs font-medium text-slate-500 shrink-0">Research Area</dt>
+              <dd className="text-slate-900 sm:text-right leading-relaxed">{person.researchArea}</dd>
+            </div>
+          )}
+        </dl>
+      ),
+    });
+  }
+
+  if (person.education && person.education.length > 0) {
+    topicSections.push({
+      key: 'education',
+      title: `Education (${person.education.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.education.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.teachingExperience && person.teachingExperience.length > 0) {
+    topicSections.push({
+      key: 'teaching-experience',
+      title: `Teaching Experience (${person.teachingExperience.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.teachingExperience.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.administrativeExperience && person.administrativeExperience.length > 0) {
+    topicSections.push({
+      key: 'admin-experience',
+      title: `Administrative & Other Experience (${person.administrativeExperience.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.administrativeExperience.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.researchInterests && person.researchInterests.length > 0) {
+    topicSections.push({
+      key: 'research-interests',
+      title: `Research Interests (${person.researchInterests.length})`,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {person.researchInterests.map((interest, idx) => (
+            <div
+              key={`${interest}-${idx}`}
+              className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+            >
+              <FlaskConical className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+              <span>{interest}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    });
+  }
+
+  if (person.activeResearchProjects && person.activeResearchProjects.length > 0) {
+    topicSections.push({
+      key: 'active-projects',
+      title: `Active Research Projects (${person.activeResearchProjects.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.activeResearchProjects.map((proj, idx) => (
+            <li
+              key={`${proj}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
+              <span>{proj}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.previousResearchProjects && person.previousResearchProjects.length > 0) {
+    topicSections.push({
+      key: 'previous-projects',
+      title: `Previous Research Projects (${person.previousResearchProjects.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.previousResearchProjects.map((proj, idx) => (
+            <li
+              key={`${proj}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+              <span>{proj}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.externalAffiliations && person.externalAffiliations.length > 0) {
+    topicSections.push({
+      key: 'external-affiliations',
+      title: `External Affiliations (${person.externalAffiliations.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.externalAffiliations.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.awards && person.awards.length > 0) {
+    topicSections.push({
+      key: 'awards',
+      title: `Awards & Recognition (${person.awards.length})`,
+      content: (
+        <ul className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.awards.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
+            >
+              <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    });
+  }
+
+  if (person.conductedCourses && person.conductedCourses.length > 0) {
+    topicSections.push({
+      key: 'conducted-courses',
+      title: `Conducted Courses (${person.conductedCourses.length})`,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {person.conductedCourses.map((course, idx) => (
+            <div
+              key={`${course}-${idx}`}
+              className="px-3.5 py-2.5 rounded-lg border border-slate-200/85 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
+            >
+              <Bookmark className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
+              <span>{course}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    });
+  }
+
+  if (person.graduateSupervision && person.graduateSupervision.length > 0) {
+    topicSections.push({
+      key: 'graduate-supervision',
+      title: `Graduate Supervision (${person.graduateSupervision.length})`,
+      content: (
+        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+          {person.graduateSupervision.map((thesis, idx) => (
+            <li key={`${thesis}-${idx}`} className="px-4 py-3 flex items-start gap-3">
+              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                {String(idx + 1).padStart(2, '0')}.
+              </span>
+              <span className="text-slate-800 leading-relaxed">{thesis}</span>
+            </li>
+          ))}
+        </ol>
+      ),
+    });
+  }
+
+  topicSections.push({
+    key: 'contacts',
+    title: 'Official & Personal Contacts',
+    content:
+      person.phones.length === 0 && person.emails.length === 0 ? (
+        <p className="text-xs text-slate-600 rounded-xl border border-slate-200/85 bg-white px-4 py-3">
+          Direct personal contacts have not been listed. Use the departmental office contact
+          {department.contactEmail ? ` (${department.contactEmail})` : ''} for inquiries.
+        </p>
+      ) : (
+        <div className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-sm">
+          {person.phones.map((phone, idx) => (
+            <div
+              key={`${phone.value}-${idx}`}
+              className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+            >
+              <a
+                href={`tel:${sanitizeTelHref(phone.value)}`}
+                className="inline-flex items-center gap-2 font-mono text-slate-900 hover:text-pust-900 hover:underline tabular-nums"
+              >
+                <Phone className="w-4 h-4 text-pust-700 shrink-0" />
+                <span>{phone.value}</span>
+              </a>
+              <span className="font-mono text-xs text-slate-500">{phone.type}</span>
+            </div>
+          ))}
+          {person.emails.map((email, idx) => {
+            const isCopied = copiedEmail === email.value;
+            return (
+              <div
+                key={`${email.value}-${idx}`}
+                className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+              >
+                <a
+                  href={`mailto:${email.value}`}
+                  className="inline-flex items-center gap-2 font-mono text-lapis-900 hover:text-pust-900 hover:underline break-all min-w-0"
+                >
+                  <Mail className="w-4 h-4 text-lapis-700 shrink-0" />
+                  <span>{email.value}</span>
+                </a>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="font-mono text-xs text-slate-500">{email.type}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyEmail(email.value)}
+                    aria-label={`Copy ${email.value}`}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-200 bg-[#FAF8F4] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-700" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ),
+  });
+
+  if (journalArticles.length > 0) {
+    topicSections.push({
+      key: 'journal-articles',
+      title: `Journal Articles (${journalArticles.length})`,
+      rightSlot:
+        journalArticles.length > 6 ? (
+          <button
+            type="button"
+            onClick={() => setShowAllArticles((prev) => !prev)}
+            className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+          >
+            {showAllArticles
+              ? 'Show fewer articles'
+              : `Show all ${journalArticles.length} articles`}
+          </button>
+        ) : undefined,
+      content: (
+        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+          {visibleArticles.map((article, idx) => (
+            <li key={`${idx}-${article.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                {String(idx + 1).padStart(2, '0')}.
+              </span>
+              <span className="text-slate-800 leading-relaxed break-words">{article}</span>
+            </li>
+          ))}
+        </ol>
+      ),
+    });
+  }
+
+  if (conferenceProceedings.length > 0) {
+    topicSections.push({
+      key: 'conference-proceedings',
+      title: `Conference Proceedings (${conferenceProceedings.length})`,
+      rightSlot:
+        conferenceProceedings.length > 6 ? (
+          <button
+            type="button"
+            onClick={() => setShowAllProceedings((prev) => !prev)}
+            className="text-xs font-semibold text-lapis-900 hover:underline cursor-pointer"
+          >
+            {showAllProceedings
+              ? 'Show fewer proceedings'
+              : `Show all ${conferenceProceedings.length} proceedings`}
+          </button>
+        ) : undefined,
+      content: (
+        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+          {visibleProceedings.map((item, idx) => (
+            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+              <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
+                {String(idx + 1).padStart(2, '0')}.
+              </span>
+              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+            </li>
+          ))}
+        </ol>
+      ),
+    });
+  }
+
+  if (bookChapters.length > 0) {
+    topicSections.push({
+      key: 'book-chapters',
+      title: `Published Book Chapters (${bookChapters.length})`,
+      content: (
+        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+          {bookChapters.map((item, idx) => (
+            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+              <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
+                {String(idx + 1).padStart(2, '0')}.
+              </span>
+              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+            </li>
+          ))}
+        </ol>
+      ),
+    });
+  }
+
+  if (conferencesAttended.length > 0) {
+    topicSections.push({
+      key: 'conferences-attended',
+      title: `Conferences & Seminars Attended (${conferencesAttended.length})`,
+      rightSlot:
+        conferencesAttended.length > 6 ? (
+          <button
+            type="button"
+            onClick={() => setShowAllConferences((prev) => !prev)}
+            className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+          >
+            {showAllConferences
+              ? 'Show fewer conferences'
+              : `Show all ${conferencesAttended.length} entries`}
+          </button>
+        ) : undefined,
+      content: (
+        <ol className="divide-y divide-slate-200 border border-slate-200/85 rounded-xl bg-white text-xs sm:text-[13px]">
+          {visibleConferences.map((item, idx) => (
+            <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
+              <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
+                {String(idx + 1).padStart(2, '0')}.
+              </span>
+              <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+            </li>
+          ))}
+        </ol>
+      ),
+    });
+  }
+
+  if (matchedPublications.length > 0) {
+    topicSections.push({
+      key: 'dept-publications',
+      title: `Indexed Departmental Publications (${matchedPublications.length})`,
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {matchedPublications.map((pub) => (
+            <div
+              key={pub.id}
+              className="p-4 rounded-xl border border-slate-200/85 bg-white space-y-1.5"
+            >
+              <p className="font-mono text-[11px] text-pust-800">
+                {pub.year} · {pub.domain}
+              </p>
+              <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                {pub.title}
+              </h4>
+              <p className="text-xs text-slate-600">{pub.authors}</p>
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-0.5">
+                <span className="text-slate-500">{pub.venue}</span>
+                {pub.url && (
+                  <a
+                    href={pub.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
+                  >
+                    DOI
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    });
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="person-profile-modal-title"
@@ -486,535 +985,178 @@ function PersonProfileModal({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className={`w-full ${
-          hasRichDossier ? 'max-w-3xl' : 'max-w-2xl'
-        } rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto`}
+        className="w-full max-w-5xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Dossier Header */}
-        <div className="px-5 sm:px-7 py-5 sm:py-6 border-b border-slate-200 bg-[#FAF8F4] flex items-start justify-between gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 min-w-0">
-            <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
-            <div className="min-w-0 space-y-1">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
-                {department.code} · {roleCategory}
-              </p>
-              <h2
-                id="person-profile-modal-title"
-                className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 leading-tight"
+        {/* Pinned 1-Line Sticky Top Bar */}
+        <div className="shrink-0 h-14 px-5 sm:px-8 border-b border-slate-200 bg-white/95 backdrop-blur-md flex items-center justify-between gap-3 z-20">
+          <div className="min-w-0 flex-1 flex items-center gap-2.5">
+            {isScrolled ? (
+              <p
+                title={person.name}
+                className="font-serif text-base sm:text-lg font-semibold text-slate-900 truncate whitespace-nowrap"
               >
                 {person.name}
-              </h2>
-              <p className="text-sm font-medium text-pust-900">{person.designation}</p>
-              <p className="text-xs text-slate-600">
-                Department of {department.name} · {department.faculty}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close profile dossier"
-            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Body Content */}
-        <div className="p-5 sm:p-7 space-y-6">
-          {/* Quick Fact Ribbon */}
-          <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl bg-[#F7F7F5] border border-slate-200 p-4 text-sm">
-            <div>
-              <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                Department &amp; Wing
-              </dt>
-              <dd className="text-slate-900 mt-1 font-medium inline-flex items-start gap-1.5 text-xs sm:text-[13px]">
-                <MapPin className="w-3.5 h-3.5 text-pust-800 shrink-0 mt-0.5" />
-                <span>{officeLocation}</span>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                Duty Status
-              </dt>
-              <dd className="text-slate-900 mt-1 font-medium text-xs sm:text-[13px]">
-                {person.onStudyLeave
-                  ? 'On Approved Study Leave'
-                  : person.designation.includes('(PRL)')
-                  ? 'Post-Retirement Leave (PRL)'
-                  : 'Active Departmental Service'}
-              </dd>
-            </div>
-            {!isOfficer && person.totalPublications !== undefined && (
-              <div>
-                <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                  Total Publications
-                </dt>
-                <dd className="font-mono text-lg font-semibold text-pust-900 tabular-nums mt-0.5">
-                  {person.totalPublications}
-                </dd>
-              </div>
-            )}
-          </dl>
-
-          {person.bio && (
-            <div className="space-y-2">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Biography
-              </h3>
-              <p className="text-sm text-slate-700 leading-relaxed">{person.bio}</p>
-            </div>
-          )}
-
-          {/* Academic / Service Details */}
-          {(person.qualification || person.researchArea) && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                {isOfficer ? 'Academic & Service Qualifications' : 'Academic & Research Profile'}
-              </h3>
-              <dl className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-sm">
-                {person.qualification && (
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs font-medium text-slate-500 shrink-0">
-                      Qualification
-                    </dt>
-                    <dd className="text-slate-900 sm:text-right leading-relaxed">
-                      {person.qualification}
-                    </dd>
-                  </div>
-                )}
-                {person.researchArea && (
-                  <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                    <dt className="text-xs font-medium text-slate-500 shrink-0">
-                      Research Area
-                    </dt>
-                    <dd className="text-slate-900 sm:text-right leading-relaxed">
-                      {person.researchArea}
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-          )}
-
-          {/* Education */}
-          {person.education && person.education.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Education ({person.education.length})
-              </h3>
-              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                {person.education.map((item, idx) => (
-                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                    <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Teaching Experience */}
-          {person.teachingExperience && person.teachingExperience.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Teaching Experience ({person.teachingExperience.length})
-              </h3>
-              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                {person.teachingExperience.map((item, idx) => (
-                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                    <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Administrative Experience */}
-          {person.administrativeExperience && person.administrativeExperience.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Administrative &amp; Other Experience ({person.administrativeExperience.length})
-              </h3>
-              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                {person.administrativeExperience.map((item, idx) => (
-                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                    <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Research Interests */}
-          {person.researchInterests && person.researchInterests.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Research Interests ({person.researchInterests.length})
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {person.researchInterests.map((interest, idx) => (
-                  <div
-                    key={`${interest}-${idx}`}
-                    className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-[#FAF8F4] text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
-                  >
-                    <FlaskConical className="w-3.5 h-3.5 text-pust-800 shrink-0" />
-                    <span>{interest}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Active & Previous Research Projects */}
-          {((person.activeResearchProjects && person.activeResearchProjects.length > 0) ||
-            (person.previousResearchProjects && person.previousResearchProjects.length > 0)) && (
-            <div className="space-y-4">
-              {person.activeResearchProjects && person.activeResearchProjects.length > 0 && (
-                <div className="space-y-2.5">
-                  <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                    Active Research Projects ({person.activeResearchProjects.length})
-                  </h3>
-                  <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-sm">
-                    {person.activeResearchProjects.map((proj, idx) => (
-                      <li key={`${proj}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                        <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-                        <span>{proj}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {person.previousResearchProjects && person.previousResearchProjects.length > 0 && (
-                <div className="space-y-2.5">
-                  <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                    Previous Research Projects ({person.previousResearchProjects.length})
-                  </h3>
-                  <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                    {person.previousResearchProjects.map((proj, idx) => (
-                      <li key={`${proj}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                        <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-                        <span>{proj}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* External Affiliations */}
-          {person.externalAffiliations && person.externalAffiliations.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                External Affiliations ({person.externalAffiliations.length})
-              </h3>
-              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                {person.externalAffiliations.map((item, idx) => (
-                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                    <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Awards & Recognition */}
-          {person.awards && person.awards.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Awards &amp; Recognition ({person.awards.length})
-              </h3>
-              <ul className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-sm">
-                {person.awards.map((item, idx) => (
-                  <li key={`${item}-${idx}`} className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed">
-                    <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Conducted Courses */}
-          {person.conductedCourses && person.conductedCourses.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Conducted Courses ({person.conductedCourses.length})
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {person.conductedCourses.map((course, idx) => (
-                  <div
-                    key={`${course}-${idx}`}
-                    className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-white text-xs sm:text-[13px] text-slate-800 flex items-center gap-2"
-                  >
-                    <Bookmark className="w-3.5 h-3.5 text-lapis-700 shrink-0" />
-                    <span>{course}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Graduate Supervision */}
-          {person.graduateSupervision && person.graduateSupervision.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Graduate Supervision ({person.graduateSupervision.length})
-              </h3>
-              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
-                {person.graduateSupervision.map((thesis, idx) => (
-                  <li key={`${thesis}-${idx}`} className="px-4 py-3 flex items-start gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                      {String(idx + 1).padStart(2, '0')}.
-                    </span>
-                    <span className="text-slate-800 leading-relaxed">{thesis}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Contact Directory */}
-          <div className="space-y-3">
-            <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-              Official &amp; Personal Contacts
-            </h3>
-            {person.phones.length === 0 && person.emails.length === 0 ? (
-              <p className="text-xs text-slate-600 rounded-xl border border-slate-200 bg-[#F7F7F5] px-4 py-3">
-                Direct personal contacts have not been listed. Use the departmental office contact
-                {department.contactEmail ? ` (${department.contactEmail})` : ''} for inquiries.
               </p>
             ) : (
-              <div className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-sm">
-                {person.phones.map((phone, idx) => (
-                  <div
-                    key={`${phone.value}-${idx}`}
-                    className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
-                  >
-                    <a
-                      href={`tel:${sanitizeTelHref(phone.value)}`}
-                      className="inline-flex items-center gap-2 font-mono text-slate-900 hover:text-pust-900 hover:underline tabular-nums"
-                    >
-                      <Phone className="w-4 h-4 text-pust-700 shrink-0" />
-                      <span>{phone.value}</span>
-                    </a>
-                    <span className="font-mono text-xs text-slate-500">{phone.type}</span>
-                  </div>
-                ))}
-                {person.emails.map((email, idx) => {
-                  const isCopied = copiedEmail === email.value;
-                  return (
-                    <div
-                      key={`${email.value}-${idx}`}
-                      className="px-4 py-3 flex flex-wrap items-center justify-between gap-3"
-                    >
-                      <a
-                        href={`mailto:${email.value}`}
-                        className="inline-flex items-center gap-2 font-mono text-lapis-900 hover:text-pust-900 hover:underline break-all min-w-0"
-                      >
-                        <Mail className="w-4 h-4 text-lapis-700 shrink-0" />
-                        <span>{email.value}</span>
-                      </a>
-                      <div className="flex items-center gap-2.5 shrink-0">
-                        <span className="font-mono text-xs text-slate-500">{email.type}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyEmail(email.value)}
-                          aria-label={`Copy ${email.value}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-200 bg-[#FAF8F4] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-700" />
-                              Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 font-semibold truncate whitespace-nowrap">
+                {department.code} · {roleCategory} Dossier
+              </p>
             )}
           </div>
 
-          {/* Journal Articles */}
-          {journalArticles.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                  Journal Articles ({journalArticles.length})
-                </h3>
-                {journalArticles.length > 6 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllArticles((prev) => !prev)}
-                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
-                  >
-                    {showAllArticles
-                      ? 'Show fewer articles'
-                      : `Show all ${journalArticles.length} articles`}
-                  </button>
-                )}
-              </div>
-              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-[13px]">
-                {visibleArticles.map((article, idx) => (
-                  <li key={`${idx}-${article.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                      {String(idx + 1).padStart(2, '0')}.
-                    </span>
-                    <span className="text-slate-800 leading-relaxed break-words">{article}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleCopyProfileLink}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                copiedLink
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                  : 'bg-[#FAF8F4] border-pust-800/25 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900'
+              }`}
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <span>Link Copied</span>
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden sm:inline">Copy Link to Profile</span>
+                  <span className="sm:hidden">Copy Link</span>
+                </>
+              )}
+            </button>
 
-          {/* Conference Proceedings */}
-          {conferenceProceedings.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                  Conference Proceedings ({conferenceProceedings.length})
-                </h3>
-                {conferenceProceedings.length > 6 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllProceedings((prev) => !prev)}
-                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
-                  >
-                    {showAllProceedings
-                      ? 'Show fewer proceedings'
-                      : `Show all ${conferenceProceedings.length} proceedings`}
-                  </button>
-                )}
-              </div>
-              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
-                {visibleProceedings.map((item, idx) => (
-                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
-                      {String(idx + 1).padStart(2, '0')}.
-                    </span>
-                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Published Book Chapters */}
-          {bookChapters.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Published Book Chapters ({bookChapters.length})
-              </h3>
-              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-[#FAF8F4] text-xs sm:text-[13px]">
-                {bookChapters.map((item, idx) => (
-                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
-                      {String(idx + 1).padStart(2, '0')}.
-                    </span>
-                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Conferences & Seminars Attended */}
-          {conferencesAttended.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                  Conferences &amp; Seminars Attended ({conferencesAttended.length})
-                </h3>
-                {conferencesAttended.length > 6 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllConferences((prev) => !prev)}
-                    className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
-                  >
-                    {showAllConferences
-                      ? 'Show fewer conferences'
-                      : `Show all ${conferencesAttended.length} entries`}
-                  </button>
-                )}
-              </div>
-              <ol className="divide-y divide-slate-200 border border-slate-200 rounded-xl bg-white text-xs sm:text-[13px]">
-                {visibleConferences.map((item, idx) => (
-                  <li key={`${idx}-${item.slice(0, 32)}`} className="px-4 py-3 flex items-start gap-3">
-                    <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
-                      {String(idx + 1).padStart(2, '0')}.
-                    </span>
-                    <span className="text-slate-800 leading-relaxed break-words">{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Indexed Departmental Publications */}
-          {matchedPublications.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
-                Indexed Departmental Publications ({matchedPublications.length})
-              </h3>
-              <div className="space-y-2.5">
-                {matchedPublications.map((pub) => (
-                  <div
-                    key={pub.id}
-                    className="p-4 rounded-xl border border-slate-200 bg-[#FAF8F4] space-y-1.5"
-                  >
-                    <p className="font-mono text-[11px] text-pust-800">
-                      {pub.year} · {pub.domain}
-                    </p>
-                    <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                      {pub.title}
-                    </h4>
-                    <p className="text-xs text-slate-600">{pub.authors}</p>
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-0.5">
-                      <span className="text-slate-500">{pub.venue}</span>
-                      {pub.url && (
-                        <a
-                          href={pub.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
-                        >
-                          DOI
-                          <ArrowUpRight className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Modal Footer */}
-          <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <p className="font-mono text-[11px] text-slate-500">
-              PUST {department.code} Directory Record
-            </p>
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              aria-label="Close profile dossier"
+              className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
             >
-              Close Profile
+              <X className="w-5 h-5" />
             </button>
+          </div>
+        </div>
+
+        {/* Scrollable Dossier Body */}
+        <div
+          ref={scrollBodyRef}
+          onScroll={handleBodyScroll}
+          className="flex-1 overflow-y-auto overscroll-contain"
+        >
+          {/* Executive Hero Profile Header */}
+          <div className="px-5 sm:px-8 py-6 border-b border-slate-200 bg-gradient-to-br from-[#FAF8F4] via-white to-[#F4F7FF] space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 min-w-0">
+              <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
+              <div className="min-w-0 space-y-1.5">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 font-semibold">
+                  {department.code} · {roleCategory}
+                </p>
+                <h2
+                  ref={heroNameRef}
+                  id="person-profile-modal-title"
+                  className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 leading-tight"
+                >
+                  {person.name}
+                </h2>
+                <p className="text-sm sm:text-base font-medium text-pust-900">
+                  {person.designation}
+                </p>
+                <p className="text-xs sm:text-[13px] text-slate-600">
+                  Department of {department.name} · {department.faculty}
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Fact Ribbon */}
+            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl bg-white/90 border border-slate-200/90 p-4 text-sm shadow-2xs">
+              <div>
+                <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                  Department &amp; Wing
+                </dt>
+                <dd className="text-slate-900 mt-1 font-medium inline-flex items-start gap-1.5 text-xs sm:text-[13px]">
+                  <MapPin className="w-3.5 h-3.5 text-pust-800 shrink-0 mt-0.5" />
+                  <span>{officeLocation}</span>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                  Duty Status
+                </dt>
+                <dd className="text-slate-900 mt-1 font-medium text-xs sm:text-[13px]">
+                  {person.onStudyLeave
+                    ? 'On Approved Study Leave'
+                    : person.designation.includes('(PRL)')
+                    ? 'Post-Retirement Leave (PRL)'
+                    : 'Active Departmental Service'}
+                </dd>
+              </div>
+              {!isOfficer && person.totalPublications !== undefined && (
+                <div>
+                  <dt className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                    Total Publications
+                  </dt>
+                  <dd className="font-mono text-lg font-semibold text-pust-900 tabular-nums mt-0.5">
+                    {person.totalPublications}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          {/* Alternating Topic Sections */}
+          <div className="p-5 sm:p-8 space-y-5">
+            {topicSections.map((section, idx) => {
+              const isWarmCrimson = idx % 2 === 0;
+              return (
+                <section
+                  key={section.key}
+                  className={`rounded-2xl border p-5 sm:p-6 space-y-3.5 ${
+                    isWarmCrimson
+                      ? 'bg-[#FAF8F4] border-pust-200/80'
+                      : 'bg-[#F4F7FF] border-lapis-200/80'
+                  }`}
+                >
+                  <div
+                    className={`flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b ${
+                      isWarmCrimson ? 'border-pust-200/75' : 'border-lapis-200/80'
+                    }`}
+                  >
+                    <h3
+                      className={`inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold ${
+                        isWarmCrimson ? 'text-pust-900' : 'text-lapis-900'
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`w-1.5 h-4 rounded-full shrink-0 ${
+                          isWarmCrimson ? 'bg-pust-800' : 'bg-lapis-700'
+                        }`}
+                      />
+                      {section.title}
+                    </h3>
+                    {section.rightSlot}
+                  </div>
+                  {section.content}
+                </section>
+              );
+            })}
+
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <p className="font-mono text-[11px] text-slate-500">
+                PUST {department.code} Directory Record
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                Close Profile
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -1124,6 +1266,50 @@ export function DepartmentDetailView({
     [notices, department]
   );
 
+  useEffect(() => {
+    if (!department || typeof window === 'undefined') return;
+    const targetId = new URLSearchParams(window.location.search).get('profile');
+    if (!targetId) return;
+
+    const chairRecord: DepartmentPersonRecord = department.chairmanProfile ?? {
+      id: `${department.id}-chair`,
+      name: department.chairmanName,
+      designation: 'Chairman',
+      phones: department.contactPhone ? [{ value: department.contactPhone, type: 'Office' }] : [],
+      emails: department.contactEmail ? [{ value: department.contactEmail, type: 'Office' }] : [],
+    };
+
+    if (chairRecord.id === targetId) {
+      setActiveProfile({ person: chairRecord, roleCategory: 'Chairman' });
+      return;
+    }
+    const fac = (department.facultyMembers ?? []).find((m) => m.id === targetId);
+    if (fac) {
+      setActiveProfile({ person: fac, roleCategory: 'Faculty Member' });
+      return;
+    }
+    const cfac = (department.contractualFacultyMembers ?? []).find((m) => m.id === targetId);
+    if (cfac) {
+      setActiveProfile({ person: cfac, roleCategory: 'Faculty Member (Contractual)' });
+      return;
+    }
+    const off = (department.officers ?? []).find((o) => o.id === targetId);
+    if (off) {
+      setActiveProfile({ person: off, roleCategory: 'Department Officer' });
+    }
+  }, [department]);
+
+  const handleCloseProfile = useCallback(() => {
+    setActiveProfile(null);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('profile')) {
+        url.searchParams.delete('profile');
+        window.history.replaceState(null, '', url.toString());
+      }
+    }
+  }, []);
+
   if (!department) {
     return (
       <main className="flex-1 bg-white">
@@ -1164,6 +1350,11 @@ export function DepartmentDetailView({
     roleCategory: PersonRoleCategory
   ) {
     setActiveProfile({ person, roleCategory });
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('profile', person.id);
+      window.history.replaceState(null, '', url.toString());
+    }
   }
 
   async function handleToggleBookmark() {
@@ -1642,7 +1833,7 @@ export function DepartmentDetailView({
         activeProfile={activeProfile}
         department={department}
         deptPublications={deptPublications}
-        onClose={() => setActiveProfile(null)}
+        onClose={handleCloseProfile}
       />
     </main>
   );
