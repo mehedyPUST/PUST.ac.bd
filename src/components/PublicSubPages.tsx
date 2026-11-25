@@ -443,7 +443,7 @@ export function PublicSubPages({
                   })()}
                 </div>
               ) : (
-                <p className="text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
+                <p className="flow-root prose-justify text-base leading-[1.8] text-slate-700 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection?.body}
                 </p>
               )}
@@ -1203,7 +1203,8 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => setPreviewForm(null)}
-                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                    aria-label="Close form preview"
+                    className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1866,6 +1867,7 @@ export function PublicSubPages({
                       fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
                       alt={item.title}
                       containerClassName="w-full h-full"
+                      frameClassName="bg-slate-900"
                       className="w-full h-full object-cover"
                     />
                     {item.mediaType === 'video' && (
@@ -1908,10 +1910,10 @@ export function PublicSubPages({
               onClick={() => setActiveMedia(null)}
             >
               <div
-                className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden"
+                className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
+                <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
                   <div>
                     <p className="font-mono text-xs text-pust-800">
                       {activeMedia.category} ·{' '}
@@ -1926,7 +1928,8 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => setActiveMedia(null)}
-                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                    aria-label="Close media modal"
+                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer shrink-0"
                   >
                     <X className="w-5 h-5" />
                   </button>

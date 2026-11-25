@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check, Download, ExternalLink, Printer, ShieldCheck, X } from 'lucide-react';
 import { PustCrest } from '../PustCrest';
 
@@ -115,6 +115,15 @@ function escapeHtml(value: string): string {
 export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocumentModalProps) {
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    if (!doc) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [doc, onClose]);
+
   if (!doc) return null;
 
   const computedHash =
@@ -221,26 +230,30 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
       role="dialog"
       aria-modal="true"
       aria-labelledby="digital-doc-title"
+      onClick={onClose}
     >
-      <div className="print-only-document bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none">
+      <div
+        className="print-only-document bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Toolbar hidden when printing */}
         <div className="print:hidden px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-xs font-medium text-pust-900">
             <ShieldCheck className="w-4 h-4" />
             <span>Official Verified Digital Record</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" /> Print / Save PDF
             </button>
             <button
               type="button"
               onClick={handleDownloadHtml}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" /> Download Copy
             </button>
@@ -248,7 +261,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
               type="button"
               onClick={onClose}
               aria-label="Close document viewer"
-              className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-800"
+              className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -279,7 +292,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                 <button
                   type="button"
                   onClick={handleCopySerial}
-                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-pust-900 hover:underline"
+                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
                   title="Copy serial code"
                 >
                   {doc.serialCode}
@@ -369,7 +382,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                   onClose();
                   onOpenVerify(doc.serialCode);
                 }}
-                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:text-pust-950 whitespace-nowrap"
+                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:text-pust-950 whitespace-nowrap cursor-pointer"
               >
                 Verify Publicly <ExternalLink className="w-3.5 h-3.5" />
               </button>

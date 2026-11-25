@@ -10,6 +10,7 @@ interface ResilientImageProps {
   caption?: string;
   className?: string;
   containerClassName?: string;
+  frameClassName?: string;
   priority?: boolean;
 }
 
@@ -20,6 +21,7 @@ export function ResilientImage({
   caption,
   className = 'w-full h-full object-cover',
   containerClassName = '',
+  frameClassName = 'rounded-xl bg-slate-100 border border-slate-200',
   priority = false,
 }: ResilientImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
@@ -40,7 +42,7 @@ export function ResilientImage({
 
   return (
     <figure className={containerClassName}>
-      <div className="relative w-full h-full overflow-hidden rounded-xl bg-slate-100 border border-slate-200">
+      <div className={`relative w-full h-full overflow-hidden ${frameClassName}`}>
         {!failed ? (
           <img
             src={currentSrc}

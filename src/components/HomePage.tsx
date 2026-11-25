@@ -265,6 +265,7 @@ export function HomePage({
                     'Pabna University of Science and Technology campus banner'
                   }
                   containerClassName="w-full h-full"
+                  frameClassName="bg-slate-900"
                   className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
                   priority
                 />
@@ -537,7 +538,7 @@ export function HomePage({
               </p>
             </header>
 
-            <div className="space-y-4 text-[15px] sm:text-base text-slate-700 leading-[1.78]">
+            <div className="space-y-4 flow-root prose-justify text-[15px] sm:text-base text-slate-700 leading-[1.78]">
               {vcBodyParagraphs.map((paragraph, idx) => (
                 <p
                   key={idx}
@@ -979,6 +980,7 @@ export function HomePage({
                       fallbackSrc="/src/assets/images/pust_campus_hero_1795431408503.jpg"
                       alt={item.title}
                       containerClassName="w-full h-full"
+                      frameClassName="bg-slate-900"
                       className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
                     />
                     <EditTriggerButton
@@ -1060,7 +1062,7 @@ export function HomePage({
             onClick={() => setActiveMedia(null)}
           >
             <div
-              className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
+              className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
@@ -1079,7 +1081,7 @@ export function HomePage({
                   type="button"
                   onClick={() => setActiveMedia(null)}
                   aria-label="Close media modal"
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer"
+                  className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1125,7 +1127,7 @@ export function HomePage({
               type="button"
               onClick={() => setFullViewSlide(null)}
               aria-label="Close full image view"
-              className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-slate-950/80 text-white border border-white/20 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
+              className="absolute top-3 right-3 z-20 min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg bg-slate-950/80 text-white border border-white/20 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1136,6 +1138,7 @@ export function HomePage({
                 fallbackSrc="/src/assets/images/pust_banner_official_2026.jpeg"
                 alt={fullViewSlide.alt || fullViewSlide.caption}
                 containerClassName="w-full flex items-center justify-center bg-black"
+                frameClassName="bg-black"
                 className="max-h-[80vh] w-auto max-w-full object-contain"
               />
             </div>

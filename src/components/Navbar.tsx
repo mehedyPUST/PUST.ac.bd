@@ -120,16 +120,17 @@ export function Navbar({
               setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
+            className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
           >
             <PustCrest size={26} className="lg:hidden" />
-            <PustCrest size={72} className="hidden lg:block" />
+            <PustCrest size={64} className="hidden lg:block xl:hidden" />
+            <PustCrest size={72} className="hidden xl:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title + Site-Wide Search + Mobile Actions */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Site-Wide Search */}
-            <div className="h-11 lg:h-[60px] pl-2.5 pr-0 sm:px-3 lg:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
+            <div className="h-11 lg:h-[60px] pl-2.5 pr-0 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between gap-2 lg:gap-3 text-white">
               <Link
                 href="/"
                 onClick={() => {
@@ -137,7 +138,7 @@ export function Navbar({
                   setMobileMenuOpen(false);
                   setMobileSearchOpen(false);
                 }}
-                className="font-serif text-base md:text-lg lg:text-[22px] xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5 min-w-0"
+                className="font-serif text-base md:text-lg lg:text-[19px] xl:text-[23px] 2xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none py-1.5 min-w-0"
               >
                 <span className="md:hidden font-semibold tracking-wide">PUST</span>
                 <span className="hidden md:inline">Pabna University of Science and Technology</span>
@@ -241,10 +242,10 @@ export function Navbar({
             </div>
 
             {/* Tier 2: Desktop Navigation Links Strip */}
-            <div className="hidden lg:flex h-11 px-4 sm:px-6 bg-white items-center justify-between gap-4">
+            <div className="hidden lg:flex h-11 px-3 xl:px-6 bg-white items-center justify-between gap-2 xl:gap-4">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-4 xl:gap-6 text-[13.5px] font-medium text-slate-800"
+                className="flex items-center gap-2.5 xl:gap-5 2xl:gap-6 text-[12.5px] xl:text-[13.5px] font-medium text-slate-800"
               >
                 {/* Home */}
                 <div
@@ -583,13 +584,13 @@ export function Navbar({
               </nav>
 
               {/* Desktop Admin Edit Mode & Portal Action */}
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
                 {user?.role === 'admin' && onToggleEditMode && (
                   <button
                     type="button"
                     onClick={onToggleEditMode}
                     aria-pressed={editMode}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
                         : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
@@ -615,7 +616,7 @@ export function Navbar({
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
                   }}
-                  className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="px-2.5 xl:px-3.5 py-1.5 rounded-md text-[11px] xl:text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal'
                     ? 'Public Website'

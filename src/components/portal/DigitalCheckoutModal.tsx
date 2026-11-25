@@ -74,6 +74,15 @@ export function DigitalCheckoutModal({
     }
   }, [target, gateways]);
 
+  useEffect(() => {
+    if (!target) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && !processing) onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [target, processing, onClose]);
+
   if (!target) return null;
 
   const activeGateway =
@@ -132,8 +141,14 @@ export function DigitalCheckoutModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
+      onClick={() => {
+        if (!processing) onClose();
+      }}
     >
-      <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto">
+      <div
+        className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <Lock className="w-4 h-4 text-pust-800 shrink-0" />
@@ -310,7 +325,7 @@ export function DigitalCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setUseManualRef(!useManualRef)}
-                        className="text-[11px] font-medium text-pust-800 hover:underline"
+                        className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
                       >
                         {useManualRef ? 'Use Instant Checkout' : 'Have Existing TXN Ref?'}
                       </button>
@@ -350,14 +365,14 @@ export function DigitalCheckoutModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={processing || enabledGateways.length === 0}
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer"
                 >
                   {processing ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

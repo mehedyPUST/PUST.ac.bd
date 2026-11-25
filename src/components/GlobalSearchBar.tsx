@@ -539,7 +539,7 @@ export function GlobalSearchBar({
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-52 xl:w-64 2xl:w-72' : 'relative w-full'}
+      className={variant === 'desktop' ? 'relative w-44 xl:w-64 2xl:w-72' : 'relative w-full'}
     >
       <div className="relative flex items-center">
         <Search

@@ -1406,7 +1406,7 @@ export function PortalView({
                 type="button"
                 onClick={handleLogout}
                 aria-label="Sign out of portal"
-                className="lg:hidden inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
+                className="lg:hidden inline-flex items-center gap-1 min-h-[40px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 Sign Out
@@ -1494,7 +1494,7 @@ export function PortalView({
                 {activeTabMeta.label}
               </h1>
             </div>
-            <p className="font-mono text-xs text-slate-600 tabular-nums">
+            <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full">
               {user.email} · {user.hallAffiliation}
             </p>
           </div>

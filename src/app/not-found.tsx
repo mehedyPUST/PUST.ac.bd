@@ -14,16 +14,16 @@ export default function NotFound() {
           Please return to the university homepage, explore the 21 academic departments, or open the
           Digital Campus Portal.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
           <Link
             href="/"
-            className="px-5 py-2.5 text-sm font-medium bg-pust-800 text-white hover:bg-pust-900 transition-colors"
+            className="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors"
           >
             Return to Homepage
           </Link>
           <Link
             href="/portal"
-            className="px-5 py-2.5 text-sm font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-800 transition-colors"
+            className="min-h-[44px] inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
           >
             Open Campus Portal
           </Link>
