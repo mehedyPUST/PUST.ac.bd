@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Compass, MapPin } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
+import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
 import type { CampusZoneType } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -26,6 +27,11 @@ export function CampusMapSection() {
   const { campusMapMeta, campusBuildings } = resolveUniversityContent(profile);
   const [selectedZone, setSelectedZone] = useState<CampusZone>('All');
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
+  const mapSectionRef = useRef<HTMLElement>(null);
+  const buildingIndexRef = useRef<HTMLDivElement>(null);
+  const dossierRef = useRef<HTMLElement>(null);
+  const prevZoneRef = useRef(selectedZone);
+  const prevBuildingRef = useRef(selectedBuildingId);
 
   const filteredBuildings =
     selectedZone === 'All'
@@ -36,6 +42,70 @@ export function CampusMapSection() {
     campusBuildings.find((b) => b.id === selectedBuildingId) ||
     filteredBuildings[0] ||
     campusBuildings[0];
+
+  useEffect(() => {
+    const section = mapSectionRef.current;
+    if (!section || !profile || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      const pins = section.querySelectorAll('[data-gsap-map-pin]');
+      if (pins.length > 0) {
+        gsap.from(pins, {
+          scale: 0.85,
+          opacity: 0.2,
+          duration: 0.4,
+          stagger: 0.045,
+          ease: 'back.out(1.4)',
+          immediateRender: false,
+          clearProps: 'transform,opacity',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 85%',
+            once: true,
+          },
+        });
+      }
+    }, mapSectionRef);
+
+    return () => ctx.revert();
+  }, [Boolean(profile)]);
+
+  useEffect(() => {
+    if (prevZoneRef.current === selectedZone) return;
+    prevZoneRef.current = selectedZone;
+    return animateStagger(buildingIndexRef.current, '[data-gsap-building-btn]', {
+      y: 6,
+      duration: 0.25,
+      stagger: 0.03,
+    });
+  }, [selectedZone]);
+
+  useEffect(() => {
+    const currentId = activeBuilding?.id || '';
+    if (!currentId || prevBuildingRef.current === currentId) {
+      prevBuildingRef.current = currentId;
+      return;
+    }
+    prevBuildingRef.current = currentId;
+    const dossier = dossierRef.current;
+    if (!dossier || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        dossier,
+        { y: 10, opacity: 0.45 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.3,
+          ease: 'power2.out',
+          clearProps: 'transform,opacity',
+        }
+      );
+    }, dossierRef);
+
+    return () => ctx.revert();
+  }, [activeBuilding?.id]);
 
   if (loadingData && !profile) {
     return (
@@ -105,6 +175,7 @@ export function CampusMapSection() {
 
   return (
     <section
+      ref={mapSectionRef}
       id="campus-map"
       aria-labelledby="campus-map-heading"
       className="editable-region bg-[#F7F7F5] border-t border-slate-200 py-14 lg:py-16 scroll-mt-36"
@@ -390,6 +461,7 @@ export function CampusMapSection() {
                 return (
                   <button
                     key={b.id}
+                    data-gsap-map-pin
                     type="button"
                     onClick={() => setSelectedBuildingId(b.id)}
                     aria-pressed={isSelected}
@@ -423,12 +495,13 @@ export function CampusMapSection() {
               <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
                 Campus Buildings Index ({filteredBuildings.length}) — Click a building name
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div ref={buildingIndexRef} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {filteredBuildings.map((b) => {
                   const isSelected = activeBuilding.id === b.id;
                   return (
                     <button
                       key={b.id}
+                      data-gsap-building-btn
                       type="button"
                       onClick={() => setSelectedBuildingId(b.id)}
                       className={`px-3 py-2.5 rounded-lg text-left border transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
@@ -456,6 +529,7 @@ export function CampusMapSection() {
           <div className="lg:col-span-5 flex">
             <AnimatePresence mode="wait">
               <motion.article
+                ref={dossierRef}
                 key={activeBuilding.id}
                 initial={{ opacity: 0.4, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}

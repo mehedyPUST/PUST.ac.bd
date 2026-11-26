@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,6 +28,7 @@ import { pustApi } from '../lib/api';
 import { downloadIcsCalendar } from '../lib/calendarExport';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { resolveDepartmentImage } from '../lib/departmentMedia';
+import { animateStagger } from '../lib/gsap';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -226,7 +227,40 @@ export function PublicSubPages({
   const [officialFormQuery, setOfficialFormQuery] = useState<string>('');
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
 
+  const deptGroupsRef = useRef<HTMLDivElement>(null);
+  const noticesBoardRef = useRef<HTMLDivElement>(null);
+  const prevDeptFilterRef = useRef({ selectedFaculty, deptQuery });
+  const prevNoticeFilterRef = useRef({ selectedNoticeCat, noticeBoardScope, noticeQuery });
+
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const prev = prevDeptFilterRef.current;
+    if (prev.selectedFaculty === selectedFaculty && prev.deptQuery === deptQuery) return;
+    prevDeptFilterRef.current = { selectedFaculty, deptQuery };
+    return animateStagger(deptGroupsRef.current, '[data-gsap-dept-group]', {
+      y: 8,
+      duration: 0.28,
+      stagger: 0.04,
+    });
+  }, [selectedFaculty, deptQuery]);
+
+  useEffect(() => {
+    const prev = prevNoticeFilterRef.current;
+    if (
+      prev.selectedNoticeCat === selectedNoticeCat &&
+      prev.noticeBoardScope === noticeBoardScope &&
+      prev.noticeQuery === noticeQuery
+    ) {
+      return;
+    }
+    prevNoticeFilterRef.current = { selectedNoticeCat, noticeBoardScope, noticeQuery };
+    return animateStagger(noticesBoardRef.current, '[data-gsap-notice-row]', {
+      y: 8,
+      duration: 0.26,
+      stagger: 0.035,
+    });
+  }, [selectedNoticeCat, noticeBoardScope, noticeQuery]);
 
   function getDepartmentHref(dept: DepartmentRecord) {
     return `/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`;
@@ -1519,7 +1553,7 @@ export function PublicSubPages({
                       </button>
                     </div>
                   ) : (
-                    <div className="space-y-10">
+                    <div ref={deptGroupsRef} className="space-y-10">
                       {groupedFaculties.map(({ facultyName, depts }) => {
                         const groupTeachers = depts.reduce(
                           (sum, d) => sum + (d.facultyCount ?? 0),
@@ -1537,7 +1571,7 @@ export function PublicSubPages({
                             : 'card-gradient-parchment border-amber-900/15 hover:border-sage-600/60';
 
                         return (
-                          <div key={facultyName} className="space-y-4">
+                          <div key={facultyName} data-gsap-dept-group className="space-y-4">
                             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 pb-2.5 border-b border-slate-200">
                               <h2 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950">
                                 {facultyName}
@@ -2764,7 +2798,10 @@ export function PublicSubPages({
             </button>
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs">
+          <div
+            ref={noticesBoardRef}
+            className="rounded-2xl border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs"
+          >
             <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF8F4] border-b border-slate-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
               <div className="lg:col-span-2">Date &amp; Category</div>
               <div className="lg:col-span-7">Official Circular</div>
@@ -2775,6 +2812,7 @@ export function PublicSubPages({
               {filteredNotices.map((notice) => (
                 <div
                   key={notice.id}
+                  data-gsap-notice-row
                   role="button"
                   tabIndex={0}
                   onClick={() => onSelectNotice(notice)}

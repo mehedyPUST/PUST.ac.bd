@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AlertCircle,
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
+import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -123,23 +124,148 @@ export function HomePage({
   const [bannerPaused, setBannerPaused] = useState(false);
   const [fullViewSlide, setFullViewSlide] = useState<BannerSlideRecord | null>(null);
 
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const bannerStageRef = useRef<HTMLDivElement>(null);
+  const noticeListRef = useRef<HTMLDivElement>(null);
+  const pubListRef = useRef<HTMLDivElement>(null);
+  const eventGridRef = useRef<HTMLDivElement>(null);
+  const seminarGridRef = useRef<HTMLDivElement>(null);
+
+  const prevNoticeCatRef = useRef(noticeCategory);
+  const prevPubFilterRef = useRef(pubDeptFilter);
+  const prevEventCatRef = useRef(eventCategory);
+  const prevSlideIdxRef = useRef(activeSlideIdx);
+
   useEffect(() => {
     setActiveSlideIdx((prev) => (prev >= slides.length ? 0 : prev));
   }, [slides.length]);
 
   useEffect(() => {
     if (slides.length <= 1 || bannerPaused || fullViewSlide) return;
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return;
-    }
+    if (prefersReducedMotion()) return;
     const timer = window.setInterval(() => {
       setActiveSlideIdx((prev) => (prev + 1) % slides.length);
     }, 5500);
     return () => window.clearInterval(timer);
   }, [slides.length, bannerPaused, fullViewSlide]);
+
+  // GSAP Hero entrance timeline & utility ribbon stagger
+  useEffect(() => {
+    const heroEl = heroSectionRef.current;
+    if (!heroEl || !profile || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      const heroItems = heroEl.querySelectorAll('[data-gsap-hero]');
+      const ribbonItems = heroEl.querySelectorAll('[data-gsap-ribbon]');
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      if (heroItems.length > 0) {
+        tl.fromTo(
+          heroItems,
+          { y: 12, opacity: 0.25 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.42,
+            stagger: 0.055,
+            clearProps: 'transform,opacity',
+          }
+        );
+      }
+      if (ribbonItems.length > 0) {
+        tl.fromTo(
+          ribbonItems,
+          { y: 10, opacity: 0.3 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.36,
+            stagger: 0.055,
+            clearProps: 'transform,opacity',
+          },
+          '-=0.22'
+        );
+      }
+    }, heroSectionRef);
+
+    return () => ctx.revert();
+  }, [Boolean(profile)]);
+
+  // GSAP subtle zoom-settle on banner slide transition
+  useEffect(() => {
+    if (prevSlideIdxRef.current === activeSlideIdx) return;
+    prevSlideIdxRef.current = activeSlideIdx;
+    const stage = bannerStageRef.current;
+    if (!stage || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        stage,
+        { scale: 1.03 },
+        { scale: 1, duration: 0.7, ease: 'power2.out', clearProps: 'transform' }
+      );
+    }, bannerStageRef);
+
+    return () => ctx.revert();
+  }, [activeSlideIdx]);
+
+  // GSAP stagger on filter changes
+  useEffect(() => {
+    if (prevNoticeCatRef.current === noticeCategory) return;
+    prevNoticeCatRef.current = noticeCategory;
+    return animateStagger(noticeListRef.current, '[data-gsap-notice-row]', {
+      y: 8,
+      duration: 0.28,
+      stagger: 0.04,
+    });
+  }, [noticeCategory]);
+
+  useEffect(() => {
+    if (prevPubFilterRef.current === pubDeptFilter) return;
+    prevPubFilterRef.current = pubDeptFilter;
+    return animateStagger(pubListRef.current, '[data-gsap-pub-row]', {
+      y: 8,
+      duration: 0.28,
+      stagger: 0.04,
+    });
+  }, [pubDeptFilter]);
+
+  useEffect(() => {
+    if (prevEventCatRef.current === eventCategory) return;
+    prevEventCatRef.current = eventCategory;
+    return animateStagger(eventGridRef.current, '[data-gsap-event-card]', {
+      y: 10,
+      duration: 0.3,
+      stagger: 0.045,
+    });
+  }, [eventCategory]);
+
+  // GSAP ScrollTrigger stagger for upcoming seminars strip
+  useEffect(() => {
+    const grid = seminarGridRef.current;
+    if (!grid || upcomingSeminars.length === 0 || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      const items = grid.querySelectorAll('[data-gsap-seminar-item]');
+      if (items.length === 0) return;
+      gsap.from(items, {
+        y: 12,
+        opacity: 0.25,
+        duration: 0.42,
+        stagger: 0.065,
+        ease: 'power2.out',
+        immediateRender: false,
+        clearProps: 'transform,opacity',
+        scrollTrigger: {
+          trigger: grid,
+          start: 'top 90%',
+          once: true,
+        },
+      });
+    }, seminarGridRef);
+
+    return () => ctx.revert();
+  }, [upcomingSeminars.length]);
 
   const currentSlide = slides[activeSlideIdx] || slides[0] || null;
 
@@ -225,6 +351,7 @@ export function HomePage({
 
       {/* 1. Banner */}
       <section
+        ref={heroSectionRef}
         id="banner"
         className="editable-region bg-gradient-to-b from-white via-[#FBF9F4] to-[#F3EDE2] border-b border-slate-200 scroll-mt-28"
       >
@@ -235,7 +362,10 @@ export function HomePage({
                 <HeroSummarySkeleton />
               ) : profile ? (
                 <div className="space-y-5">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div
+                    data-gsap-hero
+                    className="flex flex-wrap items-center justify-between gap-2"
+                  >
                     <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
                       {profile.heroEyebrow ||
                         (profile.convocationDate
@@ -248,11 +378,17 @@ export function HomePage({
                       variant="compact"
                     />
                   </div>
-                  <h1 className="font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.08] font-semibold tracking-tight text-slate-950">
+                  <h1
+                    data-gsap-hero
+                    className="font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.08] font-semibold tracking-tight text-slate-950"
+                  >
                     {profile.heroTitle}
                   </h1>
                   {profile.heroSubtitle && (
-                    <p className="text-base sm:text-[17.5px] leading-[1.68] text-slate-700 max-w-xl">
+                    <p
+                      data-gsap-hero
+                      className="text-base sm:text-[17.5px] leading-[1.68] text-slate-700 max-w-xl"
+                    >
                       {profile.heroSubtitle}
                     </p>
                   )}
@@ -268,7 +404,10 @@ export function HomePage({
                 </div>
               )}
 
-              <div className="mt-8 pt-6 border-t border-slate-300/80 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
+              <div
+                data-gsap-hero
+                className="mt-8 pt-6 border-t border-slate-300/80 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3"
+              >
                 <Link
                   href="/portal"
                   className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold bg-pust-800 text-white hover:bg-pust-900 hover:-translate-y-0.5 hover:shadow-md shadow-sm transition-all duration-200 whitespace-nowrap shrink-0"
@@ -315,18 +454,20 @@ export function HomePage({
                         transition={{ duration: 0.18 }}
                         className="absolute inset-0 w-full h-full"
                       >
-                        <ResilientImage
-                          src={currentSlide.imageUrl}
-                          alt={
-                            currentSlide.alt ||
-                            currentSlide.caption ||
-                            'Pabna University of Science and Technology campus banner'
-                          }
-                          containerClassName="w-full h-full"
-                          frameClassName="bg-slate-900"
-                          className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
-                          priority
-                        />
+                        <div ref={bannerStageRef} className="w-full h-full">
+                          <ResilientImage
+                            src={currentSlide.imageUrl}
+                            alt={
+                              currentSlide.alt ||
+                              currentSlide.caption ||
+                              'Pabna University of Science and Technology campus banner'
+                            }
+                            containerClassName="w-full h-full"
+                            frameClassName="bg-slate-900"
+                            className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
+                            priority
+                          />
+                        </div>
                       </motion.div>
                     </AnimatePresence>
 
@@ -439,7 +580,10 @@ export function HomePage({
           {/* Operational Utility Ribbon */}
           {profile && (
             <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-300/80 bg-white shadow-sm overflow-hidden">
-              <div className="card-gradient-crimson px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200 transition-colors">
+              <div
+                data-gsap-ribbon
+                className="card-gradient-crimson px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200 transition-colors"
+              >
                 <dt className="text-xs uppercase tracking-wider text-pust-700 font-semibold">
                   Established
                 </dt>
@@ -447,7 +591,10 @@ export function HomePage({
                   {profile.establishedYear} · Act No. 43 of 2001
                 </dd>
               </div>
-              <div className="card-gradient-lapis px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200 transition-colors">
+              <div
+                data-gsap-ribbon
+                className="card-gradient-lapis px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200 transition-colors"
+              >
                 <dt className="text-xs uppercase tracking-wider text-lapis-700 font-semibold">
                   Academic Scope
                 </dt>
@@ -455,7 +602,10 @@ export function HomePage({
                   {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
                 </dd>
               </div>
-              <div className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors">
+              <div
+                data-gsap-ribbon
+                className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors"
+              >
                 <dt className="text-xs uppercase tracking-wider text-gold-700 font-semibold">
                   Community
                 </dt>
@@ -463,7 +613,10 @@ export function HomePage({
                   {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
                 </dd>
               </div>
-              <div className="bg-gradient-to-br from-pust-900 to-pust-950 hover:from-pust-800 hover:to-pust-950 text-white transition-colors group">
+              <div
+                data-gsap-ribbon
+                className="bg-gradient-to-br from-pust-900 to-pust-950 hover:from-pust-800 hover:to-pust-950 text-white transition-colors group"
+              >
                 <Link href="/verify" className="block h-full px-5 py-4">
                   <dt className="text-xs uppercase tracking-wider font-semibold text-amber-300 flex items-center justify-between">
                     <span>Public Registry</span>
@@ -823,7 +976,7 @@ export function HomePage({
             {loadingData && notices.length === 0 ? (
               <NoticeListSkeleton rows={4} />
             ) : (
-              <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+              <div ref={noticeListRef} className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
                 <div className="divide-y divide-slate-200">
                   {featuredNotices.length === 0 ? (
                     <div className="p-8 text-center space-y-3">
@@ -844,6 +997,7 @@ export function HomePage({
                       {leadNotice && (
                         <div
                           key={leadNotice.id}
+                          data-gsap-notice-row
                           role="button"
                           tabIndex={0}
                           onClick={() => onSelectNotice(leadNotice)}
@@ -880,6 +1034,7 @@ export function HomePage({
                       {secondaryNotices.map((notice) => (
                         <div
                           key={notice.id}
+                          data-gsap-notice-row
                           role="button"
                           tabIndex={0}
                           onClick={() => onSelectNotice(notice)}
@@ -1017,7 +1172,7 @@ export function HomePage({
               ))}
             </div>
 
-            <div className="divide-y divide-slate-200 border-y border-slate-200">
+            <div ref={pubListRef} className="divide-y divide-slate-200 border-y border-slate-200">
               {visiblePublications.length === 0 ? (
                 <p className="py-6 text-sm text-slate-600">
                   No peer-reviewed publications found for the selected department.
@@ -1026,6 +1181,7 @@ export function HomePage({
                 visiblePublications.map((pub) => (
                   <article
                     key={pub.id}
+                    data-gsap-pub-row
                     className="py-4 px-2 -mx-2 rounded-xl hover:bg-lapis-50/55 transition-colors space-y-1.5"
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -1166,13 +1322,14 @@ export function HomePage({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div ref={eventGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {visibleEvents.slice(0, 4).map((item, idx) => {
                 const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
                 const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
                 return (
                   <MotionCard
                     key={item.id}
+                    data-gsap-event-card
                     delay={idx * 0.04}
                     role="button"
                     tabIndex={0}
@@ -1257,10 +1414,14 @@ export function HomePage({
                 No upcoming seminars or workshops are currently scheduled.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-sage-200/80">
+              <div
+                ref={seminarGridRef}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-sage-200/80"
+              >
                 {upcomingSeminars.map((ev) => (
                   <div
                     key={ev.id}
+                    data-gsap-seminar-item
                     className="p-5 space-y-1.5 hover:bg-white/75 transition-colors"
                   >
                     <p className="font-mono text-xs font-semibold text-sage-700 tabular-nums">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -12,6 +12,7 @@ import {
   Search,
 } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
+import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
 import type { NoticeRecord } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -88,7 +89,84 @@ export function CareerView() {
   const [filter, setFilter] = useState<CareerFilter>('all');
   const [query, setQuery] = useState('');
 
+  const pageScopeRef = useRef<HTMLElement>(null);
+  const circularListRef = useRef<HTMLDivElement>(null);
+  const prevFilterRef = useRef(filter);
+  const prevQueryRef = useRef(query);
+
   const resolved = resolveUniversityContent(profile);
+
+  useEffect(() => {
+    const scope = pageScopeRef.current;
+    if (!scope || prefersReducedMotion()) return;
+
+    const ctx = gsap.context(() => {
+      const kpis = scope.querySelectorAll('[data-gsap-career-kpi]');
+      if (kpis.length > 0) {
+        gsap.fromTo(
+          kpis,
+          { y: 12, opacity: 0.25 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.4,
+            stagger: 0.06,
+            ease: 'power3.out',
+            clearProps: 'transform,opacity',
+          }
+        );
+      }
+
+      const tracks = scope.querySelectorAll('[data-gsap-career-track]');
+      if (tracks.length > 0) {
+        gsap.from(tracks, {
+          y: 14,
+          opacity: 0.25,
+          duration: 0.45,
+          stagger: 0.07,
+          ease: 'power2.out',
+          immediateRender: false,
+          clearProps: 'transform,opacity',
+          scrollTrigger: {
+            trigger: tracks[0],
+            start: 'top 90%',
+            once: true,
+          },
+        });
+      }
+
+      const steps = scope.querySelectorAll('[data-gsap-career-step]');
+      if (steps.length > 0) {
+        gsap.from(steps, {
+          y: 12,
+          opacity: 0.3,
+          duration: 0.4,
+          stagger: 0.065,
+          ease: 'power2.out',
+          immediateRender: false,
+          clearProps: 'transform,opacity',
+          scrollTrigger: {
+            trigger: steps[0],
+            start: 'top 90%',
+            once: true,
+          },
+        });
+      }
+    }, pageScopeRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (prevFilterRef.current === filter && prevQueryRef.current === query) return;
+    prevFilterRef.current = filter;
+    prevQueryRef.current = query;
+    return animateStagger(circularListRef.current, '[data-gsap-career-row]', {
+      y: 8,
+      duration: 0.26,
+      stagger: 0.04,
+    });
+  }, [filter, query]);
 
   const careerNotices = useMemo(() => {
     const jobAndTender = notices.filter((n) => n.category === 'Job & Tender');
@@ -128,7 +206,10 @@ export function CareerView() {
 
   return (
     <main className="flex-1 bg-[#F7F7F5]">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12">
+      <section
+        ref={pageScopeRef}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
+      >
         {/* Page Header */}
         <div className="space-y-6 pb-8 border-b border-slate-200">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -170,7 +251,10 @@ export function CareerView() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
+            <div
+              data-gsap-career-kpi
+              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+            >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Appointing Authority
               </p>
@@ -181,7 +265,10 @@ export function CareerView() {
                 Administrative Building, Rajapur Campus
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
+            <div
+              data-gsap-career-kpi
+              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+            >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Compensation Framework
               </p>
@@ -192,7 +279,10 @@ export function CareerView() {
                 {profile?.facultyMembersCount ?? 212} faculty &amp; institutional staff
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
+            <div
+              data-gsap-career-kpi
+              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+            >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Recruitment Inquiry Desk
               </p>
@@ -293,7 +383,10 @@ export function CareerView() {
               </button>
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+            <div
+              ref={circularListRef}
+              className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
+            >
               <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF8F4] border-b border-slate-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
                 <div className="lg:col-span-2">Date &amp; Track</div>
                 <div className="lg:col-span-7">Position / Circular Summary</div>
@@ -306,6 +399,7 @@ export function CareerView() {
                   return (
                     <div
                       key={notice.id}
+                      data-gsap-career-row
                       role="button"
                       tabIndex={0}
                       onClick={() => setActiveNotice(notice)}
@@ -387,6 +481,7 @@ export function CareerView() {
             {RECRUITMENT_TRACKS.map((track) => (
               <div
                 key={track.title}
+                data-gsap-career-track
                 className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col justify-between gap-4 shadow-xs"
               >
                 <div className="space-y-2.5">
@@ -426,7 +521,11 @@ export function CareerView() {
 
             <ol className="divide-y divide-slate-200">
               {RECRUITMENT_STEPS.map((item) => (
-                <li key={item.step} className="py-4 first:pt-1 last:pb-1 flex items-start gap-4">
+                <li
+                  key={item.step}
+                  data-gsap-career-step
+                  className="py-4 first:pt-1 last:pb-1 flex items-start gap-4"
+                >
                   <span className="font-mono text-xs font-semibold text-pust-800 bg-pust-50 border border-pust-200 rounded-lg px-2.5 py-1.5 tabular-nums shrink-0 mt-0.5">
                     {item.step}
                   </span>
