@@ -17,9 +17,35 @@ export type AppRoute =
   | '/administration/pro-vc-office'
   | '/administration/treasurer-office'
   | '/administration/registrar-office'
+  | '/administration/establishment-council'
+  | '/administration/academic-section'
+  | '/administration/central-library'
+  | '/administration/planning-development'
+  | '/administration/controller-office'
+  | '/administration/finance-accounts'
+  | '/administration/public-relations'
+  | '/administration/medical-section'
+  | '/administration/engineering-office'
   | '/administration/proctor-office'
   | '/administration/student-advisor-office'
+  | '/administration/central-cafeteria'
+  | '/administration/transportation-pool'
+  | '/administration/male-hall-1'
+  | '/administration/female-hall-1'
   | '/administration/ict-cell'
+  | '/administration/central-store'
+  | '/administration/security-section'
+  | '/administration/iqac'
+  | '/administration/central-mosque'
+  | '/administration/estate-section'
+  | '/administration/dormitory'
+  | '/administration/physical-education'
+  | '/administration/guest-house'
+  | '/administration/male-hall-2'
+  | '/administration/female-hall-2'
+  | '/administration/iied'
+  | '/administration/rttc'
+  | '/administration/collaboration-cell'
   | '/administration/all-office'
   | '/administration/apa'
   | '/academics'
@@ -109,9 +135,35 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Pro Vice-Chancellor Office', route: '/administration/pro-vc-office' },
       { label: 'Treasurer Office', route: '/administration/treasurer-office' },
       { label: 'Registrar Office', route: '/administration/registrar-office' },
+      { label: 'Establishment and Council Section', route: '/administration/establishment-council' },
+      { label: 'Academic Section', route: '/administration/academic-section' },
+      { label: 'Central Library and Information Center', route: '/administration/central-library' },
+      { label: 'Planning, Development and Works Office', route: '/administration/planning-development' },
+      { label: 'Controller Office', route: '/administration/controller-office' },
+      { label: 'Finance and Accounts Office', route: '/administration/finance-accounts' },
+      { label: 'Public Relations Office', route: '/administration/public-relations' },
+      { label: 'Medical Section', route: '/administration/medical-section' },
+      { label: 'Engineering Office', route: '/administration/engineering-office' },
       { label: 'Proctor Office', route: '/administration/proctor-office' },
       { label: 'Student Advisor Office', route: '/administration/student-advisor-office' },
+      { label: 'Central Cafeteria', route: '/administration/central-cafeteria' },
+      { label: 'Transportation Pool', route: '/administration/transportation-pool' },
+      { label: 'Male Hall 1', route: '/administration/male-hall-1' },
+      { label: 'Female Hall -1', route: '/administration/female-hall-1' },
       { label: 'ICT Cell', route: '/administration/ict-cell' },
+      { label: 'Central Store', route: '/administration/central-store' },
+      { label: 'Security Section', route: '/administration/security-section' },
+      { label: 'Institutional Quality Assurance Cell (IQAC)', route: '/administration/iqac' },
+      { label: 'Central Mosque', route: '/administration/central-mosque' },
+      { label: 'Estate Section', route: '/administration/estate-section' },
+      { label: 'Dormitory', route: '/administration/dormitory' },
+      { label: 'Physical Education Office', route: '/administration/physical-education' },
+      { label: 'Guest House', route: '/administration/guest-house' },
+      { label: 'Male Hall -2', route: '/administration/male-hall-2' },
+      { label: 'Female Hall -2', route: '/administration/female-hall-2' },
+      { label: 'Institute of Innovation and Entrepreneurship Development', route: '/administration/iied' },
+      { label: 'Research & Technology Transfer Cell', route: '/administration/rttc' },
+      { label: 'Cell for National & International Collaboration', route: '/administration/collaboration-cell' },
       { label: 'All Office', route: '/administration/all-office' },
       { label: 'APA', route: '/administration/apa' },
     ],

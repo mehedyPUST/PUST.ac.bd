@@ -256,4 +256,28 @@ test('getDepartmentNotices filters case-insensitively and prioritizes pinned and
   assert.deepEqual(getDepartmentNotices(sampleNotices, ''), []);
 });
 
+test('all 33 administration office routes validate, generate breadcrumbs, and resolve from cmsDefaults', async () => {
+  const { DEFAULT_ADMIN_OFFICES } = await import('./adminOffices');
+  const { isValidSectionSlug, getBreadcrumbsForPath, parseRouteFromPath } = await import('./routes');
 
+  assert.equal(DEFAULT_ADMIN_OFFICES.length, 33);
+  const resolved = resolveUniversityContent(null);
+  assert.equal(resolved.adminOffices.length, 33);
+
+  for (const office of DEFAULT_ADMIN_OFFICES) {
+    assert.ok(
+      isValidSectionSlug('administration', office.slug),
+      `Expected valid administration slug: ${office.slug}`
+    );
+    assert.equal(parseRouteFromPath(office.route), office.route);
+    const crumbs = getBreadcrumbsForPath(office.route);
+    assert.equal(crumbs.length, 3);
+    assert.equal(crumbs[0].label, 'Home');
+    assert.equal(crumbs[1].label, 'Administration');
+  }
+
+  const ict = resolved.adminOffices.find((o) => o.slug === 'ict-cell');
+  assert.ok(ict);
+  assert.equal(ict.head?.name, 'Dr. Md. Abdur Rahim');
+  assert.equal(ict.officers.length, 5);
+});

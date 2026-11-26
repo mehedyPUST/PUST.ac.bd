@@ -6,6 +6,7 @@ import { Check, ChevronDown, Copy, Mail, Phone, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
+import { AdministrationOfficeDossier, AllOfficesDirectory } from './AdministrationOfficeDossier';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import { usePust } from './PustContext';
@@ -176,7 +177,10 @@ export function AdministrationSection({
     );
   }
 
-  const { adminShowcase } = resolveUniversityContent(profile);
+  const { adminShowcase, adminOffices } = resolveUniversityContent(profile);
+  const activeOfficeRecord = adminOffices.find((o) => o.route === route);
+  const showAllDirectory = route === '/administration' || route === '/administration/all-office';
+  const showVcBand = route === '/administration' || route === '/administration/vc-office';
 
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
   const previousVcs = vcProfiles
@@ -235,19 +239,59 @@ export function AdministrationSection({
                     />
                   </div>
                   <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
-                    {activeOffice
+                    {activeOfficeRecord
+                      ? activeOfficeRecord.name
+                      : activeOffice
                       ? activeOffice.highlight
                       : 'University Administration & Executive Offices'}
                   </h1>
                   <p className="text-[15.5px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
-                    {activeOffice
+                    {activeOfficeRecord
+                      ? activeOfficeRecord.summary
+                      : activeOffice
                       ? activeOffice.summary
                       : 'Statutory leadership, executive offices, and accountability units guiding academic governance, faculty administration, and digital public service at Pabna University of Science and Technology.'}
                   </p>
                 </div>
 
                 {/* Focused Office Dossier Strip on Sub-Routes */}
-                {highlightedOfficer && (
+                {activeOfficeRecord && (activeOfficeRecord.head || activeOfficeRecord.officeEmail || activeOfficeRecord.officePhone) ? (
+                  <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-xs font-medium text-pust-800">
+                        {activeOfficeRecord.head?.designation || activeOfficeRecord.category}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {activeOfficeRecord.location || activeOfficeRecord.code}
+                      </p>
+                    </div>
+                    {activeOfficeRecord.head && (
+                      <p className="font-serif text-xl font-medium text-slate-900">
+                        {activeOfficeRecord.head.name}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono tabular-nums text-slate-600">
+                      {(activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value) && (
+                        <a
+                          href={`mailto:${activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value}`}
+                          className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
+                        >
+                          <Mail className="w-3.5 h-3.5 shrink-0" />
+                          {activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value}
+                        </a>
+                      )}
+                      {(activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value) && (
+                        <a
+                          href={`tel:${(activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value || '').replace(/[^+\d]/g, '')}`}
+                          className="inline-flex items-center gap-1.5 hover:text-slate-900"
+                        >
+                          <Phone className="w-3.5 h-3.5 shrink-0" />
+                          {activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ) : highlightedOfficer && (
                   <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <p className="text-xs font-medium text-pust-800">{highlightedOfficer.role}</p>
@@ -291,6 +335,15 @@ export function AdministrationSection({
                 >
                   Overview
                 </Link>
+                {activeOfficeRecord &&
+                  !OFFICE_SUBROUTES.some((s) => s.route === activeOfficeRecord.route) && (
+                    <Link
+                      href={activeOfficeRecord.route}
+                      className="px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 bg-pust-800 text-white border border-pust-800 shadow-xs"
+                    >
+                      {activeOfficeRecord.name}
+                    </Link>
+                  )}
                 {OFFICE_SUBROUTES.map((item) => (
                   <Link
                     key={item.route}
@@ -301,7 +354,9 @@ export function AdministrationSection({
                         : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                     }`}
                   >
-                    {item.label}
+                    {item.route === '/administration/all-office'
+                      ? `All Offices (${adminOffices.length})`
+                      : item.label}
                   </Link>
                 ))}
               </nav>
@@ -334,9 +389,9 @@ export function AdministrationSection({
               </dd>
             </div>
             <div className="px-5 py-4">
-              <dt className="text-xs font-medium text-slate-600">Governance &amp; Units</dt>
+              <dt className="text-xs font-medium text-slate-600">Governance &amp; Offices</dt>
               <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
-                {profile.units.length} Statutory &amp; Cell Bodies
+                {adminOffices.length} Administration Offices &amp; Cells
               </dd>
             </div>
             <div className="px-5 py-4 bg-gradient-to-br from-pust-50/70 to-amber-50/40">
@@ -349,7 +404,22 @@ export function AdministrationSection({
         </div>
       </section>
 
+      {/* Focused Office Dossier & Officers Roster (Dedicated 33-Office Sub-Routes) */}
+      {activeOfficeRecord && (
+        <AdministrationOfficeDossier
+          office={activeOfficeRecord}
+          copiedEmail={copiedEmail}
+          onCopyEmail={handleCopyEmail}
+        />
+      )}
+
+      {/* Complete 33-Office Administration Directory (Overview & All Office View) */}
+      {showAllDirectory && (
+        <AllOfficesDirectory offices={adminOffices} activeRoute={route} />
+      )}
+
       {/* Band 2: Vice-Chancellor's Welcome Address & History */}
+      {showVcBand && (
       <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Office Dossier & Welcome Address */}
@@ -558,6 +628,7 @@ export function AdministrationSection({
           </div>
         </div>
       </section>
+      )}
 
       {/* Band 3: Executive Administration Directory (Searchable Institutional Ledger) */}
       <section className="bg-[#FAF8F4] border-b border-slate-200 py-14 lg:py-16">

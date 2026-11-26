@@ -494,6 +494,41 @@ export interface AdministrativeUnit {
   description: string;
 }
 
+export type AdminOfficeCategory =
+  | 'Executive Leadership'
+  | 'Administrative Sections & Offices'
+  | 'Student Welfare & Campus Services'
+  | 'Residential Halls & Accommodation'
+  | 'Research, ICT & Quality Cells';
+
+export interface AdminOfficePersonnel {
+  id: string;
+  name: string;
+  designation: string;
+  qualification?: string;
+  researchArea?: string;
+  officeLocation?: string;
+  phones?: ContactDetailItem[];
+  emails?: ContactDetailItem[];
+}
+
+export interface AdministrationOfficeRecord {
+  slug: string;
+  route: string;
+  code: string;
+  name: string;
+  category: AdminOfficeCategory;
+  summary: string;
+  officeEmail?: string;
+  officePhone?: string;
+  deskEmail?: string;
+  deskPhone?: string;
+  location?: string;
+  officersLabel?: string;
+  head?: AdminOfficePersonnel;
+  officers: AdminOfficePersonnel[];
+}
+
 export interface InstitutionalLinkItem {
   id: string;
   route: string;
@@ -747,6 +782,7 @@ export interface UniversityProfile {
   facilitiesConfig?: FacilityItemConfig[];
   verifyPageConfig?: VerifyPageConfig;
   footerConfig?: FooterConfig;
+  adminOffices?: AdministrationOfficeRecord[];
 }
 
 export type GovernanceTabKind =

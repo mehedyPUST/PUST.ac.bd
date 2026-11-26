@@ -1,6 +1,7 @@
 import type {
   AboutExtrasConfig,
   AcademicExtrasConfig,
+  AdministrationOfficeRecord,
   AdminShowcaseConfig,
   AdmissionsConfig,
   CampusBuildingItem,
@@ -14,6 +15,7 @@ import type {
   UniversityProfile,
   VerifyPageConfig,
 } from '../types/pust';
+import { DEFAULT_ADMIN_OFFICES } from './adminOffices';
 
 export const DEFAULT_NAVBAR_TAGLINE = 'Est. 2008 · Rajapur, Pabna';
 
@@ -1200,6 +1202,7 @@ export interface ResolvedUniversityContent {
   facilitiesConfig: FacilityItemConfig[];
   verifyPageConfig: VerifyPageConfig;
   footerConfig: FooterConfig;
+  adminOffices: AdministrationOfficeRecord[];
 }
 
 export function resolveUniversityContent(
@@ -1376,6 +1379,10 @@ export function resolveUniversityContent(
         : DEFAULT_FOOTER_CONFIG.contacts,
       copyrightText: foot?.copyrightText?.trim() || DEFAULT_FOOTER_CONFIG.copyrightText,
     },
+    adminOffices:
+      Array.isArray(profile?.adminOffices) && profile.adminOffices.length > 0
+        ? profile.adminOffices
+        : (DEFAULT_ADMIN_OFFICES as AdministrationOfficeRecord[]),
   };
 }
 

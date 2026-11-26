@@ -13,6 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { DEFAULT_ADMIN_OFFICES } from '../lib/adminOffices';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
 import type { DepartmentRecord, NoticeRecord } from '../types/pust';
 import { usePust } from './PustContext';
@@ -72,14 +73,37 @@ function resolveOfficeRoute(text: string): AppRoute {
   if (lower.includes('vice-chancellor') || lower.includes('vc')) return '/administration/vc-office';
   if (lower.includes('treasurer')) return '/administration/treasurer-office';
   if (lower.includes('registrar')) return '/administration/registrar-office';
+  if (lower.includes('establishment')) return '/administration/establishment-council';
+  if (lower.includes('academic section')) return '/administration/academic-section';
+  if (lower.includes('planning')) return '/administration/planning-development';
+  if (lower.includes('controller')) return '/administration/controller-office';
+  if (lower.includes('finance') || lower.includes('accounts')) return '/administration/finance-accounts';
+  if (lower.includes('public relations') || lower.includes('pro ')) return '/administration/public-relations';
+  if (lower.includes('engineering')) return '/administration/engineering-office';
   if (lower.includes('proctor')) return '/administration/proctor-office';
   if (lower.includes('student advisor') || lower.includes('welfare') || lower.includes('dsw')) {
     return '/administration/student-advisor-office';
   }
+  if (lower.includes('cafeteria')) return '/administration/central-cafeteria';
   if (lower.includes('ict')) return '/administration/ict-cell';
-  if (lower.includes('library') || lower.includes('clic')) return '/facilities/library';
-  if (lower.includes('medical')) return '/facilities/medical';
-  if (lower.includes('transport')) return '/facilities/transport';
+  if (lower.includes('library') || lower.includes('clic')) return '/administration/central-library';
+  if (lower.includes('medical')) return '/administration/medical-section';
+  if (lower.includes('transport')) return '/administration/transportation-pool';
+  if (lower.includes('male hall 1') || lower.includes('july 06')) return '/administration/male-hall-1';
+  if (lower.includes('female hall -1') || lower.includes('matribhasha')) return '/administration/female-hall-1';
+  if (lower.includes('male hall -2') || lower.includes('swadhinota')) return '/administration/male-hall-2';
+  if (lower.includes('female hall -2') || lower.includes('ganatantra')) return '/administration/female-hall-2';
+  if (lower.includes('store')) return '/administration/central-store';
+  if (lower.includes('security')) return '/administration/security-section';
+  if (lower.includes('iqac')) return '/administration/iqac';
+  if (lower.includes('mosque')) return '/administration/central-mosque';
+  if (lower.includes('estate')) return '/administration/estate-section';
+  if (lower.includes('dormitory')) return '/administration/dormitory';
+  if (lower.includes('physical education')) return '/administration/physical-education';
+  if (lower.includes('guest house')) return '/administration/guest-house';
+  if (lower.includes('iied') || lower.includes('innovation')) return '/administration/iied';
+  if (lower.includes('rttc') || lower.includes('technology transfer')) return '/administration/rttc';
+  if (lower.includes('collaboration')) return '/administration/collaboration-cell';
   return '/administration/all-office';
 }
 
@@ -348,6 +372,28 @@ export function GlobalSearchBar({
         keywords: `${officer.name} ${officer.role} ${officer.office} ${officer.email} ${officer.phone}`.toLowerCase(),
         rankBoost: 6,
         route: resolveOfficeRoute(`${officer.role} ${officer.office}`),
+      });
+    }
+
+    const adminOffices = profile?.adminOffices?.length ? profile.adminOffices : DEFAULT_ADMIN_OFFICES;
+    for (const office of adminOffices) {
+      const peopleText = [
+        office.head
+          ? `${office.head.name} ${office.head.designation} ${office.head.qualification || ''} ${(office.head.emails || []).map((e) => e.value).join(' ')} ${(office.head.phones || []).map((p) => p.value).join(' ')}`
+          : '',
+        ...office.officers.map(
+          (o) =>
+            `${o.name} ${o.designation} ${o.qualification || ''} ${(o.emails || []).map((e) => e.value).join(' ')} ${(o.phones || []).map((p) => p.value).join(' ')}`
+        ),
+      ].join(' ');
+      entries.push({
+        id: `admin-office-${office.slug}`,
+        group: 'Academic & Campus Resources',
+        title: office.name,
+        subtitle: `${office.category}${office.officeEmail ? ` · ${office.officeEmail}` : ''}${office.head ? ` · ${office.head.name}` : ''}`,
+        keywords: `${office.name} ${office.code} ${office.category} ${office.summary} ${office.officeEmail || ''} ${office.officePhone || ''} ${office.deskEmail || ''} ${office.location || ''} ${peopleText}`.toLowerCase(),
+        rankBoost: 9,
+        route: office.route,
       });
     }
 

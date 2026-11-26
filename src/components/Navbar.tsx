@@ -385,14 +385,14 @@ export function Navbar({
                     Administration
                   </Link>
                   {hoveredGroup === 'administration' && (
-                    <div className="absolute left-0 top-full pt-1 w-[440px] max-w-[calc(100vw-2rem)] z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
+                    <div className="absolute left-0 xl:-left-24 top-full pt-1 w-[680px] xl:w-[780px] max-w-[calc(100vw-2rem)] z-50">
+                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2.5 max-h-[75vh] overflow-y-auto grid grid-cols-2 lg:grid-cols-3 gap-1">
                         {adminGroup.items.map((item) => (
                           <Link
                             key={item.route}
                             href={item.route}
                             onClick={() => setHoveredGroup(null)}
-                            className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
+                            className={`block rounded-lg px-2.5 py-1.5 text-[11.5px] leading-snug transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
                                 : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
@@ -875,7 +875,11 @@ export function Navbar({
                     </button>
                   </div>
                   {expanded && (
-                    <div className="pl-3 pr-2 py-1.5 space-y-0.5 bg-slate-50 rounded-lg mb-2">
+                    <div
+                      className={`pl-3 pr-2 py-1.5 space-y-0.5 bg-slate-50 rounded-lg mb-2 ${
+                        group.items.length > 10 ? 'max-h-[50vh] overflow-y-auto' : ''
+                      }`}
+                    >
                       {group.items.map((item) => (
                         <button
                           key={item.route}
