@@ -127,9 +127,9 @@ export function Navbar({
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band (Left) + Est. Tagline & Icon Search (Far Right) */}
+            {/* Tier 1: University Title Band + Est. Tagline (Left) & Expanded Search (Right) */}
             <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-4 text-white">
-              <div className="min-w-0 flex-1 flex items-center">
+              <div className="min-w-0 flex-1 flex items-center gap-3">
                 <Link
                   href="/"
                   onClick={() => {
@@ -142,13 +142,17 @@ export function Navbar({
                   <span className="sm:hidden">PUST</span>
                   <span className="hidden sm:inline">Pabna University of Science and Technology</span>
                 </Link>
+
+                <span
+                  aria-hidden="true"
+                  className="hidden xl:block h-4 w-px bg-white/25 shrink-0"
+                />
+                <span className="hidden xl:inline text-[11px] font-medium tracking-wide text-amber-200/90 whitespace-nowrap shrink-0">
+                  {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
+                </span>
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                <span className="hidden lg:inline text-xs font-medium text-amber-200 whitespace-nowrap shrink-0">
-                  {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
-                </span>
-
                 {user?.role === 'admin' && editMode && onOpenEditModal && (
                   <button
                     type="button"

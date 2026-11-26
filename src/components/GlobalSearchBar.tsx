@@ -106,7 +106,6 @@ export function GlobalSearchBar({
 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState(variant === 'mobile');
   const [activeIndex, setActiveIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -119,16 +118,7 @@ export function GlobalSearchBar({
     }
   }, [autoFocus]);
 
-  useEffect(() => {
-    if (variant === 'desktop' && expanded) {
-      const frame = requestAnimationFrame(() => {
-        inputRef.current?.focus();
-      });
-      return () => cancelAnimationFrame(frame);
-    }
-  }, [expanded, variant]);
-
-  // Global keyboard shortcut: Cmd/Ctrl+K or '/' expands & focuses the desktop search bar
+  // Global keyboard shortcut: Cmd/Ctrl+K or '/' focuses and opens the desktop search bar
   useEffect(() => {
     if (variant !== 'desktop') return;
     function handleGlobalKey(e: KeyboardEvent) {
@@ -143,14 +133,12 @@ export function GlobalSearchBar({
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         if (containerRef.current && containerRef.current.offsetParent !== null) {
           e.preventDefault();
-          setExpanded(true);
           setOpen(true);
           requestAnimationFrame(() => inputRef.current?.focus());
         }
       } else if (e.key === '/' && !isEditable && !e.metaKey && !e.ctrlKey && !e.altKey) {
         if (containerRef.current && containerRef.current.offsetParent !== null) {
           e.preventDefault();
-          setExpanded(true);
           setOpen(true);
           requestAnimationFrame(() => inputRef.current?.focus());
         }
@@ -160,21 +148,18 @@ export function GlobalSearchBar({
     return () => document.removeEventListener('keydown', handleGlobalKey);
   }, [variant]);
 
-  // Outside click closes dropdown & collapses desktop search back to icon
+  // Outside click closes dropdown while keeping desktop search bar expanded
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
-        if (variant === 'desktop') {
-          setExpanded(false);
-        }
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [variant]);
+  }, []);
 
-  const isSearchActive = open || expanded;
+  const isSearchActive = open;
 
   const searchIndex = useMemo<SearchEntry[]>(() => {
     if (!isSearchActive) return [];
@@ -511,9 +496,6 @@ export function GlobalSearchBar({
   function selectEntry(entry: SearchEntry) {
     setOpen(false);
     setQuery('');
-    if (variant === 'desktop') {
-      setExpanded(false);
-    }
     onActionComplete?.();
     if (entry.department) {
       navigateTo(`/academics/departments/${encodeURIComponent(entry.department.code.toLowerCase())}`);
@@ -527,9 +509,6 @@ export function GlobalSearchBar({
   function handleKeyDown(e: ReactKeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Escape') {
       setOpen(false);
-      if (variant === 'desktop') {
-        setExpanded(false);
-      }
       inputRef.current?.blur();
       return;
     }
@@ -561,30 +540,10 @@ export function GlobalSearchBar({
 
   const activeItem = flatResults[activeIndex];
 
-  if (variant === 'desktop' && !expanded) {
-    return (
-      <div ref={containerRef} className="relative shrink-0">
-        <button
-          type="button"
-          onClick={() => {
-            setExpanded(true);
-            setOpen(true);
-          }}
-          aria-label="Open site search"
-          aria-expanded={false}
-          title="Search"
-          className="w-9 h-9 inline-flex items-center justify-center rounded-lg text-white hover:bg-pust-800 transition-colors cursor-pointer"
-        >
-          <Search className="w-[17px] h-[17px]" />
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-56 xl:w-64 shrink-0' : 'relative w-full'}
+      className={variant === 'desktop' ? 'relative w-52 lg:w-56 xl:w-64 shrink-0' : 'relative w-full'}
     >
       <div className="relative flex items-center">
         <Search
@@ -619,24 +578,26 @@ export function GlobalSearchBar({
           }`}
         />
 
-        {(query || variant === 'desktop') && (
+        {query ? (
           <button
             type="button"
             onClick={() => {
-              if (query) {
-                setQuery('');
-                inputRef.current?.focus();
-              } else if (variant === 'desktop') {
-                setOpen(false);
-                setExpanded(false);
-              }
+              setQuery('');
+              inputRef.current?.focus();
             }}
-            aria-label={query ? 'Clear search query' : 'Close search'}
+            aria-label="Clear search query"
             className="absolute right-2 p-1 rounded text-slate-400 hover:text-slate-700 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
-        )}
+        ) : variant === 'desktop' ? (
+          <kbd
+            aria-hidden="true"
+            className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono leading-none text-slate-400 bg-slate-100 rounded border border-slate-200 pointer-events-none absolute right-2"
+          >
+            /
+          </kbd>
+        ) : null}
       </div>
 
       <AnimatePresence>
