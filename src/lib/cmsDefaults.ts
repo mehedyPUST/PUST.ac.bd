@@ -1153,6 +1153,7 @@ export const DEFAULT_FOOTER_CONFIG: FooterConfig = {
     { label: 'Notice Board', route: '/notices' },
     { label: 'Recent Publications', route: '/academics/publications' },
     { label: 'News & Events', route: '/gallery' },
+    { label: 'Career', route: '/career' },
     { label: 'Verify Documents', route: '/verify' },
   ],
   governanceLinks: [

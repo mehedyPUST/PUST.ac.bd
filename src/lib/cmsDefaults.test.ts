@@ -105,7 +105,7 @@ test('resolveContextualEditTarget maps public routes to accurate contextual edit
   assert.equal(resolveContextualEditTarget('/portal'), null);
 });
 
-test('parseRouteFromPath and getBreadcrumbsForPath support individual department pages', async () => {
+test('parseRouteFromPath and getBreadcrumbsForPath support individual department pages and career', async () => {
   const { parseRouteFromPath, getBreadcrumbsForPath } = await import('./routes');
   assert.equal(parseRouteFromPath('/academics/departments/phy'), '/academics/departments');
   assert.deepEqual(getBreadcrumbsForPath('/academics/departments/phy'), [
@@ -114,6 +114,12 @@ test('parseRouteFromPath and getBreadcrumbsForPath support individual department
     { label: 'Departments', href: '/academics/departments' },
     { label: 'Department of PHY' },
   ]);
+  assert.equal(parseRouteFromPath('/career'), '/career');
+  assert.deepEqual(getBreadcrumbsForPath('/career'), [
+    { label: 'Home', href: '/' },
+    { label: 'Career' },
+  ]);
+  assert.ok(DEFAULT_FOOTER_CONFIG.quickLinks.some((item) => item.route === '/career'));
 });
 
 test('resolveDepartmentImage resolves all 21 department assets, custom URLs, and safe fallbacks', async () => {

@@ -264,7 +264,7 @@ class PustRepository {
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
     await seedIfEmpty('vc_profiles', SEED_VC_PROFILES);
 
-    const INSTITUTIONAL_SEED_VERSION = 19;
+    const INSTITUTIONAL_SEED_VERSION = 20;
     const seedMetaCol = db.collection<{ id: string; version: number; syncedAt: string }>('seed_meta');
     const seedMeta = await seedMetaCol.findOne({ id: 'institutional_content' });
     if (!seedMeta || seedMeta.version < INSTITUTIONAL_SEED_VERSION) {
@@ -415,6 +415,22 @@ class PustRepository {
       for (const key of Object.keys(fullSeed) as Array<keyof UniversityProfile>) {
         if (existingProfile[key] === undefined) {
           (missingPatch as Record<string, unknown>)[key] = fullSeed[key];
+        }
+      }
+      if (existingProfile.footerConfig) {
+        const footerLinks = [
+          ...(existingProfile.footerConfig.quickLinks || []),
+          ...(existingProfile.footerConfig.governanceLinks || []),
+          ...(existingProfile.footerConfig.serviceLinks || []),
+        ];
+        if (!footerLinks.some((item) => item.route === '/career')) {
+          missingPatch.footerConfig = {
+            ...existingProfile.footerConfig,
+            quickLinks: [
+              ...(existingProfile.footerConfig.quickLinks || []),
+              { label: 'Career', route: '/career' },
+            ],
+          };
         }
       }
       if (Object.keys(missingPatch).length > 0) {

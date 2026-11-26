@@ -52,6 +52,7 @@ export type AppRoute =
   | '/notices/noc'
   | '/notices/result'
   | '/gallery'
+  | '/career'
   | '/verify'
   | '/portal';
 
@@ -174,6 +175,7 @@ const ALL_VALID_ROUTES = new Set<AppRoute>([
   '/',
   '/notices',
   '/gallery',
+  '/career',
   '/verify',
   '/portal',
   '/about/plans',
@@ -223,6 +225,7 @@ const SECTION_ROOT_LABELS: Record<string, string> = {
 
 const STANDALONE_ROUTE_LABELS: Record<string, string> = {
   '/gallery': 'News & Events Gallery',
+  '/career': 'Career',
   '/verify': 'Document Verification',
   '/portal': 'Digital Campus Portal',
 };

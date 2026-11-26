@@ -23,6 +23,16 @@ export function Footer({ onNavigate }: FooterProps) {
       )
     : '';
 
+  const hasCareerLink = [
+    ...footerConfig.quickLinks,
+    ...footerConfig.governanceLinks,
+    ...footerConfig.serviceLinks,
+  ].some((item) => item.route === '/career');
+
+  const resolvedQuickLinks = hasCareerLink
+    ? footerConfig.quickLinks
+    : [...footerConfig.quickLinks, { label: 'Career', route: '/career' }];
+
   function handleLinkClick(
     e: React.MouseEvent<HTMLAnchorElement>,
     target: string
@@ -109,7 +119,7 @@ export function Footer({ onNavigate }: FooterProps) {
             Quick Links
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
-            {footerConfig.quickLinks.map((item) => (
+            {resolvedQuickLinks.map((item) => (
               <li key={`${item.route}-${item.label}`}>
                 <Link
                   href={item.route}
