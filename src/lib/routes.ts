@@ -250,9 +250,17 @@ const STANDALONE_ROUTE_LABELS: Record<string, string> = {
   '/career': 'Career',
   '/verify': 'Document Verification',
   '/portal': 'Digital Campus Portal',
+  '/offline': 'Offline Mode',
 };
 
-export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
+export interface BreadcrumbOptions {
+  departments?: ReadonlyArray<{ code: string; name: string }>;
+}
+
+export function getBreadcrumbsForPath(
+  pathname: string,
+  options?: BreadcrumbOptions
+): BreadcrumbItem[] {
   const clean = pathname.replace(/\/+$/, '') || '/';
   if (clean === '/') {
     return [];
@@ -295,10 +303,16 @@ export function getBreadcrumbsForPath(pathname: string): BreadcrumbItem[] {
   }
 
   if (clean.startsWith('/academics/departments/')) {
-    const deptCode = decodeURIComponent(clean.slice('/academics/departments/'.length)).toUpperCase();
+    const rawSegment = clean.slice('/academics/departments/'.length).split('/')[0] || '';
+    const deptCode = decodeURIComponent(rawSegment).trim().toUpperCase();
+    const matchedDept = options?.departments?.find(
+      (dept) => dept.code.trim().toUpperCase() === deptCode
+    );
     crumbs.push({ label: 'Academics', href: '/academics' });
     crumbs.push({ label: 'Departments', href: '/academics/departments' });
-    crumbs.push({ label: `Department of ${deptCode}` });
+    crumbs.push({
+      label: matchedDept ? `${matchedDept.name} (${matchedDept.code})` : `Department of ${deptCode}`,
+    });
     return crumbs;
   }
 
