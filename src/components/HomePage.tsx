@@ -441,7 +441,7 @@ export function HomePage({
                             setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
                           }
                           aria-label="Previous banner slide"
-                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/60 text-white hover:bg-slate-950/85 transition-colors cursor-pointer"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/65 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -449,7 +449,7 @@ export function HomePage({
                           type="button"
                           onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
                           aria-label="Next banner slide"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/60 text-white hover:bg-slate-950/85 transition-colors cursor-pointer"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/65 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>

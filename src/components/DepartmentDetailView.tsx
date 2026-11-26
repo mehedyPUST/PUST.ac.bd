@@ -34,6 +34,7 @@ import {
   X,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { getDepartmentNotices } from '../lib/departmentNotices';
 import type {
   ContactDetailItem,
   DepartmentPersonGroup,
@@ -2102,10 +2103,7 @@ export function DepartmentDetailView({
   );
 
   const deptNotices = useMemo(
-    () =>
-      department
-        ? notices.filter((n) => n.departmentCode.toUpperCase() === department.code.toUpperCase())
-        : [],
+    () => (department ? getDepartmentNotices(notices, department.code) : []),
     [notices, department]
   );
 
@@ -2357,6 +2355,56 @@ export function DepartmentDetailView({
               {department.summary}
             </p>
           </div>
+
+          <nav
+            aria-label="Department sections"
+            className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs font-medium text-slate-600"
+          >
+            <a
+              href="#departmental-notices"
+              className="inline-flex items-center gap-1.5 font-semibold text-pust-900 hover:underline underline-offset-4"
+            >
+              Departmental Notices
+              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                ({deptNotices.length})
+              </span>
+            </a>
+            <a
+              href="#faculty-members"
+              className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline underline-offset-4"
+            >
+              Faculty Members
+              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                ({facultyMembers.length})
+              </span>
+            </a>
+            <a
+              href="#department-officers"
+              className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline underline-offset-4"
+            >
+              Officers
+              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                ({officers.length})
+              </span>
+            </a>
+            <a
+              href="#department-research"
+              className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline underline-offset-4"
+            >
+              Labs &amp; Research
+            </a>
+            {deptPublications.length > 0 && (
+              <a
+                href="#department-publications"
+                className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline underline-offset-4"
+              >
+                Publications
+                <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  ({deptPublications.length})
+                </span>
+              </a>
+            )}
+          </nav>
         </div>
 
         {/* Chairman & Department at a Glance */}
@@ -2476,8 +2524,145 @@ export function DepartmentDetailView({
           </div>
         </div>
 
+        {/* Departmental Notices */}
+        <div id="departmental-notices" className="space-y-4 pt-4 border-t border-slate-200 scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-pust-800 shrink-0" />
+                <p className="font-mono text-xs uppercase tracking-widest text-pust-800 font-semibold">
+                  Official Department Circulars · {department.code}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
+                  Departmental Notices
+                </h2>
+                <span className="font-mono text-xs text-slate-500 tabular-nums">
+                  ({deptNotices.length})
+                </span>
+                {canAdminEdit && (
+                  <EditTriggerButton
+                    icon="add"
+                    label="Post Notice"
+                    variant="compact"
+                    onClick={() =>
+                      openEditModal({
+                        kind: 'notice',
+                        notice: null,
+                        defaultDepartmentCode: department.code,
+                      })
+                    }
+                  />
+                )}
+              </div>
+            </div>
+
+            <Link
+              href="/notices"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline underline-offset-4 whitespace-nowrap shrink-0"
+            >
+              All University Notices
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {deptNotices.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-[#F7F7F5] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-xs sm:text-sm text-slate-600">
+                No department-specific circulars are currently posted for the Department of{' '}
+                {department.name}.
+              </p>
+              <Link
+                href="/notices"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline underline-offset-4 whitespace-nowrap shrink-0"
+              >
+                Browse Central Notice Board
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-200 overflow-hidden shadow-xs">
+              {deptNotices.map((notice) => (
+                <div
+                  key={notice.id}
+                  className="flex flex-col sm:flex-row sm:items-stretch justify-between hover:bg-[#F9F9F7] transition-colors"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveNotice(notice)}
+                    className="flex-1 min-w-0 text-left px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group"
+                  >
+                    <div className="space-y-1.5 min-w-0">
+                      <p className="font-mono text-[11px] text-slate-500 tabular-nums flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                        <span className="font-semibold text-slate-700">{notice.publishedAt}</span>
+                        <span>·</span>
+                        <span className="font-semibold text-pust-800">{notice.category}</span>
+                        {notice.pinned && (
+                          <>
+                            <span>·</span>
+                            <span className="uppercase tracking-wider font-semibold text-pust-900">
+                              Pinned
+                            </span>
+                          </>
+                        )}
+                        {notice.visibility === 'registered' && (
+                          <>
+                            <span>·</span>
+                            <span className="uppercase tracking-wider font-semibold text-amber-800">
+                              Registered Portal
+                            </span>
+                          </>
+                        )}
+                        {notice.targetSession && (
+                          <>
+                            <span>·</span>
+                            <span>Session {notice.targetSession}</span>
+                          </>
+                        )}
+                        {notice.targetCourseCode && (
+                          <>
+                            <span>·</span>
+                            <span>{notice.targetCourseCode}</span>
+                          </>
+                        )}
+                      </p>
+                      <h3 className="font-serif text-base sm:text-[17px] font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug">
+                        {notice.title}
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed">
+                        {notice.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1.5 shrink-0">
+                      <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                        {notice.referenceNo}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 group-hover:translate-x-0.5 transition-transform">
+                        Read Circular
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </button>
+
+                  {canAdminEdit && (
+                    <div className="flex items-center px-5 pb-4 sm:py-4 sm:pl-0 sm:pr-4 shrink-0">
+                      <EditTriggerButton
+                        variant="compact"
+                        label="Edit"
+                        onClick={() => openEditModal({ kind: 'notice', notice })}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Faculty Members */}
-        <div id="faculty-members" className="space-y-6 pt-2 border-t border-slate-200">
+        <div id="faculty-members" className="space-y-6 pt-2 border-t border-slate-200 scroll-mt-24">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -2510,10 +2695,10 @@ export function DepartmentDetailView({
                         key={roleOpt}
                         type="button"
                         onClick={() => setDesignationFilter(roleOpt)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                           designationFilter === roleOpt
-                            ? 'bg-pust-900 text-white'
-                            : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                            ? 'bg-pust-900 border-pust-900 text-white'
+                            : 'bg-[#F7F7F5] border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                         }`}
                       >
                         {roleOpt}
@@ -2627,7 +2812,7 @@ export function DepartmentDetailView({
         </div>
 
         {/* Officers */}
-        <div className="space-y-4 pt-2 border-t border-slate-200">
+        <div id="department-officers" className="space-y-4 pt-2 border-t border-slate-200 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <UserCheck className="w-4 h-4 text-pust-800 shrink-0" />
@@ -2672,7 +2857,10 @@ export function DepartmentDetailView({
         </div>
 
         {/* Research Priorities & Academic Laboratories */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
+        <div
+          id="department-research"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200 scroll-mt-24"
+        >
           <div className="rounded-2xl border border-lapis-200/80 card-gradient-lapis p-6 space-y-4 shadow-xs">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-lapis-800 shrink-0" />
@@ -2712,78 +2900,48 @@ export function DepartmentDetailView({
           </div>
         </div>
 
-        {/* Departmental Publications & Notices */}
-        {(deptPublications.length > 0 || deptNotices.length > 0) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-slate-200">
-            {deptPublications.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
-                  <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
-                    Featured Research Output
-                  </h2>
+        {/* Departmental Publications */}
+        {deptPublications.length > 0 && (
+          <div
+            id="department-publications"
+            className="space-y-4 pt-4 border-t border-slate-200 scroll-mt-24"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
+              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
+                Featured Research Output
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {deptPublications.map((pub) => (
+                <div
+                  key={pub.id}
+                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
+                >
+                  <p className="font-mono text-[11px] text-pust-800">
+                    {pub.year} · {pub.domain}
+                  </p>
+                  <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                    {pub.title}
+                  </h3>
+                  <p className="text-xs text-slate-600">{pub.authors}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                    <span className="text-slate-500">{pub.venue}</span>
+                    {pub.url && (
+                      <a
+                        href={pub.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
+                      >
+                        DOI
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {deptPublications.map((pub) => (
-                    <div
-                      key={pub.id}
-                      className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
-                    >
-                      <p className="font-mono text-[11px] text-pust-800">
-                        {pub.year} · {pub.domain}
-                      </p>
-                      <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                        {pub.title}
-                      </h3>
-                      <p className="text-xs text-slate-600">{pub.authors}</p>
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                        <span className="text-slate-500">{pub.venue}</span>
-                        {pub.url && (
-                          <a
-                            href={pub.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
-                          >
-                            DOI
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {deptNotices.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-pust-800 shrink-0" />
-                  <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
-                    Departmental Notices
-                  </h2>
-                </div>
-                <div className="space-y-3">
-                  {deptNotices.map((notice) => (
-                    <button
-                      key={notice.id}
-                      type="button"
-                      onClick={() => setActiveNotice(notice)}
-                      className="w-full text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-pust-700/60 hover:shadow-sm transition-all space-y-1.5 cursor-pointer"
-                    >
-                      <p className="font-mono text-[11px] text-slate-500 tabular-nums">
-                        {notice.publishedAt} · {notice.referenceNo}
-                      </p>
-                      <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                        {notice.title}
-                      </h3>
-                      <p className="text-xs text-slate-600 line-clamp-2">{notice.summary}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
       </section>

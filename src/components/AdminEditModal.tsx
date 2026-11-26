@@ -280,11 +280,16 @@ export function AdminEditModal({
         setNoticeAttachUrl(n.attachmentUrl || '');
         setNoticeAttachType(n.attachmentType || 'pdf');
       } else {
-        setNoticeRef(`PUST/REG/${new Date().getFullYear()}/`);
+        const defaultDept = target.defaultDepartmentCode?.trim().toUpperCase();
+        setNoticeRef(
+          defaultDept
+            ? `PUST/${defaultDept}/${new Date().getFullYear()}/`
+            : `PUST/REG/${new Date().getFullYear()}/`
+        );
         setNoticeTitle('');
-        setNoticeCategory('General');
-        setNoticeDeptCode('REG');
-        setNoticeScope('central');
+        setNoticeCategory(defaultDept ? 'Academic' : 'General');
+        setNoticeDeptCode(defaultDept || 'REG');
+        setNoticeScope(defaultDept ? 'department' : 'central');
         setNoticeVisibility('public');
         setNoticeSession('');
         setNoticeCourseCode('');

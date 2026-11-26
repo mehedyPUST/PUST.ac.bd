@@ -183,3 +183,77 @@ test('resolveDepartmentImage resolves all 21 department assets, custom URLs, and
   );
 });
 
+test('getDepartmentNotices filters case-insensitively and prioritizes pinned and newest circulars', async () => {
+  const { getDepartmentNotices } = await import('./departmentNotices');
+  const sampleNotices = [
+    {
+      id: 'n-reg',
+      referenceNo: 'PUST/REG/1',
+      title: 'Central Notice',
+      category: 'General' as const,
+      publishedAt: '2026-06-01',
+      departmentCode: 'REG',
+      boardScope: 'central' as const,
+      visibility: 'public' as const,
+      summary: 'Central',
+      body: 'Central',
+      authorName: 'Registrar',
+      authorRole: 'admin' as const,
+    },
+    {
+      id: 'n-cse-old',
+      referenceNo: 'PUST/CSE/1',
+      title: 'Older CSE Notice',
+      category: 'Academic' as const,
+      publishedAt: '2026-04-10',
+      departmentCode: 'cse',
+      boardScope: 'department' as const,
+      visibility: 'public' as const,
+      summary: 'Older CSE',
+      body: 'Older CSE',
+      pinned: false,
+      authorName: 'Chairman',
+      authorRole: 'chairman' as const,
+    },
+    {
+      id: 'n-cse-pinned',
+      referenceNo: 'PUST/CSE/2',
+      title: 'Pinned CSE Notice',
+      category: 'Examination' as const,
+      publishedAt: '2026-03-15',
+      departmentCode: 'CSE',
+      boardScope: 'department' as const,
+      visibility: 'registered' as const,
+      summary: 'Pinned CSE',
+      body: 'Pinned CSE',
+      pinned: true,
+      authorName: 'Chairman',
+      authorRole: 'chairman' as const,
+    },
+    {
+      id: 'n-cse-new',
+      referenceNo: 'PUST/CSE/3',
+      title: 'Newest CSE Notice',
+      category: 'Course' as const,
+      publishedAt: '2026-05-20',
+      departmentCode: 'CSE',
+      boardScope: 'course' as const,
+      visibility: 'public' as const,
+      summary: 'Newest CSE',
+      body: 'Newest CSE',
+      pinned: false,
+      authorName: 'Chairman',
+      authorRole: 'chairman' as const,
+    },
+  ];
+
+  const cse = getDepartmentNotices(sampleNotices, 'CSE');
+  assert.deepEqual(
+    cse.map((n) => n.id),
+    ['n-cse-pinned', 'n-cse-new', 'n-cse-old']
+  );
+  assert.deepEqual(getDepartmentNotices(sampleNotices, 'eee'), []);
+  assert.deepEqual(getDepartmentNotices(sampleNotices, ''), []);
+});
+
+

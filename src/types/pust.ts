@@ -763,7 +763,7 @@ export type EditModalTarget =
   | { kind: 'banner'; slideId?: string }
   | { kind: 'vc'; vcId?: string }
   | { kind: 'about'; slug: AboutContentRecord['slug'] }
-  | { kind: 'notice'; notice?: NoticeRecord | null }
+  | { kind: 'notice'; notice?: NoticeRecord | null; defaultDepartmentCode?: string }
   | { kind: 'gallery'; item?: GalleryItemRecord | null }
   | { kind: 'publication'; publication?: PublicationRecord | null }
   | { kind: 'journals' }
