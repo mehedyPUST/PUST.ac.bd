@@ -25,6 +25,7 @@ import {
   parseYouTubeVideoId,
 } from '../lib/media';
 import type { AppRoute } from '../lib/routes';
+import { BreakingNewsTicker } from './BreakingNewsTicker';
 import { CampusMapSection } from './CampusMapSection';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal } from './MotionPrimitives';
@@ -279,6 +280,15 @@ export function HomePage({
           </div>
         </div>
       )}
+
+      <BreakingNewsTicker
+        notices={notices}
+        galleryItems={galleryItems}
+        seminars={upcomingSeminars}
+        loading={loadingData}
+        onSelectNotice={onSelectNotice}
+        onSelectEvent={(item) => setActiveMedia(item)}
+      />
 
       {/* 1. Banner */}
       <section

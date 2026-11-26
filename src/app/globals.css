@@ -125,9 +125,32 @@
   display: none;
 }
 
+@keyframes pust-news-ticker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.pust-ticker-track {
+  animation: pust-news-ticker 44s linear infinite;
+  will-change: transform;
+}
+
+.pust-ticker-wrap:hover .pust-ticker-track,
+.pust-ticker-wrap:focus-within .pust-ticker-track,
+.pust-ticker-track[data-paused="true"] {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .pust-ticker-track {
+    animation: none !important;
   }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
