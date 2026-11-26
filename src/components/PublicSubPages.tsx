@@ -492,17 +492,17 @@ export function PublicSubPages({
 
                 return (
                   <>
-                    <div className="lg:col-span-7 space-y-4">
+                    <div className={visionPart ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
                       <h2 className="font-serif text-2xl font-semibold text-slate-950">
                         Our Mission
                       </h2>
                       {introLines.map((line, i) => (
-                        <p key={i} className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
+                        <p key={i} className={`text-[15.5px] leading-[1.78] text-slate-800 ${visionPart ? '' : 'max-w-[66ch]'}`}>
                           {line}
                         </p>
                       ))}
                       {bulletLines.length > 0 && (
-                        <ul className="list-disc pl-5 space-y-2.5 text-[15.5px] leading-[1.75] text-slate-800 pt-1 max-w-[66ch] prose-justify">
+                        <ul className={`list-disc pl-5 space-y-2.5 text-[15.5px] leading-[1.75] text-slate-800 pt-1 prose-justify ${visionPart ? '' : 'max-w-[66ch]'}`}>
                           {bulletLines.map((item, i) => (
                             <li key={i}>{item}</li>
                           ))}
@@ -515,7 +515,7 @@ export function PublicSubPages({
                         <h2 className="font-serif text-2xl font-semibold text-slate-950">
                           Our Vision
                         </h2>
-                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs prose-justify">
+                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs text-left">
                           {visionPart}
                         </blockquote>
                       </div>
@@ -526,67 +526,65 @@ export function PublicSubPages({
             </div>
           ) : activeSlug === 'our-university' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className="lg:col-span-7">
-                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
+              <div className={profile ? 'lg:col-span-7' : 'lg:col-span-12'}>
+                <p className={`flow-root prose-justify ${profile ? '' : 'max-w-[66ch] '}text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800`}>
                   {activeSection.body}
                 </p>
               </div>
 
-              <div className="lg:col-span-5 space-y-5">
-                {profile && (
-                  <>
-                    <div className="editable-region space-y-2">
-                      <div className="flex justify-end empty:hidden">
-                        <EditTriggerButton
-                          target={{ kind: 'milestones' }}
-                          label="Edit Campus Photo"
-                          variant="compact"
-                        />
-                      </div>
-                      <ResilientImage
-                        src={resolved.aboutExtras.campusImage}
-                        alt="PUST Rajapur Campus"
-                        caption={resolved.aboutExtras.campusCaption}
-                        className="w-full aspect-[4/3] object-cover"
-                        priority
+              {profile && (
+                <div className="lg:col-span-5 space-y-5">
+                  <div className="editable-region space-y-2">
+                    <div className="flex justify-end empty:hidden">
+                      <EditTriggerButton
+                        target={{ kind: 'milestones' }}
+                        label="Edit Campus Photo"
+                        variant="compact"
                       />
                     </div>
-                    <dl className="rounded-2xl border border-amber-900/15 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
+                    <ResilientImage
+                      src={resolved.aboutExtras.campusImage}
+                      alt="PUST Rajapur Campus"
+                      caption={resolved.aboutExtras.campusCaption}
+                      className="w-full aspect-[4/3] object-cover"
+                      priority
+                    />
+                  </div>
+                  <dl className="rounded-2xl border border-amber-900/15 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
+                    <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Established</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        {profile.establishedYear} (Act No. 43 of 2001)
+                      </dd>
+                    </div>
+                    <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Campus Area</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        {profile.campusAcres} Acres · Rajapur, Pabna
+                      </dd>
+                    </div>
+                    <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Faculties &amp; Departments</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
+                      </dd>
+                    </div>
+                    {profile.convocationDate && (
                       <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-700 font-medium">Established</dt>
-                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
-                          {profile.establishedYear} (Act No. 43 of 2001)
+                        <dt className="text-slate-700 font-medium">First Convocation</dt>
+                        <dd className="font-mono font-semibold text-pust-700 sm:text-right">
+                          {profile.convocationDate}
                         </dd>
                       </div>
-                      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-700 font-medium">Campus Area</dt>
-                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
-                          {profile.campusAcres} Acres · Rajapur, Pabna
-                        </dd>
-                      </div>
-                      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="text-slate-700 font-medium">Faculties &amp; Departments</dt>
-                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
-                          {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
-                        </dd>
-                      </div>
-                      {profile.convocationDate && (
-                        <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                          <dt className="text-slate-700 font-medium">First Convocation</dt>
-                          <dd className="font-mono font-semibold text-pust-700 sm:text-right">
-                            {profile.convocationDate}
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  </>
-                )}
-              </div>
+                    )}
+                  </dl>
+                </div>
+              )}
             </div>
           ) : activeSlug === 'history' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7">
-                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
+                <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
                 </p>
               </div>
@@ -640,7 +638,7 @@ export function PublicSubPages({
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <div className="lg:col-span-7">
-                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
+                <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
                 </p>
               </div>
@@ -789,7 +787,7 @@ export function PublicSubPages({
 
     return (
       <main className="flex-1 bg-white">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
           <div className="border-b border-slate-200 pb-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight">
@@ -869,24 +867,26 @@ export function PublicSubPages({
                   No academic degree programs have been published yet.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   {resolved.academicExtras.degreePrograms.map((prog, idx) => (
                     <MotionCard
                       key={`${prog.level}-${idx}`}
                       delay={idx * 0.04}
-                      className={`p-6 rounded-2xl border space-y-3 shadow-xs hover:shadow-md transition-all ${
+                      className={`h-full flex flex-col justify-between p-6 rounded-2xl border space-y-4 shadow-xs hover:shadow-md transition-all ${
                         idx % 2 === 0
                           ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
                           : 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
                       }`}
                     >
-                      <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
-                        {prog.duration}
-                      </p>
-                      <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
-                      <p className="text-sm font-medium text-slate-800 leading-relaxed">
-                        {prog.degrees}
-                      </p>
+                      <div className="space-y-2.5">
+                        <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
+                          {prog.duration}
+                        </p>
+                        <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
+                        <p className="text-sm font-medium text-slate-800 leading-relaxed text-left">
+                          {prog.degrees}
+                        </p>
+                      </div>
                       <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
                         <div className="flex justify-between gap-4">
                           <dt className="text-slate-500">Credit Structure</dt>
@@ -1021,7 +1021,7 @@ export function PublicSubPages({
 
                       <div className="lg:col-span-6 lg:border-l lg:border-slate-200/80 lg:pl-6 space-y-1.5 text-xs">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-sm font-serif font-medium text-slate-900">
+                          <p className="text-sm font-serif font-medium text-slate-900 text-left">
                             Dean: {fac.dean}
                           </p>
                           {typeof fac.publicationCount === 'number' && (
@@ -1031,10 +1031,10 @@ export function PublicSubPages({
                           )}
                         </div>
                         {fac.qualification && (
-                          <p className="text-slate-700 leading-relaxed">{fac.qualification}</p>
+                          <p className="text-slate-700 leading-relaxed text-left">{fac.qualification}</p>
                         )}
                         {fac.researchArea && (
-                          <p className="text-slate-600 leading-relaxed">
+                          <p className="text-slate-600 leading-relaxed text-left">
                             Research Focus: <span className="text-slate-800">{fac.researchArea}</span>
                           </p>
                         )}
@@ -1196,7 +1196,7 @@ export function PublicSubPages({
                             <h3 className="font-serif text-lg font-medium text-slate-900">
                               {form.title}
                             </h3>
-                            <p className="text-xs text-slate-600">
+                            <p className="text-xs text-slate-600 text-left">
                               {form.office} — {form.note}
                             </p>
                           </div>
@@ -1256,7 +1256,7 @@ export function PublicSubPages({
                       </div>
 
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0">
+                        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
                           {officialCategories.map((cat) => (
                             <button
                               key={cat}
@@ -1409,15 +1409,15 @@ export function PublicSubPages({
                   No scholarship schemes are currently listed.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   {resolved.academicExtras.scholarships.map((s, idx) => (
                     <MotionCard
                       key={`${s.title}-${idx}`}
                       delay={idx * 0.04}
-                      className="p-6 rounded-2xl border border-gold-200/80 card-gradient-gold hover:border-gold-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
+                      className="h-full flex flex-col p-6 rounded-2xl border border-gold-200/80 card-gradient-gold hover:border-gold-600/45 hover:shadow-md space-y-2 shadow-xs transition-all"
                     >
-                      <h2 className="font-serif text-xl font-medium text-slate-900">{s.title}</h2>
-                      <p className="text-sm text-slate-600 leading-relaxed">{s.detail}</p>
+                      <h2 className="font-serif text-xl font-medium text-slate-900 text-left">{s.title}</h2>
+                      <p className="text-sm text-slate-600 leading-relaxed text-left">{s.detail}</p>
                     </MotionCard>
                   ))}
                 </div>
@@ -1551,7 +1551,7 @@ export function PublicSubPages({
               return (
                 <div className="editable-region space-y-8">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
                       {FACULTY_FILTERS.map((tab) => (
                         <button
                           key={tab.value}
@@ -1568,7 +1568,7 @@ export function PublicSubPages({
                       ))}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 w-full lg:w-auto shrink-0">
                       <EditTriggerButton
                         target={{ kind: 'department', department: null }}
                         label="Add Department"
@@ -1576,7 +1576,7 @@ export function PublicSubPages({
                         variant="compact"
                       />
 
-                      <div className="relative flex-1 sm:w-64 lg:w-64">
+                      <div className="relative w-full sm:w-72 lg:w-64">
                         <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="search"
@@ -1642,7 +1642,7 @@ export function PublicSubPages({
                               </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
                               {depts.map((dept, idx) => {
                                 const isOpening = openingDeptCode === dept.code;
                                 const coverPhoto = resolveDepartmentImage(dept);
@@ -1650,7 +1650,7 @@ export function PublicSubPages({
                                   <MotionCard
                                     key={dept.id}
                                     delay={(idx % 6) * 0.03}
-                                    className={`relative text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group ${
+                                    className={`relative h-full text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group ${
                                       isOpening ? 'ring-2 ring-pust-800/45 border-pust-800' : ''
                                     }`}
                                   >
@@ -2011,12 +2011,12 @@ export function PublicSubPages({
             </div>
           ) : (
             <div className="editable-region space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
                 {resolved.admissionsConfig.gstUnits.map((unit, idx) => (
                   <MotionCard
                     key={`${unit.unitLabel}-${idx}`}
                     delay={idx * 0.04}
-                    className={`p-6 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${
+                    className={`h-full flex flex-col p-6 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${
                       idx === 0
                         ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
                         : idx === 1
@@ -2025,10 +2025,10 @@ export function PublicSubPages({
                     }`}
                   >
                     <p className="font-mono text-xs text-pust-800">{unit.unitLabel}</p>
-                    <p className="font-serif text-lg font-medium text-slate-900">
+                    <p className="font-serif text-lg font-medium text-slate-900 text-left">
                       {unit.deptCountLabel}
                     </p>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed text-left">
                       {unit.departmentsText}
                     </p>
                   </MotionCard>
@@ -2052,7 +2052,7 @@ export function PublicSubPages({
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-5 space-y-6">
-                  <p className="text-[15px] text-slate-700 leading-relaxed">
+                  <p className="text-[15px] text-slate-700 leading-relaxed text-left">
                     {route === '/admissions/graduate'
                       ? resolved.admissionsConfig.gradText
                       : route === '/admissions/evening-programs'
@@ -2115,7 +2115,7 @@ export function PublicSubPages({
                       <h2 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
                         Track Inquiry or Pending Portal Account
                       </h2>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-600 mt-1 text-left">
                         Enter your inquiry reference (e.g. PUST-INQ-2026-101) or registered institutional email.
                       </p>
                     </div>
@@ -2330,7 +2330,7 @@ export function PublicSubPages({
     if (!profile) {
       return (
         <main className="flex-1 bg-white">
-          <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
             <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
               <h1 className="font-serif text-xl font-medium text-red-950">
                 Campus Facilities Data Unavailable
@@ -2573,7 +2573,7 @@ export function PublicSubPages({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {items.map((item, idx) => {
                 const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
                 const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
@@ -2598,7 +2598,7 @@ export function PublicSubPages({
                         setActiveMedia(item);
                       }
                     }}
-                    className={`text-left rounded-2xl border ${cardStyle} transition-all group cursor-pointer flex flex-col overflow-hidden shadow-xs hover:shadow-md`}
+                    className={`h-full text-left rounded-2xl border ${cardStyle} transition-all group cursor-pointer flex flex-col overflow-hidden shadow-xs hover:shadow-md`}
                   >
                     <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
                       <ResilientImage
@@ -2620,7 +2620,7 @@ export function PublicSubPages({
                         className="absolute top-2.5 right-2.5 z-10"
                       />
                     </div>
-                    <div className="p-5 space-y-1">
+                    <div className="p-5 space-y-1 flex-1">
                       <p className="font-mono text-xs text-pust-800 tabular-nums">
                         {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
                         {item.eventDate}
@@ -2631,7 +2631,7 @@ export function PublicSubPages({
                       <h2 className="font-serif text-lg font-medium text-slate-900 group-hover:text-pust-900 transition-colors">
                         {item.title}
                       </h2>
-                      <p className="text-xs text-slate-600">{item.description}</p>
+                      <p className="text-xs text-slate-600 text-left leading-relaxed">{item.description}</p>
                     </div>
                   </MotionCard>
                 );
@@ -2749,7 +2749,7 @@ export function PublicSubPages({
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <nav
               aria-label="Notice categories"
-              className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pb-1 lg:pb-0 min-w-0"
+              className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 lg:pb-0 min-w-0"
             >
               {noticeSubTabs.map((tab) => (
                 <Link
@@ -2784,7 +2784,7 @@ export function PublicSubPages({
           <div
             role="group"
             aria-label="Filter notices by category"
-            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0 min-w-0 flex-1"
+            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0 min-w-0 flex-1"
           >
             {NOTICE_FILTERS.map((cat) => (
               <button

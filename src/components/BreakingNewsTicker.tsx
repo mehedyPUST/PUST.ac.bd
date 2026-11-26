@@ -42,7 +42,7 @@ export function BreakingNewsTicker({
         aria-label="Latest university news and notices"
         className="border-b border-slate-200 bg-[#FBF9F4] print:hidden"
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-10 flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center gap-3">
           <div className="h-5 w-28 rounded bg-slate-200 animate-pulse" />
           <div className="h-4 flex-1 max-w-md rounded bg-slate-200/80 animate-pulse" />
         </div>
@@ -116,7 +116,7 @@ export function BreakingNewsTicker({
       data-breaking-ticker="true"
       className="border-b border-slate-200 bg-[#FBF9F4] print:hidden"
     >
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-10 border-x border-slate-200/80 bg-[#FBF9F4]">
           {/* Institutional Bulletin Tag */}
           <div className="shrink-0 h-full bg-pust-900 text-white px-3 sm:px-4 inline-flex items-center gap-2">

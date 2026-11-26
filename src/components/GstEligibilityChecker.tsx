@@ -262,11 +262,11 @@ export function GstEligibilityChecker({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
             {evaluation.matchedDepts.map(({ dept, eligible, note }) => (
               <div
                 key={dept.id}
-                className={`p-4 rounded-xl border transition-colors flex flex-col justify-between gap-3 ${
+                className={`h-full p-4 rounded-xl border transition-colors flex flex-col justify-between gap-3 ${
                   eligible
                     ? 'border-slate-200 bg-[#FAF8F4] hover:border-pust-700/60'
                     : 'border-slate-200/70 bg-slate-50/70 opacity-75'
@@ -281,10 +281,10 @@ export function GstEligibilityChecker({
                       <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                     )}
                   </div>
-                  <h3 className="font-serif text-base font-medium text-slate-900 mt-1">
+                  <h3 className="font-serif text-base font-medium text-slate-900 mt-1 text-left">
                     {dept.name}
                   </h3>
-                  <p className="text-[11px] text-slate-600 mt-1">{note}</p>
+                  <p className="text-[11px] text-slate-600 mt-1 text-left">{note}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-xs">

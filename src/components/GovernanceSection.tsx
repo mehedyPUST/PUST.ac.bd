@@ -83,7 +83,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
 
   if (!profile) {
     return (
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
           <h1 className="font-serif text-xl font-medium text-red-950">
             Statutory Governance Data Unavailable
@@ -169,14 +169,14 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 <h2 className="font-serif text-2xl font-semibold text-slate-950">
                   Statutory Mandate Under the PUST Act (Act No. 43 of 2001)
                 </h2>
-                <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
+                <p className="text-[15.5px] leading-[1.78] text-slate-800">
                   {governanceContent.actIntro}
                 </p>
                 <div className="rounded-2xl divide-y divide-amber-900/10 border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
                   {governanceContent.actClauses.map((item, idx) => (
                     <div key={`${item.clause}-${idx}`} className="p-5 space-y-1.5 hover:bg-white/75 transition-colors">
                       <p className="font-mono text-xs font-semibold text-pust-700">{item.clause}</p>
-                      <p className="text-sm text-slate-800 leading-relaxed">{item.detail}</p>
+                      <p className="text-sm text-slate-800 leading-relaxed text-left">{item.detail}</p>
                     </div>
                   ))}
                 </div>
@@ -303,7 +303,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                       <p className="sm:col-span-4 font-mono text-xs font-semibold text-pust-700">
                         {m.seat}
                       </p>
-                      <p className="sm:col-span-6 text-slate-900 font-medium">{m.designation}</p>
+                      <p className="sm:col-span-6 text-slate-900 font-medium text-left">{m.designation}</p>
                       <p className="sm:col-span-2 sm:text-right font-mono text-xs font-medium text-slate-600">
                         {m.term}
                       </p>
@@ -332,18 +332,18 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <h2 className="font-serif text-2xl font-semibold text-slate-950">
                 Mandate &amp; Jurisdiction of the Academic Council
               </h2>
-              <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
+              <p className="text-[15.5px] leading-[1.78] text-slate-800">
                 {governanceContent.academicCouncilIntro}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                 {governanceContent.academicCouncilCards.map((card, idx) => (
                   <MotionCard
                     key={`${card.title}-${idx}`}
                     delay={idx * 0.04}
-                    className="p-5 rounded-2xl border border-lapis-200 card-gradient-lapis hover:border-lapis-600/60 hover:shadow-md space-y-1.5 transition-all"
+                    className="h-full flex flex-col p-5 rounded-2xl border border-lapis-200 card-gradient-lapis hover:border-lapis-600/60 hover:shadow-md space-y-1.5 transition-all"
                   >
-                    <h3 className="font-serif text-lg font-semibold text-slate-950">{card.title}</h3>
-                    <p className="text-xs text-slate-700 leading-relaxed">{card.detail}</p>
+                    <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">{card.title}</h3>
+                    <p className="text-xs text-slate-700 leading-relaxed text-left">{card.detail}</p>
                   </MotionCard>
                 ))}
               </div>
@@ -380,14 +380,14 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <h2 className="font-serif text-2xl font-semibold text-slate-950">
                 Financial Stewardship &amp; Audit Oversight
               </h2>
-              <p className="text-[15.5px] leading-[1.78] text-slate-800 max-w-[66ch]">
+              <p className="text-[15.5px] leading-[1.78] text-slate-800">
                 {governanceContent.financeCommitteeIntro}
               </p>
               <div className="rounded-2xl divide-y divide-sage-200/80 border border-sage-200 card-gradient-sage overflow-hidden shadow-xs">
                 {governanceContent.financeCommitteeScopes.map((item, idx) => (
                   <div key={`${item.scope}-${idx}`} className="p-5 space-y-1 hover:bg-white/75 transition-colors">
-                    <p className="font-serif text-lg font-semibold text-slate-950">{item.scope}</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">{item.desc}</p>
+                    <p className="font-serif text-lg font-semibold text-slate-950 text-left">{item.scope}</p>
+                    <p className="text-sm text-slate-700 leading-relaxed text-left">{item.desc}</p>
                   </div>
                 ))}
               </div>

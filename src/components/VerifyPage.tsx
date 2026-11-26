@@ -94,7 +94,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
 
   if (!profile) {
     return (
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
           <h1 className="font-serif text-xl font-medium text-red-950">
             Document Verification Portal Unavailable
@@ -117,7 +117,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   const { verifyPageConfig } = resolveUniversityContent(profile);
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
       <header className="editable-region border-b border-slate-200 pb-8 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -351,19 +351,19 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
         <div className="editable-region grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden">
           <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2">
             <FileCheck2 className="w-5 h-5 text-pust-800" />
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+            <h3 className="font-serif text-lg font-medium text-slate-900 text-left">
               {verifyPageConfig.employerCardTitle}
             </h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed text-left">
               {verifyPageConfig.employerCardBody}
             </p>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between gap-3">
             <div className="space-y-1.5">
-              <h3 className="font-serif text-lg font-medium text-slate-900">
+              <h3 className="font-serif text-lg font-medium text-slate-900 text-left">
                 {verifyPageConfig.portalCardTitle}
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed text-left">
                 {verifyPageConfig.portalCardBody}
               </p>
             </div>

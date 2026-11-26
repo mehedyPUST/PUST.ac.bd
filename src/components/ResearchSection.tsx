@@ -105,7 +105,7 @@ export function ResearchSection({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 pb-1 sm:pb-0">
+          <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap items-center gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
             {deptFilters.map((code) => (
               <button
                 key={code}
@@ -217,7 +217,7 @@ export function ResearchSection({
                 <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug">
                   {pub.title}
                 </h3>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed text-left">
                   Authors: {pub.authors}
                   {pub.venue ? ` · ${pub.venue}` : ''}
                   {pub.doi ? ` · DOI: ${pub.doi}` : ''}
@@ -262,9 +262,9 @@ export function ResearchSection({
             {journals.map((journal) => (
               <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
                 <p className="font-mono text-xs font-medium text-slate-600 tabular-nums">{journal.issn}</p>
-                <h3 className="font-serif text-lg font-semibold text-slate-950">{journal.title}</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">{journal.scope}</p>
-                <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
+                <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">{journal.title}</h3>
+                <p className="text-sm text-slate-700 leading-relaxed text-left">{journal.scope}</p>
+                <p className="text-xs font-semibold text-gold-800 text-left">{journal.currentIssue}</p>
               </div>
             ))}
           </div>
@@ -287,7 +287,7 @@ export function ResearchSection({
   );
 
   return (
-    <section id="research" className="bg-white border-t border-slate-200 pt-8 pb-14 lg:pb-16">
+    <div id="research" className="bg-white">
       <div className="space-y-12">
         {/* Verified Institutional Research Output Summary */}
         {deptResearchList.length > 0 && (
@@ -388,13 +388,13 @@ export function ResearchSection({
                 </h2>
               </div>
               <div className="lg:col-span-5">
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <p className="text-sm text-slate-700 leading-relaxed text-left">
                   {academicExtras.researchIntro}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
               {academicExtras.researchInfraCards.map((card, idx) => {
                 const gradientClass =
                   idx === 0
@@ -409,7 +409,7 @@ export function ResearchSection({
                   <MotionCard
                     key={card.id}
                     delay={idx * 0.05}
-                    className={`${gradientClass} rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all space-y-4 group`}
+                    className={`${gradientClass} h-full flex flex-col rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all space-y-4 group`}
                   >
                     <div className="overflow-hidden rounded-xl">
                       <ResilientImage
@@ -421,10 +421,10 @@ export function ResearchSection({
                     </div>
                     <div>
                       <p className={`font-mono text-xs font-semibold ${tagColor}`}>{card.tag}</p>
-                      <h3 className="font-serif text-xl font-semibold text-slate-950 mt-1">
+                      <h3 className="font-serif text-xl font-semibold text-slate-950 mt-1 text-left">
                         {card.title}
                       </h3>
-                      <p className="text-sm text-slate-700 mt-2 leading-relaxed">
+                      <p className="text-sm text-slate-700 mt-2 leading-relaxed text-left">
                         {card.description}
                       </p>
                     </div>
@@ -435,6 +435,6 @@ export function ResearchSection({
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }

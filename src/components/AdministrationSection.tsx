@@ -156,7 +156,7 @@ export function AdministrationSection({
 
   if (!profile) {
     return (
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
           <h1 className="font-serif text-xl font-medium text-red-950">
             Administration Data Unavailable
@@ -219,7 +219,7 @@ export function AdministrationSection({
     <div className="bg-[#FAF8F4]">
       {/* Band 1: Institutional Masthead, Architectural Anchor & Sub-Navigation */}
       <section className="editable-region border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10 lg:pt-14 lg:pb-12 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-7 flex flex-col justify-between gap-6">
               <SubPagePanel subKey={route} className="space-y-6">
@@ -523,13 +523,13 @@ export function AdministrationSection({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch"
                 >
                   {previousVcs.map((vc, idx) => (
                     <MotionCard
                       key={vc.id}
                       delay={idx * 0.03}
-                      className="card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
+                      className="h-full card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
                     >
                       <div className="space-y-1.5">
                         <div className="flex items-start justify-between gap-2">
@@ -542,13 +542,13 @@ export function AdministrationSection({
                             variant="compact"
                           />
                         </div>
-                        <h4 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                        <h4 className="font-serif text-base font-medium text-slate-900 leading-snug text-left">
                           {vc.name}
                         </h4>
                         <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
                           {vc.title}
                         </p>
-                        <p className="text-xs text-slate-600 leading-relaxed pt-0.5">{vc.message}</p>
+                        <p className="text-xs text-slate-600 leading-relaxed pt-0.5 text-left">{vc.message}</p>
                       </div>
                     </MotionCard>
                   ))}
@@ -640,10 +640,10 @@ export function AdministrationSection({
                         {officer.role}
                       </dt>
                       <dd className="lg:col-span-4 space-y-0.5">
-                        <p className="font-serif text-base font-medium text-slate-900">
+                        <p className="font-serif text-base font-medium text-slate-900 text-left">
                           {officer.name}
                         </p>
-                        <p className="text-xs text-slate-600">{officer.office}</p>
+                        <p className="text-xs text-slate-600 text-left">{officer.office}</p>
                       </dd>
                       <dd className="lg:col-span-5 flex flex-wrap items-center lg:justify-end gap-3 text-xs font-mono tabular-nums text-slate-600">
                         <a
@@ -730,8 +730,8 @@ export function AdministrationSection({
                   }`}
                 >
                   <p className="font-mono text-xs font-medium text-pust-800">{item.code}</p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900">{item.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{item.detail}</p>
+                  <h3 className="font-serif text-xl font-medium text-slate-900 text-left">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed text-left">{item.detail}</p>
                 </div>
               ))}
             </div>
@@ -788,7 +788,7 @@ export function AdministrationSection({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
             {filteredUnits.map((unit, idx) => {
               const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
               const unitGradient = matchesRoute
@@ -803,10 +803,10 @@ export function AdministrationSection({
                 <MotionCard
                   key={unit.code}
                   delay={idx * 0.025}
-                  className={`p-6 rounded-2xl border space-y-2.5 shadow-xs hover:shadow-md transition-all ${unitGradient}`}
+                  className={`h-full flex flex-col p-6 rounded-2xl border space-y-2.5 shadow-xs hover:shadow-md transition-all ${unitGradient}`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-mono text-xs font-semibold text-pust-700">
+                    <p className="font-mono text-xs font-semibold text-pust-700 text-left">
                       {unit.code} · {unit.category}
                     </p>
                     <EditTriggerButton
@@ -815,8 +815,8 @@ export function AdministrationSection({
                       variant="compact"
                     />
                   </div>
-                  <h3 className="font-serif text-lg font-semibold text-slate-950">{unit.name}</h3>
-                  <p className="text-sm text-slate-700 leading-relaxed">{unit.description}</p>
+                  <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">{unit.name}</h3>
+                  <p className="text-sm text-slate-700 leading-relaxed text-left">{unit.description}</p>
                 </MotionCard>
               );
             })}
