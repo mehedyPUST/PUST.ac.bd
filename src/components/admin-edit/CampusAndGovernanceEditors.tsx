@@ -240,7 +240,7 @@ export function CampusAndGovernanceEditors({
                   gridRef: 'Campus Quad · Grid B2',
                   xPercent: 50,
                   yPercent: 50,
-                  photo: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
+                  photo: 'https://i.ibb.co.com/chBZ45sr/pust-campus-hero-1795431408503.jpg',
                   caption: 'PUST Campus Building.',
                   summary: 'Academic and institutional campus building.',
                   offices: 'University Offices',

@@ -2096,7 +2096,7 @@ export function AdminCmsPanel({
                     if (nextType === 'video' && galUrl.startsWith('/src/assets/')) {
                       setGalUrl('');
                     } else if (nextType === 'photo' && !galUrl.trim()) {
-                      setGalUrl('/src/assets/images/pust_campus_hero_1795431408503.jpg');
+                      setGalUrl('https://i.ibb.co.com/chBZ45sr/pust-campus-hero-1795431408503.jpg');
                     }
                   }}
                   className="px-2.5 py-2 rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"

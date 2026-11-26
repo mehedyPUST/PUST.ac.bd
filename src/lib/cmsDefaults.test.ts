@@ -148,9 +148,7 @@ test('resolveDepartmentImage resolves all 21 department assets, custom URLs, and
       name: code,
       faculty: 'Faculty of Science',
     });
-    assert.ok(url.startsWith('/src/assets/images/dept_'), `Expected local dept image for ${code}`);
-    const publicPath = join(process.cwd(), 'public', url);
-    assert.ok(existsSync(publicPath), `Missing public asset file for ${code}: ${publicPath}`);
+    assert.ok(url.startsWith('https://'), `Expected remote dept image for ${code}, got ${url}`);
   }
 
   assert.equal(

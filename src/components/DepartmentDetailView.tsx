@@ -59,15 +59,15 @@ interface ActiveProfileState {
 }
 
 const PORTRAIT_SENIOR_PROF =
-  '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg';
+  'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg';
 const PORTRAIT_MALE_SCHOLAR =
-  '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg';
+  'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg';
 const PORTRAIT_FEMALE_PROF =
-  '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg';
+  'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg';
 const PORTRAIT_YOUNG_LECTURER =
-  '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg';
+  'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg';
 const PORTRAIT_OFFICER =
-  '/src/assets/images/officer_portrait_admin_1795622513333.jpg';
+  'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg';
 
 const FEMALE_NAME_HINTS = [
   'tahmina',

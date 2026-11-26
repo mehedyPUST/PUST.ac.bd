@@ -264,6 +264,7 @@ export const SEED_VC_PROFILES: ViceChancellorRecord[] = [
     tenure: '16 May 2026 – Present',
     email: 'vc@pust.ac.bd',
     phone: '+8802588842379',
+    photoUrl: 'https://i.ibb.co.com/0VtFtt1n/VC-Sir-PUST-2026.jpg',
     message: `Welcome to the website of Pabna University of Science and Technology (PUST), one of the most promising universities in Bangladesh committed to teaching, research, and academic excellence!
 
 Founded in 2008, PUST started its journey with around 140 students enrolled in 4 departments including departments of Computer Science and Engineering (CSE), Electrical and Electronic Engineering (EEE), Mathematics (Math), and Business Administration (BA). This thriving university is spread over 30 acres of land beside the Dhaka-Pabna highway and is located about 3 kilometers east of Pabna town. Within this short span of time, PUST has been able to achieve substantial progress, while it currently accommodates 5 faculties, 21 departments, 172 teaching staff, and nearly 5000 students. We are already in a process of elevating this university to reach a global standard in terms of academics, research, and areal expansion.
@@ -399,7 +400,7 @@ export const SEED_BANNER_SLIDES: BannerSlideRecord[] = [
   },
   {
     id: 'banner-2',
-    imageUrl: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    imageUrl: 'https://i.ibb.co.com/tFJbPW5/pust-convocation-pavilion-1795438822077.jpg',
     caption: 'Fig. 2 — Ceremonial Pavilion and Campus Lawn ahead of the First Convocation (15 March 2027).',
     alt: 'PUST First Convocation Ceremonial Pavilion',
     orderIndex: 2,
@@ -407,7 +408,7 @@ export const SEED_BANNER_SLIDES: BannerSlideRecord[] = [
   },
   {
     id: 'banner-3',
-    imageUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    imageUrl: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
     caption: 'Fig. 3 — Central Library & Information Center (CLIC) serving 5 Faculties and 21 Departments.',
     alt: 'PUST Central Library reading hall',
     orderIndex: 3,
@@ -415,7 +416,7 @@ export const SEED_BANNER_SLIDES: BannerSlideRecord[] = [
   },
   {
     id: 'banner-4',
-    imageUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    imageUrl: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
     caption: 'Fig. 4 — Faculty of Engineering & Technology Research and Computing Laboratories.',
     alt: 'PUST Engineering and Computing Laboratory',
     orderIndex: 4,
@@ -431,7 +432,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
       'Grand ceremonial pavilion prepared on the 30-acre Rajapur campus lawn ahead of the historic First Convocation on 15 March 2027.',
     category: 'Convocation',
     mediaType: 'photo',
-    mediaUrl: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    mediaUrl: 'https://i.ibb.co.com/tFJbPW5/pust-convocation-pavilion-1795438822077.jpg',
     eventDate: '2026-11-21',
     visibility: 'public',
   },
@@ -441,7 +442,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     description: 'Morning light across the Rajapur academic buildings and library complex.',
     category: 'Campus Life',
     mediaType: 'photo',
-    mediaUrl: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
+    mediaUrl: 'https://i.ibb.co.com/chBZ45sr/pust-campus-hero-1795431408503.jpg',
     eventDate: '2026-11-10',
     visibility: 'public',
   },
@@ -451,7 +452,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     description: 'Student innovators and faculty mentors collaborating inside the engineering laboratory.',
     category: 'Academic Event',
     mediaType: 'photo',
-    mediaUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    mediaUrl: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
     eventDate: '2026-10-22',
     visibility: 'public',
   },
@@ -461,7 +462,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     description: 'Video walkthrough of PUST Central Library study halls and IEEE/Springer research access.',
     category: 'Academic Event',
     mediaType: 'video',
-    mediaUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    mediaUrl: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
     eventDate: '2026-10-14',
     visibility: 'public',
   },
@@ -471,7 +472,7 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
     description: 'Golden hour quadrangle gathering celebrating incoming 2026 batch students.',
     category: 'Festival',
     mediaType: 'photo',
-    mediaUrl: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    mediaUrl: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
     eventDate: '2026-09-28',
     visibility: 'public',
   },
@@ -1132,7 +1133,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'cse-chair',
       name: 'Dr. Md. Abdur Rahim',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801728548300', type: 'Personal' },
         { value: '+8802588844876', type: 'Office' },
@@ -1311,7 +1312,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-1',
         name: 'Dr. Md. Abdur Rahim',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801728548300', type: 'Personal' }],
         emails: [
           { value: 'rahim@pust.ac.bd', type: 'Office' },
@@ -1486,7 +1487,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-2',
         name: 'Md. Shafiul Azam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [],
         emails: [
           { value: 'msacse@pust.ac.bd', type: 'Office' },
@@ -1500,7 +1501,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-3',
         name: 'S. M. Hasan Sazzad Iqbal',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801753622822', type: 'Personal' }],
         emails: [
           { value: 'sazzad@pust.ac.bd', type: 'Office' },
@@ -1514,7 +1515,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-4',
         name: 'Dr. Md. Toukir Ahmed',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801745983200', type: 'Personal' }],
         emails: [
           { value: 'toukir@pust.ac.bd', type: 'Office' },
@@ -1528,7 +1529,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-5',
         name: 'Dr. Md. Khaled Ben Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [],
         emails: [{ value: 'khaled@pust.ac.bd', type: 'Office' }],
         qualification: 'PhD (Griffith University...',
@@ -1540,7 +1541,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Mursalin',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801778110026 (currently not reachable)', type: 'Personal' }],
         emails: [
           { value: 'mursalin@pust.ac.bd', type: 'Office' },
@@ -1555,7 +1556,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Kislu Noman',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [
           { value: '01717265859', type: 'Personal' },
           { value: '01558557060', type: 'Personal' },
@@ -1572,7 +1573,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Mahmudul Hasan',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '0731-64876', type: 'Office' }],
         emails: [
           { value: 'mahmudul.cse@pust.ac.bd', type: 'Office' },
@@ -1586,7 +1587,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-9',
         name: 'Dr. Md. Niaz Imtiaz',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801334981050', type: 'Personal' }],
         emails: [
           { value: 'niaz.cse@pust.ac.bd', type: 'Office' },
@@ -1600,7 +1601,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-10',
         name: 'Nitun Kumar Podder',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01720543366', type: 'Personal' }],
         emails: [
           { value: 'nitun@pust.ac.bd', type: 'Office' },
@@ -1614,7 +1615,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-fac-11',
         name: 'Nakib Aman',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801762910933', type: 'Personal' }],
         emails: [
           { value: 'nakib.cse@pust.ac.bd', type: 'Office' },
@@ -1631,7 +1632,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-off-1',
         name: 'Md. Tipu Sultan',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [
           { value: '+8801736751862', type: 'Personal' },
           { value: '+8801956908661', type: 'Personal' },
@@ -1642,7 +1643,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-off-2',
         name: 'Md. Sazzadul Islam',
         designation: 'Section Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [],
         emails: [{ value: 'sazzadul1980cse@gmail.com', type: 'Personal' }],
         qualification: 'MSS in SW(PUST)',
@@ -1651,7 +1652,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-off-3',
         name: 'Md. Gagiur Rahman',
         designation: 'Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01731976363', type: 'Personal' }],
         emails: [{ value: 'gajicse6363@gmail.com', type: 'Personal' }],
         qualification: 'BSS',
@@ -1660,7 +1661,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-off-4',
         name: 'Md. Ali Salman',
         designation: 'Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01819193949', type: 'Personal' }],
         emails: [{ value: 'salman1080@gmail.com', type: 'Personal' }],
       },
@@ -1668,7 +1669,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'cse-off-5',
         name: 'Asma Hoque',
         designation: 'Section Officer G-2 (Academic)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01735754460', type: 'Personal' }],
         emails: [
           { value: 'asma12@pust.ac.bd', type: 'Office' },
@@ -1700,7 +1701,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'eee-chair',
       name: 'Dr. T. H. M. Sumon Rashid',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801715-587294', type: 'Personal' },
         { value: '+8802588844890', type: 'Office' },
@@ -1718,7 +1719,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-1',
         name: 'Dr. Dilip Kumar Sarker',
         designation: 'Professor (PRL)',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801712102477', type: 'Personal' },
           { value: '+8801914218653', type: 'Personal' },
@@ -1735,7 +1736,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-2',
         name: 'Diponkar Kundu',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801723122846', type: 'Personal' },
           { value: '+8801978122846', type: 'Personal' },
@@ -1753,7 +1754,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-3',
         name: 'Dr. Md. Masudur Rahman',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801716495004', type: 'Personal' }],
         emails: [
           { value: 'mmrahman@pust.ac.bd', type: 'Office' },
@@ -1768,7 +1769,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Dr. Md. Rabiul Islam',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '01726257629', type: 'Personal' }],
         emails: [
           { value: 'rabiul_eee@pust.ac.bd', type: 'Office' },
@@ -1782,7 +1783,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-5',
         name: 'Dr. T. H. M. Sumon Rashid',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801715-587294', type: 'Personal' }],
         emails: [
           { value: 'sumonrashid.eee@pust.ac.bd', type: 'Office' },
@@ -1796,7 +1797,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-6',
         name: 'Dr. A.H.M. Iftekharul Ferdous',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801713644754', type: 'Personal' }],
         emails: [
           { value: 'iferdous.eee@pust.ac.bd', type: 'Office' },
@@ -1810,7 +1811,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-7',
         name: 'Dr. Md. Feroz Ali',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [],
         emails: [
           { value: 'feroz.ali.eee@pust.ac.bd', type: 'Office' },
@@ -1825,7 +1826,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Golam Sadeque',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+88 01725083838', type: 'Personal' }],
         emails: [{ value: 'msadeque.eee@pust.ac.bd', type: 'Office' }],
         qualification: 'M. Eng. Sc., Multime....',
@@ -1836,7 +1837,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-9',
         name: 'Md. Galib Hasan',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801712853843', type: 'Personal' },
           { value: '2313423', type: 'IP Phone' },
@@ -1854,7 +1855,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Motaher Hossain',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '8801961168686', type: 'Personal' }],
         emails: [
           { value: 'motaher_eee@pust.ac.bd', type: 'Office' },
@@ -1869,7 +1870,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Nadia Afrin',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801777888463', type: 'Personal' }],
         emails: [
           { value: 'nafrin@pust.ac.bd', type: 'Office' },
@@ -1884,7 +1885,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md Asaduzzaman Shobug',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801724773530', type: 'Personal' }],
         emails: [
           { value: 'mshobug.eee@pust.ac.bd', type: 'Office' },
@@ -1898,7 +1899,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-13',
         name: 'Rosni Sayed',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801674397871', type: 'Personal' }],
         emails: [
           { value: 'rsayed.eee@pust.ac.bd', type: 'Office' },
@@ -1912,7 +1913,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-14',
         name: 'Md. Ariful Islam',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801745363828', type: 'Personal' }],
         emails: [
           { value: 'arif.eee@pust.ac.bd', type: 'Office' },
@@ -1926,7 +1927,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-15',
         name: 'Md. Shamim Hossain',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801742739800', type: 'Personal' }],
         emails: [
           { value: 'smhossain.eee@pust.ac.bd', type: 'Office' },
@@ -1940,7 +1941,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-fac-16',
         name: 'Tonmoy Ghosh',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+12056578375', type: 'Personal' }],
         emails: [
           { value: 'tghosh.eee@pust.ac.bd', type: 'Office' },
@@ -1957,7 +1958,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-off-1',
         name: 'Md. Saidur Rahman',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01729347777', type: 'Personal' }],
         emails: [{ value: 'saidur.pust@gmail.com', type: 'Personal' }],
         qualification: 'Diploma Engg. in EEE',
@@ -1966,7 +1967,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-off-2',
         name: 'Wahidur Rahman Rasel',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '8801714256000', type: 'Personal' }],
         emails: [],
       },
@@ -1974,7 +1975,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-off-3',
         name: 'Md. Aminul Islam',
         designation: 'Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01725332223', type: 'Personal' }],
         emails: [{ value: 'htpavelht@gmail.com', type: 'Personal' }],
         qualification: 'MA in SW(PUST)',
@@ -1983,7 +1984,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-off-4',
         name: 'Md. Sahinur Rahman',
         designation: 'Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01747404284', type: 'Personal' }],
         emails: [{ value: 'sahinurpust92@gmail.com', type: 'Personal' }],
         qualification: 'MSS(NU)',
@@ -1992,7 +1993,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eee-off-5',
         name: 'Ahsan Habib Rumy',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01745-801202', type: 'Personal' }],
         emails: [
           { value: 'rumy@pust.ac.bd', type: 'Office' },
@@ -2025,7 +2026,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'eece-chair',
       name: 'Dr. Md. Najmul Hossain',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801733264993', type: 'Personal' },
         { value: '+8801711574410', type: 'Personal' },
@@ -2044,7 +2045,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-1',
         name: 'Dr. Md. Saiful Islam',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801710459092', type: 'Personal' },
           { value: '+8801913704192', type: 'Personal' },
@@ -2061,7 +2062,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-2',
         name: 'Dr. Sheikh Rashel Al Ahmed',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801742191314', type: 'Personal' },
           { value: '+88 0258884 4903', type: 'Office' },
@@ -2077,7 +2078,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-3',
         name: 'Dr. Md. Najmul Hossain',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801733264993', type: 'Personal' },
           { value: '+8801711574410', type: 'Personal' },
@@ -2094,7 +2095,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-4',
         name: 'Dr. Md. Rashedul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801301800401', type: 'Personal' }],
         emails: [
           { value: 'rashed.85@pust.ac.bd', type: 'Office' },
@@ -2109,7 +2110,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Purno Mohon Ghosh',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [
           { value: '+8801717622886', type: 'Personal' },
           { value: '+8801733130648', type: 'Personal' },
@@ -2127,7 +2128,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'S. M. Yahea Mahbub',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '8801711578358', type: 'Personal' }],
         emails: [
           { value: 'yahea.mahbub@pust.ac.bd', type: 'Office' },
@@ -2141,7 +2142,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-7',
         name: 'Liton Chandra Paul',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801737242554', type: 'Personal' }],
         emails: [
           { value: 'litonpaulete@pust.ac.bd', type: 'Office' },
@@ -2156,7 +2157,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Fatin Ishraque',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801712501856', type: 'Personal' }],
         emails: [
           { value: 'fatin@pust.ac.bd', type: 'Office' },
@@ -2170,7 +2171,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-9',
         name: 'Md. Imran Hossain',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01726804759', type: 'Personal' }],
         emails: [
           { value: 'imran@pust.ac.bd', type: 'Office' },
@@ -2184,7 +2185,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-10',
         name: 'Kumary Sumi Rani Shaha',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '01701050389', type: 'Personal' },
           { value: '01970060389', type: 'Personal' },
@@ -2201,7 +2202,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-fac-11',
         name: 'Most. Marzia Khatun',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+88-01753907504', type: 'Personal' }],
         emails: [
           { value: 'marzia.eece@pust.ac.bd', type: 'Office' },
@@ -2218,7 +2219,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-off-1',
         name: 'Md. Shahadath Hossain Sarker',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01716006426', type: 'Personal' }],
         emails: [
           { value: 'shahadath.eece@pust.ac.bd', type: 'Office' },
@@ -2229,7 +2230,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-off-2',
         name: 'Md. Rashedul Bary',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01712593970', type: 'Personal' }],
         emails: [
           { value: 'rashedulbary@pust.ac.bd', type: 'Office' },
@@ -2241,7 +2242,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-off-3',
         name: 'Md. Mahfuzur Rahman',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01719322374', type: 'Personal' }],
         emails: [
           { value: 'mahfuzur.eece@pust.ac.bd', type: 'Office' },
@@ -2253,7 +2254,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-off-4',
         name: 'Md. Rokibul Hasan',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01718096661', type: 'Personal' }],
         emails: [
           { value: 'rokibul.eece@pust.ac.bd', type: 'Office' },
@@ -2265,7 +2266,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eece-off-5',
         name: 'Md. Faruk Hossan',
         designation: 'Section Officer-G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01716860016', type: 'Personal' }],
         emails: [
           { value: 'faruk.eece@pust.ac.bd', type: 'Office' },
@@ -2298,7 +2299,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'ice-chair',
       name: 'Dr. Md. Anwar Hossain',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801717330923', type: 'Personal' },
         { value: '+8802588844986', type: 'Office' },
@@ -2316,7 +2317,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-1',
         name: 'Dr. Md. Anwar Hossain',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801717330923', type: 'Personal' },
           { value: '+8802588845644', type: 'Office' },
@@ -2333,7 +2334,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-2',
         name: 'Dr. Md. Sarwar Hosain',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801722047833', type: 'Personal' },
           { value: '01913815311', type: 'Personal' },
@@ -2352,7 +2353,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-3',
         name: 'Dr. Md. Omar Faruk',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801712415335', type: 'Personal' },
           { value: '2268', type: 'PABX' },
@@ -2370,7 +2371,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Dr. Pallab Kanti Podder',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801917485890', type: 'Personal' },
           { value: '+88073164986', type: 'Office' },
@@ -2389,7 +2390,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Iffat Ara',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '+8801913699368', type: 'Personal' },
           { value: '2264', type: 'PABX' },
@@ -2407,7 +2408,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Sohag Sarker',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801722456324', type: 'Personal' },
           { value: '2269', type: 'PABX' },
@@ -2424,7 +2425,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-7',
         name: 'Dr. Abul Fazal Mohammad Zainul Abadin',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801717797217', type: 'Personal' },
           { value: '+601136827217', type: 'Personal' },
@@ -2443,7 +2444,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-8',
         name: 'Dr. Md. Imran Hossain',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801759320341', type: 'Personal' },
           { value: '2267', type: 'PABX' },
@@ -2460,7 +2461,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-9',
         name: 'Taskin Noor Turna',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801739816787', type: 'Personal' }],
         emails: [
           { value: 'taskin.it1405@pust.ac.bd', type: 'Office' },
@@ -2474,7 +2475,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-10',
         name: 'Dr. Md. Tofail Ahmed',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [],
         emails: [
           { value: 'tofail.ru@pust.ac.bd', type: 'Office' },
@@ -2488,7 +2489,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-fac-11',
         name: 'Tarun Debnath',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801798134745', type: 'Personal' }],
         emails: [
           { value: 'iamtarun09@pust.ac.bd', type: 'Office' },
@@ -2503,7 +2504,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Akif Mahdi',
         designation: 'Lecturer (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01684388093', type: 'Personal' }],
         emails: [
           { value: 'akif.mahdi@pust.ac.bd', type: 'Office' },
@@ -2520,7 +2521,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-off-1',
         name: 'Md. Anwar Hossain',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801735 757532', type: 'Personal' }],
         emails: [
           { value: 'anwar.ice75@pust.ac.bd', type: 'Office' },
@@ -2532,7 +2533,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-off-2',
         name: 'Kamal Hossain',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01735753788', type: 'Personal' }],
         emails: [{ value: 'kamalpust1987@gmail.com', type: 'Personal' }],
         qualification: 'BSS & MSS(ongoing)',
@@ -2541,7 +2542,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ice-off-3',
         name: 'Golam Mirza Saqib',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01728233749', type: 'Personal' }],
         emails: [{ value: 'gmshakib.13@gmail.com', type: 'Personal' }],
         qualification: 'BA & MSS(Ongoing)',
@@ -2589,7 +2590,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'arch-chair',
       name: 'Laila Arzumand Banu',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+      photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
       phones: [
         { value: '+8801712041400', type: 'Personal' },
         { value: '+8802588846271', type: 'Office' },
@@ -2607,7 +2608,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-1',
         name: 'Audity Biswas',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01716781936', type: 'Personal' }],
         emails: [
           { value: 'audity12arch@pust.ac.bd', type: 'Office' },
@@ -2621,7 +2622,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-2',
         name: 'Bijoy Dash Gupta',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801710557926', type: 'Personal' }],
         emails: [
           { value: 'bijoydashgupta@pust.ac.bd', type: 'Office' },
@@ -2635,7 +2636,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-3',
         name: 'Jannat Ara Ferdousi',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+880 1711272047', type: 'Personal' }],
         emails: [
           { value: 'ferdousi@pust.ac.bd', type: 'Office' },
@@ -2649,7 +2650,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-4',
         name: 'Sarjana Afroz',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+880 1921-151653', type: 'Personal' }],
         emails: [
           { value: 'sarjana_arch@pust.ac.bd', type: 'Office' },
@@ -2663,7 +2664,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-5',
         name: 'Laila Arzumand Banu',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801712041400', type: 'Personal' }],
         emails: [
           { value: 'laila2019_arch@pust.ac.bd', type: 'Office' },
@@ -2677,7 +2678,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-6',
         name: 'Sonjit Kumar Nath',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [],
         emails: [{ value: 'sonjit.kumar@pust.ac.bd', type: 'Office' }],
         qualification: 'Bachelor of Architec....',
@@ -2688,7 +2689,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-7',
         name: 'Zannatuge Jahan',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [{ value: 'zannatuge.arc@pust.ac.bd', type: 'Office' }],
         qualification: 'Bachelor of Architec....',
@@ -2699,7 +2700,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-8',
         name: 'Sourav Ghosh',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01400726895', type: 'Personal' }],
         emails: [
           { value: 'sourav.arch@pust.ac.bd', type: 'Office' },
@@ -2713,7 +2714,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-fac-9',
         name: 'Md. Mohaiminul Islam',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+880 1710323306', type: 'Personal' }],
         emails: [
           { value: 'mohaiminul.arch@pust.ac.bd', type: 'Office' },
@@ -2730,7 +2731,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'arch-off-1',
         name: 'Mst. Nurunnahar Khatun',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '8801729397781', type: 'Personal' }],
         emails: [],
       },
@@ -2759,7 +2760,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'urp-chair',
       name: 'Dr. Md. Ashrafuzzaman Pramanik',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+88 01712-604430', type: 'Personal' },
         { value: '+8802588844982', type: 'Office' },
@@ -2777,7 +2778,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-1',
         name: 'Dr. Md. Ashrafuzzaman Pramanik',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+88 01712-604430', type: 'Personal' }],
         emails: [
           { value: 'ashraf@pust.ac.bd', type: 'Office' },
@@ -2791,7 +2792,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-2',
         name: 'Md. Sohel Rana',
         designation: 'Assistant Professor (on Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801753973645', type: 'Personal' }],
         emails: [
           { value: 'sohelrana_urp@pust.ac.bd', type: 'Office' },
@@ -2805,7 +2806,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-3',
         name: 'Dr. Md. Kamrul Hasan',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801783571409', type: 'Personal' }],
         emails: [
           { value: 'kamrul.urp@pust.ac.bd', type: 'Office' },
@@ -2819,7 +2820,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-4',
         name: 'Ashraf Uddin Fahim',
         designation: 'Assistant Professor (on Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '01630167828', type: 'Personal' }],
         emails: [
           { value: 'fahim.urp@pust.ac.bd', type: 'Office' },
@@ -2833,7 +2834,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-5',
         name: 'Tasnim Tabassum',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [{ value: 'tasnimtabassum@pust.ac.bd', type: 'Office' }],
         qualification: '(Study leave) PhD in....',
@@ -2844,7 +2845,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-6',
         name: 'Saimunnahar Ritu',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01737054407', type: 'Personal' }],
         emails: [
           { value: 'saimunnahar@pust.ac.bd', type: 'Office' },
@@ -2858,7 +2859,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-7',
         name: 'Mst. Tanzila Aktar Shawon',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01785464944', type: 'Personal' }],
         emails: [
           { value: 'tanzila.urp@pust.ac.bd', type: 'Office' },
@@ -2871,7 +2872,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-fac-8',
         name: 'Ferdous Hussain',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [
           { value: '01716864300', type: 'Personal' },
           { value: '01521454832 (WhatsApp)', type: 'Personal' },
@@ -2890,7 +2891,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-off-1',
         name: 'S. M. Johurul Islam',
         designation: 'Deputy Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [
           { value: '+8801793050000', type: 'Personal' },
           { value: '+8801818500004', type: 'Personal' },
@@ -2902,7 +2903,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-off-2',
         name: 'Md. Abdullah -Al- Kafi',
         designation: 'Assistant Documentation Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801712296239', type: 'Personal' }],
         emails: [
           { value: 'kafi.urp@pust.ac.bd', type: 'Office' },
@@ -2913,7 +2914,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-off-3',
         name: 'Md. Iman Hossain',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01746808570', type: 'Personal' }],
         emails: [{ value: 'iman.pust@gmail.com', type: 'Personal' }],
         qualification: 'BSS(Hons), NU and MA',
@@ -2922,7 +2923,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'urp-off-4',
         name: 'Nurzahan Khatun',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01765477463', type: 'Personal' }],
         emails: [{ value: 'nurzahanpust@gmail.com', type: 'Personal' }],
         qualification: 'Master of Social Science',
@@ -2952,7 +2953,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'math-chair',
       name: 'Dr. Md. Fazlul Hoque',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801773961797', type: 'Personal' },
         { value: '+8802588843572', type: 'Office' },
@@ -2971,7 +2972,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-1',
         name: 'Dr. Md. Fazlul Hoque',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801773961797', type: 'Personal' }],
         emails: [
           { value: 'fazlulmath@pust.ac.bd', type: 'Office' },
@@ -2985,7 +2986,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-2',
         name: 'Dr. Kamruzzaman Khan',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [],
         emails: [
           { value: 'k.khanru@pust.ac.bd', type: 'Office' },
@@ -2999,7 +3000,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-3',
         name: 'Dr. Md. Nur Alam',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801716438757', type: 'Personal' }],
         emails: [
           { value: 'nuralam23@pust.ac.bd', type: 'Office' },
@@ -3013,7 +3014,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-4',
         name: 'Rafiqul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801773218216', type: 'Personal' }],
         emails: [
           { value: 'rafiq.math@pust.ac.bd', type: 'Office' },
@@ -3027,7 +3028,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-5',
         name: 'Dr. Md. Azizur Rahman',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801716094291', type: 'Personal' },
           { value: '+8801916091121', type: 'Personal' },
@@ -3044,7 +3045,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-6',
         name: 'Dr. Udoy Sankar Basak',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801754669609', type: 'Personal' }],
         emails: [
           { value: 'udoy@pust.ac.bd', type: 'Office' },
@@ -3058,7 +3059,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-7',
         name: 'Dr. Md. Ekramul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801718577226', type: 'Personal' }],
         emails: [
           { value: 'ekramul.math@pust.ac.bd', type: 'Office' },
@@ -3072,7 +3073,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-8',
         name: 'Md. Rafiqul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801717744772', type: 'Personal' }],
         emails: [
           { value: 'rafiqku.islam@pust.ac.bd', type: 'Office' },
@@ -3086,7 +3087,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-9',
         name: 'Rajandra Chadra Bhowmik',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801717585688', type: 'Personal' }],
         emails: [
           { value: 'rajandra_math@pust.ac.bd', type: 'Office' },
@@ -3100,7 +3101,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-10',
         name: 'S. M. Rayhanul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+88 01719 364133', type: 'Personal' },
           { value: '+88 01575 215530', type: 'Personal' },
@@ -3118,7 +3119,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Bimal Kumar Datta',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801764006583', type: 'Personal' }],
         emails: [
           { value: 'bimaldu@pust.ac.bd', type: 'Office' },
@@ -3133,7 +3134,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Kaniz Fatema',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801745252430', type: 'Personal' }],
         emails: [
           { value: 'kaniz17@pust.ac.bd', type: 'Office' },
@@ -3148,7 +3149,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Mousumi Akhter',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801776867477', type: 'Personal' }],
         emails: [
           { value: 'mousumiakter@pust.ac.bd', type: 'Office' },
@@ -3162,7 +3163,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-fac-14',
         name: 'Md. Aslam Hossain',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01747102009', type: 'Personal' }],
         emails: [
           { value: 'aslam.math@pust.ac.bd', type: 'Office' },
@@ -3179,7 +3180,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-off-1',
         name: 'A.B.M. Atiqur Rahman',
         designation: 'Assistant Director (Finance and Accounts)',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01712271258', type: 'Personal' }],
         emails: [{ value: 'shiplupust@gmail.com', type: 'Personal' }],
         qualification: 'BCom (NU), MCom (NU)',
@@ -3188,7 +3189,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-off-2',
         name: 'Md. Harunor Rashid',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01712998501', type: 'Personal' }],
         emails: [{ value: 'harun79rashid@gmail.com', type: 'Personal' }],
         qualification: 'B.Com and M.Com(Accounting),NU',
@@ -3197,7 +3198,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'math-off-3',
         name: 'Md. Saddam Hossain',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01735756228', type: 'Personal' }],
         emails: [{ value: 'saddamhossainpab2@gmail.com', type: 'Personal' }],
         qualification: 'B.Sc. & M.Sc. in Mathematics (NU)',
@@ -3227,7 +3228,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'phy-chair',
       name: 'Dr. Md. Khairul Alam',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801712659746', type: 'Personal' },
         { value: '+8802588844898', type: 'Office' },
@@ -3245,7 +3246,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-1',
         name: 'Dr. Md. Khairul Alam',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801712659746', type: 'Personal' }],
         emails: [
           { value: 'khairul_phy@pust.ac.bd', type: 'Office' },
@@ -3259,7 +3260,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-2',
         name: 'Dr. Md. Aftabuzzaman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801719822299', type: 'Personal' }],
         emails: [{ value: 'azamanphy@pust.ac.bd', type: 'Office' }],
         qualification:
@@ -3363,7 +3364,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-3',
         name: 'Dr. Pretam Kumar Das',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801744356879', type: 'Personal' },
           { value: '+8802588844898', type: 'Office' },
@@ -3380,7 +3381,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-4',
         name: 'Dr. Samiron Kumar Saha',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801716603410', type: 'Personal' },
           { value: '+8802588844898', type: 'Office' },
@@ -3513,7 +3514,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-5',
         name: 'Dr. Md. Atikur Rahman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+880 1723051728', type: 'Personal' },
           { value: '+8801788-403928', type: 'Personal' },
@@ -3695,7 +3696,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-6',
         name: 'Dr. Md. Shahajan Ali',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '01323886868', type: 'Personal' }],
         emails: [
           { value: 'msali@pust.ac.bd', type: 'Office' },
@@ -3801,7 +3802,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-7',
         name: 'Dr. Md. Hafijur Rahman',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801719130233', type: 'Personal' },
           { value: '+8801827227987', type: 'Personal' },
@@ -3929,7 +3930,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-8',
         name: 'Dr. Md. Lokman Ali',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801747929123', type: 'Personal' }],
         emails: [
           { value: 'lokman.ali@pust.ac.bd', type: 'Office' },
@@ -4052,7 +4053,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Mahmudul Hasan',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801714137711', type: 'Personal' }],
         emails: [{ value: 'mahmudul_hasan60@yahoo.com', type: 'Personal' }],
         qualification: 'B.Sc(Hons.) and M.Sc....',
@@ -4063,7 +4064,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-10',
         name: 'Md. Afjalur Rahman',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801739207932', type: 'Personal' }],
         emails: [
           { value: 'afjalur.rahman@pust.ac.bd', type: 'Office' },
@@ -4077,7 +4078,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-11',
         name: 'Uttam Kumar Chowdhury',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801718605025', type: 'Personal' }],
         emails: [
           { value: 'phy.uttam@pust.ac.bd', type: 'Office' },
@@ -4091,7 +4092,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-12',
         name: 'Dr. Md. Tofajjol Hossen Bhuiyan',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801347139062', type: 'Personal' }],
         emails: [{ value: 'thbapon@pust.ac.bd', type: 'Office' }],
         qualification:
@@ -4227,7 +4228,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Maliha Nishat',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801743405916', type: 'Personal' }],
         emails: [
           { value: 'malihanishat@pust.ac.bd', type: 'Office' },
@@ -4241,7 +4242,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-fac-14',
         name: 'Dr. Dayal Chandra Roy',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801780870223', type: 'Personal' }],
         emails: [
           { value: 'dayal.phy@pust.ac.bd', type: 'Office' },
@@ -4257,7 +4258,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-off-1',
         name: 'Md. Ashraful Islam',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [
           { value: '8801718400084', type: 'Personal' },
           { value: '+8801782015494', type: 'Personal' },
@@ -4268,7 +4269,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phy-off-2',
         name: 'Md. Feroz Zaman Biswas',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801716178851', type: 'Personal' }],
         emails: [{ value: 'feroz.singa@gmail.com', type: 'Personal' }],
       },
@@ -4297,7 +4298,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'phar-chair',
       name: 'Dr. Md. Shamim Reza',
       designation: 'Professor',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [{ value: '+8801717725553', type: 'Personal' }],
       emails: [
         { value: 'chair.pharm@pust.ac.bd', type: 'Office' },
@@ -4312,7 +4313,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-1',
         name: 'Dr. Shariful Haque',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801731373697', type: 'Personal' }],
         emails: [
           { value: 'sharifulh044@pust.ac.bd', type: 'Office' },
@@ -4326,7 +4327,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-2',
         name: 'Dr. Sm Faysal Bellah',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '01844775670', type: 'Personal' }],
         emails: [
           { value: 'faysal.pharm@pust.ac.bd', type: 'Office' },
@@ -4340,7 +4341,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-3',
         name: 'Ashish Kumar Sarker',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801721664138', type: 'Personal' }],
         emails: [
           { value: 'ashish_phar@pust.ac.bd', type: 'Office' },
@@ -4354,7 +4355,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-4',
         name: 'Monirul Islam',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801717486064', type: 'Personal' },
           { value: '+88073164921', type: 'Office' },
@@ -4368,7 +4369,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-5',
         name: 'Md. Sanowar Hossain',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801717118862', type: 'Personal' }],
         emails: [
           { value: 'sanowar@pust.ac.bd', type: 'Office' },
@@ -4382,7 +4383,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-6',
         name: 'Most. Reshma Akter',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801764582935', type: 'Personal' }],
         emails: [
           { value: 'reshma@pust.ac.bd', type: 'Office' },
@@ -4396,7 +4397,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-7',
         name: 'Md. Ashraful Islam',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '01770969890', type: 'Personal' },
           { value: '01886969880', type: 'Personal' },
@@ -4413,7 +4414,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-8',
         name: 'G.M. Masud Parvez',
         designation: 'Lecturer (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801767063152', type: 'Personal' }],
         emails: [
           { value: 'masud.ph@pust.ac.bd', type: 'Office' },
@@ -4427,7 +4428,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-9',
         name: 'Abdul Ali Bhuiyan',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01837645002', type: 'Personal' }],
         emails: [
           { value: 'alibhuiyan.pharm@pust.ac.bd', type: 'Office' },
@@ -4440,7 +4441,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-10',
         name: 'Md. Selim Uddin',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01786859543', type: 'Personal' }],
         emails: [
           { value: 'selim.pharm@pust.ac.bd', type: 'Office' },
@@ -4453,7 +4454,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-fac-11',
         name: 'Md. Sabbir Hossain',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01773553085', type: 'Personal' }],
         emails: [
           { value: 'sabbir.pharm@pust.ac.bd', type: 'Office' },
@@ -4469,7 +4470,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-off-1',
         name: 'Moniruzzaman',
         designation: 'Section Officer -G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01712861522', type: 'Personal' }],
         emails: [{ value: 'sohagq@gmail.com', type: 'Personal' }],
         qualification: 'BSS',
@@ -4478,7 +4479,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-off-2',
         name: 'Md. Milon Hossain',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01746110800', type: 'Personal' }],
         emails: [{ value: 'milonpbn55553@gmail.com', type: 'Personal' }],
         qualification: 'MSc in Chemistry (NU)',
@@ -4487,7 +4488,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'phar-off-3',
         name: 'Md. Saiful Islam',
         designation: 'Section Officer-G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01714425040', type: 'Personal' }],
         emails: [{ value: 'shiponshepon83@gmail.com', type: 'Personal' }],
         qualification: 'Degree Pass',
@@ -4517,7 +4518,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'chem-chair',
       name: 'Ratan Kumar Paul',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801714704579', type: 'Personal' },
         { value: '+8802588844828', type: 'Office' },
@@ -4535,7 +4536,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-1',
         name: 'Ratan Kumar Paul',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801714704579', type: 'Personal' }],
         emails: [
           { value: 'ratanpaul05@pust.ac.bd', type: 'Office' },
@@ -4549,7 +4550,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-2',
         name: 'Dr. Sultana Shakila Khan',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801775292929', type: 'Personal' }],
         emails: [{ value: 'sshakilak@pust.ac.bd', type: 'Office' }],
         qualification: 'B.Sc(Hons.) , M.Sc i....',
@@ -4560,7 +4561,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-3',
         name: 'Md. Faruak Ahmad',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801719478023', type: 'Personal' }],
         emails: [
           { value: 'farukahmedche@pust.ac.bd', type: 'Office' },
@@ -4574,7 +4575,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-4',
         name: 'Md. Homayun Kabir',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801760478043', type: 'Personal' }],
         emails: [
           { value: 'kabirchem07@pust.ac.bd', type: 'Office' },
@@ -4588,7 +4589,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-5',
         name: 'Md. Kawsar Hossain',
         designation: 'Assistant Professor (Organic Chemistry)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '01733136839', type: 'Personal' },
           { value: '01303867226', type: 'Personal' },
@@ -4605,7 +4606,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-6',
         name: 'Dr. Tasmina Khandaker',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801716755914', type: 'Personal' }],
         emails: [
           { value: 'tasmina.chem@pust.ac.bd', type: 'Office' },
@@ -4619,7 +4620,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-7',
         name: 'Abrar Yasir Abir',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801816046591', type: 'Personal' }],
         emails: [
           { value: 'abraryasir@pust.ac.bd', type: 'Office' },
@@ -4633,7 +4634,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-8',
         name: 'Suprim Chandra Sarker',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801683711029', type: 'Personal' }],
         emails: [
           { value: 'suprimchandra@pust.ac.bd', type: 'Office' },
@@ -4646,7 +4647,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-9',
         name: 'Md. Mahabur Rahman',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801793889188', type: 'Personal' }],
         emails: [
           { value: 'mahaburrahman@pust.ac.bd', type: 'Office' },
@@ -4659,7 +4660,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-10',
         name: 'Soma Saha',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [
           { value: 'somasaha@pust.ac.bd', type: 'Office' },
@@ -4673,7 +4674,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-fac-11',
         name: 'Md. Byzed Hasan',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [
           { value: '+8801765843662', type: 'Personal' },
           { value: '+8801623258865', type: 'Personal' },
@@ -4692,7 +4693,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-off-1',
         name: 'Md. Sheikh Shahzamal',
         designation: 'Assistant Registrar (Security)',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801719014265', type: 'Personal' }],
         emails: [
           { value: 'shahzamal.che@pust.ac.bd', type: 'Office' },
@@ -4704,7 +4705,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-off-2',
         name: 'Md. Ariful Islam',
         designation: 'Section Officer -G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01719380721', type: 'Personal' }],
         emails: [
           { value: 'ariful91@pust.ac.bd', type: 'Office' },
@@ -4716,7 +4717,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'chem-off-3',
         name: 'Md. Manirul Islam',
         designation: 'Assistant Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01516127920', type: 'Personal' }],
         emails: [
           { value: 'manirul.che@pust.ac.bd', type: 'Office' },
@@ -4749,7 +4750,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'sds-chair',
       name: 'Dr. Sabba Ruhi',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+      photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
       phones: [
         { value: '+8801710380934', type: 'Personal' },
         { value: '+8802588843588', type: 'Office' },
@@ -4767,7 +4768,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-1',
         name: 'Dr. Md. Shamim Reza',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801717725553', type: 'Personal' }],
         emails: [
           { value: 'shamim.reza@pust.ac.bd', type: 'Office' },
@@ -4781,7 +4782,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-2',
         name: 'Dr. Sabba Ruhi',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801710380934', type: 'Personal' }],
         emails: [
           { value: 'sabba.ruhi@pust.ac.bd', type: 'Office' },
@@ -4795,7 +4796,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-3',
         name: 'Imran Parvez',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801717339492', type: 'Personal' }],
         emails: [{ value: 'pavel1342@yahoo.com', type: 'Personal' }],
         qualification: 'B.Sc(Hons.) & M.Sc i....',
@@ -4806,7 +4807,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-4',
         name: 'Md. Shahajada Mia',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801761369064', type: 'Personal' }],
         emails: [
           { value: 'shahajada_stat@pust.ac.bd', type: 'Office' },
@@ -4820,7 +4821,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-5',
         name: 'A.H.M. Musfiqur Rahman Nabeen',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801744729424', type: 'Personal' }],
         emails: [
           { value: 'musfiqnabeen.stat@pust.ac.bd', type: 'Office' },
@@ -4834,7 +4835,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-6',
         name: 'Most. Mira Khatun',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '01303187147', type: 'Personal' },
           { value: '01751908381', type: 'Personal' },
@@ -4851,7 +4852,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-7',
         name: 'Most. Sonia Khatun',
         designation: 'Lecturer (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [
           { value: 'sonia.stat@pust.ac.bd', type: 'Office' },
@@ -4863,7 +4864,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-8',
         name: 'Md. Miraj Hossain',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801744466270', type: 'Personal' }],
         emails: [{ value: 'miraj.stat@pust.ac.bd', type: 'Office' }],
         qualification: 'M.Sc & B.Sc in Stati....',
@@ -4874,7 +4875,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-9',
         name: 'Dr. Md. Nasif Hossain',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801843971527', type: 'Personal' }],
         emails: [
           { value: 'nasif.stat@pust.ac.bd', type: 'Office' },
@@ -4888,7 +4889,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-fac-10',
         name: 'Rubia Yasmin',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01795450580', type: 'Personal' }],
         emails: [
           { value: 'rubia.stat@pust.ac.bd', type: 'Office' },
@@ -4904,7 +4905,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-off-1',
         name: 'Md. Kamrul Ahsan',
         designation: 'Senior Technical Officer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801717886852', type: 'Personal' }],
         emails: [{ value: 'pust.kamrul@gmail.com', type: 'Personal' }],
         qualification: 'Diploma in EE, B.Sc. in EEE (AMBAN)',
@@ -4913,7 +4914,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-off-2',
         name: 'Md. Faridul Islam',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801734343707', type: 'Personal' }],
         emails: [{ value: 'faridulislam95@yahoo.com', type: 'Personal' }],
         qualification: 'M.A (EMTS) (IU)',
@@ -4922,7 +4923,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sds-off-3',
         name: 'Sumaia Mehnaz',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01712401801', type: 'Personal' }],
         emails: [{ value: 'mituc4610@gmail.com', type: 'Personal' }],
         qualification: 'B.S.S & M.A (NU)',
@@ -4952,7 +4953,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'bba-chair',
       name: 'Dr. Md. Kamruzzaman',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801716183432', type: 'Personal' },
         { value: '+8802588845265', type: 'Office' },
@@ -4970,7 +4971,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-1',
         name: 'Dr. Md. Mushfiqur Rahman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '01718842497', type: 'Personal' },
           { value: '2291', type: 'PABX' },
@@ -4987,7 +4988,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-2',
         name: 'Dr. Md. Kamruzzaman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801716183432', type: 'Personal' },
           { value: '+88073165265', type: 'Office' },
@@ -5005,7 +5006,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-3',
         name: 'Dr. Md. Amirul Islam',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801712441979', type: 'Personal' },
           { value: '0731-65265', type: 'Office' },
@@ -5023,7 +5024,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-4',
         name: 'Dr. Md. Hasebur Rahman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801718293000', type: 'Personal' },
           { value: '+8801978293000', type: 'Personal' },
@@ -5043,7 +5044,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-5',
         name: 'Dr. Md. Redwanuzzaman',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801717015448', type: 'Personal' },
           { value: '2286', type: 'PABX' },
@@ -5060,7 +5061,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-6',
         name: 'Mohammad Abu Sufian',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '8801717623728', type: 'Personal' },
           { value: '2290', type: 'PABX' },
@@ -5077,7 +5078,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-7',
         name: 'Dr. Md. Abdullah Al Mamun',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801767525266', type: 'Personal' }],
         emails: [{ value: 'mamun@pust.ac.bd', type: 'Office' }],
         qualification: 'BBA, MBA (Finance an....',
@@ -5088,7 +5089,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-8',
         name: 'Dr. Md. Asfaqur Rahman',
         designation: 'Associate Professor (Management)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+880 1717481180', type: 'Personal' },
           { value: '2288', type: 'PABX' },
@@ -5105,7 +5106,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-9',
         name: 'Dr. Masud Rana',
         designation: 'Associate Professor (Finance)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+880 1729591799', type: 'Personal' },
           { value: '2292', type: 'PABX' },
@@ -5122,7 +5123,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-10',
         name: 'Dr. Md. Kamal Hossain',
         designation: 'Associate Professor (Marketing)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+880 1711899998', type: 'Personal' },
           { value: '+8801718485775', type: 'Personal' },
@@ -5140,7 +5141,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-fac-11',
         name: 'Dr. Rebeka Sultana Rekha',
         designation: 'Associate Professor (Finance)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '+880 1722069132', type: 'Personal' },
           { value: '+8801717143149', type: 'Personal' },
@@ -5162,7 +5163,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bba-off-1',
         name: 'Md. Sazedur Rahman',
         designation: 'Deputy Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801718068575', type: 'Personal' }],
         emails: [{ value: 'suzonpust@gmail.com', type: 'Personal' }],
         qualification: 'B.S.c Honours and M.S.c in Mathematics (NU)',
@@ -5191,7 +5192,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'thm-chair',
       name: 'Md. Ashikur Rahman Avi',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+      photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
       phones: [{ value: '+8801557233448', type: 'Personal' }],
       emails: [
         { value: 'thm@pust.ac.bd', type: 'Office' },
@@ -5206,7 +5207,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-1',
         name: 'Sraboni Bagchi',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801789221850', type: 'Personal' }],
         emails: [
           { value: 'sraboni.thm@pust.ac.bd', type: 'Office' },
@@ -5219,7 +5220,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-2',
         name: 'Md. Ashikur Rahman Avi',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801557233448', type: 'Personal' }],
         emails: [
           { value: 'ashikur.thm@pust.ac.bd', type: 'Office' },
@@ -5233,7 +5234,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-3',
         name: 'S. M. Shahedul Alam',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801517004829', type: 'Personal' },
           { value: '+8801737909904', type: 'Personal' },
@@ -5250,7 +5251,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-4',
         name: 'Mahfuza Sultana Fariha',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01711091923', type: 'Personal' }],
         emails: [
           { value: 'mahfuzasultana@pust.ac.bd', type: 'Office' },
@@ -5263,7 +5264,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-5',
         name: 'Rafatul Islam',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01521220351', type: 'Personal' }],
         emails: [
           { value: 'rafatul.thm@pust.ac.bd', type: 'Office' },
@@ -5276,7 +5277,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-6',
         name: 'Md. Tanjil Hossen Sojib',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01791605351', type: 'Personal' }],
         emails: [
           { value: 'tanjil.thm@pust.ac.bd', type: 'Office' },
@@ -5290,7 +5291,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-fac-7',
         name: 'Jannatul Ferdous',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '01580337759', type: 'Personal' },
           { value: '01822232206', type: 'Personal' },
@@ -5309,7 +5310,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-off-1',
         name: 'Md. Sohag Hossain',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [
           { value: '+8801720664616', type: 'Personal' },
           { value: '2022', type: 'PABX' },
@@ -5321,7 +5322,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'thm-off-2',
         name: 'Nur Mohammad',
         designation: 'Section Officer G-2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01773923103', type: 'Personal' }],
         emails: [{ value: 'nurpust78@gmail.com', type: 'Personal' }],
         qualification: 'M.Sc. in Physics (NU)',
@@ -5351,7 +5352,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'econ-chair',
       name: 'Dr. Mir Khaled Iqbal Chowdhury',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801711007189', type: 'Personal' },
         { value: '+8802588844905', type: 'Office' },
@@ -5368,7 +5369,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-1',
         name: 'Dr. Mir Khaled Iqbal Chowdhury',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801711007189', type: 'Personal' }],
         emails: [
           { value: 'khalediqbal@pust.ac.bd', type: 'Office' },
@@ -5381,7 +5382,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-2',
         name: 'Redwan Ahmed',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801777457855', type: 'Personal' }],
         emails: [
           { value: 'red1eco@pust.ac.bd', type: 'Office' },
@@ -5395,7 +5396,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-3',
         name: 'Md. Enamul Haque',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '8801710701301', type: 'Personal' }],
         emails: [
           { value: 'enam1875@pust.ac.bd', type: 'Office' },
@@ -5410,7 +5411,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Md. Yahia Bapari',
         designation: 'Associate Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801738224098', type: 'Personal' }],
         emails: [
           { value: 'yahia.bapari@pust.ac.bd', type: 'Office' },
@@ -5424,7 +5425,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-5',
         name: 'Md. Al-Amin',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801720592749', type: 'Personal' }],
         emails: [
           { value: 'alamin_eco@pust.ac.bd', type: 'Office' },
@@ -5438,7 +5439,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-6',
         name: 'Bikash Chandra Ghosh',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801719474053', type: 'Personal' },
           { value: '+8801724524057', type: 'Personal' },
@@ -5455,7 +5456,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-7',
         name: 'Dr. Md. Tawhidul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '8801723435842', type: 'Personal' }],
         emails: [
           { value: 'tawhideco@pust.ac.bd', type: 'Office' },
@@ -5469,7 +5470,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-8',
         name: 'Tahmidul Islam',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801714405029', type: 'Personal' }],
         emails: [{ value: 'likhon.aniruddha@gmail.com', type: 'Personal' }],
         qualification: 'B.Sc (Hons.), M.Sc i....',
@@ -5480,7 +5481,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-9',
         name: 'Khaleda Akter',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801765786414', type: 'Personal' }],
         emails: [
           { value: 'khaleda.nur.econju@pust.ac.bd', type: 'Office' },
@@ -5494,7 +5495,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-10',
         name: 'Farjana Eyasmin',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801782118674', type: 'Personal' }],
         emails: [
           { value: 'farjanatonny825@pust.ac.bd', type: 'Office' },
@@ -5508,7 +5509,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-11',
         name: 'Md. Nehal Hasnain',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01723808288', type: 'Personal' }],
         emails: [
           { value: 'nehalecon@pust.ac.bd', type: 'Office' },
@@ -5522,7 +5523,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-fac-12',
         name: 'Md. Obidul Haque',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01686838019', type: 'Personal' }],
         emails: [
           { value: 'obidul.eco@pust.ac.bd', type: 'Office' },
@@ -5539,7 +5540,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'econ-off-1',
         name: 'Md. Samsul Alom',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01732022023', type: 'Personal' }],
         emails: [{ value: 'sa.babu1978@gmail.com', type: 'Personal' }],
       },
@@ -5568,7 +5569,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'bng-chair',
       name: 'Dr. Mir Humayun Kabir',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '01716383136', type: 'Personal' },
         { value: '+8802588844914', type: 'Office' },
@@ -5583,7 +5584,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-1',
         name: 'Dr. Mir Humayun Kabir',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '01716383136', type: 'Personal' }],
         emails: [{ value: 'biplob.humayun@pust.ac.bd', type: 'Office' }],
         qualification: 'M Phil, PhD (DU) ....',
@@ -5594,7 +5595,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-2',
         name: 'Dr. Md. Abdul Alim',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '01716819474', type: 'Personal' }],
         emails: [
           { value: 'dr.alim@pust.ac.bd', type: 'Office' },
@@ -5607,7 +5608,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-3',
         name: 'Dr. Mohammad Arif Obaidullah',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801712120740', type: 'Personal' }],
         emails: [
           { value: 'arifobaidullah@pust.ac.bd', type: 'Office' },
@@ -5621,7 +5622,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-4',
         name: 'Dr. Jinnat Rehana',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801717656781', type: 'Personal' }],
         emails: [{ value: 'jinnat.pust@gmail.com', type: 'Personal' }],
         qualification: 'B.A(Hons.) and M.A i....',
@@ -5632,7 +5633,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-5',
         name: 'Dr. Md. Asraful Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [
           { value: '+8801719745727', type: 'Personal' },
           { value: '+8801913950552', type: 'Personal' },
@@ -5649,7 +5650,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-fac-6',
         name: 'Dr. Md. Tanvir Hyder',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '8801718249121', type: 'Personal' }],
         emails: [
           { value: 'tanvir.sazal@pust.ac.bd', type: 'Office' },
@@ -5664,7 +5665,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         name: 'Muhammad Nurunnabi',
         designation: 'Assistant Professor (On Study Leave)',
         onStudyLeave: true,
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01763789525', type: 'Personal' }],
         emails: [
           { value: 'mnurunnabi@pust.ac.bd', type: 'Office' },
@@ -5681,7 +5682,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-off-1',
         name: 'Md. Sultan Mahmud',
         designation: 'Section Officer -G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01713743714', type: 'Personal' }],
         emails: [{ value: 'sultanpust1983@gmail.com', type: 'Personal' }],
         qualification: 'MA(Bangla)',
@@ -5690,7 +5691,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'bng-off-2',
         name: 'Munni Khatun',
         designation: 'Section Officer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01744353296', type: 'Personal' }],
         emails: [{ value: 'munnikhatun614@gmail.com', type: 'Personal' }],
         qualification: 'MA in Political Science',
@@ -5720,7 +5721,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'sw-chair',
       name: 'Dr. Md. Jahidul Islam',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801710441624', type: 'Personal' },
         { value: '+8802588844847', type: 'Office' },
@@ -5738,7 +5739,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-fac-1',
         name: 'Dr. Md. Jahidul Islam',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801710441624', type: 'Personal' }],
         emails: [
           { value: 'jahidsw@pust.ac.bd', type: 'Office' },
@@ -5752,7 +5753,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-fac-2',
         name: 'Mst. Khadezatul Kobra',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [
           { value: '+8801718617462', type: 'Personal' },
           { value: '073164847', type: 'Office' },
@@ -5769,7 +5770,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-fac-3',
         name: 'Mst. Fatema Begum',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801749788487', type: 'Personal' }],
         emails: [
           { value: 'fatemasw@pust.ac.bd', type: 'Office' },
@@ -5783,7 +5784,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-fac-4',
         name: 'Md. Sohel Rana',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01515292235', type: 'Personal' }],
         emails: [
           { value: 'sohel.sw@pust.ac.bd', type: 'Office' },
@@ -5800,7 +5801,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-off-1',
         name: 'Nesrin Pervin',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01717088073', type: 'Personal' }],
         emails: [{ value: 'nesrinpust15@gmail.com', type: 'Personal' }],
       },
@@ -5808,7 +5809,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'sw-off-2',
         name: 'Md. Abdul Kayom Hosen',
         designation: 'Section Officer-G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01924103705', type: 'Personal' }],
         emails: [
           { value: 'kayom.sw@pust.ac.bd', type: 'Office' },
@@ -5841,7 +5842,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'eng-chair',
       name: 'Dr. Md. Mokarrom Hossain',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801913235104', type: 'Personal' },
         { value: '+8802588844265', type: 'Office' },
@@ -5859,7 +5860,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-1',
         name: 'Dr. Md. Mokarrom Hossain',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801913235104', type: 'Personal' }],
         emails: [
           { value: 'mokarrom@pust.ac.bd', type: 'Office' },
@@ -5873,7 +5874,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-2',
         name: 'Rashed Mahmud',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801738207670', type: 'Personal' }],
         emails: [
           { value: 'rashed.mahmud@pust.ac.bd', type: 'Office' },
@@ -5887,7 +5888,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-3',
         name: 'Sanjida Afrin',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '8801711956036', type: 'Personal' }],
         emails: [{ value: 'sanjida15@gmail.com', type: 'Personal' }],
         qualification: 'B. A (Hons.) & M. A ....',
@@ -5898,7 +5899,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-4',
         name: 'Md. Rawshan Yeazdani',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '01714932201', type: 'Personal' }],
         emails: [
           { value: 'yeazdani_english@pust.ac.bd', type: 'Office' },
@@ -5912,7 +5913,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-5',
         name: 'Md. Mahamudul Hasan',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801716729042', type: 'Personal' }],
         emails: [
           { value: 'mahamudul.eng@pust.ac.bd', type: 'Office' },
@@ -5924,7 +5925,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-6',
         name: 'Shayla Akter',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801717017973', type: 'Personal' }],
         emails: [
           { value: 'shayla@pust.ac.bd', type: 'Office' },
@@ -5936,7 +5937,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-7',
         name: 'Md. Ibrahim Khalil',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '01738-023635', type: 'Personal' }],
         emails: [
           { value: 'ibrahimkhalil@pust.ac.bd', type: 'Office' },
@@ -5950,7 +5951,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-8',
         name: 'S.M. Ishmam Alam',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '01912654022', type: 'Personal' }],
         emails: [
           { value: 'ishmam@pust.ac.bd', type: 'Office' },
@@ -5964,7 +5965,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-9',
         name: 'Nusrat Jahan Nova',
         designation: 'Lecturer (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801784607861', type: 'Personal' }],
         emails: [
           { value: 'nova_eng@pust.ac.bd', type: 'Office' },
@@ -5978,7 +5979,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-fac-10',
         name: 'Sabiha Afrin Badhan',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [{ value: 'sabiha.eng@pust.ac.bd', type: 'Office' }],
         qualification: 'B.A. (Hons.), M.A. (....',
@@ -5992,7 +5993,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-off-1',
         name: 'Md. Rafiqul Islam',
         designation: 'Deputy Director',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '+8801716772247', type: 'Personal' }],
         emails: [
           { value: 'rafiqul@pust.ac.bd', type: 'Office' },
@@ -6004,7 +6005,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'eng-off-2',
         name: 'Farjana Islam',
         designation: 'Section Officer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01790651111', type: 'Personal' }],
         emails: [{ value: 'farjanaislampust@gmail.com', type: 'Personal' }],
         qualification: 'MA(NU)',
@@ -6034,7 +6035,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'pa-chair',
       name: 'Md. Al-Fahad Bhuiyan',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [
         { value: '+8801727947699', type: 'Personal' },
         { value: '+8802588844821', type: 'Office' },
@@ -6052,7 +6053,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-1',
         name: 'Md. Al-Fahad Bhuiyan',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [{ value: '+8801727947699', type: 'Personal' }],
         emails: [
           { value: 'fahadpa@pust.ac.bd', type: 'Office' },
@@ -6066,7 +6067,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-2',
         name: 'Bulbul Ahmed',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801737531972', type: 'Personal' }],
         emails: [
           { value: 'bulbul.pa@pust.ac.bd', type: 'Office' },
@@ -6080,7 +6081,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-3',
         name: 'Most. Sangida Rahman',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801737346433', type: 'Personal' }],
         emails: [
           { value: 'sangidaru@pust.ac.bd', type: 'Office' },
@@ -6094,7 +6095,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-4',
         name: 'Md. Miraz Hosen',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '+8801521258406', type: 'Personal' }],
         emails: [
           { value: 'miraz.hosen@pust.ac.bd', type: 'Office' },
@@ -6108,7 +6109,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-5',
         name: 'Tanveer Alam',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01718507547', type: 'Personal' }],
         emails: [
           { value: 'tanveer.alam@pust.ac.bd', type: 'Office' },
@@ -6122,7 +6123,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-6',
         name: 'Nishat Tabassum',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+880 1623523717', type: 'Personal' }],
         emails: [{ value: 'nishat@pust.ac.bd', type: 'Office' }],
         qualification: 'BSS & MSS in Public ....',
@@ -6132,7 +6133,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-7',
         name: 'Nishat Tasnim',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01303898911', type: 'Personal' }],
         emails: [
           { value: 'tasnim.pad@pust.ac.bd', type: 'Office' },
@@ -6145,7 +6146,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-8',
         name: 'Shammy Islam',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01794106263', type: 'Personal' }],
         emails: [
           { value: 'shammy.pad@pust.ac.bd', type: 'Office' },
@@ -6158,7 +6159,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'pa-fac-9',
         name: 'Md. Ashek- A- Khoda',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '+8801410-880911', type: 'Personal' }],
         emails: [
           { value: 'ashek.pad@pust.ac.bd', type: 'Office' },
@@ -6194,7 +6195,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'hist-chair',
       name: 'Dr. Md. Habibullah',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [{ value: '+8801717135560', type: 'Personal' }],
       emails: [{ value: 'chairman.hbs@pust.ac.bd', type: 'Office' }],
       qualification: 'Ph.D (RU), B.A (Hons...',
@@ -6206,7 +6207,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-1',
         name: 'Dr. Md. Habibullah',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801717135560', type: 'Personal' },
           { value: '+8802588844926', type: 'Office' },
@@ -6220,7 +6221,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-2',
         name: 'Md. Shafiqur Rahaman',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [],
         emails: [
           { value: 'shafiq.rahman@pust.ac.bd', type: 'Office' },
@@ -6234,7 +6235,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-3',
         name: 'Mst. Rahena Begum',
         designation: 'Assistant Professor (On Study Leave)',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [],
         emails: [
           { value: 'rahena.history@pust.ac.bd', type: 'Office' },
@@ -6247,7 +6248,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-4',
         name: 'Most. Shahanaz Parvin',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01767553037', type: 'Personal' }],
         emails: [
           { value: 'shahanajlucky.history@pust.ac.bd', type: 'Office' },
@@ -6260,7 +6261,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-5',
         name: 'Afrin Jahan',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01629073169', type: 'Personal' }],
         emails: [
           { value: 'afrin.his@pust.ac.bd', type: 'Office' },
@@ -6273,7 +6274,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-6',
         name: 'Md. Faruk Gazi',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01963216623', type: 'Personal' }],
         emails: [
           { value: 'gazi.his@pust.ac.bd', type: 'Office' },
@@ -6286,7 +6287,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-7',
         name: 'Abu Tayeb',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01705530139', type: 'Personal' }],
         emails: [
           { value: 'abutayeb.his@pust.ac.bd', type: 'Office' },
@@ -6299,7 +6300,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-fac-8',
         name: 'Arjuna Akter',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '01516546536', type: 'Personal' }],
         emails: [
           { value: 'arjuna.his@pust.ac.bd', type: 'Office' },
@@ -6315,7 +6316,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'hist-off-1',
         name: 'Md. Sakib Hossain',
         designation: 'Section Officer-G2',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01763957530', type: 'Personal' }],
         emails: [{ value: 'mdsakibhossain212@gmail.com', type: 'Personal' }],
         qualification: 'BSS',
@@ -6345,7 +6346,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
       id: 'ge-chair',
       name: 'Dr. Mohammad Najmul Islam',
       designation: 'Chairman',
-      photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+      photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
       phones: [{ value: '+8802588844907', type: 'Office' }],
       emails: [{ value: 'chairman.ge@pust.ac.bd', type: 'Office' }],
       qualification: 'Ph.D. (Kyoto Univers...',
@@ -6357,7 +6358,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-1',
         name: 'Dr. Mohammad Najmul Islam',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [],
         emails: [{ value: 'najmul@pust.ac.bd', type: 'Office' }],
         qualification: 'Ph.D. (Kyoto Univers....',
@@ -6368,7 +6369,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-2',
         name: 'Md Rahedul Islam (D. Eng.)',
         designation: 'Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_senior_prof_1795622511157.jpg',
+        photoUrl: 'https://i.ibb.co.com/Rp8szTHk/faculty-portrait-senior-prof-1795622511157.jpg',
         phones: [
           { value: '+8801717270888', type: 'Personal' },
           { value: '+88073164907', type: 'Office' },
@@ -6385,7 +6386,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-3',
         name: 'A. H. M. Monzurul Mamun',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_male_scholar_1795622511678.jpg',
+        photoUrl: 'https://i.ibb.co.com/nq2z9kLs/faculty-portrait-male-scholar-1795622511678.jpg',
         phones: [{ value: '8801719106342', type: 'Personal' }],
         emails: [
           { value: 'hasnat@pust.ac.bd', type: 'Office' },
@@ -6399,7 +6400,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-4',
         name: 'Humayra Anjum',
         designation: 'Associate Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_female_prof_1795622512182.jpg',
+        photoUrl: 'https://i.ibb.co.com/jP9ryQgk/faculty-portrait-female-prof-1795622512182.jpg',
         phones: [{ value: '+8801715103296', type: 'Personal' }],
         emails: [
           { value: 'humayra.geo@pust.ac.bd', type: 'Office' },
@@ -6413,7 +6414,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-5',
         name: 'Khondakar Arifuzzaman',
         designation: 'Assistant Professor',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01758020370', type: 'Personal' }],
         emails: [
           { value: 'arkhdm@pust.ac.bd', type: 'Office' },
@@ -6427,7 +6428,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-6',
         name: 'Md. Abrar Tazwar Rijon',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01783242242', type: 'Personal' }],
         emails: [
           { value: 'rijon.ge@pust.ac.bd', type: 'Office' },
@@ -6440,7 +6441,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-fac-7',
         name: 'Shekh Md. Shajid Hasan Tusher',
         designation: 'Lecturer',
-        photoUrl: '/src/assets/images/faculty_portrait_young_lecturer_1795622512478.jpg',
+        photoUrl: 'https://i.ibb.co.com/dwbtZz73/faculty-portrait-young-lecturer-1795622512478.jpg',
         phones: [{ value: '01752923161', type: 'Personal' }],
         emails: [
           { value: 'shajid.ge@pust.ac.bd', type: 'Office' },
@@ -6456,7 +6457,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-off-1',
         name: 'Md. Ariful Islam',
         designation: 'Assistant Registrar',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '8801712445186', type: 'Personal' }],
         emails: [
           { value: 'ariful.geo@pust.ac.bd', type: 'Office' },
@@ -6468,7 +6469,7 @@ export const SEED_DEPARTMENTS: DepartmentRecord[] = [
         id: 'ge-off-2',
         name: 'Md. Mahmudur Rahman',
         designation: 'Assistant Cartographer',
-        photoUrl: '/src/assets/images/officer_portrait_admin_1795622513333.jpg',
+        photoUrl: 'https://i.ibb.co.com/qMRvkRxt/officer-portrait-admin-1795622513333.jpg',
         phones: [{ value: '01710504691', type: 'Personal' }],
         emails: [{ value: 'mahmudur6010@gmail.com', type: 'Personal' }],
         qualification: 'B.Sc and M.Sc in GES (RU)',

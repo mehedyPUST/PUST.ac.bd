@@ -76,5 +76,5 @@ export function resolveDepartmentImage(
     }
   }
 
-  return FACULTY_DEFAULT_IMAGES[dept.faculty] || '/src/assets/images/pust_campus_hero_1795431408503.jpg';
+  return FACULTY_DEFAULT_IMAGES[dept.faculty] || 'https://i.ibb.co.com/chBZ45sr/pust-campus-hero-1795431408503.jpg';
 }

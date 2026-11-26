@@ -106,7 +106,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'South-Central Axis · Grid C4',
     xPercent: 48,
     yPercent: 67,
-    photo: '/src/assets/images/pust_admin_building_1795441924646.jpg',
+    photo: 'https://i.ibb.co.com/675xWTMC/pust-admin-building-1795441924646.jpg',
     caption: 'Fig. M1 — Administrative Building housing VC, Registrar & Examination Offices.',
     summary:
       'Central governance hub of the Rajapur campus situated directly north of the Main Gate promenade. Houses executive offices, statutory committee rooms, and student certificate verification counters.',
@@ -126,7 +126,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'Central Quad West · Grid B3',
     xPercent: 25,
     yPercent: 47,
-    photo: '/src/assets/images/pust_campus_hero_1795431408503.jpg',
+    photo: 'https://i.ibb.co.com/chBZ45sr/pust-campus-hero-1795431408503.jpg',
     caption: 'Fig. M2 — Main Academic Promenade and Academic Building I.',
     summary:
       'Founding multi-story academic complex supporting Faculty of Science (including Pharmacy), Faculty of Business Studies, Humanities & Social Science, and Geography & Environment.',
@@ -146,7 +146,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'West Research Wing · Grid A2',
     xPercent: 22,
     yPercent: 23,
-    photo: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    photo: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
     caption: 'Fig. M3 — Engineering & Applied Science Research Laboratories.',
     summary:
       'Dedicated engineering and technology complex equipped with high-performance computing clusters, VLSI & THz microwave testbeds, architecture design studios, and structural materials labs.',
@@ -165,7 +165,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'Central Quad North · Grid C2',
     xPercent: 51,
     yPercent: 41,
-    photo: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    photo: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
     caption: 'Fig. M4 — Central Library Reading Floor and Digital Archive.',
     summary:
       'Academic and research hub (clic@pust.ac.bd) managed by Additional Librarian Md. Hafizur Rahaman Mollah with faculty-wise monograph collections, thesis archives, and institutional IEEE/SpringerLink access.',
@@ -184,7 +184,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'East Cultural Axis · Grid D3',
     xPercent: 76,
     yPercent: 45,
-    photo: '/src/assets/images/pust_convocation_pavilion_1795438822077.jpg',
+    photo: 'https://i.ibb.co.com/tFJbPW5/pust-convocation-pavilion-1795438822077.jpg',
     caption: 'Fig. M5 — Convocation Grounds and Central Ceremonial Pavilion.',
     summary:
       'Ceremonial cultural precinct anchoring Shaheed Minar, Mukta Mancha, and the main auditorium grounds—designated venue for national academic symposia and the First Convocation (15 March 2027).',
@@ -203,7 +203,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'North Campus Sector · Grid D1',
     xPercent: 62,
     yPercent: 18,
-    photo: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    photo: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
     caption: 'Fig. M6 — Residential Halls Precinct and Landscaped Quadrangle.',
     summary:
       'Gated northern residential zone encompassing July 06 Hall (Male Hall-1), Swadhinota Hall (Male Hall-2), Matribhasha Hall (Female Hall-1), and Ganatantra Hall (Female Hall-2) with dining commons and reading rooms.',
@@ -223,7 +223,7 @@ export const DEFAULT_CAMPUS_BUILDINGS: CampusBuildingItem[] = [
     gridRef: 'East Lawn Sector · Grid D4',
     xPercent: 77,
     yPercent: 69,
-    photo: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
+    photo: 'https://i.ibb.co.com/x8FCcfhh/pust-medical-tsc-1795441926681.jpg',
     caption: 'Fig. M7 — Teacher-Student Center (TSC) & Campus Medical Pavilion.',
     summary:
       'Integrated student life and wellness pavilion connecting the Student Advisor Office (Dr. Md. Rashedul Haque), Central Cafeteria, student club rooms, and the Medical Center (+8802588844975, medicalsection@pust.ac.bd).',
@@ -400,7 +400,7 @@ export const DEFAULT_GOVERNANCE_CONTENT: GovernanceContent = {
 };
 
 export const DEFAULT_ADMIN_SHOWCASE: AdminShowcaseConfig = {
-  buildingImage: '/src/assets/images/pust_admin_building_1795441924646.jpg',
+  buildingImage: 'https://i.ibb.co.com/675xWTMC/pust-admin-building-1795441924646.jpg',
   buildingCaption: 'Fig. 1 — Administrative Building & Central Executive Complex, Rajapur Campus, Pabna.',
   charterTag: 'Act No. 43 of 2001',
   accountabilityCycle: 'APA FY 2026–2027 · UGC',
@@ -428,7 +428,7 @@ export const DEFAULT_ADMIN_SHOWCASE: AdminShowcaseConfig = {
 };
 
 export const DEFAULT_ABOUT_EXTRAS: AboutExtrasConfig = {
-  campusImage: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+  campusImage: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
   campusCaption: 'Rajapur Campus Quadrangle along the Dhaka–Pabna Highway.',
   milestones: [
     {
@@ -984,7 +984,7 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
       title: 'Engineering & Scientific Laboratories',
       description:
         'Hands-on facilities for VLSI, THz wireless communications, deep learning, supercapacitor synthesis, pharmaceutical HPLC, and river-basin geotechnics.',
-      imageUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+      imageUrl: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
       caption: 'Fig. 2 — Applied Engineering & Instrumentation Laboratories.',
     },
     {
@@ -993,7 +993,7 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
       title: 'Central Library & Digital Subscriptions',
       description:
         'Print monograph collections paired with institutional journal access to IEEE Xplore, SpringerLink, ACM Digital Library, and quiet thesis research floors.',
-      imageUrl: '/src/assets/images/pust_central_library_1795431408614.jpg',
+      imageUrl: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
       caption: 'Fig. 3 — Central Library & Information Center Reading Floor.',
     },
     {
@@ -1002,7 +1002,7 @@ export const DEFAULT_ACADEMIC_EXTRAS: AcademicExtrasConfig = {
       title: 'Residential Halls, Medical & Transport',
       description:
         'Residential accommodation across Male and Female Halls, PUST Medical Section (+8802588844975), ICT Cell, Student Advisor Office, and Transportation Pool bus routes (+8802588845650).',
-      imageUrl: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+      imageUrl: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
       caption: 'Fig. 4 — Rajapur Campus Quadrangle & Residential Precinct.',
     },
   ],
@@ -1047,7 +1047,7 @@ export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
     route: '/facilities/library',
     title: 'Central Library & Information Center (CLIC)',
     body: 'Managed by Additional Librarian Md. Hafizur Rahaman Mollah (clic@pust.ac.bd), the Central Library houses academic and reference books across all 5 faculties plus registered campus-IP access to IEEE Xplore, SpringerLink, and ACM Digital Library. Students apply in the Campus Portal with Department Chairman digital seal JSON for Digital and Physical Library Cards.',
-    img: '/src/assets/images/pust_central_library_1795431408614.jpg',
+    img: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
     hours: 'Sun–Thu · 08:30–21:00 BST',
     location: 'Central Library Complex · clic@pust.ac.bd',
     portalRoute: '/portal?tab=library',
@@ -1062,7 +1062,7 @@ export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
     route: '/facilities/transport',
     title: 'University Transportation Pool',
     body: 'Administered by Dr. Mir Humayun Kabir (transport@pust.ac.bd, +8802588845650), the Transportation Pool operates university-owned and contracted buses connecting Rajapur Campus with Pabna Town, Central Terminal, Edward College, and highway corridors for students, faculty, and officers.',
-    img: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    img: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
     hours: 'Sun–Thu · 07:15–18:30 BST',
     location: 'Transport Pool · +8802588845650 · transport@pust.ac.bd',
     portalRoute: '/portal',
@@ -1077,7 +1077,7 @@ export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
     route: '/facilities/residence',
     title: 'Residential Halls (July 06, Swadhinota, Matribhasha & Ganatantra)',
     body: 'PUST provides campus residential accommodation including July 06 Hall / Male Hall-1 (Provost: Md. Al-Fahad Bhuiyan), Swadhinota Hall / Male Hall-2 (Provost: Dr. Md. Kamruzzaman), Matribhasha Hall / Female Hall-1 (Provost: Dr. Rebeka Sultana Rekha), and Ganatantra Hall / Female Hall-2 (Provost: Laila Arzumand Banu). Vacancy circulars, seat history, and Hall Financial Clearances are fully online.',
-    img: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+    img: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
     hours: '24/7 Provost & House Tutor Duty',
     location: 'North Residential Precinct, Rajapur',
     portalRoute: '/portal?tab=halls',
@@ -1092,7 +1092,7 @@ export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
     route: '/facilities/medical',
     title: 'PUST Medical Section & Health Center',
     body: 'Staffed by Deputy Chief Medical Officers Dr. Md. Rafiqul Islam and Dr. Nasrin Sultana (medicalsection@pust.ac.bd, +8802588844975), the PUST Medical Center provides primary healthcare, outpatient consultations, essential medications, and 24/7 ambulance referral for residential students, faculty, and staff.',
-    img: '/src/assets/images/pust_medical_tsc_1795441926681.jpg',
+    img: 'https://i.ibb.co.com/x8FCcfhh/pust-medical-tsc-1795441926681.jpg',
     hours: 'Outpatient Sun–Thu · 24/7 Ambulance',
     location: 'Medical Center · +8802588844975 · medicalsection@pust.ac.bd',
     portalRoute: '/portal',
@@ -1107,7 +1107,7 @@ export const DEFAULT_FACILITIES_CONFIG: FacilityItemConfig[] = [
     route: '/facilities/ict-sheba',
     title: 'ICT Cell & ICT Sheba Portal',
     body: 'Directed by Dr. Md. Abdur Rahim (ictdirector@pust.ac.bd), the ICT Cell maintains PUST’s campus fiber-optic backbone, high-speed Wi-Fi across academic & residential wings, institutional @pust.ac.bd accounts, and automated portal clearance infrastructure.',
-    img: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+    img: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
     hours: 'Sun–Thu · 09:00–17:00 BST',
     location: 'ICT Cell Wing · ictdirector@pust.ac.bd',
     portalRoute: '/portal',

@@ -959,7 +959,7 @@ export function AcademicAndFacilitiesEditors({
                   tag: 'PUST Research Facility',
                   title: 'New Research Wing',
                   description: 'Laboratory and student support overview.',
-                  imageUrl: '/src/assets/images/pust_engineering_lab_1795431408924.jpg',
+                  imageUrl: 'https://i.ibb.co.com/FLNWQqzY/pust-engineering-lab-1795431408924.jpg',
                   caption: 'PUST Research Facility.',
                 },
               ])
@@ -1222,7 +1222,7 @@ export function AcademicAndFacilitiesEditors({
                 route: `/facilities/unit-${nextIdx + 1}`,
                 title: 'New Campus Service Wing',
                 body: 'Overview of campus student services and operating protocol.',
-                img: '/src/assets/images/pust_campus_grounds_1795431408500.jpg',
+                img: 'https://i.ibb.co.com/qLZmQK8S/pust-campus-grounds-1795431408500.jpg',
                 hours: 'Sun–Thu · 09:00–17:00 BST',
                 location: 'Rajapur Campus, Pabna',
                 portalRoute: '/portal',
