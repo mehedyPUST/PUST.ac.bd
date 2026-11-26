@@ -1001,3 +1001,67 @@ export interface AutomationOverviewResponse {
   studentReadiness: StudentReadinessSummary | null;
   recentAuditLogs: AuditLogRecord[];
 }
+
+export type DepartmentRequestCategory =
+  | 'Leave & NOC'
+  | 'Procurement & Lab'
+  | 'Curriculum & Course'
+  | 'Event & Seminar'
+  | 'Student Exemption'
+  | 'Grade & Exam';
+
+export type DepartmentRequestPriority = 'Standard' | 'Urgent';
+
+export type DepartmentRequestStatus =
+  | 'pending'
+  | 'revision_requested'
+  | 'approved'
+  | 'declined';
+
+export interface DepartmentRequestHistoryEntry {
+  action: 'submitted' | 'approved' | 'revision_requested' | 'resubmitted' | 'declined';
+  note: string;
+  actor: string;
+  actorRole: UserRole;
+  timestamp: string;
+}
+
+export interface DepartmentRequestRecord {
+  id: string;
+  referenceCode: string;
+  title: string;
+  category: DepartmentRequestCategory;
+  priority: DepartmentRequestPriority;
+  departmentCode: string;
+  requesterId: string;
+  requesterName: string;
+  requesterRole: UserRole;
+  requesterEmail: string;
+  requesterAcademicId: string;
+  summary: string;
+  justification: string;
+  requestedAmountBdt?: number;
+  targetDate?: string;
+  attachments: string[];
+  status: DepartmentRequestStatus;
+  reviewerName?: string;
+  reviewerNote?: string;
+  revisionInstructions?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  history: DepartmentRequestHistoryEntry[];
+}
+
+export interface DepartmentPendingCrossChecks {
+  pendingAccounts: number;
+  pendingLibrarySeals: number;
+  pendingExamAdmits: number;
+  pendingDraftResults: number;
+  pendingCertClearances: number;
+}
+
+export interface DepartmentApprovalOverviewResponse {
+  requests: DepartmentRequestRecord[];
+  crossChecks: DepartmentPendingCrossChecks;
+}

@@ -3127,3 +3127,330 @@ portalRouter.post(
     res.json({ report });
   }
 );
+
+// 11. Departmental Approval Dashboard (Department Head Review, Approve & Request Revisions)
+const deptRequestCreateSchema = z.object({
+  title: z.string().trim().min(5).max(180),
+  category: z.enum([
+    'Leave & NOC',
+    'Procurement & Lab',
+    'Curriculum & Course',
+    'Event & Seminar',
+    'Student Exemption',
+    'Grade & Exam',
+  ]),
+  priority: z.enum(['Standard', 'Urgent']).default('Standard'),
+  departmentCode: z.string().trim().min(2).max(16).optional(),
+  summary: z.string().trim().min(10).max(400),
+  justification: z.string().trim().min(15).max(2500),
+  requestedAmountBdt: z.number().int().min(0).max(50_000_000).optional(),
+  targetDate: z.string().trim().max(20).optional(),
+  attachments: z.array(z.string().trim().min(1).max(140)).max(8).optional(),
+});
+
+const deptRequestDecisionSchema = z.object({
+  decision: z.enum(['approve', 'request_revision', 'decline']),
+  note: z.string().trim().max(1000).optional(),
+});
+
+const deptRequestResubmitSchema = z.object({
+  summary: z.string().trim().min(10).max(400),
+  justification: z.string().trim().min(15).max(2500),
+  responseNote: z.string().trim().min(5).max(800),
+  attachments: z.array(z.string().trim().min(1).max(140)).max(8).optional(),
+});
+
+portalRouter.get('/approvals', requireAuth, async (req: AuthenticatedRequest, res) => {
+  const actor = req.authUser!;
+  const deptParam =
+    typeof req.query.department === 'string' ? req.query.department.trim().toUpperCase() : 'ALL';
+
+  let requests = await pustRepo.listDepartmentRequests();
+
+  if (actor.role === 'chairman') {
+    requests = requests.filter((r) => r.departmentCode === actor.departmentCode);
+  } else if (actor.role === 'admin') {
+    if (deptParam && deptParam !== 'ALL') {
+      requests = requests.filter((r) => r.departmentCode === deptParam);
+    }
+  } else {
+    requests = requests.filter(
+      (r) =>
+        r.requesterId === actor.sub ||
+        r.requesterEmail.toLowerCase() === actor.email.toLowerCase()
+    );
+  }
+
+  const targetDept = actor.role === 'chairman' ? actor.departmentCode : deptParam;
+  const isDeptScoped = targetDept && targetDept !== 'ALL';
+
+  const [users, libApps, examApps, examResults, certApps] = await Promise.all([
+    pustRepo.listUsers(),
+    pustRepo.listLibraryApplications(),
+    pustRepo.listExamApplications(),
+    pustRepo.listExamResults(),
+    pustRepo.listCertificateApplications(),
+  ]);
+
+  const crossChecks =
+    actor.role === 'chairman' || actor.role === 'admin'
+      ? {
+          pendingAccounts: users.filter(
+            (u) =>
+              u.approvalStatus === 'pending' &&
+              (u.role === 'student' || u.role === 'teacher') &&
+              (!isDeptScoped || u.departmentCode === targetDept)
+          ).length,
+          pendingLibrarySeals: libApps.filter(
+            (a) =>
+              a.status === 'pending_chairman' && (!isDeptScoped || a.departmentCode === targetDept)
+          ).length,
+          pendingExamAdmits: examApps.filter(
+            (a) =>
+              a.verificationStatus === 'Pending Chairman Verification' &&
+              (!isDeptScoped || a.departmentCode === targetDept)
+          ).length,
+          pendingDraftResults: examResults.filter(
+            (r) => !r.published && (!isDeptScoped || r.departmentCode === targetDept)
+          ).length,
+          pendingCertClearances: certApps.filter(
+            (c) =>
+              c.finalAdminStatus !== 'approved' &&
+              c.finalAdminStatus !== 'rejected' &&
+              c.clearances.chairman.status !== 'approved' &&
+              (!isDeptScoped || c.departmentCode === targetDept)
+          ).length,
+        }
+      : {
+          pendingAccounts: 0,
+          pendingLibrarySeals: 0,
+          pendingExamAdmits: 0,
+          pendingDraftResults: 0,
+          pendingCertClearances: 0,
+        };
+
+  res.json({ requests, crossChecks });
+});
+
+portalRouter.post('/approvals', requireAuth, async (req: AuthenticatedRequest, res) => {
+  const parsed = deptRequestCreateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({
+      error:
+        parsed.error.issues[0]?.message ||
+        'Complete request title, category, summary, and detailed justification.',
+    });
+    return;
+  }
+
+  const actor = req.authUser!;
+  const assignedDepartment =
+    actor.role === 'admin' && parsed.data.departmentCode
+      ? parsed.data.departmentCode.toUpperCase()
+      : actor.departmentCode;
+
+  if (!assignedDepartment || assignedDepartment === 'ADMIN') {
+    res.status(400).json({ error: 'Specify a target academic department code (e.g. CSE, EEE).' });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const created = await pustRepo.createDepartmentRequest({
+    title: parsed.data.title,
+    category: parsed.data.category,
+    priority: parsed.data.priority,
+    departmentCode: assignedDepartment,
+    requesterId: actor.sub,
+    requesterName: actor.name,
+    requesterRole: actor.role,
+    requesterEmail: actor.email,
+    requesterAcademicId: actor.academicId,
+    summary: parsed.data.summary,
+    justification: parsed.data.justification,
+    requestedAmountBdt:
+      parsed.data.requestedAmountBdt && parsed.data.requestedAmountBdt > 0
+        ? parsed.data.requestedAmountBdt
+        : undefined,
+    targetDate: parsed.data.targetDate || undefined,
+    attachments: parsed.data.attachments || [],
+    status: 'pending',
+    history: [
+      {
+        action: 'submitted',
+        note: parsed.data.summary,
+        actor: actor.name,
+        actorRole: actor.role,
+        timestamp: now,
+      },
+    ],
+  });
+
+  await pustRepo.logAudit(
+    actor.name,
+    actor.role,
+    `Submitted departmental request (${created.category})`,
+    `${created.referenceCode} -> ${created.departmentCode}`
+  );
+
+  res.status(201).json({ request: created });
+});
+
+portalRouter.patch(
+  '/approvals/:id/decision',
+  requireRoles('chairman', 'admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = deptRequestDecisionSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid approval decision payload.' });
+      return;
+    }
+
+    const target = await pustRepo.findDepartmentRequestById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Departmental request not found.' });
+      return;
+    }
+
+    const actor = req.authUser!;
+    if (actor.role === 'chairman' && target.departmentCode !== actor.departmentCode) {
+      res.status(403).json({
+        error: `Department Chairmen may only review requests assigned to ${actor.departmentCode}.`,
+      });
+      return;
+    }
+
+    if (target.status === 'approved' || target.status === 'declined') {
+      res.status(409).json({
+        error: `This request has already been finalized (${target.status}).`,
+      });
+      return;
+    }
+
+    const note = parsed.data.note?.trim() || '';
+    if (
+      (parsed.data.decision === 'request_revision' || parsed.data.decision === 'decline') &&
+      note.length < 5
+    ) {
+      res.status(400).json({
+        error: 'Provide clear written instructions or reason (min 5 characters) when requesting revisions or declining.',
+      });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const nextStatus =
+      parsed.data.decision === 'approve'
+        ? 'approved'
+        : parsed.data.decision === 'request_revision'
+        ? 'revision_requested'
+        : 'declined';
+
+    const historyAction =
+      parsed.data.decision === 'approve'
+        ? 'approved'
+        : parsed.data.decision === 'request_revision'
+        ? 'revision_requested'
+        : 'declined';
+
+    const finalNote =
+      note ||
+      (parsed.data.decision === 'approve'
+        ? `Approved by ${actor.name} (${target.departmentCode}).`
+        : 'Reviewed.');
+
+    const updated = await pustRepo.updateDepartmentRequest(target.id, {
+      status: nextStatus,
+      reviewerName: actor.name,
+      reviewerNote: finalNote,
+      revisionInstructions:
+        parsed.data.decision === 'request_revision' ? finalNote : target.revisionInstructions,
+      reviewedAt: now,
+      history: [
+        ...target.history,
+        {
+          action: historyAction,
+          note: finalNote,
+          actor: actor.name,
+          actorRole: actor.role,
+          timestamp: now,
+        },
+      ],
+    });
+
+    await pustRepo.logAudit(
+      actor.name,
+      actor.role,
+      `Department request ${nextStatus}`,
+      `${target.referenceCode} (${target.departmentCode})`
+    );
+
+    res.json({ request: updated });
+  }
+);
+
+portalRouter.post(
+  '/approvals/:id/resubmit',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = deptRequestResubmitSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error:
+          parsed.error.issues[0]?.message ||
+          'Provide updated summary, justification, and revision response note.',
+      });
+      return;
+    }
+
+    const target = await pustRepo.findDepartmentRequestById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Departmental request not found.' });
+      return;
+    }
+
+    const actor = req.authUser!;
+    const isOwner =
+      target.requesterId === actor.sub ||
+      target.requesterEmail.toLowerCase() === actor.email.toLowerCase();
+    if (!isOwner && actor.role !== 'admin') {
+      res.status(403).json({
+        error: 'Only the original requester or Admin Office may resubmit a revised request.',
+      });
+      return;
+    }
+
+    if (target.status !== 'revision_requested') {
+      res.status(409).json({
+        error: 'Only requests marked for revision may be resubmitted.',
+      });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const updated = await pustRepo.updateDepartmentRequest(target.id, {
+      summary: parsed.data.summary,
+      justification: parsed.data.justification,
+      attachments: parsed.data.attachments ?? target.attachments,
+      status: 'pending',
+      history: [
+        ...target.history,
+        {
+          action: 'resubmitted',
+          note: parsed.data.responseNote,
+          actor: actor.name,
+          actorRole: actor.role,
+          timestamp: now,
+        },
+      ],
+    });
+
+    await pustRepo.logAudit(
+      actor.name,
+      actor.role,
+      'Resubmitted revised departmental request',
+      `${target.referenceCode} (${target.departmentCode})`
+    );
+
+    res.json({ request: updated });
+  }
+);

@@ -11,7 +11,11 @@ import type {
   CertificateApplicationRecord,
   ClearanceOfficeKey,
   CourseRecord,
+  DepartmentApprovalOverviewResponse,
   DepartmentRecord,
+  DepartmentRequestCategory,
+  DepartmentRequestPriority,
+  DepartmentRequestRecord,
   DigitalDocumentMeta,
   ExamApplicationRecord,
   ExamCircularRecord,
@@ -867,4 +871,55 @@ export const pustApi = {
       method: 'POST',
       body: JSON.stringify({}),
     }),
+
+  // Portal: Department Head Approval Dashboard
+  getDepartmentApprovals: (department?: string) => {
+    const qs = department && department !== 'ALL' ? `?department=${encodeURIComponent(department)}` : '';
+    return apiFetch<DepartmentApprovalOverviewResponse>(`/api/portal/approvals${qs}`);
+  },
+
+  submitDepartmentRequest: (payload: {
+    title: string;
+    category: DepartmentRequestCategory;
+    priority: DepartmentRequestPriority;
+    departmentCode?: string;
+    summary: string;
+    justification: string;
+    requestedAmountBdt?: number;
+    targetDate?: string;
+    attachments?: string[];
+  }) =>
+    apiFetch<{ request: DepartmentRequestRecord }>('/api/portal/approvals', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  reviewDepartmentRequest: (
+    id: string,
+    payload: { decision: 'approve' | 'request_revision' | 'decline'; note?: string }
+  ) =>
+    apiFetch<{ request: DepartmentRequestRecord }>(
+      `/api/portal/approvals/${encodeURIComponent(id)}/decision`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  resubmitDepartmentRequest: (
+    id: string,
+    payload: {
+      summary: string;
+      justification: string;
+      responseNote: string;
+      attachments?: string[];
+    }
+  ) =>
+    apiFetch<{ request: DepartmentRequestRecord }>(
+      `/api/portal/approvals/${encodeURIComponent(id)}/resubmit`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
 };

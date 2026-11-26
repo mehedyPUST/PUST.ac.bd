@@ -10,6 +10,7 @@ import type {
   CertificateApplicationRecord,
   CourseRecord,
   DepartmentRecord,
+  DepartmentRequestRecord,
   ExamApplicationRecord,
   ExamCircularRecord,
   ExamResultRecord,
@@ -39,6 +40,7 @@ import {
   SEED_CERTIFICATE_APPLICATIONS,
   SEED_COURSES,
   SEED_DEPARTMENTS,
+  SEED_DEPARTMENT_REQUESTS,
   SEED_EXAM_APPLICATIONS,
   SEED_EXAM_CIRCULARS,
   SEED_EXAM_RESULTS,
@@ -121,6 +123,7 @@ class PustRepository {
   private vcProfiles: ViceChancellorRecord[] = [...SEED_VC_PROFILES];
   private auditLogs: AuditLogRecord[] = [];
   private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
+  private departmentRequests: DepartmentRequestRecord[] = [...SEED_DEPARTMENT_REQUESTS];
   private bookmarks: BookmarkRecord[] = [];
   private automationConfig: AutomationRulesConfig = {
     autoClearPaidHallDues: true,
@@ -259,6 +262,7 @@ class PustRepository {
     await seedIfEmpty('payment_gateways', SEED_PAYMENT_GATEWAYS);
     await seedIfEmpty('payment_receipts', SEED_PAYMENT_RECEIPTS);
     await seedIfEmpty('inquiries', SEED_INQUIRIES);
+    await seedIfEmpty('department_requests', SEED_DEPARTMENT_REQUESTS);
     await seedIfEmpty('gallery_items', SEED_GALLERY_ITEMS);
     await seedIfEmpty('banner_slides', SEED_BANNER_SLIDES);
     await seedIfEmpty('about_sections', SEED_ABOUT_SECTIONS);
@@ -1168,6 +1172,40 @@ class PustRepository {
       respondedAt: new Date().toISOString(),
     });
   };
+
+  // Departmental Administrative Requests (Approval Dashboard)
+  listDepartmentRequests = async (): Promise<DepartmentRequestRecord[]> => {
+    const items = await this.getAll('department_requests', this.departmentRequests);
+    return items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  };
+
+  findDepartmentRequestById = async (id: string): Promise<DepartmentRequestRecord | null> => {
+    const list = await this.listDepartmentRequests();
+    return list.find((r) => r.id === id) ?? null;
+  };
+
+  createDepartmentRequest = (
+    input: Omit<DepartmentRequestRecord, 'id' | 'referenceCode' | 'createdAt' | 'updatedAt'>
+  ): Promise<DepartmentRequestRecord> => {
+    const refSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const now = new Date().toISOString();
+    return this.insertItem('department_requests', this.departmentRequests, {
+      id: `dreq-${crypto.randomUUID()}`,
+      referenceCode: `PUST-REQ-${input.departmentCode}-${new Date().getFullYear()}-${refSuffix}`,
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    });
+  };
+
+  updateDepartmentRequest = (
+    id: string,
+    patch: Partial<DepartmentRequestRecord>
+  ): Promise<DepartmentRequestRecord | null> =>
+    this.updateItem('department_requests', this.departmentRequests, id, {
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    });
 
   // Public Document Verification Lookup
   async findVerificationByCode(rawCode: string): Promise<VerificationLookupResult | null> {

@@ -11,6 +11,7 @@ import {
   Building,
   Check,
   CheckCircle2,
+  ClipboardCheck,
   Clock,
   Eye,
   EyeOff,
@@ -37,6 +38,7 @@ import { usePust } from './PustContext';
 import { PwaInstallButton } from './PwaManager';
 import { PortalRecordsSkeleton } from './PustSkeletons';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
+import { ApprovalDashboardPanel } from './portal/ApprovalDashboardPanel';
 import { CertificatePanel } from './portal/CertificatePanel';
 import { DigitalDocumentModal, type DigitalDocumentData } from './portal/DigitalDocumentModal';
 import { ExamPanel } from './portal/ExamPanel';
@@ -82,6 +84,7 @@ interface PortalViewProps {
 type AuthMode = 'login' | 'student-token' | 'officer' | 'admin-claim' | 'admin-passcode';
 type PortalTab =
   | 'overview'
+  | 'approvals'
   | 'workflow'
   | 'students'
   | 'library'
@@ -92,6 +95,7 @@ type PortalTab =
 
 const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
+  'approvals',
   'workflow',
   'students',
   'library',
@@ -1310,6 +1314,7 @@ export function PortalView({
       case 'student':
         return [
           { id: 'overview', label: 'My Campus Overview', icon: LayoutDashboard, desc: 'Standing, receipts & alerts' },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Exemptions & Chair review' },
           { id: 'workflow', label: 'Automated Readiness', icon: Workflow, desc: 'Live 6-step clearance checks' },
           { id: 'students', label: 'My Academic Profile', icon: GraduationCap, desc: 'CGPA, hall & documents' },
           { id: 'library', label: 'Library & Digital Card', icon: BookOpen, desc: 'Card, QR & borrowed books' },
@@ -1320,6 +1325,7 @@ export function PortalView({
       case 'teacher':
         return [
           { id: 'overview', label: 'Faculty Overview', icon: LayoutDashboard, desc: 'Assigned courses & alerts' },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Leave, lab & course filings' },
           { id: 'workflow', label: 'Office Flow Status', icon: Workflow, desc: 'Live campus policy triggers' },
           { id: 'students', label: 'Department Class Roster', icon: Users, desc: `${user.departmentCode} student records` },
           { id: 'exams', label: 'Gradebook & Exams', icon: FileSpreadsheet, desc: 'Submit marksheets & courses' },
@@ -1328,6 +1334,7 @@ export function PortalView({
       case 'chairman':
         return [
           { id: 'overview', label: 'Chairman Desk', icon: LayoutDashboard, desc: `${user.departmentCode} office summary` },
+          { id: 'approvals', label: 'Approval Dashboard', icon: ClipboardCheck, desc: `${user.departmentCode} requests & revisions` },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Unified queue & batch sweep' },
           { id: 'students', label: 'Department Students', icon: Users, desc: 'Roster & Chairman remarks' },
           { id: 'library', label: 'Chairman Library Seals', icon: BookOpen, desc: 'Sign & forward applications' },
@@ -1338,6 +1345,7 @@ export function PortalView({
       case 'library':
         return [
           { id: 'overview', label: 'Library Overview', icon: LayoutDashboard, desc: 'Card queue & alerts' },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Card & clearance queue sweep' },
           { id: 'library', label: 'Cards & Borrowing Desk', icon: BookOpen, desc: 'Verify seals & checkouts' },
           { id: 'certificates', label: 'Library Clearances', icon: Award, desc: '4-office graduation sign-off' },
@@ -1346,6 +1354,7 @@ export function PortalView({
       case 'hall':
         return [
           { id: 'overview', label: 'Hall Provost Overview', icon: LayoutDashboard, desc: `${user.hallAffiliation} summary` },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Seats, dues & clearances sweep' },
           { id: 'students', label: 'Hall Residents Roster', icon: Users, desc: 'Resident standing & rooms' },
           { id: 'halls', label: 'Seats, Circulars & Dues', icon: Building, desc: 'Allotments & clearances' },
@@ -1355,6 +1364,7 @@ export function PortalView({
       case 'proctor':
         return [
           { id: 'overview', label: 'Proctorial Overview', icon: LayoutDashboard, desc: 'Conduct & clearance queue' },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Proctorial queue & sweep' },
           { id: 'students', label: 'Student Conduct Ledger', icon: Users, desc: 'Disciplinary status & notes' },
           { id: 'certificates', label: 'Proctorial Clearances', icon: Award, desc: '4-office graduation sign-off' },
@@ -1364,6 +1374,7 @@ export function PortalView({
       case 'vc':
         return [
           { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, desc: 'Governance metrics & alerts' },
+          { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Inquiries & campus automation' },
           { id: 'students', label: 'University Student Directory', icon: Users, desc: 'All departments & sessions' },
           { id: 'governance', label: 'Governance, Notices & Audit', icon: ShieldCheck, desc: 'Circulars, inquiries & logs' },
@@ -1372,6 +1383,7 @@ export function PortalView({
       default:
         return [
           { id: 'overview', label: 'Admin Command Overview', icon: LayoutDashboard, desc: 'Institution-wide summary' },
+          { id: 'approvals', label: 'Approval Dashboard', icon: ClipboardCheck, desc: 'All-department request review' },
           { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Cross-office sweep & rules' },
           { id: 'students', label: 'All-Dept Student Database', icon: Users, desc: 'Directory & Admin remarks' },
           { id: 'library', label: 'Library Oversight', icon: BookOpen, desc: 'Cards & borrowing ledger' },
@@ -2150,6 +2162,14 @@ export function PortalView({
                 </>
               )}
             </div>
+          )}
+
+          {resolvedTab === 'approvals' && (
+            <ApprovalDashboardPanel
+              user={user}
+              departments={departments}
+              onOpenTab={(tab) => setActiveTab(tab as PortalTab)}
+            />
           )}
 
           {resolvedTab === 'workflow' && (
