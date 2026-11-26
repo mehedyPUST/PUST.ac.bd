@@ -5,12 +5,14 @@
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 
-  /* ── Official PUST Shield Maroon (Primary — unchanged brand core) ── */
-  --color-pust-50: #FDF6F6;
-  --color-pust-100: #FAEAEA;
-  --color-pust-200: #F3D0D1;
-  --color-pust-300: #E8A8AB;
-  --color-pust-400: #D15C61;
+  /* ═══════════════════════════════════════════════════════════════
+     PRIMARY — Official PUST Shield Maroon (brand core, do not shift)
+     ═══════════════════════════════════════════════════════════════ */
+  --color-pust-50: #FFF5F5;
+  --color-pust-100: #FFE8E8;
+  --color-pust-200: #FFC9CB;
+  --color-pust-300: #F59A9E;
+  --color-pust-400: #E04D55;
   --color-pust-500: #9E1B1F;
   --color-pust-600: #861518;
   --color-pust-700: #6F1013;
@@ -18,70 +20,161 @@
   --color-pust-900: #450305;
   --color-pust-950: #2C0203;
 
-  /* ── Ribbon Gold (honors, accents, highlights) ── */
-  --color-gold-50: #FFFBF0;
-  --color-gold-100: #FCF4D9;
-  --color-gold-200: #F8E6A8;
-  --color-gold-300: #F0D26A;
-  --color-gold-400: #E4B82E;
-  --color-gold-500: #C9920A;
+  /* ── Vivid Red (alerts, urgent, live status) ── */
+  --color-red-50: #FFF1F1;
+  --color-red-100: #FFE0E0;
+  --color-red-200: #FFC5C5;
+  --color-red-300: #FF9B9B;
+  --color-red-400: #FF6464;
+  --color-red-500: #EF2B2B;
+  --color-red-600: #D91A1A;
+  --color-red-700: #B41414;
+  --color-red-800: #8F1212;
+  --color-red-900: #711616;
+  --color-red-950: #3D0707;
+
+  /* ── Ribbon Gold (honors, awards, highlights) ── */
+  --color-gold-50: #FFFBEB;
+  --color-gold-100: #FFF3C4;
+  --color-gold-200: #FFE686;
+  --color-gold-300: #FFD445;
+  --color-gold-400: #F5BC12;
+  --color-gold-500: #D99A00;
   --color-gold-600: #B37B00;
   --color-gold-700: #8D6000;
   --color-gold-800: #6E4A00;
   --color-gold-900: #523600;
   --color-gold-950: #2F1E00;
 
-  /* ── Engineering Navy / Lapis (governance & structure) ── */
-  --color-lapis-50: #F3F4FC;
-  --color-lapis-100: #E4E6F8;
-  --color-lapis-200: #C8CCF0;
-  --color-lapis-300: #9AA1E0;
-  --color-lapis-400: #5C63C4;
-  --color-lapis-500: #3533A0;
-  --color-lapis-600: #222082;
-  --color-lapis-700: #1B186B;
-  --color-lapis-800: #151254;
-  --color-lapis-900: #0F0D3D;
-  --color-lapis-950: #080724;
+  /* ── Amber (warnings, deadlines) ── */
+  --color-amber-50: #FFF8EB;
+  --color-amber-100: #FFEFC6;
+  --color-amber-200: #FFDB87;
+  --color-amber-300: #FFC14A;
+  --color-amber-400: #FFA51A;
+  --color-amber-500: #F58A00;
+  --color-amber-600: #D96E00;
+  --color-amber-700: #B35300;
+  --color-amber-800: #8F4208;
+  --color-amber-900: #75370C;
+  --color-amber-950: #431A02;
 
-  /* ── Bengal Emerald / Sage (campus & growth) ── */
-  --color-sage-50: #F1FAF4;
-  --color-sage-100: #DCF3E4;
-  --color-sage-200: #B6E5C8;
-  --color-sage-300: #7DCF9C;
-  --color-sage-400: #3EAD68;
-  --color-sage-500: #1A8F45;
+  /* ── Emerald (success, campus, growth) — vivid ── */
+  --color-emerald-50: #ECFDF5;
+  --color-emerald-100: #D1FAE5;
+  --color-emerald-200: #A7F3D0;
+  --color-emerald-300: #6EE7B7;
+  --color-emerald-400: #34D399;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065F46;
+  --color-emerald-900: #064E3B;
+  --color-emerald-950: #022C22;
+
+  /* ── Sage / Bengal green (legacy alias + deeper campus) ── */
+  --color-sage-50: #F0FDF6;
+  --color-sage-100: #DCFCE9;
+  --color-sage-200: #BBF7D4;
+  --color-sage-300: #86EFBA;
+  --color-sage-400: #4ADE8A;
+  --color-sage-500: #22C55E;
   --color-sage-600: #0C7830;
   --color-sage-700: #0A6126;
   --color-sage-800: #074A1D;
   --color-sage-900: #053515;
   --color-sage-950: #031F0C;
 
-  /* ── Science Cerulean (research & ICT) ── */
-  --color-cerulean-50: #F0F8FF;
-  --color-cerulean-100: #DFF0FE;
-  --color-cerulean-200: #B6E0FD;
-  --color-cerulean-300: #7CC8FA;
-  --color-cerulean-400: #36A9F0;
-  --color-cerulean-500: #0C8DD9;
-  --color-cerulean-600: #027AC7;
-  --color-cerulean-700: #0362A0;
-  --color-cerulean-800: #064D7C;
-  --color-cerulean-900: #08395C;
-  --color-cerulean-950: #05243C;
+  /* ── Teal (labs, data, digital services) ── */
+  --color-teal-50: #F0FDFA;
+  --color-teal-100: #CCFBF1;
+  --color-teal-200: #99F6E4;
+  --color-teal-300: #5EEAD4;
+  --color-teal-400: #2DD4BF;
+  --color-teal-500: #14B8A6;
+  --color-teal-600: #0D9488;
+  --color-teal-700: #0F766E;
+  --color-teal-800: #115E59;
+  --color-teal-900: #134E4A;
+  --color-teal-950: #042F2E;
 
-  /* ── Institutional neutral (warm slate, not cold gray) ── */
-  --color-ink-50: #F7F6F4;
-  --color-ink-100: #EEECE7;
-  --color-ink-200: #DCD8D2;
-  --color-ink-300: #C0B9B0;
-  --color-ink-400: #958C82;
-  --color-ink-500: #6F675F;
-  --color-ink-600: #564F49;
-  --color-ink-700: #3F3A36;
-  --color-ink-800: #2A2623;
-  --color-ink-900: #1A1715;
-  --color-ink-950: #0C0B0A;
+  /* ── Cerulean / Sky (research, ICT) ── */
+  --color-cerulean-50: #F0F9FF;
+  --color-cerulean-100: #E0F2FE;
+  --color-cerulean-200: #BAE6FD;
+  --color-cerulean-300: #7DD3FC;
+  --color-cerulean-400: #38BDF8;
+  --color-cerulean-500: #0EA5E9;
+  --color-cerulean-600: #0284C7;
+  --color-cerulean-700: #0369A1;
+  --color-cerulean-800: #075985;
+  --color-cerulean-900: #0C4A6E;
+  --color-cerulean-950: #082F49;
+
+  /* ── Indigo / Lapis (governance, structure) ── */
+  --color-lapis-50: #EEF2FF;
+  --color-lapis-100: #E0E7FF;
+  --color-lapis-200: #C7D2FE;
+  --color-lapis-300: #A5B4FC;
+  --color-lapis-400: #818CF8;
+  --color-lapis-500: #6366F1;
+  --color-lapis-600: #222082;
+  --color-lapis-700: #1B186B;
+  --color-lapis-800: #151254;
+  --color-lapis-900: #0F0D3D;
+  --color-lapis-950: #080724;
+
+  /* ── Violet (innovation, programs, culture) ── */
+  --color-violet-50: #F5F3FF;
+  --color-violet-100: #EDE9FE;
+  --color-violet-200: #DDD6FE;
+  --color-violet-300: #C4B5FD;
+  --color-violet-400: #A78BFA;
+  --color-violet-500: #8B5CF6;
+  --color-violet-600: #7C3AED;
+  --color-violet-700: #6D28D9;
+  --color-violet-800: #5B21B6;
+  --color-violet-900: #4C1D95;
+  --color-violet-950: #2E1065;
+
+  /* ── Fuchsia (events, student life) ── */
+  --color-fuchsia-50: #FDF4FF;
+  --color-fuchsia-100: #FAE8FF;
+  --color-fuchsia-200: #F5D0FE;
+  --color-fuchsia-300: #F0ABFC;
+  --color-fuchsia-400: #E879F9;
+  --color-fuchsia-500: #D946EF;
+  --color-fuchsia-600: #C026D3;
+  --color-fuchsia-700: #A21CAF;
+  --color-fuchsia-800: #86198F;
+  --color-fuchsia-900: #701A75;
+  --color-fuchsia-950: #4A044E;
+
+  /* ── Rose (admissions, soft emphasis) ── */
+  --color-rose-50: #FFF1F2;
+  --color-rose-100: #FFE4E6;
+  --color-rose-200: #FECDD3;
+  --color-rose-300: #FDA4AF;
+  --color-rose-400: #FB7185;
+  --color-rose-500: #F43F5E;
+  --color-rose-600: #E11D48;
+  --color-rose-700: #BE123C;
+  --color-rose-800: #9F1239;
+  --color-rose-900: #881337;
+  --color-rose-950: #4C0519;
+
+  /* ── Institutional ink (warm neutral text & chrome) ── */
+  --color-ink-50: #FAFAF9;
+  --color-ink-100: #F5F5F4;
+  --color-ink-200: #E7E5E4;
+  --color-ink-300: #D6D3D1;
+  --color-ink-400: #A8A29E;
+  --color-ink-500: #78716C;
+  --color-ink-600: #57534E;
+  --color-ink-700: #44403C;
+  --color-ink-800: #292524;
+  --color-ink-900: #1C1917;
+  --color-ink-950: #0C0A09;
 }
 
 @layer base {
@@ -93,20 +186,21 @@
   }
 
   body {
-    color: #1a1715;
+    color: #1c1917;
     line-height: 1.65;
     overflow-x: clip;
-    background-color: #f6f4f1;
+    background-color: #f7f5f2;
     background-image:
-      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(158, 27, 31, 0.04), transparent 55%),
-      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(179, 123, 0, 0.035), transparent 45%),
-      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(12, 120, 48, 0.03), transparent 40%);
+      radial-gradient(ellipse 110% 70% at 50% -15%, rgba(158, 27, 31, 0.07), transparent 55%),
+      radial-gradient(ellipse 70% 45% at 100% 5%, rgba(139, 92, 246, 0.05), transparent 50%),
+      radial-gradient(ellipse 60% 40% at 0% 90%, rgba(16, 185, 129, 0.05), transparent 45%),
+      radial-gradient(ellipse 50% 35% at 90% 85%, rgba(14, 165, 233, 0.04), transparent 40%);
     background-attachment: fixed;
   }
 
   h1, h2, h3 {
     text-wrap: balance;
-    color: #1a1715;
+    color: #1c1917;
   }
 
   :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not(.text-center *):not(.text-right *) {
@@ -116,7 +210,7 @@
   }
 
   ::selection {
-    background-color: #590608;
+    background-color: #9E1B1F;
     color: #ffffff;
   }
 
@@ -129,10 +223,9 @@
     outline-offset: 2px;
   }
 
-  /* Refined scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #c0b9b0 transparent;
+    scrollbar-color: #a8a29e transparent;
   }
 
   *::-webkit-scrollbar {
@@ -145,7 +238,7 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #c0b9b0, #958c82);
+    background: linear-gradient(180deg, #d6d3d1, #a8a29e);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -158,41 +251,55 @@
   }
 }
 
-/* ── Architectural card surfaces (crest-tinted, soft depth) ── */
+/* ── Vivid card surfaces ── */
 .card-gradient-crimson {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(253, 246, 246, 0.95) 48%, rgba(250, 234, 234, 0.9) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: linear-gradient(160deg, #ffffff 0%, #fff5f5 42%, #ffe8e8 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-gradient-gold {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 251, 240, 0.95) 48%, rgba(252, 244, 217, 0.88) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: linear-gradient(160deg, #ffffff 0%, #fffbeb 42%, #fff3c4 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-gradient-lapis {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(243, 244, 252, 0.95) 48%, rgba(228, 230, 248, 0.9) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: linear-gradient(160deg, #ffffff 0%, #eef2ff 42%, #e0e7ff 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-gradient-sage {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(241, 250, 244, 0.95) 48%, rgba(220, 243, 228, 0.88) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: linear-gradient(160deg, #ffffff 0%, #ecfdf5 42%, #d1fae5 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-gradient-cerulean {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(240, 248, 255, 0.95) 48%, rgba(223, 240, 254, 0.88) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: linear-gradient(160deg, #ffffff 0%, #f0f9ff 42%, #e0f2fe 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-gradient-parchment {
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(252, 250, 246, 0.96) 45%, rgba(245, 241, 232, 0.92) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  background: linear-gradient(160deg, #ffffff 0%, #fafaf9 42%, #f5f5f4 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.card-gradient-violet {
+  background: linear-gradient(160deg, #ffffff 0%, #f5f3ff 42%, #ede9fe 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.card-gradient-emerald {
+  background: linear-gradient(160deg, #ffffff 0%, #ecfdf5 42%, #a7f3d0 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.card-gradient-teal {
+  background: linear-gradient(160deg, #ffffff 0%, #f0fdfa 42%, #ccfbf1 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.card-gradient-rose {
+  background: linear-gradient(160deg, #ffffff 0%, #fff1f2 42%, #ffe4e6 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .card-hover-lift {
@@ -205,32 +312,87 @@
 .card-hover-lift:hover {
   transform: translateY(-3px);
   box-shadow:
-    0 18px 36px -14px rgba(44, 2, 3, 0.14),
-    0 8px 16px -10px rgba(158, 27, 31, 0.1),
-    0 0 0 1px rgba(158, 27, 31, 0.04);
+    0 20px 40px -16px rgba(44, 2, 3, 0.16),
+    0 10px 18px -12px rgba(158, 27, 31, 0.12),
+    0 0 0 1px rgba(158, 27, 31, 0.06);
 }
 
-/* Soft institutional panel */
 .surface-panel {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(192, 185, 176, 0.45);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(214, 211, 209, 0.65);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 10px 28px -16px rgba(26, 23, 21, 0.12);
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 12px 32px -18px rgba(28, 25, 23, 0.14);
 }
 
-/* Primary CTA sheen */
+/* Primary CTA — vivid maroon sheen */
 .btn-primary-sheen {
-  background: linear-gradient(180deg, #b32025 0%, #9E1B1F 45%, #861518 100%);
+  background: linear-gradient(180deg, #c42328 0%, #9E1B1F 48%, #7a1215 100%);
+  color: #fff;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 8px 18px -8px rgba(158, 27, 31, 0.45);
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 10px 22px -10px rgba(158, 27, 31, 0.55);
 }
 
 .btn-primary-sheen:hover {
-  background: linear-gradient(180deg, #c42a30 0%, #a81d21 45%, #8f171a 100%);
+  background: linear-gradient(180deg, #d42c32 0%, #b01e22 48%, #8a1519 100%);
+}
+
+/* Accent chips / badges */
+.accent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.accent-chip-primary {
+  background: #ffe8e8;
+  color: #861518;
+  border: 1px solid #ffc9cb;
+}
+
+.accent-chip-emerald {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.accent-chip-violet {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.accent-chip-red {
+  background: #ffe0e0;
+  color: #b41414;
+  border: 1px solid #ffc5c5;
+}
+
+.accent-chip-gold {
+  background: #fff3c4;
+  color: #8d6000;
+  border: 1px solid #ffe686;
+}
+
+.accent-chip-cerulean {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.accent-chip-teal {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
 }
 
 .prose-justify {
@@ -282,15 +444,15 @@
 }
 
 [data-edit-mode="true"] .editable-region {
-  outline: 1.5px dashed rgba(179, 123, 0, 0.5);
+  outline: 1.5px dashed rgba(217, 119, 6, 0.55);
   outline-offset: 4px;
   border-radius: 0.75rem;
   transition: outline-color 150ms ease, background-color 150ms ease;
 }
 
 [data-edit-mode="true"] .editable-region:hover {
-  outline-color: rgba(158, 27, 31, 0.75);
-  background-color: rgba(158, 27, 31, 0.02);
+  outline-color: rgba(158, 27, 31, 0.8);
+  background-color: rgba(158, 27, 31, 0.03);
 }
 
 @media print {
