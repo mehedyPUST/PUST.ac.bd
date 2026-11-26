@@ -331,18 +331,18 @@ export function HomePage({
                   {profile.heroSubtitle && (
                     <p
                       data-gsap-hero
-                      className="text-fluid-lead text-slate-700 max-w-xl"
+                      className="text-fluid-lead text-slate-700 max-w-xl text-left"
                     >
                       {profile.heroSubtitle}
                     </p>
                   )}
                 </div>
               ) : (
-                <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-2">
+                <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2">
                   <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                     Pabna University of Science and Technology
                   </h1>
-                  <p className="text-fluid-body text-slate-700">
+                  <p className="text-fluid-body text-slate-700 text-left">
                     University profile summary is currently unavailable.
                   </p>
                 </div>
@@ -350,7 +350,7 @@ export function HomePage({
 
               <div
                 data-gsap-hero
-                className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3"
+                className="mt-8 pt-6 border-t border-stone-200 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3"
               >
                 <Link
                   href="/portal"
@@ -360,7 +360,7 @@ export function HomePage({
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold border border-slate-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 shadow-xs transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   {profile?.departmentsCount
                     ? `Explore ${profile.departmentsCount} Departments`
@@ -368,10 +368,10 @@ export function HomePage({
                 </Link>
                 <Link
                   href="/verify"
-                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-semibold text-pust-800 bg-white border border-slate-200 hover:border-pust-700 hover:bg-pust-50/60 transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-2.5 py-2 text-sm font-semibold text-pust-800 hover:text-pust-950 transition-colors whitespace-nowrap shrink-0"
                 >
                   <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                  Verify Document
+                  <span className="underline-offset-4 group-hover:underline">Verify Document</span>
                   <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
               </div>
@@ -490,10 +490,10 @@ export function HomePage({
 
               {slides.length > 1 && (
                 <div
-                  className="mt-1.5 flex items-center justify-between gap-3"
+                  className="mt-2 flex items-center justify-between gap-3"
                   aria-label="Banner slide controls"
                 >
-                  <div className="flex items-center gap-0.5">
+                  <div className="flex items-center gap-1">
                     {slides.map((s, idx) => (
                       <button
                         key={s.id}
@@ -501,20 +501,21 @@ export function HomePage({
                         onClick={() => setActiveSlideIdx(idx)}
                         aria-label={`View slide ${idx + 1}: ${s.caption}`}
                         aria-current={idx === activeSlideIdx ? 'true' : undefined}
-                        className="py-2.5 px-1 inline-flex items-center justify-center cursor-pointer group"
+                        className="py-2 px-0.5 inline-flex items-center justify-center cursor-pointer group"
                       >
                         <span
-                          className={`block h-1.5 rounded-full transition-all ${
+                          className={`block h-1 rounded-xs transition-all ${
                             idx === activeSlideIdx
                               ? 'w-7 bg-pust-800'
-                              : 'w-2.5 bg-slate-400 group-hover:bg-slate-600'
+                              : 'w-3 bg-stone-300 group-hover:bg-stone-500'
                           }`}
                         />
                       </button>
                     ))}
                   </div>
-                  <p className="font-mono text-[11px] font-medium text-slate-600 truncate">
-                    {bannerPaused ? 'Paused' : 'Auto-sliding'} · {slides.length} Campus Photos
+                  <p className="font-mono text-[11px] font-medium text-stone-500 tabular-nums shrink-0">
+                    {String(activeSlideIdx + 1).padStart(2, '0')} /{' '}
+                    {String(slides.length).padStart(2, '0')} Campus Highlights
                   </p>
                 </div>
               )}
@@ -523,12 +524,12 @@ export function HomePage({
 
           {/* Operational Utility Ribbon */}
           {profile && (
-            <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+            <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-stone-200 bg-white overflow-hidden">
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200 transition-colors"
+                className="bg-white px-5 py-4 border-b lg:border-b-0 sm:border-r border-stone-200"
               >
-                <dt className="text-xs uppercase tracking-wider text-pust-700 font-semibold">
+                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Established
                 </dt>
                 <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
@@ -537,9 +538,9 @@ export function HomePage({
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200 transition-colors"
+                className="bg-white px-5 py-4 border-b lg:border-b-0 lg:border-r border-stone-200"
               >
-                <dt className="text-xs uppercase tracking-wider text-lapis-600 font-semibold">
+                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Academic Scope
                 </dt>
                 <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
@@ -548,9 +549,9 @@ export function HomePage({
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors"
+                className="bg-white px-5 py-4 border-b sm:border-b-0 sm:border-r border-stone-200"
               >
-                <dt className="text-xs uppercase tracking-wider text-gold-700 font-semibold">
+                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Community
                 </dt>
                 <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
@@ -562,11 +563,11 @@ export function HomePage({
                 className="bg-pust-800 hover:bg-pust-900 text-white transition-colors group"
               >
                 <Link href="/verify" className="block h-full px-5 py-4">
-                  <dt className="text-xs uppercase tracking-wider font-semibold text-gold-300 flex items-center justify-between">
+                  <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center justify-between">
                     <span>Public Registry</span>
-                    <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+                    <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
                   </dt>
-                  <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1 flex items-center gap-1">
+                  <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1 flex items-center gap-1.5">
                     <span>Verify Certificates &amp; Receipts</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                   </dd>
@@ -588,12 +589,12 @@ export function HomePage({
             <HeroSummarySkeleton />
           ) : currentVc ? (
             <MotionReveal>
-              <article className="editable-region rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-xs hover:border-slate-300 transition-all duration-200">
+              <article className="editable-region rounded-2xl bg-white border border-stone-200 overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-                  {/* Portrait & Office Info (Left Column inside the Card) */}
-                  <div className="lg:col-span-4 bg-[#F7F5F0] border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
+                  {/* Portrait & Office Info (Left Column) */}
+                  <div className="lg:col-span-4 bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-stone-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
                     <div className="space-y-5">
-                      <div className="max-w-[240px] mx-auto lg:max-w-none">
+                      <div className="max-w-[240px] mx-auto lg:max-w-none overflow-hidden rounded-xl border border-stone-200 bg-white">
                         <ResilientImage
                           src={currentVc.photoUrl || ''}
                           alt={currentVc.name}
@@ -601,16 +602,13 @@ export function HomePage({
                         />
                       </div>
                       <div className="space-y-2">
-                        <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
-                          Honorable Vice-Chancellor
+                        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-700">
+                          Office of the Vice-Chancellor
                         </p>
-                        <h2 className="font-serif text-fluid-h3 font-semibold text-slate-950 leading-snug">
-                          {currentVc.name}
-                        </h2>
-                        <p className="font-mono text-xs font-medium text-slate-700 tabular-nums">
-                          {currentVc.tenure}
+                        <p className="font-mono text-xs font-medium text-stone-600 tabular-nums">
+                          Tenure: {currentVc.tenure}
                         </p>
-                        <div className="font-mono text-xs text-slate-700 tabular-nums pt-2 border-t border-slate-300/80 space-y-1">
+                        <div className="font-mono text-xs text-slate-700 tabular-nums pt-2.5 border-t border-stone-200 space-y-1">
                           {currentVc.email && (
                             <a
                               href={`mailto:${currentVc.email}`}
@@ -631,23 +629,24 @@ export function HomePage({
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-300/80 flex items-center justify-between gap-3">
+                    <div className="pt-4 border-t border-stone-200 flex items-center justify-between gap-3">
                       <Link
                         href="/administration/vc-office"
-                        className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
                       >
-                        Vice-Chancellor Office →
+                        Vice-Chancellor Office
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   </div>
 
-                  {/* Welcome Message (Right Column inside the Card) */}
+                  {/* Welcome Message (Right Column) */}
                   <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
                     <div className="space-y-6">
-                      <header className="space-y-2 border-b border-gold-200/80 pb-5">
+                      <header className="space-y-1.5 border-b border-stone-200 pb-5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
-                            Welcome Message from the Vice-Chancellor · {currentVc.tenure}
+                          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                            Welcome Message · {currentVc.tenure}
                           </p>
                           <EditTriggerButton
                             target={{ kind: 'vc' }}
@@ -655,10 +654,10 @@ export function HomePage({
                             variant="compact"
                           />
                         </div>
-                        <h3 className="font-serif text-fluid-h2 font-semibold text-slate-950">
+                        <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                           {currentVc.name}
-                        </h3>
-                        <p className="text-sm font-medium text-slate-700">
+                        </h2>
+                        <p className="text-sm font-medium text-stone-600 text-left">
                           Honorable Vice-Chancellor, Pabna University of Science and Technology
                         </p>
                       </header>
@@ -670,7 +669,7 @@ export function HomePage({
                               key={idx}
                               className={
                                 idx === 0
-                                  ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-600'
+                                  ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-700'
                                   : ''
                               }
                             >
@@ -679,16 +678,18 @@ export function HomePage({
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-slate-700">
+                        <p className="text-sm text-slate-700 text-left">
                           No welcome message published for this profile yet.
                         </p>
                       )}
                     </div>
 
                     {vcClosingLine && (
-                      <div className="pt-4 border-t border-slate-200 space-y-1.5">
-                        <p className="font-serif italic text-lg font-medium text-slate-950">{vcClosingLine}</p>
-                        <p className="text-sm font-semibold text-slate-800">
+                      <div className="pt-4 border-t border-stone-200 space-y-1">
+                        <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
+                          {vcClosingLine}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-700 text-left">
                           {currentVc.name} · Vice-Chancellor
                         </p>
                       </div>
@@ -698,12 +699,12 @@ export function HomePage({
               </article>
             </MotionReveal>
           ) : (
-            <div className="editable-region rounded-2xl border border-slate-200 bg-[#FAF8F4] p-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Office of the Vice-Chancellor
                 </p>
-                <p className="text-sm text-slate-600 mt-1">
+                <p className="text-sm text-slate-600 mt-1 text-left">
                   Vice-Chancellor profile is not currently published.
                 </p>
               </div>
@@ -717,10 +718,10 @@ export function HomePage({
           )}
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-slate-200 bg-[#FAF9F6] overflow-hidden shadow-xs">
-            <div className="px-6 py-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] overflow-hidden">
+            <div className="px-6 py-4 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-stone-500">
                   Institutional Leadership Archive
                   {profile?.establishedYear ? ` · ${profile.establishedYear} – Present` : ''}
                 </p>
@@ -739,7 +740,7 @@ export function HomePage({
                   type="button"
                   onClick={() => setShowPreviousVcs((prev) => !prev)}
                   aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-pust-800 hover:bg-pust-800 hover:text-white hover:border-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-stone-300 bg-white text-pust-800 hover:bg-pust-800 hover:text-white hover:border-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {showPreviousVcs ? 'Hide History' : 'Show History'}
                   <ChevronDown
@@ -761,54 +762,39 @@ export function HomePage({
                   className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
                   {previousVcs.length === 0 ? (
-                    <p className="text-sm text-slate-600 col-span-full py-2">
+                    <p className="text-sm text-slate-600 col-span-full py-2 text-left">
                       No former Vice-Chancellor records archived yet.
                     </p>
                   ) : (
-                    previousVcs.map((vc, idx) => {
-                      const variant = idx % 3;
-                      const cardTheme =
-                        variant === 0
-                          ? 'bg-white border-slate-200 hover:border-pust-400'
-                          : variant === 1
-                          ? 'bg-white border-slate-200 hover:border-lapis-400'
-                          : 'bg-white border-slate-200 hover:border-gold-400';
-                      const labelTone =
-                        variant === 0
-                          ? 'text-pust-700'
-                          : variant === 1
-                          ? 'text-lapis-600'
-                          : 'text-gold-700';
-                      return (
-                        <MotionCard
-                          key={vc.id}
-                          delay={idx * 0.03}
-                          className={`rounded-xl border hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors ${cardTheme}`}
-                        >
-                          <div className="space-y-1.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <span
-                                className={`font-mono text-xs font-bold tabular-nums ${labelTone}`}
-                              >
-                                {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                              </span>
-                              <EditTriggerButton
-                                target={{ kind: 'vc', vcId: vc.id }}
-                                label="Edit"
-                                variant="compact"
-                              />
-                            </div>
-                            <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
-                              {vc.name}
-                            </h4>
-                            <p className="text-xs font-mono font-medium uppercase tracking-wider text-slate-600 text-left">
-                              {vc.title}
-                            </p>
-                            <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">{vc.message}</p>
+                    previousVcs.map((vc, idx) => (
+                      <MotionCard
+                        key={vc.id}
+                        delay={idx * 0.03}
+                        className="rounded-xl border border-stone-200 bg-white hover:border-pust-700/45 p-5 space-y-2 flex flex-col justify-between transition-colors"
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-mono text-xs font-semibold tabular-nums text-pust-800">
+                              {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                            </span>
+                            <EditTriggerButton
+                              target={{ kind: 'vc', vcId: vc.id }}
+                              label="Edit"
+                              variant="compact"
+                            />
                           </div>
-                        </MotionCard>
-                      );
-                    })
+                          <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
+                            {vc.name}
+                          </h4>
+                          <p className="text-xs font-mono font-medium uppercase tracking-wider text-stone-500 text-left">
+                            {vc.title}
+                          </p>
+                          <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">
+                            {vc.message}
+                          </p>
+                        </div>
+                      </MotionCard>
+                    ))
                   )}
                 </motion.div>
               )}
@@ -817,11 +803,11 @@ export function HomePage({
 
           {/* About PUST Brief & Sub-Topic Links */}
           <MotionReveal>
-            <div className="rounded-2xl border border-slate-200 bg-[#FAF8F3] p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start shadow-xs hover:border-slate-300 transition-all duration-200">
+            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               <div className="lg:col-span-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-mono text-xs font-bold uppercase tracking-widest text-gold-700">
+                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
                       About PUST
                     </p>
                     <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1">
@@ -837,25 +823,25 @@ export function HomePage({
                 <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1 text-xs font-semibold">
                   <Link
                     href="/about/our-university"
-                    className="text-pust-700 hover:underline whitespace-nowrap"
+                    className="text-pust-800 hover:underline whitespace-nowrap"
                   >
                     Our University →
                   </Link>
                   <Link
                     href="/about/mission-vision"
-                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
                   >
                     Mission &amp; Vision
                   </Link>
                   <Link
                     href="/about/history"
-                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
                   >
                     History
                   </Link>
                   <Link
                     href="/about/plans"
-                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
                   >
                     Strategic Plans
                   </Link>
@@ -863,18 +849,18 @@ export function HomePage({
               </div>
               <div className="lg:col-span-8 space-y-3">
                 {ourUniversity ? (
-                  <p className="text-fluid-body text-slate-800 line-clamp-3">
+                  <p className="text-fluid-body text-slate-800 line-clamp-3 prose-justify">
                     {ourUniversity.body}
                   </p>
                 ) : loadingData ? (
                   <HeroSummarySkeleton />
                 ) : (
-                  <p className="text-sm text-slate-700">
+                  <p className="text-sm text-slate-700 text-left">
                     University overview content is not currently published.
                   </p>
                 )}
                 {missionVision && (
-                  <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2 pt-3 border-t border-gold-200/80">
+                  <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2 pt-3 border-t border-stone-200 text-left">
                     {missionVision.body.replace(/^Our Mission\s*\n/i, '')}
                   </p>
                 )}
@@ -917,16 +903,20 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter circulars by category">
+            <div
+              className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+              role="group"
+              aria-label="Filter circulars by category"
+            >
               {NOTICE_CATS.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setNoticeCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     noticeCategory === cat
-                      ? 'bg-pust-800 text-white border-pust-800 shadow-xs'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-white text-slate-950 shadow-xs'
+                      : 'text-stone-600 hover:text-slate-950'
                   }`}
                 >
                   {cat}
@@ -937,8 +927,8 @@ export function HomePage({
             {loadingData && notices.length === 0 ? (
               <NoticeListSkeleton rows={4} />
             ) : (
-              <div ref={noticeListRef} className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-                <div className="divide-y divide-slate-200">
+              <div ref={noticeListRef} className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                <div className="divide-y divide-stone-200">
                   {featuredNotices.length === 0 ? (
                     <div className="p-8 text-center space-y-3">
                       <p className="text-sm text-slate-600">
@@ -948,7 +938,7 @@ export function HomePage({
                       <button
                         type="button"
                         onClick={() => setNoticeCategory('All')}
-                        className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
+                        className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-stone-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                       >
                         Show All Circulars
                       </button>
@@ -968,7 +958,7 @@ export function HomePage({
                               onSelectNotice(leadNotice);
                             }
                           }}
-                          className="w-full text-left p-6 card-gradient-crimson hover:brightness-[0.985] transition-all space-y-2 group cursor-pointer"
+                          className="w-full text-left p-6 bg-[#FAF9F6] hover:bg-stone-100/70 transition-colors space-y-2 group cursor-pointer"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <p className="font-mono text-xs text-slate-600 tabular-nums">
@@ -1064,13 +1054,13 @@ export function HomePage({
                 No institutional directory links configured yet.
               </div>
             ) : (
-              <div className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-                <div className="divide-y divide-slate-200">
+              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                <div className="divide-y divide-stone-200">
                   {institutionalLinks.map((item, idx) => (
                     <Link
                       key={item.id}
                       href={item.route}
-                      className={`w-full text-left px-5 py-4 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
+                      className={`w-full text-left px-5 py-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
                         idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                       }`}
                     >
@@ -1095,11 +1085,11 @@ export function HomePage({
       {/* 4. Recent Publications */}
       <section
         id="recent-publications"
-        className="bg-white border-t border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
+        className="bg-white border-t border-b border-stone-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   Faculty Research Output
@@ -1125,16 +1115,20 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter publications by department">
+            <div
+              className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+              role="group"
+              aria-label="Filter publications by department"
+            >
               {pubDeptFilters.map((code) => (
                 <button
                   key={code}
                   type="button"
                   onClick={() => setPubDeptFilter(code)}
-                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     pubDeptFilter === code
-                      ? 'bg-pust-800 text-white shadow-xs'
-                      : 'bg-[#F6F5F0] border border-slate-200 text-slate-700 hover:text-pust-800 hover:border-pust-600'
+                      ? 'bg-white text-slate-950 shadow-xs'
+                      : 'text-stone-600 hover:text-slate-950'
                   }`}
                 >
                   {code}
@@ -1142,9 +1136,9 @@ export function HomePage({
               ))}
             </div>
 
-            <div ref={pubListRef} className="divide-y divide-slate-200 border-y border-slate-200">
+            <div ref={pubListRef} className="divide-y divide-stone-200 border-y border-stone-200">
               {visiblePublications.length === 0 ? (
-                <p className="py-6 text-sm text-slate-600">
+                <p className="py-6 text-sm text-slate-600 text-left">
                   No peer-reviewed publications found for the selected department.
                 </p>
               ) : (
@@ -1152,12 +1146,12 @@ export function HomePage({
                   <article
                     key={pub.id}
                     data-gsap-pub-row
-                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-slate-50 transition-colors space-y-1.5 ${
+                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-stone-50 transition-colors space-y-1.5 ${
                       idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-mono text-xs font-semibold text-lapis-600 tabular-nums">
+                      <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                         {pub.departmentCode} · {pub.domain} · {pub.year}
                       </p>
                       <EditTriggerButton
@@ -1179,8 +1173,8 @@ export function HomePage({
           </div>
 
           {/* Official PUST Journals Sidebar */}
-          <aside className="lg:col-span-5 rounded-2xl border border-slate-200 bg-[#FAF8F3] p-6 sm:p-7 space-y-5 shadow-xs hover:border-slate-300 transition-colors">
-            <div className="flex items-end justify-between gap-4 border-b border-slate-200 pb-4">
+          <aside className="lg:col-span-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 space-y-5">
+            <div className="flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   University Periodicals
@@ -1204,24 +1198,24 @@ export function HomePage({
               </div>
             </div>
 
-            <div className="divide-y divide-gold-200/70">
+            <div className="divide-y divide-stone-200">
               {loadingData && !profile ? (
                 <NoticeListSkeleton rows={3} />
               ) : (profile?.journals ?? []).length === 0 ? (
-                <p className="py-4 text-sm text-slate-700">
+                <p className="py-4 text-sm text-slate-700 text-left">
                   No university journals are currently listed.
                 </p>
               ) : (
                 (profile?.journals ?? []).map((journal) => (
                   <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
-                    <p className="font-mono text-xs font-medium text-slate-600 tabular-nums">{journal.issn}</p>
+                    <p className="font-mono text-xs font-medium text-stone-500 tabular-nums">{journal.issn}</p>
                     <h4 className="font-serif text-base font-semibold text-slate-950 text-left">
                       {journal.title}
                     </h4>
                     <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed text-left">
                       {journal.scope}
                     </p>
-                    <p className="text-xs font-semibold text-gold-800 text-left">{journal.currentIssue}</p>
+                    <p className="text-xs font-semibold text-gold-700 text-left">{journal.currentIssue}</p>
                   </div>
                 ))
               )}
@@ -1236,7 +1230,7 @@ export function HomePage({
         className="bg-transparent py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-stone-200">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Campus Chronicles &amp; Seminars
@@ -1246,21 +1240,23 @@ export function HomePage({
               </h2>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {NEWS_EVENT_CATS.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setEventCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    eventCategory === cat
-                      ? 'bg-pust-800 text-white shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80">
+                {NEWS_EVENT_CATS.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setEventCategory(cat)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      eventCategory === cat
+                        ? 'bg-white text-slate-950 shadow-xs'
+                        : 'text-stone-600 hover:text-slate-950'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
               <EditTriggerButton
                 target={{ kind: 'gallery', item: null }}
                 label="Add Event"
@@ -1269,7 +1265,7 @@ export function HomePage({
               />
               <Link
                 href="/gallery"
-                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
               >
                 Full Archive
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1366,8 +1362,8 @@ export function HomePage({
           )}
 
           {/* Scheduled University Seminars & Milestones */}
-          <div className="editable-region rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-            <div className="px-6 py-4 bg-[#F7F5F0] border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <div className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
+            <div className="px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Upcoming Seminars, Workshops &amp; Academic Milestones
               </p>

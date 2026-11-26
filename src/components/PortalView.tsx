@@ -552,52 +552,52 @@ export function PortalView({
         </div>
 
         {/* Split Institutional Auth Studio Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          {/* Left Column: Deep Emerald Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl border border-stone-200 overflow-hidden">
+          {/* Left Column: Deep Oxblood Maroon Sidebar */}
           <div className="lg:col-span-5 bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-8">
             <div className="space-y-6">
               <div className="flex items-center gap-3.5">
                 <PustCrest variant="light" size={44} className="shrink-0" />
                 <div>
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200 text-left">
                     Rajapur Campus · Pabna
                   </p>
-                  <p className="font-serif text-base font-medium text-white">
+                  <p className="font-serif text-base font-medium text-white text-left">
                     Digital Campus Gateway
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2.5">
-                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200 text-left">
                   {currentMeta.eyebrow}
                 </p>
                 <h2 className="font-serif text-2xl font-medium text-white leading-snug">
                   {currentMeta.title}
                 </h2>
-                <p className="text-sm text-pust-100/90 leading-relaxed">
+                <p className="text-sm text-pust-100/90 leading-relaxed text-left">
                   {currentMeta.summary}
                 </p>
               </div>
 
-              <div className="space-y-3 pt-1">
-                <div className="bg-white/10 rounded-xl border border-white/15 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5" />
+              <div className="border-t border-white/15 divide-y divide-white/15">
+                <div className="py-3.5 space-y-1">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5 text-left">
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                     Role-Verified Governance
                   </p>
-                  <p className="text-xs text-pust-50/90 leading-relaxed">
+                  <p className="text-xs text-pust-50/90 leading-relaxed text-left">
                     Strict separation across Student, Teacher, Chairman, Library, Hall, Proctor,
                     Registrar, VC, and Admin Office permissions.
                   </p>
                 </div>
 
-                <div className="bg-white/10 rounded-xl border border-white/15 p-4 space-y-1">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5">
-                    <KeyRound className="w-3.5 h-3.5" />
+                <div className="py-3.5 space-y-1">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 flex items-center gap-1.5 text-left">
+                    <KeyRound className="w-3.5 h-3.5 shrink-0" />
                     Paperless Checkout &amp; Verification
                   </p>
-                  <p className="text-xs text-pust-50/90 leading-relaxed">
+                  <p className="text-xs text-pust-50/90 leading-relaxed text-left">
                     SSLCommerz, Bangla QR &amp; MFS checkouts, QR-sealed Admit Cards, Library Cards,
                     Hall Clearances, and 4-Office Certificates.
                   </p>
@@ -1406,16 +1406,16 @@ export function PortalView({
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Responsive Role-Criteria Workspace Sidebar (horizontal strip on mobile, sticky rail on lg+) */}
-        <aside className="w-full lg:w-68 shrink-0 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden lg:sticky lg:top-24">
+        <aside className="w-full lg:w-68 shrink-0 bg-white rounded-2xl border border-stone-200 overflow-hidden lg:sticky lg:top-24">
           <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-4 sm:p-5 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <PustCrest variant="light" size={30} className="shrink-0" />
                 <div className="min-w-0">
-                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-pust-200 truncate">
+                  <p className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-pust-200 truncate text-left">
                     {ROLE_LABELS[user.role]}
                   </p>
-                  <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate">
+                  <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
                     {user.name}
                   </p>
                 </div>
@@ -1430,7 +1430,7 @@ export function PortalView({
                 Sign Out
               </button>
             </div>
-            <p className="font-mono text-xs text-pust-100/90 tabular-nums">
+            <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left">
               {user.departmentCode} · ID {user.academicId}
               {user.session ? ` · ${user.session}` : ''}
             </p>
@@ -1448,10 +1448,10 @@ export function PortalView({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
+                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-colors cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
                     isActive
-                      ? 'bg-pust-900 text-white shadow-xs'
-                      : 'bg-[#F7F7F5] lg:bg-transparent text-slate-700 hover:bg-[#F7F7F5] hover:text-pust-900'
+                      ? 'bg-pust-900 text-white'
+                      : 'bg-stone-100 lg:bg-transparent text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -1472,26 +1472,26 @@ export function PortalView({
             })}
           </nav>
 
-          <div className="hidden lg:block p-3 border-t border-slate-200 bg-[#F7F7F5]/70 space-y-2">
+          <div className="hidden lg:block p-3 border-t border-stone-200 bg-[#FAF9F6] space-y-2">
             <PwaInstallButton variant="portal" />
             <button
               type="button"
               onClick={() => navigateTo('/verify')}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
             >
               Public Document Verification
             </button>
             <button
               type="button"
               onClick={onBackToSite}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
             >
               Public University Website
             </button>
             <button
               type="button"
               onClick={handleLogout}
-              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer whitespace-nowrap"
             >
               <LogOut className="w-3.5 h-3.5" />
               Sign Out
@@ -1502,9 +1502,9 @@ export function PortalView({
         {/* Main Workspace Surface */}
         <div className="flex-1 min-w-0 w-full space-y-6">
           {/* Top Contextual Breadcrumb Header */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="bg-white rounded-2xl border border-stone-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <p className="font-mono text-xs text-slate-500">
+              <p className="font-mono text-xs text-slate-500 text-left">
                 Digital Campus / {ROLE_LABELS[user.role]} /{' '}
                 <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
               </p>
@@ -1512,7 +1512,7 @@ export function PortalView({
                 {activeTabMeta.label}
               </h1>
             </div>
-            <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full">
+            <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full text-left">
               {user.email} · {user.hallAffiliation}
             </p>
           </div>
@@ -1522,78 +1522,78 @@ export function PortalView({
             <div className="space-y-6">
               {/* Role-Specific 4-Card KPI Strip */}
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-2xl p-5 space-y-1 shadow-xs">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200">
+                <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-2xl p-5 space-y-1">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-200 text-left">
                     Active Role Criteria
                   </p>
-                  <p className="font-serif text-xl font-medium text-white">
+                  <p className="font-serif text-xl font-medium text-white text-left">
                     {ROLE_LABELS[user.role]}
                   </p>
-                  <p className="font-mono text-xs text-pust-100/90 tabular-nums">
+                  <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left">
                     {user.departmentCode} · ID {user.academicId}
                   </p>
                 </div>
 
                 {user.role === 'student' ? (
                   <>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Academic Standing
                       </p>
-                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                         {studentSelf ? `CGPA ${studentSelf.cgpa.toFixed(2)}` : 'Loading...'}
                       </p>
-                      <p className="text-xs text-slate-600 tabular-nums">
+                      <p className="text-xs text-slate-600 tabular-nums text-left">
                         {studentSelf
                           ? `Sem ${studentSelf.currentSemester} · ${studentSelf.completedSemesters}/8 Completed`
                           : 'Fetching academic record'}
                       </p>
                     </div>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Residential Hall &amp; Seat
                       </p>
-                      <p className="font-serif text-xl font-medium text-slate-900 truncate">
+                      <p className="font-serif text-xl font-medium text-slate-900 truncate text-left">
                         {studentSelf?.hallName || user.hallAffiliation}
                       </p>
-                      <p className="font-mono text-xs text-slate-600 tabular-nums truncate">
+                      <p className="font-mono text-xs text-slate-600 tabular-nums truncate text-left">
                         {studentSelf?.seatNumber || 'Seat pending verification'}
                       </p>
                     </div>
                   </>
                 ) : user.role === 'teacher' ? (
                   <>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Assigned Courses
                       </p>
-                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                         {(user.assignedCourses || []).length}
                       </p>
-                      <p className="font-mono text-xs text-slate-600 truncate">
+                      <p className="font-mono text-xs text-slate-600 truncate text-left">
                         {(user.assignedCourses || []).join(', ') || 'Pending assignment'}
                       </p>
                     </div>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Department Students
                       </p>
-                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                         {loadingStudents ? '...' : students.length}
                       </p>
-                      <p className="text-xs text-slate-600">Scoped to {user.departmentCode}</p>
+                      <p className="text-xs text-slate-600 text-left">Scoped to {user.departmentCode}</p>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Scoped Student Records
                       </p>
-                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                         {loadingStudents ? '...' : students.length}
                       </p>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-slate-600 text-left">
                         {user.role === 'chairman'
                           ? `${user.departmentCode} Department`
                           : user.role === 'hall'
@@ -1601,26 +1601,26 @@ export function PortalView({
                           : 'University-wide scope'}
                       </p>
                     </div>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                         Targeted Bulletins
                       </p>
-                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                      <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                         {targetedNotifications.length}
                       </p>
-                      <p className="text-xs text-slate-600">Scoped to {user.departmentCode}</p>
+                      <p className="text-xs text-slate-600 text-left">Scoped to {user.departmentCode}</p>
                     </div>
                   </>
                 )}
 
-                <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1 shadow-xs">
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                     {user.role === 'student' ? 'Targeted Bulletins' : 'Workspace Modules'}
                   </p>
-                  <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+                  <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
                     {user.role === 'student' ? targetedNotifications.length : portalTabs.length - 1}
                   </p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 text-left tabular-nums">
                     {user.role === 'student'
                       ? `${receipts.length} payment receipt(s) · ${bookmarks.length} bookmarks`
                       : `Active workflows for ${user.role}`}
@@ -1629,24 +1629,24 @@ export function PortalView({
               </div>
 
               {/* Role Criteria Scope & Direct Module Shortcuts */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+              <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800 text-left">
                       Personalized Role Workspace
                     </p>
                     <h2 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
                       {ROLE_LABELS[user.role]} Responsibilities &amp; Direct Actions
                     </h2>
                   </div>
-                  <span className="font-mono text-xs text-slate-500">
+                  <span className="font-mono text-xs text-slate-500 tabular-nums">
                     {portalTabs.length - 1} authorized modules
                   </span>
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+                <p className="text-sm text-slate-600 leading-relaxed max-w-3xl text-left">
                   {ROLE_SCOPE_SUMMARY[user.role]}
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-stone-200 border border-stone-200 rounded-xl overflow-hidden">
                   {portalTabs
                     .filter((t) => t.id !== 'overview')
                     .map((tab) => {
@@ -1656,17 +1656,19 @@ export function PortalView({
                           key={tab.id}
                           type="button"
                           onClick={() => setActiveTab(tab.id)}
-                          className="text-left p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] hover:bg-white hover:border-pust-800 transition-all flex items-start justify-between gap-3 group cursor-pointer"
+                          className="text-left p-4 bg-white hover:bg-[#FAF9F6] transition-colors flex items-start justify-between gap-3 group cursor-pointer"
                         >
                           <div className="flex items-start gap-3 min-w-0">
-                            <div className="p-2 rounded-lg bg-white border border-slate-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white transition-colors shrink-0">
+                            <span className="w-8 h-8 rounded-lg bg-[#FAF9F6] border border-stone-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white group-hover:border-pust-900 transition-colors flex items-center justify-center shrink-0">
                               <Icon className="w-4 h-4" />
-                            </div>
+                            </span>
                             <div className="min-w-0">
-                              <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 truncate">
+                              <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 truncate text-left">
                                 {tab.label}
                               </p>
-                              <p className="text-xs text-slate-600 mt-0.5 truncate">{tab.desc}</p>
+                              <p className="text-xs text-slate-600 mt-0.5 truncate text-left">
+                                {tab.desc}
+                              </p>
                             </div>
                           </div>
                           <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 mt-1 transition-colors" />
@@ -1678,8 +1680,8 @@ export function PortalView({
 
               {/* Verified Payment Receipts Ledger (Student & Admin) */}
               {(user.role === 'student' || user.role === 'admin') && receipts.length > 0 && (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-                  <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+                  <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
                     <div className="flex items-center gap-2">
                       <Receipt className="w-4 h-4 text-pust-800" />
                       <h2 className="font-serif text-xl font-medium text-slate-900">
@@ -1694,15 +1696,15 @@ export function PortalView({
                       Verify on Public Registry →
                     </button>
                   </div>
-                  <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+                  <div className="rounded-xl divide-y divide-stone-200 border border-stone-200 overflow-hidden">
                     {receipts.slice(0, 5).map((r) => (
                       <div
                         key={r.id}
-                        className="p-3.5 sm:px-4 flex flex-wrap items-center justify-between gap-3 text-xs hover:bg-[#F7F7F5]/60"
+                        className="p-3.5 sm:px-4 flex flex-wrap items-center justify-between gap-3 text-xs hover:bg-[#FAF9F6]"
                       >
                         <div>
-                          <p className="font-medium text-sm text-slate-900">{r.title}</p>
-                          <p className="font-mono text-slate-500 tabular-nums mt-0.5">
+                          <p className="font-medium text-sm text-slate-900 text-left">{r.title}</p>
+                          <p className="font-mono text-slate-500 tabular-nums mt-0.5 text-left">
                             {r.receiptNo} · {r.gatewayName} ({r.transactionId}) · Paid{' '}
                             <span className="font-semibold text-pust-900">
                               BDT {r.amountBdt.toLocaleString('en-US')}
@@ -1713,7 +1715,7 @@ export function PortalView({
                         <button
                           type="button"
                           onClick={() => openReceiptModal(r)}
-                          className="px-3 py-1.5 font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
+                          className="px-3 py-1.5 font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
                         >
                           View Official Receipt
                         </button>
@@ -1725,8 +1727,8 @@ export function PortalView({
 
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                 {/* Targeted In-App Notifications */}
-                <div className="xl:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-                  <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="xl:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+                  <div className="flex items-center justify-between gap-3 border-b border-stone-200 pb-3">
                     <div className="flex items-center gap-2">
                       <Bell className="w-4 h-4 text-pust-800" />
                       <h2 className="font-serif text-xl font-medium text-slate-900">
@@ -1739,25 +1741,25 @@ export function PortalView({
                   </div>
 
                   {targetedNotifications.length === 0 ? (
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 text-left">
                       No targeted notices or alerts at this time.
                     </p>
                   ) : (
-                    <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+                    <div className="rounded-xl divide-y divide-stone-200 border border-stone-200 overflow-hidden">
                       {targetedNotifications.map((n) => (
                         <button
                           key={n.id}
                           type="button"
                           onClick={() => setActiveNotice(n)}
-                          className="w-full text-left p-3.5 space-y-1 text-sm hover:bg-[#F7F7F5] transition-colors cursor-pointer"
+                          className="w-full text-left p-3.5 space-y-1 text-sm hover:bg-[#FAF9F6] transition-colors cursor-pointer"
                         >
-                          <p className="font-mono text-[11px] text-pust-800 tabular-nums">
+                          <p className="font-mono text-[11px] text-pust-800 tabular-nums text-left">
                             {n.publishedAt} · {n.category} · {n.departmentCode}
                             {n.targetSession ? ` · Session ${n.targetSession}` : ''}
                             {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
                           </p>
-                          <p className="font-medium text-slate-900">{n.title}</p>
-                          <p className="text-xs text-slate-600">{n.summary}</p>
+                          <p className="font-medium text-slate-900 text-left">{n.title}</p>
+                          <p className="text-xs text-slate-600 text-left">{n.summary}</p>
                         </button>
                       ))}
                     </div>
@@ -1765,25 +1767,25 @@ export function PortalView({
                 </div>
 
                 {/* Saved Bookmarks + Role Assignment Card */}
-                <div className="xl:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-                  <h2 className="font-serif text-xl font-medium text-slate-900 border-b border-slate-200 pb-3">
+                <div className="xl:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+                  <h2 className="font-serif text-xl font-medium text-slate-900 border-b border-stone-200 pb-3">
                     Saved Bookmarks ({bookmarks.length})
                   </h2>
                   {bookmarks.length === 0 ? (
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 text-left">
                       No saved bookmarks yet. Bookmark departments or circulars while browsing the
                       public website.
                     </p>
                   ) : (
-                    <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+                    <div className="rounded-xl divide-y divide-stone-200 border border-stone-200 overflow-hidden">
                       {bookmarks.map((b) => (
                         <div
                           key={b.id}
                           className="p-3.5 flex items-center justify-between gap-3 text-sm"
                         >
                           <div className="min-w-0">
-                            <p className="font-medium text-slate-900 truncate">{b.title}</p>
-                            <p className="text-xs text-slate-500 truncate">{b.subtitle}</p>
+                            <p className="font-medium text-slate-900 truncate text-left">{b.title}</p>
+                            <p className="text-xs text-slate-500 truncate text-left">{b.subtitle}</p>
                           </div>
                           <button
                             type="button"
@@ -1801,15 +1803,15 @@ export function PortalView({
                   )}
 
                   {user.role === 'teacher' && (
-                    <div className="p-4 rounded-xl border border-emerald-200 bg-[#F7F7F5] text-xs space-y-1.5 font-mono">
-                      <p className="font-semibold text-pust-900 uppercase tracking-wider">
+                    <div className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs space-y-1.5 font-mono">
+                      <p className="font-semibold text-pust-900 uppercase tracking-wider text-left">
                         Chairman Course Assignment
                       </p>
-                      <p className="text-slate-700">
+                      <p className="text-slate-700 text-left">
                         Courses:{' '}
                         {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}
                       </p>
-                      <p className="text-slate-700">
+                      <p className="text-slate-700 text-left">
                         Sessions:{' '}
                         {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}
                       </p>
@@ -1822,12 +1824,12 @@ export function PortalView({
 
           {/* Tab 2: Student Personal Profile Dossier OR Role-Scoped Student Database */}
           {resolvedTab === 'students' && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+            <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
               {user.role === 'student' ? (
                 <>
-                  <div className="border-b border-slate-200 pb-4 flex flex-wrap items-end justify-between gap-3">
+                  <div className="border-b border-stone-200 pb-4 flex flex-wrap items-end justify-between gap-3">
                     <div>
-                      <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                      <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
                         Verified Institutional Record
                       </p>
                       <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -1844,13 +1846,13 @@ export function PortalView({
                   {loadingStudents ? (
                     <PortalRecordsSkeleton rows={3} />
                   ) : !studentSelf ? (
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-slate-600 text-left">
                       Your institutional student record is still syncing. Contact your Department Chairman if this persists.
                     </p>
                   ) : (
                     <div className="space-y-6">
-                      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-stone-200 border border-stone-200 rounded-xl overflow-hidden">
+                        <div className="p-4 bg-[#FAF9F6]">
                           <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                             Academic ID &amp; Session
                           </dt>
@@ -1862,7 +1864,7 @@ export function PortalView({
                           </dd>
                         </div>
 
-                        <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                        <div className="p-4 bg-[#FAF9F6]">
                           <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                             Cumulative Standing
                           </dt>
@@ -1874,7 +1876,7 @@ export function PortalView({
                           </dd>
                         </div>
 
-                        <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                        <div className="p-4 bg-[#FAF9F6]">
                           <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                             Residential Hall &amp; Seat
                           </dt>
@@ -1886,7 +1888,7 @@ export function PortalView({
                           </dd>
                         </div>
 
-                        <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                        <div className="p-4 bg-[#FAF9F6]">
                           <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                             Disciplinary &amp; Results
                           </dt>
@@ -1900,49 +1902,49 @@ export function PortalView({
                       </dl>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-5 rounded-xl border border-slate-200 bg-white space-y-1.5">
-                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+                        <div className="p-5 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2">
+                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
                             Chairman &amp; Admin Remarks
                           </p>
-                          <p className="text-sm text-slate-700">
+                          <p className="text-sm text-slate-700 text-left">
                             <span className="font-medium text-slate-900">Chairman:</span>{' '}
                             {studentSelf.chairmanNotes || 'No remarks recorded.'}
                           </p>
-                          <p className="text-sm text-slate-700">
+                          <p className="text-sm text-slate-700 text-left">
                             <span className="font-medium text-slate-900">Admin Office:</span>{' '}
                             {studentSelf.adminNotes || 'No remarks recorded.'}
                           </p>
-                          <p className="text-sm text-slate-700">
+                          <p className="text-sm text-slate-700 text-left">
                             <span className="font-medium text-slate-900">Proctor Note:</span>{' '}
                             {studentSelf.disciplinaryNotes || 'Clear standing.'}
                           </p>
                         </div>
 
-                        <div className="p-5 rounded-xl border border-slate-200 bg-white space-y-2">
-                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+                        <div className="p-5 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
+                          <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
                             Verified Admission Documents
                           </p>
-                          <p className="text-sm text-slate-700 leading-relaxed">
+                          <p className="text-sm text-slate-700 leading-relaxed text-left">
                             {studentSelf.admissionDocuments.length > 0
                               ? studentSelf.admissionDocuments.join(' · ')
                               : 'Admission packet verified on file.'}
                           </p>
                           {studentSelf.digitalDocuments && studentSelf.digitalDocuments.length > 0 && (
-                            <div className="pt-2 space-y-1.5">
+                            <div className="border-t border-stone-200 divide-y divide-stone-200 pt-1">
                               {studentSelf.digitalDocuments.map((dd, i) => (
                                 <div
                                   key={`${dd.fileName}-${i}`}
-                                  className="px-3 py-1.5 rounded-lg bg-[#F7F7F5] border border-slate-200 text-[11px] font-mono text-slate-700 flex flex-wrap items-center justify-between gap-2"
+                                  className="py-1.5 text-[11px] font-mono text-slate-700 flex flex-wrap items-center justify-between gap-2"
                                 >
                                   <span className="truncate min-w-0">{dd.fileName}</span>
-                                  <span className="text-pust-800 shrink-0">
+                                  <span className="text-pust-800 shrink-0 tabular-nums">
                                     {dd.sizeLabel} · {dd.verifiedHash}
                                   </span>
                                 </div>
                               ))}
                             </div>
                           )}
-                          <p className="font-mono text-xs text-slate-500 pt-1 tabular-nums">
+                          <p className="font-mono text-xs text-slate-500 pt-1 tabular-nums text-left">
                             Contact: {studentSelf.email} · {studentSelf.phone}
                           </p>
                         </div>

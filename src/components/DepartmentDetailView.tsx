@@ -1902,28 +1902,16 @@ function PersonProfileModal({
               return (
                 <section
                   key={section.key}
-                  className={`rounded-2xl border p-5 sm:p-6 space-y-3.5 ${
-                    isWarmCrimson
-                      ? 'bg-[#FAF8F4] border-pust-200/80'
-                      : 'bg-[#F4F7FF] border-lapis-200/80'
+                  className={`rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3.5 ${
+                    isWarmCrimson ? 'bg-[#FAF9F6]' : 'bg-white'
                   }`}
                 >
-                  <div
-                    className={`flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b ${
-                      isWarmCrimson ? 'border-pust-200/75' : 'border-lapis-200/80'
-                    }`}
-                  >
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-stone-200">
                     <h3
-                      className={`inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest font-semibold ${
-                        isWarmCrimson ? 'text-pust-900' : 'text-lapis-900'
+                      className={`font-mono text-xs uppercase tracking-widest font-semibold ${
+                        isWarmCrimson ? 'text-pust-800' : 'text-slate-700'
                       }`}
                     >
-                      <span
-                        aria-hidden="true"
-                        className={`w-1.5 h-4 rounded-full shrink-0 ${
-                          isWarmCrimson ? 'bg-pust-800' : 'bg-lapis-700'
-                        }`}
-                      />
                       {section.title}
                     </h3>
                     <div className="flex items-center gap-2.5">

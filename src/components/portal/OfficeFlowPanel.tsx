@@ -193,10 +193,10 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800 flex items-center gap-1.5">
-            <Workflow className="w-3.5 h-3.5" />
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800 flex items-center gap-1.5 text-left">
+            <Workflow className="w-3.5 h-3.5 shrink-0" />
             Automated Cross-Office Orchestration
           </p>
           <h2 className="font-serif text-2xl font-medium text-slate-900">
@@ -204,7 +204,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
               ? 'Automated Campus Clearance & Service Readiness'
               : 'Automated Office Flow & Batch Queue Center'}
           </h2>
-          <p className="text-sm text-slate-600 max-w-2xl">
+          <p className="text-sm text-slate-600 max-w-2xl text-left">
             {user.role === 'student'
               ? 'Live prerequisite checks across Residential Hall, Central Library, Proctorial Standing, Examinations, and 4-Office Graduation Clearances.'
               : 'Evaluate live inter-office prerequisites, advance eligible approvals in one click, or run an automated sweep across your authorized queues.'}
@@ -216,7 +216,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
             type="button"
             onClick={refresh}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh State
@@ -318,10 +318,10 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
             ].map((card) => (
               <div
                 key={card.title}
-                className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 shadow-xs ${
+                className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 ${
                   card.passed
-                    ? 'bg-white border-emerald-200'
-                    : 'bg-amber-50/40 border-amber-200'
+                    ? 'bg-white border-stone-200'
+                    : 'bg-[#FAF9F6] border-amber-300/80'
                 }`}
               >
                 <div className="space-y-2">
@@ -330,27 +330,25 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                       {card.title}
                     </span>
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold ${
-                        card.passed
-                          ? 'bg-emerald-100 text-emerald-900'
-                          : 'bg-amber-100 text-amber-900'
+                      className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold whitespace-nowrap shrink-0 ${
+                        card.passed ? 'text-emerald-800' : 'text-amber-800'
                       }`}
                     >
                       {card.passed ? (
-                        <CheckCircle2 className="w-3 h-3" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                       ) : (
-                        <Clock className="w-3 h-3" />
+                        <Clock className="w-3.5 h-3.5" />
                       )}
                       {card.passed ? 'CLEARED' : 'ACTION NEEDED'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">{card.detail}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed text-left">{card.detail}</p>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => onOpenTab(card.tab)}
-                  className="inline-flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                  className="inline-flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
                 >
                   <span>{card.cta}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -366,35 +364,35 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
         <>
           {/* KPI Strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Total Active Items
               </p>
-              <p className="font-serif text-2xl font-medium text-slate-900 mt-1 tabular-nums">
+              <p className="font-serif text-2xl font-medium text-slate-900 mt-1 tabular-nums text-left">
                 {overview.counts.total}
               </p>
             </div>
-            <div className="bg-emerald-50/60 rounded-2xl border border-emerald-200 p-4 shadow-xs">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-800">
+            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Auto-Ready
               </p>
-              <p className="font-serif text-2xl font-medium text-emerald-950 mt-1 tabular-nums">
+              <p className="font-serif text-2xl font-medium text-emerald-800 mt-1 tabular-nums text-left">
                 {overview.counts.ready}
               </p>
             </div>
-            <div className="bg-amber-50/60 rounded-2xl border border-amber-200 p-4 shadow-xs">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-amber-800">
+            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Held by Checks
               </p>
-              <p className="font-serif text-2xl font-medium text-amber-950 mt-1 tabular-nums">
+              <p className="font-serif text-2xl font-medium text-amber-800 mt-1 tabular-nums text-left">
                 {overview.counts.held}
               </p>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Manual Desk Review
               </p>
-              <p className="font-serif text-2xl font-medium text-slate-900 mt-1 tabular-nums">
+              <p className="font-serif text-2xl font-medium text-slate-900 mt-1 tabular-nums text-left">
                 {overview.counts.manual}
               </p>
             </div>
@@ -402,10 +400,10 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
           {/* Sweep Execution Report */}
           {sweepReport && (
-            <div className="bg-white rounded-2xl border border-pust-700/30 p-5 shadow-xs space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div className="bg-white rounded-2xl border border-pust-700/35 p-5 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-3">
                 <div>
-                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
                     Sweep Execution Report · {new Date(sweepReport.ranAt).toLocaleTimeString('en-US')}
                   </p>
                   <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -421,25 +419,23 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                 </button>
               </div>
               {sweepReport.actions.length === 0 ? (
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 text-left">
                   No automated items required processing during this sweep.
                 </p>
               ) : (
-                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs">
+                <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 overflow-hidden text-xs">
                   {sweepReport.actions.map((act, idx) => (
                     <div
                       key={`${act.flowType}-${idx}`}
                       className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 bg-white"
                     >
                       <div className="min-w-0">
-                        <p className="font-medium text-slate-900 truncate">{act.target}</p>
-                        <p className="text-slate-600">{act.detail}</p>
+                        <p className="font-medium text-slate-900 truncate text-left">{act.target}</p>
+                        <p className="text-slate-600 text-left">{act.detail}</p>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded font-mono font-semibold uppercase ${
-                          act.outcome === 'processed'
-                            ? 'bg-emerald-100 text-emerald-900'
-                            : 'bg-amber-100 text-amber-900'
+                        className={`font-mono text-[11px] font-semibold uppercase whitespace-nowrap shrink-0 ${
+                          act.outcome === 'processed' ? 'text-emerald-800' : 'text-amber-800'
                         }`}
                       >
                         {act.outcome}
@@ -452,9 +448,9 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
           )}
 
           {/* Unified Cross-Office Queue */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-              <div className="flex flex-wrap items-center gap-1.5">
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-200 pb-4">
+              <div className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80">
                 {(
                   [
                     { id: 'all', label: `All (${overview.counts.total})` },
@@ -467,10 +463,10 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                     key={tab.id}
                     type="button"
                     onClick={() => setFilterMode(tab.id)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap tabular-nums ${
                       filterMode === tab.id
-                        ? 'bg-pust-900 text-white border-pust-900'
-                        : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
+                        ? 'bg-white text-slate-950 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-950'
                     }`}
                   >
                     {tab.label}
@@ -485,7 +481,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter by student, ID, or office..."
-                  className="w-full md:w-64 pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                  className="w-full md:w-64 pl-8 pr-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-800 focus:outline-none"
                 />
               </div>
             </div>
@@ -499,28 +495,29 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+              <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 overflow-hidden">
                 {filteredQueue.map((item) => {
                   const isBusy = busyId === item.id;
                   return (
                     <div
                       key={item.id}
-                      className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
+                      className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white hover:bg-[#FAF9F6] transition-colors"
                     >
                       <div className="space-y-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-pust-800">
                             {item.officeLabel}
                           </span>
-                          <span className="text-slate-300">·</span>
+                          <span className="text-stone-300">·</span>
                           <span className="font-mono text-[11px] text-slate-500">{item.stage}</span>
+                          <span className="text-stone-300">·</span>
                           <span
-                            className={`px-2 py-0.5 rounded font-mono text-[10px] font-semibold uppercase ${
+                            className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold uppercase ${
                               item.eligibility === 'ready'
-                                ? 'bg-emerald-100 text-emerald-900'
+                                ? 'text-emerald-800'
                                 : item.eligibility === 'held'
-                                ? 'bg-amber-100 text-amber-900'
-                                : 'bg-slate-100 text-slate-700'
+                                ? 'text-amber-800'
+                                : 'text-slate-600'
                             }`}
                           >
                             {item.eligibility === 'ready'
@@ -530,10 +527,10 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                               : 'Manual Review'}
                           </span>
                         </div>
-                        <p className="font-medium text-sm text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-600">{item.subtitle}</p>
+                        <p className="font-medium text-sm text-slate-900 text-left">{item.title}</p>
+                        <p className="text-xs text-slate-600 text-left">{item.subtitle}</p>
                         <p
-                          className={`text-xs ${
+                          className={`text-xs text-left ${
                             item.eligibility === 'held' ? 'text-amber-800' : 'text-emerald-800'
                           }`}
                         >
@@ -545,7 +542,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                         <button
                           type="button"
                           onClick={() => onOpenTab(item.portalTab)}
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
                         >
                           Open Module
                         </button>
@@ -572,8 +569,8 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
       {/* Automation Policy Rules Grid */}
       {overview && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-3">
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-pust-800" />
               <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -594,11 +591,13 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
               return (
                 <div
                   key={rule.key}
-                  className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] flex items-start justify-between gap-4"
+                  className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4"
                 >
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-900">{rule.label}</p>
-                    <p className="text-xs text-slate-600 leading-relaxed">{rule.description}</p>
+                    <p className="text-sm font-medium text-slate-900 text-left">{rule.label}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed text-left">
+                      {rule.description}
+                    </p>
                   </div>
 
                   {user.role === 'admin' ? (
@@ -609,18 +608,16 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                       aria-pressed={enabled}
                       className={`px-3 py-1 rounded-lg font-mono text-[11px] font-semibold shrink-0 cursor-pointer transition-colors ${
                         enabled
-                          ? 'bg-emerald-700 text-white hover:bg-emerald-800'
-                          : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                          ? 'bg-emerald-800 text-white hover:bg-emerald-900'
+                          : 'bg-stone-200 text-slate-700 hover:bg-stone-300'
                       }`}
                     >
                       {isSaving ? '...' : enabled ? 'ENABLED' : 'PAUSED'}
                     </button>
                   ) : (
                     <span
-                      className={`px-2.5 py-1 rounded-lg font-mono text-[11px] font-semibold shrink-0 ${
-                        enabled
-                          ? 'bg-emerald-100 text-emerald-900'
-                          : 'bg-slate-200 text-slate-700'
+                      className={`font-mono text-[11px] font-semibold shrink-0 ${
+                        enabled ? 'text-emerald-800' : 'text-slate-500'
                       }`}
                     >
                       {enabled ? 'ACTIVE' : 'MANUAL'}
@@ -635,14 +632,14 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
       {/* Recent Automated & Office Activity Feed */}
       {overview && overview.recentAuditLogs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <div className="flex items-center gap-2 border-b border-stone-200 pb-3">
             <Activity className="w-4 h-4 text-pust-800" />
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Recent Campus Office Activity Feed
             </h3>
           </div>
-          <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs">
+          <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 overflow-hidden text-xs">
             {overview.recentAuditLogs.slice(0, 8).map((log) => (
               <div
                 key={log.id}

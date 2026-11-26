@@ -98,7 +98,7 @@ export function Navbar({
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
+      className="sticky top-0 z-40 bg-white border-b border-stone-200 print:hidden"
     >
       <div className="relative z-10">
         {/* Full-bleed upper institutional title band backdrop (heritage PUST maroon + brushed gold accent rule) */}
@@ -269,7 +269,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'home' && (
                     <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {HOME_SUBTOPICS.map((item) => (
                           <Link
                             key={item.href}
@@ -308,7 +308,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'governance' && (
                     <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {governanceGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -351,7 +351,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'about' && (
                     <div className="absolute left-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {aboutGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -394,7 +394,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'administration' && (
                     <div className="absolute left-0 xl:-left-24 top-full pt-1 w-[680px] xl:w-[780px] max-w-[calc(100vw-2rem)] z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-2.5 max-h-[75vh] overflow-y-auto grid grid-cols-2 lg:grid-cols-3 gap-1">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-2.5 max-h-[75vh] overflow-y-auto grid grid-cols-2 lg:grid-cols-3 gap-1">
                         {adminGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -437,7 +437,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'academic' && (
                     <div className="absolute left-0 top-full pt-1 w-[420px] max-w-[calc(100vw-2rem)] z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-2 grid grid-cols-2 gap-1">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-2 grid grid-cols-2 gap-1">
                         {academicGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -480,7 +480,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'facilities' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {facilitiesGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -523,7 +523,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'notices' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {noticesGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -566,7 +566,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'admission' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-stone-200 shadow-[0_14px_32px_-12px_rgba(28,25,23,0.16)] p-1.5 space-y-0.5">
                         {admissionGroup.items.map((item) => (
                           <Link
                             key={item.route}

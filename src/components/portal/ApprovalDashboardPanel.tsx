@@ -335,10 +335,10 @@ export function ApprovalDashboardPanel({
   return (
     <div className="space-y-6">
       {/* Header Surface */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800 flex items-center gap-1.5">
-            <ClipboardCheck className="w-3.5 h-3.5" />
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800 flex items-center gap-1.5 text-left">
+            <ClipboardCheck className="w-3.5 h-3.5 shrink-0" />
             {user.role === 'chairman'
               ? `${user.departmentCode} Department Head Review`
               : user.role === 'admin'
@@ -350,7 +350,7 @@ export function ApprovalDashboardPanel({
               ? 'Departmental Approval Dashboard'
               : 'My Departmental Approval Requests'}
           </h2>
-          <p className="text-sm text-slate-600 max-w-2xl">
+          <p className="text-sm text-slate-600 max-w-2xl text-left">
             {user.role === 'chairman'
               ? `Inspect pending administrative requisitions, faculty leaves, lab procurement, and student exemptions assigned to ${user.departmentCode}.`
               : user.role === 'admin'
@@ -601,44 +601,44 @@ export function ApprovalDashboardPanel({
 
       {/* 4-Column KPI Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
             Pending Review
           </p>
-          <p className="font-serif text-2xl font-medium text-amber-800 tabular-nums">
+          <p className="font-serif text-2xl font-medium text-amber-800 tabular-nums text-left">
             {counts.pending}
           </p>
-          <p className="text-xs text-slate-600">Awaiting department head decision</p>
+          <p className="text-xs text-slate-600 text-left">Awaiting department head decision</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
             Revisions Requested
           </p>
-          <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+          <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
             {counts.revision_requested}
           </p>
-          <p className="text-xs text-slate-600">Returned for requester updates</p>
+          <p className="text-xs text-slate-600 text-left">Returned for requester updates</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
             Approved
           </p>
-          <p className="font-serif text-2xl font-medium text-emerald-800 tabular-nums">
+          <p className="font-serif text-2xl font-medium text-emerald-800 tabular-nums text-left">
             {counts.approved}
           </p>
-          <p className="text-xs text-slate-600">Signed off &amp; logged</p>
+          <p className="text-xs text-slate-600 text-left">Signed off &amp; logged</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-1">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-1">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
             Total Requests
           </p>
-          <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums">
+          <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
             {counts.all}
           </p>
-          <p className="text-xs text-slate-600 tabular-nums">
+          <p className="text-xs text-slate-600 tabular-nums text-left">
             {counts.declined > 0 ? `${counts.declined} declined` : 'Scoped dossier ledger'}
           </p>
         </div>
@@ -646,16 +646,16 @@ export function ApprovalDashboardPanel({
 
       {/* Other Departmental Sign-Offs Cross-Check Strip (Chairman & Admin) */}
       {isReviewer && hasCrossChecks && crossChecks && (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div className="px-5 py-3 border-b border-slate-200 bg-[#F7F7F5] flex flex-wrap items-center justify-between gap-2">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-900 font-semibold">
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+          <div className="px-5 py-3 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-900 font-semibold text-left">
               Pending Departmental Sign-Off Queues
             </p>
             <span className="font-mono text-[11px] text-slate-500">
               Jump directly to operational clearance desks
             </span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
             {[
               {
                 label: 'Account Approvals',
@@ -687,11 +687,11 @@ export function ApprovalDashboardPanel({
                 key={item.label}
                 type="button"
                 onClick={() => onOpenTab(item.tab)}
-                className="p-4 text-left hover:bg-[#F7F7F5] transition-colors flex items-center justify-between gap-2 cursor-pointer"
+                className="p-4 text-left hover:bg-[#FAF9F6] transition-colors flex items-center justify-between gap-2 cursor-pointer"
               >
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-600 truncate">{item.label}</p>
-                  <p className="font-mono text-lg font-semibold text-slate-900 tabular-nums mt-0.5">
+                  <p className="text-xs text-slate-600 truncate text-left">{item.label}</p>
+                  <p className="font-mono text-lg font-semibold text-slate-900 tabular-nums mt-0.5 text-left">
                     {item.count}
                   </p>
                 </div>
@@ -703,11 +703,11 @@ export function ApprovalDashboardPanel({
       )}
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-stone-200 p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
         <div
           role="tablist"
           aria-label="Filter departmental requests by status"
-          className="inline-flex flex-wrap gap-1 bg-slate-100 rounded-lg p-1"
+          className="inline-flex flex-wrap gap-1 bg-stone-100 border border-stone-200/80 rounded-lg p-1"
         >
           {(
             [
@@ -787,8 +787,8 @@ export function ApprovalDashboardPanel({
       {/* Master-Detail Split Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Master Queue */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between gap-2">
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-stone-200 overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-stone-200 flex items-center justify-between gap-2">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Assigned Request Queue
             </h3>
@@ -799,7 +799,7 @@ export function ApprovalDashboardPanel({
 
           {filteredRequests.length === 0 ? (
             <div className="p-8 text-center space-y-3">
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 text-center">
                 No administrative requests match the current filters.
               </p>
               {(statusFilter !== 'all' || categoryFilter !== 'ALL' || searchQuery) && (
@@ -810,14 +810,14 @@ export function ApprovalDashboardPanel({
                     setCategoryFilter('ALL');
                     setSearchQuery('');
                   }}
-                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800 cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] text-pust-900 hover:border-pust-800 cursor-pointer"
                 >
                   Reset Filters
                 </button>
               )}
             </div>
           ) : (
-            <div className="divide-y divide-slate-200">
+            <div className="divide-y divide-stone-200">
               {filteredRequests.map((item) => {
                 const isSelected = selectedRequest?.id === item.id;
                 return (
@@ -826,17 +826,17 @@ export function ApprovalDashboardPanel({
                     type="button"
                     onClick={() => setSelectedId(item.id)}
                     className={`w-full text-left p-5 space-y-2 transition-colors cursor-pointer ${
-                      isSelected ? 'bg-[#F7F7F5]' : 'bg-white hover:bg-[#F7F7F5]/60'
+                      isSelected ? 'bg-[#FAF9F6]' : 'bg-white hover:bg-[#FAF9F6]/70'
                     }`}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <p className="font-serif text-base font-medium text-slate-900 leading-snug">
+                      <p className="font-serif text-base font-medium text-slate-900 leading-snug text-left">
                         {item.title}
                       </p>
                       <StatusLabel status={item.status} />
                     </div>
 
-                    <p className="font-mono text-[11px] text-slate-600 tabular-nums">
+                    <p className="font-mono text-[11px] text-slate-600 tabular-nums text-left">
                       <span className="text-pust-900 font-semibold">{item.referenceCode}</span>
                       {' · '}
                       {item.category}
@@ -855,7 +855,7 @@ export function ApprovalDashboardPanel({
                     </p>
 
                     <div className="flex flex-wrap items-end justify-between gap-3">
-                      <p className="text-xs text-slate-600 line-clamp-2 flex-1 min-w-[200px]">
+                      <p className="text-xs text-slate-600 line-clamp-2 flex-1 min-w-[200px] text-left">
                         {item.summary}
                       </p>
                       {typeof item.requestedAmountBdt === 'number' && item.requestedAmountBdt > 0 && (
@@ -872,11 +872,11 @@ export function ApprovalDashboardPanel({
         </div>
 
         {/* Right Detail & Decision Dossier */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 bg-white rounded-2xl border border-slate-200 p-6 space-y-5">
+        <div className="lg:col-span-5 lg:sticky lg:top-24 bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
           {!selectedRequest ? (
             <div className="py-10 text-center space-y-2">
               <ClipboardCheck className="w-7 h-7 text-slate-400 mx-auto" />
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 text-center">
                 Select a request from the queue to inspect its dossier and review history.
               </p>
             </div>
