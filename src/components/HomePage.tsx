@@ -855,7 +855,7 @@ export function HomePage({
                           }}
                           className="w-full text-left p-6 card-gradient-crimson hover:brightness-[0.985] transition-all space-y-2 group cursor-pointer"
                         >
-                          <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-start justify-between gap-3">
                             <p className="font-mono text-xs text-slate-600 tabular-nums">
                               {leadNotice.publishedAt} ·{' '}
                               <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
@@ -871,7 +871,9 @@ export function HomePage({
                           <h3 className="font-serif text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
                             {leadNotice.title}
                           </h3>
-                          <p className="text-sm text-slate-700 leading-relaxed">{leadNotice.summary}</p>
+                          <p className="prose-justify text-sm text-slate-700 leading-relaxed">
+                            {leadNotice.summary}
+                          </p>
                         </div>
                       )}
 
@@ -887,9 +889,9 @@ export function HomePage({
                               onSelectNotice(notice);
                             }
                           }}
-                          className="w-full text-left px-6 py-4 hover:bg-pust-50/70 transition-colors space-y-1 group cursor-pointer"
+                          className="w-full text-left px-6 py-4 hover:bg-pust-50/70 transition-colors space-y-1.5 group cursor-pointer"
                         >
-                          <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-start justify-between gap-3">
                             <p className="font-mono text-xs text-slate-600 tabular-nums">
                               {notice.publishedAt} ·{' '}
                               <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
@@ -905,7 +907,7 @@ export function HomePage({
                           <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
                             {notice.title}
                           </h3>
-                          <p className="text-sm text-slate-700 leading-relaxed line-clamp-2">
+                          <p className="prose-justify text-sm text-slate-700 leading-relaxed line-clamp-2">
                             {notice.summary}
                           </p>
                         </div>

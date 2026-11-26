@@ -2623,64 +2623,79 @@ export function PublicSubPages({
   return (
     <main className="flex-1 bg-[#F7F7F5]">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-200">
-          <div className="space-y-4">
+        <div className="space-y-5 pb-6 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Central &amp; Department Circulars
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-2 tracking-tight">
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-1.5 tracking-tight">
                 {activeNoticeHeading}
               </h1>
             </div>
-            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
+
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="font-mono text-xs font-medium text-slate-600 tabular-nums">
+                {filteredNotices.length} {filteredNotices.length === 1 ? 'circular' : 'circulars'}
+              </span>
+              <EditTriggerButton
+                target={{ kind: 'notice', notice: null }}
+                label="New Notice"
+                icon="add"
+                variant="compact"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <nav
+              aria-label="Notice categories"
+              className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pb-1 lg:pb-0 min-w-0"
+            >
               {noticeSubTabs.map((tab) => (
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`h-10 inline-flex items-center justify-center px-3.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route
-                      ? 'bg-pust-800 text-white shadow-xs'
+                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                       : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
                   {tab.label}
                 </Link>
               ))}
-            </div>
-          </div>
+            </nav>
 
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
-            <EditTriggerButton
-              target={{ kind: 'notice', notice: null }}
-              label="New Notice"
-              icon="add"
-              variant="compact"
-            />
-            <div className="relative w-full sm:w-72 shrink-0">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <div className="relative w-full lg:w-72 shrink-0">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={noticeQuery}
                 onChange={(e) => setNoticeQuery(e.target.value)}
                 placeholder="Search circulars or memo no."
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
+                aria-label="Search circulars or memo number"
+                className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-slate-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3 py-5 border-b border-slate-200">
-          <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 py-4 border-b border-slate-200">
+          <div
+            role="group"
+            aria-label="Filter notices by category"
+            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 pb-1 sm:pb-0 min-w-0 flex-1"
+          >
             {NOTICE_FILTERS.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedNoticeCat(cat)}
-                className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`h-9 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
-                    ? 'bg-pust-800 text-white shadow-xs'
-                    : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                    ? 'bg-pust-800 text-white border-pust-800 shadow-xs'
+                    : 'bg-white border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                 }`}
               >
                 {cat}
@@ -2688,7 +2703,11 @@ export function PublicSubPages({
             ))}
           </div>
 
-          <div className="flex gap-1.5">
+          <div
+            role="group"
+            aria-label="Filter notices by board scope"
+            className="inline-flex items-center self-start xl:self-auto p-1 rounded-xl bg-white border border-slate-200/90 shadow-2xs overflow-x-auto max-w-full shrink-0"
+          >
             {(
               [
                 { id: 'all', label: 'All Boards' },
@@ -2700,10 +2719,10 @@ export function PublicSubPages({
                 key={scope.id}
                 type="button"
                 onClick={() => setNoticeBoardScope(scope.id)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
+                className={`h-7 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   noticeBoardScope === scope.id
                     ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-white border border-slate-300/80 text-slate-800 hover:border-slate-400'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
                 }`}
               >
                 {scope.label}
@@ -2730,8 +2749,8 @@ export function PublicSubPages({
             )}
           </div>
         ) : filteredNotices.length === 0 ? (
-          <div className="py-10 px-6 text-sm text-slate-700 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
-            <p>No notices match the selected filter criteria.</p>
+          <div className="py-12 px-6 text-sm text-slate-700 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
+            <p className="text-center">No notices match the selected filter criteria.</p>
             <button
               type="button"
               onClick={() => {
@@ -2739,57 +2758,78 @@ export function PublicSubPages({
                 setNoticeBoardScope('all');
                 setNoticeQuery('');
               }}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-800 text-white cursor-pointer"
+              className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-800 text-white hover:bg-pust-900 transition-colors cursor-pointer"
             >
               Reset Notice Filters
             </button>
           </div>
         ) : (
-          <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs">
-            {filteredNotices.map((notice) => (
-              <div
-                key={notice.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => onSelectNotice(notice)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onSelectNotice(notice);
-                  }
-                }}
-                className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-baseline group cursor-pointer"
-              >
-                <div className="lg:col-span-3 font-mono text-xs text-slate-600 tabular-nums">
-                  <span>{notice.publishedAt}</span>
-                  <span className="mx-2 text-slate-400">·</span>
-                  <span className="font-semibold text-pust-700">{notice.category}</span>
-                </div>
+          <div className="rounded-2xl border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs">
+            <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF8F4] border-b border-slate-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+              <div className="lg:col-span-2">Date &amp; Category</div>
+              <div className="lg:col-span-7">Official Circular</div>
+              <div className="lg:col-span-3 text-right">Memo Reference</div>
+            </div>
 
-                <div className="lg:col-span-7">
-                  <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                    {notice.title}
-                  </h2>
-                  <p className="text-sm text-slate-700 mt-1 leading-relaxed">{notice.summary}</p>
-                </div>
-
-                <div className="lg:col-span-2 lg:text-right font-mono text-xs text-slate-600 tabular-nums flex lg:flex-col items-center lg:items-end justify-between gap-2">
-                  <div>
-                    {notice.referenceNo}
-                    {notice.visibility === 'registered' && (
-                      <span className="block text-pust-700 font-semibold mt-0.5">
-                        Registered Only
-                      </span>
-                    )}
+            <div className="divide-y divide-slate-200">
+              {filteredNotices.map((notice) => (
+                <div
+                  key={notice.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onSelectNotice(notice)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelectNotice(notice);
+                    }
+                  }}
+                  className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer"
+                >
+                  <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
+                    <span className="text-slate-600 font-medium whitespace-nowrap">
+                      {notice.publishedAt}
+                    </span>
+                    <span className="font-semibold text-pust-700 uppercase tracking-wide text-[11px] leading-tight">
+                      {notice.category}
+                    </span>
                   </div>
-                  <EditTriggerButton
-                    target={{ kind: 'notice', notice }}
-                    label="Edit"
-                    variant="compact"
-                  />
+
+                  <div className="lg:col-span-7 min-w-0">
+                    <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
+                      {notice.title}
+                    </h2>
+                    <p className="prose-justify text-sm text-slate-700 mt-1.5 leading-relaxed">
+                      {notice.summary}
+                    </p>
+                  </div>
+
+                  <div className="lg:col-span-3 min-w-0 pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 font-mono text-xs tabular-nums">
+                    <div className="lg:text-right min-w-0">
+                      <span className="block font-medium text-slate-700 break-words">
+                        {notice.referenceNo}
+                      </span>
+                      {notice.visibility === 'registered' && (
+                        <span className="block text-[11px] text-pust-700 font-semibold mt-0.5">
+                          Registered Only
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <EditTriggerButton
+                        target={{ kind: 'notice', notice }}
+                        label="Edit"
+                        variant="compact"
+                      />
+                      <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950">
+                        Read
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </section>
