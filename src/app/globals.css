@@ -50,6 +50,7 @@
   html {
     font-family: var(--font-sans);
     overflow-x: clip;
+    scrollbar-gutter: stable;
   }
 
   body {

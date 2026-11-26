@@ -24,7 +24,7 @@ export function PageReveal({
       initial={hasHydratedRef.current ? { opacity: 0.84 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.14, ease: EDITORIAL_EASE }}
-      className="flex-1 flex flex-col min-h-[65vh]"
+      className="flex-1 w-full flex flex-col min-h-[65vh]"
     >
       {children}
     </motion.div>

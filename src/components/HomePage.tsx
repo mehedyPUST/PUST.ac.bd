@@ -261,8 +261,8 @@ export function HomePage({
   return (
     <main className="flex-1 bg-[#F7F7F5]">
       {dataError && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-sm text-red-900">
+        <div className="bg-red-50 border-b border-red-200 py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm text-red-900">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-700 shrink-0" />
               <span>{dataError}</span>
