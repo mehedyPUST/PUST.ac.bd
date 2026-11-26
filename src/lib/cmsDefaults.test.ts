@@ -105,9 +105,21 @@ test('resolveContextualEditTarget maps public routes to accurate contextual edit
   assert.equal(resolveContextualEditTarget('/portal'), null);
 });
 
-test('parseRouteFromPath and getBreadcrumbsForPath support individual department pages and career', async () => {
-  const { parseRouteFromPath, getBreadcrumbsForPath } = await import('./routes');
+test('parseRouteFromPath, getRouteSectionKey, and getBreadcrumbsForPath support sub-pages, department pages, and career', async () => {
+  const { parseRouteFromPath, getRouteSectionKey, getBreadcrumbsForPath } = await import('./routes');
   assert.equal(parseRouteFromPath('/academics/departments/phy'), '/academics/departments');
+  assert.equal(getRouteSectionKey('/'), 'home');
+  assert.equal(getRouteSectionKey('/academics/programs'), 'academics');
+  assert.equal(getRouteSectionKey('/academics/faculty'), 'academics');
+  assert.equal(getRouteSectionKey('/academics/departments'), 'academics');
+  assert.equal(getRouteSectionKey('/academics/departments/CSE'), 'department-detail:cse');
+  assert.equal(getRouteSectionKey('/governance/pust-act'), 'governance');
+  assert.equal(getRouteSectionKey('/governance/regent-board'), 'governance');
+  assert.equal(getRouteSectionKey('/about/our-university'), 'about');
+  assert.equal(getRouteSectionKey('/about/history'), 'about');
+  assert.equal(getRouteSectionKey('/administration/vc-office'), 'administration');
+  assert.equal(getRouteSectionKey('/administration/ict-cell'), 'administration');
+  assert.equal(getRouteSectionKey('/career'), '/career');
   assert.deepEqual(getBreadcrumbsForPath('/academics/departments/phy'), [
     { label: 'Home', href: '/' },
     { label: 'Academics', href: '/academics' },

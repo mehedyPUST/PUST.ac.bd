@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { pustRepo } from '../../../../../server/db';
 import { DepartmentDetailView } from '../../../../components/DepartmentDetailView';
+import DepartmentDetailLoading from './loading';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export default async function DepartmentPage({
   }
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<DepartmentDetailLoading />}>
       <DepartmentDetailView code={matched.code} initialDepartment={matched} />
     </Suspense>
   );

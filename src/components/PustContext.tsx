@@ -16,7 +16,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
-import { parseRouteFromPath, type AppRoute } from '../lib/routes';
+import { getRouteSectionKey, parseRouteFromPath, type AppRoute } from '../lib/routes';
 import { PageReveal } from './MotionPrimitives';
 import { OfflineIndicator, PwaRegistrar } from './PwaManager';
 import type {
@@ -641,8 +641,8 @@ export function PustShell({
               onNavigate={navigateTo}
             />
             <div className="flex-1 flex flex-col">
-              <PageReveal routeKey={pathname}>
-                <Breadcrumb />
+              <Breadcrumb />
+              <PageReveal routeKey={getRouteSectionKey(pathname)}>
                 {children}
               </PageReveal>
             </div>

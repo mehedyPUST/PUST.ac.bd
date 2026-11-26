@@ -20,7 +20,7 @@ export function ResilientImage({
   caption,
   className = 'w-full h-full object-cover',
   containerClassName = '',
-  frameClassName = 'rounded-xl bg-slate-100 border border-slate-200',
+  frameClassName = 'rounded-xl bg-[#F5F2EB] border border-slate-200',
   fallbackMinHeightClassName = 'min-h-[240px]',
   priority = false,
 }: ResilientImageProps) {
@@ -47,7 +47,7 @@ export function ResilientImage({
             src={trimmedSrc}
             alt={alt}
             loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
+            decoding={priority ? 'sync' : 'async'}
             referrerPolicy="no-referrer"
             onError={() => setFailedSrc(trimmedSrc)}
             className={className}

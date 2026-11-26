@@ -21,11 +21,38 @@ export function PageReveal({
   return (
     <motion.div
       key={routeKey}
-      initial={hasHydratedRef.current ? { opacity: 0.3, y: 4 } : false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: EDITORIAL_EASE }}
-      style={{ willChange: 'opacity, transform' }}
+      initial={hasHydratedRef.current ? { opacity: 0.84 } : false}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.14, ease: EDITORIAL_EASE }}
       className="flex-1 flex flex-col min-h-[65vh]"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function SubPagePanel({
+  subKey,
+  children,
+  className = '',
+}: {
+  subKey: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const hasMountedRef = useRef(false);
+
+  useEffect(() => {
+    hasMountedRef.current = true;
+  }, []);
+
+  return (
+    <motion.div
+      key={subKey}
+      initial={hasMountedRef.current ? { opacity: 0.86 } : false}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.12, ease: EDITORIAL_EASE }}
+      className={className}
     >
       {children}
     </motion.div>

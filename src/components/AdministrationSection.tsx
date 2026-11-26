@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionCard, MotionReveal } from './MotionPrimitives';
+import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
@@ -222,57 +222,59 @@ export function AdministrationSection({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10 lg:pt-14 lg:pb-12 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-7 flex flex-col justify-between gap-6">
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-pust-700">
-                    Administration &amp; Executive Governance · PUST Act No. 43 of 2001
+              <SubPagePanel subKey={route} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-pust-700">
+                      Administration &amp; Executive Governance · PUST Act No. 43 of 2001
+                    </p>
+                    <EditTriggerButton
+                      target={{ kind: 'apa-benchmarks' }}
+                      label="Edit Showcase & APA"
+                      variant="compact"
+                    />
+                  </div>
+                  <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
+                    {activeOffice
+                      ? activeOffice.highlight
+                      : 'University Administration & Executive Offices'}
+                  </h1>
+                  <p className="text-[15.5px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
+                    {activeOffice
+                      ? activeOffice.summary
+                      : 'Statutory leadership, executive offices, and accountability units guiding academic governance, faculty administration, and digital public service at Pabna University of Science and Technology.'}
                   </p>
-                  <EditTriggerButton
-                    target={{ kind: 'apa-benchmarks' }}
-                    label="Edit Showcase & APA"
-                    variant="compact"
-                  />
                 </div>
-                <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
-                  {activeOffice
-                    ? activeOffice.highlight
-                    : 'University Administration & Executive Offices'}
-                </h1>
-                <p className="text-[15.5px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
-                  {activeOffice
-                    ? activeOffice.summary
-                    : 'Statutory leadership, executive offices, and accountability units guiding academic governance, faculty administration, and digital public service at Pabna University of Science and Technology.'}
-                </p>
-              </div>
 
-              {/* Focused Office Dossier Strip on Sub-Routes */}
-              {highlightedOfficer && (
-                <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="text-xs font-medium text-pust-800">{highlightedOfficer.role}</p>
-                    <p className="text-xs text-slate-500">{highlightedOfficer.office}</p>
+                {/* Focused Office Dossier Strip on Sub-Routes */}
+                {highlightedOfficer && (
+                  <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-xs font-medium text-pust-800">{highlightedOfficer.role}</p>
+                      <p className="text-xs text-slate-500">{highlightedOfficer.office}</p>
+                    </div>
+                    <p className="font-serif text-xl font-medium text-slate-900">
+                      {highlightedOfficer.name}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono tabular-nums text-slate-600">
+                      <a
+                        href={`mailto:${highlightedOfficer.email}`}
+                        className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
+                      >
+                        <Mail className="w-3.5 h-3.5 shrink-0" />
+                        {highlightedOfficer.email}
+                      </a>
+                      <a
+                        href={`tel:${highlightedOfficer.phone}`}
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900"
+                      >
+                        <Phone className="w-3.5 h-3.5 shrink-0" />
+                        {highlightedOfficer.phone}
+                      </a>
+                    </div>
                   </div>
-                  <p className="font-serif text-xl font-medium text-slate-900">
-                    {highlightedOfficer.name}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono tabular-nums text-slate-600">
-                    <a
-                      href={`mailto:${highlightedOfficer.email}`}
-                      className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
-                    >
-                      <Mail className="w-3.5 h-3.5 shrink-0" />
-                      {highlightedOfficer.email}
-                    </a>
-                    <a
-                      href={`tel:${highlightedOfficer.phone}`}
-                      className="inline-flex items-center gap-1.5 hover:text-slate-900"
-                    >
-                      <Phone className="w-3.5 h-3.5 shrink-0" />
-                      {highlightedOfficer.phone}
-                    </a>
-                  </div>
-                </div>
-              )}
+                )}
+              </SubPagePanel>
 
               {/* Sub-Navigation Rail across Administration Pages */}
               <nav

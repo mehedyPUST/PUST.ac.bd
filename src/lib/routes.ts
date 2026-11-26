@@ -194,6 +194,28 @@ export function parseRouteFromPath(pathname: string): AppRoute {
   return ALL_VALID_ROUTES.has(clean) ? clean : '/';
 }
 
+export function getRouteSectionKey(pathname: string): string {
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  if (clean === '/') return 'home';
+  if (clean.startsWith('/academics/departments/')) {
+    return `department-detail:${clean.slice('/academics/departments/'.length).toLowerCase()}`;
+  }
+  for (const prefix of [
+    '/governance',
+    '/about',
+    '/administration',
+    '/academics',
+    '/admissions',
+    '/facilities',
+    '/notices',
+  ]) {
+    if (clean === prefix || clean.startsWith(`${prefix}/`)) {
+      return prefix.slice(1);
+    }
+  }
+  return clean;
+}
+
 export function isValidSectionSlug(
   section:
     | 'about'

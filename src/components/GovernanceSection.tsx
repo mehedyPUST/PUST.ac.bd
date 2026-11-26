@@ -8,7 +8,7 @@ import type { AppRoute } from '../lib/routes';
 import type { GovernanceTabKind } from '../types/pust';
 import { CgpaCalculator } from './CgpaCalculator';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionCard, MotionReveal } from './MotionPrimitives';
+import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 
@@ -161,7 +161,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
       </div>
 
       {/* Content by Governance Sub-Page */}
-      <div>
+      <SubPagePanel subKey={activeRoute}>
         {activeRoute === '/governance/pust-act' && (
           <div className="space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -478,7 +478,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
             <CgpaCalculator />
           </div>
         )}
-      </div>
+      </SubPagePanel>
     </section>
   );
 }

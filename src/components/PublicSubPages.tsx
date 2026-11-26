@@ -38,7 +38,7 @@ import type { AppRoute } from '../lib/routes';
 import { AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
-import { MotionCard } from './MotionPrimitives';
+import { MotionCard, SubPagePanel } from './MotionPrimitives';
 import {
   CardsGridSkeleton,
   HeroSummarySkeleton,
@@ -488,6 +488,7 @@ export function PublicSubPages({
             </div>
           </div>
 
+          <SubPagePanel subKey={activeSlug} className="space-y-10">
           {loadingData && !activeSection ? (
             <HeroSummarySkeleton />
           ) : !activeSection ? (
@@ -578,6 +579,7 @@ export function PublicSubPages({
                         alt="PUST Rajapur Campus"
                         caption={resolved.aboutExtras.campusCaption}
                         className="w-full aspect-[4/3] object-cover"
+                        priority
                       />
                     </div>
                     <dl className="rounded-2xl border border-amber-900/15 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
@@ -661,6 +663,7 @@ export function PublicSubPages({
               )}
             </div>
           )}
+          </SubPagePanel>
         </section>
       </main>
     );
@@ -769,6 +772,7 @@ export function PublicSubPages({
             </div>
           </div>
 
+          <SubPagePanel subKey={activeHeading}>
           {route !== '/academics/departments' &&
           route !== '/academics' &&
           route !== '/academics/chairmen' &&
@@ -1679,6 +1683,7 @@ export function PublicSubPages({
               );
             })()
           )}
+          </SubPagePanel>
         </section>
 
         {/* Interactive Printable Form Preview Modal */}
@@ -1858,6 +1863,7 @@ export function PublicSubPages({
             </div>
           </div>
 
+          <SubPagePanel subKey={route === '/admissions' ? '/admissions/undergraduate' : route}>
           {route === '/admissions/notice' ? (
             <div className="space-y-4">
               <div className="flex justify-end empty:hidden">
@@ -2248,6 +2254,7 @@ export function PublicSubPages({
               </div>
             </div>
           )}
+          </SubPagePanel>
         </section>
       </main>
     );
@@ -2348,7 +2355,7 @@ export function PublicSubPages({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <SubPagePanel subKey={currentFac.route} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <div className="lg:col-span-6 space-y-6">
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
@@ -2418,9 +2425,10 @@ export function PublicSubPages({
                 alt={currentFac.title}
                 caption={currentFac.title}
                 className="w-full aspect-[4/3] object-cover"
+                priority
               />
             </div>
-          </div>
+          </SubPagePanel>
         </section>
       </main>
     );
@@ -2765,6 +2773,7 @@ export function PublicSubPages({
           </div>
         </div>
 
+        <SubPagePanel subKey={route}>
         {loadingData && notices.length === 0 ? (
           <div className="mt-6">
             <NoticeListSkeleton rows={6} />
@@ -2870,6 +2879,7 @@ export function PublicSubPages({
             </div>
           </div>
         )}
+        </SubPagePanel>
       </section>
     </main>
   );
