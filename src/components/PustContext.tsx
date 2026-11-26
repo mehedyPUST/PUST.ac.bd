@@ -19,7 +19,7 @@ import { pustApi } from '../lib/api';
 import { getRouteSectionKey, parseRouteFromPath, type AppRoute } from '../lib/routes';
 import { PageReveal } from './MotionPrimitives';
 import { OfflineIndicator, PwaRegistrar } from './PwaManager';
-import { GoToTopButton } from './ScrollControls';
+import { GoToTopButton, ScrollMarkerBar } from './ScrollControls';
 import type {
   AboutContentRecord,
   AuthUser,
@@ -691,6 +691,7 @@ export function PustShell({
           />
           <PwaRegistrar />
           <OfflineIndicator />
+          <ScrollMarkerBar />
           <GoToTopButton />
         </PustContext.Provider>
       </MotionConfig>

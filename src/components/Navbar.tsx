@@ -15,7 +15,6 @@ import type {
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { PustCrest } from './PustCrest';
 import { PwaInstallButton } from './PwaManager';
-import { ScrollMarkerBar } from './ScrollControls';
 
 interface NavbarProps {
   route: AppRoute;
@@ -923,7 +922,6 @@ export function Navbar({
           </nav>
         </>
       )}
-      <ScrollMarkerBar />
     </header>
   );
 }
