@@ -359,7 +359,7 @@ export function DepartmentPersonEditor({
         value={photoUrl}
         onChange={setPhotoUrl}
         onError={setError}
-        placeholder="/src/assets/images/... or https://..."
+        placeholder="https://... image URL"
       />
 
       {/* Qualification & Research */}

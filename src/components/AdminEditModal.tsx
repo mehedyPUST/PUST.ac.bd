@@ -1188,7 +1188,7 @@ export function AdminEditModal({
                   required
                   value={slideImageUrl}
                   onChange={(e) => setSlideImageUrl(e.target.value)}
-                  placeholder="/src/assets/images/... or https://..."
+                  placeholder="https://... image URL"
                   className={INPUT_CLASS}
                 />
               </div>

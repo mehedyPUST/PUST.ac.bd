@@ -135,8 +135,6 @@ test('parseRouteFromPath, getRouteSectionKey, and getBreadcrumbsForPath support 
 });
 
 test('resolveDepartmentImage resolves all 21 department assets, custom URLs, and safe fallbacks', async () => {
-  const { existsSync } = await import('node:fs');
-  const { join } = await import('node:path');
   const { DEPARTMENT_COVER_IMAGES, resolveDepartmentImage } = await import('./departmentMedia');
 
   const codes = Object.keys(DEPARTMENT_COVER_IMAGES);

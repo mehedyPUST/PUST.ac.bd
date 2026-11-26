@@ -267,7 +267,7 @@ export const SEED_VC_PROFILES: ViceChancellorRecord[] = [
     photoUrl: 'https://i.ibb.co.com/0VtFtt1n/VC-Sir-PUST-2026.jpg',
     message: `Welcome to the website of Pabna University of Science and Technology (PUST), one of the most promising universities in Bangladesh committed to teaching, research, and academic excellence!
 
-Founded in 2008, PUST started its journey with around 140 students enrolled in 4 departments including departments of Computer Science and Engineering (CSE), Electrical and Electronic Engineering (EEE), Mathematics (Math), and Business Administration (BA). This thriving university is spread over 30 acres of land beside the Dhaka-Pabna highway and is located about 3 kilometers east of Pabna town. Within this short span of time, PUST has been able to achieve substantial progress, while it currently accommodates 5 faculties, 21 departments, 172 teaching staff, and nearly 5000 students. We are already in a process of elevating this university to reach a global standard in terms of academics, research, and areal expansion.
+Founded in 2008, PUST started its journey with around 140 students enrolled in 4 departments including departments of Computer Science and Engineering (CSE), Electrical and Electronic Engineering (EEE), Mathematics (Math), and Business Administration (BA). This thriving university is spread over 30 acres of land beside the Dhaka-Pabna highway and is located about 3 kilometers east of Pabna town. Within this short span of time, PUST has been able to achieve substantial progress, while it currently accommodates 5 faculties, 21 departments, 212 teaching staff, and nearly 5000 students. We are already in a process of elevating this university to reach a global standard in terms of academics, research, and areal expansion.
 
 Since its establishment, PUST has always had the mission of promoting research in the field of science and technology. Our academics and students have secured commendable recognition through high-quality research publications in national and international journals. Recent webinars have attracted distinct scholars from around the world including noble laureates. We are determined to continue our progress in teaching quality, research output, and service to the community. In addition, PUST is unique in its campus design, educational curriculum, co-curricular, and extra-curricular activities. Students of PUST regularly participate in debate, sports, computer programming, engineering and architectural designs, competition for business ideas, and alike, and have won many awards at the national and international levels.
 
@@ -391,8 +391,7 @@ Our Vision
 export const SEED_BANNER_SLIDES: BannerSlideRecord[] = [
   {
     id: 'banner-1',
-    imageUrl:
-      'https://pust.ac.bd/includes/images/slides/1791951638WhatsApp%20Image%202026-09-22%20at%201.42.30%20PM%20(1).jpeg',
+    imageUrl: 'https://i.ibb.co.com/Xxm26cg2/pust-banner-official-2026.jpg',
     caption: 'Fig. 1 — Main Academic Promenade and Campus Grounds, Rajapur Campus, Pabna.',
     alt: 'Pabna University of Science and Technology Rajapur campus academic complex',
     orderIndex: 1,
@@ -459,9 +458,9 @@ export const SEED_GALLERY_ITEMS: GalleryItemRecord[] = [
   {
     id: 'gal-3',
     title: 'Central Library Reading Floor & Digital Archive Tour',
-    description: 'Video walkthrough of PUST Central Library study halls and IEEE/Springer research access.',
+    description: 'Walkthrough of PUST Central Library study halls and IEEE/Springer research access.',
     category: 'Academic Event',
-    mediaType: 'video',
+    mediaType: 'photo',
     mediaUrl: 'https://i.ibb.co.com/zhdT1BCm/pust-central-library-1795431408614.jpg',
     eventDate: '2026-10-14',
     visibility: 'public',

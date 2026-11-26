@@ -1807,7 +1807,7 @@ function PersonProfileModal({
                   value={draftPhotoUrl}
                   onChange={setDraftPhotoUrl}
                   onError={setInlineError}
-                  placeholder="/src/assets/images/... or https://..."
+                  placeholder="https://... image URL"
                 />
                 <div className="flex items-center gap-2.5">
                   <input

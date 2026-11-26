@@ -33,7 +33,7 @@ export function CmsImageField({
   value,
   onChange,
   onError,
-  placeholder = '/src/assets/images/... or https://...',
+  placeholder = 'https://... image URL',
   required = false,
 }: {
   label: string;
