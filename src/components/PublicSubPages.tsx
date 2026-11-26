@@ -583,11 +583,94 @@ export function PublicSubPages({
                 )}
               </div>
             </div>
+          ) : activeSlug === 'history' ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              <div className="lg:col-span-7">
+                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
+                  {activeSection.body}
+                </p>
+              </div>
+
+              <div className="lg:col-span-5 space-y-5">
+                <div className="rounded-2xl border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
+                  <div className="px-5 py-3.5 border-b border-amber-900/10 bg-white/50">
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800">
+                      Founding Charter &amp; Key Dates
+                    </p>
+                  </div>
+                  <dl className="divide-y divide-slate-200 text-sm">
+                    <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Act Enacted</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        15 July 2001 (Act No. 43)
+                      </dd>
+                    </div>
+                    <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Curriculum Launch</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        05 June 2008
+                      </dd>
+                    </div>
+                    <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                      <dt className="text-slate-700 font-medium">Gazette Operational</dt>
+                      <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                        12 October 2008
+                      </dd>
+                    </div>
+                    {profile && (
+                      <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                        <dt className="text-slate-700 font-medium">Campus Footprint</dt>
+                        <dd className="font-mono font-semibold text-slate-950 sm:text-right">
+                          {profile.campusAcres} Acres · Rajapur, Pabna
+                        </dd>
+                      </div>
+                    )}
+                    {profile?.convocationDate && (
+                      <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
+                        <dt className="text-slate-700 font-medium">First Convocation</dt>
+                        <dd className="font-mono font-semibold text-pust-700 sm:text-right">
+                          {profile.convocationDate}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              </div>
+            </div>
           ) : (
-            <div className="max-w-4xl">
-              <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
-                {activeSection.body}
-              </p>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              <div className="lg:col-span-7">
+                <p className="flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
+                  {activeSection.body}
+                </p>
+              </div>
+              <div className="lg:col-span-5">
+                <div className="rounded-2xl border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
+                  <div className="px-5 py-3.5 border-b border-amber-900/10 bg-white/50">
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800">
+                      Strategic Priorities
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-slate-200 text-sm">
+                    <li className="px-5 py-3 flex items-center justify-between gap-4">
+                      <span className="font-medium text-slate-800">OBE Curriculum &amp; IQAC</span>
+                      <span className="font-mono text-xs font-semibold text-pust-800">Active</span>
+                    </li>
+                    <li className="px-5 py-3 flex items-center justify-between gap-4">
+                      <span className="font-medium text-slate-800">RTTC &amp; IIED Research Grants</span>
+                      <span className="font-mono text-xs font-semibold text-pust-800">Expanding</span>
+                    </li>
+                    <li className="px-5 py-3 flex items-center justify-between gap-4">
+                      <span className="font-medium text-slate-800">Digital Campus Portal</span>
+                      <span className="font-mono text-xs font-semibold text-pust-800">Unified</span>
+                    </li>
+                    <li className="px-5 py-3 flex items-center justify-between gap-4">
+                      <span className="font-medium text-slate-800">Residential Halls &amp; Library</span>
+                      <span className="font-mono text-xs font-semibold text-pust-800">Upgrading</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
@@ -606,7 +689,7 @@ export function PublicSubPages({
               {resolved.aboutExtras.milestones.length === 0 ? (
                 <p className="text-sm text-slate-600">No chronology milestones published yet.</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
                   {resolved.aboutExtras.milestones.map((m, idx) => {
                     const milestoneStyle =
                       idx === 0 || idx === 1
@@ -618,13 +701,17 @@ export function PublicSubPages({
                       <MotionCard
                         key={`${m.year}-${idx}`}
                         delay={idx * 0.04}
-                        className={`p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
+                        className={`h-full flex flex-col p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
                       >
                         <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                           {m.year}
                         </p>
-                        <h2 className="font-serif text-base font-medium text-slate-900">{m.title}</h2>
-                        <p className="text-xs text-slate-600 leading-relaxed">{m.detail}</p>
+                        <h2 className="font-serif text-base font-medium text-slate-900 text-left">
+                          {m.title}
+                        </h2>
+                        <p className="text-xs text-slate-700 leading-relaxed text-left">
+                          {m.detail}
+                        </p>
                       </MotionCard>
                     );
                   })}
