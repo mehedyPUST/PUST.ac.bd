@@ -2,13 +2,22 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, Copy, Mail, Phone, Search, X } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Copy,
+  Mail,
+  Phone,
+  Search,
+  X,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { AdministrationOfficeDossier, AllOfficesDirectory } from './AdministrationOfficeDossier';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
+import { SubPagePanel } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
@@ -50,7 +59,7 @@ interface OfficeMeta {
 const OFFICE_SUBROUTES: OfficeMeta[] = [
   {
     route: '/administration/vc-office',
-    label: 'Vice-Chancellor Office',
+    label: 'VC Office',
     highlight: 'Office of the Vice-Chancellor',
     summary:
       'Executive head of the university, Chair of the Regent Board and Academic Council, directing institutional strategy and research expansion.',
@@ -58,7 +67,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/pro-vc-office',
-    label: 'Pro Vice-Chancellor Office',
+    label: 'Pro-VC Office',
     highlight: 'Office of the Pro Vice-Chancellor',
     summary:
       'Coordinates academic governance, faculty development, Outcome-Based Education (OBE) schedules, and inter-faculty coordination.',
@@ -66,7 +75,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/treasurer-office',
-    label: 'Treasurer Office',
+    label: 'Treasurer',
     highlight: 'Office of the Treasurer',
     summary:
       'Oversees annual UGC grants, university budgets, transparent procurement, financial disbursements, and digital revenue accounting.',
@@ -75,7 +84,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/registrar-office',
-    label: 'Registrar Office',
+    label: 'Registrar',
     highlight: 'Office of the Registrar',
     summary:
       'Custodian of university statutes, official circulars, Regent Board records, faculty appointments, and institutional administration.',
@@ -83,7 +92,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/proctor-office',
-    label: 'Proctor Office',
+    label: 'Proctor',
     highlight: "Proctor's Office",
     summary:
       'Maintains campus discipline, student safety, residential conduct, and digital clearance verification across the 30-acre campus.',
@@ -92,7 +101,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/student-advisor-office',
-    label: 'Student Advisor Office',
+    label: 'Student Advisor',
     highlight: 'Directorate of Student Welfare & Guidance',
     summary:
       'Supports scholarships, cultural and technical clubs, student counseling, and campus co-curricular life.',
@@ -110,7 +119,7 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
   },
   {
     route: '/administration/all-office',
-    label: 'All Office',
+    label: 'All 33 Offices',
     highlight: 'All University Offices & Units',
     summary:
       'Complete directory of PUST administrative offices, medical & transport wings, statutory bodies, and specialized cells.',
@@ -124,6 +133,26 @@ const OFFICE_SUBROUTES: OfficeMeta[] = [
     matchUnit: (code) => code === 'APA',
   },
 ];
+
+function sanitizeTel(phone: string): string {
+  const digits = phone.replace(/[^+\d]/g, '');
+  return digits || phone;
+}
+
+function matchLeadershipToOfficeRoute(role: string): string | null {
+  const normalized = role.toLowerCase();
+  if (normalized === 'vice-chancellor') return '/administration/vc-office';
+  if (normalized.includes('pro-vice') || normalized.includes('pro vice')) {
+    return '/administration/pro-vc-office';
+  }
+  if (normalized.includes('treasurer')) return '/administration/treasurer-office';
+  if (normalized.includes('registrar')) return '/administration/registrar-office';
+  if (normalized.includes('proctor')) return '/administration/proctor-office';
+  if (normalized.includes('student advisor')) return '/administration/student-advisor-office';
+  if (normalized.includes('ict')) return '/administration/ict-cell';
+  if (normalized.includes('controller')) return '/administration/controller-office';
+  return null;
+}
 
 export function AdministrationSection({
   route,
@@ -158,12 +187,13 @@ export function AdministrationSection({
   if (!profile) {
     return (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 space-y-3">
           <h1 className="font-serif text-xl font-medium text-red-950">
             Administration Data Unavailable
           </h1>
           <p className="text-sm text-red-800">
-            {dataError || 'Unable to load administration profile and leadership directory from the university server.'}
+            {dataError ||
+              'Unable to load administration profile and leadership directory from the university server.'}
           </p>
           <button
             type="button"
@@ -220,17 +250,17 @@ export function AdministrationSection({
   }
 
   return (
-    <div className="bg-[#FAF8F4]">
-      {/* Band 1: Institutional Masthead, Architectural Anchor & Sub-Navigation */}
-      <section className="editable-region border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
+    <div className="bg-[#FBF9F5] text-stone-900">
+      {/* Band 1: Institutional Masthead, Architectural Frame & Operational Ribbon */}
+      <section className="editable-region border-b border-stone-200 bg-[#FBF9F5]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             <div className="lg:col-span-7 flex flex-col justify-between gap-6">
-              <SubPagePanel subKey={route} className="space-y-6">
-                <div className="space-y-4">
+              <SubPagePanel subKey={route} className="space-y-5">
+                <div className="space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-pust-700">
-                      Administration &amp; Executive Governance · PUST Act No. 43 of 2001
+                    <p className="text-xs font-medium text-pust-800">
+                      Pabna University of Science and Technology · Act No. 43 of 2001
                     </p>
                     <EditTriggerButton
                       target={{ kind: 'apa-benchmarks' }}
@@ -238,99 +268,117 @@ export function AdministrationSection({
                       variant="compact"
                     />
                   </div>
-                  <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
+                  <h1 className="font-serif text-3xl sm:text-4xl lg:text-[2.85rem] leading-[1.08] font-semibold tracking-tight text-stone-950 max-w-2xl">
                     {activeOfficeRecord
                       ? activeOfficeRecord.name
                       : activeOffice
                       ? activeOffice.highlight
-                      : 'University Administration & Executive Offices'}
+                      : 'University Administration & Executive Governance'}
                   </h1>
-                  <p className="text-[15.5px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
+                  <p className="text-[15.5px] sm:text-base leading-[1.72] text-stone-700 max-w-2xl">
                     {activeOfficeRecord
                       ? activeOfficeRecord.summary
                       : activeOffice
                       ? activeOffice.summary
-                      : 'Statutory leadership, executive offices, and accountability units guiding academic governance, faculty administration, and digital public service at Pabna University of Science and Technology.'}
+                      : 'Statutory leadership, administrative offices, residential halls, and specialized cells stewarding academic governance, campus services, and transparent public administration.'}
                   </p>
                 </div>
 
-                {/* Focused Office Dossier Strip on Sub-Routes */}
-                {activeOfficeRecord && (activeOfficeRecord.head || activeOfficeRecord.officeEmail || activeOfficeRecord.officePhone) ? (
-                  <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-xs font-medium text-pust-800">
-                        {activeOfficeRecord.head?.designation || activeOfficeRecord.category}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {activeOfficeRecord.location || activeOfficeRecord.code}
-                      </p>
-                    </div>
+                {/* Focused Accession-Style Desk Summary on Office Sub-Routes */}
+                {activeOfficeRecord &&
+                (activeOfficeRecord.head ||
+                  activeOfficeRecord.officeEmail ||
+                  activeOfficeRecord.officePhone) ? (
+                  <dl className="border-y border-stone-200 bg-white/80 px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     {activeOfficeRecord.head && (
-                      <p className="font-serif text-xl font-medium text-slate-900">
-                        {activeOfficeRecord.head.name}
-                      </p>
+                      <div className="space-y-0.5">
+                        <dt className="text-stone-500">{activeOfficeRecord.head.designation}</dt>
+                        <dd className="font-serif text-lg font-medium text-stone-950">
+                          {activeOfficeRecord.head.name}
+                        </dd>
+                      </div>
                     )}
-                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono tabular-nums text-slate-600">
-                      {(activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value) && (
-                        <a
-                          href={`mailto:${activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value}`}
-                          className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
-                        >
-                          <Mail className="w-3.5 h-3.5 shrink-0" />
-                          {activeOfficeRecord.officeEmail || activeOfficeRecord.head?.emails?.[0]?.value}
-                        </a>
+                    <div className="space-y-1.5 sm:text-right font-mono tabular-nums">
+                      {(activeOfficeRecord.officeEmail ||
+                        activeOfficeRecord.head?.emails?.[0]?.value) && (
+                        <div>
+                          <a
+                            href={`mailto:${
+                              activeOfficeRecord.officeEmail ||
+                              activeOfficeRecord.head?.emails?.[0]?.value
+                            }`}
+                            className="inline-flex items-center gap-1.5 text-pust-900 hover:underline break-all"
+                          >
+                            <Mail className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                            {activeOfficeRecord.officeEmail ||
+                              activeOfficeRecord.head?.emails?.[0]?.value}
+                          </a>
+                        </div>
                       )}
-                      {(activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value) && (
-                        <a
-                          href={`tel:${(activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value || '').replace(/[^+\d]/g, '')}`}
-                          className="inline-flex items-center gap-1.5 hover:text-slate-900"
-                        >
-                          <Phone className="w-3.5 h-3.5 shrink-0" />
-                          {activeOfficeRecord.officePhone || activeOfficeRecord.head?.phones?.[0]?.value}
-                        </a>
+                      {(activeOfficeRecord.officePhone ||
+                        activeOfficeRecord.head?.phones?.[0]?.value) && (
+                        <div>
+                          <a
+                            href={`tel:${sanitizeTel(
+                              activeOfficeRecord.officePhone ||
+                                activeOfficeRecord.head?.phones?.[0]?.value ||
+                                ''
+                            )}`}
+                            className="inline-flex items-center gap-1.5 text-stone-700 hover:text-stone-950"
+                          >
+                            <Phone className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                            {activeOfficeRecord.officePhone ||
+                              activeOfficeRecord.head?.phones?.[0]?.value}
+                          </a>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ) : highlightedOfficer && (
-                  <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-2">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-xs font-medium text-pust-800">{highlightedOfficer.role}</p>
-                      <p className="text-xs text-slate-500">{highlightedOfficer.office}</p>
-                    </div>
-                    <p className="font-serif text-xl font-medium text-slate-900">
-                      {highlightedOfficer.name}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono tabular-nums text-slate-600">
-                      <a
-                        href={`mailto:${highlightedOfficer.email}`}
-                        className="inline-flex items-center gap-1.5 text-pust-900 hover:underline"
-                      >
-                        <Mail className="w-3.5 h-3.5 shrink-0" />
-                        {highlightedOfficer.email}
-                      </a>
-                      <a
-                        href={`tel:${highlightedOfficer.phone}`}
-                        className="inline-flex items-center gap-1.5 hover:text-slate-900"
-                      >
-                        <Phone className="w-3.5 h-3.5 shrink-0" />
-                        {highlightedOfficer.phone}
-                      </a>
-                    </div>
-                  </div>
+                  </dl>
+                ) : (
+                  highlightedOfficer && (
+                    <dl className="border-y border-stone-200 bg-white/80 px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                      <div className="space-y-0.5">
+                        <dt className="text-stone-500">{highlightedOfficer.role}</dt>
+                        <dd className="font-serif text-lg font-medium text-stone-950">
+                          {highlightedOfficer.name}
+                        </dd>
+                      </div>
+                      <div className="space-y-1.5 sm:text-right font-mono tabular-nums">
+                        <div>
+                          <a
+                            href={`mailto:${highlightedOfficer.email}`}
+                            className="inline-flex items-center gap-1.5 text-pust-900 hover:underline break-all"
+                          >
+                            <Mail className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                            {highlightedOfficer.email}
+                          </a>
+                        </div>
+                        <div>
+                          <a
+                            href={`tel:${sanitizeTel(highlightedOfficer.phone)}`}
+                            className="inline-flex items-center gap-1.5 text-stone-700 hover:text-stone-950"
+                          >
+                            <Phone className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                            {highlightedOfficer.phone}
+                          </a>
+                        </div>
+                      </div>
+                    </dl>
+                  )
                 )}
               </SubPagePanel>
 
-              {/* Sub-Navigation Rail across Administration Pages */}
+              {/* Editorial Sub-Navigation Strip */}
               <nav
                 aria-label="Administration offices"
-                className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1"
+                className="flex overflow-x-auto no-scrollbar items-center gap-1 border-b border-stone-200 -mx-4 px-4 sm:mx-0 sm:px-0"
               >
                 <Link
                   href="/administration"
-                  className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+                  className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                     route === '/administration'
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                      ? 'border-pust-900 text-pust-900'
+                      : 'border-transparent text-stone-600 hover:text-stone-950 hover:border-stone-300'
                   }`}
                 >
                   Overview
@@ -339,26 +387,29 @@ export function AdministrationSection({
                   !OFFICE_SUBROUTES.some((s) => s.route === activeOfficeRecord.route) && (
                     <Link
                       href={activeOfficeRecord.route}
-                      className="px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 bg-pust-800 text-white border border-pust-800 shadow-xs"
+                      className="px-3 py-2.5 text-xs font-semibold border-b-2 border-pust-900 text-pust-900 whitespace-nowrap shrink-0"
                     >
                       {activeOfficeRecord.name}
                     </Link>
                   )}
-                {OFFICE_SUBROUTES.map((item) => (
-                  <Link
-                    key={item.route}
-                    href={item.route}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
-                      route === item.route
-                        ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                        : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
-                    }`}
-                  >
-                    {item.route === '/administration/all-office'
-                      ? `All Offices (${adminOffices.length})`
-                      : item.label}
-                  </Link>
-                ))}
+                {OFFICE_SUBROUTES.map((item) => {
+                  const isActive = route === item.route;
+                  return (
+                    <Link
+                      key={item.route}
+                      href={item.route}
+                      className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                        isActive
+                          ? 'border-pust-900 text-pust-900'
+                          : 'border-transparent text-stone-600 hover:text-stone-950 hover:border-stone-300'
+                      }`}
+                    >
+                      {item.route === '/administration/all-office'
+                        ? `All Offices (${adminOffices.length})`
+                        : item.label}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 
@@ -368,33 +419,33 @@ export function AdministrationSection({
                 alt="Administrative Building at Pabna University of Science and Technology"
                 caption={adminShowcase.buildingCaption}
                 containerClassName="h-full flex flex-col"
-                className="w-full h-full min-h-[240px] lg:min-h-[300px] aspect-[4/3] object-cover"
+                className="w-full h-full min-h-[240px] lg:min-h-[320px] aspect-[4/3] object-cover"
                 priority
               />
             </div>
           </div>
 
-          {/* Operational Leadership Utility Ribbon */}
-          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-amber-900/15 bg-white shadow-xs divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+          {/* Operational Utility Ribbon */}
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-stone-200 bg-white divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
             <div className="px-5 py-4">
-              <dt className="text-xs font-medium text-slate-600">Statutory Charter</dt>
-              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
+              <dt className="text-xs font-medium text-stone-500">Statutory Charter</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-stone-950 mt-1">
                 {adminShowcase.charterTag} · Est. {profile.establishedYear}
               </dd>
             </div>
             <div className="px-5 py-4">
-              <dt className="text-xs font-medium text-slate-600">Principal Officers</dt>
-              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
-                {profile.leadership.length} Executive Offices
+              <dt className="text-xs font-medium text-stone-500">Executive Desks</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-stone-950 mt-1">
+                {profile.leadership.length} Principal Officers
               </dd>
             </div>
             <div className="px-5 py-4">
-              <dt className="text-xs font-medium text-slate-600">Governance &amp; Offices</dt>
-              <dd className="font-mono tabular-nums text-sm font-semibold text-slate-950 mt-1">
-                {adminOffices.length} Administration Offices &amp; Cells
+              <dt className="text-xs font-medium text-stone-500">Administrative Registry</dt>
+              <dd className="font-mono tabular-nums text-sm font-semibold text-stone-950 mt-1">
+                {adminOffices.length} Offices, Halls &amp; Cells
               </dd>
             </div>
-            <div className="px-5 py-4 bg-gradient-to-br from-pust-50/70 to-amber-50/40">
+            <div className="px-5 py-4 bg-[#FAF6EE]">
               <dt className="text-xs font-medium text-pust-800">Accountability Cycle</dt>
               <dd className="font-mono tabular-nums text-sm font-semibold text-pust-900 mt-1">
                 {adminShowcase.accountabilityCycle}
@@ -404,7 +455,7 @@ export function AdministrationSection({
         </div>
       </section>
 
-      {/* Focused Office Dossier & Officers Roster (Dedicated 33-Office Sub-Routes) */}
+      {/* Dedicated Office Dossier & Personnel Roster (on all 33 office routes) */}
       {activeOfficeRecord && (
         <AdministrationOfficeDossier
           office={activeOfficeRecord}
@@ -413,23 +464,16 @@ export function AdministrationSection({
         />
       )}
 
-      {/* Complete 33-Office Administration Directory (Overview & All Office View) */}
-      {showAllDirectory && (
-        <AllOfficesDirectory offices={adminOffices} activeRoute={route} />
-      )}
-
-      {/* Band 2: Vice-Chancellor's Welcome Address & History */}
+      {/* Band 2: Vice-Chancellor's Welcome Address & Leadership Archive (Overview & VC Office) */}
       {showVcBand && (
-      <section className="bg-white border-b border-slate-200 py-14 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          {/* Unified Card: VC Portrait, Office Dossier & Welcome Address */}
-          {currentVc ? (
-            <MotionReveal>
-              <article className="editable-region rounded-2xl card-gradient-parchment border border-slate-200 overflow-hidden shadow-xs hover:border-pust-600/35 hover:shadow-md transition-all duration-200">
+        <section className="bg-white border-b border-stone-200 py-14 lg:py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            {currentVc ? (
+              <article className="editable-region rounded-xl border border-stone-200 bg-[#FBF9F5] overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-                  {/* Portrait & Desk Dossier (Left Column inside Card) */}
-                  <div className="lg:col-span-4 bg-[#F3EFE8]/75 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 space-y-6">
-                    <div className="max-w-[260px] mx-auto lg:max-w-none">
+                  {/* VC Portrait & Desk Accession Column */}
+                  <div className="lg:col-span-4 bg-[#F4EFE6] border-b lg:border-b-0 lg:border-r border-stone-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
+                    <div className="max-w-[260px] mx-auto lg:max-w-none w-full">
                       <ResilientImage
                         src={currentVc.photoUrl || ''}
                         alt={currentVc.name}
@@ -438,28 +482,28 @@ export function AdministrationSection({
                       />
                     </div>
 
-                    <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
+                    <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
                       <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                        <dt className="text-xs font-medium text-slate-600 shrink-0">Designation</dt>
-                        <dd className="font-semibold text-slate-950 sm:text-right">
+                        <dt className="text-xs font-medium text-stone-500 shrink-0">Designation</dt>
+                        <dd className="font-medium text-stone-950 sm:text-right">
                           {currentVc.title || 'Honorable Vice-Chancellor'}
                         </dd>
                       </div>
                       {currentVc.tenure && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs font-medium text-slate-600 shrink-0">Tenure</dt>
-                          <dd className="font-mono tabular-nums text-xs font-medium text-slate-900 sm:text-right">
+                          <dt className="text-xs font-medium text-stone-500 shrink-0">Tenure</dt>
+                          <dd className="font-mono tabular-nums text-xs font-medium text-stone-900 sm:text-right">
                             {currentVc.tenure}
                           </dd>
                         </div>
                       )}
                       {currentVc.email && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs font-medium text-slate-600 shrink-0">Direct Email</dt>
+                          <dt className="text-xs font-medium text-stone-500 shrink-0">Direct Email</dt>
                           <dd className="font-mono text-xs sm:text-right min-w-0">
                             <a
                               href={`mailto:${currentVc.email}`}
-                              className="text-pust-800 font-medium hover:underline break-all"
+                              className="text-pust-900 font-medium hover:underline break-all"
                             >
                               {currentVc.email}
                             </a>
@@ -468,12 +512,9 @@ export function AdministrationSection({
                       )}
                       {currentVc.phone && (
                         <div className="py-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                          <dt className="text-xs font-medium text-slate-600 shrink-0">Telephone</dt>
-                          <dd className="font-mono tabular-nums text-xs font-medium text-slate-900 sm:text-right">
-                            <a
-                              href={`tel:${currentVc.phone}`}
-                              className="hover:text-pust-800"
-                            >
+                          <dt className="text-xs font-medium text-stone-500 shrink-0">Telephone</dt>
+                          <dd className="font-mono tabular-nums text-xs font-medium text-stone-900 sm:text-right">
+                            <a href={`tel:${sanitizeTel(currentVc.phone)}`} className="hover:text-pust-900">
                               {currentVc.phone}
                             </a>
                           </dd>
@@ -482,13 +523,13 @@ export function AdministrationSection({
                     </dl>
                   </div>
 
-                  {/* Long-Form Editorial Welcome Message (Right Column inside Card) */}
-                  <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
+                  {/* Long-Form Editorial Welcome Address */}
+                  <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between bg-white">
                     <div className="space-y-6">
-                      <header className="space-y-2 border-b border-slate-200 pb-6">
+                      <header className="space-y-2 border-b border-stone-200 pb-6">
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-pust-700">
-                            Welcome Message from the Vice-Chancellor
+                          <p className="text-xs font-medium text-pust-800">
+                            Message from the Vice-Chancellor
                             {currentVc.tenure ? ` · ${currentVc.tenure}` : ''}
                           </p>
                           <EditTriggerButton
@@ -497,21 +538,21 @@ export function AdministrationSection({
                             variant="compact"
                           />
                         </div>
-                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-950">
+                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.2rem] font-semibold text-stone-950 leading-tight">
                           {currentVc.name}
                         </h2>
-                        <p className="text-sm font-medium text-slate-700">
+                        <p className="text-sm text-stone-600">
                           Honorable Vice-Chancellor, Pabna University of Science and Technology
                         </p>
                       </header>
 
-                      <div className="space-y-5 flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-[16.5px] leading-[1.78] text-slate-800">
+                      <div className="space-y-5 flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-[16.5px] leading-[1.8] text-stone-800">
                         {bodyParagraphs.map((paragraph, index) => (
                           <p
                             key={index}
                             className={
                               index === 0
-                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
+                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-900'
                                 : ''
                             }
                           >
@@ -522,125 +563,129 @@ export function AdministrationSection({
                     </div>
 
                     {closingLine && (
-                      <div className="pt-4 border-t border-slate-200 space-y-2">
-                        <p className="font-serif italic text-lg text-slate-900">{closingLine}</p>
-                        <p className="text-sm font-medium text-slate-700">
+                      <footer className="pt-5 border-t border-stone-200 space-y-1.5">
+                        <p className="font-serif italic text-lg text-stone-900">{closingLine}</p>
+                        <p className="text-sm font-medium text-stone-700">
                           {currentVc.name} — Honorable Vice-Chancellor
                         </p>
-                      </div>
+                      </footer>
                     )}
                   </div>
                 </div>
               </article>
-            </MotionReveal>
-          ) : (
-            <div className="rounded-2xl border border-slate-200 bg-[#FAF8F4] p-8 flex flex-wrap items-center justify-between gap-4">
-              <div className="space-y-1">
-                <h2 className="font-serif text-xl font-medium text-slate-900">
-                  Vice-Chancellor Profile Not Configured
-                </h2>
-                <p className="text-sm text-slate-600">
-                  No current Vice-Chancellor dossier is published in the university directory yet.
-                </p>
-              </div>
-              <EditTriggerButton
-                target={{ kind: 'vc' }}
-                label="Add VC Profile"
-                icon="add"
-                variant="compact"
-              />
-            </div>
-          )}
-
-          {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
-            <div className="px-6 py-4 bg-white/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
-                  Institutional Leadership Archive · {profile.establishedYear} – Present
-                </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
-                  Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
-                </h3>
-              </div>
-              <div className="flex flex-wrap items-center gap-2.5">
+            ) : (
+              <div className="rounded-xl border border-stone-200 bg-[#FBF9F5] p-8 flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h2 className="font-serif text-xl font-medium text-stone-900">
+                    Vice-Chancellor Profile Not Configured
+                  </h2>
+                  <p className="text-sm text-stone-600">
+                    No current Vice-Chancellor dossier is published in the university directory yet.
+                  </p>
+                </div>
                 <EditTriggerButton
-                  target={{ kind: 'vc', vcId: 'new-former' }}
-                  label="Add Former VC"
+                  target={{ kind: 'vc' }}
+                  label="Add VC Profile"
                   icon="add"
                   variant="compact"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPreviousVcs((prev) => !prev)}
-                  aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 hover:bg-pust-50/60 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  {showPreviousVcs ? 'Hide History' : 'Show History'}
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      showPreviousVcs ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
               </div>
-            </div>
+            )}
 
-            <AnimatePresence initial={false}>
-              {showPreviousVcs && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch"
-                >
-                  {previousVcs.map((vc, idx) => (
-                    <MotionCard
-                      key={vc.id}
-                      delay={idx * 0.03}
-                      className="h-full card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
-                            {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                          </span>
-                          <EditTriggerButton
-                            target={{ kind: 'vc', vcId: vc.id }}
-                            label="Edit"
-                            variant="compact"
-                          />
+            {/* Vice-Chancellor Chronological Archive */}
+            <div className="editable-region rounded-xl border border-stone-200 bg-[#FBF9F5] overflow-hidden">
+              <div className="px-6 py-4 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-mono text-xs text-pust-800 tabular-nums">
+                    Institutional Leadership Archive · {profile.establishedYear} – Present
+                  </p>
+                  <h3 className="font-serif text-xl font-medium text-stone-950 mt-0.5">
+                    Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
+                  </h3>
+                </div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <EditTriggerButton
+                    target={{ kind: 'vc', vcId: 'new-former' }}
+                    label="Add Former VC"
+                    icon="add"
+                    variant="compact"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPreviousVcs((prev) => !prev)}
+                    aria-expanded={showPreviousVcs}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-stone-900 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    {showPreviousVcs ? 'Hide History' : 'Show History'}
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        showPreviousVcs ? 'rotate-180' : ''
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <AnimatePresence initial={false}>
+                {showPreviousVcs && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch"
+                  >
+                    {previousVcs.map((vc, idx) => (
+                      <article
+                        key={vc.id}
+                        className="h-full bg-white rounded-xl border border-stone-200 hover:border-stone-400 p-5 space-y-2 flex flex-col justify-between transition-colors"
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-mono text-xs font-semibold text-pust-900 tabular-nums">
+                              {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                            </span>
+                            <EditTriggerButton
+                              target={{ kind: 'vc', vcId: vc.id }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
+                          <h4 className="font-serif text-base font-medium text-stone-950 leading-snug text-left">
+                            {vc.name}
+                          </h4>
+                          <p className="text-xs text-stone-500 text-left">{vc.title}</p>
+                          <p className="text-xs text-stone-600 leading-relaxed pt-1 text-left">
+                            {vc.message}
+                          </p>
                         </div>
-                        <h4 className="font-serif text-base font-medium text-slate-900 leading-snug text-left">
-                          {vc.name}
-                        </h4>
-                        <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                          {vc.title}
-                        </p>
-                        <p className="text-xs text-slate-600 leading-relaxed pt-0.5 text-left">{vc.message}</p>
-                      </div>
-                    </MotionCard>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      </article>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
-      {/* Band 3: Executive Administration Directory (Searchable Institutional Ledger) */}
-      <section className="bg-[#FAF8F4] border-b border-slate-200 py-14 lg:py-16">
+      {/* Band 3: Complete 33-Office Administrative Registry (Overview & All Office View) */}
+      {showAllDirectory && (
+        <AllOfficesDirectory offices={adminOffices} activeRoute={route} />
+      )}
+
+      {/* Band 4: Executive Administration Ledger (Principal Officers & Desks) */}
+      <section className="bg-white border-b border-stone-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-6">
             <div className="space-y-1">
               <p className="text-xs font-medium text-pust-800">Principal Leadership &amp; Desks</p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
-                Executive Administration Directory
+              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-stone-950">
+                Executive Administration Ledger
               </h2>
-              <p className="text-sm text-slate-600">
-                Direct office desks, email addresses, and institutional telephone contacts across the
+              <p className="text-sm text-stone-600">
+                Direct office desks, email addresses, and telephone contacts across the
                 Administrative Complex.
               </p>
             </div>
@@ -653,102 +698,112 @@ export function AdministrationSection({
               />
               <div className="w-full md:w-80 relative">
                 <Search
-                  className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
                   aria-hidden="true"
                 />
                 <input
                   type="search"
                   value={directoryQuery}
                   onChange={(e) => setDirectoryQuery(e.target.value)}
-                  placeholder="Search office, role, or officer..."
-                  aria-label="Filter executive administration directory"
-                  className="w-full pl-10 pr-9 py-2.5 text-sm bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800"
+                  placeholder="Filter principal office or officer..."
+                  aria-label="Filter executive administration ledger"
+                  className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#FBF9F5] border border-stone-300 rounded-lg text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-pust-800 focus:bg-white"
                 />
                 {directoryQuery && (
                   <button
                     type="button"
                     onClick={() => setDirectoryQuery('')}
                     aria-label="Clear search"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
             {filteredLeadership.length === 0 ? (
               <div className="p-10 text-center space-y-3">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-stone-600">
                   No administrative officer matched{' '}
-                  <span className="font-medium text-slate-900">“{directoryQuery}”</span>.
+                  <span className="font-medium text-stone-900">“{directoryQuery}”</span>.
                 </p>
                 <button
                   type="button"
                   onClick={() => setDirectoryQuery('')}
-                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#FAF8F4] text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-[#FBF9F5] text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                 >
                   Reset Directory Filter
                 </button>
               </div>
             ) : (
-              <dl className="divide-y divide-slate-200">
+              <dl className="divide-y divide-stone-200">
                 {filteredLeadership.map((officer) => {
                   const isHighlighted = activeOffice?.matchLeadership?.(officer.role) ?? false;
                   const isCopied = copiedEmail === officer.email;
                   const originalIdx = profile.leadership.indexOf(officer);
+                  const linkedRoute = matchLeadershipToOfficeRoute(officer.role);
 
                   return (
                     <div
                       key={officer.role}
-                      className={`px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-6 items-center transition-colors ${
-                        isHighlighted ? 'bg-pust-50/70' : 'hover:bg-slate-50/70'
+                      className={`px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 items-center transition-colors ${
+                        isHighlighted ? 'bg-pust-50/50' : 'hover:bg-[#FBF9F5]'
                       }`}
                     >
-                      <dt className="lg:col-span-3 text-xs font-semibold text-pust-800">
+                      <dt className="lg:col-span-3 text-xs font-semibold text-pust-900">
                         {officer.role}
                       </dt>
                       <dd className="lg:col-span-4 space-y-0.5">
-                        <p className="font-serif text-base font-medium text-slate-900 text-left">
+                        <p className="font-serif text-base font-medium text-stone-950 text-left">
                           {officer.name}
                         </p>
-                        <p className="text-xs text-slate-600 text-left">{officer.office}</p>
+                        <p className="text-xs text-stone-600 text-left">{officer.office}</p>
                       </dd>
-                      <dd className="lg:col-span-5 flex flex-wrap items-center lg:justify-end gap-3 text-xs font-mono tabular-nums text-slate-600">
+                      <dd className="lg:col-span-5 flex flex-wrap items-center lg:justify-end gap-3 text-xs font-mono tabular-nums text-stone-600">
                         <a
                           href={`mailto:${officer.email}`}
                           className="inline-flex items-center gap-1.5 text-pust-900 hover:underline break-all"
                         >
-                          <Mail className="w-3.5 h-3.5 shrink-0" />
+                          <Mail className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                           {officer.email}
                         </a>
                         <button
                           type="button"
                           onClick={() => handleCopyEmail(officer.email)}
                           aria-label={`Copy ${officer.email}`}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-200 bg-[#FAF8F4] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone-200 bg-[#FBF9F5] text-[11px] font-sans font-medium text-stone-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                         >
                           {isCopied ? (
                             <>
-                              <Check className="w-3 h-3 text-emerald-700" />
+                              <Check className="w-3 h-3 text-emerald-700" aria-hidden="true" />
                               Copied
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3 h-3" />
+                              <Copy className="w-3 h-3" aria-hidden="true" />
                               Copy
                             </>
                           )}
                         </button>
                         <a
-                          href={`tel:${officer.phone}`}
-                          className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 whitespace-nowrap"
+                          href={`tel:${sanitizeTel(officer.phone)}`}
+                          className="inline-flex items-center gap-1 text-stone-700 hover:text-stone-950 whitespace-nowrap"
                         >
-                          <Phone className="w-3.5 h-3.5 shrink-0" />
+                          <Phone className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                           {officer.phone}
                         </a>
+                        {linkedRoute && (
+                          <Link
+                            href={linkedRoute}
+                            className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap"
+                          >
+                            Dossier
+                            <ArrowRight className="w-3 h-3" aria-hidden="true" />
+                          </Link>
+                        )}
                         <EditTriggerButton
                           target={{
                             kind: 'leadership',
@@ -767,138 +822,140 @@ export function AdministrationSection({
         </div>
       </section>
 
-      {/* Band 4: Annual Performance Agreement (APA) & Integrity Benchmarks */}
-      {(route === '/administration/apa' || route === '/administration') && (
-        <section className="editable-region bg-white border-b border-slate-200 py-14 lg:py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-4">
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-pust-800">
-                  Public Accountability &amp; Citizen’s Charter
-                </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
-                  Annual Performance Agreement (APA) Benchmarks
-                </h2>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-mono text-xs text-slate-600 tabular-nums">
-                  {adminShowcase.apaFyLabel}
-                </span>
-                <EditTriggerButton
-                  target={{ kind: 'apa-benchmarks' }}
-                  label="Edit APA & Benchmarks"
-                  variant="compact"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
-              {adminShowcase.apaBenchmarks.map((item, idx) => (
-                <div
-                  key={`${item.code}-${idx}`}
-                  className={`py-4 md:py-0 space-y-2 ${
-                    idx === 0 ? 'md:pr-8' : idx === 1 ? 'md:px-8' : 'md:pl-8'
-                  }`}
-                >
-                  <p className="font-mono text-xs font-medium text-pust-800">{item.code}</p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900 text-left">{item.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed text-left">{item.detail}</p>
+      {/* Band 5: Public Accountability (APA) & Statutory Governance Architecture */}
+      <section className="bg-[#FBF9F5] py-14 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+          {/* Annual Performance Agreement (APA) Benchmarks */}
+          {(route === '/administration/apa' || route === '/administration') && (
+            <div className="editable-region rounded-xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-stone-200 pb-5">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-pust-800">
+                    Public Accountability &amp; Citizen’s Charter
+                  </p>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-medium text-stone-950">
+                    Annual Performance Agreement (APA) Benchmarks
+                  </h2>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-xs text-stone-600 tabular-nums">
+                    {adminShowcase.apaFyLabel}
+                  </span>
+                  <EditTriggerButton
+                    target={{ kind: 'apa-benchmarks' }}
+                    label="Edit APA & Benchmarks"
+                    variant="compact"
+                  />
+                </div>
+              </div>
 
-      {/* Band 5: Statutory Bodies, Administrative Offices & Specialized Cells */}
-      <section className="bg-[#FAF8F4] py-14 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
-            <div className="space-y-1 max-w-2xl">
-              <p className="text-xs font-medium text-pust-800">
-                Institutional Architecture · {filteredUnits.length} Units Displayed
-              </p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900">
-                Statutory Bodies, Administrative Offices &amp; Specialized Cells
-              </h2>
-              <p className="text-sm text-slate-600">
-                University governance under Act No. 43 of 2001, covering the Regent Board, Academic
-                Council, Controller of Examinations, IQAC, RTTC, and ICT Cell.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <EditTriggerButton
-                target={{ kind: 'unit' }}
-                label="Edit Units"
-                variant="compact"
-              />
-              <div
-                className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 p-1 bg-white border border-slate-200 rounded-lg max-w-full"
-                role="group"
-                aria-label="Filter administrative units by category"
-              >
-                {UNIT_TABS.map((tab) => {
-                  const active = unitFilter === tab;
-                  return (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setUnitFilter(tab)}
-                      className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                        active
-                          ? 'bg-pust-900 text-white'
-                          : 'text-slate-700 hover:bg-[#FAF8F4] hover:text-pust-900'
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  );
-                })}
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-stone-200">
+                {adminShowcase.apaBenchmarks.map((item, idx) => (
+                  <div
+                    key={`${item.code}-${idx}`}
+                    className={`py-4 md:py-0 space-y-2 ${
+                      idx === 0 ? 'md:pr-8' : idx === 1 ? 'md:px-8' : 'md:pl-8'
+                    }`}
+                  >
+                    <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
+                      {item.code}
+                    </p>
+                    <h3 className="font-serif text-xl font-medium text-stone-950 text-left">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-stone-600 leading-relaxed text-left">{item.detail}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
-            {filteredUnits.map((unit, idx) => {
-              const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
-              const unitGradient = matchesRoute
-                ? 'card-gradient-crimson border-pust-700/70'
-                : unit.category === 'Statutory Governance'
-                ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
-                : unit.category === 'Specialized Cell & Institute'
-                ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
-                : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50';
+          {/* Statutory Governance & Specialized Units */}
+          <div className="space-y-8">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-stone-200 pb-6">
+              <div className="space-y-1 max-w-2xl">
+                <p className="text-xs font-medium text-pust-800">
+                  Institutional Architecture · {filteredUnits.length} Units Displayed
+                </p>
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-stone-950">
+                  Statutory Bodies &amp; Governance Units
+                </h2>
+                <p className="text-sm text-stone-600">
+                  Statutory boards and governance councils operating under PUST Act No. 43 of 2001.
+                </p>
+              </div>
 
-              return (
-                <MotionCard
-                  key={unit.code}
-                  delay={idx * 0.025}
-                  className={`h-full flex flex-col p-6 rounded-2xl border space-y-2.5 shadow-xs hover:shadow-md transition-all ${unitGradient}`}
+              <div className="flex flex-wrap items-center gap-3">
+                <EditTriggerButton target={{ kind: 'unit' }} label="Edit Units" variant="compact" />
+                <div
+                  className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 bg-stone-200/60 border border-stone-200 rounded-lg max-w-full"
+                  role="group"
+                  aria-label="Filter administrative units by category"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-mono text-xs font-semibold text-pust-700 text-left">
-                      {unit.code} · {unit.category}
-                    </p>
-                    <EditTriggerButton
-                      target={{ kind: 'unit', unitCode: unit.code }}
-                      label="Edit"
-                      variant="compact"
-                    />
-                  </div>
-                  <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">{unit.name}</h3>
-                  <p className="text-sm text-slate-700 leading-relaxed text-left">{unit.description}</p>
-                </MotionCard>
-              );
-            })}
+                  {UNIT_TABS.map((tab) => {
+                    const active = unitFilter === tab;
+                    return (
+                      <button
+                        key={tab}
+                        type="button"
+                        onClick={() => setUnitFilter(tab)}
+                        className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          active
+                            ? 'bg-white text-stone-950 shadow-xs'
+                            : 'text-stone-600 hover:text-stone-950'
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+              {filteredUnits.map((unit) => {
+                const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
+                return (
+                  <article
+                    key={unit.code}
+                    className={`h-full flex flex-col justify-between p-6 rounded-xl border transition-colors ${
+                      matchesRoute
+                        ? 'bg-pust-50/50 border-pust-800'
+                        : 'bg-white border-stone-200 hover:border-stone-400'
+                    }`}
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-mono text-xs text-stone-500 text-left tabular-nums">
+                          <span className="font-semibold text-pust-900">{unit.code}</span> ·{' '}
+                          <span className="font-sans">{unit.category}</span>
+                        </p>
+                        <EditTriggerButton
+                          target={{ kind: 'unit', unitCode: unit.code }}
+                          label="Edit"
+                          variant="compact"
+                        />
+                      </div>
+                      <h3 className="font-serif text-lg font-medium text-stone-950 text-left">
+                        {unit.name}
+                      </h3>
+                      <p className="text-sm text-stone-600 leading-relaxed text-left">
+                        {unit.description}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
 
           {/* Related Institutional Links Footer */}
-          <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm">
-            <p className="text-slate-600">
+          <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm">
+            <p className="text-stone-600">
               Looking for statutory acts, Regent Board membership, or official university orders?
             </p>
-            <div className="flex flex-wrap items-center gap-4 font-medium">
+            <div className="flex flex-wrap items-center gap-5 font-medium">
               <Link href="/governance" className="text-pust-900 hover:underline whitespace-nowrap">
                 Statutory Governance →
               </Link>
