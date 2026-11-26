@@ -13,8 +13,7 @@ import {
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
-import { MotionConfig } from 'motion/react';
+import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
 import { parseRouteFromPath, type AppRoute } from '../lib/routes';
@@ -619,28 +618,19 @@ export function PustShell({
             data-edit-mode={effectiveEditMode ? 'true' : undefined}
             className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900"
           >
-            {isNavigating && (
-              <>
-                <div
+            <AnimatePresence>
+              {isNavigating && (
+                <motion.div
                   aria-hidden="true"
-                  className="fixed top-0 left-0 right-0 z-[70] h-[3px] bg-pust-900/15 overflow-hidden pointer-events-none"
-                >
-                  <div className="h-full w-1/2 bg-pust-800 animate-pulse" />
-                </div>
-                <div
-                  role="status"
-                  aria-live="polite"
-                  className="fixed top-20 left-1/2 -translate-x-1/2 z-[65] pointer-events-none rounded-xl border border-pust-800/30 bg-white shadow-lg px-4 py-2.5 flex items-center gap-2.5 text-xs font-semibold text-slate-900"
-                >
-                  <Loader2 className="w-4 h-4 animate-spin text-pust-800 shrink-0" />
-                  <span>
-                    {pendingTarget?.startsWith('/academics/departments/')
-                      ? 'Loading department page...'
-                      : 'Loading page...'}
-                  </span>
-                </div>
-              </>
-            )}
+                  initial={{ scaleX: 0.08, opacity: 0 }}
+                  animate={{ scaleX: 0.86, opacity: 1 }}
+                  exit={{ scaleX: 1, opacity: 0 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ transformOrigin: 'left center' }}
+                  className="fixed top-0 left-0 right-0 z-[70] h-[2.5px] bg-gradient-to-r from-pust-600 via-gold-500 to-pust-700 pointer-events-none"
+                />
+              )}
+            </AnimatePresence>
             <Navbar
               route={route}
               user={user}
@@ -650,9 +640,11 @@ export function PustShell({
               onOpenEditModal={openEditModal}
               onNavigate={navigateTo}
             />
-            <Breadcrumb />
             <div className="flex-1 flex flex-col">
-              <PageReveal routeKey={pathname}>{children}</PageReveal>
+              <PageReveal routeKey={pathname}>
+                <Breadcrumb />
+                {children}
+              </PageReveal>
             </div>
             <Footer onNavigate={navigateTo} />
           </div>

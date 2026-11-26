@@ -12,7 +12,7 @@ import {
   Search,
 } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
-import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
+import { animateStagger } from '../lib/gsap';
 import type { NoticeRecord } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -95,67 +95,6 @@ export function CareerView() {
   const prevQueryRef = useRef(query);
 
   const resolved = resolveUniversityContent(profile);
-
-  useEffect(() => {
-    const scope = pageScopeRef.current;
-    if (!scope || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      const kpis = scope.querySelectorAll('[data-gsap-career-kpi]');
-      if (kpis.length > 0) {
-        gsap.fromTo(
-          kpis,
-          { y: 12, opacity: 0.25 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.4,
-            stagger: 0.06,
-            ease: 'power3.out',
-            clearProps: 'transform,opacity',
-          }
-        );
-      }
-
-      const tracks = scope.querySelectorAll('[data-gsap-career-track]');
-      if (tracks.length > 0) {
-        gsap.from(tracks, {
-          y: 14,
-          opacity: 0.25,
-          duration: 0.45,
-          stagger: 0.07,
-          ease: 'power2.out',
-          immediateRender: false,
-          clearProps: 'transform,opacity',
-          scrollTrigger: {
-            trigger: tracks[0],
-            start: 'top 90%',
-            once: true,
-          },
-        });
-      }
-
-      const steps = scope.querySelectorAll('[data-gsap-career-step]');
-      if (steps.length > 0) {
-        gsap.from(steps, {
-          y: 12,
-          opacity: 0.3,
-          duration: 0.4,
-          stagger: 0.065,
-          ease: 'power2.out',
-          immediateRender: false,
-          clearProps: 'transform,opacity',
-          scrollTrigger: {
-            trigger: steps[0],
-            start: 'top 90%',
-            once: true,
-          },
-        });
-      }
-    }, pageScopeRef);
-
-    return () => ctx.revert();
-  }, []);
 
   useEffect(() => {
     if (prevFilterRef.current === filter && prevQueryRef.current === query) return;

@@ -149,48 +149,6 @@ export function HomePage({
     return () => window.clearInterval(timer);
   }, [slides.length, bannerPaused, fullViewSlide]);
 
-  // GSAP Hero entrance timeline & utility ribbon stagger
-  useEffect(() => {
-    const heroEl = heroSectionRef.current;
-    if (!heroEl || !profile || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      const heroItems = heroEl.querySelectorAll('[data-gsap-hero]');
-      const ribbonItems = heroEl.querySelectorAll('[data-gsap-ribbon]');
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-      if (heroItems.length > 0) {
-        tl.fromTo(
-          heroItems,
-          { y: 12, opacity: 0.25 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.42,
-            stagger: 0.055,
-            clearProps: 'transform,opacity',
-          }
-        );
-      }
-      if (ribbonItems.length > 0) {
-        tl.fromTo(
-          ribbonItems,
-          { y: 10, opacity: 0.3 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.36,
-            stagger: 0.055,
-            clearProps: 'transform,opacity',
-          },
-          '-=0.22'
-        );
-      }
-    }, heroSectionRef);
-
-    return () => ctx.revert();
-  }, [Boolean(profile)]);
-
   // GSAP subtle zoom-settle on banner slide transition
   useEffect(() => {
     if (prevSlideIdxRef.current === activeSlideIdx) return;
@@ -239,33 +197,6 @@ export function HomePage({
       stagger: 0.045,
     });
   }, [eventCategory]);
-
-  // GSAP ScrollTrigger stagger for upcoming seminars strip
-  useEffect(() => {
-    const grid = seminarGridRef.current;
-    if (!grid || upcomingSeminars.length === 0 || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      const items = grid.querySelectorAll('[data-gsap-seminar-item]');
-      if (items.length === 0) return;
-      gsap.from(items, {
-        y: 12,
-        opacity: 0.25,
-        duration: 0.42,
-        stagger: 0.065,
-        ease: 'power2.out',
-        immediateRender: false,
-        clearProps: 'transform,opacity',
-        scrollTrigger: {
-          trigger: grid,
-          start: 'top 90%',
-          once: true,
-        },
-      });
-    }, seminarGridRef);
-
-    return () => ctx.revert();
-  }, [upcomingSeminars.length]);
 
   const currentSlide = slides[activeSlideIdx] || slides[0] || null;
 

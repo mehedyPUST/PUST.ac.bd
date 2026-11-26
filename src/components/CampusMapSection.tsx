@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Compass, MapPin } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
-import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
+import { animateStagger } from '../lib/gsap';
 import type { CampusZoneType } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
@@ -29,9 +29,7 @@ export function CampusMapSection() {
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
   const mapSectionRef = useRef<HTMLElement>(null);
   const buildingIndexRef = useRef<HTMLDivElement>(null);
-  const dossierRef = useRef<HTMLElement>(null);
   const prevZoneRef = useRef(selectedZone);
-  const prevBuildingRef = useRef(selectedBuildingId);
 
   const filteredBuildings =
     selectedZone === 'All'
@@ -44,33 +42,6 @@ export function CampusMapSection() {
     campusBuildings[0];
 
   useEffect(() => {
-    const section = mapSectionRef.current;
-    if (!section || !profile || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      const pins = section.querySelectorAll('[data-gsap-map-pin]');
-      if (pins.length > 0) {
-        gsap.from(pins, {
-          scale: 0.85,
-          opacity: 0.2,
-          duration: 0.4,
-          stagger: 0.045,
-          ease: 'back.out(1.4)',
-          immediateRender: false,
-          clearProps: 'transform,opacity',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 85%',
-            once: true,
-          },
-        });
-      }
-    }, mapSectionRef);
-
-    return () => ctx.revert();
-  }, [Boolean(profile)]);
-
-  useEffect(() => {
     if (prevZoneRef.current === selectedZone) return;
     prevZoneRef.current = selectedZone;
     return animateStagger(buildingIndexRef.current, '[data-gsap-building-btn]', {
@@ -79,33 +50,6 @@ export function CampusMapSection() {
       stagger: 0.03,
     });
   }, [selectedZone]);
-
-  useEffect(() => {
-    const currentId = activeBuilding?.id || '';
-    if (!currentId || prevBuildingRef.current === currentId) {
-      prevBuildingRef.current = currentId;
-      return;
-    }
-    prevBuildingRef.current = currentId;
-    const dossier = dossierRef.current;
-    if (!dossier || prefersReducedMotion()) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        dossier,
-        { y: 10, opacity: 0.45 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          ease: 'power2.out',
-          clearProps: 'transform,opacity',
-        }
-      );
-    }, dossierRef);
-
-    return () => ctx.revert();
-  }, [activeBuilding?.id]);
 
   if (loadingData && !profile) {
     return (
@@ -529,12 +473,11 @@ export function CampusMapSection() {
           <div className="lg:col-span-5 flex">
             <AnimatePresence mode="wait">
               <motion.article
-                ref={dossierRef}
                 key={activeBuilding.id}
-                initial={{ opacity: 0.4, y: 6 }}
+                initial={{ opacity: 0.4, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0.4 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full rounded-2xl card-gradient-sage border border-sage-200 shadow-sm hover:shadow-md hover:border-sage-600/50 transition-all flex flex-col justify-between overflow-hidden"
               >
                 <div>
