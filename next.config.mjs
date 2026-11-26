@@ -48,6 +48,9 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     // Cache optimized variants for 24h (seconds).
     minimumCacheTTL: 60 * 60 * 24,
+    // Open /_next/image?... in a new tab should DISPLAY the image, not download it.
+    // Next.js default became 'attachment' in recent versions.
+    contentDispositionType: 'inline',
   },
   async headers() {
     return [
