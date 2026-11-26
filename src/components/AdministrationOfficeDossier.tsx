@@ -186,8 +186,8 @@ export function AdministrationOfficeDossier({
   const totalPersonnel = (office.head ? 1 : 0) + office.officers.length;
 
   return (
-    <section className="bg-white border-b border-stone-200 py-14 lg:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <section className="rounded-xl border border-stone-200 bg-white p-6 sm:p-8 space-y-10">
+      <div className="space-y-10">
         {/* Office Accession Desk Header & Contact Strip */}
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-6">
@@ -346,7 +346,7 @@ export function AdministrationOfficeDossier({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
               {filteredOfficers.map((officer) => (
                 <PersonnelEntry
                   key={officer.id}
@@ -397,10 +397,10 @@ export function AllOfficesDirectory({
   return (
     <section
       id="all-offices-directory"
-      className="bg-[#FBF9F5] border-b border-stone-200 py-14 lg:py-16"
+      className="rounded-xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-stone-200 pb-6">
+      <div className="space-y-8">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-stone-200 pb-6">
           <div className="space-y-1.5 max-w-2xl">
             <p className="text-xs font-medium text-pust-800">
               Complete Administrative Registry · {offices.length} Official Offices, Halls &amp; Cells
@@ -486,7 +486,7 @@ export function AllOfficesDirectory({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
             {filtered.map((office) => {
               const isCurrent = activeRoute === office.route;
               const officerCount = office.officers.length;
@@ -494,10 +494,10 @@ export function AllOfficesDirectory({
                 <Link
                   key={office.slug}
                   href={office.route}
-                  className={`group h-full flex flex-col justify-between p-6 rounded-xl border transition-colors duration-150 text-left ${
+                  className={`group h-full flex flex-col justify-between p-5 rounded-xl border transition-colors duration-150 text-left ${
                     isCurrent
                       ? 'bg-pust-50/50 border-pust-800'
-                      : 'bg-white border-stone-200 hover:border-pust-700/60'
+                      : 'bg-[#FBF9F5] border-stone-200 hover:bg-white hover:border-pust-700/60'
                   }`}
                 >
                   <div className="space-y-2.5">
