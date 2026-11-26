@@ -98,16 +98,16 @@ export function Navbar({
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-40 bg-white border-b border-stone-200 print:hidden"
+      className="sticky top-0 z-40 bg-white shadow-[0_1px_4px_-1px_rgba(28,25,23,0.1)] print:hidden"
     >
       <div className="relative z-10">
-        {/* Full-bleed upper institutional title band backdrop (heritage PUST maroon + brushed gold accent rule) */}
+        {/* Full-bleed upper institutional title band backdrop */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b-2 border-gold-400/85"
+          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[52px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Official University Crest */}
           <Link
             href="/"
@@ -117,9 +117,9 @@ export function Navbar({
               setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-1 lg:my-0 rounded-lg lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 shadow-xs lg:shadow-none"
+            className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0"
           >
-            <PustCrest size={28} className="lg:hidden" />
+            <PustCrest size={26} className="lg:hidden" />
             <PustCrest size={58} className="hidden lg:block xl:hidden" />
             <PustCrest size={68} className="hidden xl:block" />
           </Link>
@@ -127,7 +127,7 @@ export function Navbar({
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Est. Tagline (Left) & Expanded Search (Right) */}
-            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:pl-3 sm:pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-4 text-white">
+            <div className="min-h-12 lg:h-[52px] py-1 lg:py-0 pl-2 sm:pl-3 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
               <div className="min-w-0 flex-1 flex items-center gap-3">
                 <Link
                   href="/"
@@ -136,10 +136,9 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="font-serif text-[clamp(1rem,0.85rem+0.7vw,1.5rem)] font-medium tracking-tight text-white hover:text-gold-200 transition-colors truncate leading-none"
+                  className="block font-serif text-[clamp(0.66rem,2.7vw,0.875rem)] leading-[1.18] sm:text-base lg:text-[clamp(1.05rem,0.85rem+0.6vw,1.45rem)] sm:leading-none font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
                 >
-                  <span className="sm:hidden">PUST</span>
-                  <span className="hidden sm:inline">Pabna University of Science and Technology</span>
+                  Pabna University of Science and Technology
                 </Link>
 
                 <span
@@ -151,7 +150,7 @@ export function Navbar({
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
                 {user?.role === 'admin' && editMode && onOpenEditModal && (
                   <button
                     type="button"
@@ -178,11 +177,11 @@ export function Navbar({
                   }}
                   aria-label="Toggle site search"
                   aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                  className={`lg:hidden w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
                   }`}
                 >
-                  {mobileSearchOpen ? <X className="w-[17px] h-[17px]" /> : <Search className="w-[17px] h-[17px]" />}
+                  {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
                 </button>
 
                 {/* Mobile Admin Edit Mode Toggle */}
@@ -193,7 +192,7 @@ export function Navbar({
                     aria-pressed={editMode}
                     aria-label={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
                     title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden min-h-[34px] min-w-[34px] inline-flex items-center justify-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`lg:hidden min-h-[32px] min-w-[32px] inline-flex items-center justify-center gap-1 px-1.5 sm:px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       editMode
                         ? 'bg-amber-400 text-slate-950'
                         : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
@@ -212,7 +211,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-800 hover:bg-gold-50 shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[30px] inline-flex items-center px-2 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-800 hover:bg-gold-50 shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -233,11 +232,11 @@ export function Navbar({
                   }}
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
-                  className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                  className={`lg:hidden w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-700'
                   }`}
                 >
-                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  {mobileMenuOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
                 </button>
               </div>
             </div>
@@ -788,9 +787,9 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileSearchOpen(false)}
-            className="fixed inset-x-0 top-11 sm:top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
-          <div className="relative z-10 lg:hidden border-t border-slate-200 bg-white px-3.5 py-3 shadow-md">
+          <div className="relative z-10 lg:hidden border-t border-stone-200 bg-white px-3.5 py-3 shadow-md">
             <GlobalSearchBar
               variant="mobile"
               autoFocus
@@ -806,11 +805,11 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-x-0 top-11 sm:top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <nav
             aria-label="Mobile navigation"
-            className="relative z-10 lg:hidden border-t border-slate-200 bg-white max-h-[calc(100dvh-2.75rem)] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
+            className="relative z-10 lg:hidden border-t border-stone-200 bg-white max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
           >
             <div className="pb-2.5 mb-1 border-b border-slate-100">
               <GlobalSearchBar
