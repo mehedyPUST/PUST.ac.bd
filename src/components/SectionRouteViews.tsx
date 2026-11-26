@@ -21,7 +21,7 @@ export function GovernanceRouteView() {
   const { route, navigateTo } = usePust();
 
   return (
-    <main className="flex-1 w-full bg-[#FAF8F5]">
+    <main className="flex-1 w-full bg-[#F9F8F5]">
       <GovernanceSection route={route} onNavigate={navigateTo} />
     </main>
   );
@@ -31,7 +31,7 @@ export function AdministrationRouteView() {
   const { route, profile, vcProfiles, navigateTo } = usePust();
 
   return (
-    <main className="flex-1 w-full bg-[#FAF8F5]">
+    <main className="flex-1 w-full bg-[#F9F8F5]">
       <AdministrationSection
         route={route}
         profile={profile}

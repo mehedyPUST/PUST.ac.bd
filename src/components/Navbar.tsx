@@ -101,10 +101,10 @@ export function Navbar({
       className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
     >
       <div className="relative z-10">
-        {/* Full-bleed upper institutional title band backdrop (vibrant PUST crimson + emerald accent rule) */}
+        {/* Full-bleed upper institutional title band backdrop (heritage PUST maroon + brushed gold accent rule) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#520407] via-pust-600 to-rose-700 border-b-[3px] border-emerald-500"
+          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b-2 border-gold-400/85"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -212,7 +212,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-white to-gold-100 text-pust-800 hover:from-gold-100 hover:to-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-white text-pust-800 hover:bg-gold-50 shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'

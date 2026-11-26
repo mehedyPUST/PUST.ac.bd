@@ -268,7 +268,7 @@ export function AdministrationSection({
                 <SubPagePanel subKey={route} className="space-y-5">
                   <div className="space-y-3.5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-xs font-semibold tracking-wide text-pust-600">
+                      <p className="text-xs font-semibold tracking-wide text-pust-700">
                         Pabna University of Science and Technology · Act No. 43 of 2001
                       </p>
                       <EditTriggerButton

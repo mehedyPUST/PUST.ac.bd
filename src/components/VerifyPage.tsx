@@ -119,9 +119,9 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
-      <header className="editable-region border-b border-emerald-200/80 pb-8 print:hidden">
+      <header className="editable-region border-b border-slate-200 pb-8 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-700">
             {verifyPageConfig.kicker}
           </p>
           <EditTriggerButton
@@ -139,7 +139,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       </header>
 
       {/* Search & Quick Examples */}
-      <div className="card-gradient-parchment rounded-2xl border border-amber-300/70 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />

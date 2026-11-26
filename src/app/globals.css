@@ -6,162 +6,161 @@
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 
   /* ═══════════════════════════════════════════════════════════════
-     PRIMARY — Vibrant PUST Shield Crimson & Maroon
+     PRIMARY — Heritage PUST Oxblood Maroon
      ═══════════════════════════════════════════════════════════════ */
-  --color-pust-50: #FFF2F3;
-  --color-pust-100: #FFE0E2;
-  --color-pust-200: #FFC2C6;
-  --color-pust-300: #F88B92;
-  --color-pust-400: #EB4650;
-  --color-pust-500: #C81E24;
-  --color-pust-600: #A8151B;
-  --color-pust-700: #880F14;
-  --color-pust-800: #66080B;
-  --color-pust-900: #4A0406;
-  --color-pust-950: #2C0203;
+  --color-pust-50: #FDF6F6;
+  --color-pust-100: #FAE8E9;
+  --color-pust-200: #F2CCCE;
+  --color-pust-300: #E09FA3;
+  --color-pust-400: #C25D63;
+  --color-pust-500: #9E1B20;
+  --color-pust-600: #851217;
+  --color-pust-700: #6D0D11;
+  --color-pust-800: #56080B;
+  --color-pust-900: #3E0406;
+  --color-pust-950: #260203;
 
-  /* ── Vivid Red (alerts, urgent, live status) ── */
-  --color-red-50: #FFF0F0;
-  --color-red-100: #FFD9D9;
-  --color-red-200: #FFB8B8;
-  --color-red-300: #FF8888;
-  --color-red-400: #FF4D4D;
-  --color-red-500: #EF2B2B;
-  --color-red-600: #D91A1A;
-  --color-red-700: #B41414;
-  --color-red-800: #8F1212;
-  --color-red-900: #711616;
-  --color-red-950: #3D0707;
+  /* ── Status Red (alerts, urgent) ── */
+  --color-red-50: #FEF5F5;
+  --color-red-100: #FDE5E5;
+  --color-red-200: #FAC8C8;
+  --color-red-300: #F29C9C;
+  --color-red-400: #DF6464;
+  --color-red-500: #C43B3B;
+  --color-red-600: #A62626;
+  --color-red-700: #881C1C;
+  --color-red-800: #6E1818;
+  --color-red-900: #591616;
+  --color-red-950: #330909;
 
-  /* ── Radiant Gold (honors, awards, highlights) ── */
-  --color-gold-50: #FFFBEB;
-  --color-gold-100: #FEF0B8;
-  --color-gold-200: #FDE078;
-  --color-gold-300: #FCCD35;
-  --color-gold-400: #F5B800;
-  --color-gold-500: #E09B00;
-  --color-gold-600: #BA7B00;
-  --color-gold-700: #925E00;
-  --color-gold-800: #724900;
-  --color-gold-900: #523400;
-  --color-gold-950: #2F1E00;
+  /* ── Heritage Brushed Gold (crest, honors, fine rules) ── */
+  --color-gold-50: #FBF8EE;
+  --color-gold-100: #F5EED6;
+  --color-gold-200: #EADAA9;
+  --color-gold-300: #DBC074;
+  --color-gold-400: #C89D28;
+  --color-gold-500: #AE8218;
+  --color-gold-600: #8F6810;
+  --color-gold-700: #70500C;
+  --color-gold-800: #573E0B;
+  --color-gold-900: #422F09;
+  --color-gold-950: #261A04;
 
-  /* ── Amber (warnings, deadlines) ── */
-  --color-amber-50: #FFF7E6;
-  --color-amber-100: #FFE8B8;
-  --color-amber-200: #FFD275;
-  --color-amber-300: #FFB938;
-  --color-amber-400: #FF9E14;
-  --color-amber-500: #F58200;
-  --color-amber-600: #D96800;
-  --color-amber-700: #B35000;
-  --color-amber-800: #8F4008;
-  --color-amber-900: #75350C;
-  --color-amber-950: #431A02;
+  /* ── Warm Amber (notices, deadlines) ── */
+  --color-amber-50: #FCF8EE;
+  --color-amber-100: #F7ECD2;
+  --color-amber-200: #EED59F;
+  --color-amber-300: #DFB768;
+  --color-amber-400: #CC9636;
+  --color-amber-500: #B37718;
+  --color-amber-600: #935D10;
+  --color-amber-700: #76480D;
+  --color-amber-800: #5E390D;
+  --color-amber-900: #4B2E0D;
+  --color-amber-950: #2B1805;
 
-  /* ── Emerald (success, campus, growth) — vivid jewel green ── */
-  --color-emerald-50: #E9FDF4;
-  --color-emerald-100: #C8FAE2;
-  --color-emerald-200: #96F3C7;
-  --color-emerald-300: #55E5A5;
-  --color-emerald-400: #22D388;
-  --color-emerald-500: #10B972;
-  --color-emerald-600: #059659;
-  --color-emerald-700: #047848;
-  --color-emerald-800: #065F3B;
-  --color-emerald-900: #064E31;
-  --color-emerald-950: #022C1B;
+  /* ── Botanical Emerald (verification, campus growth) ── */
+  --color-emerald-50: #F1F8F4;
+  --color-emerald-100: #DCEEE4;
+  --color-emerald-200: #BBDCCB;
+  --color-emerald-300: #8DC2A7;
+  --color-emerald-400: #549F7B;
+  --color-emerald-500: #2C7E59;
+  --color-emerald-600: #1B6444;
+  --color-emerald-700: #154F36;
+  --color-emerald-800: #113F2B;
+  --color-emerald-900: #0E3423;
+  --color-emerald-950: #061D13;
 
-  /* ── Sage / Bengal green (vibrant campus green) ── */
-  --color-sage-50: #ECFEF4;
-  --color-sage-100: #CEFCE3;
-  --color-sage-200: #A2F7CA;
-  --color-sage-300: #66EEA7;
-  --color-sage-400: #2FDF82;
-  --color-sage-500: #16BE65;
-  --color-sage-600: #0D9450;
-  --color-sage-700: #0A763F;
-  --color-sage-800: #075B30;
-  --color-sage-900: #054223;
-  --color-sage-950: #032413;
+  /* ── Heritage Sage (campus grounds & facilities) ── */
+  --color-sage-50: #F3F8F5;
+  --color-sage-100: #E1EFE7;
+  --color-sage-200: #C5DFD0;
+  --color-sage-300: #9AC6AD;
+  --color-sage-400: #66A382;
+  --color-sage-500: #3D7F5D;
+  --color-sage-600: #2A6447;
+  --color-sage-700: #204F38;
+  --color-sage-800: #193F2C;
+  --color-sage-900: #143224;
+  --color-sage-950: #091B13;
 
-  /* ── Teal (labs, data, digital services) ── */
-  --color-teal-50: #EAFDFB;
-  --color-teal-100: #C5FBF4;
-  --color-teal-200: #8CF5E8;
-  --color-teal-300: #4BEAD6;
-  --color-teal-400: #1DD4BF;
-  --color-teal-500: #0DB8A5;
-  --color-teal-600: #0A9485;
-  --color-teal-700: #0D766B;
-  --color-teal-800: #105E56;
-  --color-teal-900: #124E48;
-  --color-teal-950: #042F2B;
+  /* ── Deep Teal (laboratories, technical units) ── */
+  --color-teal-50: #F2F8F8;
+  --color-teal-100: #DDEEEE;
+  --color-teal-200: #BEDEDE;
+  --color-teal-300: #90C3C3;
+  --color-teal-400: #5B9D9E;
+  --color-teal-500: #337B7D;
+  --color-teal-600: #226063;
+  --color-teal-700: #1B4D50;
+  --color-teal-800: #173F42;
+  --color-teal-900: #143437;
+  --color-teal-950: #091D1F;
 
-  /* ── Cerulean / Sky (research, ICT) ── */
-  --color-cerulean-50: #ECF7FF;
-  --color-cerulean-100: #D5EEFF;
-  --color-cerulean-200: #ADE0FF;
-  --color-cerulean-300: #70CCFF;
-  --color-cerulean-400: #30B6FF;
-  --color-cerulean-500: #0A9DF0;
-  --color-cerulean-600: #0281CC;
-  --color-cerulean-700: #0366A3;
-  --color-cerulean-800: #075485;
-  --color-cerulean-900: #0C466E;
-  --color-cerulean-950: #082D49;
+  /* ── Academic Slate-Blue / Cerulean (research, ICT) ── */
+  --color-cerulean-50: #F2F7FA;
+  --color-cerulean-100: #E0ECF4;
+  --color-cerulean-200: #C3DAE8;
+  --color-cerulean-300: #96BED7;
+  --color-cerulean-400: #6099BD;
+  --color-cerulean-500: #35759D;
+  --color-cerulean-600: #205B80;
+  --color-cerulean-700: #184867;
+  --color-cerulean-800: #143B55;
+  --color-cerulean-900: #123146;
+  --color-cerulean-950: #0A1E2D;
 
-  /* ── Royal Cobalt / Lapis (governance, structure) ── */
-  --color-lapis-50: #EDF0FF;
-  --color-lapis-100: #DCE2FF;
-  --color-lapis-200: #BCC7FF;
-  --color-lapis-300: #91A2FF;
-  --color-lapis-400: #6678FF;
-  --color-lapis-500: #4B56EE;
-  --color-lapis-600: #373CD0;
-  --color-lapis-700: #2B2EA8;
-  --color-lapis-800: #222382;
-  --color-lapis-900: #18185E;
-  --color-lapis-950: #0D0D38;
+  /* ── Academic Navy / Lapis (governance, directories) ── */
+  --color-lapis-50: #F3F5F9;
+  --color-lapis-100: #E3E8F1;
+  --color-lapis-200: #C8D2E3;
+  --color-lapis-300: #9FB1CE;
+  --color-lapis-400: #6E87B0;
+  --color-lapis-500: #425E8C;
+  --color-lapis-600: #28426D;
+  --color-lapis-700: #1E3356;
+  --color-lapis-800: #172743;
+  --color-lapis-900: #111E35;
+  --color-lapis-950: #0A1221;
 
-  /* ── Violet (innovation, programs, culture) ── */
-  --color-violet-50: #F4F0FF;
-  --color-violet-100: #E8E0FF;
-  --color-violet-200: #D3C4FF;
-  --color-violet-300: #B59BFF;
-  --color-violet-400: #956DFF;
-  --color-violet-500: #7E48FA;
-  --color-violet-600: #6D2EE8;
-  --color-violet-700: #5B21C8;
-  --color-violet-800: #4A1BA0;
-  --color-violet-900: #3B167E;
-  --color-violet-950: #240B52;
+  /* ── Muted Plum / Heritage Wine (unused fallback) ── */
+  --color-violet-50: #F8F5F7;
+  --color-violet-100: #EFE8EC;
+  --color-violet-200: #DFD2DA;
+  --color-violet-300: #C5AEBC;
+  --color-violet-400: #9F7E93;
+  --color-violet-500: #7B586F;
+  --color-violet-600: #634258;
+  --color-violet-700: #4F3346;
+  --color-violet-800: #402A39;
+  --color-violet-900: #33222E;
+  --color-violet-950: #1E121A;
 
-  /* ── Fuchsia (events, student life) ── */
-  --color-fuchsia-50: #FDF2FF;
-  --color-fuchsia-100: #F8E0FF;
-  --color-fuchsia-200: #F2C2FF;
-  --color-fuchsia-300: #EA96FF;
-  --color-fuchsia-400: #E163FF;
-  --color-fuchsia-500: #D133EC;
-  --color-fuchsia-600: #B61CCC;
-  --color-fuchsia-700: #9516A6;
-  --color-fuchsia-800: #791585;
-  --color-fuchsia-900: #62166B;
-  --color-fuchsia-950: #420449;
+  --color-fuchsia-50: #FAF5F7;
+  --color-fuchsia-100: #F2E8EC;
+  --color-fuchsia-200: #E4D0D8;
+  --color-fuchsia-300: #CCAEBA;
+  --color-fuchsia-400: #AC8092;
+  --color-fuchsia-500: #8D5C71;
+  --color-fuchsia-600: #744459;
+  --color-fuchsia-700: #5D3547;
+  --color-fuchsia-800: #4C2C3B;
+  --color-fuchsia-900: #3D2430;
+  --color-fuchsia-950: #23121A;
 
-  /* ── Rose (admissions, vibrant emphasis) ── */
-  --color-rose-50: #FFF0F3;
-  --color-rose-100: #FFDCE3;
-  --color-rose-200: #FFBCCB;
-  --color-rose-300: #FC8BA5;
-  --color-rose-400: #F8567C;
-  --color-rose-500: #EE2D5B;
-  --color-rose-600: #D81748;
-  --color-rose-700: #B4103B;
-  --color-rose-800: #951034;
-  --color-rose-900: #7E1230;
-  --color-rose-950: #470517;
+  /* ── Heritage Burgundy Rose ── */
+  --color-rose-50: #FCF4F5;
+  --color-rose-100: #F7E5E8;
+  --color-rose-200: #ECCBD1;
+  --color-rose-300: #DAA2AD;
+  --color-rose-400: #BE6C7C;
+  --color-rose-500: #9F4255;
+  --color-rose-600: #832E40;
+  --color-rose-700: #6B2232;
+  --color-rose-800: #581C29;
+  --color-rose-900: #481823;
+  --color-rose-950: #2A0B12;
 
   /* ── Institutional ink (warm neutral text & chrome) ── */
   --color-ink-50: #FAFAF9;
@@ -193,13 +192,8 @@
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #faf8f5;
-    background-image:
-      radial-gradient(ellipse 95% 55% at 50% -8%, rgba(200, 30, 36, 0.06), transparent 55%),
-      radial-gradient(ellipse 65% 45% at 100% 4%, rgba(2, 129, 204, 0.055), transparent 50%),
-      radial-gradient(ellipse 60% 44% at 0% 88%, rgba(16, 185, 114, 0.055), transparent 48%),
-      radial-gradient(ellipse 55% 40% at 92% 84%, rgba(245, 184, 0, 0.05), transparent 44%);
-    background-attachment: fixed;
+    background-color: #f9f8f5;
+    background-image: radial-gradient(ellipse 90% 45% at 50% -6%, rgba(133, 18, 23, 0.035), transparent 60%);
   }
 
   h1, h2, h3 {
@@ -214,7 +208,7 @@
   }
 
   ::selection {
-    background-color: #C81E24;
+    background-color: #6D0D11;
     color: #ffffff;
   }
 
@@ -223,7 +217,7 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid #C81E24;
+    outline: 2px solid #851217;
     outline-offset: 2px;
   }
 
@@ -286,45 +280,45 @@
   line-height: 1.72;
 }
 
-/* ── Crisp Luminous Card Surfaces ── */
+/* ── Subtle Editorial Institutional Surfaces ── */
 .card-gradient-crimson {
-  background: linear-gradient(155deg, #ffffff 0%, #fff4f5 55%, #ffe3e5 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fdf8f8 100%);
 }
 
 .card-gradient-gold {
-  background: linear-gradient(155deg, #ffffff 0%, #fff9e6 55%, #fef0be 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fcf9f0 100%);
 }
 
 .card-gradient-lapis {
-  background: linear-gradient(155deg, #ffffff 0%, #f2f5ff 55%, #e1e8ff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
 }
 
 .card-gradient-sage {
-  background: linear-gradient(155deg, #ffffff 0%, #edfdf5 55%, #cbf7df 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9f6 100%);
 }
 
 .card-gradient-cerulean {
-  background: linear-gradient(155deg, #ffffff 0%, #eef8ff 55%, #d4eeff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
 }
 
 .card-gradient-parchment {
-  background: linear-gradient(155deg, #ffffff 0%, #fdf9f0 55%, #f8ebd3 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #faf7f0 100%);
 }
 
 .card-gradient-violet {
-  background: linear-gradient(155deg, #ffffff 0%, #fff8eb 55%, #fde8b8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #faf7f0 100%);
 }
 
 .card-gradient-emerald {
-  background: linear-gradient(155deg, #ffffff 0%, #ecfdf5 55%, #c5f7df 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
 }
 
 .card-gradient-teal {
-  background: linear-gradient(155deg, #ffffff 0%, #ecfdfb 55%, #c4f7ef 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9f9 100%);
 }
 
 .card-gradient-rose {
-  background: linear-gradient(155deg, #ffffff 0%, #fff2f5 55%, #ffdfe7 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fcf6f7 100%);
 }
 
 .card-hover-lift {
@@ -336,37 +330,37 @@
 
 .card-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -10px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 8px 20px -12px rgba(15, 23, 42, 0.12);
 }
 
 .surface-panel {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(200, 195, 188, 0.7);
-  box-shadow: 0 6px 18px -12px rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #e2e0d8;
+  box-shadow: 0 4px 14px -10px rgba(15, 23, 42, 0.1);
 }
 
-/* Primary CTA — crisp PUST ruby-crimson sheen */
+/* Primary CTA — dignified PUST maroon */
 .btn-primary-sheen {
-  background: linear-gradient(135deg, #d4232a 0%, #b81920 55%, #961117 100%);
+  background: linear-gradient(180deg, #7c1015 0%, #650b0f 100%);
   color: #fff;
-  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
 }
 
 .btn-primary-sheen:hover {
-  background: linear-gradient(135deg, #e02c33 0%, #c81e24 55%, #a8151b 100%);
-  box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.2);
+  background: linear-gradient(180deg, #8b141a 0%, #700d12 100%);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
 }
 
 .btn-secondary-lapis {
-  background: linear-gradient(135deg, #0281cc 0%, #0366a3 100%);
+  background: linear-gradient(180deg, #25406a 0%, #1c3152 100%);
   color: #fff;
-  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }
 
 .btn-secondary-lapis:hover {
-  background: linear-gradient(135deg, #0a92e0 0%, #0275ba 100%);
+  background: linear-gradient(180deg, #2c4c7d 0%, #223b63 100%);
 }
 
 /* Accent chips / badges */
@@ -374,8 +368,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  border-radius: 999px;
-  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -383,45 +377,45 @@
 }
 
 .accent-chip-primary {
-  background: #ffe0e2;
-  color: #880f14;
-  border: 1px solid #f88b92;
+  background: #fae8e9;
+  color: #6d0d11;
+  border: 1px solid #e8b8bb;
 }
 
 .accent-chip-emerald {
-  background: #c8fae2;
-  color: #047848;
-  border: 1px solid #55e5a5;
+  background: #dceee4;
+  color: #154f36;
+  border: 1px solid #b5d6c4;
 }
 
 .accent-chip-violet {
-  background: #fef0b8;
-  color: #925e00;
-  border: 1px solid #fccd35;
+  background: #f5eed6;
+  color: #70500c;
+  border: 1px solid #e2cf98;
 }
 
 .accent-chip-red {
-  background: #ffd9d9;
-  color: #b41414;
-  border: 1px solid #ff8888;
+  background: #fde5e5;
+  color: #881c1c;
+  border: 1px solid #efb8b8;
 }
 
 .accent-chip-gold {
-  background: #fef0b8;
-  color: #925e00;
-  border: 1px solid #fccd35;
+  background: #f5eed6;
+  color: #70500c;
+  border: 1px solid #e2cf98;
 }
 
 .accent-chip-cerulean {
-  background: #d5eeff;
-  color: #0366a3;
-  border: 1px solid #70ccff;
+  background: #e0ecf4;
+  color: #184867;
+  border: 1px solid #bdd4e4;
 }
 
 .accent-chip-teal {
-  background: #c5fbf4;
-  color: #0d766b;
-  border: 1px solid #4bead6;
+  background: #ddeeee;
+  color: #1b4d50;
+  border: 1px solid #b8d7d7;
 }
 
 .prose-justify {

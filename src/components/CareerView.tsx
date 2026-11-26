@@ -144,16 +144,16 @@ export function CareerView() {
     };
 
   return (
-    <main className="flex-1 bg-[#FAF8F5]">
+    <main className="flex-1 bg-[#F9F8F5]">
       <section
         ref={pageScopeRef}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
       >
         {/* Page Header */}
-        <div className="space-y-6 pb-8 border-b border-pust-200/80">
+        <div className="space-y-6 pb-8 border-b border-slate-200">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-3xl space-y-3">
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Human Resources &amp; Recruitment · Office of the Registrar
               </p>
               <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight leading-tight">

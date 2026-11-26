@@ -115,10 +115,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
   return (
     <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header + Sub-Navigation Bar */}
-      <div className="border-b border-pust-200/80 pb-6 space-y-4">
+      <div className="border-b border-slate-200 pb-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               Statutory Governance · {activeTab.code}
             </p>
             <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-1.5 tracking-tight">
@@ -147,10 +147,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <Link
                 key={tab.route}
                 href={tab.route}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
-                    : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-500 hover:bg-pust-50 hover:text-pust-700'
+                    ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-600 hover:text-pust-800'
                 }`}
               >
                 {tab.label}

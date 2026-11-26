@@ -53,7 +53,7 @@ export function CampusMapSection() {
 
   if (loadingData && !profile) {
     return (
-      <section id="campus-map" className="bg-gradient-to-b from-[#FAF8F5] via-emerald-50/30 to-[#FAF8F5] border-t border-emerald-200/70 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
         <PageHeaderAndSectionSkeleton />
       </section>
     );
@@ -61,7 +61,7 @@ export function CampusMapSection() {
 
   if (!profile) {
     return (
-      <section id="campus-map" className="bg-gradient-to-b from-[#FAF8F5] via-emerald-50/30 to-[#FAF8F5] border-t border-emerald-200/70 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-red-800">
@@ -82,7 +82,7 @@ export function CampusMapSection() {
 
   if (!activeBuilding) {
     return (
-      <section id="campus-map" className="bg-gradient-to-b from-[#FAF8F5] via-emerald-50/30 to-[#FAF8F5] border-t border-emerald-200/70 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-slate-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1">
@@ -122,13 +122,13 @@ export function CampusMapSection() {
       ref={mapSectionRef}
       id="campus-map"
       aria-labelledby="campus-map-heading"
-      className="editable-region bg-gradient-to-b from-[#FAF8F5] via-emerald-50/30 to-[#FAF8F5] border-t border-emerald-200/70 py-14 lg:py-16 scroll-mt-36"
+      className="editable-region bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-emerald-200/80 pb-5">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-700">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               {campusMapMeta.eyebrow}
             </p>
             <h2
@@ -158,10 +158,10 @@ export function CampusMapSection() {
                     key={zone}
                     type="button"
                     onClick={() => handleZoneChange(zone)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       active
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs'
-                        : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-800'
+                        ? 'bg-pust-800 text-white shadow-xs'
+                        : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
                     }`}
                   >
                     {zone === 'All' ? 'All Precincts' : zone}
@@ -221,23 +221,23 @@ export function CampusMapSection() {
                   y="148"
                   width="290"
                   height="155"
-                  fill="#BBF7D0"
-                  stroke="#16A34A"
-                  strokeWidth="1.3"
+                  fill="#DCECE1"
+                  stroke="#6A9978"
+                  strokeWidth="1.2"
                 />
 
                 {/* Campus Lake / Reflecting Pond */}
                 <path
                   d="M 430 100 C 460 88, 520 92, 535 112 C 548 128, 515 142, 470 138 C 430 135, 412 114, 430 100 Z"
-                  fill="#7DD3FC"
-                  stroke="#0284C7"
-                  strokeWidth="1.5"
+                  fill="#CFE3F0"
+                  stroke="#4B7B99"
+                  strokeWidth="1.3"
                 />
                 <text
                   x="480"
                   y="119"
                   textAnchor="middle"
-                  className="fill-sky-950 font-mono text-[9.5px] font-semibold"
+                  className="fill-slate-800 font-mono text-[9.5px] font-semibold"
                 >
                   Campus Lake
                 </text>
@@ -248,8 +248,8 @@ export function CampusMapSection() {
                   y="286"
                   width="176"
                   height="112"
-                  fill="#DCFCE7"
-                  stroke="#22C55E"
+                  fill="#DCECE1"
+                  stroke="#6A9978"
                   strokeDasharray="4 3"
                   strokeWidth="1.2"
                 />
@@ -257,7 +257,7 @@ export function CampusMapSection() {
                   x="144"
                   y="346"
                   textAnchor="middle"
-                  className="fill-emerald-950/85 font-mono text-[10px] font-semibold"
+                  className="fill-emerald-900 font-mono text-[10px] font-semibold"
                 >
                   Central Playground
                 </text>
@@ -285,7 +285,7 @@ export function CampusMapSection() {
                   y="68"
                   width="132"
                   height="74"
-                  fill={activeBuilding.id === 'wazed-bhaban' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'wazed-bhaban' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -296,7 +296,7 @@ export function CampusMapSection() {
                     y="42"
                     width="82"
                     height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#B81D24' : '#E7E5E4'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E7E5E4'}
                     stroke="#78716C"
                     strokeWidth="1.2"
                   />
@@ -305,7 +305,7 @@ export function CampusMapSection() {
                     y="42"
                     width="96"
                     height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#B81D24' : '#E7E5E4'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E7E5E4'}
                     stroke="#78716C"
                     strokeWidth="1.2"
                   />
@@ -316,7 +316,7 @@ export function CampusMapSection() {
                   y="196"
                   width="116"
                   height="68"
-                  fill={activeBuilding.id === 'academic-1' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'academic-1' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -326,7 +326,7 @@ export function CampusMapSection() {
                   y="168"
                   width="112"
                   height="64"
-                  fill={activeBuilding.id === 'central-library' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'central-library' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -336,7 +336,7 @@ export function CampusMapSection() {
                   y="186"
                   width="104"
                   height="66"
-                  fill={activeBuilding.id === 'convocation-plaza' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'convocation-plaza' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -346,7 +346,7 @@ export function CampusMapSection() {
                   y="302"
                   width="124"
                   height="68"
-                  fill={activeBuilding.id === 'admin-bhaban' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'admin-bhaban' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -356,7 +356,7 @@ export function CampusMapSection() {
                   y="314"
                   width="112"
                   height="60"
-                  fill={activeBuilding.id === 'medical-tsc' ? '#B81D24' : '#E7E5E4'}
+                  fill={activeBuilding.id === 'medical-tsc' ? '#7A0B10' : '#E7E5E4'}
                   stroke="#78716C"
                   strokeWidth="1.2"
                 />
@@ -379,7 +379,7 @@ export function CampusMapSection() {
                 >
                   DHAKA–PABNA HIGHWAY (N6) · RAJAPUR
                 </text>
-                <rect x="348" y="424" width="72" height="22" fill="#B81D24" />
+                <rect x="348" y="424" width="72" height="22" fill="#7A0B10" />
                 <text
                   x="384"
                   y="439"
@@ -414,17 +414,17 @@ export function CampusMapSection() {
                       left: `${b.xPercent}%`,
                       top: `${b.yPercent}%`,
                     }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border shadow-sm transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-600 ${
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border shadow-xs transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                       isSelected
-                        ? 'z-20 bg-gradient-to-r from-pust-700 to-pust-600 text-white border-pust-800 shadow-md scale-[1.03]'
+                        ? 'z-20 bg-pust-800 text-white border-pust-900 shadow-sm scale-[1.03]'
                         : isInZone
-                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-pust-600 hover:text-pust-700'
-                        : 'z-0 bg-white/60 text-slate-400 border-slate-200 hover:bg-white hover:text-slate-700'
+                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-pust-600 hover:text-pust-800'
+                        : 'z-0 bg-white/65 text-slate-400 border-slate-200 hover:bg-white hover:text-slate-700'
                     }`}
                   >
                     <MapPin
                       className={`w-3 h-3 shrink-0 ${
-                        isSelected ? 'text-amber-300' : 'text-pust-600'
+                        isSelected ? 'text-gold-300' : 'text-pust-700'
                       }`}
                     />
                     <span className="font-mono sm:hidden">{b.code}</span>
@@ -435,7 +435,7 @@ export function CampusMapSection() {
             </div>
 
               {/* Direct Clickable Building Directory Grid (Accessible on Desktop & Mobile) */}
-            <div className="rounded-2xl card-gradient-parchment border border-amber-300/70 p-4 space-y-2.5 shadow-sm">
+            <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-2.5 shadow-xs">
               <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
                 Campus Buildings Index ({filteredBuildings.length}) — Click a building name
               </p>
@@ -450,14 +450,14 @@ export function CampusMapSection() {
                       onClick={() => setSelectedBuildingId(b.id)}
                       className={`px-3 py-2.5 rounded-lg text-left border transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
-                          ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border-pust-700 shadow-sm'
-                          : 'bg-white/95 text-slate-900 border-slate-200 hover:border-pust-500 hover:bg-white hover:-translate-y-0.5'
+                          ? 'bg-pust-800 text-white border-pust-900 shadow-xs'
+                          : 'bg-[#FAF9F6] text-slate-900 border-slate-200 hover:border-pust-500 hover:bg-white'
                       }`}
                     >
                       <span className="text-xs font-medium truncate">{b.name}</span>
                       <span
                         className={`font-mono text-[10px] shrink-0 tabular-nums ${
-                          isSelected ? 'text-amber-200 font-semibold' : 'text-slate-600'
+                          isSelected ? 'text-gold-200 font-semibold' : 'text-slate-600'
                         }`}
                       >
                         {b.code}
@@ -478,7 +478,7 @@ export function CampusMapSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0.4 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full rounded-2xl card-gradient-sage border border-sage-200 shadow-sm hover:shadow-md hover:border-sage-600/50 transition-all flex flex-col justify-between overflow-hidden"
+                className="w-full rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   <ResilientImage
@@ -508,7 +508,7 @@ export function CampusMapSection() {
 
                     <p className="text-fluid-body text-slate-800 leading-relaxed">{activeBuilding.summary}</p>
 
-                    <dl className="divide-y divide-emerald-200/80 border-y border-emerald-200/80 text-xs sm:text-sm">
+                    <dl className="divide-y divide-slate-200 border-y border-slate-200 text-xs sm:text-sm">
                       <div className="py-2.5 space-y-0.5">
                         <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Offices &amp; Academic Units

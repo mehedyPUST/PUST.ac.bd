@@ -89,7 +89,7 @@ export function ResearchSection({
       <div className="space-y-4 pb-4 border-b border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               Faculty Research &amp; Periodicals
             </p>
             <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
@@ -111,10 +111,10 @@ export function ResearchSection({
                 key={code}
                 type="button"
                 onClick={() => setSelectedDeptFilter(code)}
-                className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedDeptFilter === code
-                    ? 'bg-gradient-to-r from-lapis-700 to-cerulean-600 text-white border border-lapis-700 shadow-xs'
-                    : 'bg-white border border-slate-200 text-slate-800 hover:text-lapis-700 hover:border-lapis-400 hover:bg-lapis-50'
+                    ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-800 hover:text-pust-800 hover:border-pust-600'
                 }`}
               >
                 {code}

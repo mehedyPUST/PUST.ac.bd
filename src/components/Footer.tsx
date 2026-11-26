@@ -55,7 +55,7 @@ export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer
       id="footer"
-      className="editable-region bg-gradient-to-b from-[#520407] via-[#340305] to-[#170102] text-slate-100 border-t-[3px] border-emerald-500 print:hidden"
+      className="editable-region bg-gradient-to-b from-[#3A0407] via-[#270204] to-[#160102] text-slate-100 border-t-2 border-gold-400/80 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
