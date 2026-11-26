@@ -168,12 +168,17 @@ export function ResearchSection({
         </div>
       ) : (
         <div className="divide-y divide-slate-200 border-b border-slate-200">
-          {visiblePubs.map((pub) => {
+          {visiblePubs.map((pub, idx) => {
             const isCopied = copiedPubId === pub.id;
             const externalUrl =
               pub.url || (pub.doi ? `https://doi.org/${pub.doi}` : undefined);
             return (
-              <article key={pub.id} className="py-4 space-y-1.5 hover:bg-slate-50/70 px-2 -mx-2 rounded-lg transition-colors">
+              <article
+                key={pub.id}
+                className={`py-4 space-y-1.5 hover:bg-lapis-50/50 px-3 -mx-3 rounded-lg transition-colors ${
+                  idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/75'
+                }`}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="font-mono text-xs text-pust-800 tabular-nums">
                     {pub.departmentCode} · {pub.domain} · {pub.year}

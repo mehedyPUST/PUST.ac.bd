@@ -256,6 +256,8 @@ export function Navbar({
                 >
                   <Link
                     href="/"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'home'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route === '/'
@@ -267,13 +269,13 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'home' && (
                     <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {HOME_SUBTOPICS.map((item) => (
                           <Link
                             key={item.href}
                             href={item.href}
                             onClick={() => setHoveredGroup(null)}
-                            className="block rounded-lg px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-pust-900 transition-colors"
+                            className="block rounded-lg px-3 py-2 text-xs text-slate-700 hover:bg-pust-50/70 hover:text-pust-900 transition-colors"
                           >
                             {item.label}
                           </Link>
@@ -293,6 +295,8 @@ export function Navbar({
                 >
                   <Link
                     href="/governance"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'governance'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/governance')
@@ -304,7 +308,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'governance' && (
                     <div className="absolute left-0 top-full pt-1 w-60 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {governanceGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -315,7 +319,7 @@ export function Navbar({
                               (route === '/governance/university-act' &&
                                 item.route === '/governance/pust-act')
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -334,6 +338,8 @@ export function Navbar({
                 >
                   <Link
                     href="/about"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'about'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/about')
@@ -345,7 +351,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'about' && (
                     <div className="absolute left-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {aboutGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -354,7 +360,7 @@ export function Navbar({
                             className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -375,6 +381,8 @@ export function Navbar({
                 >
                   <Link
                     href="/administration"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'administration'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/administration')
@@ -386,16 +394,16 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'administration' && (
                     <div className="absolute left-0 xl:-left-24 top-full pt-1 w-[680px] xl:w-[780px] max-w-[calc(100vw-2rem)] z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2.5 max-h-[75vh] overflow-y-auto grid grid-cols-2 lg:grid-cols-3 gap-1">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-2.5 max-h-[75vh] overflow-y-auto grid grid-cols-2 lg:grid-cols-3 gap-1">
                         {adminGroup.items.map((item) => (
                           <Link
                             key={item.route}
                             href={item.route}
                             onClick={() => setHoveredGroup(null)}
-                            className={`block rounded-lg px-2.5 py-1.5 text-[11.5px] leading-snug transition-colors ${
+                            className={`block rounded-lg px-2.5 py-2 text-[11.5px] leading-snug transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -416,6 +424,8 @@ export function Navbar({
                 >
                   <Link
                     href="/academics"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'academic'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/academics')
@@ -427,7 +437,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'academic' && (
                     <div className="absolute left-0 top-full pt-1 w-[420px] max-w-[calc(100vw-2rem)] z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-2 grid grid-cols-2 gap-1">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-2 grid grid-cols-2 gap-1">
                         {academicGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -436,7 +446,7 @@ export function Navbar({
                             className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -457,6 +467,8 @@ export function Navbar({
                 >
                   <Link
                     href="/facilities"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'facilities'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/facilities')
@@ -468,7 +480,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'facilities' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {facilitiesGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -477,7 +489,7 @@ export function Navbar({
                             className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -498,6 +510,8 @@ export function Navbar({
                 >
                   <Link
                     href="/notices"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'notices'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/notices')
@@ -509,7 +523,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'notices' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {noticesGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -518,7 +532,7 @@ export function Navbar({
                             className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}
@@ -539,6 +553,8 @@ export function Navbar({
                 >
                   <Link
                     href="/admissions"
+                    aria-haspopup="true"
+                    aria-expanded={hoveredGroup === 'admission'}
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/admissions')
@@ -550,7 +566,7 @@ export function Navbar({
                   </Link>
                   {hoveredGroup === 'admission' && (
                     <div className="absolute right-0 top-full pt-1 w-56 z-50">
-                      <div className="bg-white rounded-xl border border-slate-200 shadow-lg p-1.5 space-y-0.5">
+                      <div className="bg-white rounded-xl border border-slate-200 ring-1 ring-slate-950/5 shadow-xl p-1.5 space-y-0.5">
                         {admissionGroup.items.map((item) => (
                           <Link
                             key={item.route}
@@ -559,7 +575,7 @@ export function Navbar({
                             className={`block rounded-lg px-3 py-2 text-xs transition-colors ${
                               route === item.route
                                 ? 'bg-pust-50 text-pust-900 font-semibold'
-                                : 'text-slate-700 hover:bg-slate-50 hover:text-pust-900'
+                                : 'text-slate-700 hover:bg-pust-50/70 hover:text-pust-900'
                             }`}
                           >
                             {item.label}

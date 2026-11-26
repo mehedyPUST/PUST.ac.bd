@@ -74,7 +74,7 @@ export function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           {profile ? (
-            <p className="text-sm text-slate-200 leading-relaxed">{resolvedDescription}</p>
+            <p className="text-sm text-slate-200 leading-relaxed text-left">{resolvedDescription}</p>
           ) : loadingData ? (
             <div className="space-y-2 py-1">
               <div className="h-3 w-5/6 rounded bg-white/10 animate-pulse" />
@@ -101,7 +101,7 @@ export function Footer({ onNavigate }: FooterProps) {
                   href={social.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-gold-300 transition-colors"
+                  className="hover:text-gold-300 hover:underline underline-offset-4 transition-colors"
                 >
                   {social.label}
                 </a>
@@ -124,7 +124,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-200 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white hover:underline underline-offset-4 transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -144,7 +144,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-200 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white hover:underline underline-offset-4 transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -164,7 +164,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Link
                   href={item.route}
                   onClick={(e) => handleLinkClick(e, item.route)}
-                  className="text-slate-200 hover:text-white transition-colors"
+                  className="text-slate-200 hover:text-white hover:underline underline-offset-4 transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -180,7 +180,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </p>
           {profile ? (
             <>
-              <p className="leading-relaxed text-slate-200">
+              <p className="leading-relaxed text-slate-200 text-left">
                 {footerConfig.addressLines.map((line, idx) => (
                   <span key={`${line}-${idx}`}>
                     {idx > 0 && <br />}
@@ -191,7 +191,7 @@ export function Footer({ onNavigate }: FooterProps) {
               {footerConfig.contacts.map((c, idx) => (
                 <p
                   key={`${c.label}-${idx}`}
-                  className={`font-mono tabular-nums ${idx === 0 ? 'pt-1' : ''}`}
+                  className={`font-mono tabular-nums text-left ${idx === 0 ? 'pt-1' : ''}`}
                 >
                   {c.label}:{' '}
                   <a
@@ -211,7 +211,7 @@ export function Footer({ onNavigate }: FooterProps) {
               ))}
             </>
           ) : (
-            <p className="text-slate-300">
+            <p className="text-slate-300 text-left">
               {loadingData ? 'Loading directory contacts...' : 'Contact directory unavailable.'}
             </p>
           )}
@@ -220,7 +220,9 @@ export function Footer({ onNavigate }: FooterProps) {
 
       <div className="border-t border-pust-900/90 bg-black/35">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-200">
-          <p>{profile ? footerConfig.copyrightText : 'Pabna University of Science and Technology'}</p>
+          <p className="text-center sm:text-left">
+            {profile ? footerConfig.copyrightText : 'Pabna University of Science and Technology'}
+          </p>
           {profile?.convocationDate && (
             <p className="font-mono tabular-nums">
               First Convocation: {profile.convocationDate} · Rajapur Campus

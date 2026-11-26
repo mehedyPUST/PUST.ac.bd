@@ -2661,6 +2661,9 @@ export function PublicSubPages({
           return (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
+              role="dialog"
+              aria-modal="true"
+              aria-label={activeMedia.title}
               onClick={() => setActiveMedia(null)}
             >
               <div
@@ -2675,7 +2678,7 @@ export function PublicSubPages({
                       {activeMedia.eventDate}
                       {activeMedia.visibility === 'registered' ? ' · REGISTERED MEMBERS ONLY' : ''}
                     </p>
-                    <h3 className="font-serif text-xl font-medium text-slate-900">
+                    <h3 className="font-serif text-xl font-medium text-slate-900 text-left">
                       {activeMedia.title}
                     </h3>
                   </div>
@@ -2683,7 +2686,7 @@ export function PublicSubPages({
                     type="button"
                     onClick={() => setActiveMedia(null)}
                     aria-label="Close media modal"
-                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer shrink-0"
+                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -2711,7 +2714,7 @@ export function PublicSubPages({
                       className="w-full aspect-video object-cover"
                     />
                   )}
-                  <p className="text-sm text-slate-700">{activeMedia.description}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed text-left">{activeMedia.description}</p>
                 </div>
               </div>
             </div>
@@ -2890,7 +2893,7 @@ export function PublicSubPages({
             </div>
 
             <div className="divide-y divide-slate-200">
-              {filteredNotices.map((notice) => (
+              {filteredNotices.map((notice, idx) => (
                 <div
                   key={notice.id}
                   data-gsap-notice-row
@@ -2903,7 +2906,9 @@ export function PublicSubPages({
                       onSelectNotice(notice);
                     }
                   }}
-                  className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer"
+                  className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer ${
+                    idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/80'
+                  }`}
                 >
                   <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
                     <span className="text-slate-600 font-medium whitespace-nowrap">
@@ -2915,10 +2920,10 @@ export function PublicSubPages({
                   </div>
 
                   <div className="lg:col-span-7 min-w-0">
-                    <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
+                    <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left">
                       {notice.title}
                     </h2>
-                    <p className="prose-justify text-sm text-slate-700 mt-1.5 leading-relaxed">
+                    <p className="text-sm text-slate-700 mt-1.5 leading-relaxed text-left">
                       {notice.summary}
                     </p>
                   </div>

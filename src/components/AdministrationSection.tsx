@@ -719,7 +719,7 @@ export function AdministrationSection({
               </div>
             ) : (
               <dl className="divide-y divide-slate-200 border-b border-slate-200">
-                {filteredLeadership.map((officer) => {
+                {filteredLeadership.map((officer, idx) => {
                   const isHighlighted = activeOffice?.matchLeadership?.(officer.role) ?? false;
                   const isCopied = copiedEmail === officer.email;
                   const originalIdx = profile.leadership.indexOf(officer);
@@ -729,7 +729,11 @@ export function AdministrationSection({
                     <div
                       key={officer.role}
                       className={`py-4 px-2 sm:px-3 grid grid-cols-1 xl:grid-cols-12 gap-3 xl:gap-5 items-center transition-colors ${
-                        isHighlighted ? 'bg-pust-50/55 rounded-lg' : 'hover:bg-[#F8F8F6]'
+                        isHighlighted
+                          ? 'bg-pust-50/55 rounded-lg'
+                          : idx % 2 === 0
+                          ? 'bg-white hover:bg-[#F8F8F6]'
+                          : 'bg-[#FAF9F5]/75 hover:bg-[#F8F8F6]'
                       }`}
                     >
                       <dt className="xl:col-span-3 text-xs font-semibold text-pust-900">

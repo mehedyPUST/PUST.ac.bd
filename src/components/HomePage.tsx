@@ -194,11 +194,27 @@ export function HomePage({
       if (e.key === 'Escape') {
         if (fullViewSlide) setFullViewSlide(null);
         if (activeMedia) setActiveMedia(null);
+        return;
+      }
+      if (fullViewSlide && slides.length > 1) {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          const idx = slides.findIndex((s) => s.id === fullViewSlide.id);
+          const nextIdx = idx >= 0 ? (idx + 1) % slides.length : 0;
+          setFullViewSlide(slides[nextIdx]);
+          setActiveSlideIdx(nextIdx);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const idx = slides.findIndex((s) => s.id === fullViewSlide.id);
+          const prevIdx = idx >= 0 ? (idx - 1 + slides.length) % slides.length : 0;
+          setFullViewSlide(slides[prevIdx]);
+          setActiveSlideIdx(prevIdx);
+        }
       }
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [activeMedia, fullViewSlide]);
+  }, [activeMedia, fullViewSlide, slides]);
 
   const filteredNotices =
     noticeCategory === 'All'
@@ -418,7 +434,7 @@ export function HomePage({
 
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-transparent pt-14 pb-4 px-4 sm:px-5 text-white pointer-events-none">
                       <div className="flex items-end justify-between gap-4">
-                        <p className="text-xs sm:text-sm font-serif italic text-white leading-snug line-clamp-2 drop-shadow-xs">
+                        <p className="text-xs sm:text-sm font-serif italic text-white leading-snug line-clamp-2 text-left drop-shadow-xs">
                           {currentSlide.caption}
                         </p>
                         {slides.length > 1 && (
@@ -779,10 +795,10 @@ export function HomePage({
                             <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
                               {vc.name}
                             </h4>
-                            <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-slate-600">
+                            <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-slate-600 text-left">
                               {vc.title}
                             </p>
-                            <p className="text-xs text-slate-700 leading-relaxed pt-0.5">{vc.message}</p>
+                            <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">{vc.message}</p>
                           </div>
                         </MotionCard>
                       );
@@ -874,7 +890,7 @@ export function HomePage({
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Notice Board
                 </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
                   Recent University Circulars
                 </h2>
               </div>
@@ -970,7 +986,7 @@ export function HomePage({
                         </div>
                       )}
 
-                      {secondaryNotices.map((notice) => (
+                      {secondaryNotices.map((notice, idx) => (
                         <div
                           key={notice.id}
                           data-gsap-notice-row
@@ -983,7 +999,9 @@ export function HomePage({
                               onSelectNotice(notice);
                             }
                           }}
-                          className="w-full text-left px-6 py-4 hover:bg-pust-50/70 transition-colors space-y-1.5 group cursor-pointer"
+                          className={`w-full text-left px-6 py-4 hover:bg-pust-50/70 transition-colors space-y-1.5 group cursor-pointer ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F4]/70'
+                          }`}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <p className="font-mono text-xs text-slate-600 tabular-nums">
@@ -998,10 +1016,13 @@ export function HomePage({
                               variant="compact"
                             />
                           </div>
-                          <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                            {notice.title}
-                          </h3>
-                          <p className="prose-justify text-sm text-slate-700 leading-relaxed line-clamp-2">
+                          <div className="flex items-baseline justify-between gap-3">
+                            <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                              {notice.title}
+                            </h3>
+                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-0.5 transition-all shrink-0 hidden sm:block" />
+                          </div>
+                          <p className="text-sm text-slate-700 leading-relaxed line-clamp-2 text-left">
                             {notice.summary}
                           </p>
                         </div>
@@ -1039,17 +1060,21 @@ export function HomePage({
             ) : (
               <div className="rounded-2xl border border-lapis-200 card-gradient-lapis shadow-sm overflow-hidden">
                 <div className="divide-y divide-lapis-200/70">
-                  {institutionalLinks.map((item) => (
+                  {institutionalLinks.map((item, idx) => (
                     <Link
                       key={item.id}
                       href={item.route}
-                      className="w-full text-left px-5 py-4 hover:bg-white/85 transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+                      className={`w-full text-left px-5 py-4 hover:bg-white/90 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
+                        idx % 2 === 0 ? 'bg-white/40' : 'bg-transparent'
+                      }`}
                     >
                       <div>
                         <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-lapis-700 transition-colors">
                           {item.title}
                         </h3>
-                        <p className="text-xs sm:text-[13px] text-slate-700 mt-0.5 leading-relaxed">{item.desc}</p>
+                        <p className="text-xs sm:text-[13px] text-slate-700 mt-0.5 leading-relaxed text-left">
+                          {item.desc}
+                        </p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-lapis-700 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
                     </Link>
@@ -1073,7 +1098,7 @@ export function HomePage({
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Faculty Research Output
                 </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
                   Recent Publications
                 </h2>
               </div>
@@ -1117,11 +1142,13 @@ export function HomePage({
                   No peer-reviewed publications found for the selected department.
                 </p>
               ) : (
-                visiblePublications.map((pub) => (
+                visiblePublications.map((pub, idx) => (
                   <article
                     key={pub.id}
                     data-gsap-pub-row
-                    className="py-4 px-2 -mx-2 rounded-xl hover:bg-lapis-50/55 transition-colors space-y-1.5"
+                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-lapis-50/55 transition-colors space-y-1.5 ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F4]/55'
+                    }`}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-mono text-xs font-semibold text-lapis-700 tabular-nums">
@@ -1133,10 +1160,10 @@ export function HomePage({
                         variant="compact"
                       />
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug">
+                    <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
                       {pub.title}
                     </h3>
-                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed">
+                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed text-left">
                       Authors: {pub.authors}
                     </p>
                   </article>
@@ -1182,11 +1209,13 @@ export function HomePage({
                 (profile?.journals ?? []).map((journal) => (
                   <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
                     <p className="font-mono text-xs font-medium text-slate-600 tabular-nums">{journal.issn}</p>
-                    <h4 className="font-serif text-base font-semibold text-slate-950">
+                    <h4 className="font-serif text-base font-semibold text-slate-950 text-left">
                       {journal.title}
                     </h4>
-                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed">{journal.scope}</p>
-                    <p className="text-xs font-semibold text-gold-800">{journal.currentIssue}</p>
+                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed text-left">
+                      {journal.scope}
+                    </p>
+                    <p className="text-xs font-semibold text-gold-800 text-left">{journal.currentIssue}</p>
                   </div>
                 ))
               )}
@@ -1206,7 +1235,7 @@ export function HomePage({
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Campus Chronicles &amp; Seminars
               </p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-900 mt-1">
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
                 News and Events
               </h2>
             </div>
@@ -1316,10 +1345,10 @@ export function HomePage({
                             <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
                           )}
                         </p>
-                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors text-left">
                           {item.title}
                         </h3>
-                        <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2">
+                        <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2 text-left">
                           {item.description}
                         </p>
                       </div>
@@ -1391,106 +1420,170 @@ export function HomePage({
       <CampusMapSection />
 
       {/* Media Preview Modal */}
-      {activeMedia && (() => {
-        const activeYtId =
-          activeMedia.mediaType === 'video' ? parseYouTubeVideoId(activeMedia.mediaUrl) : null;
-        return (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
-            onClick={() => setActiveMedia(null)}
-          >
-            <div
-              className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {activeMedia && (() => {
+          const activeYtId =
+            activeMedia.mediaType === 'video' ? parseYouTubeVideoId(activeMedia.mediaUrl) : null;
+          return (
+            <motion.div
+              key="home-media-modal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.16 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4"
+              role="dialog"
+              aria-modal="true"
+              aria-label={activeMedia.title}
+              onClick={() => setActiveMedia(null)}
             >
-              <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
-                <div>
-                  <p className="font-mono text-xs text-pust-800 tabular-nums">
-                    {activeMedia.category} ·{' '}
-                    {activeYtId ? 'YOUTUBE' : activeMedia.mediaType.toUpperCase()} ·{' '}
-                    {activeMedia.eventDate}
-                    {activeMedia.visibility === 'registered' ? ' · REGISTERED MEMBERS ONLY' : ''}
-                  </p>
-                  <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
-                    {activeMedia.title}
-                  </h3>
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.99 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 6, scale: 0.99 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
+                  <div>
+                    <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      {activeMedia.category} ·{' '}
+                      {activeYtId ? 'YOUTUBE' : activeMedia.mediaType.toUpperCase()} ·{' '}
+                      {activeMedia.eventDate}
+                      {activeMedia.visibility === 'registered' ? ' · REGISTERED MEMBERS ONLY' : ''}
+                    </p>
+                    <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5 text-left">
+                      {activeMedia.title}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMedia(null)}
+                    aria-label="Close media modal"
+                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
+                <div className="p-5 space-y-4">
+                  {activeYtId ? (
+                    <iframe
+                      src={getYouTubeEmbedUrl(activeYtId)}
+                      title={activeMedia.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                    />
+                  ) : activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
+                    <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
+                  ) : (
+                    <ResilientImage
+                      src={activeMedia.mediaUrl}
+                      alt={activeMedia.title}
+                      className="w-full aspect-video object-cover"
+                    />
+                  )}
+                  <p className="text-sm text-slate-700 leading-relaxed text-left">{activeMedia.description}</p>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* Banner Full Image Lightbox Modal */}
+      <AnimatePresence>
+        {fullViewSlide && (() => {
+          const slidePos = slides.findIndex((s) => s.id === fullViewSlide.id);
+          const displayIdx = slidePos >= 0 ? slidePos : activeSlideIdx;
+          const stepLightbox = (delta: number) => {
+            if (slides.length <= 1) return;
+            const nextIdx = (displayIdx + delta + slides.length) % slides.length;
+            setFullViewSlide(slides[nextIdx]);
+            setActiveSlideIdx(nextIdx);
+          };
+
+          return (
+            <motion.div
+              key="banner-lightbox-modal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.16 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-xs p-4 sm:p-8"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Full banner image view"
+              onClick={() => setFullViewSlide(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full max-w-5xl rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
                   type="button"
-                  onClick={() => setActiveMedia(null)}
-                  aria-label="Close media modal"
-                  className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 cursor-pointer shrink-0"
+                  onClick={() => setFullViewSlide(null)}
+                  aria-label="Close full image view"
+                  className="absolute top-3 right-3 z-20 min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg bg-slate-950/80 text-white border border-white/20 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
-              </div>
-              <div className="p-5 space-y-4">
-                {activeYtId ? (
-                  <iframe
-                    src={getYouTubeEmbedUrl(activeYtId)}
-                    title={activeMedia.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
-                  />
-                ) : activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
-                  <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />
-                ) : (
+
+                <div className="relative flex items-center justify-center bg-black max-h-[80vh]">
                   <ResilientImage
-                    src={activeMedia.mediaUrl}
-                    alt={activeMedia.title}
-                    className="w-full aspect-video object-cover"
+                    src={fullViewSlide.imageUrl}
+                    alt={fullViewSlide.alt || fullViewSlide.caption}
+                    containerClassName="w-full flex items-center justify-center bg-black"
+                    frameClassName="bg-black"
+                    className="max-h-[80vh] w-auto max-w-full object-contain"
                   />
-                )}
-                <p className="text-sm text-slate-700 leading-relaxed">{activeMedia.description}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-      {/* Banner Full Image Lightbox Modal */}
-      {fullViewSlide && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 sm:p-8"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full banner image view"
-          onClick={() => setFullViewSlide(null)}
-        >
-          <div
-            className="relative w-full max-w-5xl rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setFullViewSlide(null)}
-              aria-label="Close full image view"
-              className="absolute top-3 right-3 z-20 min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg bg-slate-950/80 text-white border border-white/20 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
 
-            <div className="flex items-center justify-center bg-black max-h-[80vh]">
-              <ResilientImage
-                src={fullViewSlide.imageUrl}
-                alt={fullViewSlide.alt || fullViewSlide.caption}
-                containerClassName="w-full flex items-center justify-center bg-black"
-                frameClassName="bg-black"
-                className="max-h-[80vh] w-auto max-w-full object-contain"
-              />
-            </div>
+                  {slides.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => stepLightbox(-1)}
+                        aria-label="Previous campus photo"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/75 text-white border border-white/20 hover:bg-white hover:text-slate-950 transition-colors cursor-pointer"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => stepLightbox(1)}
+                        aria-label="Next campus photo"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/75 text-white border border-white/20 hover:bg-white hover:text-slate-950 transition-colors cursor-pointer"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
 
-            <div className="px-5 py-3.5 bg-slate-950 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-white">
-              <p className="text-xs sm:text-sm font-serif italic text-white/95 leading-snug">
-                {fullViewSlide.caption}
-              </p>
-              <span className="font-mono text-[11px] text-white/60 shrink-0">
-                Press ESC or × to close
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+                <div className="px-5 py-3.5 bg-slate-950 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-white">
+                  <p className="text-xs sm:text-sm font-serif italic text-white/95 leading-snug text-left">
+                    {fullViewSlide.caption}
+                  </p>
+                  <div className="flex items-center gap-3 font-mono text-[11px] text-white/70 shrink-0 tabular-nums">
+                    {slides.length > 1 && (
+                      <span className="text-amber-200 font-semibold">
+                        {String(displayIdx + 1).padStart(2, '0')} /{' '}
+                        {String(slides.length).padStart(2, '0')}
+                      </span>
+                    )}
+                    <span>Press ESC or × to close</span>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </main>
   );
 }

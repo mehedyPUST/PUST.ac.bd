@@ -58,12 +58,17 @@ export function BreakingNewsTicker({
     const content = (
       <>
         <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-pust-800">
-          [{item.tag}]
+          {item.tag}
         </span>
         {item.dateLabel && (
-          <span className="font-mono text-[10px] text-slate-500 tabular-nums">
-            {item.dateLabel}
-          </span>
+          <>
+            <span aria-hidden="true" className="text-slate-300 text-[10px]">
+              ·
+            </span>
+            <span className="font-mono text-[10px] text-slate-500 tabular-nums">
+              {item.dateLabel}
+            </span>
+          </>
         )}
         <span className="text-xs sm:text-[13px] font-medium text-slate-900 group-hover:text-pust-900 group-hover:underline underline-offset-4">
           {item.title}
@@ -174,7 +179,11 @@ export function BreakingNewsTicker({
               aria-label={paused ? 'Resume latest news ticker' : 'Pause latest news ticker'}
               aria-pressed={paused}
               title={paused ? 'Resume ticker' : 'Pause ticker'}
-              className="w-9 h-full inline-flex items-center justify-center text-slate-600 hover:text-pust-900 hover:bg-slate-50 transition-colors cursor-pointer"
+              className={`w-9 h-full inline-flex items-center justify-center transition-colors cursor-pointer ${
+                paused
+                  ? 'bg-pust-50 text-pust-900'
+                  : 'text-slate-600 hover:text-pust-900 hover:bg-slate-50'
+              }`}
             >
               {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
             </button>

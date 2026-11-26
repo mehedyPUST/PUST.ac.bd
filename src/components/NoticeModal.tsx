@@ -65,16 +65,16 @@ export function NoticeModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="notice-modal-title"
       onClick={onClose}
     >
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18 }}
+        initial={{ opacity: 0, y: 10, scale: 0.99 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
@@ -122,8 +122,10 @@ export function NoticeModal({
             </button>
           </div>
 
-          <p className="text-[15px] font-medium text-slate-900 leading-relaxed">{notice.summary}</p>
-          <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-line">
+          <p className="text-[15px] font-medium text-slate-900 leading-relaxed text-left">
+            {notice.summary}
+          </p>
+          <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-line text-left">
             {notice.body}
           </p>
 

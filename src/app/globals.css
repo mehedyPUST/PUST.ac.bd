@@ -189,6 +189,8 @@
     color: #1c1917;
     line-height: 1.65;
     overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     background-color: #f7f5f2;
     background-image:
       radial-gradient(ellipse 110% 70% at 50% -15%, rgba(158, 27, 31, 0.07), transparent 55%),
@@ -203,7 +205,7 @@
     color: #1c1917;
   }
 
-  :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not(.text-center *):not(.text-right *) {
+  :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not([class*="line-clamp-"]):not(.text-center *):not(.text-right *) {
     text-align: justify;
     text-justify: inter-word;
     hyphens: auto;
