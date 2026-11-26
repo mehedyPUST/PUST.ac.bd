@@ -107,7 +107,7 @@ export function Navbar({
           className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-pust-950 via-pust-800 to-pust-900"
         />
 
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Official University Crest */}
           <Link
             href="/"
@@ -127,7 +127,7 @@ export function Navbar({
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Est. Tagline (Left) & Expanded Search (Right) */}
-            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:px-3 lg:px-5 xl:px-6 flex items-center justify-between gap-4 text-white">
+            <div className="h-11 sm:h-12 lg:h-[52px] pl-2.5 pr-0 sm:pl-3 sm:pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-4 text-white">
               <div className="min-w-0 flex-1 flex items-center gap-3">
                 <Link
                   href="/"
@@ -243,7 +243,7 @@ export function Navbar({
             </div>
 
             {/* Tier 2: Desktop Navigation Links Strip + Portal */}
-            <div className="hidden lg:flex h-11 px-4 lg:px-5 xl:px-6 bg-white items-center justify-between gap-4">
+            <div className="hidden lg:flex h-11 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
               <nav
                 aria-label="Primary navigation"
                 className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[13.5px] xl:text-sm font-medium text-slate-900"
