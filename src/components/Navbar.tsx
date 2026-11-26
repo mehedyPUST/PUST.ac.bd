@@ -101,10 +101,10 @@ export function Navbar({
       className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
     >
       <div className="relative z-10">
-        {/* Full-bleed upper institutional title band backdrop (official PUST crimson) */}
+        {/* Full-bleed upper institutional title band backdrop (official PUST shield maroon + Bengal emerald accent rule) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-pust-950 via-pust-800 to-pust-900"
+          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#380305] via-pust-800 to-pust-700 border-b-2 border-sage-700"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -146,7 +146,7 @@ export function Navbar({
                   aria-hidden="true"
                   className="hidden xl:block h-4 w-px bg-white/25 shrink-0"
                 />
-                <span className="hidden xl:inline text-[11px] font-medium tracking-wide text-amber-200/90 whitespace-nowrap shrink-0">
+                <span className="hidden xl:inline text-[11px] font-medium tracking-wide text-gold-300 whitespace-nowrap shrink-0">
                   {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                 </span>
               </div>

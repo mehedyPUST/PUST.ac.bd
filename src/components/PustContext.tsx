@@ -615,12 +615,12 @@ export function PustShell({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SkeletonTheme baseColor="#EAE4D8" highlightColor="#FBF9F5" borderRadius={8}>
+      <SkeletonTheme baseColor="#ECECE8" highlightColor="#F8F8F6" borderRadius={8}>
         <MotionConfig reducedMotion="user">
           <PustContext.Provider value={value}>
           <div
             data-edit-mode={effectiveEditMode ? 'true' : undefined}
-            className="min-h-screen flex flex-col bg-[#F7F7F5] text-slate-900"
+            className="min-h-screen flex flex-col bg-[#F8F8F6] text-slate-900"
           >
             <AnimatePresence>
               {isNavigating && (
@@ -631,7 +631,7 @@ export function PustShell({
                   exit={{ scaleX: 1, opacity: 0 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   style={{ transformOrigin: 'left center' }}
-                  className="fixed top-0 left-0 right-0 z-[70] h-[2.5px] bg-gradient-to-r from-pust-600 via-gold-500 to-pust-700 pointer-events-none"
+                  className="fixed top-0 left-0 right-0 z-[70] h-[2.5px] bg-gradient-to-r from-pust-700 via-gold-300 to-sage-700 pointer-events-none"
                 />
               )}
             </AnimatePresence>

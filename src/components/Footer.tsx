@@ -55,7 +55,7 @@ export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer
       id="footer"
-      className="editable-region bg-gradient-to-b from-[#2E0505] via-[#210404] to-[#150202] text-slate-100 border-t-2 border-pust-700 print:hidden"
+      className="editable-region bg-gradient-to-b from-[#240304] via-[#190202] to-[#100101] text-slate-100 border-t-2 border-sage-700 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
@@ -64,7 +64,7 @@ export function Footer({ onNavigate }: FooterProps) {
             <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
               {profile && (
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-300">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-gold-300">
                   {footerConfig.tagline}
                 </p>
               )}
@@ -101,7 +101,7 @@ export function Footer({ onNavigate }: FooterProps) {
                   href={social.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-amber-300 transition-colors"
+                  className="hover:text-gold-300 transition-colors"
                 >
                   {social.label}
                 </a>
@@ -115,7 +115,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Quick Links & About */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gold-300 mb-2">
             Quick Links
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -135,7 +135,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Administration & Governance */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gold-300 mb-2">
             Governance &amp; Admin
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -155,7 +155,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Academic & Student Services */}
         <div className="lg:col-span-2 space-y-2 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gold-300 mb-2">
             Digital Services
           </p>
           <ul className="space-y-1.5 text-xs sm:text-sm">
@@ -175,7 +175,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
         {/* Contact Information */}
         <div className="lg:col-span-2 space-y-2 text-xs text-slate-200">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gold-300 mb-2">
             Contact
           </p>
           {profile ? (
@@ -196,14 +196,14 @@ export function Footer({ onNavigate }: FooterProps) {
                   {c.label}:{' '}
                   <a
                     href={`tel:${c.phone.replace(/\s+/g, '')}`}
-                    className="hover:text-amber-300 transition-colors"
+                    className="hover:text-gold-300 transition-colors"
                   >
                     {c.phone}
                   </a>
                   <br />
                   <a
                     href={`mailto:${c.email}`}
-                    className="hover:text-amber-300 underline decoration-slate-400 hover:decoration-amber-300 transition-colors break-all"
+                    className="hover:text-gold-300 underline decoration-slate-400 hover:decoration-gold-300 transition-colors break-all"
                   >
                     {c.email}
                   </a>
@@ -218,7 +218,7 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
       </div>
 
-      <div className="border-t border-pust-800/80 bg-black/35">
+      <div className="border-t border-pust-900/90 bg-black/35">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-200">
           <p>{profile ? footerConfig.copyrightText : 'Pabna University of Science and Technology'}</p>
           {profile?.convocationDate && (

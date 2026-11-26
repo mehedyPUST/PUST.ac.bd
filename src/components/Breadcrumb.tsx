@@ -23,10 +23,10 @@ export function Breadcrumb() {
   const parentCrumb = crumbs.length >= 2 ? crumbs[crumbs.length - 2] : null;
 
   return (
-    <div className="bg-[#FBF9F4] border-b border-slate-200 print:hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-4">
+    <div className="bg-[#F8F8F6] border-b border-slate-200 print:hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
         <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
-          <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-700 overflow-x-auto no-scrollbar">
+          <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-600 overflow-x-auto no-scrollbar">
             {crumbs.map((crumb, index) => {
               const isFirst = index === 0;
               const isLast = index === crumbs.length - 1;
@@ -47,7 +47,7 @@ export function Breadcrumb() {
                     <span
                       aria-current="page"
                       title={crumb.label}
-                      className="inline-flex items-center px-2 py-0.5 rounded-md bg-pust-50 border border-pust-200/70 font-semibold text-pust-900 whitespace-nowrap truncate max-w-[230px] sm:max-w-md"
+                      className="inline-flex items-center px-1.5 py-0.5 font-semibold text-pust-800 whitespace-nowrap truncate max-w-[230px] sm:max-w-md"
                     >
                       {crumb.label}
                     </span>

@@ -5,45 +5,55 @@
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 
-  /* Official PUST Logo Primary Palette (vivid heritage crimson) */
-  --color-pust-50: #FFF1F2;
-  --color-pust-100: #FFE0E2;
-  --color-pust-200: #FFC2C6;
-  --color-pust-300: #F8969C;
-  --color-pust-400: #EB5E66;
-  --color-pust-500: #CE2A34;
-  --color-pust-600: #AA131D;
-  --color-pust-700: #8B0912;
-  --color-pust-800: #720007;
-  --color-pust-900: #590005;
-  --color-pust-950: #3D0003;
+  /* Official PUST Shield Maroon (Crest Shield & Institutional Primary) */
+  --color-pust-50: #FDF4F4;
+  --color-pust-100: #FAE6E6;
+  --color-pust-200: #F3C8C9;
+  --color-pust-300: #E5989B;
+  --color-pust-400: #C84D52;
+  --color-pust-500: #9E1B1F;
+  --color-pust-600: #801014;
+  --color-pust-700: #6B0A0D;
+  --color-pust-800: #590608;
+  --color-pust-900: #450305;
+  --color-pust-950: #2C0203;
 
-  /* Academic Heritage Gold (Convocation, Honors & Institutional Crest) */
-  --color-gold-50: #FFFBEB;
-  --color-gold-100: #FEF0C3;
-  --color-gold-200: #FDE08B;
-  --color-gold-600: #C66A00;
-  --color-gold-700: #9E4F00;
-  --color-gold-800: #7C3C00;
-  --color-gold-900: #5A2B00;
+  /* Official PUST Ribbon Gold (Scroll Banner, Accountability & Honors) */
+  --color-gold-50: #FEFBF0;
+  --color-gold-100: #FCF3D4;
+  --color-gold-200: #F7E39C;
+  --color-gold-300: #F3CE5A;
+  --color-gold-600: #B37B00;
+  --color-gold-700: #8D6000;
+  --color-gold-800: #6E4A00;
+  --color-gold-900: #523600;
 
-  /* Academic Lapis (Science, Engineering & Research) */
-  --color-lapis-50: #EFF5FF;
-  --color-lapis-100: #DCE8FF;
-  --color-lapis-200: #BAD2FF;
-  --color-lapis-600: #1D4ED8;
-  --color-lapis-700: #193CB8;
-  --color-lapis-800: #162E8A;
-  --color-lapis-900: #13215E;
+  /* Official PUST Engineering Gear Navy Indigo (Governance, Engineering & Operations) */
+  --color-lapis-50: #F2F3FC;
+  --color-lapis-100: #E3E5F8;
+  --color-lapis-200: #C5CAF0;
+  --color-lapis-600: #222082;
+  --color-lapis-700: #1B186B;
+  --color-lapis-800: #151254;
+  --color-lapis-900: #0F0D3D;
 
-  /* Rajapur Campus Sage (Grounds, Library, Wellness & Sustainability) */
-  --color-sage-50: #ECFDF4;
-  --color-sage-100: #D2F8E4;
-  --color-sage-200: #A4EECA;
-  --color-sage-600: #15803D;
-  --color-sage-700: #146834;
-  --color-sage-800: #105028;
-  --color-sage-900: #0B3A1D;
+  /* Official PUST Bengal Emerald (Crest Border, Campus Grounds & Residential Halls) */
+  --color-sage-50: #F0F9F3;
+  --color-sage-100: #DCF2E3;
+  --color-sage-200: #B7E4C7;
+  --color-sage-600: #0C7830;
+  --color-sage-700: #0A6126;
+  --color-sage-800: #074A1D;
+  --color-sage-900: #053515;
+
+  /* Official PUST Science Atom Cerulean (Research, ICT & Innovation Cells) */
+  --color-cerulean-50: #F0F8FF;
+  --color-cerulean-100: #E0F0FE;
+  --color-cerulean-200: #BAE0FD;
+  --color-cerulean-600: #027AC7;
+  --color-cerulean-700: #0362A0;
+  --color-cerulean-800: #064D7C;
+  --color-cerulean-900: #08395C;
 }
 
 @layer base {
@@ -74,30 +84,34 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid #8B0912;
+    outline: 2px solid #590608;
     outline-offset: 2px;
   }
 }
 
-/* Luminous single-color light gradient surfaces for cards (vivid tint + crisp WCAG AAA dark text contrast) */
+/* Subtle architectural gallery surfaces tinted gently with official PUST crest colors */
 .card-gradient-crimson {
-  background: linear-gradient(145deg, #ffffff 0%, #fff4f5 48%, #ffe2e5 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #fdf9f9 55%, #f9efef 100%);
 }
 
 .card-gradient-gold {
-  background: linear-gradient(145deg, #ffffff 0%, #fff9e8 48%, #feecba 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #fefcf4 55%, #faf4e1 100%);
 }
 
 .card-gradient-lapis {
-  background: linear-gradient(145deg, #ffffff 0%, #f1f6ff 48%, #dce8ff 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #f7f8fd 55%, #eef0fa 100%);
 }
 
 .card-gradient-sage {
-  background: linear-gradient(145deg, #ffffff 0%, #effcf5 48%, #d4f5e2 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #f5fbf7 55%, #eaf6ee 100%);
+}
+
+.card-gradient-cerulean {
+  background: linear-gradient(155deg, #ffffff 0%, #f5fafe 55%, #eaf4fc 100%);
 }
 
 .card-gradient-parchment {
-  background: linear-gradient(145deg, #ffffff 0%, #fcf8ef 50%, #f3e8d4 100%);
+  background: linear-gradient(155deg, #ffffff 0%, #fbfaf7 55%, #f4f1ea 100%);
 }
 
 .card-hover-lift {
@@ -108,7 +122,7 @@
 
 .card-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px -10px rgba(15, 23, 42, 0.14), 0 4px 10px -6px rgba(114, 0, 7, 0.1);
+  box-shadow: 0 12px 26px -10px rgba(15, 23, 42, 0.12), 0 4px 10px -6px rgba(89, 6, 8, 0.08);
 }
 
 .prose-justify {

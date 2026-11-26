@@ -40,7 +40,7 @@ export function BreakingNewsTicker({
     return (
       <section
         aria-label="Latest university news and notices"
-        className="border-b border-slate-200 bg-[#FBF9F4] print:hidden"
+        className="border-b border-slate-200 bg-[#F8F8F6] print:hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center gap-3">
           <div className="h-5 w-28 rounded bg-slate-200 animate-pulse" />
@@ -114,13 +114,13 @@ export function BreakingNewsTicker({
     <section
       aria-label="Latest university news and notices"
       data-breaking-ticker="true"
-      className="border-b border-slate-200 bg-[#FBF9F4] print:hidden"
+      className="border-b border-slate-200 bg-[#F8F8F6] print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-10 border-x border-slate-200/80 bg-[#FBF9F4]">
+        <div className="flex items-center h-10 border-x border-slate-200/80 bg-[#F8F8F6]">
           {/* Institutional Bulletin Tag */}
           <div className="shrink-0 h-full bg-pust-900 text-white px-3 sm:px-4 inline-flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            <Radio className="w-3.5 h-3.5 text-gold-300 shrink-0" />
             <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap">
               Latest
             </span>
@@ -130,11 +130,11 @@ export function BreakingNewsTicker({
           <div className="pust-ticker-wrap flex-1 min-w-0 h-full overflow-hidden relative flex items-center">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-[#FBF9F4] to-transparent z-10"
+              className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-[#F8F8F6] to-transparent z-10"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[#FBF9F4] to-transparent z-10"
+              className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[#F8F8F6] to-transparent z-10"
             />
 
             <div

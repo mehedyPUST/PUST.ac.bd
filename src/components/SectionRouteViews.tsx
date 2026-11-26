@@ -31,7 +31,7 @@ export function AdministrationRouteView() {
   const { route, profile, vcProfiles, navigateTo } = usePust();
 
   return (
-    <main className="flex-1 w-full bg-white">
+    <main className="flex-1 w-full bg-[#F8F8F6]">
       <AdministrationSection
         route={route}
         profile={profile}

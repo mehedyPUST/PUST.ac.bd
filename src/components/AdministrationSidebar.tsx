@@ -24,12 +24,40 @@ const WING_ORDER: AdminOfficeCategory[] = [
   'Research, ICT & Quality Cells',
 ];
 
-const WING_META: Record<AdminOfficeCategory, { index: string; label: string }> = {
-  'Executive Leadership': { index: '01', label: 'Executive Leadership' },
-  'Administrative Sections & Offices': { index: '02', label: 'Administrative Sections' },
-  'Student Welfare & Campus Services': { index: '03', label: 'Welfare & Campus Services' },
-  'Residential Halls & Accommodation': { index: '04', label: 'Residential Halls' },
-  'Research, ICT & Quality Cells': { index: '05', label: 'Research, ICT & Quality' },
+const WING_META: Record<
+  AdminOfficeCategory,
+  { index: string; label: string; accentClass: string; activeBgClass: string }
+> = {
+  'Executive Leadership': {
+    index: '01',
+    label: 'Executive Leadership',
+    accentClass: 'text-pust-800',
+    activeBgClass: 'bg-pust-50/80 text-pust-900',
+  },
+  'Administrative Sections & Offices': {
+    index: '02',
+    label: 'Administrative Sections',
+    accentClass: 'text-lapis-700',
+    activeBgClass: 'bg-lapis-50/75 text-lapis-900',
+  },
+  'Student Welfare & Campus Services': {
+    index: '03',
+    label: 'Welfare & Campus Services',
+    accentClass: 'text-sage-700',
+    activeBgClass: 'bg-sage-50/75 text-sage-900',
+  },
+  'Residential Halls & Accommodation': {
+    index: '04',
+    label: 'Residential Halls',
+    accentClass: 'text-gold-700',
+    activeBgClass: 'bg-gold-50/80 text-gold-900',
+  },
+  'Research, ICT & Quality Cells': {
+    index: '05',
+    label: 'Research, ICT & Quality',
+    accentClass: 'text-cerulean-700',
+    activeBgClass: 'bg-cerulean-50/80 text-cerulean-900',
+  },
 };
 
 const QUICK_ROUTES = [
@@ -54,7 +82,7 @@ export function AdministrationSidebar({
   const defaultExpandedCategory: AdminOfficeCategory =
     activeOffice?.category || 'Executive Leadership';
 
-  // Store per-route wing overrides so navigating to any office automatically opens its wing
+  // Per-route wing overrides so navigating to any office automatically expands its wing
   const [wingOverrideState, setWingOverrideState] = useState<{
     route: string;
     map: Record<string, boolean>;
@@ -82,10 +110,13 @@ export function AdministrationSidebar({
             );
           })
         : wingOffices;
+      const meta = WING_META[category];
       return {
         category,
-        index: WING_META[category].index,
-        label: WING_META[category].label,
+        index: meta.index,
+        label: meta.label,
+        accentClass: meta.accentClass,
+        activeBgClass: meta.activeBgClass,
         offices: matching,
       };
     }).filter((g) => g.offices.length > 0);
@@ -128,10 +159,10 @@ export function AdministrationSidebar({
     return (
       <div className="flex flex-col min-h-0 flex-1">
         {/* Search Input */}
-        <div className="px-3.5 py-3 border-b border-stone-200 bg-[#FAF7F1] shrink-0">
+        <div className="px-3.5 py-3 border-b border-slate-200 bg-[#F8F8F6] shrink-0">
           <div className="relative">
             <Search
-              className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+              className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
               aria-hidden="true"
             />
             <input
@@ -141,14 +172,14 @@ export function AdministrationSidebar({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Find office, head, or officer..."
               aria-label="Filter administration sidebar"
-              className="w-full pl-8 pr-8 py-2 text-xs bg-white border border-stone-300/90 rounded-lg text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-pust-800 transition-colors"
+              className="w-full pl-8 pr-8 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 transition-colors"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
                 aria-label="Clear sidebar filter"
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700 cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" aria-hidden="true" />
               </button>
@@ -159,7 +190,7 @@ export function AdministrationSidebar({
         {/* Scrollable Navigation Body */}
         <nav
           aria-label="Administration offices directory sidebar"
-          className={`min-h-0 overflow-y-auto divide-y divide-stone-200/80 [scrollbar-width:thin] [scrollbar-color:#d6d3d1_transparent] ${
+          className={`min-h-0 overflow-y-auto divide-y divide-slate-200/80 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] ${
             isMobile ? 'max-h-[56vh]' : 'flex-1'
           }`}
         >
@@ -177,15 +208,15 @@ export function AdministrationSidebar({
                     className={`group flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
                       isActive
                         ? 'bg-pust-900 text-white font-semibold'
-                        : 'text-stone-800 font-medium hover:bg-[#FAF7F1] hover:text-pust-900'
+                        : 'text-slate-800 font-medium hover:bg-[#F8F8F6] hover:text-pust-900'
                     }`}
                   >
                     <span className="flex items-center gap-2.5 min-w-0">
                       <Icon
                         className={`w-3.5 h-3.5 shrink-0 ${
                           isActive
-                            ? 'text-pust-100'
-                            : 'text-stone-400 group-hover:text-pust-800'
+                            ? 'text-gold-300'
+                            : 'text-slate-400 group-hover:text-pust-800'
                         }`}
                         aria-hidden="true"
                       />
@@ -194,7 +225,7 @@ export function AdministrationSidebar({
                     {item.href === '/administration/all-office' && (
                       <span
                         className={`font-mono text-[11px] tabular-nums shrink-0 ${
-                          isActive ? 'text-pust-100' : 'text-stone-400'
+                          isActive ? 'text-gold-300' : 'text-slate-400'
                         }`}
                       >
                         {offices.length}
@@ -209,8 +240,8 @@ export function AdministrationSidebar({
           {/* Wing Accordions */}
           {groupedOffices.length === 0 ? (
             <div className="p-6 text-center space-y-2.5">
-              <p className="text-xs text-stone-600 text-center">
-                No office matched <span className="font-medium text-stone-900">“{query}”</span>.
+              <p className="text-xs text-slate-600 text-center">
+                No office matched <span className="font-medium text-slate-900">“{query}”</span>.
               </p>
               <button
                 type="button"
@@ -226,19 +257,21 @@ export function AdministrationSidebar({
               const hasActiveChild = group.offices.some((o) => o.route === activeRoute);
 
               return (
-                <div key={group.category} className="py-2 px-2.5">
+                <div key={group.category} className="py-2 px-2.5 bg-white">
                   <button
                     type="button"
                     onClick={() => toggleWing(group.category)}
                     aria-expanded={expanded}
                     className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 text-left rounded-lg transition-colors cursor-pointer ${
                       hasActiveChild && !expanded
-                        ? 'bg-[#FBF1F2] text-pust-900'
-                        : 'hover:bg-[#FAF7F1] text-stone-800'
+                        ? group.activeBgClass
+                        : 'hover:bg-[#F8F8F6] text-slate-800'
                     }`}
                   >
                     <span className="flex items-baseline gap-2 min-w-0">
-                      <span className="font-mono text-[10px] font-semibold text-pust-800 tabular-nums shrink-0">
+                      <span
+                        className={`font-mono text-[10px] font-semibold tabular-nums shrink-0 ${group.accentClass}`}
+                      >
                         {group.index}
                       </span>
                       <span className="text-xs font-semibold tracking-tight text-left leading-snug truncate">
@@ -246,11 +279,11 @@ export function AdministrationSidebar({
                       </span>
                     </span>
                     <span className="flex items-center gap-1.5 shrink-0">
-                      <span className="font-mono text-[11px] text-stone-400 tabular-nums">
+                      <span className="font-mono text-[11px] text-slate-400 tabular-nums">
                         {group.offices.length}
                       </span>
                       <ChevronDown
-                        className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${
+                        className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${
                           expanded ? 'rotate-180' : ''
                         }`}
                         aria-hidden="true"
@@ -270,8 +303,8 @@ export function AdministrationSidebar({
                               aria-current={isActive ? 'page' : undefined}
                               className={`flex items-start justify-between gap-2 px-2.5 py-2 rounded-lg transition-colors ${
                                 isActive
-                                  ? 'bg-[#FBF1F2] text-pust-900 font-semibold'
-                                  : 'text-stone-700 hover:bg-[#FAF7F1] hover:text-stone-950'
+                                  ? `${group.activeBgClass} font-semibold`
+                                  : 'text-slate-700 hover:bg-[#F8F8F6] hover:text-slate-950'
                               }`}
                             >
                               <div className="min-w-0 flex-1 space-y-0.5">
@@ -279,18 +312,14 @@ export function AdministrationSidebar({
                                   {office.name}
                                 </span>
                                 {(normalizedQuery || isActive) && office.head && (
-                                  <span
-                                    className={`block text-[11px] leading-tight text-left truncate ${
-                                      isActive ? 'text-pust-800/85 font-normal' : 'text-stone-500'
-                                    }`}
-                                  >
+                                  <span className="block text-[11px] leading-tight text-left truncate text-slate-600 font-normal">
                                     {office.head.name}
                                   </span>
                                 )}
                               </div>
                               {isActive && (
                                 <ChevronRight
-                                  className="w-3.5 h-3.5 text-pust-800 shrink-0 mt-0.5"
+                                  className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${group.accentClass}`}
                                   aria-hidden="true"
                                 />
                               )}
@@ -307,10 +336,10 @@ export function AdministrationSidebar({
         </nav>
 
         {/* Sidebar Footer: Wing Toggle & Central Registrar Helpdesk */}
-        <div className="border-t border-stone-200 bg-[#FAF7F1] px-3.5 py-3 space-y-2.5 shrink-0">
+        <div className="border-t border-slate-200 bg-[#F8F8F6] px-3.5 py-3 space-y-2.5 shrink-0">
           {!normalizedQuery && (
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-[11px] text-stone-500 tabular-nums">
+              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
                 5 Wings · {offices.length} Offices
               </span>
               <button
@@ -323,8 +352,8 @@ export function AdministrationSidebar({
             </div>
           )}
 
-          <div className="pt-2 border-t border-stone-200/80 space-y-1 text-[11px]">
-            <p className="font-medium text-stone-500 text-left">Central Registry Desk</p>
+          <div className="pt-2 border-t border-slate-200 space-y-1 text-[11px]">
+            <p className="font-medium text-slate-500 text-left">Central Registry Desk</p>
             <div className="flex flex-wrap items-center justify-between gap-2 font-mono tabular-nums">
               <a
                 href="mailto:registrar@pust.ac.bd"
@@ -335,7 +364,7 @@ export function AdministrationSidebar({
               </a>
               <a
                 href="tel:+8802588845193"
-                className="inline-flex items-center gap-1 text-stone-700 hover:text-stone-950 shrink-0"
+                className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-950 shrink-0"
               >
                 <Phone className="w-3 h-3 shrink-0" aria-hidden="true" />
                 +8802588845193
@@ -350,20 +379,20 @@ export function AdministrationSidebar({
   return (
     <>
       {/* Mobile / Tablet Collapsible Office Switcher */}
-      <div className="lg:hidden rounded-xl border border-stone-200 bg-white overflow-hidden shadow-[0_1px_2px_rgba(28,25,23,0.04)]">
+      <div className="lg:hidden rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
         <button
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-expanded={mobileOpen}
-          className="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-[#FAF7F1] transition-colors cursor-pointer"
+          className="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#F8F8F6] transition-colors cursor-pointer"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <Menu className="w-4 h-4 text-pust-900 shrink-0" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="text-[11px] font-medium text-stone-500 text-left">
+              <p className="text-[11px] font-medium text-slate-500 text-left">
                 Administration Index · {offices.length} Offices
               </p>
-              <p className="text-xs font-semibold text-stone-950 truncate text-left">
+              <p className="text-xs font-semibold text-slate-950 truncate text-left">
                 {activeOffice
                   ? activeOffice.name
                   : activeRoute === '/administration/all-office'
@@ -386,7 +415,7 @@ export function AdministrationSidebar({
         </button>
 
         {mobileOpen && (
-          <div className="border-t border-stone-200 flex flex-col">
+          <div className="border-t border-slate-200 flex flex-col">
             {renderBody(true)}
           </div>
         )}
@@ -395,16 +424,16 @@ export function AdministrationSidebar({
       {/* Desktop Sticky Archival Sidebar */}
       <aside
         aria-label="Administration navigation"
-        className="hidden lg:flex flex-col min-h-0 max-h-[calc(100vh-8rem)] rounded-xl border border-stone-200 bg-white overflow-hidden shadow-[0_1px_2px_rgba(28,25,23,0.04)]"
+        className="hidden lg:flex flex-col min-h-0 max-h-[calc(100vh-8.5rem)] rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
       >
-        <div className="px-4 py-3.5 border-b border-stone-200 bg-[#FAF7F1] flex items-center justify-between gap-2 shrink-0">
+        <div className="px-4 py-3.5 border-b border-slate-200 bg-[#F8F8F6] flex items-center justify-between gap-2 shrink-0">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-pust-800 text-left">PUST Governance</p>
-            <h2 className="font-serif text-[17px] font-semibold text-stone-950 text-left leading-tight">
+            <p className="text-[11px] font-semibold text-pust-800 text-left">PUST Governance</p>
+            <h2 className="font-serif text-[17px] font-semibold text-slate-950 text-left leading-tight">
               Administration Index
             </h2>
           </div>
-          <span className="font-mono text-xs font-semibold text-stone-500 tabular-nums shrink-0">
+          <span className="font-mono text-xs font-semibold text-sage-700 tabular-nums shrink-0">
             {offices.length}
           </span>
         </div>
