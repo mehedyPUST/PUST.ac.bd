@@ -429,14 +429,14 @@ export function PublicSubPages({
       aboutTabs.find((t) => t.slug === activeSlug)?.label || 'About PUST';
 
     return (
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-[#FAF8F5]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+          <div className="border-b border-pust-200/80 pb-6 space-y-4">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
               About Pabna University of Science &amp; Technology
             </p>
             <div className="flex flex-wrap items-start justify-between gap-4">
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight">
+              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
                 {activeSection?.title || activeTabLabel}
               </h1>
               <EditTriggerButton
@@ -449,10 +449,10 @@ export function PublicSubPages({
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     activeSlug === tab.slug
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-500 hover:bg-pust-50 hover:text-pust-700'
                   }`}
                 >
                   {tab.label}
@@ -790,11 +790,11 @@ export function PublicSubPages({
     ].filter(Boolean);
 
     return (
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-[#FAF8F5]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
+          <div className="border-b border-lapis-200/80 pb-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight">
+              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
                 {activeHeading}
               </h1>
               {summaryParts.length > 0 && (
@@ -817,10 +817,10 @@ export function PublicSubPages({
                         setSelectedFaculty('All');
                       }
                     }}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                        : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                        ? 'bg-gradient-to-r from-lapis-700 to-cerulean-600 text-white border border-lapis-700 shadow-xs'
+                        : 'bg-white border border-slate-200 text-slate-800 hover:border-lapis-400 hover:bg-lapis-50 hover:text-lapis-700'
                     }`}
                   >
                     {tab.label}
@@ -1916,7 +1916,7 @@ export function PublicSubPages({
                 variant="compact"
               />
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+            <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
               {admissionTabs.find((t) => t.route === route)?.label || 'Admissions'}
             </h1>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
@@ -1924,11 +1924,11 @@ export function PublicSubPages({
                 <Link
                   key={t.route}
                   href={t.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route ||
                     (route === '/admissions' && t.route === '/admissions/undergraduate')
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-500 hover:bg-pust-50 hover:text-pust-700'
                   }`}
                 >
                   {t.label}
@@ -2409,7 +2409,7 @@ export function PublicSubPages({
                 variant="compact"
               />
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900">
+            <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
               {currentFac.title}
             </h1>
             <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
@@ -2417,10 +2417,10 @@ export function PublicSubPages({
                 <Link
                   key={f.route}
                   href={f.route}
-                  className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border border-emerald-600 shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-800'
                   }`}
                 >
                   {f.label}
@@ -2523,14 +2523,14 @@ export function PublicSubPages({
         : galleryItems.filter((g) => g.category === galleryCategory);
 
     return (
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-[#FAF8F5]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-pust-200/80">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
                 University Media Archive
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-medium text-slate-900 mt-1">
+              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-1 tracking-tight">
                 Campus Photos &amp; Videos Gallery
               </h1>
             </div>
@@ -2546,10 +2546,10 @@ export function PublicSubPages({
                   key={c}
                   type="button"
                   onClick={() => setGalleryCategory(c)}
-                  className={`px-3.5 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors ${
+                  className={`px-3.5 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-all whitespace-nowrap shrink-0 ${
                     galleryCategory === c
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-400 hover:bg-pust-50 hover:text-pust-700'
                   }`}
                 >
                   {c}
@@ -2738,15 +2738,15 @@ export function PublicSubPages({
     'University Notice Board';
 
   return (
-    <main className="flex-1 bg-[#F7F7F5]">
+    <main className="flex-1 bg-[#FAF8F5]">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="space-y-5 pb-6 border-b border-slate-200">
+        <div className="space-y-5 pb-6 border-b border-pust-200/80">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
                 Central &amp; Department Circulars
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-1.5 tracking-tight">
+              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-1.5 tracking-tight">
                 {activeNoticeHeading}
               </h1>
             </div>
@@ -2773,10 +2773,10 @@ export function PublicSubPages({
                 <Link
                   key={tab.route}
                   href={tab.route}
-                  className={`h-10 inline-flex items-center justify-center px-3.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`h-10 inline-flex items-center justify-center px-3.5 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-500 hover:bg-pust-50 hover:text-pust-700'
                   }`}
                 >
                   {tab.label}

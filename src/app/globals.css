@@ -6,26 +6,26 @@
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 
   /* ═══════════════════════════════════════════════════════════════
-     PRIMARY — Official PUST Shield Maroon (brand core, do not shift)
+     PRIMARY — Vibrant PUST Shield Crimson & Maroon
      ═══════════════════════════════════════════════════════════════ */
-  --color-pust-50: #FFF5F5;
-  --color-pust-100: #FFE8E8;
-  --color-pust-200: #FFC9CB;
-  --color-pust-300: #F59A9E;
-  --color-pust-400: #E04D55;
-  --color-pust-500: #9E1B1F;
-  --color-pust-600: #861518;
-  --color-pust-700: #6F1013;
-  --color-pust-800: #590608;
-  --color-pust-900: #450305;
+  --color-pust-50: #FFF2F3;
+  --color-pust-100: #FFE0E2;
+  --color-pust-200: #FFC2C6;
+  --color-pust-300: #F88B92;
+  --color-pust-400: #EB4650;
+  --color-pust-500: #C81E24;
+  --color-pust-600: #A8151B;
+  --color-pust-700: #880F14;
+  --color-pust-800: #66080B;
+  --color-pust-900: #4A0406;
   --color-pust-950: #2C0203;
 
   /* ── Vivid Red (alerts, urgent, live status) ── */
-  --color-red-50: #FFF1F1;
-  --color-red-100: #FFE0E0;
-  --color-red-200: #FFC5C5;
-  --color-red-300: #FF9B9B;
-  --color-red-400: #FF6464;
+  --color-red-50: #FFF0F0;
+  --color-red-100: #FFD9D9;
+  --color-red-200: #FFB8B8;
+  --color-red-300: #FF8888;
+  --color-red-400: #FF4D4D;
   --color-red-500: #EF2B2B;
   --color-red-600: #D91A1A;
   --color-red-700: #B41414;
@@ -33,135 +33,135 @@
   --color-red-900: #711616;
   --color-red-950: #3D0707;
 
-  /* ── Ribbon Gold (honors, awards, highlights) ── */
+  /* ── Radiant Gold (honors, awards, highlights) ── */
   --color-gold-50: #FFFBEB;
-  --color-gold-100: #FFF3C4;
-  --color-gold-200: #FFE686;
-  --color-gold-300: #FFD445;
-  --color-gold-400: #F5BC12;
-  --color-gold-500: #D99A00;
-  --color-gold-600: #B37B00;
-  --color-gold-700: #8D6000;
-  --color-gold-800: #6E4A00;
-  --color-gold-900: #523600;
+  --color-gold-100: #FEF0B8;
+  --color-gold-200: #FDE078;
+  --color-gold-300: #FCCD35;
+  --color-gold-400: #F5B800;
+  --color-gold-500: #E09B00;
+  --color-gold-600: #BA7B00;
+  --color-gold-700: #925E00;
+  --color-gold-800: #724900;
+  --color-gold-900: #523400;
   --color-gold-950: #2F1E00;
 
   /* ── Amber (warnings, deadlines) ── */
-  --color-amber-50: #FFF8EB;
-  --color-amber-100: #FFEFC6;
-  --color-amber-200: #FFDB87;
-  --color-amber-300: #FFC14A;
-  --color-amber-400: #FFA51A;
-  --color-amber-500: #F58A00;
-  --color-amber-600: #D96E00;
-  --color-amber-700: #B35300;
-  --color-amber-800: #8F4208;
-  --color-amber-900: #75370C;
+  --color-amber-50: #FFF7E6;
+  --color-amber-100: #FFE8B8;
+  --color-amber-200: #FFD275;
+  --color-amber-300: #FFB938;
+  --color-amber-400: #FF9E14;
+  --color-amber-500: #F58200;
+  --color-amber-600: #D96800;
+  --color-amber-700: #B35000;
+  --color-amber-800: #8F4008;
+  --color-amber-900: #75350C;
   --color-amber-950: #431A02;
 
-  /* ── Emerald (success, campus, growth) — vivid ── */
-  --color-emerald-50: #ECFDF5;
-  --color-emerald-100: #D1FAE5;
-  --color-emerald-200: #A7F3D0;
-  --color-emerald-300: #6EE7B7;
-  --color-emerald-400: #34D399;
-  --color-emerald-500: #10B981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
-  --color-emerald-800: #065F46;
-  --color-emerald-900: #064E3B;
-  --color-emerald-950: #022C22;
+  /* ── Emerald (success, campus, growth) — vivid jewel green ── */
+  --color-emerald-50: #E9FDF4;
+  --color-emerald-100: #C8FAE2;
+  --color-emerald-200: #96F3C7;
+  --color-emerald-300: #55E5A5;
+  --color-emerald-400: #22D388;
+  --color-emerald-500: #10B972;
+  --color-emerald-600: #059659;
+  --color-emerald-700: #047848;
+  --color-emerald-800: #065F3B;
+  --color-emerald-900: #064E31;
+  --color-emerald-950: #022C1B;
 
-  /* ── Sage / Bengal green (legacy alias + deeper campus) ── */
-  --color-sage-50: #F0FDF6;
-  --color-sage-100: #DCFCE9;
-  --color-sage-200: #BBF7D4;
-  --color-sage-300: #86EFBA;
-  --color-sage-400: #4ADE8A;
-  --color-sage-500: #22C55E;
-  --color-sage-600: #0C7830;
-  --color-sage-700: #0A6126;
-  --color-sage-800: #074A1D;
-  --color-sage-900: #053515;
-  --color-sage-950: #031F0C;
+  /* ── Sage / Bengal green (vibrant campus green) ── */
+  --color-sage-50: #ECFEF4;
+  --color-sage-100: #CEFCE3;
+  --color-sage-200: #A2F7CA;
+  --color-sage-300: #66EEA7;
+  --color-sage-400: #2FDF82;
+  --color-sage-500: #16BE65;
+  --color-sage-600: #0D9450;
+  --color-sage-700: #0A763F;
+  --color-sage-800: #075B30;
+  --color-sage-900: #054223;
+  --color-sage-950: #032413;
 
   /* ── Teal (labs, data, digital services) ── */
-  --color-teal-50: #F0FDFA;
-  --color-teal-100: #CCFBF1;
-  --color-teal-200: #99F6E4;
-  --color-teal-300: #5EEAD4;
-  --color-teal-400: #2DD4BF;
-  --color-teal-500: #14B8A6;
-  --color-teal-600: #0D9488;
-  --color-teal-700: #0F766E;
-  --color-teal-800: #115E59;
-  --color-teal-900: #134E4A;
-  --color-teal-950: #042F2E;
+  --color-teal-50: #EAFDFB;
+  --color-teal-100: #C5FBF4;
+  --color-teal-200: #8CF5E8;
+  --color-teal-300: #4BEAD6;
+  --color-teal-400: #1DD4BF;
+  --color-teal-500: #0DB8A5;
+  --color-teal-600: #0A9485;
+  --color-teal-700: #0D766B;
+  --color-teal-800: #105E56;
+  --color-teal-900: #124E48;
+  --color-teal-950: #042F2B;
 
   /* ── Cerulean / Sky (research, ICT) ── */
-  --color-cerulean-50: #F0F9FF;
-  --color-cerulean-100: #E0F2FE;
-  --color-cerulean-200: #BAE6FD;
-  --color-cerulean-300: #7DD3FC;
-  --color-cerulean-400: #38BDF8;
-  --color-cerulean-500: #0EA5E9;
-  --color-cerulean-600: #0284C7;
-  --color-cerulean-700: #0369A1;
-  --color-cerulean-800: #075985;
-  --color-cerulean-900: #0C4A6E;
-  --color-cerulean-950: #082F49;
+  --color-cerulean-50: #ECF7FF;
+  --color-cerulean-100: #D5EEFF;
+  --color-cerulean-200: #ADE0FF;
+  --color-cerulean-300: #70CCFF;
+  --color-cerulean-400: #30B6FF;
+  --color-cerulean-500: #0A9DF0;
+  --color-cerulean-600: #0281CC;
+  --color-cerulean-700: #0366A3;
+  --color-cerulean-800: #075485;
+  --color-cerulean-900: #0C466E;
+  --color-cerulean-950: #082D49;
 
-  /* ── Indigo / Lapis (governance, structure) ── */
-  --color-lapis-50: #EEF2FF;
-  --color-lapis-100: #E0E7FF;
-  --color-lapis-200: #C7D2FE;
-  --color-lapis-300: #A5B4FC;
-  --color-lapis-400: #818CF8;
-  --color-lapis-500: #6366F1;
-  --color-lapis-600: #222082;
-  --color-lapis-700: #1B186B;
-  --color-lapis-800: #151254;
-  --color-lapis-900: #0F0D3D;
-  --color-lapis-950: #080724;
+  /* ── Royal Cobalt / Lapis (governance, structure) ── */
+  --color-lapis-50: #EDF0FF;
+  --color-lapis-100: #DCE2FF;
+  --color-lapis-200: #BCC7FF;
+  --color-lapis-300: #91A2FF;
+  --color-lapis-400: #6678FF;
+  --color-lapis-500: #4B56EE;
+  --color-lapis-600: #373CD0;
+  --color-lapis-700: #2B2EA8;
+  --color-lapis-800: #222382;
+  --color-lapis-900: #18185E;
+  --color-lapis-950: #0D0D38;
 
   /* ── Violet (innovation, programs, culture) ── */
-  --color-violet-50: #F5F3FF;
-  --color-violet-100: #EDE9FE;
-  --color-violet-200: #DDD6FE;
-  --color-violet-300: #C4B5FD;
-  --color-violet-400: #A78BFA;
-  --color-violet-500: #8B5CF6;
-  --color-violet-600: #7C3AED;
-  --color-violet-700: #6D28D9;
-  --color-violet-800: #5B21B6;
-  --color-violet-900: #4C1D95;
-  --color-violet-950: #2E1065;
+  --color-violet-50: #F4F0FF;
+  --color-violet-100: #E8E0FF;
+  --color-violet-200: #D3C4FF;
+  --color-violet-300: #B59BFF;
+  --color-violet-400: #956DFF;
+  --color-violet-500: #7E48FA;
+  --color-violet-600: #6D2EE8;
+  --color-violet-700: #5B21C8;
+  --color-violet-800: #4A1BA0;
+  --color-violet-900: #3B167E;
+  --color-violet-950: #240B52;
 
   /* ── Fuchsia (events, student life) ── */
-  --color-fuchsia-50: #FDF4FF;
-  --color-fuchsia-100: #FAE8FF;
-  --color-fuchsia-200: #F5D0FE;
-  --color-fuchsia-300: #F0ABFC;
-  --color-fuchsia-400: #E879F9;
-  --color-fuchsia-500: #D946EF;
-  --color-fuchsia-600: #C026D3;
-  --color-fuchsia-700: #A21CAF;
-  --color-fuchsia-800: #86198F;
-  --color-fuchsia-900: #701A75;
-  --color-fuchsia-950: #4A044E;
+  --color-fuchsia-50: #FDF2FF;
+  --color-fuchsia-100: #F8E0FF;
+  --color-fuchsia-200: #F2C2FF;
+  --color-fuchsia-300: #EA96FF;
+  --color-fuchsia-400: #E163FF;
+  --color-fuchsia-500: #D133EC;
+  --color-fuchsia-600: #B61CCC;
+  --color-fuchsia-700: #9516A6;
+  --color-fuchsia-800: #791585;
+  --color-fuchsia-900: #62166B;
+  --color-fuchsia-950: #420449;
 
-  /* ── Rose (admissions, soft emphasis) ── */
-  --color-rose-50: #FFF1F2;
-  --color-rose-100: #FFE4E6;
-  --color-rose-200: #FECDD3;
-  --color-rose-300: #FDA4AF;
-  --color-rose-400: #FB7185;
-  --color-rose-500: #F43F5E;
-  --color-rose-600: #E11D48;
-  --color-rose-700: #BE123C;
-  --color-rose-800: #9F1239;
-  --color-rose-900: #881337;
-  --color-rose-950: #4C0519;
+  /* ── Rose (admissions, vibrant emphasis) ── */
+  --color-rose-50: #FFF0F3;
+  --color-rose-100: #FFDCE3;
+  --color-rose-200: #FFBCCB;
+  --color-rose-300: #FC8BA5;
+  --color-rose-400: #F8567C;
+  --color-rose-500: #EE2D5B;
+  --color-rose-600: #D81748;
+  --color-rose-700: #B4103B;
+  --color-rose-800: #951034;
+  --color-rose-900: #7E1230;
+  --color-rose-950: #470517;
 
   /* ── Institutional ink (warm neutral text & chrome) ── */
   --color-ink-50: #FAFAF9;
@@ -180,6 +180,8 @@
 @layer base {
   html {
     font-family: var(--font-sans);
+    /* Fluid root scale: 14px on small phones -> 16px at 1440px -> 18px on ultra-wide displays */
+    font-size: clamp(0.875rem, 0.79rem + 0.23vw, 1.125rem);
     overflow-x: clip;
     scrollbar-gutter: stable;
     scroll-behavior: smooth;
@@ -191,12 +193,12 @@
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #f7f5f2;
+    background-color: #faf8f5;
     background-image:
-      radial-gradient(ellipse 110% 70% at 50% -15%, rgba(158, 27, 31, 0.07), transparent 55%),
-      radial-gradient(ellipse 70% 45% at 100% 5%, rgba(139, 92, 246, 0.05), transparent 50%),
-      radial-gradient(ellipse 60% 40% at 0% 90%, rgba(16, 185, 129, 0.05), transparent 45%),
-      radial-gradient(ellipse 50% 35% at 90% 85%, rgba(14, 165, 233, 0.04), transparent 40%);
+      radial-gradient(ellipse 95% 55% at 50% -8%, rgba(200, 30, 36, 0.06), transparent 55%),
+      radial-gradient(ellipse 65% 45% at 100% 4%, rgba(2, 129, 204, 0.055), transparent 50%),
+      radial-gradient(ellipse 60% 44% at 0% 88%, rgba(16, 185, 114, 0.055), transparent 48%),
+      radial-gradient(ellipse 55% 40% at 92% 84%, rgba(245, 184, 0, 0.05), transparent 44%);
     background-attachment: fixed;
   }
 
@@ -212,7 +214,7 @@
   }
 
   ::selection {
-    background-color: #9E1B1F;
+    background-color: #C81E24;
     color: #ffffff;
   }
 
@@ -221,7 +223,7 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid #9E1B1F;
+    outline: 2px solid #C81E24;
     outline-offset: 2px;
   }
 
@@ -247,61 +249,82 @@
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #9E1B1F, #6F1013);
+    background: linear-gradient(180deg, #C81E24, #880F14);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 }
 
-/* ── Vivid card surfaces ── */
+/* ── Fluid Screen-Responsive Typography Scale ── */
+.text-fluid-hero {
+  font-size: clamp(2rem, 1.35rem + 2.5vw, 3.6rem);
+  line-height: 1.08;
+}
+
+.text-fluid-h1 {
+  font-size: clamp(1.65rem, 1.25rem + 1.55vw, 2.65rem);
+  line-height: 1.14;
+}
+
+.text-fluid-h2 {
+  font-size: clamp(1.35rem, 1.1rem + 0.95vw, 2.05rem);
+  line-height: 1.2;
+}
+
+.text-fluid-h3 {
+  font-size: clamp(1.08rem, 0.98rem + 0.42vw, 1.42rem);
+  line-height: 1.3;
+}
+
+.text-fluid-lead {
+  font-size: clamp(0.95rem, 0.88rem + 0.28vw, 1.18rem);
+  line-height: 1.68;
+}
+
+.text-fluid-body {
+  font-size: clamp(0.875rem, 0.84rem + 0.16vw, 1.02rem);
+  line-height: 1.72;
+}
+
+/* ── Crisp Luminous Card Surfaces ── */
 .card-gradient-crimson {
-  background: linear-gradient(160deg, #ffffff 0%, #fff5f5 42%, #ffe8e8 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #fff4f5 55%, #ffe3e5 100%);
 }
 
 .card-gradient-gold {
-  background: linear-gradient(160deg, #ffffff 0%, #fffbeb 42%, #fff3c4 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #fff9e6 55%, #fef0be 100%);
 }
 
 .card-gradient-lapis {
-  background: linear-gradient(160deg, #ffffff 0%, #eef2ff 42%, #e0e7ff 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #f2f5ff 55%, #e1e8ff 100%);
 }
 
 .card-gradient-sage {
-  background: linear-gradient(160deg, #ffffff 0%, #ecfdf5 42%, #d1fae5 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #edfdf5 55%, #cbf7df 100%);
 }
 
 .card-gradient-cerulean {
-  background: linear-gradient(160deg, #ffffff 0%, #f0f9ff 42%, #e0f2fe 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #eef8ff 55%, #d4eeff 100%);
 }
 
 .card-gradient-parchment {
-  background: linear-gradient(160deg, #ffffff 0%, #fafaf9 42%, #f5f5f4 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #fdf9f0 55%, #f8ebd3 100%);
 }
 
 .card-gradient-violet {
-  background: linear-gradient(160deg, #ffffff 0%, #f5f3ff 42%, #ede9fe 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #fff8eb 55%, #fde8b8 100%);
 }
 
 .card-gradient-emerald {
-  background: linear-gradient(160deg, #ffffff 0%, #ecfdf5 42%, #a7f3d0 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #ecfdf5 55%, #c5f7df 100%);
 }
 
 .card-gradient-teal {
-  background: linear-gradient(160deg, #ffffff 0%, #f0fdfa 42%, #ccfbf1 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #ecfdfb 55%, #c4f7ef 100%);
 }
 
 .card-gradient-rose {
-  background: linear-gradient(160deg, #ffffff 0%, #fff1f2 42%, #ffe4e6 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  background: linear-gradient(155deg, #ffffff 0%, #fff2f5 55%, #ffdfe7 100%);
 }
 
 .card-hover-lift {
@@ -312,34 +335,38 @@
 }
 
 .card-hover-lift:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    0 20px 40px -16px rgba(44, 2, 3, 0.16),
-    0 10px 18px -12px rgba(158, 27, 31, 0.12),
-    0 0 0 1px rgba(158, 27, 31, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -10px rgba(15, 23, 42, 0.14);
 }
 
 .surface-panel {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(214, 211, 209, 0.65);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 12px 32px -18px rgba(28, 25, 23, 0.14);
+  border: 1px solid rgba(200, 195, 188, 0.7);
+  box-shadow: 0 6px 18px -12px rgba(15, 23, 42, 0.12);
 }
 
-/* Primary CTA — vivid maroon sheen */
+/* Primary CTA — crisp PUST ruby-crimson sheen */
 .btn-primary-sheen {
-  background: linear-gradient(180deg, #c42328 0%, #9E1B1F 48%, #7a1215 100%);
+  background: linear-gradient(135deg, #d4232a 0%, #b81920 55%, #961117 100%);
   color: #fff;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 10px 22px -10px rgba(158, 27, 31, 0.55);
+  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.16);
 }
 
 .btn-primary-sheen:hover {
-  background: linear-gradient(180deg, #d42c32 0%, #b01e22 48%, #8a1519 100%);
+  background: linear-gradient(135deg, #e02c33 0%, #c81e24 55%, #a8151b 100%);
+  box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.2);
+}
+
+.btn-secondary-lapis {
+  background: linear-gradient(135deg, #0281cc 0%, #0366a3 100%);
+  color: #fff;
+  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.14);
+}
+
+.btn-secondary-lapis:hover {
+  background: linear-gradient(135deg, #0a92e0 0%, #0275ba 100%);
 }
 
 /* Accent chips / badges */
@@ -356,45 +383,45 @@
 }
 
 .accent-chip-primary {
-  background: #ffe8e8;
-  color: #861518;
-  border: 1px solid #ffc9cb;
+  background: #ffe0e2;
+  color: #880f14;
+  border: 1px solid #f88b92;
 }
 
 .accent-chip-emerald {
-  background: #d1fae5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
+  background: #c8fae2;
+  color: #047848;
+  border: 1px solid #55e5a5;
 }
 
 .accent-chip-violet {
-  background: #ede9fe;
-  color: #6d28d9;
-  border: 1px solid #ddd6fe;
+  background: #fef0b8;
+  color: #925e00;
+  border: 1px solid #fccd35;
 }
 
 .accent-chip-red {
-  background: #ffe0e0;
+  background: #ffd9d9;
   color: #b41414;
-  border: 1px solid #ffc5c5;
+  border: 1px solid #ff8888;
 }
 
 .accent-chip-gold {
-  background: #fff3c4;
-  color: #8d6000;
-  border: 1px solid #ffe686;
+  background: #fef0b8;
+  color: #925e00;
+  border: 1px solid #fccd35;
 }
 
 .accent-chip-cerulean {
-  background: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background: #d5eeff;
+  color: #0366a3;
+  border: 1px solid #70ccff;
 }
 
 .accent-chip-teal {
-  background: #ccfbf1;
-  color: #0f766e;
-  border: 1px solid #99f6e4;
+  background: #c5fbf4;
+  color: #0d766b;
+  border: 1px solid #4bead6;
 }
 
 .prose-justify {

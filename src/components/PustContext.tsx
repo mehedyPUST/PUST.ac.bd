@@ -631,7 +631,7 @@ export function PustShell({
                   exit={{ scaleX: 1, opacity: 0 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   style={{ transformOrigin: 'left center' }}
-                  className="fixed top-0 left-0 right-0 z-[70] h-[2.5px] bg-gradient-to-r from-pust-500 via-gold-400 via-emerald-400 via-violet-500 to-cerulean-500 pointer-events-none"
+                  className="fixed top-0 left-0 right-0 z-[70] h-[2.5px] bg-gradient-to-r from-pust-600 via-gold-400 via-emerald-500 to-cerulean-500 pointer-events-none"
                 />
               )}
             </AnimatePresence>

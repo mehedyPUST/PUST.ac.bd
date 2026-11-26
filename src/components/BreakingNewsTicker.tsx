@@ -57,20 +57,20 @@ export function BreakingNewsTicker({
   function renderTickerItem(item: BreakingNewsItem, duplicateCopy: boolean) {
     const content = (
       <>
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-pust-800">
+        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-pust-600">
           {item.tag}
         </span>
         {item.dateLabel && (
           <>
-            <span aria-hidden="true" className="text-slate-300 text-[10px]">
+            <span aria-hidden="true" className="text-pust-300 text-xs">
               ·
             </span>
-            <span className="font-mono text-[10px] text-slate-500 tabular-nums">
+            <span className="font-mono text-[11px] text-slate-600 tabular-nums">
               {item.dateLabel}
             </span>
           </>
         )}
-        <span className="text-xs sm:text-[13px] font-medium text-slate-900 group-hover:text-pust-900 group-hover:underline underline-offset-4">
+        <span className="text-xs sm:text-[0.84rem] font-semibold text-slate-900 group-hover:text-pust-600 group-hover:underline underline-offset-4">
           {item.title}
         </span>
       </>
@@ -119,14 +119,14 @@ export function BreakingNewsTicker({
     <section
       aria-label="Latest university news and notices"
       data-breaking-ticker="true"
-      className="border-b border-slate-200 bg-[#F8F8F6] print:hidden"
+      className="border-b border-pust-200/80 bg-gradient-to-r from-pust-50 via-white to-amber-50/70 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-10 border-x border-slate-200/80 bg-[#F8F8F6]">
+        <div className="flex items-center h-10 border-x border-pust-200/70 bg-white/75 backdrop-blur-xs">
           {/* Institutional Bulletin Tag */}
-          <div className="shrink-0 h-full bg-pust-900 text-white px-3 sm:px-4 inline-flex items-center gap-2">
+          <div className="shrink-0 h-full bg-gradient-to-r from-pust-700 via-pust-600 to-rose-600 text-white px-3 sm:px-4 inline-flex items-center gap-2 shadow-xs">
             <Radio className="w-3.5 h-3.5 text-gold-300 shrink-0" />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
               Latest
             </span>
           </div>
@@ -135,11 +135,11 @@ export function BreakingNewsTicker({
           <div className="pust-ticker-wrap flex-1 min-w-0 h-full overflow-hidden relative flex items-center">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-[#F8F8F6] to-transparent z-10"
+              className="pointer-events-none absolute inset-y-0 left-0 w-5 bg-gradient-to-r from-white/95 to-transparent z-10"
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[#F8F8F6] to-transparent z-10"
+              className="pointer-events-none absolute inset-y-0 right-0 w-7 bg-gradient-to-l from-white/95 to-transparent z-10"
             />
 
             <div
@@ -159,7 +159,7 @@ export function BreakingNewsTicker({
                         {renderTickerItem(item, isDuplicate)}
                         <span
                           aria-hidden="true"
-                          className="mx-4 text-[10px] text-pust-700/45 select-none"
+                          className="mx-4 text-[10px] text-amber-500/70 select-none"
                         >
                           ◆
                         </span>
@@ -172,7 +172,7 @@ export function BreakingNewsTicker({
           </div>
 
           {/* Controls & Notices Archive Link */}
-          <div className="shrink-0 h-full flex items-center border-l border-slate-200 bg-white">
+          <div className="shrink-0 h-full flex items-center border-l border-pust-200/80 bg-white/90">
             <button
               type="button"
               onClick={() => setPaused((prev) => !prev)}
@@ -181,15 +181,15 @@ export function BreakingNewsTicker({
               title={paused ? 'Resume ticker' : 'Pause ticker'}
               className={`w-9 h-full inline-flex items-center justify-center transition-colors cursor-pointer ${
                 paused
-                  ? 'bg-pust-50 text-pust-900'
-                  : 'text-slate-600 hover:text-pust-900 hover:bg-slate-50'
+                  ? 'bg-pust-100 text-pust-700'
+                  : 'text-slate-600 hover:text-pust-700 hover:bg-pust-50'
               }`}
             >
               {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
             </button>
             <Link
               href="/notices"
-              className="hidden sm:inline-flex items-center gap-1 px-3.5 h-full border-l border-slate-200 text-[11px] font-semibold text-pust-900 hover:bg-pust-50 whitespace-nowrap transition-colors"
+              className="hidden sm:inline-flex items-center gap-1 px-3.5 h-full border-l border-pust-200/80 text-xs font-semibold text-pust-700 hover:bg-pust-600 hover:text-white whitespace-nowrap transition-colors"
             >
               All Notices
               <ArrowUpRight className="w-3.5 h-3.5" />

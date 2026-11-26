@@ -268,7 +268,7 @@ export function AdministrationSection({
                 <SubPagePanel subKey={route} className="space-y-5">
                   <div className="space-y-3.5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-xs font-semibold tracking-wide text-pust-800">
+                      <p className="text-xs font-semibold tracking-wide text-pust-600">
                         Pabna University of Science and Technology · Act No. 43 of 2001
                       </p>
                       <EditTriggerButton
@@ -277,14 +277,14 @@ export function AdministrationSection({
                         variant="compact"
                       />
                     </div>
-                    <h1 className="font-serif text-3xl sm:text-4xl leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
+                    <h1 className="font-serif text-fluid-h1 leading-[1.1] font-semibold tracking-tight text-slate-950 max-w-2xl">
                       {activeOfficeRecord
                         ? activeOfficeRecord.name
                         : activeOffice
                         ? activeOffice.highlight
                         : 'University Administration & Executive Governance'}
                     </h1>
-                    <p className="text-[15px] sm:text-base leading-[1.72] text-slate-700 max-w-2xl">
+                    <p className="text-fluid-lead leading-[1.72] text-slate-700 max-w-2xl">
                       {activeOfficeRecord
                         ? activeOfficeRecord.summary
                         : activeOffice

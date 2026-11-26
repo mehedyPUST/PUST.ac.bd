@@ -2344,14 +2344,14 @@ export function DepartmentDetailView({
           </div>
 
           <div className="space-y-2.5 max-w-4xl">
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
               {department.officialCode ? `Dept Code ${department.officialCode} · ` : ''}
               {department.code} · {department.faculty}
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] font-semibold text-slate-950 tracking-tight leading-tight">
+            <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight leading-tight">
               Department of {department.name}
             </h1>
-            <p className="text-[15.5px] sm:text-base text-slate-700 leading-[1.72]">
+            <p className="text-fluid-lead text-slate-700 leading-[1.72]">
               {department.summary}
             </p>
           </div>

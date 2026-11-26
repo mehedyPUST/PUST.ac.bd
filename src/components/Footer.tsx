@@ -55,7 +55,7 @@ export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer
       id="footer"
-      className="editable-region bg-gradient-to-b from-[#240304] via-[#190202] to-[#100101] text-slate-100 border-t-2 border-sage-700 print:hidden"
+      className="editable-region bg-gradient-to-b from-[#520407] via-[#340305] to-[#170102] text-slate-100 border-t-[3px] border-emerald-500 print:hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
@@ -64,11 +64,11 @@ export function Footer({ onNavigate }: FooterProps) {
             <PustCrest size={42} variant="light" className="shrink-0" />
             <div>
               {profile && (
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-gold-300">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gold-300">
                   {footerConfig.tagline}
                 </p>
               )}
-              <h2 className="font-serif text-lg font-medium text-white">
+              <h2 className="font-serif text-fluid-h3 font-medium text-white">
                 Pabna University of Science and Technology
               </h2>
             </div>

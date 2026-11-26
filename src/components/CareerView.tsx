@@ -144,22 +144,22 @@ export function CareerView() {
     };
 
   return (
-    <main className="flex-1 bg-[#F7F7F5]">
+    <main className="flex-1 bg-[#FAF8F5]">
       <section
         ref={pageScopeRef}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
       >
         {/* Page Header */}
-        <div className="space-y-6 pb-8 border-b border-slate-200">
+        <div className="space-y-6 pb-8 border-b border-pust-200/80">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-3xl space-y-3">
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
                 Human Resources &amp; Recruitment · Office of the Registrar
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] font-semibold text-slate-950 tracking-tight leading-tight">
+              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight leading-tight">
                 Career Opportunities at PUST
               </h1>
-              <p className="prose-justify text-base text-slate-700 leading-relaxed">
+              <p className="prose-justify text-fluid-lead text-slate-700 leading-relaxed">
                 Pabna University of Science and Technology welcomes accomplished scholars,
                 researchers, administrative officers, and technical specialists committed to
                 advancing higher education and applied discovery across its{' '}
@@ -181,7 +181,7 @@ export function CareerView() {
               />
               <a
                 href="#application-forms"
-                className="h-10 inline-flex items-center justify-center gap-2 px-4 text-xs sm:text-sm font-semibold rounded-lg bg-pust-800 text-white hover:bg-pust-900 transition-colors whitespace-nowrap shrink-0"
+                className="btn-primary-sheen h-10 inline-flex items-center justify-center gap-2 px-4 text-xs sm:text-sm font-semibold rounded-lg text-white whitespace-nowrap shrink-0"
               >
                 <FileDown className="w-4 h-4" />
                 Application Forms
@@ -244,7 +244,7 @@ export function CareerView() {
               </p>
               <h2
                 id="career-circulars-heading"
-                className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1"
+                className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1"
               >
                 Active Recruitment &amp; Tender Circulars
               </h2>

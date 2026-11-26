@@ -262,7 +262,7 @@ export function HomePage({
   const vcBodyParagraphs = vcClosingLine ? vcParagraphs.slice(0, -1) : vcParagraphs;
 
   return (
-    <main className="flex-1 bg-[#F7F7F5]">
+    <main className="flex-1 bg-[#FAF8F5]">
       {dataError && (
         <div className="bg-red-50 border-b border-red-200 py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm text-red-900">
@@ -297,7 +297,7 @@ export function HomePage({
       <section
         ref={heroSectionRef}
         id="banner"
-        className="editable-region bg-gradient-to-b from-white via-[#FBF9F4] to-[#F3EDE2] border-b border-slate-200 scroll-mt-28"
+        className="editable-region bg-gradient-to-br from-white via-pust-50/45 to-amber-50/65 border-b border-pust-200/70 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
@@ -310,7 +310,7 @@ export function HomePage({
                     data-gsap-hero
                     className="flex flex-wrap items-center justify-between gap-2"
                   >
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
+                    <p className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-pust-600">
                       {profile.heroEyebrow ||
                         (profile.convocationDate
                           ? `Rajapur, Pabna-6600 · First Convocation: ${profile.convocationDate}`
@@ -324,14 +324,14 @@ export function HomePage({
                   </div>
                   <h1
                     data-gsap-hero
-                    className="font-serif text-[clamp(2.25rem,4vw,3.5rem)] leading-[1.08] font-semibold tracking-tight text-slate-950"
+                    className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950"
                   >
                     {profile.heroTitle}
                   </h1>
                   {profile.heroSubtitle && (
                     <p
                       data-gsap-hero
-                      className="text-base sm:text-[17.5px] leading-[1.68] text-slate-700 max-w-xl"
+                      className="text-fluid-lead text-slate-700 max-w-xl"
                     >
                       {profile.heroSubtitle}
                     </p>
@@ -339,10 +339,10 @@ export function HomePage({
                 </div>
               ) : (
                 <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-2">
-                  <h1 className="font-serif text-2xl font-semibold text-slate-950">
+                  <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                     Pabna University of Science and Technology
                   </h1>
-                  <p className="text-sm text-slate-700">
+                  <p className="text-fluid-body text-slate-700">
                     University profile summary is currently unavailable.
                   </p>
                 </div>
@@ -350,17 +350,17 @@ export function HomePage({
 
               <div
                 data-gsap-hero
-                className="mt-8 pt-6 border-t border-slate-300/80 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3"
+                className="mt-8 pt-6 border-t border-pust-200/70 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3"
               >
                 <Link
                   href="/portal"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold bg-pust-800 text-white hover:bg-pust-900 hover:-translate-y-0.5 hover:shadow-md shadow-sm transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   Open Digital Campus Portal
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold border border-slate-300 bg-white text-slate-900 hover:border-lapis-700 hover:text-lapis-800 hover:bg-lapis-50/40 hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold border border-lapis-300 bg-lapis-50/75 text-lapis-700 hover:bg-lapis-600 hover:text-white hover:border-lapis-600 hover:-translate-y-0.5 shadow-xs transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   {profile?.departmentsCount
                     ? `Explore ${profile.departmentsCount} Departments`
@@ -368,7 +368,7 @@ export function HomePage({
                 </Link>
                 <Link
                   href="/verify"
-                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-semibold text-pust-800 hover:bg-pust-100/70 transition-colors whitespace-nowrap shrink-0"
+                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-4 py-3 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50/80 border border-emerald-200 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   Verify Document
@@ -523,46 +523,46 @@ export function HomePage({
 
           {/* Operational Utility Ribbon */}
           {profile && (
-            <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-300/80 bg-white shadow-sm overflow-hidden">
+            <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl border border-slate-200/90 bg-white shadow-xs overflow-hidden">
               <div
                 data-gsap-ribbon
-                className="card-gradient-crimson px-5 py-4 border-b lg:border-b-0 sm:border-r border-slate-200 transition-colors"
+                className="card-gradient-crimson px-5 py-4 border-b lg:border-b-0 sm:border-r border-pust-200/70 transition-colors"
               >
-                <dt className="text-xs uppercase tracking-wider text-pust-700 font-semibold">
+                <dt className="text-xs uppercase tracking-wider text-pust-600 font-bold">
                   Established
                 </dt>
-                <dd className="font-mono tabular-nums text-[15px] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
                   {profile.establishedYear} · Act No. 43 of 2001
                 </dd>
               </div>
               <div
                 data-gsap-ribbon
-                className="card-gradient-lapis px-5 py-4 border-b lg:border-b-0 lg:border-r border-slate-200 transition-colors"
+                className="card-gradient-lapis px-5 py-4 border-b lg:border-b-0 lg:border-r border-lapis-200/70 transition-colors"
               >
-                <dt className="text-xs uppercase tracking-wider text-lapis-700 font-semibold">
+                <dt className="text-xs uppercase tracking-wider text-lapis-600 font-bold">
                   Academic Scope
                 </dt>
-                <dd className="font-mono tabular-nums text-[15px] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
                   {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
                 </dd>
               </div>
               <div
                 data-gsap-ribbon
-                className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-slate-200 transition-colors"
+                className="card-gradient-gold px-5 py-4 border-b sm:border-b-0 sm:border-r border-gold-300/70 transition-colors"
               >
-                <dt className="text-xs uppercase tracking-wider text-gold-700 font-semibold">
+                <dt className="text-xs uppercase tracking-wider text-gold-700 font-bold">
                   Community
                 </dt>
-                <dd className="font-mono tabular-nums text-[15px] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
                   {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
                 </dd>
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-gradient-to-br from-pust-900 to-pust-950 hover:from-pust-800 hover:to-pust-950 text-white transition-colors group"
+                className="bg-gradient-to-br from-pust-600 via-pust-700 to-pust-800 hover:from-pust-500 hover:via-pust-600 hover:to-pust-700 text-white transition-all group"
               >
                 <Link href="/verify" className="block h-full px-5 py-4">
-                  <dt className="text-xs uppercase tracking-wider font-semibold text-amber-300 flex items-center justify-between">
+                  <dt className="text-xs uppercase tracking-wider font-bold text-gold-300 flex items-center justify-between">
                     <span>Public Registry</span>
                     <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                   </dt>
@@ -580,7 +580,7 @@ export function HomePage({
       {/* 2. Vice-Chancellor's Welcome Message & History */}
       <section
         id="vc-message"
-        className="bg-white border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
+        className="bg-white/95 border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Credentials & Welcome Message */}
@@ -588,10 +588,10 @@ export function HomePage({
             <HeroSummarySkeleton />
           ) : currentVc ? (
             <MotionReveal>
-              <article className="editable-region rounded-2xl card-gradient-parchment border border-amber-900/15 overflow-hidden shadow-sm hover:border-pust-600/40 hover:shadow-md transition-all duration-200">
+              <article className="editable-region rounded-2xl card-gradient-parchment border border-gold-300/70 overflow-hidden shadow-xs hover:border-pust-500/50 hover:shadow-sm transition-all duration-200">
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
                   {/* Portrait & Office Info (Left Column inside the Card) */}
-                  <div className="lg:col-span-4 bg-[#EFE8DA]/80 border-b lg:border-b-0 lg:border-r border-slate-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
+                  <div className="lg:col-span-4 bg-gradient-to-b from-amber-50/80 via-[#F8EBD4] to-amber-50/60 border-b lg:border-b-0 lg:border-r border-gold-200/80 p-6 sm:p-8 flex flex-col justify-between gap-6">
                     <div className="space-y-5">
                       <div className="max-w-[240px] mx-auto lg:max-w-none">
                         <ResilientImage
@@ -601,10 +601,10 @@ export function HomePage({
                         />
                       </div>
                       <div className="space-y-2">
-                        <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-700">
+                        <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
                           Honorable Vice-Chancellor
                         </p>
-                        <h2 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 leading-snug">
+                        <h2 className="font-serif text-fluid-h3 font-semibold text-slate-950 leading-snug">
                           {currentVc.name}
                         </h2>
                         <p className="font-mono text-xs font-medium text-slate-700 tabular-nums">
@@ -644,9 +644,9 @@ export function HomePage({
                   {/* Welcome Message (Right Column inside the Card) */}
                   <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
                     <div className="space-y-6">
-                      <header className="space-y-2 border-b border-slate-200 pb-5">
+                      <header className="space-y-2 border-b border-gold-200/80 pb-5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                          <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
                             Welcome Message from the Vice-Chancellor · {currentVc.tenure}
                           </p>
                           <EditTriggerButton
@@ -655,7 +655,7 @@ export function HomePage({
                             variant="compact"
                           />
                         </div>
-                        <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950">
+                        <h3 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                           {currentVc.name}
                         </h3>
                         <p className="text-sm font-medium text-slate-700">
@@ -664,13 +664,13 @@ export function HomePage({
                       </header>
 
                       {vcBodyParagraphs.length > 0 ? (
-                        <div className="space-y-4 flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-[16.5px] text-slate-800 leading-[1.78]">
+                        <div className="space-y-4 flow-root prose-justify max-w-[66ch] text-fluid-body text-slate-800 leading-[1.78]">
                           {vcBodyParagraphs.map((paragraph, idx) => (
                             <p
                               key={idx}
                               className={
                                 idx === 0
-                                  ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
+                                  ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-600'
                                   : ''
                               }
                             >
@@ -717,14 +717,14 @@ export function HomePage({
           )}
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-slate-200 card-gradient-crimson overflow-hidden shadow-xs">
-            <div className="px-6 py-4 bg-white/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="editable-region rounded-2xl border border-pust-200 card-gradient-crimson overflow-hidden shadow-xs">
+            <div className="px-6 py-4 bg-white/85 border-b border-pust-200/80 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="font-mono text-[11px] uppercase tracking-widest text-pust-800">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
                   Institutional Leadership Archive
                   {profile?.establishedYear ? ` · ${profile.establishedYear} – Present` : ''}
                 </p>
-                <h3 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
+                <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-0.5">
                   Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
                 </h3>
               </div>
@@ -739,7 +739,7 @@ export function HomePage({
                   type="button"
                   onClick={() => setShowPreviousVcs((prev) => !prev)}
                   aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 hover:bg-pust-50/60 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-pust-200 bg-white text-pust-700 hover:bg-pust-600 hover:text-white hover:border-pust-600 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {showPreviousVcs ? 'Hide History' : 'Show History'}
                   <ChevronDown
@@ -766,23 +766,29 @@ export function HomePage({
                     </p>
                   ) : (
                     previousVcs.map((vc, idx) => {
-                      const isCrimson = idx % 2 === 0;
+                      const variant = idx % 3;
+                      const cardTheme =
+                        variant === 0
+                          ? 'card-gradient-crimson border-pust-200 hover:border-pust-500'
+                          : variant === 1
+                          ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-500'
+                          : 'card-gradient-emerald border-emerald-200 hover:border-emerald-500';
+                      const labelTone =
+                        variant === 0
+                          ? 'text-pust-700'
+                          : variant === 1
+                          ? 'text-lapis-600'
+                          : 'text-emerald-700';
                       return (
                         <MotionCard
                           key={vc.id}
                           delay={idx * 0.03}
-                          className={`rounded-xl border hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors ${
-                            isCrimson
-                              ? 'card-gradient-crimson border-pust-200/75 hover:border-pust-600/50'
-                              : 'card-gradient-lapis border-lapis-200/75 hover:border-lapis-600/50'
-                          }`}
+                          className={`rounded-xl border hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors ${cardTheme}`}
                         >
                           <div className="space-y-1.5">
                             <div className="flex items-start justify-between gap-2">
                               <span
-                                className={`font-mono text-[11px] font-semibold tabular-nums ${
-                                  isCrimson ? 'text-pust-800' : 'text-lapis-700'
-                                }`}
+                                className={`font-mono text-xs font-bold tabular-nums ${labelTone}`}
                               >
                                 {String(idx + 1).padStart(2, '0')} · {vc.tenure}
                               </span>
@@ -795,7 +801,7 @@ export function HomePage({
                             <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
                               {vc.name}
                             </h4>
-                            <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-slate-600 text-left">
+                            <p className="text-xs font-mono font-medium uppercase tracking-wider text-slate-600 text-left">
                               {vc.title}
                             </p>
                             <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">{vc.message}</p>
@@ -811,14 +817,14 @@ export function HomePage({
 
           {/* About PUST Brief & Sub-Topic Links */}
           <MotionReveal>
-            <div className="rounded-2xl border border-gold-200 card-gradient-gold p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start shadow-sm hover:border-gold-600/50 hover:shadow-md transition-all duration-200">
+            <div className="rounded-2xl border border-gold-300/80 card-gradient-gold p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start shadow-xs hover:border-gold-500 hover:shadow-sm transition-all duration-200">
               <div className="lg:col-span-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
+                    <p className="font-mono text-xs font-bold uppercase tracking-widest text-gold-700">
                       About PUST
                     </p>
-                    <h3 className="font-serif text-xl font-semibold text-slate-950 mt-1">
+                    <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1">
                       {ourUniversity?.title || 'About the University'}
                     </h3>
                   </div>
@@ -831,25 +837,25 @@ export function HomePage({
                 <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1 text-xs font-semibold">
                   <Link
                     href="/about/our-university"
-                    className="text-pust-800 hover:underline whitespace-nowrap"
+                    className="text-pust-700 hover:underline whitespace-nowrap"
                   >
                     Our University →
                   </Link>
                   <Link
                     href="/about/mission-vision"
-                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
                   >
                     Mission &amp; Vision
                   </Link>
                   <Link
                     href="/about/history"
-                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
                   >
                     History
                   </Link>
                   <Link
                     href="/about/plans"
-                    className="text-slate-800 hover:text-pust-800 transition-colors whitespace-nowrap"
+                    className="text-slate-800 hover:text-pust-700 transition-colors whitespace-nowrap"
                   >
                     Strategic Plans
                   </Link>
@@ -857,7 +863,7 @@ export function HomePage({
               </div>
               <div className="lg:col-span-8 space-y-3">
                 {ourUniversity ? (
-                  <p className="text-[15px] leading-[1.7] text-slate-800 line-clamp-3">
+                  <p className="text-fluid-body text-slate-800 line-clamp-3">
                     {ourUniversity.body}
                   </p>
                 ) : loadingData ? (
@@ -885,12 +891,12 @@ export function HomePage({
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-pust-200/70">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
                   Notice Board
                 </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
+                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
                   Recent University Circulars
                 </h2>
               </div>
@@ -903,7 +909,7 @@ export function HomePage({
                 />
                 <Link
                   href="/notices"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-700 hover:text-pust-600 hover:underline whitespace-nowrap shrink-0"
                 >
                   All Notices
                   <ArrowRight className="w-4 h-4" />
@@ -917,10 +923,10 @@ export function HomePage({
                   key={cat}
                   type="button"
                   onClick={() => setNoticeCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     noticeCategory === cat
-                      ? 'bg-pust-900 text-white border-pust-900'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-pust-700 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border-pust-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-pust-500 hover:text-pust-700 hover:bg-pust-50/60'
                   }`}
                 >
                   {cat}
@@ -1035,12 +1041,12 @@ export function HomePage({
           </div>
 
           <div className="editable-region lg:col-span-5 space-y-5">
-            <div className="pb-4 border-b border-slate-200 flex items-end justify-between gap-3">
+            <div className="pb-4 border-b border-lapis-200/80 flex items-end justify-between gap-3">
               <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-lapis-600">
                   {institutionalLinksEyebrow || 'Digital Services & Directory'}
                 </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
+                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
                   {institutionalLinksHeading || 'Institutional Sections'}
                 </h2>
               </div>
@@ -1058,25 +1064,25 @@ export function HomePage({
                 No institutional directory links configured yet.
               </div>
             ) : (
-              <div className="rounded-2xl border border-lapis-200 card-gradient-lapis shadow-sm overflow-hidden">
-                <div className="divide-y divide-lapis-200/70">
+              <div className="rounded-2xl border border-lapis-300/80 card-gradient-lapis shadow-sm overflow-hidden">
+                <div className="divide-y divide-lapis-200/75">
                   {institutionalLinks.map((item, idx) => (
                     <Link
                       key={item.id}
                       href={item.route}
-                      className={`w-full text-left px-5 py-4 hover:bg-white/90 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
-                        idx % 2 === 0 ? 'bg-white/40' : 'bg-transparent'
+                      className={`w-full text-left px-5 py-4 hover:bg-white/95 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
+                        idx % 2 === 0 ? 'bg-white/45' : 'bg-transparent'
                       }`}
                     >
                       <div>
-                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-lapis-700 transition-colors">
+                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-lapis-600 transition-colors">
                           {item.title}
                         </h3>
-                        <p className="text-xs sm:text-[13px] text-slate-700 mt-0.5 leading-relaxed text-left">
+                        <p className="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed text-left">
                           {item.desc}
                         </p>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-lapis-700 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
+                      <ArrowRight className="w-4 h-4 text-lapis-600 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
                     </Link>
                   ))}
                 </div>
@@ -1089,16 +1095,16 @@ export function HomePage({
       {/* 4. Recent Publications */}
       <section
         id="recent-publications"
-        className="bg-white border-t border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
+        className="bg-white/95 border-t border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-lapis-200/70">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-lapis-600">
                   Faculty Research Output
                 </p>
-                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
+                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
                   Recent Publications
                 </h2>
               </div>
@@ -1111,7 +1117,7 @@ export function HomePage({
                 />
                 <Link
                   href="/academics/publications"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-lapis-700 hover:text-lapis-600 hover:underline whitespace-nowrap shrink-0"
                 >
                   All Publications
                   <ArrowRight className="w-4 h-4" />
@@ -1125,10 +1131,10 @@ export function HomePage({
                   key={code}
                   type="button"
                   onClick={() => setPubDeptFilter(code)}
-                  className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     pubDeptFilter === code
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:text-pust-900 hover:border-pust-700/50'
+                      ? 'bg-gradient-to-r from-lapis-600 to-cerulean-600 text-white shadow-xs'
+                      : 'bg-lapis-50/70 border border-lapis-200/80 text-slate-700 hover:text-lapis-700 hover:border-lapis-500'
                   }`}
                 >
                   {code}
@@ -1146,12 +1152,12 @@ export function HomePage({
                   <article
                     key={pub.id}
                     data-gsap-pub-row
-                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-lapis-50/55 transition-colors space-y-1.5 ${
-                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F4]/55'
+                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-lapis-50/70 transition-colors space-y-1.5 ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-cerulean-50/40'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-mono text-xs font-semibold text-lapis-700 tabular-nums">
+                      <p className="font-mono text-xs font-bold text-cerulean-700 tabular-nums">
                         {pub.departmentCode} · {pub.domain} · {pub.year}
                       </p>
                       <EditTriggerButton
@@ -1163,7 +1169,7 @@ export function HomePage({
                     <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
                       {pub.title}
                     </h3>
-                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed text-left">
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
                       Authors: {pub.authors}
                     </p>
                   </article>
@@ -1173,13 +1179,13 @@ export function HomePage({
           </div>
 
           {/* Official PUST Journals Sidebar */}
-          <aside className="lg:col-span-5 rounded-2xl border border-gold-200 card-gradient-gold p-6 sm:p-7 space-y-5 shadow-sm hover:border-gold-600/50 transition-colors">
-            <div className="flex items-end justify-between gap-4 border-b border-gold-200/80 pb-4">
+          <aside className="lg:col-span-5 rounded-2xl border border-gold-300/80 card-gradient-gold p-6 sm:p-7 space-y-5 shadow-sm hover:border-gold-500 transition-colors">
+            <div className="flex items-end justify-between gap-4 border-b border-gold-300/70 pb-4">
               <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
+                <p className="font-mono text-xs font-bold uppercase tracking-widest text-gold-700">
                   University Periodicals
                 </p>
-                <h3 className="font-serif text-2xl font-semibold text-slate-950 mt-1">
+                <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1">
                   Official PUST Journals
                 </h3>
               </div>
@@ -1227,15 +1233,15 @@ export function HomePage({
       {/* 5. News and Events */}
       <section
         id="news-events"
-        className="bg-[#F7F7F5] py-14 lg:py-16 scroll-mt-28"
+        className="bg-transparent py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-pust-200/70">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-pust-600">
                 Campus Chronicles &amp; Seminars
               </p>
-              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950 mt-1">
+              <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
                 News and Events
               </h2>
             </div>
@@ -1246,10 +1252,10 @@ export function HomePage({
                   key={cat}
                   type="button"
                   onClick={() => setEventCategory(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                     eventCategory === cat
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-900'
+                      ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-pust-50 hover:text-pust-700 hover:border-pust-300'
                   }`}
                 >
                   {cat}
@@ -1263,7 +1269,7 @@ export function HomePage({
               />
               <Link
                 href="/gallery"
-                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0 group"
+                className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-pust-700 hover:text-pust-600 hover:underline whitespace-nowrap shrink-0 group"
               >
                 Full Archive
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1313,7 +1319,7 @@ export function HomePage({
                           setActiveMedia(item);
                         }
                       }}
-                      className={`text-left rounded-2xl border ${eventTheme.cardClass} shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col overflow-hidden`}
+                      className={`text-left rounded-2xl border ${eventTheme.cardClass} shadow-xs hover:shadow-sm transition-all group cursor-pointer flex flex-col overflow-hidden`}
                     >
                       <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
                         <ResilientImage
@@ -1360,9 +1366,9 @@ export function HomePage({
           )}
 
           {/* Scheduled University Seminars & Milestones */}
-          <div className="editable-region rounded-2xl border border-sage-200 card-gradient-sage overflow-hidden shadow-sm">
-            <div className="px-6 py-4 bg-white/85 border-b border-sage-200/80 flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-sage-800">
+          <div className="editable-region rounded-2xl border border-emerald-300/80 card-gradient-emerald overflow-hidden shadow-xs">
+            <div className="px-6 py-4 bg-white/85 border-b border-emerald-200/80 flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-700">
                 Upcoming Seminars, Workshops &amp; Academic Milestones
               </p>
               <div className="flex items-center gap-3">
@@ -1373,7 +1379,7 @@ export function HomePage({
                 />
                 <Link
                   href="/academics/seminars"
-                  className="text-xs font-semibold text-sage-800 hover:text-pust-900 hover:underline whitespace-nowrap"
+                  className="text-xs font-semibold text-emerald-700 hover:text-pust-700 hover:underline whitespace-nowrap"
                 >
                   All Seminars &amp; Workshops →
                 </Link>
@@ -1386,7 +1392,7 @@ export function HomePage({
             ) : (
               <div
                 ref={seminarGridRef}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-sage-200/80"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-emerald-200/80"
               >
                 {upcomingSeminars.map((ev, idx) => (
                   <div
@@ -1394,13 +1400,13 @@ export function HomePage({
                     data-gsap-seminar-item
                     className={`p-5 space-y-1.5 transition-colors ${
                       idx % 2 === 0
-                        ? 'bg-white/30 hover:bg-white/80'
-                        : 'bg-teal-50/45 hover:bg-white/80'
+                        ? 'bg-white/40 hover:bg-white/85'
+                        : 'bg-teal-50/60 hover:bg-white/85'
                     }`}
                   >
                     <p
-                      className={`font-mono text-xs font-semibold tabular-nums ${
-                        idx % 2 === 0 ? 'text-sage-700' : 'text-teal-700'
+                      className={`font-mono text-xs font-bold tabular-nums ${
+                        idx % 2 === 0 ? 'text-emerald-700' : 'text-teal-700'
                       }`}
                     >
                       {ev.date} · {ev.organizer}

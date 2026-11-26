@@ -119,9 +119,9 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header */}
-      <header className="editable-region border-b border-slate-200 pb-8 print:hidden">
+      <header className="editable-region border-b border-emerald-200/80 pb-8 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-pust-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
             {verifyPageConfig.kicker}
           </p>
           <EditTriggerButton
@@ -130,16 +130,16 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             variant="compact"
           />
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-2 tracking-tight">
+        <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-2 tracking-tight">
           {verifyPageConfig.title}
         </h1>
-        <p className="text-[15px] sm:text-base text-slate-700 max-w-2xl mt-3 leading-[1.72]">
+        <p className="text-fluid-lead text-slate-700 max-w-2xl mt-3 leading-[1.72]">
           {verifyPageConfig.subtitle}
         </p>
       </header>
 
       {/* Search & Quick Examples */}
-      <div className="card-gradient-parchment rounded-2xl border border-amber-900/15 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
+      <div className="card-gradient-parchment rounded-2xl border border-amber-300/70 shadow-xs p-6 sm:p-8 space-y-5 print:hidden">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -148,13 +148,13 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter serial (e.g. PUST-CERT-CSE-2026A1 or PUST-RCPT-2026-091)"
-              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-950 placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-pust-700/25 focus:border-pust-700"
+              className="w-full pl-10 pr-4 py-3 text-sm font-mono rounded-lg border border-slate-300 bg-white text-slate-950 placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-pust-600/25 focus:border-pust-600"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-pust-800 text-white text-sm font-semibold hover:bg-pust-900 shadow-xs hover:-translate-y-0.5 transition-all disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
+            className="btn-primary-sheen inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-white text-sm font-semibold disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4" />
             {loading ? 'Verifying...' : 'Verify Serial'}

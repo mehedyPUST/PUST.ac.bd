@@ -115,18 +115,18 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
   return (
     <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header + Sub-Navigation Bar */}
-      <div className="border-b border-slate-200 pb-6 space-y-4">
+      <div className="border-b border-pust-200/80 pb-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-600">
               Statutory Governance · {activeTab.code}
             </p>
-            <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-slate-950 mt-1.5 tracking-tight">
+            <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-1.5 tracking-tight">
               {route === '/governance'
                 ? 'University Governance & Statutory Framework'
                 : activeTab.heading}
             </h1>
-            <p className="text-[15px] text-slate-700 mt-2.5 max-w-3xl leading-[1.72]">
+            <p className="text-fluid-lead text-slate-700 mt-2.5 max-w-3xl leading-[1.72]">
               {activeTab.subtitle}
             </p>
           </div>
@@ -147,10 +147,10 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               <Link
                 key={tab.route}
                 href={tab.route}
-                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+                className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                    : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                    ? 'bg-gradient-to-r from-pust-700 to-pust-600 text-white border border-pust-700 shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-500 hover:bg-pust-50 hover:text-pust-700'
                 }`}
               >
                 {tab.label}
@@ -205,7 +205,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                       <button
                         type="button"
                         onClick={() => setShowActPreview((prev) => !prev)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                        className="btn-primary-sheen inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg text-white cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}

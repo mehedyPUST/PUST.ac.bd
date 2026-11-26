@@ -17,43 +17,43 @@ export function getAlternatingEventCardTheme(
   if (category === 'Convocation') {
     return isEven
       ? {
-          cardClass: 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45',
+          cardClass: 'card-gradient-gold border-gold-300/80 hover:border-gold-500',
           accentClass: 'text-gold-800',
         }
       : {
-          cardClass: 'card-gradient-parchment border-amber-900/15 hover:border-gold-600/45',
-          accentClass: 'text-pust-800',
+          cardClass: 'card-gradient-crimson border-pust-200 hover:border-pust-500',
+          accentClass: 'text-pust-700',
         };
   }
   if (category === 'Academic Event') {
     return isEven
       ? {
-          cardClass: 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45',
-          accentClass: 'text-lapis-700',
+          cardClass: 'card-gradient-lapis border-lapis-200 hover:border-lapis-500',
+          accentClass: 'text-lapis-600',
         }
       : {
-          cardClass: 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/45',
+          cardClass: 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500',
           accentClass: 'text-cerulean-700',
         };
   }
   if (category === 'Festival') {
     return isEven
       ? {
-          cardClass: 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45',
-          accentClass: 'text-pust-800',
+          cardClass: 'card-gradient-rose border-rose-200 hover:border-rose-500',
+          accentClass: 'text-rose-700',
         }
       : {
-          cardClass: 'card-gradient-violet border-violet-200/80 hover:border-violet-600/45',
-          accentClass: 'text-violet-700',
+          cardClass: 'card-gradient-gold border-gold-300/80 hover:border-gold-500',
+          accentClass: 'text-gold-800',
         };
   }
   return isEven
     ? {
-        cardClass: 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45',
-        accentClass: 'text-sage-700',
+        cardClass: 'card-gradient-emerald border-emerald-200 hover:border-emerald-500',
+        accentClass: 'text-emerald-700',
       }
     : {
-        cardClass: 'card-gradient-teal border-teal-200/80 hover:border-teal-600/45',
+        cardClass: 'card-gradient-teal border-teal-200 hover:border-teal-500',
         accentClass: 'text-teal-700',
       };
 }
@@ -62,27 +62,27 @@ export function getAlternatingDepartmentCardClass(facultyName: string, idx: numb
   const isEven = idx % 2 === 0;
   if (facultyName === 'Faculty of Engineering and Technology') {
     return isEven
-      ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-600/60'
-      : 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-600/60';
+      ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-500'
+      : 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500';
   }
   if (facultyName === 'Faculty of Science') {
     return isEven
-      ? 'card-gradient-sage border-sage-200 hover:border-sage-600/60'
-      : 'card-gradient-teal border-teal-200 hover:border-teal-600/60';
+      ? 'card-gradient-emerald border-emerald-200 hover:border-emerald-500'
+      : 'card-gradient-teal border-teal-200 hover:border-teal-500';
   }
   if (facultyName === 'Faculty of Business Studies') {
     return isEven
-      ? 'card-gradient-gold border-gold-200 hover:border-gold-600/60'
-      : 'card-gradient-parchment border-amber-900/15 hover:border-gold-600/60';
+      ? 'card-gradient-gold border-gold-300/80 hover:border-gold-500'
+      : 'card-gradient-parchment border-amber-300/70 hover:border-amber-500';
   }
   if (facultyName === 'Faculty of Humanities and Social Science') {
     return isEven
-      ? 'card-gradient-crimson border-pust-200 hover:border-pust-600/60'
-      : 'card-gradient-violet border-violet-200 hover:border-violet-600/60';
+      ? 'card-gradient-crimson border-pust-200 hover:border-pust-500'
+      : 'card-gradient-gold border-gold-300/80 hover:border-gold-500';
   }
   return isEven
-    ? 'card-gradient-emerald border-emerald-200 hover:border-emerald-600/60'
-    : 'card-gradient-parchment border-amber-900/15 hover:border-sage-600/60';
+    ? 'card-gradient-sage border-sage-200 hover:border-sage-500'
+    : 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500';
 }
 
 export function getAlternatingUnitCardClass(
@@ -92,17 +92,17 @@ export function getAlternatingUnitCardClass(
   const isEven = occurrenceIdx % 2 === 0;
   if (category === 'Statutory Governance') {
     return isEven
-      ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
-      : 'card-gradient-parchment border-amber-900/15 hover:border-pust-600/45';
+      ? 'card-gradient-crimson border-pust-200 hover:border-pust-500'
+      : 'card-gradient-gold border-gold-300/80 hover:border-gold-500';
   }
   if (category === 'Administrative Office') {
     return isEven
-      ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-      : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/45';
+      ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-500'
+      : 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500';
   }
   return isEven
-    ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
-    : 'card-gradient-teal border-teal-200/80 hover:border-teal-600/45';
+    ? 'card-gradient-emerald border-emerald-200 hover:border-emerald-500'
+    : 'card-gradient-teal border-teal-200 hover:border-teal-500';
 }
 
 export function getAlternatingOfficeCardClass(
@@ -113,23 +113,23 @@ export function getAlternatingOfficeCardClass(
   switch (category) {
     case 'Executive Leadership':
       return isEven
-        ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/50'
-        : 'card-gradient-rose border-rose-200/80 hover:border-pust-600/50';
+        ? 'card-gradient-crimson border-pust-200 hover:border-pust-500'
+        : 'card-gradient-rose border-rose-200 hover:border-rose-500';
     case 'Administrative Sections & Offices':
       return isEven
-        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/50'
-        : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/50';
+        ? 'card-gradient-lapis border-lapis-200 hover:border-lapis-500'
+        : 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500';
     case 'Student Welfare & Campus Services':
       return isEven
-        ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
-        : 'card-gradient-teal border-teal-200/80 hover:border-teal-600/50';
+        ? 'card-gradient-emerald border-emerald-200 hover:border-emerald-500'
+        : 'card-gradient-teal border-teal-200 hover:border-teal-500';
     case 'Residential Halls & Accommodation':
       return isEven
-        ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/50'
-        : 'card-gradient-parchment border-amber-900/15 hover:border-gold-600/50';
+        ? 'card-gradient-gold border-gold-300/80 hover:border-gold-500'
+        : 'card-gradient-parchment border-amber-300/70 hover:border-amber-500';
     case 'Research, ICT & Quality Cells':
       return isEven
-        ? 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/50'
-        : 'card-gradient-violet border-violet-200/80 hover:border-violet-600/50';
+        ? 'card-gradient-cerulean border-cerulean-200 hover:border-cerulean-500'
+        : 'card-gradient-lapis border-lapis-200 hover:border-lapis-500';
   }
 }

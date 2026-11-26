@@ -101,10 +101,10 @@ export function Navbar({
       className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs print:hidden"
     >
       <div className="relative z-10">
-        {/* Full-bleed upper institutional title band backdrop (official PUST shield maroon + Bengal emerald accent rule) */}
+        {/* Full-bleed upper institutional title band backdrop (vibrant PUST crimson + emerald accent rule) */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#380305] via-pust-800 to-pust-700 border-b-2 border-sage-700"
+          className="absolute inset-x-0 top-0 h-11 sm:h-12 lg:h-[52px] bg-gradient-to-r from-[#520407] via-pust-600 to-rose-700 border-b-[3px] border-emerald-500"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -136,7 +136,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[25px] font-medium tracking-tight text-white hover:text-pust-100 transition-colors truncate leading-none"
+                  className="font-serif text-[clamp(1rem,0.85rem+0.7vw,1.5rem)] font-medium tracking-tight text-white hover:text-gold-200 transition-colors truncate leading-none"
                 >
                   <span className="sm:hidden">PUST</span>
                   <span className="hidden sm:inline">Pabna University of Science and Technology</span>
@@ -144,9 +144,9 @@ export function Navbar({
 
                 <span
                   aria-hidden="true"
-                  className="hidden xl:block h-4 w-px bg-white/25 shrink-0"
+                  className="hidden xl:block h-4 w-px bg-white/30 shrink-0"
                 />
-                <span className="hidden xl:inline text-[11px] font-medium tracking-wide text-gold-300 whitespace-nowrap shrink-0">
+                <span className="hidden xl:inline text-xs font-semibold tracking-wide text-gold-300 whitespace-nowrap shrink-0">
                   {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                 </span>
               </div>
@@ -212,7 +212,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-900 hover:bg-pust-50 transition-colors whitespace-nowrap shrink-0"
+                  className="lg:hidden min-h-[32px] inline-flex items-center px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-white to-gold-100 text-pust-800 hover:from-gold-100 hover:to-white shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
                   {route === '/portal' ? (
                     'Public Site'
@@ -234,7 +234,7 @@ export function Navbar({
                   aria-label="Toggle navigation menu"
                   aria-expanded={mobileMenuOpen}
                   className={`lg:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                    mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
+                    mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-700'
                   }`}
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -246,7 +246,7 @@ export function Navbar({
             <div className="hidden lg:flex h-11 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[13.5px] xl:text-sm font-medium text-slate-900"
+                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
               >
                 {/* Home */}
                 <div
@@ -261,7 +261,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route === '/'
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -300,7 +300,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/governance')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -343,7 +343,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/about')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -386,7 +386,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/administration')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -429,7 +429,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/academics')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -472,7 +472,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/facilities')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -515,7 +515,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/notices')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -558,7 +558,7 @@ export function Navbar({
                     onClick={() => setHoveredGroup(null)}
                     className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/admissions')
-                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        ? 'border-pust-600 text-pust-700 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                     }`}
                   >
@@ -592,7 +592,7 @@ export function Navbar({
                   onClick={() => setHoveredGroup(null)}
                   className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                     route === '/verify'
-                      ? 'border-pust-800 text-pust-900 font-semibold'
+                      ? 'border-pust-600 text-pust-700 font-semibold'
                       : 'border-transparent hover:text-pust-900 hover:border-pust-200'
                   }`}
                 >
@@ -633,7 +633,7 @@ export function Navbar({
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
                   }}
-                  className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold btn-primary-sheen transition-all whitespace-nowrap shrink-0"
                 >
                   {route === '/portal'
                     ? 'Public Website'
