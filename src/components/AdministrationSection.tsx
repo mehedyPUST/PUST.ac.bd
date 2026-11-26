@@ -252,15 +252,15 @@ export function AdministrationSection({
 
   return (
     <div className="bg-[#FBF9F5] text-stone-900">
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[276px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)] gap-8 items-start">
           {/* Left Column: Persistent Sticky Administration Sidebar */}
-          <div className="lg:col-span-3 lg:sticky lg:top-28">
+          <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
             <AdministrationSidebar offices={adminOffices} activeRoute={route} />
           </div>
 
           {/* Right Column: Main Editorial & Office Dossier Workspace */}
-          <div className="lg:col-span-9 min-w-0 space-y-10">
+          <div className="min-w-0 space-y-10">
             {/* Band 1: Institutional Masthead, Architectural Frame & Operational Ribbon */}
             <section className="editable-region rounded-xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-stretch">
