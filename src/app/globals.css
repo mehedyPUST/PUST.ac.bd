@@ -135,7 +135,7 @@
 }
 
 .pust-ticker-track {
-  animation: pust-news-ticker 44s linear infinite;
+  animation: pust-news-ticker 120s linear infinite;
   will-change: transform;
 }
 

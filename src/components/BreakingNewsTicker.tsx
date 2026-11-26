@@ -122,8 +122,7 @@ export function BreakingNewsTicker({
           <div className="shrink-0 h-full bg-pust-900 text-white px-3 sm:px-4 inline-flex items-center gap-2">
             <Radio className="w-3.5 h-3.5 text-amber-300 shrink-0" />
             <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap">
-              <span className="sm:hidden">Latest</span>
-              <span className="hidden sm:inline">Latest Bulletin</span>
+              Latest
             </span>
           </div>
 
