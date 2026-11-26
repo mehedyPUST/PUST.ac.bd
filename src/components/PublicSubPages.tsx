@@ -498,7 +498,7 @@ export function PublicSubPages({
                         </p>
                       ))}
                       {bulletLines.length > 0 && (
-                        <ul className="list-disc pl-5 space-y-2.5 text-[15.5px] leading-[1.75] text-slate-800 pt-1 max-w-[66ch]">
+                        <ul className="list-disc pl-5 space-y-2.5 text-[15.5px] leading-[1.75] text-slate-800 pt-1 max-w-[66ch] prose-justify">
                           {bulletLines.map((item, i) => (
                             <li key={i}>{item}</li>
                           ))}
@@ -511,7 +511,7 @@ export function PublicSubPages({
                         <h2 className="font-serif text-2xl font-semibold text-slate-950">
                           Our Vision
                         </h2>
-                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs">
+                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs prose-justify">
                           {visionPart}
                         </blockquote>
                       </div>
@@ -2333,7 +2333,7 @@ export function PublicSubPages({
                 <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
                   Key Capabilities
                 </p>
-                <ul className="space-y-2 text-sm text-slate-700 list-disc pl-5">
+                <ul className="space-y-2 text-sm text-slate-700 list-disc pl-5 prose-justify">
                   {currentFac.highlights.map((h, idx) => (
                     <li key={`${h}-${idx}`}>{h}</li>
                   ))}

@@ -993,7 +993,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <GraduationCap className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-                <span>{item}</span>
+                <span className="flex-1 prose-justify">{item}</span>
               </li>
             ))}
           </ul>
@@ -1021,7 +1021,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <BookOpen className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-                <span>{item}</span>
+                <span className="flex-1 prose-justify">{item}</span>
               </li>
             ))}
           </ul>
@@ -1052,7 +1052,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <Building2 className="w-4 h-4 text-pust-700 shrink-0 mt-0.5" />
-                <span>{item}</span>
+                <span className="flex-1 prose-justify">{item}</span>
               </li>
             ))}
           </ul>
@@ -1108,7 +1108,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <FlaskConical className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
-                <span>{proj}</span>
+                <span className="flex-1 prose-justify">{proj}</span>
               </li>
             ))}
           </ul>
@@ -1136,7 +1136,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-                <span>{proj}</span>
+                <span className="flex-1 prose-justify">{proj}</span>
               </li>
             ))}
           </ul>
@@ -1164,7 +1164,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <Globe className="w-4 h-4 text-lapis-700 shrink-0 mt-0.5" />
-                <span>{item}</span>
+                <span className="flex-1 prose-justify">{item}</span>
               </li>
             ))}
           </ul>
@@ -1189,7 +1189,7 @@ function PersonProfileModal({
                 className="px-4 py-3 flex items-start gap-3 text-slate-800 leading-relaxed"
               >
                 <Award className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-                <span>{item}</span>
+                <span className="flex-1 prose-justify">{item}</span>
               </li>
             ))}
           </ul>
@@ -1244,7 +1244,7 @@ function PersonProfileModal({
                 <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
                   {String(idx + 1).padStart(2, '0')}.
                 </span>
-                <span className="text-slate-800 leading-relaxed">{thesis}</span>
+                <span className="flex-1 text-slate-800 leading-relaxed prose-justify">{thesis}</span>
               </li>
             ))}
           </ol>
@@ -1480,7 +1480,7 @@ function PersonProfileModal({
                 <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
                   {String(idx + 1).padStart(2, '0')}.
                 </span>
-                <span className="text-slate-800 leading-relaxed break-words">{article}</span>
+                <span className="flex-1 text-slate-800 leading-relaxed break-words prose-justify">{article}</span>
               </li>
             ))}
           </ol>
@@ -1518,7 +1518,7 @@ function PersonProfileModal({
                 <span className="font-mono text-[11px] font-semibold text-lapis-800 tabular-nums shrink-0 mt-0.5">
                   {String(idx + 1).padStart(2, '0')}.
                 </span>
-                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                <span className="flex-1 text-slate-800 leading-relaxed break-words prose-justify">{item}</span>
               </li>
             ))}
           </ol>
@@ -1544,7 +1544,7 @@ function PersonProfileModal({
                 <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums shrink-0 mt-0.5">
                   {String(idx + 1).padStart(2, '0')}.
                 </span>
-                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                <span className="flex-1 text-slate-800 leading-relaxed break-words prose-justify">{item}</span>
               </li>
             ))}
           </ol>
@@ -1582,7 +1582,7 @@ function PersonProfileModal({
                 <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums shrink-0 mt-0.5">
                   {String(idx + 1).padStart(2, '0')}.
                 </span>
-                <span className="text-slate-800 leading-relaxed break-words">{item}</span>
+                <span className="flex-1 text-slate-800 leading-relaxed break-words prose-justify">{item}</span>
               </li>
             ))}
           </ol>
@@ -2538,7 +2538,7 @@ export function DepartmentDetailView({
           </div>
 
           {facultyMembers.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+            <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600 prose-justify">
               Individual faculty profiles for the Department of {department.name} have not been
               published yet.
               {department.facultyCount ? ` Departmental faculty strength: ${department.facultyCount} teachers.` : ''}
@@ -2604,7 +2604,7 @@ export function DepartmentDetailView({
           </div>
 
           {contractualFaculty.length === 0 ? (
-            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600">
+            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600 prose-justify">
               No contractual faculty members are currently listed for the Department of{' '}
               {department.name}.
             </div>
@@ -2649,7 +2649,7 @@ export function DepartmentDetailView({
           </div>
 
           {officers.length === 0 ? (
-            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600">
+            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600 prose-justify">
               No departmental administrative or technical officers have been published for the
               Department of {department.name} yet.
             </div>
@@ -2680,7 +2680,7 @@ export function DepartmentDetailView({
                 Research Priorities
               </h2>
             </div>
-            <ul className="space-y-2.5 text-sm text-slate-800">
+            <ul className="space-y-2.5 text-sm text-slate-800 prose-justify">
               {department.researchFocus.map((topic) => (
                 <li
                   key={topic}
@@ -2699,7 +2699,7 @@ export function DepartmentDetailView({
                 Academic Laboratories
               </h2>
             </div>
-            <ul className="space-y-2.5 text-sm text-slate-800">
+            <ul className="space-y-2.5 text-sm text-slate-800 prose-justify">
               {department.laboratories.map((lab) => (
                 <li
                   key={lab}

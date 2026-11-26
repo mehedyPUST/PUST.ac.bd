@@ -777,7 +777,7 @@ export function PortalView({
             {/* 2. Student Token Signup Form + Digital File Upload Dropzone */}
             {authMode === 'student-token' && (
               <form onSubmit={handleStudentSignup} className="space-y-4">
-                <div className="p-3.5 rounded-xl bg-[#F7F7F5] border border-slate-200 text-xs text-slate-700 leading-relaxed">
+                <div className="p-3.5 rounded-xl bg-[#F7F7F5] border border-slate-200 text-xs text-slate-700 leading-relaxed prose-justify">
                   Step 1: Enter your departmental signup token · Step 2: Upload admission files &amp;
                   credentials · Step 3: Your Department Chairman approves access.
                 </div>
@@ -1093,7 +1093,7 @@ export function PortalView({
             {/* 4. First-Time Claim Admin Form */}
             {authMode === 'admin-claim' && (
               <form onSubmit={handleAdminClaim} className="space-y-4 max-w-md">
-                <div className="p-3.5 rounded-xl bg-[#F7F7F5] border border-slate-200 text-xs text-slate-700 leading-relaxed">
+                <div className="p-3.5 rounded-xl bg-[#F7F7F5] border border-slate-200 text-xs text-slate-700 leading-relaxed prose-justify">
                   First-time setup: claim the central Admin Office account to approve officers,
                   issue tokens, configure payments, and manage CMS content.
                 </div>

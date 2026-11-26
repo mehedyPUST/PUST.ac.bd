@@ -119,7 +119,7 @@ export function DepartmentModal({
               <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800 mb-2.5">
                 Research Priorities
               </h4>
-              <ul className="space-y-2 text-sm text-slate-800">
+              <ul className="space-y-2 text-sm text-slate-800 prose-justify">
                 {department.researchFocus.map((topic) => (
                   <li key={topic} className="pb-2 border-b border-slate-100 last:border-b-0 leading-relaxed">
                     {topic}
@@ -132,7 +132,7 @@ export function DepartmentModal({
               <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800 mb-2.5">
                 Academic Laboratories
               </h4>
-              <ul className="space-y-2 text-sm text-slate-800">
+              <ul className="space-y-2 text-sm text-slate-800 prose-justify">
                 {department.laboratories.map((lab) => (
                   <li key={lab} className="pb-2 border-b border-slate-100 last:border-b-0 leading-relaxed">
                     {lab}

@@ -316,7 +316,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 <h2 className="font-serif text-xl font-semibold text-slate-950">
                   Core Executive Functions
                 </h2>
-                <ul className="space-y-3 text-sm text-slate-800 leading-relaxed list-disc pl-5">
+                <ul className="space-y-3 text-sm text-slate-800 leading-relaxed list-disc pl-5 prose-justify">
                   {governanceContent.regentFunctions.map((fn, idx) => (
                     <li key={idx}>{fn}</li>
                   ))}

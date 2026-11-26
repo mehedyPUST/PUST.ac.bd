@@ -567,7 +567,7 @@ export function HomePage({
                       </header>
 
                       {vcBodyParagraphs.length > 0 ? (
-                        <div className="space-y-4 flow-root max-w-[66ch] text-[15.5px] sm:text-[16.5px] text-slate-800 leading-[1.78]">
+                        <div className="space-y-4 flow-root prose-justify max-w-[66ch] text-[15.5px] sm:text-[16.5px] text-slate-800 leading-[1.78]">
                           {vcBodyParagraphs.map((paragraph, idx) => (
                             <p
                               key={idx}

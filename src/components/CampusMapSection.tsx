@@ -496,7 +496,7 @@ export function CampusMapSection() {
                         <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Offices &amp; Academic Units
                         </dt>
-                        <dd className="text-slate-900 font-medium leading-relaxed">{activeBuilding.offices}</dd>
+                        <dd className="text-slate-900 font-medium leading-relaxed prose-justify">{activeBuilding.offices}</dd>
                       </div>
                       <div className="py-2.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                         <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 shrink-0">
@@ -510,7 +510,7 @@ export function CampusMapSection() {
                         <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Key Facilities
                         </dt>
-                        <dd className="text-slate-800 leading-relaxed">{activeBuilding.facilities}</dd>
+                        <dd className="text-slate-800 leading-relaxed prose-justify">{activeBuilding.facilities}</dd>
                       </div>
                     </dl>
                   </div>

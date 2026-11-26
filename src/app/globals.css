@@ -62,6 +62,12 @@
     text-wrap: balance;
   }
 
+  :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not(.text-center *):not(.text-right *) {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+  }
+
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
@@ -105,8 +111,9 @@
 }
 
 .prose-justify {
-  text-align: left;
-  text-wrap: pretty;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 
 .no-scrollbar {
