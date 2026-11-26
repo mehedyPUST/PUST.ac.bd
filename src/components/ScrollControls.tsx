@@ -87,10 +87,10 @@ export function ScrollMarkerBar() {
       aria-valuemax={100}
       aria-valuenow={percent}
       data-scroll-marker="true"
-      className="pointer-events-none fixed top-0 inset-x-0 z-50 h-[3px] bg-transparent overflow-hidden print:hidden"
+      className="pointer-events-none fixed bottom-0 inset-x-0 z-50 h-[3px] bg-transparent overflow-hidden print:hidden"
     >
       <div
-        className="h-full w-full bg-gradient-to-r from-amber-300 via-gold-200 to-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.45)] transition-opacity duration-150"
+        className="h-full w-full bg-gradient-to-r from-pust-800 via-amber-500 to-amber-300 shadow-[0_-1px_8px_rgba(139,9,18,0.28)] transition-opacity duration-150"
         style={{
           transform: `scaleX(${isScrollable ? progress : 0})`,
           transformOrigin: 'left center',
