@@ -336,7 +336,10 @@ export function PustShell({
         return;
       }
 
-      setPendingTarget(target);
+      const sameSection = getRouteSectionKey(targetPath) === getRouteSectionKey(pathname);
+      if (!sameSection) {
+        setPendingTarget(target);
+      }
       startTransition(() => {
         router.push(target);
       });

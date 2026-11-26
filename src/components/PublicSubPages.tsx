@@ -28,7 +28,6 @@ import { pustApi } from '../lib/api';
 import { downloadIcsCalendar } from '../lib/calendarExport';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { resolveDepartmentImage } from '../lib/departmentMedia';
-import { animateStagger } from '../lib/gsap';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -229,38 +228,8 @@ export function PublicSubPages({
 
   const deptGroupsRef = useRef<HTMLDivElement>(null);
   const noticesBoardRef = useRef<HTMLDivElement>(null);
-  const prevDeptFilterRef = useRef({ selectedFaculty, deptQuery });
-  const prevNoticeFilterRef = useRef({ selectedNoticeCat, noticeBoardScope, noticeQuery });
 
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const prev = prevDeptFilterRef.current;
-    if (prev.selectedFaculty === selectedFaculty && prev.deptQuery === deptQuery) return;
-    prevDeptFilterRef.current = { selectedFaculty, deptQuery };
-    return animateStagger(deptGroupsRef.current, '[data-gsap-dept-group]', {
-      y: 8,
-      duration: 0.28,
-      stagger: 0.04,
-    });
-  }, [selectedFaculty, deptQuery]);
-
-  useEffect(() => {
-    const prev = prevNoticeFilterRef.current;
-    if (
-      prev.selectedNoticeCat === selectedNoticeCat &&
-      prev.noticeBoardScope === noticeBoardScope &&
-      prev.noticeQuery === noticeQuery
-    ) {
-      return;
-    }
-    prevNoticeFilterRef.current = { selectedNoticeCat, noticeBoardScope, noticeQuery };
-    return animateStagger(noticesBoardRef.current, '[data-gsap-notice-row]', {
-      y: 8,
-      duration: 0.26,
-      stagger: 0.035,
-    });
-  }, [selectedNoticeCat, noticeBoardScope, noticeQuery]);
 
   function getDepartmentHref(dept: DepartmentRecord) {
     return `/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`;
@@ -478,7 +447,7 @@ export function PublicSubPages({
                   href={tab.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     activeSlug === tab.slug
-                      ? 'bg-pust-800 text-white shadow-xs'
+                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                       : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
@@ -761,7 +730,7 @@ export function PublicSubPages({
                     }}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-800 text-white shadow-xs'
+                        ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                         : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                     }`}
                   >
@@ -1208,7 +1177,7 @@ export function PublicSubPages({
                               onClick={() => setOfficialFormCat(cat)}
                               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                                 officialFormCat === cat
-                                  ? 'bg-pust-900 text-white'
+                                  ? 'bg-pust-900 text-white border border-pust-900'
                                   : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                               }`}
                             >
@@ -1503,7 +1472,7 @@ export function PublicSubPages({
                           onClick={() => setSelectedFaculty(tab.value)}
                           className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                             selectedFaculty === tab.value
-                              ? 'bg-pust-800 text-white shadow-xs'
+                              ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                               : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:text-pust-900 hover:border-pust-700'
                           }`}
                         >
@@ -1558,7 +1527,7 @@ export function PublicSubPages({
                     </div>
                   ) : (
                     <div ref={deptGroupsRef} className="space-y-10">
-                      {groupedFaculties.map(({ facultyName, depts }) => {
+                      {groupedFaculties.map(({ facultyName, depts }, facultyIdx) => {
                         const groupTeachers = depts.reduce(
                           (sum, d) => sum + (d.facultyCount ?? 0),
                           0
@@ -1622,14 +1591,15 @@ export function PublicSubPages({
                                       onClick={() => handleOpenDepartmentLink(dept)}
                                       className="flex-1 flex flex-col justify-between rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
                                     >
-                                      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-slate-200/80 bg-slate-100">
+                                      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-slate-200/80 bg-[#F5F2EB]">
                                         <ResilientImage
                                           src={coverPhoto}
                                           alt={`Department of ${dept.name}, PUST`}
                                           containerClassName="w-full h-full m-0"
-                                          frameClassName="w-full h-full bg-slate-100"
+                                          frameClassName="w-full h-full bg-[#F5F2EB]"
                                           fallbackMinHeightClassName="min-h-0"
                                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                          priority={facultyIdx === 0 && idx < 6}
                                         />
                                         <div
                                           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent"
@@ -1853,7 +1823,7 @@ export function PublicSubPages({
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route ||
                     (route === '/admissions' && t.route === '/admissions/undergraduate')
-                      ? 'bg-pust-900 text-white'
+                      ? 'bg-pust-900 text-white border border-pust-900'
                       : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
@@ -2345,7 +2315,7 @@ export function PublicSubPages({
                   href={f.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
-                      ? 'bg-pust-900 text-white'
+                      ? 'bg-pust-900 text-white border border-pust-900'
                       : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
@@ -2474,7 +2444,7 @@ export function PublicSubPages({
                   onClick={() => setGalleryCategory(c)}
                   className={`px-3.5 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors ${
                     galleryCategory === c
-                      ? 'bg-pust-900 text-white'
+                      ? 'bg-pust-900 text-white border border-pust-900'
                       : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >

@@ -113,7 +113,7 @@ export function ResearchSection({
                 onClick={() => setSelectedDeptFilter(code)}
                 className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedDeptFilter === code
-                    ? 'bg-pust-800 text-white shadow-xs'
+                    ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                     : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:text-pust-900 hover:border-pust-700'
                 }`}
               >

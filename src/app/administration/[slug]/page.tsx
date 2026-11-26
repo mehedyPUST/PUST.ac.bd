@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { AdministrationRouteView } from '../../../components/SectionRouteViews';
 import { isValidSectionSlug } from '../../../lib/routes';
 
 export default async function AdministrationSubPage({
@@ -11,5 +10,5 @@ export default async function AdministrationSubPage({
   if (!isValidSectionSlug('administration', slug)) {
     notFound();
   }
-  return <AdministrationRouteView />;
+  return null;
 }

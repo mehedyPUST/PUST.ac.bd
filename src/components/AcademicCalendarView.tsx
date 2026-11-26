@@ -522,7 +522,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                   }}
                   className={`min-h-[40px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-pust-900 text-white'
+                      ? 'bg-pust-900 text-white border border-pust-900'
                       : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >

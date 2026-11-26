@@ -149,7 +149,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 href={tab.route}
                 className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-pust-800 text-white shadow-xs'
+                    ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                     : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                 }`}
               >

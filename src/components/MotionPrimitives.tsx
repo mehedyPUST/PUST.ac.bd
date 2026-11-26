@@ -49,10 +49,10 @@ export function SubPagePanel({
   return (
     <motion.div
       key={subKey}
-      initial={hasMountedRef.current ? { opacity: 0.86 } : false}
+      initial={hasMountedRef.current ? { opacity: 0.92 } : false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.12, ease: EDITORIAL_EASE }}
-      className={className}
+      className={className ? `min-w-0 ${className}` : 'min-w-0'}
     >
       {children}
     </motion.div>

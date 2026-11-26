@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { GovernanceRouteView } from '../../../components/SectionRouteViews';
 import { isValidSectionSlug } from '../../../lib/routes';
 
 export default async function GovernanceSubPage({
@@ -11,5 +10,5 @@ export default async function GovernanceSubPage({
   if (!isValidSectionSlug('governance', slug)) {
     notFound();
   }
-  return <GovernanceRouteView />;
+  return null;
 }

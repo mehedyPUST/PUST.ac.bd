@@ -285,7 +285,7 @@ export function AdministrationSection({
                   href="/administration"
                   className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                     route === '/administration'
-                      ? 'bg-pust-800 text-white shadow-xs'
+                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                       : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                   }`}
                 >
@@ -297,7 +297,7 @@ export function AdministrationSection({
                     href={item.route}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                       route === item.route
-                        ? 'bg-pust-800 text-white shadow-xs'
+                        ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
                         : 'bg-white border border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
                     }`}
                   >

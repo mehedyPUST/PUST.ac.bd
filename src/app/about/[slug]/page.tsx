@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import { PublicRouteView } from '../../../components/PublicRouteView';
 import { isValidSectionSlug } from '../../../lib/routes';
 
 export default async function AboutSubPage({
@@ -11,5 +10,5 @@ export default async function AboutSubPage({
   if (!isValidSectionSlug('about', slug)) {
     notFound();
   }
-  return <PublicRouteView />;
+  return null;
 }
