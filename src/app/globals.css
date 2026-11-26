@@ -5,55 +5,83 @@
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 
-  /* Official PUST Shield Maroon (Crest Shield & Institutional Primary) */
-  --color-pust-50: #FDF4F4;
-  --color-pust-100: #FAE6E6;
-  --color-pust-200: #F3C8C9;
-  --color-pust-300: #E5989B;
-  --color-pust-400: #C84D52;
+  /* ── Official PUST Shield Maroon (Primary — unchanged brand core) ── */
+  --color-pust-50: #FDF6F6;
+  --color-pust-100: #FAEAEA;
+  --color-pust-200: #F3D0D1;
+  --color-pust-300: #E8A8AB;
+  --color-pust-400: #D15C61;
   --color-pust-500: #9E1B1F;
-  --color-pust-600: #801014;
-  --color-pust-700: #6B0A0D;
+  --color-pust-600: #861518;
+  --color-pust-700: #6F1013;
   --color-pust-800: #590608;
   --color-pust-900: #450305;
   --color-pust-950: #2C0203;
 
-  /* Official PUST Ribbon Gold (Scroll Banner, Accountability & Honors) */
-  --color-gold-50: #FEFBF0;
-  --color-gold-100: #FCF3D4;
-  --color-gold-200: #F7E39C;
-  --color-gold-300: #F3CE5A;
+  /* ── Ribbon Gold (honors, accents, highlights) ── */
+  --color-gold-50: #FFFBF0;
+  --color-gold-100: #FCF4D9;
+  --color-gold-200: #F8E6A8;
+  --color-gold-300: #F0D26A;
+  --color-gold-400: #E4B82E;
+  --color-gold-500: #C9920A;
   --color-gold-600: #B37B00;
   --color-gold-700: #8D6000;
   --color-gold-800: #6E4A00;
   --color-gold-900: #523600;
+  --color-gold-950: #2F1E00;
 
-  /* Official PUST Engineering Gear Navy Indigo (Governance, Engineering & Operations) */
-  --color-lapis-50: #F2F3FC;
-  --color-lapis-100: #E3E5F8;
-  --color-lapis-200: #C5CAF0;
+  /* ── Engineering Navy / Lapis (governance & structure) ── */
+  --color-lapis-50: #F3F4FC;
+  --color-lapis-100: #E4E6F8;
+  --color-lapis-200: #C8CCF0;
+  --color-lapis-300: #9AA1E0;
+  --color-lapis-400: #5C63C4;
+  --color-lapis-500: #3533A0;
   --color-lapis-600: #222082;
   --color-lapis-700: #1B186B;
   --color-lapis-800: #151254;
   --color-lapis-900: #0F0D3D;
+  --color-lapis-950: #080724;
 
-  /* Official PUST Bengal Emerald (Crest Border, Campus Grounds & Residential Halls) */
-  --color-sage-50: #F0F9F3;
-  --color-sage-100: #DCF2E3;
-  --color-sage-200: #B7E4C7;
+  /* ── Bengal Emerald / Sage (campus & growth) ── */
+  --color-sage-50: #F1FAF4;
+  --color-sage-100: #DCF3E4;
+  --color-sage-200: #B6E5C8;
+  --color-sage-300: #7DCF9C;
+  --color-sage-400: #3EAD68;
+  --color-sage-500: #1A8F45;
   --color-sage-600: #0C7830;
   --color-sage-700: #0A6126;
   --color-sage-800: #074A1D;
   --color-sage-900: #053515;
+  --color-sage-950: #031F0C;
 
-  /* Official PUST Science Atom Cerulean (Research, ICT & Innovation Cells) */
+  /* ── Science Cerulean (research & ICT) ── */
   --color-cerulean-50: #F0F8FF;
-  --color-cerulean-100: #E0F0FE;
-  --color-cerulean-200: #BAE0FD;
+  --color-cerulean-100: #DFF0FE;
+  --color-cerulean-200: #B6E0FD;
+  --color-cerulean-300: #7CC8FA;
+  --color-cerulean-400: #36A9F0;
+  --color-cerulean-500: #0C8DD9;
   --color-cerulean-600: #027AC7;
   --color-cerulean-700: #0362A0;
   --color-cerulean-800: #064D7C;
   --color-cerulean-900: #08395C;
+  --color-cerulean-950: #05243C;
+
+  /* ── Institutional neutral (warm slate, not cold gray) ── */
+  --color-ink-50: #F7F6F4;
+  --color-ink-100: #EEECE7;
+  --color-ink-200: #DCD8D2;
+  --color-ink-300: #C0B9B0;
+  --color-ink-400: #958C82;
+  --color-ink-500: #6F675F;
+  --color-ink-600: #564F49;
+  --color-ink-700: #3F3A36;
+  --color-ink-800: #2A2623;
+  --color-ink-900: #1A1715;
+  --color-ink-950: #0C0B0A;
 }
 
 @layer base {
@@ -61,16 +89,24 @@
     font-family: var(--font-sans);
     overflow-x: clip;
     scrollbar-gutter: stable;
+    scroll-behavior: smooth;
   }
 
   body {
-    color: #0f172a;
-    line-height: 1.6;
+    color: #1a1715;
+    line-height: 1.65;
     overflow-x: clip;
+    background-color: #f6f4f1;
+    background-image:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(158, 27, 31, 0.04), transparent 55%),
+      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(179, 123, 0, 0.035), transparent 45%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(12, 120, 48, 0.03), transparent 40%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3 {
     text-wrap: balance;
+    color: #1a1715;
   }
 
   :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not(.text-center *):not(.text-right *) {
@@ -79,50 +115,122 @@
     hyphens: auto;
   }
 
+  ::selection {
+    background-color: #590608;
+    color: #ffffff;
+  }
+
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid #590608;
+    outline: 2px solid #9E1B1F;
     outline-offset: 2px;
+  }
+
+  /* Refined scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c0b9b0 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #c0b9b0, #958c82);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #9E1B1F, #6F1013);
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
 }
 
-/* Subtle architectural gallery surfaces tinted gently with official PUST crest colors */
+/* ── Architectural card surfaces (crest-tinted, soft depth) ── */
 .card-gradient-crimson {
-  background: linear-gradient(155deg, #ffffff 0%, #fdf9f9 55%, #f9efef 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(253, 246, 246, 0.95) 48%, rgba(250, 234, 234, 0.9) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .card-gradient-gold {
-  background: linear-gradient(155deg, #ffffff 0%, #fefcf4 55%, #faf4e1 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 251, 240, 0.95) 48%, rgba(252, 244, 217, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .card-gradient-lapis {
-  background: linear-gradient(155deg, #ffffff 0%, #f7f8fd 55%, #eef0fa 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(243, 244, 252, 0.95) 48%, rgba(228, 230, 248, 0.9) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .card-gradient-sage {
-  background: linear-gradient(155deg, #ffffff 0%, #f5fbf7 55%, #eaf6ee 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(241, 250, 244, 0.95) 48%, rgba(220, 243, 228, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .card-gradient-cerulean {
-  background: linear-gradient(155deg, #ffffff 0%, #f5fafe 55%, #eaf4fc 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(240, 248, 255, 0.95) 48%, rgba(223, 240, 254, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .card-gradient-parchment {
-  background: linear-gradient(155deg, #ffffff 0%, #fbfaf7 55%, #f4f1ea 100%);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(252, 250, 246, 0.96) 45%, rgba(245, 241, 232, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .card-hover-lift {
-  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 140ms ease;
+  transition:
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease;
 }
 
 .card-hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px -10px rgba(15, 23, 42, 0.12), 0 4px 10px -6px rgba(89, 6, 8, 0.08);
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 36px -14px rgba(44, 2, 3, 0.14),
+    0 8px 16px -10px rgba(158, 27, 31, 0.1),
+    0 0 0 1px rgba(158, 27, 31, 0.04);
+}
+
+/* Soft institutional panel */
+.surface-panel {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(192, 185, 176, 0.45);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 10px 28px -16px rgba(26, 23, 21, 0.12);
+}
+
+/* Primary CTA sheen */
+.btn-primary-sheen {
+  background: linear-gradient(180deg, #b32025 0%, #9E1B1F 45%, #861518 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 8px 18px -8px rgba(158, 27, 31, 0.45);
+}
+
+.btn-primary-sheen:hover {
+  background: linear-gradient(180deg, #c42a30 0%, #a81d21 45%, #8f171a 100%);
 }
 
 .prose-justify {
@@ -174,19 +282,21 @@
 }
 
 [data-edit-mode="true"] .editable-region {
-  outline: 1.5px dashed rgba(217, 119, 6, 0.45);
+  outline: 1.5px dashed rgba(179, 123, 0, 0.5);
   outline-offset: 4px;
   border-radius: 0.75rem;
   transition: outline-color 150ms ease, background-color 150ms ease;
 }
 
 [data-edit-mode="true"] .editable-region:hover {
-  outline-color: rgba(180, 83, 9, 0.85);
+  outline-color: rgba(158, 27, 31, 0.75);
+  background-color: rgba(158, 27, 31, 0.02);
 }
 
 @media print {
   body {
     background: #ffffff !important;
+    background-image: none !important;
   }
   header,
   footer,

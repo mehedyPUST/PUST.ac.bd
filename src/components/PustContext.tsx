@@ -620,7 +620,7 @@ export function PustShell({
           <PustContext.Provider value={value}>
           <div
             data-edit-mode={effectiveEditMode ? 'true' : undefined}
-            className="min-h-screen flex flex-col bg-[#F8F8F6] text-slate-900"
+            className="min-h-screen flex flex-col bg-transparent text-ink-900"
           >
             <AnimatePresence>
               {isNavigating && (

@@ -133,7 +133,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       lang="en"
       className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="bg-[#F8F8F6] text-slate-900 antialiased selection:bg-pust-800 selection:text-white">
+      <body className="bg-[#F6F4F1] text-ink-900 antialiased selection:bg-pust-800 selection:text-white">
         <PustShell initialData={initialData}>{children}</PustShell>
       </body>
     </html>
