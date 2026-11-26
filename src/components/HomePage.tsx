@@ -24,6 +24,7 @@ import {
   getYouTubeThumbnailUrl,
   parseYouTubeVideoId,
 } from '../lib/media';
+import { getAlternatingEventCardTheme } from '../lib/cardTheme';
 import type { AppRoute } from '../lib/routes';
 import { BreakingNewsTicker } from './BreakingNewsTicker';
 import { CampusMapSection } from './CampusMapSection';
@@ -75,20 +76,6 @@ const NOTICE_CATS: Array<'All' | NoticeRecord['category']> = [
   'Academic',
   'General',
 ];
-
-function getEventGradientClass(category: GalleryItemRecord['category']) {
-  if (category === 'Convocation') return 'card-gradient-gold hover:border-gold-600/40';
-  if (category === 'Academic Event') return 'card-gradient-lapis hover:border-lapis-600/40';
-  if (category === 'Festival') return 'card-gradient-crimson hover:border-pust-600/40';
-  return 'card-gradient-sage hover:border-sage-600/40';
-}
-
-function getEventAccentClass(category: GalleryItemRecord['category']) {
-  if (category === 'Convocation') return 'text-gold-700';
-  if (category === 'Academic Event') return 'text-lapis-700';
-  if (category === 'Festival') return 'text-pust-800';
-  return 'text-sage-700';
-}
 
 export function HomePage({
   bannerSlides = [],
@@ -762,33 +749,44 @@ export function HomePage({
                       No former Vice-Chancellor records archived yet.
                     </p>
                   ) : (
-                    previousVcs.map((vc, idx) => (
-                      <MotionCard
-                        key={vc.id}
-                        delay={idx * 0.03}
-                        className="card-gradient-crimson rounded-xl border border-pust-200/70 hover:border-pust-600/50 hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors"
-                      >
-                        <div className="space-y-1.5">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
-                              {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                            </span>
-                            <EditTriggerButton
-                              target={{ kind: 'vc', vcId: vc.id }}
-                              label="Edit"
-                              variant="compact"
-                            />
+                    previousVcs.map((vc, idx) => {
+                      const isCrimson = idx % 2 === 0;
+                      return (
+                        <MotionCard
+                          key={vc.id}
+                          delay={idx * 0.03}
+                          className={`rounded-xl border hover:shadow-md p-5 space-y-2 flex flex-col justify-between transition-colors ${
+                            isCrimson
+                              ? 'card-gradient-crimson border-pust-200/75 hover:border-pust-600/50'
+                              : 'card-gradient-lapis border-lapis-200/75 hover:border-lapis-600/50'
+                          }`}
+                        >
+                          <div className="space-y-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <span
+                                className={`font-mono text-[11px] font-semibold tabular-nums ${
+                                  isCrimson ? 'text-pust-800' : 'text-lapis-700'
+                                }`}
+                              >
+                                {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                              </span>
+                              <EditTriggerButton
+                                target={{ kind: 'vc', vcId: vc.id }}
+                                label="Edit"
+                                variant="compact"
+                              />
+                            </div>
+                            <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
+                              {vc.name}
+                            </h4>
+                            <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-slate-600">
+                              {vc.title}
+                            </p>
+                            <p className="text-xs text-slate-700 leading-relaxed pt-0.5">{vc.message}</p>
                           </div>
-                          <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
-                            {vc.name}
-                          </h4>
-                          <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-slate-600">
-                            {vc.title}
-                          </p>
-                          <p className="text-xs text-slate-700 leading-relaxed pt-0.5">{vc.message}</p>
-                        </div>
-                      </MotionCard>
-                    ))
+                        </MotionCard>
+                      );
+                    })
                   )}
                 </motion.div>
               )}
@@ -1264,69 +1262,71 @@ export function HomePage({
             </div>
           ) : (
             <div ref={eventGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {visibleEvents.slice(0, 4).map((item, idx) => {
-                const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
-                const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
-                return (
-                  <MotionCard
-                    key={item.id}
-                    data-gsap-event-card
-                    delay={idx * 0.04}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setActiveMedia(item)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setActiveMedia(item);
-                      }
-                    }}
-                    className={`text-left rounded-2xl border border-slate-200 ${getEventGradientClass(
-                      item.category
-                    )} shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col overflow-hidden`}
-                  >
-                    <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
-                      <ResilientImage
-                        src={thumbUrl}
-                        alt={item.title}
-                        containerClassName="w-full h-full"
-                        frameClassName="bg-slate-900"
-                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300"
-                      />
-                      <EditTriggerButton
-                        target={{ kind: 'gallery', item }}
-                        label="Edit"
-                        variant="overlay"
-                        className="absolute top-2.5 right-2.5 z-10"
-                      />
-                      {item.mediaType === 'video' && (
-                        <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white pointer-events-none">
-                          <PlayCircle className="w-10 h-10 transition-transform duration-200 group-hover:scale-110" />
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-4 space-y-1.5 flex-1">
-                      <p
-                        className={`font-mono text-[11px] tabular-nums font-semibold ${getEventAccentClass(
-                          item.category
-                        )}`}
-                      >
-                        {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
-                        {item.eventDate}
-                        {item.visibility === 'registered' && (
-                          <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+              {(() => {
+                const categoryCounts: Record<string, number> = {};
+                return visibleEvents.slice(0, 4).map((item, idx) => {
+                  const occIdx = categoryCounts[item.category] ?? 0;
+                  categoryCounts[item.category] = occIdx + 1;
+                  const eventTheme = getAlternatingEventCardTheme(item.category, occIdx);
+                  const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
+                  const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
+                  return (
+                    <MotionCard
+                      key={item.id}
+                      data-gsap-event-card
+                      delay={idx * 0.04}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setActiveMedia(item)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setActiveMedia(item);
+                        }
+                      }}
+                      className={`text-left rounded-2xl border ${eventTheme.cardClass} shadow-xs hover:shadow-md transition-all group cursor-pointer flex flex-col overflow-hidden`}
+                    >
+                      <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
+                        <ResilientImage
+                          src={thumbUrl}
+                          alt={item.title}
+                          containerClassName="w-full h-full"
+                          frameClassName="bg-slate-900"
+                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300"
+                        />
+                        <EditTriggerButton
+                          target={{ kind: 'gallery', item }}
+                          label="Edit"
+                          variant="overlay"
+                          className="absolute top-2.5 right-2.5 z-10"
+                        />
+                        {item.mediaType === 'video' && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35 text-white pointer-events-none">
+                            <PlayCircle className="w-10 h-10 transition-transform duration-200 group-hover:scale-110" />
+                          </span>
                         )}
-                      </p>
-                      <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                    </div>
-                  </MotionCard>
-                );
-              })}
+                      </div>
+                      <div className="p-4 space-y-1.5 flex-1">
+                        <p
+                          className={`font-mono text-[11px] tabular-nums font-semibold ${eventTheme.accentClass}`}
+                        >
+                          {item.category} · {ytId ? 'YOUTUBE' : item.mediaType.toUpperCase()} ·{' '}
+                          {item.eventDate}
+                          {item.visibility === 'registered' && (
+                            <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
+                          )}
+                        </p>
+                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2">
+                          {item.description}
+                        </p>
+                      </div>
+                    </MotionCard>
+                  );
+                });
+              })()}
             </div>
           )}
 
@@ -1359,13 +1359,21 @@ export function HomePage({
                 ref={seminarGridRef}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-sage-200/80"
               >
-                {upcomingSeminars.map((ev) => (
+                {upcomingSeminars.map((ev, idx) => (
                   <div
                     key={ev.id}
                     data-gsap-seminar-item
-                    className="p-5 space-y-1.5 hover:bg-white/75 transition-colors"
+                    className={`p-5 space-y-1.5 transition-colors ${
+                      idx % 2 === 0
+                        ? 'bg-white/30 hover:bg-white/80'
+                        : 'bg-teal-50/45 hover:bg-white/80'
+                    }`}
                   >
-                    <p className="font-mono text-xs font-semibold text-sage-700 tabular-nums">
+                    <p
+                      className={`font-mono text-xs font-semibold tabular-nums ${
+                        idx % 2 === 0 ? 'text-sage-700' : 'text-teal-700'
+                      }`}
+                    >
                       {ev.date} · {ev.organizer}
                     </p>
                     <h3 className="font-serif text-base font-semibold text-slate-950 leading-snug">

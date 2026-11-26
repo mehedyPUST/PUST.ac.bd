@@ -2801,7 +2801,11 @@ export function DepartmentDetailView({
                   person={member}
                   roleCategory="Faculty Member (Contractual)"
                   delay={idx * 0.03}
-                  accentClass="card-gradient-gold border-gold-200/80"
+                  accentClass={
+                    idx % 2 === 0
+                      ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
+                      : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/45'
+                  }
                   canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
                   onEditPerson={handleEditPerson}
@@ -2846,7 +2850,11 @@ export function DepartmentDetailView({
                   person={officer}
                   roleCategory="Department Officer"
                   delay={idx * 0.03}
-                  accentClass="card-gradient-parchment border-slate-200 hover:border-pust-600/40"
+                  accentClass={
+                    idx % 2 === 0
+                      ? 'card-gradient-parchment border-slate-200 hover:border-pust-600/40'
+                      : 'card-gradient-crimson border-pust-200/75 hover:border-pust-600/45'
+                  }
                   canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
                   onEditPerson={handleEditPerson}
@@ -2913,34 +2921,45 @@ export function DepartmentDetailView({
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {deptPublications.map((pub) => (
-                <div
-                  key={pub.id}
-                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] space-y-2"
-                >
-                  <p className="font-mono text-[11px] text-pust-800">
-                    {pub.year} · {pub.domain}
-                  </p>
-                  <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                    {pub.title}
-                  </h3>
-                  <p className="text-xs text-slate-600">{pub.authors}</p>
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                    <span className="text-slate-500">{pub.venue}</span>
-                    {pub.url && (
-                      <a
-                        href={pub.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
-                      >
-                        DOI
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    )}
+              {deptPublications.map((pub, idx) => {
+                const isLapis = idx % 2 === 0;
+                return (
+                  <div
+                    key={pub.id}
+                    className={`p-4 sm:p-5 rounded-2xl border space-y-2 transition-colors ${
+                      isLapis
+                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                        : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
+                    }`}
+                  >
+                    <p
+                      className={`font-mono text-[11px] font-semibold ${
+                        isLapis ? 'text-lapis-800' : 'text-sage-800'
+                      }`}
+                    >
+                      {pub.year} · {pub.domain}
+                    </p>
+                    <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
+                      {pub.title}
+                    </h3>
+                    <p className="text-xs text-slate-600">{pub.authors}</p>
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                      <span className="text-slate-600">{pub.venue}</span>
+                      {pub.url && (
+                        <a
+                          href={pub.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
+                        >
+                          DOI
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

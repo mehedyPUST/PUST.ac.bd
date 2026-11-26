@@ -314,8 +314,9 @@ export function ResearchSection({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-              {deptResearchList.map((dept) => {
+              {deptResearchList.map((dept, idx) => {
                 const active = selectedDeptFilter === dept.code;
+                const isEven = idx % 2 === 0;
                 return (
                   <button
                     key={dept.id}
@@ -326,12 +327,18 @@ export function ResearchSection({
                     className={`text-left px-3 py-2 rounded-xl border transition-all cursor-pointer ${
                       active
                         ? 'bg-pust-800 text-white border-pust-800 shadow-xs'
-                        : 'bg-white/95 border-lapis-200 text-slate-900 hover:border-pust-700 hover:bg-white'
+                        : isEven
+                        ? 'bg-white/95 border-lapis-200 text-slate-900 hover:border-pust-700 hover:bg-white'
+                        : 'bg-cerulean-50/85 border-cerulean-200 text-slate-900 hover:border-pust-700 hover:bg-white'
                     }`}
                   >
                     <p
                       className={`font-mono text-[11px] font-semibold ${
-                        active ? 'text-amber-200' : 'text-lapis-800'
+                        active
+                          ? 'text-amber-200'
+                          : isEven
+                          ? 'text-lapis-800'
+                          : 'text-cerulean-800'
                       }`}
                     >
                       {dept.code}

@@ -417,28 +417,39 @@ export function CareerView() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {RECRUITMENT_TRACKS.map((track) => (
-              <div
-                key={track.title}
-                data-gsap-career-track
-                className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col justify-between gap-4 shadow-xs"
-              >
-                <div className="space-y-2.5">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-700">
-                    {track.code}
-                  </p>
-                  <h3 className="font-serif text-xl font-semibold text-slate-950">
-                    {track.title}
-                  </h3>
-                  <p className="prose-justify text-sm text-slate-700 leading-relaxed">
-                    {track.body}
+            {RECRUITMENT_TRACKS.map((track, idx) => {
+              const isCrimson = idx % 2 === 0;
+              return (
+                <div
+                  key={track.title}
+                  data-gsap-career-track
+                  className={`rounded-2xl border p-6 flex flex-col justify-between gap-4 shadow-xs ${
+                    isCrimson
+                      ? 'card-gradient-crimson border-pust-200/75'
+                      : 'card-gradient-lapis border-lapis-200/75'
+                  }`}
+                >
+                  <div className="space-y-2.5">
+                    <p
+                      className={`font-mono text-xs font-semibold uppercase tracking-wider ${
+                        isCrimson ? 'text-pust-700' : 'text-lapis-700'
+                      }`}
+                    >
+                      {track.code}
+                    </p>
+                    <h3 className="font-serif text-xl font-semibold text-slate-950">
+                      {track.title}
+                    </h3>
+                    <p className="prose-justify text-sm text-slate-700 leading-relaxed">
+                      {track.body}
+                    </p>
+                  </div>
+                  <p className="pt-3 border-t border-slate-200/70 font-mono text-xs text-slate-600">
+                    Baseline Criteria: {track.qualification}
                   </p>
                 </div>
-                <p className="pt-3 border-t border-slate-100 font-mono text-xs text-slate-600">
-                  Baseline Criteria: {track.qualification}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

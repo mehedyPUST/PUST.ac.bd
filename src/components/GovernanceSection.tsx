@@ -340,7 +340,11 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   <MotionCard
                     key={`${card.title}-${idx}`}
                     delay={idx * 0.04}
-                    className="h-full flex flex-col p-5 rounded-2xl border border-lapis-200 card-gradient-lapis hover:border-lapis-600/60 hover:shadow-md space-y-1.5 transition-all"
+                    className={`h-full flex flex-col p-5 rounded-2xl border hover:shadow-md space-y-1.5 transition-all ${
+                      idx % 2 === 0
+                        ? 'border-lapis-200 card-gradient-lapis hover:border-lapis-600/60'
+                        : 'border-sage-200 card-gradient-sage hover:border-sage-600/60'
+                    }`}
                   >
                     <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">{card.title}</h3>
                     <p className="text-xs text-slate-700 leading-relaxed text-left">{card.detail}</p>

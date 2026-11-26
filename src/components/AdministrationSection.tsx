@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { getAlternatingUnitCardClass } from '../lib/cardTheme';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { AdministrationOfficeDossier, AllOfficesDirectory } from './AdministrationOfficeDossier';
@@ -603,32 +604,43 @@ export function AdministrationSection({
                       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                       className="p-6 bg-[#F8F8F6] grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch"
                     >
-                      {previousVcs.map((vc, idx) => (
-                        <article
-                          key={vc.id}
-                          className="h-full bg-white rounded-xl border border-slate-200 hover:border-slate-300 p-5 space-y-2 flex flex-col justify-between transition-colors"
-                        >
-                          <div className="space-y-1.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="font-mono text-xs font-semibold text-pust-900 tabular-nums">
-                                {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                              </span>
-                              <EditTriggerButton
-                                target={{ kind: 'vc', vcId: vc.id }}
-                                label="Edit"
-                                variant="compact"
-                              />
+                      {previousVcs.map((vc, idx) => {
+                        const isEven = idx % 2 === 0;
+                        return (
+                          <article
+                            key={vc.id}
+                            className={`h-full rounded-xl border p-5 space-y-2 flex flex-col justify-between transition-colors ${
+                              isEven
+                                ? 'card-gradient-crimson border-pust-200/75 hover:border-pust-600/45'
+                                : 'card-gradient-lapis border-lapis-200/75 hover:border-lapis-600/45'
+                            }`}
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <span
+                                  className={`font-mono text-xs font-semibold tabular-nums ${
+                                    isEven ? 'text-pust-900' : 'text-lapis-800'
+                                  }`}
+                                >
+                                  {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                                </span>
+                                <EditTriggerButton
+                                  target={{ kind: 'vc', vcId: vc.id }}
+                                  label="Edit"
+                                  variant="compact"
+                                />
+                              </div>
+                              <h4 className="font-serif text-base font-medium text-slate-950 leading-snug text-left">
+                                {vc.name}
+                              </h4>
+                              <p className="text-xs text-slate-500 text-left">{vc.title}</p>
+                              <p className="text-xs text-slate-600 leading-relaxed pt-1 text-left">
+                                {vc.message}
+                              </p>
                             </div>
-                            <h4 className="font-serif text-base font-medium text-slate-950 leading-snug text-left">
-                              {vc.name}
-                            </h4>
-                            <p className="text-xs text-slate-500 text-left">{vc.title}</p>
-                            <p className="text-xs text-slate-600 leading-relaxed pt-1 text-left">
-                              {vc.message}
-                            </p>
-                          </div>
-                        </article>
-                      ))}
+                          </article>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -878,46 +890,52 @@ export function AdministrationSection({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
-                {filteredUnits.map((unit) => {
-                  const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
-                  const unitAccent =
-                    unit.category === 'Statutory Governance'
-                      ? 'text-pust-800'
-                      : unit.category === 'Administrative Office'
-                      ? 'text-lapis-700'
-                      : 'text-cerulean-700';
+                {(() => {
+                  const categoryCounts: Record<string, number> = {};
+                  return filteredUnits.map((unit) => {
+                    const occIdx = categoryCounts[unit.category] ?? 0;
+                    categoryCounts[unit.category] = occIdx + 1;
+                    const matchesRoute = activeOffice?.matchUnit?.(unit.code) ?? false;
+                    const unitAccent =
+                      unit.category === 'Statutory Governance'
+                        ? 'text-pust-800'
+                        : unit.category === 'Administrative Office'
+                        ? 'text-lapis-700'
+                        : 'text-cerulean-700';
+                    const alternatingSurface = getAlternatingUnitCardClass(unit.category, occIdx);
 
-                  return (
-                    <article
-                      key={unit.code}
-                      className={`h-full flex flex-col justify-between p-5 rounded-xl border transition-colors ${
-                        matchesRoute
-                          ? 'bg-pust-50/55 border-pust-800'
-                          : 'bg-[#F8F8F6] border-slate-200 hover:bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="space-y-2.5">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="font-mono text-xs text-slate-500 text-left tabular-nums">
-                            <span className={`font-semibold ${unitAccent}`}>{unit.code}</span> ·{' '}
-                            <span className="font-sans">{unit.category}</span>
+                    return (
+                      <article
+                        key={unit.code}
+                        className={`h-full flex flex-col justify-between p-5 rounded-xl border transition-all ${
+                          matchesRoute
+                            ? 'bg-pust-50/75 border-pust-800 ring-1 ring-pust-800/30'
+                            : alternatingSurface
+                        }`}
+                      >
+                        <div className="space-y-2.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-mono text-xs text-slate-600 text-left tabular-nums">
+                              <span className={`font-semibold ${unitAccent}`}>{unit.code}</span> ·{' '}
+                              <span className="font-sans">{unit.category}</span>
+                            </p>
+                            <EditTriggerButton
+                              target={{ kind: 'unit', unitCode: unit.code }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                          </div>
+                          <h3 className="font-serif text-lg font-medium text-slate-950 text-left">
+                            {unit.name}
+                          </h3>
+                          <p className="text-sm text-slate-600 leading-relaxed text-left">
+                            {unit.description}
                           </p>
-                          <EditTriggerButton
-                            target={{ kind: 'unit', unitCode: unit.code }}
-                            label="Edit"
-                            variant="compact"
-                          />
                         </div>
-                        <h3 className="font-serif text-lg font-medium text-slate-950 text-left">
-                          {unit.name}
-                        </h3>
-                        <p className="text-sm text-slate-600 leading-relaxed text-left">
-                          {unit.description}
-                        </p>
-                      </div>
-                    </article>
-                  );
-                })}
+                      </article>
+                    );
+                  });
+                })()}
               </div>
 
               {/* Related Institutional Links Footer */}

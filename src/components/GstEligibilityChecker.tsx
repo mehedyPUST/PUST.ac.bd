@@ -263,15 +263,24 @@ export function GstEligibilityChecker({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
-            {evaluation.matchedDepts.map(({ dept, eligible, note }) => (
-              <div
-                key={dept.id}
-                className={`h-full p-4 rounded-xl border transition-colors flex flex-col justify-between gap-3 ${
-                  eligible
-                    ? 'border-slate-200 bg-[#FAF8F4] hover:border-pust-700/60'
-                    : 'border-slate-200/70 bg-slate-50/70 opacity-75'
-                }`}
-              >
+            {(() => {
+              let eligibleIdx = 0;
+              let ineligibleIdx = 0;
+              return evaluation.matchedDepts.map(({ dept, eligible, note }) => {
+                const statusOcc = eligible ? eligibleIdx++ : ineligibleIdx++;
+                const cardSurface = eligible
+                  ? statusOcc % 2 === 0
+                    ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
+                    : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/50'
+                  : statusOcc % 2 === 0
+                  ? 'border-slate-200/80 bg-slate-50/80 opacity-75'
+                  : 'border-slate-200/80 bg-stone-100/60 opacity-75';
+
+                return (
+                  <div
+                    key={dept.id}
+                    className={`h-full p-4 rounded-xl border transition-colors flex flex-col justify-between gap-3 ${cardSurface}`}
+                  >
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
@@ -309,8 +318,10 @@ export function GstEligibilityChecker({
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
-              </div>
-            ))}
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

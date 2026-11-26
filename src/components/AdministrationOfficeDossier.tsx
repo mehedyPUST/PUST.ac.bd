@@ -13,6 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { getAlternatingOfficeCardClass } from '../lib/cardTheme';
 import type {
   AdministrationOfficeRecord,
   AdminOfficeCategory,
@@ -76,12 +77,14 @@ function PersonnelEntry({
   person,
   isHead = false,
   accentClass = 'text-pust-800',
+  surfaceClass = 'bg-[#F8F8F6] border-slate-200 hover:bg-white hover:border-slate-300',
   copiedEmail,
   onCopyEmail,
 }: {
   person: AdminOfficePersonnel;
   isHead?: boolean;
   accentClass?: string;
+  surfaceClass?: string;
   copiedEmail: string | null;
   onCopyEmail: (email: string) => void;
 }) {
@@ -93,7 +96,7 @@ function PersonnelEntry({
       className={`h-full rounded-xl border p-5 sm:p-6 flex flex-col justify-between gap-5 text-left transition-colors duration-150 ${
         isHead
           ? 'card-gradient-parchment border-pust-800/25'
-          : 'bg-[#F8F8F6] border-slate-200 hover:bg-white hover:border-slate-300'
+          : surfaceClass
       }`}
     >
       <div className="space-y-3">
@@ -386,11 +389,16 @@ export function AdministrationOfficeDossier({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
-            {filteredOfficers.map((officer) => (
+            {filteredOfficers.map((officer, idx) => (
               <PersonnelEntry
                 key={officer.id}
                 person={officer}
                 accentClass={accent.text}
+                surfaceClass={
+                  idx % 2 === 0
+                    ? 'card-gradient-lapis border-lapis-200/75 hover:border-lapis-600/45'
+                    : 'card-gradient-parchment border-slate-200 hover:border-slate-300'
+                }
                 copiedEmail={copiedEmail}
                 onCopyEmail={onCopyEmail}
               />
@@ -526,61 +534,65 @@ export function AllOfficesDirectory({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
-          {filtered.map((office) => {
-            const isCurrent = activeRoute === office.route;
-            const officerCount = office.officers.length;
-            const accent = getWingAccent(office.category);
-            return (
-              <Link
-                key={office.slug}
-                href={office.route}
-                className={`group h-full flex flex-col justify-between p-5 rounded-xl border transition-colors duration-150 text-left ${
-                  isCurrent
-                    ? accent.activeBg
-                    : `bg-[#F8F8F6] border-slate-200 hover:bg-white ${accent.hoverBorder}`
-                }`}
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2 text-xs text-slate-500 font-mono tabular-nums">
-                    <span className={`font-semibold ${accent.text}`}>{office.code}</span>
-                    <span>
-                      {officerCount > 0
-                        ? `${officerCount} ${officerCount === 1 ? 'Officer' : 'Officers'}`
-                        : office.head
-                        ? 'Head Listed'
-                        : 'Unit Desk'}
-                    </span>
-                  </div>
-                  <h3 className="font-serif text-lg font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug text-left">
-                    {office.name}
-                  </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 text-left">
-                    {office.summary}
-                  </p>
-                </div>
-
-                <div className="pt-4 mt-5 border-t border-slate-200/80 space-y-2">
-                  {office.head && (
-                    <p className="text-xs font-medium text-slate-800 truncate text-left">
-                      {office.head.name} ·{' '}
-                      <span className="text-slate-500 font-normal">{office.head.designation}</span>
+          {(() => {
+            const categoryCounts: Record<string, number> = {};
+            return filtered.map((office) => {
+              const occIdx = categoryCounts[office.category] ?? 0;
+              categoryCounts[office.category] = occIdx + 1;
+              const isCurrent = activeRoute === office.route;
+              const officerCount = office.officers.length;
+              const accent = getWingAccent(office.category);
+              const cardSurface = getAlternatingOfficeCardClass(office.category, occIdx);
+              return (
+                <Link
+                  key={office.slug}
+                  href={office.route}
+                  className={`group h-full flex flex-col justify-between p-5 rounded-xl border transition-all duration-150 text-left ${
+                    isCurrent ? `${accent.activeBg} ring-1 ring-pust-800/20` : cardSurface
+                  }`}
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-2 text-xs text-slate-600 font-mono tabular-nums">
+                      <span className={`font-semibold ${accent.text}`}>{office.code}</span>
+                      <span>
+                        {officerCount > 0
+                          ? `${officerCount} ${officerCount === 1 ? 'Officer' : 'Officers'}`
+                          : office.head
+                          ? 'Head Listed'
+                          : 'Unit Desk'}
+                      </span>
+                    </div>
+                    <h3 className="font-serif text-lg font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug text-left">
+                      {office.name}
+                    </h3>
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 text-left">
+                      {office.summary}
                     </p>
-                  )}
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="font-mono text-[11px] text-slate-600 truncate">
-                      {office.officeEmail || office.officePhone || 'Rajapur Campus'}
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1 font-semibold group-hover:translate-x-0.5 transition-transform shrink-0 ${accent.text}`}
-                    >
-                      Open Dossier
-                      <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                    </span>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+
+                  <div className="pt-4 mt-5 border-t border-slate-200/80 space-y-2">
+                    {office.head && (
+                      <p className="text-xs font-medium text-slate-800 truncate text-left">
+                        {office.head.name} ·{' '}
+                        <span className="text-slate-600 font-normal">{office.head.designation}</span>
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="font-mono text-[11px] text-slate-600 truncate">
+                        {office.officeEmail || office.officePhone || 'Rajapur Campus'}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1 font-semibold group-hover:translate-x-0.5 transition-transform shrink-0 ${accent.text}`}
+                      >
+                        Open Dossier
+                        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            });
+          })()}
         </div>
       )}
     </section>
