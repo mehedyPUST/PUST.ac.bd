@@ -587,28 +587,35 @@ export function HomePage({
             <HeroSummarySkeleton />
           ) : currentVc ? (
             <MotionReveal>
-              <article className="editable-region rounded-2xl bg-white border border-stone-200 overflow-hidden flex flex-col">
-                {/* Portrait & Office Header (Top Band of 1-Column Card) */}
-                <div className="bg-[#FAF9F6] border-b border-stone-200 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
-                    <div className="w-36 sm:w-40 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-white">
-                      <ResilientImage
-                        src={currentVc.photoUrl || ''}
-                        alt={currentVc.name}
-                        className="w-full aspect-[3/4] object-cover object-top"
+              <article className="editable-region rounded-xl bg-[#FAF8F2] border border-stone-300 overflow-hidden">
+                {/* Broadsheet Dateline & Masthead Rules */}
+                <div className="px-6 sm:px-8 pt-6 pb-5">
+                  <div className="border-t-2 border-stone-900 pt-2 border-b border-stone-400 pb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700 tabular-nums">
+                    <span>Office of the Vice-Chancellor · Rajapur, Pabna</span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span>Tenure: {currentVc.tenure}</span>
+                      <EditTriggerButton
+                        target={{ kind: 'vc' }}
+                        label="Edit VC Profile & Message"
+                        variant="compact"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-700">
-                        Office of the Vice-Chancellor · {currentVc.tenure}
-                      </p>
-                      <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950">
-                        {currentVc.name}
-                      </h2>
-                      <p className="text-sm font-medium text-stone-600 text-left">
+                  </div>
+
+                  {/* Broadsheet Headline & Byline Rule */}
+                  <header className="pt-5 text-left">
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-pust-800">
+                      Chancellery Address · Welcome Message
+                    </p>
+                    <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-slate-950 leading-[1.12] mt-1.5 text-balance">
+                      {currentVc.name}
+                    </h2>
+
+                    <div className="mt-4 py-2.5 border-t border-b-2 border-stone-900/85 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      <p className="font-serif italic text-sm text-slate-800">
                         Honorable Vice-Chancellor, Pabna University of Science and Technology
                       </p>
-                      <div className="font-mono text-xs text-slate-700 tabular-nums pt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <div className="font-mono tabular-nums flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-700">
                         {currentVc.email && (
                           <a
                             href={`mailto:${currentVc.email}`}
@@ -625,59 +632,80 @@ export function HomePage({
                             {currentVc.phone}
                           </a>
                         )}
+                        <Link
+                          href="/administration/vc-office"
+                          className="inline-flex items-center gap-1 font-sans font-semibold text-pust-800 hover:underline whitespace-nowrap"
+                        >
+                          <span>VC Office</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-3 shrink-0">
-                    <EditTriggerButton
-                      target={{ kind: 'vc' }}
-                      label="Edit VC Profile & Message"
-                      variant="compact"
-                    />
-                    <Link
-                      href="/administration/vc-office"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
-                    >
-                      Vice-Chancellor Office
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
+                  </header>
                 </div>
 
-                {/* Welcome Message Body */}
-                <div className="p-6 sm:p-8 space-y-6">
-                  {vcBodyParagraphs.length > 0 ? (
-                    <div className="space-y-4 flow-root prose-justify text-fluid-body text-slate-800 leading-[1.78]">
-                      {vcBodyParagraphs.map((paragraph, idx) => (
-                        <p
-                          key={idx}
-                          className={
-                            idx === 0
-                              ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-700'
-                              : ''
-                          }
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
+                {/* Broadsheet Columns: Lead Photograph Column + Multi-Column Editorial Copy */}
+                <div className="px-6 sm:px-8 pb-7 grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+                  {/* Left Newspaper Photo Column */}
+                  <div className="lg:col-span-3 lg:border-r lg:border-stone-300 lg:pr-7 space-y-2.5">
+                    <div className="max-w-[220px] lg:max-w-none border border-stone-400 p-1 bg-white">
+                      <ResilientImage
+                        src={currentVc.photoUrl || ''}
+                        alt={currentVc.name}
+                        frameClassName="bg-stone-100"
+                        className="w-full aspect-[3/4] object-cover object-top"
+                      />
                     </div>
-                  ) : (
-                    <p className="text-sm text-slate-700 text-left">
-                      No welcome message published for this profile yet.
+                    <p className="text-xs font-serif italic text-stone-600 leading-relaxed border-b border-stone-300 pb-2.5">
+                      Fig. — {currentVc.name}, Honorable Vice-Chancellor of Pabna University of Science and Technology.
                     </p>
-                  )}
+                  </div>
 
-                  {vcClosingLine && (
-                    <div className="pt-4 border-t border-stone-200 space-y-1">
-                      <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
-                        {vcClosingLine}
+                  {/* Right Broadsheet Text Columns */}
+                  <div className="lg:col-span-9 flex flex-col justify-between">
+                    {vcBodyParagraphs.length > 0 ? (
+                      <div
+                        className={`${
+                          vcBodyParagraphs.length >= 2
+                            ? 'columns-1 md:columns-2 gap-8 md:[column-rule:1px_solid_#d6d3cd]'
+                            : 'max-w-3xl'
+                        } prose-justify text-[15.5px] sm:text-base text-slate-900 leading-[1.78]`}
+                      >
+                        {vcBodyParagraphs.map((paragraph, idx) => (
+                          <p
+                            key={idx}
+                            className={`mb-4 last:mb-0 ${
+                              idx === 0
+                                ? 'first-letter:font-serif first-letter:text-[3.25rem] first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-0.5 first-letter:leading-[0.82] first-letter:text-pust-800'
+                                : ''
+                            }`}
+                          >
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-700 text-left">
+                        No welcome message published for this profile yet.
                       </p>
-                      <p className="text-sm font-semibold text-slate-700 text-left">
-                        {currentVc.name} · Vice-Chancellor
+                    )}
+
+                    {/* Broadsheet Closing Rule & Signature */}
+                    <div className="mt-6 pt-4 border-t border-stone-300 flex flex-wrap items-baseline justify-between gap-3">
+                      {vcClosingLine ? (
+                        <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
+                          {vcClosingLine}
+                        </p>
+                      ) : (
+                        <span className="font-mono text-[11px] uppercase tracking-widest text-stone-500">
+                          Office of the Vice-Chancellor · PUST
+                        </span>
+                      )}
+                      <p className="font-serif text-sm font-semibold text-slate-800 text-left">
+                        — {currentVc.name}, Vice-Chancellor
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
               </article>
             </MotionReveal>
