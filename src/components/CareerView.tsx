@@ -254,7 +254,7 @@ export function CareerView() {
               <div
                 role="group"
                 aria-label="Filter career circulars"
-                className="inline-flex items-center p-1 rounded-xl bg-white border border-slate-200/90 shadow-2xs shrink-0"
+                className="inline-flex items-center p-1 rounded-xl bg-white border border-stone-200 shrink-0"
               >
                 {(
                   [
@@ -269,8 +269,8 @@ export function CareerView() {
                     onClick={() => setFilter(item.id)}
                     className={`h-8 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       filter === item.id
-                        ? 'bg-pust-800 text-white shadow-xs'
-                        : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
+                        ? 'bg-pust-900 text-white'
+                        : 'text-slate-700 hover:text-slate-950 hover:bg-[#FAF9F6]'
                     }`}
                   >
                     {item.label}
@@ -324,9 +324,9 @@ export function CareerView() {
           ) : (
             <div
               ref={circularListRef}
-              className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
+              className="rounded-2xl border border-stone-200 bg-white overflow-hidden"
             >
-              <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF8F4] border-b border-slate-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+              <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
                 <div className="lg:col-span-2">Date &amp; Track</div>
                 <div className="lg:col-span-7">Position / Circular Summary</div>
                 <div className="lg:col-span-3 text-right">Memo Reference</div>
@@ -404,8 +404,8 @@ export function CareerView() {
 
         {/* Appointment Tracks */}
         <section aria-labelledby="career-tracks-heading" className="space-y-6">
-          <div className="pb-4 border-b border-slate-200">
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">
+          <div className="pb-4 border-b border-stone-200">
+            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
               University Appointment Categories
             </p>
             <h2
@@ -418,23 +418,17 @@ export function CareerView() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {RECRUITMENT_TRACKS.map((track, idx) => {
-              const isCrimson = idx % 2 === 0;
+              const isEven = idx % 2 === 0;
               return (
                 <div
                   key={track.title}
                   data-gsap-career-track
-                  className={`rounded-2xl border p-6 flex flex-col justify-between gap-4 shadow-xs ${
-                    isCrimson
-                      ? 'card-gradient-crimson border-pust-200/75'
-                      : 'card-gradient-lapis border-lapis-200/75'
+                  className={`rounded-2xl border border-stone-200 p-6 flex flex-col justify-between gap-4 ${
+                    isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                   }`}
                 >
                   <div className="space-y-2.5">
-                    <p
-                      className={`font-mono text-xs font-semibold uppercase tracking-wider ${
-                        isCrimson ? 'text-pust-700' : 'text-lapis-700'
-                      }`}
-                    >
+                    <p className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800 text-left">
                       {track.code}
                     </p>
                     <h3 className="font-serif text-xl font-semibold text-slate-950">
@@ -444,7 +438,7 @@ export function CareerView() {
                       {track.body}
                     </p>
                   </div>
-                  <p className="pt-3 border-t border-slate-200/70 font-mono text-xs text-slate-600">
+                  <p className="pt-3 border-t border-stone-200 font-mono text-xs text-slate-600 text-left">
                     Baseline Criteria: {track.qualification}
                   </p>
                 </div>
@@ -459,9 +453,9 @@ export function CareerView() {
           aria-labelledby="application-forms-heading"
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-28"
         >
-          <div className="lg:col-span-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 space-y-5 shadow-xs">
-            <div className="pb-3 border-b border-slate-200">
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+          <div className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5">
+            <div className="pb-3 border-b border-stone-200">
+              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
                 Statutory Procedure
               </p>
               <h2 className="font-serif text-2xl font-semibold text-slate-950 mt-1">
@@ -469,14 +463,14 @@ export function CareerView() {
               </h2>
             </div>
 
-            <ol className="divide-y divide-slate-200">
+            <ol className="divide-y divide-stone-200">
               {RECRUITMENT_STEPS.map((item) => (
                 <li
                   key={item.step}
                   data-gsap-career-step
                   className="py-4 first:pt-1 last:pb-1 flex items-start gap-4"
                 >
-                  <span className="font-mono text-xs font-semibold text-pust-800 bg-pust-50 border border-pust-200 rounded-lg px-2.5 py-1.5 tabular-nums shrink-0 mt-0.5">
+                  <span className="font-mono text-xs font-semibold text-pust-800 bg-[#FAF9F6] border border-stone-200 rounded-lg px-2.5 py-1.5 tabular-nums shrink-0 mt-0.5">
                     {item.step}
                   </span>
                   <div className="space-y-1 min-w-0">
@@ -492,7 +486,7 @@ export function CareerView() {
             </ol>
           </div>
 
-          <div className="lg:col-span-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 space-y-5 shadow-xs">
+          <div className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5">
             <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">

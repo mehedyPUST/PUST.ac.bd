@@ -106,9 +106,9 @@ export function GstEligibilityChecker({
   return (
     <div
       id="gst-eligibility-checker"
-      className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden scroll-mt-28"
+      className="rounded-2xl border border-stone-200 bg-white overflow-hidden scroll-mt-28"
     >
-      <div className="px-6 py-4 border-b border-slate-200 bg-[#FAF8F4] flex flex-wrap items-center justify-between gap-3">
+      <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Compass className="w-5 h-5 text-pust-800 shrink-0" />
           <div>
@@ -270,11 +270,9 @@ export function GstEligibilityChecker({
                 const statusOcc = eligible ? eligibleIdx++ : ineligibleIdx++;
                 const cardSurface = eligible
                   ? statusOcc % 2 === 0
-                    ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/50'
-                    : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/50'
-                  : statusOcc % 2 === 0
-                  ? 'border-slate-200/80 bg-slate-50/80 opacity-75'
-                  : 'border-slate-200/80 bg-stone-100/60 opacity-75';
+                    ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                    : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
+                  : 'border-stone-200 bg-[#F5F3EE] opacity-75';
 
                 return (
                   <div

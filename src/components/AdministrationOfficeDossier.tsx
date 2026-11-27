@@ -95,7 +95,7 @@ function PersonnelEntry({
     <article
       className={`h-full rounded-xl border p-5 sm:p-6 flex flex-col justify-between gap-5 text-left transition-colors duration-150 ${
         isHead
-          ? 'card-gradient-parchment border-pust-800/25'
+          ? 'bg-[#FAF9F6] border-pust-800/35'
           : surfaceClass
       }`}
     >
@@ -227,7 +227,7 @@ export function AdministrationOfficeDossier({
   const totalPersonnel = (office.head ? 1 : 0) + office.officers.length;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 space-y-8 shadow-xs">
+    <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
       {/* Office Accession Desk Header & Contact Strip */}
       <div className="space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-6">
@@ -396,8 +396,8 @@ export function AdministrationOfficeDossier({
                 accentClass={accent.text}
                 surfaceClass={
                   idx % 2 === 0
-                    ? 'card-gradient-lapis border-lapis-200/75 hover:border-lapis-600/45'
-                    : 'card-gradient-parchment border-slate-200 hover:border-slate-300'
+                    ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                    : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                 }
                 copiedEmail={copiedEmail}
                 onCopyEmail={onCopyEmail}
@@ -444,11 +444,11 @@ export function AllOfficesDirectory({
   return (
     <section
       id="all-offices-directory"
-      className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 space-y-8 shadow-xs"
+      className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
     >
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-slate-200 pb-6">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-stone-200 pb-6">
         <div className="space-y-1.5 max-w-2xl">
-          <p className="text-xs font-semibold text-lapis-700">
+          <p className="text-xs font-semibold text-pust-800 text-left">
             Complete Administrative Registry · {offices.length} Official Offices, Halls &amp; Cells
           </p>
           <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-950">
@@ -489,7 +489,7 @@ export function AllOfficesDirectory({
 
       {/* Wing Segmented Filter Bar */}
       <div
-        className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 bg-slate-100 border border-slate-200 rounded-lg -mx-2 px-2 sm:mx-0 sm:px-1"
+        className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 bg-[#FAF9F6] border border-stone-200 rounded-lg -mx-2 px-2 sm:mx-0 sm:px-1"
         role="group"
         aria-label="Filter administration offices by wing"
       >
@@ -506,7 +506,7 @@ export function AllOfficesDirectory({
               onClick={() => setCategory(cat)}
               className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 active
-                  ? 'bg-white text-slate-950 shadow-xs font-semibold'
+                  ? 'bg-pust-900 text-white font-semibold'
                   : 'text-slate-600 hover:text-slate-950'
               }`}
             >

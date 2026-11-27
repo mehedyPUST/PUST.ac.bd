@@ -304,9 +304,9 @@ export function CgpaCalculator() {
           </div>
         </div>
 
-        <aside className="lg:col-span-4 rounded-2xl border border-pust-200 bg-pust-50/50 p-5 space-y-5">
+        <aside className="lg:col-span-4 rounded-2xl border border-stone-200 bg-[#FAF9F6] p-5 space-y-5">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
               Calculated Term Result
             </p>
             <div className="mt-2 flex items-baseline justify-between">
@@ -315,10 +315,10 @@ export function CgpaCalculator() {
                 {summary.sgpa.toFixed(2)}
               </span>
             </div>
-            <p className="text-xs font-medium text-slate-700 mt-1">{summary.standing}</p>
+            <p className="text-xs font-medium text-slate-700 mt-1 text-left">{summary.standing}</p>
           </div>
 
-          <dl className="border-t border-pust-200/80 pt-4 space-y-2.5 text-xs">
+          <dl className="border-t border-stone-200 pt-4 space-y-2.5 text-xs">
             <div className="flex justify-between gap-2">
               <dt className="text-slate-600">Attempted Credits (Term)</dt>
               <dd className="font-mono font-medium text-slate-900 tabular-nums">
@@ -339,7 +339,7 @@ export function CgpaCalculator() {
             </div>
             {summary.hasPrior && (
               <>
-                <div className="pt-2 border-t border-pust-200/80 flex justify-between gap-2">
+                <div className="pt-2 border-t border-stone-200 flex justify-between gap-2">
                   <dt className="text-slate-700 font-medium">Total Cumulative Credits</dt>
                   <dd className="font-mono font-semibold text-slate-900 tabular-nums">
                     {summary.cumulativeCredits.toFixed(2)}
@@ -355,7 +355,7 @@ export function CgpaCalculator() {
             )}
           </dl>
 
-          <p className="text-[11px] text-slate-600 leading-relaxed border-t border-pust-200/80 pt-3">
+          <p className="text-[11px] text-slate-600 leading-relaxed border-t border-stone-200 pt-3 text-left">
             Computes weighted averages using PUST’s statutory 4.00 scale (A+ = 4.00, D = 2.00
             minimum pass, F = 0.00). Official transcripts are issued by the Controller of
             Examinations.

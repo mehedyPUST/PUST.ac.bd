@@ -519,7 +519,7 @@ export function PublicSubPages({
                         <h2 className="font-serif text-2xl font-semibold text-slate-950">
                           Our Vision
                         </h2>
-                        <blockquote className="rounded-2xl border border-gold-200 card-gradient-gold p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 shadow-xs text-left">
+                        <blockquote className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 text-left">
                           {visionPart}
                         </blockquote>
                       </div>
@@ -554,7 +554,7 @@ export function PublicSubPages({
                       priority
                     />
                   </div>
-                  <dl className="rounded-2xl border border-amber-900/15 card-gradient-parchment divide-y divide-slate-200 text-sm overflow-hidden shadow-xs">
+                  <dl className="rounded-2xl border border-stone-200 bg-[#FAF9F6] divide-y divide-stone-200 text-sm overflow-hidden">
                     <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="text-slate-700 font-medium">Established</dt>
                       <dd className="font-mono font-semibold text-slate-950 sm:text-right">
@@ -576,7 +576,7 @@ export function PublicSubPages({
                     {profile.convocationDate && (
                       <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                         <dt className="text-slate-700 font-medium">First Convocation</dt>
-                        <dd className="font-mono font-semibold text-pust-700 sm:text-right">
+                        <dd className="font-mono font-semibold text-pust-800 sm:text-right">
                           {profile.convocationDate}
                         </dd>
                       </div>
@@ -594,9 +594,9 @@ export function PublicSubPages({
               </div>
 
               <div className="lg:col-span-5 space-y-5">
-                <div className="rounded-2xl border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
-                  <div className="px-5 py-3.5 border-b border-amber-900/10 bg-white/50">
-                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800">
+                <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6]">
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800 text-left">
                       Founding Charter &amp; Key Dates
                     </p>
                   </div>
@@ -647,13 +647,13 @@ export function PublicSubPages({
                 </p>
               </div>
               <div className="lg:col-span-5">
-                <div className="rounded-2xl border border-amber-900/15 card-gradient-parchment overflow-hidden shadow-xs">
-                  <div className="px-5 py-3.5 border-b border-amber-900/10 bg-white/50">
-                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800">
+                <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6]">
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800 text-left">
                       Strategic Priorities
                     </p>
                   </div>
-                  <ul className="divide-y divide-slate-200 text-sm">
+                  <ul className="divide-y divide-stone-200 text-sm">
                     <li className="px-5 py-3 flex items-center justify-between gap-4">
                       <span className="font-medium text-slate-800">OBE Curriculum &amp; IQAC</span>
                       <span className="font-mono text-xs font-semibold text-pust-800">Active</span>
@@ -694,16 +694,14 @@ export function PublicSubPages({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
                   {resolved.aboutExtras.milestones.map((m, idx) => {
                     const milestoneStyle =
-                      idx % 3 === 0
-                        ? 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
-                        : idx % 3 === 1
-                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                        : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45';
+                      idx % 2 === 0
+                        ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                        : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45';
                     return (
                       <MotionCard
                         key={`${m.year}-${idx}`}
                         delay={idx * 0.04}
-                        className={`h-full flex flex-col p-5 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${milestoneStyle}`}
+                        className={`h-full flex flex-col p-5 space-y-1.5 rounded-2xl border transition-colors ${milestoneStyle}`}
                       >
                         <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                           {m.year}
@@ -819,8 +817,8 @@ export function PublicSubPages({
                     }}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                        : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-600 hover:text-pust-800'
+                        ? 'bg-pust-900 text-white border border-pust-900'
+                        : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
                     }`}
                   >
                     {tab.label}
@@ -876,18 +874,12 @@ export function PublicSubPages({
                     <MotionCard
                       key={`${prog.level}-${idx}`}
                       delay={idx * 0.04}
-                      className={`h-full flex flex-col justify-between p-6 rounded-2xl border space-y-4 shadow-xs hover:shadow-md transition-all ${
-                        idx % 2 === 0
-                          ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                          : 'card-gradient-crimson border-pust-200/80 hover:border-pust-600/45'
+                      className={`h-full flex flex-col justify-between p-6 rounded-2xl border border-stone-200 hover:border-pust-700/45 space-y-4 transition-colors ${
+                        idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                       }`}
                     >
                       <div className="space-y-2.5">
-                        <p
-                          className={`font-mono text-xs uppercase tracking-wider font-semibold ${
-                            idx % 2 === 0 ? 'text-lapis-700' : 'text-pust-800'
-                          }`}
-                        >
+                        <p className="font-mono text-xs uppercase tracking-wider font-semibold text-pust-800 text-left">
                           {prog.duration}
                         </p>
                         <h2 className="font-serif text-2xl font-medium text-slate-900">{prog.level}</h2>
@@ -895,7 +887,7 @@ export function PublicSubPages({
                           {prog.degrees}
                         </p>
                       </div>
-                      <dl className="pt-3 border-t border-slate-200/80 space-y-1.5 text-xs">
+                      <dl className="pt-3 border-t border-stone-200 space-y-1.5 text-xs">
                         <div className="flex justify-between gap-4">
                           <dt className="text-slate-500">Credit Structure</dt>
                           <dd className="font-mono text-slate-900 text-right">{prog.credits}</dd>
@@ -911,9 +903,9 @@ export function PublicSubPages({
               )}
 
               {/* Official PUST Specialized Institute (IIED) */}
-              <div className="card-gradient-sage rounded-2xl border border-sage-200/80 p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                 <div className="space-y-1.5 max-w-3xl">
-                  <p className="font-mono text-xs uppercase tracking-widest text-sage-800">
+                  <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
                     University Institute · pust.ac.bd/academic/Institute
                   </p>
                   <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
@@ -929,7 +921,7 @@ export function PublicSubPages({
                   href="https://pust.ac.bd/academic/Institute"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg border border-sage-600/40 bg-white text-sage-900 hover:border-sage-700 hover:bg-sage-50 whitespace-nowrap shrink-0 self-start lg:self-center"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg border border-stone-300 bg-white text-pust-900 hover:border-pust-800 whitespace-nowrap shrink-0 self-start lg:self-center"
                 >
                   Official IIED Portal
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -997,24 +989,18 @@ export function PublicSubPages({
                 const facTeachers = facDepts.reduce((s, d) => s + (d.facultyCount ?? 0), 0);
                 const facWorks = facDepts.reduce((s, d) => s + (d.researchTotal ?? 0), 0);
                 const isCopied = copiedContact === fac.email;
-                const facGradient =
-                  idx === 0
-                    ? 'card-gradient-lapis border-lapis-200/80'
-                    : idx === 1
-                    ? 'card-gradient-sage border-sage-200/80'
-                    : idx === 2
-                    ? 'card-gradient-gold border-gold-200/80'
-                    : idx === 3
-                    ? 'card-gradient-crimson border-pust-200/80'
-                    : 'card-gradient-parchment border-slate-200';
+                const facSurface =
+                  idx % 2 === 0
+                    ? 'bg-white border-stone-200'
+                    : 'bg-[#FAF9F6] border-stone-200';
 
                 return (
                   <MotionCard
                     key={fac.faculty}
                     delay={idx * 0.04}
-                    className={`rounded-2xl border ${facGradient} overflow-hidden shadow-xs`}
+                    className={`rounded-2xl border ${facSurface} overflow-hidden`}
                   >
-                    <div className="px-6 py-5 border-b border-slate-200/80 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    <div className="px-6 py-5 border-b border-stone-200 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                       <div className="lg:col-span-6 space-y-1.5">
                         <p className="font-mono text-xs text-pust-800 tabular-nums">
                           {fac.code.split('·')[0].trim()} · {facDepts.length}{' '}
@@ -1311,14 +1297,14 @@ export function PublicSubPages({
                           </button>
                         </div>
                       ) : (
-                        <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                        <div className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
                           {visibleOfficialForms.map((item) => (
                             <div
                               key={`${item.serial}-${item.title}`}
-                              className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF8F4] transition-colors"
+                              className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF9F6] transition-colors"
                             >
                               <div className="space-y-0.5 min-w-0">
-                                <p className="font-mono text-[11px] text-slate-500 tabular-nums">
+                                <p className="font-mono text-[11px] text-slate-500 tabular-nums text-left">
                                   Form #{String(item.serial).padStart(2, '0')} · {item.category}
                                 </p>
                                 <h3 className="text-sm font-medium text-slate-900">
@@ -1331,7 +1317,7 @@ export function PublicSubPages({
                                     href={item.pdfUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-pust-300 bg-pust-50/70 text-pust-900 hover:bg-pust-100 whitespace-nowrap"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg border border-stone-300 bg-[#FAF9F6] text-pust-900 hover:border-pust-800 whitespace-nowrap"
                                   >
                                     <FileDown className="w-3.5 h-3.5" />
                                     PDF
@@ -1342,7 +1328,7 @@ export function PublicSubPages({
                                     href={item.docUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-lapis-200 bg-lapis-50/70 text-lapis-900 hover:bg-lapis-100 whitespace-nowrap"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap"
                                   >
                                     <FileText className="w-3.5 h-3.5" />
                                     DOCX
@@ -1360,10 +1346,10 @@ export function PublicSubPages({
             })()
           ) : route === '/academics/calendar' ? (
             <div className="space-y-6">
-              <div className="card-gradient-parchment rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
+              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+                    <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
                       Official Bi-Semester Ordinance (pust.ac.bd)
                     </p>
                     <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900 mt-0.5">
@@ -1374,7 +1360,7 @@ export function PublicSubPages({
                     Each Academic Year = 2 Semesters × 20 Weeks
                   </span>
                 </div>
-                <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-200/80 text-xs">
+                <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-stone-200 text-xs">
                   <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
                     <dt className="text-slate-500">Class Teaching</dt>
                     <dd className="font-mono text-base font-semibold text-slate-900 tabular-nums mt-0.5">
@@ -1422,10 +1408,8 @@ export function PublicSubPages({
                     <MotionCard
                       key={`${s.title}-${idx}`}
                       delay={idx * 0.04}
-                      className={`h-full flex flex-col p-6 rounded-2xl border hover:shadow-md space-y-2 shadow-xs transition-all ${
-                        idx % 2 === 0
-                          ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
-                          : 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
+                      className={`h-full flex flex-col p-6 rounded-2xl border border-stone-200 hover:border-pust-700/45 space-y-2 transition-colors ${
+                        idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                       }`}
                     >
                       <h2 className="font-serif text-xl font-medium text-slate-900 text-left">{s.title}</h2>
@@ -1500,21 +1484,15 @@ export function PublicSubPages({
                       <MotionCard
                         key={sem.id}
                         delay={idx * 0.04}
-                        className={`p-5 sm:p-6 rounded-2xl border shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                          isEven
-                            ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                            : 'card-gradient-teal border-teal-200/80 hover:border-teal-600/45'
+                        className={`p-5 sm:p-6 rounded-2xl border border-stone-200 hover:border-pust-700/45 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                          isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                         }`}
                       >
                         <div className="space-y-1">
-                          <p
-                            className={`font-mono text-xs font-semibold tabular-nums ${
-                              isEven ? 'text-lapis-800' : 'text-teal-800'
-                            }`}
-                          >
+                          <p className="font-mono text-xs font-semibold tabular-nums text-pust-800 text-left">
                             {sem.date} · {sem.organizer}
                           </p>
-                          <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900">
+                          <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900 text-left">
                             {sem.title}
                           </h2>
                         </div>
@@ -1582,8 +1560,8 @@ export function PublicSubPages({
                           onClick={() => setSelectedFaculty(tab.value)}
                           className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                             selectedFaculty === tab.value
-                              ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                              : 'bg-[#F8F5EE] border border-slate-300/80 text-slate-800 hover:text-pust-900 hover:border-pust-700'
+                              ? 'bg-pust-900 text-white border border-pust-900'
+                              : 'bg-white border border-stone-200 text-slate-800 hover:text-pust-900 hover:border-pust-700/50'
                           }`}
                         >
                           {tab.label}
@@ -1667,7 +1645,7 @@ export function PublicSubPages({
                                   <MotionCard
                                     key={dept.id}
                                     delay={(idx % 6) * 0.03}
-                                    className={`relative h-full text-left rounded-2xl border ${deptGradient} shadow-xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group ${
+                                    className={`relative h-full text-left rounded-2xl border ${deptGradient} transition-colors flex flex-col justify-between overflow-hidden group ${
                                       isOpening ? 'ring-2 ring-pust-800/45 border-pust-800' : ''
                                     }`}
                                   >
@@ -1927,8 +1905,8 @@ export function PublicSubPages({
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route ||
                     (route === '/admissions' && t.route === '/admissions/undergraduate')
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-pust-900 text-white border border-pust-900'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   {t.label}
@@ -1977,7 +1955,7 @@ export function PublicSubPages({
                   </button>
                 </div>
               ) : (
-                <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+                <div className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
                   {admissionNotices.map((n) => (
                     <div
                       key={n.id}
@@ -2033,15 +2011,11 @@ export function PublicSubPages({
                   <MotionCard
                     key={`${unit.unitLabel}-${idx}`}
                     delay={idx * 0.04}
-                    className={`h-full flex flex-col p-6 space-y-1.5 rounded-2xl border shadow-xs hover:shadow-md transition-all ${
-                      idx === 0
-                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                        : idx === 1
-                        ? 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
-                        : 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
+                    className={`h-full flex flex-col p-6 space-y-1.5 rounded-2xl border border-stone-200 hover:border-pust-700/45 transition-colors ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                     }`}
                   >
-                    <p className="font-mono text-xs text-pust-800">{unit.unitLabel}</p>
+                    <p className="font-mono text-xs text-pust-800 text-left">{unit.unitLabel}</p>
                     <p className="font-serif text-lg font-medium text-slate-900 text-left">
                       {unit.deptCountLabel}
                     </p>
@@ -2124,9 +2098,9 @@ export function PublicSubPages({
                   </button>
 
                   {/* Pre-Login Public Inquiry & Account Application Status Tracker */}
-                  <div className="card-gradient-lapis rounded-2xl border border-lapis-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
+                  <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
                     <div>
-                      <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
                         Live Status Tracker
                       </p>
                       <h2 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
@@ -2191,7 +2165,7 @@ export function PublicSubPages({
 
                 <div
                   id="admission-inquiry-form"
-                  className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs scroll-mt-28"
+                  className="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 scroll-mt-28"
                 >
                   <h2 className="font-serif text-2xl font-medium text-slate-900">
                     Submit an Admission Inquiry
@@ -2419,8 +2393,8 @@ export function PublicSubPages({
                   href={f.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-pust-900 text-white border border-pust-900'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   {f.label}
@@ -2433,7 +2407,7 @@ export function PublicSubPages({
             <div className="lg:col-span-6 space-y-6">
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
-              <dl className="rounded-2xl border border-sage-200/80 card-gradient-sage divide-y divide-sage-200/70 text-sm overflow-hidden shadow-xs">
+              <dl className="rounded-2xl border border-stone-200 bg-[#FAF9F6] divide-y divide-stone-200 text-sm overflow-hidden">
                 <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                   <dt className="text-slate-600">Service Hours</dt>
                   <dd className="font-mono font-medium text-slate-900 sm:text-right">{currentFac.hours}</dd>
@@ -2548,8 +2522,8 @@ export function PublicSubPages({
                   onClick={() => setGalleryCategory(c)}
                   className={`px-3.5 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors whitespace-nowrap shrink-0 ${
                     galleryCategory === c
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-pust-900 text-white border border-pust-900'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   {c}
@@ -2612,7 +2586,7 @@ export function PublicSubPages({
                           setActiveMedia(item);
                         }
                       }}
-                      className={`h-full text-left rounded-2xl border ${eventTheme.cardClass} transition-all group cursor-pointer flex flex-col overflow-hidden shadow-xs hover:shadow-md`}
+                      className={`h-full text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col overflow-hidden`}
                     >
                       <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden w-full">
                         <ResilientImage
@@ -2775,8 +2749,8 @@ export function PublicSubPages({
                   href={tab.route}
                   className={`h-10 inline-flex items-center justify-center px-3.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === tab.route
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-pust-900 text-white border border-pust-900'
+                      : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
                   }`}
                 >
                   {tab.label}
@@ -2792,13 +2766,13 @@ export function PublicSubPages({
                 onChange={(e) => setNoticeQuery(e.target.value)}
                 placeholder="Search circulars or memo no."
                 aria-label="Search circulars or memo number"
-                className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-slate-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
+                className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-stone-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 py-4 border-b border-slate-200">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 py-4 border-b border-stone-200">
           <div
             role="group"
             aria-label="Filter notices by category"
@@ -2811,8 +2785,8 @@ export function PublicSubPages({
                 onClick={() => setSelectedNoticeCat(cat)}
                 className={`h-9 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
-                    ? 'bg-pust-800 text-white border-pust-800 shadow-xs'
-                    : 'bg-white border-slate-300/80 text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                    ? 'bg-pust-900 text-white border-pust-900'
+                    : 'bg-white border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
                 }`}
               >
                 {cat}
@@ -2823,7 +2797,7 @@ export function PublicSubPages({
           <div
             role="group"
             aria-label="Filter notices by board scope"
-            className="inline-flex items-center self-start xl:self-auto p-1 rounded-xl bg-white border border-slate-200/90 shadow-2xs overflow-x-auto max-w-full shrink-0"
+            className="inline-flex items-center self-start xl:self-auto p-1 rounded-xl bg-white border border-stone-200 overflow-x-auto max-w-full shrink-0"
           >
             {(
               [
@@ -2838,8 +2812,8 @@ export function PublicSubPages({
                 onClick={() => setNoticeBoardScope(scope.id)}
                 className={`h-7 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   noticeBoardScope === scope.id
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-[#FAF9F6]'
                 }`}
               >
                 {scope.label}
@@ -2867,7 +2841,7 @@ export function PublicSubPages({
             )}
           </div>
         ) : filteredNotices.length === 0 ? (
-          <div className="py-12 px-6 text-sm text-slate-700 bg-white rounded-2xl border border-slate-200 mt-6 text-center space-y-3">
+          <div className="py-12 px-6 text-sm text-slate-700 bg-white rounded-2xl border border-stone-200 mt-6 text-center space-y-3">
             <p className="text-center">No notices match the selected filter criteria.</p>
             <button
               type="button"
@@ -2876,7 +2850,7 @@ export function PublicSubPages({
                 setNoticeBoardScope('all');
                 setNoticeQuery('');
               }}
-              className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-800 text-white hover:bg-pust-900 transition-colors cursor-pointer"
+              className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
             >
               Reset Notice Filters
             </button>
@@ -2884,9 +2858,9 @@ export function PublicSubPages({
         ) : (
           <div
             ref={noticesBoardRef}
-            className="rounded-2xl border border-slate-200 bg-white mt-6 overflow-hidden shadow-xs"
+            className="rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
           >
-            <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF8F4] border-b border-slate-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+            <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
               <div className="lg:col-span-2">Date &amp; Category</div>
               <div className="lg:col-span-7">Official Circular</div>
               <div className="lg:col-span-3 text-right">Memo Reference</div>

@@ -396,7 +396,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
               ? focusEventOnCalendar(nextHighlights.exam)
               : setCategoryFilter('exam')
           }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-pust-700/60 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-pust-700/55 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
@@ -430,7 +430,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
               ? focusEventOnCalendar(nextHighlights.holiday)
               : setCategoryFilter('holiday')
           }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-emerald-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-emerald-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">
@@ -464,7 +464,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
               ? focusEventOnCalendar(nextHighlights.deadline)
               : setCategoryFilter('deadline')
           }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] hover:border-amber-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-amber-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-amber-800 font-semibold">
@@ -542,13 +542,13 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Upcoming vs All Dates */}
-            <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200">
+            <div className="inline-flex p-1 rounded-lg bg-[#F5F3EE] border border-stone-200">
               <button
                 type="button"
                 onClick={() => setTimeframe('upcoming')}
                 className={`min-h-[34px] px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   timeframe === 'upcoming'
-                    ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                    ? 'bg-white text-pust-900 font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -559,7 +559,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 onClick={() => setTimeframe('all')}
                 className={`min-h-[34px] px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   timeframe === 'all'
-                    ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                    ? 'bg-white text-pust-900 font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -568,13 +568,13 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
             </div>
 
             {/* Month Grid vs Timeline List */}
-            <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200">
+            <div className="inline-flex p-1 rounded-lg bg-[#F5F3EE] border border-stone-200">
               <button
                 type="button"
                 onClick={() => setViewMode('month')}
                 className={`min-h-[34px] inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'month'
-                    ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                    ? 'bg-white text-pust-900 font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -586,7 +586,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 onClick={() => setViewMode('timeline')}
                 className={`min-h-[34px] inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'timeline'
-                    ? 'bg-white text-pust-900 shadow-xs font-semibold'
+                    ? 'bg-white text-pust-900 font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -684,8 +684,8 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
       ) : viewMode === 'month' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Interactive Monthly Grid */}
-          <div className="lg:col-span-7 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-            <div className="px-4 sm:px-5 py-3.5 bg-[#F7F7F5] border-b border-slate-200 flex items-center justify-between gap-2">
+          <div className="lg:col-span-7 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+            <div className="px-4 sm:px-5 py-3.5 bg-[#FAF9F6] border-b border-stone-200 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900 truncate">
                   {MONTH_NAMES[cursorMonth.month]} {cursorMonth.year}
@@ -854,10 +854,10 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
           </div>
 
           {/* Right Column: Selected Day / Monthly Schedule Inspector */}
-          <div className="lg:col-span-5 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-            <div className="px-5 py-3.5 bg-[#F7F7F5] border-b border-slate-200 flex items-center justify-between gap-2">
+          <div className="lg:col-span-5 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+            <div className="px-5 py-3.5 bg-[#FAF9F6] border-b border-stone-200 flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold text-left">
                   {selectedDate ? 'Selected Date Schedule' : 'Monthly Schedule'}
                 </p>
                 <h3 className="font-serif text-lg font-medium text-slate-900 truncate">
@@ -1000,7 +1000,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 </span>
               </div>
 
-              <div className="rounded-2xl divide-y divide-slate-200 border border-slate-200 bg-white overflow-hidden shadow-xs">
+              <div className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
                 {groupItems.map((row) => {
                   const meta = CATEGORY_META[row.resolvedCategory];
                   const rel = getRelativeDayLabel(row.date, row.effectiveEndDate, todayIso);

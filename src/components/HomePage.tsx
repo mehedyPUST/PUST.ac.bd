@@ -297,7 +297,7 @@ export function HomePage({
       <section
         ref={heroSectionRef}
         id="banner"
-        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F4F2EC] border-b border-slate-200 scroll-mt-28"
+        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
@@ -384,9 +384,9 @@ export function HomePage({
               onFocusCapture={() => setBannerPaused(true)}
               onBlurCapture={() => setBannerPaused(false)}
             >
-              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-slate-200 bg-slate-900 shadow-sm">
+              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-stone-200 bg-slate-900 shadow-[0_20px_48px_-24px_rgba(28,25,23,0.28)]">
                 {loadingData && !currentSlide ? (
-                  <div className="w-full h-full min-h-[300px] lg:min-h-[420px] bg-slate-200 animate-pulse" />
+                  <div className="w-full h-full min-h-[300px] lg:min-h-[420px] bg-stone-200 animate-pulse" />
                 ) : currentSlide ? (
                   <>
                     <AnimatePresence initial={false}>
@@ -454,7 +454,7 @@ export function HomePage({
                             setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
                           }
                           aria-label="Previous banner slide"
-                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/65 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -462,7 +462,7 @@ export function HomePage({
                           type="button"
                           onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
                           aria-label="Next banner slide"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-full bg-slate-950/65 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>
@@ -581,7 +581,7 @@ export function HomePage({
       {/* 2. Vice-Chancellor's Welcome Message & History */}
       <section
         id="vc-message"
-        className="bg-white border-b border-slate-200 py-14 lg:py-16 scroll-mt-28"
+        className="bg-white border-b border-stone-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           {/* Unified Card: VC Portrait, Credentials & Welcome Message */}
@@ -877,7 +877,7 @@ export function HomePage({
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           <div className="lg:col-span-7 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   Notice Board
@@ -995,8 +995,8 @@ export function HomePage({
                               onSelectNotice(notice);
                             }
                           }}
-                          className={`w-full text-left px-6 py-4 hover:bg-pust-50/70 transition-colors space-y-1.5 group cursor-pointer ${
-                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F4]/70'
+                          className={`w-full text-left px-6 py-4 hover:bg-[#FAF9F6] transition-colors space-y-1.5 group cursor-pointer ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/65'
                           }`}
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -1031,7 +1031,7 @@ export function HomePage({
           </div>
 
           <div className="editable-region lg:col-span-5 space-y-5">
-            <div className="pb-4 border-b border-slate-200 flex items-end justify-between gap-3">
+            <div className="pb-4 border-b border-stone-200 flex items-end justify-between gap-3">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   {institutionalLinksEyebrow || 'Digital Services & Directory'}
@@ -1050,7 +1050,7 @@ export function HomePage({
             {loadingData && !profile ? (
               <NoticeListSkeleton rows={4} />
             ) : institutionalLinks.length === 0 ? (
-              <div className="p-6 rounded-2xl border border-slate-200 bg-white text-sm text-slate-700">
+              <div className="p-6 rounded-2xl border border-stone-200 bg-white text-sm text-slate-700">
                 No institutional directory links configured yet.
               </div>
             ) : (
@@ -1276,7 +1276,7 @@ export function HomePage({
           {loadingData && galleryItems.length === 0 ? (
             <MediaGridSkeleton count={4} />
           ) : visibleEvents.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-slate-200 bg-white text-center space-y-3">
+            <div className="p-8 rounded-2xl border border-stone-200 bg-white text-center space-y-3">
               <p className="text-sm text-slate-600">
                 No news or campus events currently listed
                 {eventCategory !== 'All' ? ` under ${eventCategory}` : ''}.
@@ -1285,7 +1285,7 @@ export function HomePage({
                 <button
                   type="button"
                   onClick={() => setEventCategory('All')}
-                  className="px-4 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-slate-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                 >
                   Show All Categories
                 </button>
@@ -1315,7 +1315,7 @@ export function HomePage({
                           setActiveMedia(item);
                         }
                       }}
-                      className={`text-left rounded-2xl border ${eventTheme.cardClass} shadow-xs hover:shadow-sm transition-all group cursor-pointer flex flex-col overflow-hidden`}
+                      className={`text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col overflow-hidden`}
                     >
                       <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
                         <ResilientImage
@@ -1388,7 +1388,7 @@ export function HomePage({
             ) : (
               <div
                 ref={seminarGridRef}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-200"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-stone-200"
               >
                 {upcomingSeminars.map((ev, idx) => (
                   <div
@@ -1440,10 +1440,10 @@ export function HomePage({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 6, scale: 0.99 }}
                 transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+                className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-slate-200 bg-slate-50">
+                <div className="flex items-start justify-between gap-4 px-5 py-4 border-b border-stone-200 bg-[#FAF9F6]">
                   <div>
                     <p className="font-mono text-xs text-pust-800 tabular-nums">
                       {activeMedia.category} ·{' '}

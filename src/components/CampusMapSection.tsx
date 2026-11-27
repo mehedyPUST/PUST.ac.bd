@@ -122,11 +122,11 @@ export function CampusMapSection() {
       ref={mapSectionRef}
       id="campus-map"
       aria-labelledby="campus-map-heading"
-      className="editable-region bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16 scroll-mt-36"
+      className="editable-region bg-[#F5F3EE] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header + Zone Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-slate-200 pb-5">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-stone-200 pb-5">
           <div>
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               {campusMapMeta.eyebrow}
@@ -137,10 +137,12 @@ export function CampusMapSection() {
             >
               {campusMapMeta.title}
             </h2>
-            <p className="text-fluid-body text-slate-700 mt-1.5 max-w-2xl">{campusMapMeta.subtitle}</p>
+            <p className="text-fluid-body text-slate-700 mt-1.5 max-w-2xl text-left">
+              {campusMapMeta.subtitle}
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <EditTriggerButton
               target={{ kind: 'campus-building', buildingId: activeBuilding?.id }}
               label="Edit Map & Buildings"
@@ -149,7 +151,7 @@ export function CampusMapSection() {
             <div
               role="group"
               aria-label="Filter campus buildings by precinct"
-              className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 max-w-full pb-1 sm:pb-0"
+              className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
             >
               {ZONES.map((zone) => {
                 const active = selectedZone === zone;
@@ -158,10 +160,10 @@ export function CampusMapSection() {
                     key={zone}
                     type="button"
                     onClick={() => handleZoneChange(zone)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       active
-                        ? 'bg-pust-800 text-white shadow-xs'
-                        : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-600 hover:text-pust-800'
+                        ? 'bg-pust-900 text-white'
+                        : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
                     }`}
                   >
                     {zone === 'All' ? 'All Precincts' : zone}
@@ -176,7 +178,7 @@ export function CampusMapSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left: Interactive Architectural Blueprint */}
           <div className="lg:col-span-7 flex flex-col gap-4">
-            <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-slate-200 overflow-hidden select-none shadow-xs">
+            <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-stone-200 overflow-hidden select-none">
               {/* Architectural Blueprint SVG Layer */}
               <svg
                 viewBox="0 0 800 500"
@@ -434,12 +436,18 @@ export function CampusMapSection() {
               })}
             </div>
 
-              {/* Direct Clickable Building Directory Grid (Accessible on Desktop & Mobile) */}
-            <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-2.5 shadow-xs">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700">
-                Campus Buildings Index ({filteredBuildings.length}) — Click a building name
-              </p>
-              <div ref={buildingIndexRef} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Direct Clickable Building Directory Grid */}
+            <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
+              <div className="px-4 py-3 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2">
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-600 text-left">
+                  Campus Buildings Index ({filteredBuildings.length})
+                </p>
+                <span className="font-mono text-[11px] text-stone-500">Select building</span>
+              </div>
+              <div
+                ref={buildingIndexRef}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-stone-200"
+              >
                 {filteredBuildings.map((b) => {
                   const isSelected = activeBuilding.id === b.id;
                   return (
@@ -448,16 +456,16 @@ export function CampusMapSection() {
                       data-gsap-building-btn
                       type="button"
                       onClick={() => setSelectedBuildingId(b.id)}
-                      className={`px-3 py-2.5 rounded-lg text-left border transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
+                      className={`px-4 py-3 text-left transition-colors duration-150 flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
-                          ? 'bg-pust-800 text-white border-pust-900 shadow-xs'
-                          : 'bg-[#FAF9F6] text-slate-900 border-slate-200 hover:border-pust-500 hover:bg-white'
+                          ? 'bg-pust-900 text-white'
+                          : 'bg-white text-slate-900 hover:bg-[#FAF9F6]'
                       }`}
                     >
                       <span className="text-xs font-medium truncate">{b.name}</span>
                       <span
                         className={`font-mono text-[10px] shrink-0 tabular-nums ${
-                          isSelected ? 'text-gold-200 font-semibold' : 'text-slate-600'
+                          isSelected ? 'text-gold-200 font-semibold' : 'text-stone-500'
                         }`}
                       >
                         {b.code}
@@ -478,7 +486,7 @@ export function CampusMapSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0.4 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full rounded-2xl bg-white border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between overflow-hidden"
+                className="w-full rounded-2xl bg-white border border-stone-200 transition-colors flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   <ResilientImage
@@ -492,7 +500,7 @@ export function CampusMapSection() {
                   <div className="p-6 space-y-4">
                     <div>
                       <div className="flex items-center justify-between gap-3">
-                        <p className="font-mono text-xs font-semibold text-sage-800 tabular-nums">
+                        <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
                           {activeBuilding.code} · {activeBuilding.zone} · {activeBuilding.gridRef}
                         </p>
                         <EditTriggerButton
@@ -506,9 +514,11 @@ export function CampusMapSection() {
                       </h3>
                     </div>
 
-                    <p className="text-fluid-body text-slate-800 leading-relaxed">{activeBuilding.summary}</p>
+                    <p className="text-fluid-body text-slate-800 leading-relaxed text-left">
+                      {activeBuilding.summary}
+                    </p>
 
-                    <dl className="divide-y divide-slate-200 border-y border-slate-200 text-xs sm:text-sm">
+                    <dl className="divide-y divide-stone-200 border-y border-stone-200 text-xs sm:text-sm">
                       <div className="py-2.5 space-y-0.5">
                         <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                           Offices &amp; Academic Units

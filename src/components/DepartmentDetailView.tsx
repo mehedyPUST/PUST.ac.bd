@@ -2416,7 +2416,7 @@ export function DepartmentDetailView({
               <PersonProfileCard
                 person={chairman}
                 roleCategory="Chairman"
-                accentClass="card-gradient-crimson border-pust-200/90 h-full"
+                accentClass="bg-white border-stone-200 hover:border-pust-700/45 h-full"
                 canEdit={canAdminEdit}
                 onViewProfile={handleOpenProfile}
                 onEditPerson={handleEditPerson}
@@ -2427,17 +2427,17 @@ export function DepartmentDetailView({
             <div className="lg:col-span-5">
               <MotionCard
                 delay={0.04}
-                className="rounded-2xl border border-amber-900/15 card-gradient-parchment p-5 sm:p-6 shadow-xs h-full flex flex-col justify-between space-y-5"
+                className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-5 sm:p-6 h-full flex flex-col justify-between space-y-5"
               >
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-pust-700 shrink-0" />
-                    <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-700">
+                    <Building2 className="w-4 h-4 text-pust-800 shrink-0" />
+                    <h3 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-800">
                       Department at a Glance
                     </h3>
                   </div>
 
-                  <dl className="divide-y divide-slate-200/80 text-xs sm:text-[13px]">
+                  <dl className="divide-y divide-stone-200 text-xs sm:text-[13px]">
                     {department.contactPhone && (
                       <div className="py-2.5 flex items-center justify-between gap-4">
                         <dt className="text-slate-700 font-medium">Contact</dt>
@@ -2742,8 +2742,8 @@ export function DepartmentDetailView({
                   delay={(idx % 6) * 0.03}
                   accentClass={
                     idx % 2 === 0
-                      ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                      : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
+                      ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                      : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
@@ -2755,7 +2755,7 @@ export function DepartmentDetailView({
         </div>
 
         {/* Faculty Members (Contractual) */}
-        <div className="space-y-4 pt-2 border-t border-slate-200">
+        <div className="space-y-4 pt-2 border-t border-stone-200">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <GraduationCap className="w-4 h-4 text-gold-700 shrink-0" />
@@ -2777,7 +2777,7 @@ export function DepartmentDetailView({
           </div>
 
           {contractualFaculty.length === 0 ? (
-            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600 prose-justify">
+            <div className="px-5 py-4 rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs sm:text-sm text-slate-600 prose-justify">
               No contractual faculty members are currently listed for the Department of{' '}
               {department.name}.
             </div>
@@ -2791,8 +2791,8 @@ export function DepartmentDetailView({
                   delay={idx * 0.03}
                   accentClass={
                     idx % 2 === 0
-                      ? 'card-gradient-gold border-gold-200/80 hover:border-gold-600/45'
-                      : 'card-gradient-cerulean border-cerulean-200/80 hover:border-cerulean-600/45'
+                      ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                      : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
@@ -2804,7 +2804,7 @@ export function DepartmentDetailView({
         </div>
 
         {/* Officers */}
-        <div id="department-officers" className="space-y-4 pt-2 border-t border-slate-200 scroll-mt-24">
+        <div id="department-officers" className="space-y-4 pt-2 border-t border-stone-200 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <UserCheck className="w-4 h-4 text-pust-800 shrink-0" />
@@ -2826,7 +2826,7 @@ export function DepartmentDetailView({
           </div>
 
           {officers.length === 0 ? (
-            <div className="px-5 py-4 rounded-xl border border-slate-200 bg-[#F7F7F5] text-xs sm:text-sm text-slate-600 prose-justify">
+            <div className="px-5 py-4 rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs sm:text-sm text-slate-600 prose-justify">
               No departmental administrative or technical officers have been published for the
               Department of {department.name} yet.
             </div>
@@ -2840,8 +2840,8 @@ export function DepartmentDetailView({
                   delay={idx * 0.03}
                   accentClass={
                     idx % 2 === 0
-                      ? 'card-gradient-parchment border-slate-200 hover:border-pust-600/40'
-                      : 'card-gradient-crimson border-pust-200/75 hover:border-pust-600/45'
+                      ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                      : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
                   onViewProfile={handleOpenProfile}
@@ -2855,12 +2855,12 @@ export function DepartmentDetailView({
         {/* Research Priorities & Academic Laboratories */}
         <div
           id="department-research"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-200 scroll-mt-24"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-stone-200 scroll-mt-24"
         >
-          <div className="rounded-2xl border border-lapis-200/80 card-gradient-lapis p-6 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-stone-200 bg-white p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-lapis-800 shrink-0" />
-              <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-lapis-900">
+              <Sparkles className="w-4 h-4 text-pust-800 shrink-0" />
+              <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-900">
                 Research Priorities
               </h2>
             </div>
@@ -2868,7 +2868,7 @@ export function DepartmentDetailView({
               {department.researchFocus.map((topic) => (
                 <li
                   key={topic}
-                  className="pb-2.5 border-b border-slate-200/70 last:border-b-0 last:pb-0 leading-relaxed"
+                  className="pb-2.5 border-b border-stone-200 last:border-b-0 last:pb-0 leading-relaxed"
                 >
                   {topic}
                 </li>
@@ -2876,10 +2876,10 @@ export function DepartmentDetailView({
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-sage-200/80 card-gradient-sage p-6 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-sage-800 shrink-0" />
-              <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-sage-900">
+              <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
+              <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-900">
                 Academic Laboratories
               </h2>
             </div>
@@ -2887,7 +2887,7 @@ export function DepartmentDetailView({
               {department.laboratories.map((lab) => (
                 <li
                   key={lab}
-                  className="pb-2.5 border-b border-slate-200/70 last:border-b-0 last:pb-0 leading-relaxed"
+                  className="pb-2.5 border-b border-stone-200 last:border-b-0 last:pb-0 leading-relaxed"
                 >
                   {lab}
                 </li>
@@ -2900,7 +2900,7 @@ export function DepartmentDetailView({
         {deptPublications.length > 0 && (
           <div
             id="department-publications"
-            className="space-y-4 pt-4 border-t border-slate-200 scroll-mt-24"
+            className="space-y-4 pt-4 border-t border-stone-200 scroll-mt-24"
           >
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
@@ -2910,27 +2910,21 @@ export function DepartmentDetailView({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {deptPublications.map((pub, idx) => {
-                const isLapis = idx % 2 === 0;
+                const isEven = idx % 2 === 0;
                 return (
                   <div
                     key={pub.id}
-                    className={`p-4 sm:p-5 rounded-2xl border space-y-2 transition-colors ${
-                      isLapis
-                        ? 'card-gradient-lapis border-lapis-200/80 hover:border-lapis-600/45'
-                        : 'card-gradient-sage border-sage-200/80 hover:border-sage-600/45'
+                    className={`p-4 sm:p-5 rounded-2xl border border-stone-200 hover:border-pust-700/45 space-y-2 transition-colors ${
+                      isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                     }`}
                   >
-                    <p
-                      className={`font-mono text-[11px] font-semibold ${
-                        isLapis ? 'text-lapis-800' : 'text-sage-800'
-                      }`}
-                    >
+                    <p className="font-mono text-[11px] font-semibold text-pust-800 text-left">
                       {pub.year} · {pub.domain}
                     </p>
                     <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
                       {pub.title}
                     </h3>
-                    <p className="text-xs text-slate-600">{pub.authors}</p>
+                    <p className="text-xs text-slate-600 text-left">{pub.authors}</p>
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
                       <span className="text-slate-600">{pub.venue}</span>
                       {pub.url && (
