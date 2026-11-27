@@ -193,7 +193,7 @@ export function DepartmentNavbar({
                 setMobileSearchOpen(false);
               }}
               title="Pabna University of Science and Technology — Main Website"
-              className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3.5 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-start lg:self-stretch"
+              className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3.5 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-center lg:self-stretch"
             >
               <PustCrest size={32} className="lg:hidden" />
               <PustCrest size={68} className="hidden lg:block xl:hidden" />
