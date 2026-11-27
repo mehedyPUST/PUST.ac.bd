@@ -975,23 +975,23 @@ export function Navbar({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 360, damping: 36, mass: 0.9 }}
-              className="fixed inset-y-0 right-0 z-[56] w-[min(92vw,410px)] h-dvh bg-white border-l border-stone-200 shadow-2xl flex flex-col"
+              className="fixed inset-y-0 right-0 z-[56] w-[min(78vw,310px)] h-dvh bg-white border-l border-stone-200 shadow-2xl flex flex-col"
             >
               {/* Drawer Institutional Header */}
-              <div className="shrink-0 bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] text-white px-4 py-3 border-b border-gold-500/35 flex items-center justify-between gap-3">
+              <div className="shrink-0 bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] text-white px-3.5 py-2.5 border-b border-gold-500/35 flex items-center justify-between gap-2.5">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left"
+                  className="flex items-center gap-2 min-w-0 flex-1 text-left"
                 >
                   <span className="shrink-0 rounded-md bg-white p-1 flex items-center justify-center">
-                    <PustCrest size={30} />
+                    <PustCrest size={26} />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-serif text-[13px] font-medium leading-tight text-white text-left">
+                    <p className="font-serif text-[12px] font-medium leading-tight text-white text-left">
                       Pabna University of Science and Technology
                     </p>
-                    <p className="text-[11px] text-gold-300 font-medium mt-0.5 text-left truncate">
+                    <p className="text-[10.5px] text-gold-300 font-medium mt-0.5 text-left truncate">
                       {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                     </p>
                   </div>
@@ -1000,14 +1000,14 @@ export function Navbar({
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close navigation drawer"
-                  className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
+                  className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Drawer Search Strip */}
-              <div className="shrink-0 relative z-30 px-4 py-3 bg-[#FAF9F6] border-b border-stone-200">
+              <div className="shrink-0 relative z-30 px-3.5 py-2.5 bg-[#FAF9F6] border-b border-stone-200">
                 <GlobalSearchBar
                   variant="mobile"
                   onActionComplete={() => setMobileMenuOpen(false)}
@@ -1017,7 +1017,7 @@ export function Navbar({
               {/* Scrollable Navigation Sections */}
               <nav
                 aria-label="Mobile navigation"
-                className="relative z-10 flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-2 space-y-0.5 text-sm"
+                className="relative z-10 flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-1.5 space-y-0.5 text-[13.5px]"
               >
                 {/* Home */}
                 <div className="border-b border-stone-200/80">
@@ -1269,11 +1269,11 @@ export function Navbar({
               </nav>
 
               {/* Drawer Pinned Footer Actions */}
-              <div className="shrink-0 px-4 py-3 bg-[#FAF9F6] border-t border-stone-200 space-y-2">
+              <div className="shrink-0 px-3.5 py-2.5 bg-[#FAF9F6] border-t border-stone-200 space-y-2">
                 <Link
                   href={route === '/portal' ? '/' : '/portal'}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full min-h-[44px] inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold btn-primary-sheen transition-all"
+                  className="w-full min-h-[42px] inline-flex items-center justify-center px-3.5 py-2 rounded-lg text-[13px] font-semibold btn-primary-sheen transition-all"
                 >
                   {route === '/portal'
                     ? 'Return to Public Website'
