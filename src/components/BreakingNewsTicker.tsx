@@ -43,7 +43,7 @@ export function BreakingNewsTicker({
         className="pt-2 sm:pt-2.5 border-b border-stone-200/75 bg-[#FAF9F6] print:hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center gap-3 border-t border-stone-200/75 bg-white sm:border-x sm:border-t sm:border-b-0 sm:rounded-t-lg">
-          <div className="h-5 w-28 rounded bg-stone-200 animate-pulse" />
+          <div className="h-5 w-8 sm:w-28 rounded bg-stone-200 animate-pulse" />
           <div className="h-4 flex-1 max-w-md rounded bg-stone-200/80 animate-pulse" />
         </div>
       </section>
@@ -124,9 +124,12 @@ export function BreakingNewsTicker({
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div className="flex items-center h-10 border-t border-stone-200/75 sm:border-x sm:border-t sm:border-b-0 sm:rounded-t-lg sm:overflow-hidden bg-white">
           {/* Institutional Bulletin Tag */}
-          <div className="shrink-0 h-full bg-pust-800 text-white px-3 sm:px-4 inline-flex items-center gap-2">
+          <div
+            title="Latest"
+            className="shrink-0 h-full w-10 sm:w-auto justify-center bg-pust-800 text-white sm:px-4 inline-flex items-center sm:gap-2"
+          >
             <Radio className="w-3.5 h-3.5 text-gold-300 shrink-0" />
-            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
+            <span className="sr-only sm:not-sr-only font-mono text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
               Latest
             </span>
           </div>
