@@ -587,68 +587,11 @@ export function HomePage({
             <HeroSummarySkeleton />
           ) : currentVc ? (
             <MotionReveal>
-              <article className="editable-region rounded-xl bg-[#FAF8F2] border border-stone-300 overflow-hidden">
-                {/* Broadsheet Dateline & Masthead Rules */}
-                <div className="px-6 sm:px-8 pt-6 pb-5">
-                  <div className="border-t-2 border-stone-900 pt-2 border-b border-stone-400 pb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700 tabular-nums">
-                    <span>Office of the Vice-Chancellor · Rajapur, Pabna</span>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span>Tenure: {currentVc.tenure}</span>
-                      <EditTriggerButton
-                        target={{ kind: 'vc' }}
-                        label="Edit VC Profile & Message"
-                        variant="compact"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Broadsheet Headline & Byline Rule */}
-                  <header className="pt-5 text-left">
-                    <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-pust-800">
-                      Chancellery Address · Welcome Message
-                    </p>
-                    <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-slate-950 leading-[1.12] mt-1.5 text-balance">
-                      {currentVc.name}
-                    </h2>
-
-                    <div className="mt-4 py-2.5 border-t border-b-2 border-stone-900/85 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                      <p className="font-serif italic text-sm text-slate-800">
-                        Honorable Vice-Chancellor, Pabna University of Science and Technology
-                      </p>
-                      <div className="font-mono tabular-nums flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-700">
-                        {currentVc.email && (
-                          <a
-                            href={`mailto:${currentVc.email}`}
-                            className="font-semibold text-pust-800 hover:underline break-all"
-                          >
-                            {currentVc.email}
-                          </a>
-                        )}
-                        {currentVc.phone && (
-                          <a
-                            href={`tel:${currentVc.phone.replace(/\s+/g, '')}`}
-                            className="hover:text-slate-950"
-                          >
-                            {currentVc.phone}
-                          </a>
-                        )}
-                        <Link
-                          href="/administration/vc-office"
-                          className="inline-flex items-center gap-1 font-sans font-semibold text-pust-800 hover:underline whitespace-nowrap"
-                        >
-                          <span>VC Office</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-                    </div>
-                  </header>
-                </div>
-
-                {/* Broadsheet Columns: Lead Photograph Column + Multi-Column Editorial Copy */}
-                <div className="px-6 sm:px-8 pb-7 grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-                  {/* Left Newspaper Photo Column */}
-                  <div className="lg:col-span-3 lg:border-r lg:border-stone-300 lg:pr-7 space-y-2.5">
-                    <div className="max-w-[220px] lg:max-w-none border border-stone-400 p-1 bg-white">
+              <article className="editable-region rounded-2xl bg-white border border-stone-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                {/* Left: Portrait & Chancellery Dossier */}
+                <div className="lg:col-span-4 bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-stone-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
+                  <div className="space-y-5">
+                    <div className="max-w-[240px] mx-auto lg:max-w-none overflow-hidden rounded-xl border border-stone-200 bg-white">
                       <ResilientImage
                         src={currentVc.photoUrl || ''}
                         alt={currentVc.name}
@@ -656,29 +599,100 @@ export function HomePage({
                         className="w-full aspect-[3/4] object-cover object-top"
                       />
                     </div>
-                    <p className="text-xs font-serif italic text-stone-600 leading-relaxed border-b border-stone-300 pb-2.5">
-                      Fig. — {currentVc.name}, Honorable Vice-Chancellor of Pabna University of Science and Technology.
-                    </p>
+
+                    <div className="space-y-1.5 text-center lg:text-left">
+                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-700">
+                        Office of the Vice-Chancellor
+                      </p>
+                      <h3 className="font-serif text-xl font-semibold text-slate-950 leading-snug">
+                        {currentVc.name}
+                      </h3>
+                      <p className="text-xs font-medium text-stone-600">
+                        Honorable Vice-Chancellor
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Right Broadsheet Text Columns */}
-                  <div className="lg:col-span-9 flex flex-col justify-between">
-                    {vcBodyParagraphs.length > 0 ? (
-                      <div
-                        className={`${
-                          vcBodyParagraphs.length >= 2
-                            ? 'columns-1 md:columns-2 gap-8 md:[column-rule:1px_solid_#d6d3cd]'
-                            : 'max-w-3xl'
-                        } prose-justify text-[15.5px] sm:text-base text-slate-900 leading-[1.78]`}
+                  <dl className="divide-y divide-stone-200 border-t border-stone-200 text-xs">
+                    <div className="py-2.5 flex items-center justify-between gap-3">
+                      <dt className="font-mono text-[11px] uppercase tracking-wider text-stone-500">
+                        Tenure
+                      </dt>
+                      <dd className="font-mono font-semibold text-slate-900 tabular-nums">
+                        {currentVc.tenure}
+                      </dd>
+                    </div>
+                    {currentVc.email && (
+                      <div className="py-2.5 flex flex-col gap-0.5">
+                        <dt className="font-mono text-[11px] uppercase tracking-wider text-stone-500">
+                          Official Email
+                        </dt>
+                        <dd className="font-mono font-semibold text-pust-800 break-all">
+                          <a href={`mailto:${currentVc.email}`} className="hover:underline">
+                            {currentVc.email}
+                          </a>
+                        </dd>
+                      </div>
+                    )}
+                    {currentVc.phone && (
+                      <div className="py-2.5 flex items-center justify-between gap-3">
+                        <dt className="font-mono text-[11px] uppercase tracking-wider text-stone-500">
+                          Telephone
+                        </dt>
+                        <dd className="font-mono text-slate-800 tabular-nums">
+                          <a
+                            href={`tel:${currentVc.phone.replace(/\s+/g, '')}`}
+                            className="hover:text-slate-950"
+                          >
+                            {currentVc.phone}
+                          </a>
+                        </dd>
+                      </div>
+                    )}
+                    <div className="pt-3">
+                      <Link
+                        href="/administration/vc-office"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
                       >
+                        <span>Visit Vice-Chancellor Office</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </dl>
+                </div>
+
+                {/* Right: Editorial Welcome Address */}
+                <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-8 bg-white">
+                  <div className="space-y-6">
+                    <header className="pb-5 border-b border-stone-200 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
+                          Welcome Message · {currentVc.tenure}
+                        </p>
+                        <EditTriggerButton
+                          target={{ kind: 'vc' }}
+                          label="Edit VC Profile & Message"
+                          variant="compact"
+                        />
+                      </div>
+                      <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 leading-tight">
+                        {currentVc.name}
+                      </h2>
+                      <p className="text-sm text-stone-600 text-left">
+                        Pabna University of Science and Technology · Rajapur, Pabna-6600
+                      </p>
+                    </header>
+
+                    {vcBodyParagraphs.length > 0 ? (
+                      <div className="space-y-4 flow-root prose-justify text-fluid-body text-slate-800 leading-[1.82]">
                         {vcBodyParagraphs.map((paragraph, idx) => (
                           <p
                             key={idx}
-                            className={`mb-4 last:mb-0 ${
+                            className={
                               idx === 0
-                                ? 'first-letter:font-serif first-letter:text-[3.25rem] first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-0.5 first-letter:leading-[0.82] first-letter:text-pust-800'
+                                ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-800'
                                 : ''
-                            }`}
+                            }
                           >
                             {paragraph}
                           </p>
@@ -689,23 +703,22 @@ export function HomePage({
                         No welcome message published for this profile yet.
                       </p>
                     )}
-
-                    {/* Broadsheet Closing Rule & Signature */}
-                    <div className="mt-6 pt-4 border-t border-stone-300 flex flex-wrap items-baseline justify-between gap-3">
-                      {vcClosingLine ? (
-                        <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
-                          {vcClosingLine}
-                        </p>
-                      ) : (
-                        <span className="font-mono text-[11px] uppercase tracking-widest text-stone-500">
-                          Office of the Vice-Chancellor · PUST
-                        </span>
-                      )}
-                      <p className="font-serif text-sm font-semibold text-slate-800 text-left">
-                        — {currentVc.name}, Vice-Chancellor
-                      </p>
-                    </div>
                   </div>
+
+                  <footer className="pt-5 border-t border-stone-200 flex flex-wrap items-baseline justify-between gap-3">
+                    {vcClosingLine ? (
+                      <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
+                        {vcClosingLine}
+                      </p>
+                    ) : (
+                      <span className="font-mono text-[11px] uppercase tracking-widest text-stone-500">
+                        Chancellery · Rajapur Campus
+                      </span>
+                    )}
+                    <p className="text-sm font-semibold text-slate-800 text-left">
+                      {currentVc.name} · Vice-Chancellor
+                    </p>
+                  </footer>
                 </div>
               </article>
             </MotionReveal>
