@@ -43,9 +43,9 @@ import type {
 export const SEED_UNIVERSITY_PROFILE: UniversityProfile = {
   navbarTagline: DEFAULT_NAVBAR_TAGLINE,
   heroEyebrow: 'Rajapur, Pabna-6600 · First Convocation: 15 March 2027',
-  heroTitle: 'Advancing Science, Engineering & Inquiry',
+  heroTitle: 'Excellence in Science, Technology & Research',
   heroSubtitle:
-    'Founded in 2008 at Rajapur, Pabna, PUST serves nearly 5,000 students and 212 faculty members across 5 faculties and 21 academic departments.',
+    'A public university in Rajapur, Pabna, home to 5 faculties, 21 departments, 212 faculty members, and nearly 5,000 students.',
   establishedYear: 2008,
   campusAcres: 30,
   facultiesCount: 5,

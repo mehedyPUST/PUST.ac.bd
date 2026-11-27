@@ -350,17 +350,17 @@ export function HomePage({
 
               <div
                 data-gsap-hero
-                className="mt-8 pt-6 border-t border-stone-200 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3"
+                className="mt-8 pt-6 border-t border-stone-200 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3"
               >
                 <Link
                   href="/portal"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-4 sm:px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
                 >
                   Open Digital Campus Portal
                 </Link>
                 <Link
                   href="/academics/departments"
-                  className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 whitespace-nowrap shrink-0"
+                  className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-2.5 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
                 >
                   {profile?.departmentsCount
                     ? `Explore ${profile.departmentsCount} Departments`
@@ -368,11 +368,11 @@ export function HomePage({
                 </Link>
                 <Link
                   href="/verify"
-                  className="group inline-flex items-center justify-center sm:justify-start min-h-[44px] gap-1.5 px-2.5 py-2 text-sm font-semibold text-pust-800 hover:text-pust-950 transition-colors whitespace-nowrap shrink-0"
+                  className="order-2 sm:order-3 group inline-flex items-center justify-center sm:justify-start text-center min-h-[44px] gap-1.5 px-2.5 sm:px-2.5 py-2.5 sm:py-2 rounded-lg border border-stone-300 bg-white text-slate-900 sm:border-transparent sm:bg-transparent text-xs sm:text-sm font-semibold sm:text-pust-800 hover:border-pust-700 hover:text-pust-950 transition-colors leading-tight sm:whitespace-nowrap shrink-0"
                 >
-                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
                   <span className="underline-offset-4 group-hover:underline">Verify Document</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
               </div>
             </div>

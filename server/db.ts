@@ -437,12 +437,17 @@ class PustRepository {
           };
         }
       }
-      if (existingProfile.heroTitle === 'Advancing Science, Engineering & Human Inquiry from Pabna') {
+      if (
+        existingProfile.heroTitle === 'Advancing Science, Engineering & Human Inquiry from Pabna' ||
+        existingProfile.heroTitle === 'Advancing Science, Engineering & Inquiry'
+      ) {
         missingPatch.heroTitle = fullSeed.heroTitle;
       }
       if (
         existingProfile.heroSubtitle ===
-        'Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and 212 faculty members across 5 faculties, 21 academic departments, and end-to-end digital workflows.'
+          'Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and 212 faculty members across 5 faculties, 21 academic departments, and end-to-end digital workflows.' ||
+        existingProfile.heroSubtitle ===
+          'Founded in 2008 at Rajapur, Pabna, PUST serves nearly 5,000 students and 212 faculty members across 5 faculties and 21 academic departments.'
       ) {
         missingPatch.heroSubtitle = fullSeed.heroSubtitle;
       }
