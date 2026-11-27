@@ -437,6 +437,15 @@ class PustRepository {
           };
         }
       }
+      if (existingProfile.heroTitle === 'Advancing Science, Engineering & Human Inquiry from Pabna') {
+        missingPatch.heroTitle = fullSeed.heroTitle;
+      }
+      if (
+        existingProfile.heroSubtitle ===
+        'Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and 212 faculty members across 5 faculties, 21 academic departments, and end-to-end digital workflows.'
+      ) {
+        missingPatch.heroSubtitle = fullSeed.heroSubtitle;
+      }
       if (Object.keys(missingPatch).length > 0) {
         await profileCol.updateOne({ id: 'main' }, { $set: missingPatch });
       }

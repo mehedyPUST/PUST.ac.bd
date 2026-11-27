@@ -43,9 +43,9 @@ import type {
 export const SEED_UNIVERSITY_PROFILE: UniversityProfile = {
   navbarTagline: DEFAULT_NAVBAR_TAGLINE,
   heroEyebrow: 'Rajapur, Pabna-6600 · First Convocation: 15 March 2027',
-  heroTitle: 'Advancing Science, Engineering & Human Inquiry from Pabna',
+  heroTitle: 'Advancing Science, Engineering & Inquiry',
   heroSubtitle:
-    'Established in 2008 beside the Dhaka–Pabna highway in Rajapur (Gayeshpur, Pabna), Pabna University of Science and Technology serves nearly 5,000 scholars and 212 faculty members across 5 faculties, 21 academic departments, and end-to-end digital workflows.',
+    'Founded in 2008 at Rajapur, Pabna, PUST serves nearly 5,000 students and 212 faculty members across 5 faculties and 21 academic departments.',
   establishedYear: 2008,
   campusAcres: 30,
   facultiesCount: 5,

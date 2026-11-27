@@ -299,9 +299,9 @@ export function HomePage({
         id="banner"
         className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 lg:pt-14 lg:pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-            <div className="lg:col-span-6 flex flex-col justify-between py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 sm:pt-8 sm:pb-12 lg:pt-14 lg:pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-stretch">
+            <div className="order-2 lg:order-1 lg:col-span-6 flex flex-col justify-between py-1 lg:py-2">
               {loadingData && !profile ? (
                 <HeroSummarySkeleton />
               ) : profile ? (
@@ -378,7 +378,7 @@ export function HomePage({
             </div>
 
             <div
-              className="lg:col-span-6 flex flex-col"
+              className="order-1 lg:order-2 lg:col-span-6 flex flex-col"
               onMouseEnter={() => setBannerPaused(true)}
               onMouseLeave={() => setBannerPaused(false)}
               onFocusCapture={() => setBannerPaused(true)}
