@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronRight,
   Eye,
+  Home,
   Menu,
   Pencil,
   Plus,
@@ -221,7 +222,7 @@ export function DepartmentNavbar({
                       setMobileSearchOpen(false);
                     }}
                     title="Return to Pabna University of Science and Technology Main Website"
-                    className="block mt-0.5 text-[clamp(0.66rem,2.2vw,0.75rem)] sm:text-[12px] lg:text-[12.5px] xl:text-[13.5px] font-medium text-stone-200/95 hover:text-gold-200 transition-colors leading-[1.2] truncate"
+                    className="block mt-0.5 font-serif font-normal tracking-[0.01em] text-[clamp(0.66rem,2.2vw,0.76rem)] sm:text-[12px] lg:text-[12.5px] xl:text-[13.5px] text-gold-200/95 hover:text-white transition-colors leading-[1.2] truncate"
                   >
                     Pabna University of Science and Technology, Pabna.
                   </Link>
@@ -353,8 +354,21 @@ export function DepartmentNavbar({
                   })}
                 </nav>
 
-                {/* Desktop Right Actions: Department Switcher, Edit Mode & Portal */}
+                {/* Desktop Right Actions: PUST Home, Department Switcher, Edit Mode & Portal */}
                 <div className="flex items-center gap-2 shrink-0">
+                  <Link
+                    href="/"
+                    onClick={() => {
+                      setSwitcherOpen(false);
+                      setMobileDrawerOpen(false);
+                      setMobileSearchOpen(false);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border border-stone-300 bg-white text-pust-900 hover:bg-[#FAF8F4] hover:border-pust-800 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    <Home className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                    <span>PUST Home</span>
+                  </Link>
+
                   <div className="relative">
                     <button
                       type="button"
@@ -476,31 +490,46 @@ export function DepartmentNavbar({
           </div>
         </div>
 
-        {/* Mobile Tier 2 Strip: Compact Department Nav Links Right Under University Header */}
+        {/* Mobile Tier 2 Strip: Compact Department Nav Links + PUST Home */}
         <div className="lg:hidden bg-white border-t border-stone-200">
-          <nav
-            aria-label={`${departmentTitle} mobile navigation`}
-            className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center overflow-x-auto no-scrollbar gap-4 h-9 text-xs font-medium text-slate-800"
-          >
-            {DEPARTMENT_NAV_ITEMS.map((item) => {
-              const isActive = effectiveActiveTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-current={isActive ? 'page' : undefined}
-                  onClick={() => handleTabClick(item.id)}
-                  className={`h-9 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'border-pust-800 text-pust-900 font-semibold'
-                      : 'border-transparent text-slate-700 hover:text-pust-900'
-                  }`}
-                >
-                  {item.shortLabel}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-2 h-9">
+            <nav
+              aria-label={`${departmentTitle} mobile navigation`}
+              className="min-w-0 flex-1 flex items-center overflow-x-auto no-scrollbar gap-4 h-9 text-xs font-medium text-slate-800"
+            >
+              {DEPARTMENT_NAV_ITEMS.map((item) => {
+                const isActive = effectiveActiveTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-current={isActive ? 'page' : undefined}
+                    onClick={() => handleTabClick(item.id)}
+                    className={`h-9 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'border-pust-800 text-pust-900 font-semibold'
+                        : 'border-transparent text-slate-700 hover:text-pust-900'
+                    }`}
+                  >
+                    {item.shortLabel}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <Link
+              href="/"
+              onClick={() => {
+                setSwitcherOpen(false);
+                setMobileDrawerOpen(false);
+                setMobileSearchOpen(false);
+              }}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone-300 bg-[#FAF8F4] text-[11px] font-semibold text-pust-900 hover:border-pust-800 whitespace-nowrap shrink-0"
+            >
+              <Home className="w-3 h-3 text-pust-800 shrink-0" />
+              <span>PUST Home</span>
+            </Link>
+          </div>
         </div>
 
         {/* Slim Active Admin Edit Mode Banner */}
