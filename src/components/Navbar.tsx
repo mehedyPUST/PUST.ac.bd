@@ -1,14 +1,28 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Eye, Menu, Pencil, Plus, Search, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'motion/react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  GraduationCap,
+  Menu,
+  Pencil,
+  Plus,
+  Search,
+  X,
+} from 'lucide-react';
 import { DEFAULT_NAVBAR_TAGLINE, resolveContextualEditTarget } from '../lib/cmsDefaults';
 import { NAV_GROUPS, type AppRoute } from '../lib/routes';
 import type {
   AboutContentRecord,
   AuthUser,
+  DepartmentRecord,
   EditModalTarget,
+  FacultyName,
   GovernanceTabKind,
   UniversityProfile,
 } from '../types/pust';
@@ -20,6 +34,7 @@ interface NavbarProps {
   route: AppRoute;
   user: AuthUser | null;
   profile?: UniversityProfile | null;
+  departments?: DepartmentRecord[];
   editMode?: boolean;
   onToggleEditMode?: () => void;
   onOpenEditModal?: (target: EditModalTarget) => void;
@@ -27,37 +42,143 @@ interface NavbarProps {
 }
 
 const HOME_SUBTOPICS = [
-  { label: 'Vice-Chancellor’s Message', href: '/#vc-message' },
-  { label: 'Notice Board', href: '/#notice-board' },
-  { label: 'Recent Publications', href: '/#recent-publications' },
-  { label: 'News and Events', href: '/#news-events' },
-  { label: 'Campus Map', href: '/#campus-map' },
+  { label: 'Vice-Chancellor’s Message', fullLabel: 'Office of the Vice-Chancellor’s Message', href: '/#vc-message' },
+  { label: 'Notice Board', fullLabel: 'Official University Notice Board', href: '/#notice-board' },
+  { label: 'Recent Publications', fullLabel: 'Recent Faculty & Research Publications', href: '/#recent-publications' },
+  { label: 'News and Events', fullLabel: 'University News and Campus Events', href: '/#news-events' },
+  { label: 'Campus Map', fullLabel: 'Interactive Campus Map & Building Guide', href: '/#campus-map' },
 ];
+
+const FACULTY_DISPLAY_ORDER: FacultyName[] = [
+  'Faculty of Engineering and Technology',
+  'Faculty of Science',
+  'Faculty of Business Studies',
+  'Faculty of Humanities and Social Science',
+  'Faculty of Life and Earth Science',
+];
+
+const MOBILE_GROUP_FULL_LABELS: Record<string, string> = {
+  governance: 'Governance & Statutory Authorities',
+  about: 'About the University',
+  administration: 'University Administration & Offices',
+  academic: 'Academic Affairs & Sections',
+  facilities: 'Campus Facilities & Student Services',
+  notices: 'Official Notices & Circulars',
+  admission: 'University Admissions',
+};
+
+const MOBILE_ROUTE_FULL_LABELS: Partial<Record<AppRoute, string>> = {
+  '/governance/pust-act': 'Pabna University of Science and Technology Act, 2001',
+  '/governance/regent-board': 'University Regent Board',
+  '/governance/academic-council': 'University Academic Council',
+  '/governance/finance-committee': 'University Finance Committee',
+  '/governance/academic-ordinance': 'Academic Ordinance & Grading System',
+  '/about/our-university': 'Our University Profile & Overview',
+  '/about/mission-vision': 'Institutional Mission, Vision & Core Objectives',
+  '/about/history': 'University Heritage & Founding History',
+  '/about/plans': 'Strategic Masterplans & Development Roadmap',
+  '/administration/vc-office': 'Office of the Vice-Chancellor',
+  '/administration/pro-vc-office': 'Office of the Pro-Vice-Chancellor',
+  '/administration/treasurer-office': 'Office of the Treasurer',
+  '/administration/registrar-office': 'Office of the Registrar',
+  '/administration/controller-office': 'Office of the Controller of Examinations',
+  '/administration/male-hall-1': 'July 06 Hall (Male Residential Hall – 1)',
+  '/administration/female-hall-1': 'Matribhasha Hall (Female Residential Hall – 1)',
+  '/administration/ict-cell': 'Information & Communication Technology (ICT) Cell',
+  '/administration/iqac': 'Institutional Quality Assurance Cell (IQAC)',
+  '/administration/male-hall-2': 'Swadhinota Hall (Male Residential Hall – 2)',
+  '/administration/female-hall-2': 'Ganatantra Hall (Female Residential Hall – 2)',
+  '/administration/rttc': 'Research & Technology Transfer Cell (RTTC)',
+  '/administration/apa': 'Annual Performance Agreement (APA) & Citizen’s Charter',
+  '/academics': 'Academic Affairs & Curriculum Overview',
+  '/academics/programs': 'Undergraduate, Graduate & Doctoral Degree Programs',
+  '/academics/faculty': 'Academic Faculties & Offices of the Deans',
+  '/academics/departments': 'Academic Departments & Offices of the Chairmen',
+  '/academics/calendar': 'University Academic Calendar & Examination Schedules',
+  '/academics/forms-download': 'Official Academic Forms & Templates Download',
+  '/academics/scholarship': 'Scholarships, Stipends & Financial Aid Programs',
+  '/academics/seminars': 'Academic Seminars, Symposia & Workshops',
+  '/academics/publications': 'Peer-Reviewed Publications & University Journals',
+  '/facilities/library': 'Central Library & Information Center (CLIC)',
+  '/facilities/transport': 'University Transportation Pool',
+  '/facilities/residence': 'Residential Halls & Student Accommodation',
+  '/facilities/medical': 'PUST Medical Section & Health Center',
+  '/facilities/ict-sheba': 'ICT Cell & Digital Campus Services (ICT Sheba)',
+  '/notices/general': 'General University Circulars & Notices',
+  '/notices/job': 'Recruitment, Job & Tender Notices',
+  '/notices/press-release': 'Official University Press Releases',
+  '/notices/noc': 'No Objection Certificates (NOC) & Official Orders',
+  '/notices/result': 'Semester Examination Result Notices',
+  '/admissions/undergraduate': 'Undergraduate Admissions (GST Integrated Test)',
+  '/admissions/graduate': 'Graduate & Postgraduate Admissions',
+  '/admissions/evening-programs': 'Evening & Executive Degree Programs',
+  '/admissions/notice': 'Official Admission Circulars & Schedules',
+};
 
 export function Navbar({
   route,
   user,
   profile,
+  departments = [],
   editMode = false,
   onToggleEditMode,
   onOpenEditModal,
   onNavigate,
 }: NavbarProps) {
+  const pathname = usePathname() || '/';
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+
+  const groupedDepartments = useMemo(() => {
+    const groups: Array<{ faculty: string; items: DepartmentRecord[] }> = [];
+    const seen = new Set<string>();
+
+    for (const faculty of FACULTY_DISPLAY_ORDER) {
+      const items = departments.filter((d) => d.faculty === faculty);
+      if (items.length > 0) {
+        groups.push({ faculty, items });
+        seen.add(faculty);
+      }
+    }
+
+    for (const dept of departments) {
+      if (!seen.has(dept.faculty)) {
+        seen.add(dept.faculty);
+        groups.push({
+          faculty: dept.faculty,
+          items: departments.filter((d) => d.faculty === dept.faculty),
+        });
+      }
+    }
+
+    return groups;
+  }, [departments]);
 
   useEffect(() => {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
     setMobileSearchOpen(false);
-  }, [route]);
+  }, [pathname, route]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     function handleOutside(e: MouseEvent | TouchEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const insideHeader = navRef.current?.contains(target) ?? false;
+      const insideDrawer = drawerRef.current?.contains(target) ?? false;
+      if (!insideHeader && !insideDrawer) {
         setHoveredGroup(null);
         setMobileMenuOpen(false);
         setMobileSearchOpen(false);
@@ -80,6 +201,37 @@ export function Navbar({
     };
   }, []);
 
+  function openOrToggleMobileDrawer() {
+    setMobileSearchOpen(false);
+    setMobileMenuOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        if (pathname.startsWith('/academics/departments')) {
+          setMobileExpanded('departments');
+        } else if (route.startsWith('/academics')) {
+          setMobileExpanded('academic');
+        } else {
+          const activeGroup = NAV_GROUPS.find(
+            (group) =>
+              route === group.defaultRoute ||
+              group.items.some((item) => item.route === route) ||
+              route.startsWith(
+                `/${
+                  group.id === 'academic'
+                    ? 'academics'
+                    : group.id === 'admission'
+                    ? 'admissions'
+                    : group.id
+                }`
+              )
+          );
+          setMobileExpanded(activeGroup?.id ?? null);
+        }
+      }
+      return next;
+    });
+  }
+
   function go(target: AppRoute | string) {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
@@ -96,10 +248,11 @@ export function Navbar({
   const admissionGroup = NAV_GROUPS.find((g) => g.id === 'admission')!;
 
   return (
-    <header
-      ref={navRef}
-      className="sticky top-0 z-40 bg-white shadow-[0_1px_4px_-1px_rgba(28,25,23,0.1)] print:hidden"
-    >
+    <>
+      <header
+        ref={navRef}
+        className="sticky top-0 z-40 bg-white shadow-[0_1px_4px_-1px_rgba(28,25,23,0.1)] print:hidden"
+      >
       <div className="relative z-10">
         {/* Full-bleed upper institutional title band backdrop */}
         <div
@@ -226,12 +379,10 @@ export function Navbar({
                 </Link>
                 <button
                   type="button"
-                  onClick={() => {
-                    setMobileMenuOpen((prev) => !prev);
-                    setMobileSearchOpen(false);
-                  }}
-                  aria-label="Toggle navigation menu"
+                  onClick={openOrToggleMobileDrawer}
+                  aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
                   aria-expanded={mobileMenuOpen}
+                  aria-controls="mobile-off-canvas-drawer"
                   className={`lg:hidden w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
                     mobileMenuOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-700'
                   }`}
@@ -798,149 +949,344 @@ export function Navbar({
           </div>
         </>
       )}
+      </header>
 
-      {/* Responsive Mobile Navigation Drawer */}
-      {mobileMenuOpen && (
-        <>
-          <div
-            aria-hidden="true"
-            onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-x-0 top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
-          />
-          <nav
-            aria-label="Mobile navigation"
-            className="relative z-10 lg:hidden border-t border-stone-200 bg-white max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain px-4 pt-3 pb-6 space-y-1 text-sm shadow-xl"
-          >
-            <div className="pb-2.5 mb-1 border-b border-stone-100">
-              <GlobalSearchBar
-                variant="mobile"
-                onActionComplete={() => setMobileMenuOpen(false)}
-              />
-            </div>
+      {/* Slide-Out Off-Canvas Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <div className="lg:hidden print:hidden">
+            <motion.div
+              aria-hidden="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-[55] bg-slate-950/55 backdrop-blur-[2px]"
+            />
 
-            <div className="border-b border-stone-100">
-              <div className="flex items-center justify-between">
+            <motion.aside
+              ref={drawerRef}
+              id="mobile-off-canvas-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile university navigation drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 360, damping: 36, mass: 0.9 }}
+              className="fixed inset-y-0 right-0 z-[56] w-[min(92vw,410px)] h-dvh bg-white border-l border-stone-200 shadow-2xl flex flex-col"
+            >
+              {/* Drawer Institutional Header */}
+              <div className="shrink-0 bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] text-white px-4 py-3 border-b border-gold-500/35 flex items-center justify-between gap-3">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left"
+                >
+                  <span className="shrink-0 rounded-md bg-white p-1 flex items-center justify-center">
+                    <PustCrest size={30} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-serif text-[13px] font-medium leading-tight text-white text-left">
+                      Pabna University of Science and Technology
+                    </p>
+                    <p className="text-[11px] text-gold-300 font-medium mt-0.5 text-left truncate">
+                      {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
+                    </p>
+                  </div>
+                </Link>
                 <button
                   type="button"
-                  onClick={() => go('/')}
-                  className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
-                    route === '/' ? 'text-pust-900 font-semibold' : 'text-slate-800'
-                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close navigation drawer"
+                  className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
                 >
-                  Home
-                </button>
-                <button
-                  type="button"
-                  aria-label="Toggle Home sections"
-                  aria-expanded={mobileExpanded === 'home'}
-                  onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
-                  className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
-                >
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      mobileExpanded === 'home' ? 'rotate-180' : ''
-                    }`}
-                  />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-              {mobileExpanded === 'home' && (
-                <div className="pl-3 pr-2 py-1.5 space-y-0.5 bg-[#FAF9F6] rounded-lg mb-2">
-                  {HOME_SUBTOPICS.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-xs rounded-md text-slate-700 hover:text-pust-900 hover:bg-white transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            {NAV_GROUPS.map((group) => {
-              const expanded = mobileExpanded === group.id;
-              const isGroupActive =
-                route === group.defaultRoute ||
-                group.items.some((item) => item.route === route) ||
-                route.startsWith(`/${group.id === 'academic' ? 'academics' : group.id === 'admission' ? 'admissions' : group.id}`);
-              return (
-                <div key={group.id} className="border-b border-stone-100">
-                  <div className="flex items-center justify-between">
+              {/* Drawer Search Strip */}
+              <div className="shrink-0 relative z-30 px-4 py-3 bg-[#FAF9F6] border-b border-stone-200">
+                <GlobalSearchBar
+                  variant="mobile"
+                  onActionComplete={() => setMobileMenuOpen(false)}
+                />
+              </div>
+
+              {/* Scrollable Navigation Sections */}
+              <nav
+                aria-label="Mobile navigation"
+                className="relative z-10 flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-2 space-y-0.5 text-sm"
+              >
+                {/* Home */}
+                <div className="border-b border-stone-200/80">
+                  <div className="flex items-center justify-between gap-1">
                     <button
                       type="button"
-                      onClick={() => go(group.defaultRoute)}
+                      onClick={() => go('/')}
                       className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
-                        isGroupActive ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
+                        route === '/' ? 'text-pust-900 font-semibold' : 'text-slate-900 hover:text-pust-900'
                       }`}
                     >
-                      {group.label}
+                      University Homepage
                     </button>
                     <button
                       type="button"
-                      aria-label={`Toggle ${group.label} subtopics`}
-                      aria-expanded={expanded}
-                      onClick={() => setMobileExpanded(expanded ? null : group.id)}
-                      className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer"
+                      aria-label="Toggle University Homepage sections"
+                      aria-expanded={mobileExpanded === 'home'}
+                      onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
+                      className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer shrink-0"
                     >
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+                        className={`w-4 h-4 transition-transform ${
+                          mobileExpanded === 'home' ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
                   </div>
-                  {expanded && (
-                    <div
-                      className={`pl-3 pr-2 py-1.5 space-y-0.5 bg-[#FAF9F6] rounded-lg mb-2 ${
-                        group.items.length > 10 ? 'max-h-[50vh] overflow-y-auto' : ''
-                      }`}
-                    >
-                      {group.items.map((item) => (
-                        <button
-                          key={item.route}
-                          type="button"
-                          onClick={() => go(item.route)}
-                          className={`flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-xs rounded-md cursor-pointer transition-colors ${
-                            route === item.route ||
-                            (route === '/governance/university-act' &&
-                              item.route === '/governance/pust-act')
-                              ? 'text-pust-900 font-semibold bg-white'
-                              : 'text-slate-700 hover:text-pust-900 hover:bg-white'
-                          }`}
+                  {mobileExpanded === 'home' && (
+                    <div className="pl-2.5 pr-2 py-2 space-y-1 bg-[#FAF9F6] border border-stone-200/80 rounded-lg mb-2.5">
+                      {HOME_SUBTOPICS.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-[13px] leading-snug rounded-md text-slate-700 hover:text-pust-900 hover:bg-white transition-colors"
                         >
-                          {item.label}
-                        </button>
+                          {item.fullLabel}
+                        </Link>
                       ))}
                     </div>
                   )}
                 </div>
-              );
-            })}
 
-            <button
-              type="button"
-              onClick={() => go('/verify')}
-              className={`w-full min-h-[44px] text-left py-2.5 px-2 border-b border-stone-100 font-medium cursor-pointer ${
-                route === '/verify' ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
-              }`}
-            >
-              Verify
-            </button>
-            <button
-              type="button"
-              onClick={() => go('/gallery')}
-              className={`w-full min-h-[44px] text-left py-2.5 px-2 font-medium cursor-pointer ${
-                route === '/gallery' ? 'text-pust-900 font-semibold' : 'text-slate-800 hover:text-pust-900'
-              }`}
-            >
-              News &amp; Events Gallery
-            </button>
-            <div className="pt-3 mt-1 border-t border-stone-100">
-              <PwaInstallButton variant="drawer" allowGuideFallback />
-            </div>
-          </nav>
-        </>
-      )}
-    </header>
+                {/* All Primary Navigation Groups + Dedicated Full-Form Academic Departments */}
+                {NAV_GROUPS.map((group) => {
+                  const expanded = mobileExpanded === group.id;
+                  const isGroupActive =
+                    route === group.defaultRoute ||
+                    group.items.some((item) => item.route === route) ||
+                    route.startsWith(
+                      `/${
+                        group.id === 'academic'
+                          ? 'academics'
+                          : group.id === 'admission'
+                          ? 'admissions'
+                          : group.id
+                      }`
+                    );
+                  const groupFullLabel = MOBILE_GROUP_FULL_LABELS[group.id] || group.label;
+
+                  return (
+                    <div key={group.id}>
+                      <div className="border-b border-stone-200/80">
+                        <div className="flex items-center justify-between gap-1">
+                          <button
+                            type="button"
+                            onClick={() => go(group.defaultRoute)}
+                            className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium leading-snug cursor-pointer ${
+                              isGroupActive
+                                ? 'text-pust-900 font-semibold'
+                                : 'text-slate-900 hover:text-pust-900'
+                            }`}
+                          >
+                            {groupFullLabel}
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Toggle ${groupFullLabel}`}
+                            aria-expanded={expanded}
+                            onClick={() => setMobileExpanded(expanded ? null : group.id)}
+                            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer shrink-0"
+                          >
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+                            />
+                          </button>
+                        </div>
+
+                        {expanded && (
+                          <div className="pl-2.5 pr-2 py-2 space-y-1 bg-[#FAF9F6] border border-stone-200/80 rounded-lg mb-2.5">
+                            {group.id === 'academic' && (
+                              <button
+                                type="button"
+                                onClick={() => go('/academics')}
+                                className={`flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-[13px] leading-snug rounded-md cursor-pointer transition-colors ${
+                                  pathname === '/academics'
+                                    ? 'text-pust-900 font-semibold bg-white border border-stone-200'
+                                    : 'text-slate-700 hover:text-pust-900 hover:bg-white'
+                                }`}
+                              >
+                                {MOBILE_ROUTE_FULL_LABELS['/academics']}
+                              </button>
+                            )}
+
+                            {group.items.map((item) => {
+                              const fullLabel = MOBILE_ROUTE_FULL_LABELS[item.route] || item.label;
+                              const isItemActive =
+                                route === item.route ||
+                                (route === '/governance/university-act' &&
+                                  item.route === '/governance/pust-act');
+                              return (
+                                <button
+                                  key={item.route}
+                                  type="button"
+                                  onClick={() => go(item.route)}
+                                  className={`flex items-center min-h-[40px] w-full text-left py-2 px-2.5 text-[13px] leading-snug rounded-md cursor-pointer transition-colors ${
+                                    isItemActive
+                                      ? 'text-pust-900 font-semibold bg-white border border-stone-200'
+                                      : 'text-slate-700 hover:text-pust-900 hover:bg-white'
+                                  }`}
+                                >
+                                  {fullLabel}
+                                </button>
+                              );
+                            })}
+
+                            {group.id === 'academic' && departments.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setMobileExpanded('departments')}
+                                className="mt-1.5 flex items-center justify-between gap-2 min-h-[42px] w-full text-left py-2 px-2.5 text-[13px] font-semibold rounded-md bg-white border border-stone-200 text-pust-900 hover:bg-pust-50 transition-colors cursor-pointer"
+                              >
+                                <span className="inline-flex items-center gap-2 min-w-0">
+                                  <GraduationCap className="w-4 h-4 shrink-0 text-pust-800" />
+                                  <span>
+                                    Browse All {departments.length} Academic Departments
+                                  </span>
+                                </span>
+                                <ChevronRight className="w-4 h-4 shrink-0 text-pust-700" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Full-Form Academic Departments Directory right under Academic */}
+                      {group.id === 'academic' && departments.length > 0 && (
+                        <div className="border-b border-stone-200/80">
+                          <div className="flex items-center justify-between gap-1">
+                            <button
+                              type="button"
+                              onClick={() => go('/academics/departments')}
+                              className={`flex-1 min-h-[44px] text-left py-2.5 px-2 font-medium leading-snug cursor-pointer flex items-center justify-between gap-2 ${
+                                pathname.startsWith('/academics/departments')
+                                  ? 'text-pust-900 font-semibold'
+                                  : 'text-slate-900 hover:text-pust-900'
+                              }`}
+                            >
+                              <span>All Academic Departments</span>
+                              <span className="font-mono text-[11px] font-medium text-slate-500 tabular-nums shrink-0">
+                                {departments.length}
+                              </span>
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Toggle All Academic Departments by Faculty"
+                              aria-expanded={mobileExpanded === 'departments'}
+                              onClick={() =>
+                                setMobileExpanded(
+                                  mobileExpanded === 'departments' ? null : 'departments'
+                                )
+                              }
+                              className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer shrink-0"
+                            >
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform ${
+                                  mobileExpanded === 'departments' ? 'rotate-180' : ''
+                                }`}
+                              />
+                            </button>
+                          </div>
+
+                          {mobileExpanded === 'departments' && (
+                            <div className="pl-2.5 pr-2 py-2.5 space-y-3 bg-[#FAF9F6] border border-stone-200/80 rounded-lg mb-2.5">
+                              {groupedDepartments.map((facultyGroup) => (
+                                <div key={facultyGroup.faculty} className="space-y-1">
+                                  <p className="px-2 pt-1 pb-1 text-[10px] font-mono uppercase tracking-[0.12em] text-pust-800 border-b border-stone-200 text-left">
+                                    {facultyGroup.faculty}
+                                  </p>
+                                  {facultyGroup.items.map((dept) => {
+                                    const deptHref = `/academics/departments/${encodeURIComponent(
+                                      dept.code.toLowerCase()
+                                    )}`;
+                                    const isDeptActive =
+                                      pathname.toLowerCase() === deptHref.toLowerCase();
+                                    return (
+                                      <button
+                                        key={dept.id}
+                                        type="button"
+                                        onClick={() => go(deptHref)}
+                                        className={`flex items-start justify-between gap-2 min-h-[40px] w-full text-left py-2 px-2.5 text-[13px] leading-snug rounded-md cursor-pointer transition-colors ${
+                                          isDeptActive
+                                            ? 'text-pust-900 font-semibold bg-white border border-stone-200'
+                                            : 'text-slate-800 hover:text-pust-900 hover:bg-white'
+                                        }`}
+                                      >
+                                        <span className="min-w-0 text-left">
+                                          Department of {dept.name}
+                                        </span>
+                                        <span className="font-mono text-[10.5px] text-slate-500 shrink-0 mt-0.5 tabular-nums">
+                                          {dept.code}
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Standalone Links */}
+                <button
+                  type="button"
+                  onClick={() => go('/verify')}
+                  className={`w-full min-h-[44px] text-left py-2.5 px-2 border-b border-stone-200/80 font-medium leading-snug cursor-pointer ${
+                    route === '/verify'
+                      ? 'text-pust-900 font-semibold'
+                      : 'text-slate-900 hover:text-pust-900'
+                  }`}
+                >
+                  Public Document &amp; Certificate Verification
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go('/gallery')}
+                  className={`w-full min-h-[44px] text-left py-2.5 px-2 font-medium leading-snug cursor-pointer ${
+                    route === '/gallery'
+                      ? 'text-pust-900 font-semibold'
+                      : 'text-slate-900 hover:text-pust-900'
+                  }`}
+                >
+                  University News, Convocation &amp; Events Gallery
+                </button>
+              </nav>
+
+              {/* Drawer Pinned Footer Actions */}
+              <div className="shrink-0 px-4 py-3 bg-[#FAF9F6] border-t border-stone-200 space-y-2">
+                <Link
+                  href={route === '/portal' ? '/' : '/portal'}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full min-h-[44px] inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold btn-primary-sheen transition-all"
+                >
+                  {route === '/portal'
+                    ? 'Return to Public Website'
+                    : user
+                    ? `${user.name.split(' ')[0]} · Digital Campus Portal`
+                    : 'Open Digital Campus Portal'}
+                </Link>
+                <PwaInstallButton variant="drawer" allowGuideFallback />
+              </div>
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

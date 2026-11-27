@@ -639,6 +639,7 @@ export function PustShell({
               route={route}
               user={user}
               profile={profile}
+              departments={departments}
               editMode={effectiveEditMode}
               onToggleEditMode={toggleEditMode}
               onOpenEditModal={openEditModal}

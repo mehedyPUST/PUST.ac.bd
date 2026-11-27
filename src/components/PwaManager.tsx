@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   CheckCircle2,
   Download,
@@ -142,14 +143,16 @@ export function PwaInstallButton({
         <span>{label}</span>
       </button>
 
-      {showGuideModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/65 backdrop-blur-[2px] p-0 sm:p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="pwa-guide-title"
-          onClick={() => setShowGuideModal(false)}
-        >
+      {showGuideModal &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-slate-950/65 backdrop-blur-[2px] p-0 sm:p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pwa-guide-title"
+            onClick={() => setShowGuideModal(false)}
+          >
           <div
             className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-slate-900"
             onClick={(e) => e.stopPropagation()}
@@ -264,8 +267,9 @@ export function PwaInstallButton({
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+          document.body
+        )}
     </>
   );
 }
