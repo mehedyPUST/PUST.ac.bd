@@ -22,8 +22,10 @@ import {
   Pencil,
   Phone,
   Plus,
+  QrCode,
   Save,
   Trash2,
+  UserPlus,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import {
@@ -34,6 +36,7 @@ import {
   type PersonRoleCategory,
   sanitizeTelHref,
 } from '../lib/departmentPeople';
+import { downloadPersonVCard } from '../lib/vcard';
 import type {
   ContactDetailItem,
   DepartmentPersonGroup,
@@ -43,6 +46,7 @@ import type {
 import { CmsImageField, INPUT_CLASS, LABEL_CLASS } from './admin-edit/shared';
 import { EditTriggerButton } from './EditTriggerButton';
 import { usePust } from './PustContext';
+import { ShareProfileModal } from './ShareProfileModal';
 
 export function PersonThumbnail({
   person,
@@ -312,6 +316,8 @@ export function PersonProfileView({
 
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [savedQuickContact, setSavedQuickContact] = useState(false);
   const [showAllArticles, setShowAllArticles] = useState(false);
   const [showAllProceedings, setShowAllProceedings] = useState(false);
   const [showAllConferences, setShowAllConferences] = useState(false);
@@ -454,6 +460,20 @@ export function PersonProfileView({
     window.setTimeout(() => {
       setCopiedLink(false);
     }, 2000);
+  }
+
+  function handleQuickSaveContact() {
+    if (!person) return;
+    const url = `${window.location.origin}${getDepartmentPersonHref(department.code, person.id)}`;
+    downloadPersonVCard({
+      person,
+      department,
+      profileUrl: url,
+    });
+    setSavedQuickContact(true);
+    window.setTimeout(() => {
+      setSavedQuickContact(false);
+    }, 2200);
   }
 
   function startInlineEdit(sectionKey: InlineSectionKey) {
@@ -1409,6 +1429,14 @@ export function PersonProfileView({
             )}
             <button
               type="button"
+              onClick={() => setShareModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <QrCode className="w-3.5 h-3.5 shrink-0" />
+              <span>Share Profile</span>
+            </button>
+            <button
+              type="button"
               onClick={handleCopyProfileLink}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 copiedLink
@@ -1554,6 +1582,35 @@ export function PersonProfileView({
                     Call Office
                   </a>
                 )}
+                <button
+                  type="button"
+                  onClick={handleQuickSaveContact}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap cursor-pointer ${
+                    savedQuickContact
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                      : 'bg-white border-stone-300 text-slate-900 hover:border-pust-700 hover:text-pust-900'
+                  }`}
+                >
+                  {savedQuickContact ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      Saved Contact
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Save Contact
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShareModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#FAF8F4] border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap cursor-pointer"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  Share QR
+                </button>
                 {canEdit && (
                   <EditTriggerButton
                     label="Edit Identity"
@@ -1674,6 +1731,14 @@ export function PersonProfileView({
           </Link>
         </div>
       </section>
+
+      <ShareProfileModal
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        person={person}
+        department={department}
+        roleCategory={roleCategory}
+      />
     </main>
   );
 }

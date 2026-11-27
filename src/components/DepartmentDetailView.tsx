@@ -16,6 +16,7 @@ import {
   GraduationCap,
   Mail,
   Phone,
+  QrCode,
   Search,
   Sparkles,
   UserCheck,
@@ -40,6 +41,7 @@ import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard } from './MotionPrimitives';
 import { PersonThumbnail } from './PersonProfileView';
 import { usePust } from './PustContext';
+import { ShareProfileModal } from './ShareProfileModal';
 
 function PersonProfileCard({
   person,
@@ -49,6 +51,7 @@ function PersonProfileCard({
   delay = 0,
   canEdit = false,
   onEditPerson,
+  onSharePerson,
 }: {
   person: DepartmentPersonRecord;
   departmentCode: string;
@@ -57,6 +60,7 @@ function PersonProfileCard({
   delay?: number;
   canEdit?: boolean;
   onEditPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
+  onSharePerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
   const hasPersonalInfo =
     Boolean(person.qualification) ||
@@ -166,7 +170,7 @@ function PersonProfileCard({
         )}
       </div>
 
-      {/* Card Footer Action: View Profile & Admin Edit */}
+      {/* Card Footer Action: View Profile, Share QR & Admin Edit */}
       <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2.5">
         <span className="font-mono text-[11px] text-slate-500 truncate">{roleCategory}</span>
         <div className="flex items-center gap-2 shrink-0">
@@ -176,6 +180,18 @@ function PersonProfileCard({
               variant="compact"
               onClick={() => onEditPerson(person, roleCategory)}
             />
+          )}
+          {onSharePerson && (
+            <button
+              type="button"
+              onClick={() => onSharePerson(person, roleCategory)}
+              aria-label={`Share ${person.name} profile QR code`}
+              title="Share Profile & Save Contact QR"
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium bg-[#FAF8F4] border border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <QrCode className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
           )}
           <Link
             href={profileHref}
@@ -214,6 +230,10 @@ export function DepartmentDetailView({
   const [designationFilter, setDesignationFilter] = useState<string>('All');
   const [memberQuery, setMemberQuery] = useState('');
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
+  const [shareTarget, setShareTarget] = useState<{
+    person: DepartmentPersonRecord;
+    roleCategory: PersonRoleCategory;
+  } | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -504,6 +524,7 @@ export function DepartmentDetailView({
                 accentClass="bg-white border-stone-200 hover:border-pust-700/45 h-full"
                 canEdit={canAdminEdit}
                 onEditPerson={handleEditPerson}
+                onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
               />
             </div>
 
@@ -837,6 +858,7 @@ export function DepartmentDetailView({
                   }
                   canEdit={canAdminEdit}
                   onEditPerson={handleEditPerson}
+                  onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
               ))}
             </div>
@@ -886,6 +908,7 @@ export function DepartmentDetailView({
                   }
                   canEdit={canAdminEdit}
                   onEditPerson={handleEditPerson}
+                  onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
               ))}
             </div>
@@ -935,6 +958,7 @@ export function DepartmentDetailView({
                   }
                   canEdit={canAdminEdit}
                   onEditPerson={handleEditPerson}
+                  onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
               ))}
             </div>
@@ -1035,6 +1059,16 @@ export function DepartmentDetailView({
           </div>
         )}
       </section>
+
+      {shareTarget && (
+        <ShareProfileModal
+          open={true}
+          onClose={() => setShareTarget(null)}
+          person={shareTarget.person}
+          department={department}
+          roleCategory={shareTarget.roleCategory}
+        />
+      )}
     </main>
   );
 }
