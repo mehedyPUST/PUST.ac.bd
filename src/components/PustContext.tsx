@@ -16,6 +16,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { pustApi } from '../lib/api';
+import {
+  isDepartmentTab,
+  parseDepartmentPath,
+  type DepartmentTab,
+} from '../lib/departmentNav';
 import { getRouteSectionKey, parseRouteFromPath, type AppRoute } from '../lib/routes';
 import { PageReveal } from './MotionPrimitives';
 import { OfflineIndicator, PwaRegistrar } from './PwaManager';
@@ -38,6 +43,7 @@ import type {
 import { AdminEditModal } from './AdminEditModal';
 import { Breadcrumb } from './Breadcrumb';
 import { DepartmentModal } from './DepartmentModal';
+import { DepartmentNavbar } from './DepartmentNavbar';
 import { Footer } from './Footer';
 import { Navbar } from './Navbar';
 import { NoticeModal } from './NoticeModal';
@@ -65,6 +71,8 @@ interface PustContextValue {
   closeEditModal: () => void;
   setUser: (user: AuthUser | null) => void;
   isNavigating: boolean;
+  departmentTab: DepartmentTab;
+  setDepartmentTab: (tab: DepartmentTab, options?: { scrollToTop?: boolean }) => void;
   prefetchRoute: (target: AppRoute | string) => void;
   navigateTo: (target: AppRoute | string) => void;
   setActiveDepartment: (dept: DepartmentRecord | null) => void;
@@ -116,6 +124,8 @@ export function PustShell({
   const pathname = usePathname() || '/';
   const router = useRouter();
   const route = parseRouteFromPath(pathname);
+  const parsedDepartmentRoute = useMemo(() => parseDepartmentPath(pathname), [pathname]);
+  const [departmentTab, setDepartmentTabState] = useState<DepartmentTab>('overview');
 
   const [profile, setProfile] = useState<UniversityProfile | null>(initialData?.profile ?? null);
   const [aboutSections, setAboutSections] = useState<AboutContentRecord[]>(
@@ -275,6 +285,14 @@ export function PustShell({
 
   useEffect(() => {
     setPendingTarget(null);
+    if (typeof window !== 'undefined' && parsedDepartmentRoute && !parsedDepartmentRoute.isPersonPage) {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      setDepartmentTabState(isDepartmentTab(tabParam) ? tabParam : 'overview');
+    } else if (!parsedDepartmentRoute) {
+      setDepartmentTabState('overview');
+    }
+
     if (prevPathnameRef.current !== pathname) {
       prevPathnameRef.current = pathname;
       if (typeof window !== 'undefined') {
@@ -285,7 +303,7 @@ export function PustShell({
         }
       }
     }
-  }, [pathname, scrollToHashId]);
+  }, [pathname, parsedDepartmentRoute, scrollToHashId]);
 
   useEffect(() => {
     if (!pendingTarget) return;
@@ -346,6 +364,36 @@ export function PustShell({
       });
     },
     [router, pathname, startTransition, scrollToHashId]
+  );
+
+  const setDepartmentTab = useCallback(
+    (nextTab: DepartmentTab, options?: { scrollToTop?: boolean }) => {
+      const shouldScroll = options?.scrollToTop ?? true;
+      if (parsedDepartmentRoute?.isPersonPage) {
+        const basePath = `/academics/departments/${encodeURIComponent(
+          parsedDepartmentRoute.code.toLowerCase()
+        )}`;
+        const dest = nextTab === 'overview' ? basePath : `${basePath}?tab=${nextTab}`;
+        navigateTo(dest);
+        return;
+      }
+
+      setDepartmentTabState(nextTab);
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        if (nextTab === 'overview') {
+          url.searchParams.delete('tab');
+        } else {
+          url.searchParams.set('tab', nextTab);
+        }
+        window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+        if (shouldScroll) {
+          const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+        }
+      }
+    },
+    [parsedDepartmentRoute, navigateTo]
   );
 
   const loadCmsProfile = useCallback(async () => {
@@ -567,6 +615,8 @@ export function PustShell({
       closeEditModal,
       setUser,
       isNavigating,
+      departmentTab,
+      setDepartmentTab,
       prefetchRoute,
       navigateTo,
       setActiveDepartment,
@@ -601,6 +651,8 @@ export function PustShell({
       openEditModal,
       closeEditModal,
       isNavigating,
+      departmentTab,
+      setDepartmentTab,
       prefetchRoute,
       navigateTo,
       loadCmsProfile,
@@ -635,18 +687,33 @@ export function PustShell({
                 />
               )}
             </AnimatePresence>
-            <Navbar
-              route={route}
-              user={user}
-              profile={profile}
-              departments={departments}
-              editMode={effectiveEditMode}
-              onToggleEditMode={toggleEditMode}
-              onOpenEditModal={openEditModal}
-              onNavigate={navigateTo}
-            />
+            {parsedDepartmentRoute ? (
+              <DepartmentNavbar
+                departmentCode={parsedDepartmentRoute.code}
+                isPersonPage={parsedDepartmentRoute.isPersonPage}
+                activeTab={departmentTab}
+                departments={departments}
+                user={user}
+                editMode={effectiveEditMode}
+                onSelectTab={setDepartmentTab}
+                onToggleEditMode={toggleEditMode}
+                onOpenEditModal={openEditModal}
+                onNavigate={navigateTo}
+              />
+            ) : (
+              <Navbar
+                route={route}
+                user={user}
+                profile={profile}
+                departments={departments}
+                editMode={effectiveEditMode}
+                onToggleEditMode={toggleEditMode}
+                onOpenEditModal={openEditModal}
+                onNavigate={navigateTo}
+              />
+            )}
             <div className="flex-1 flex flex-col">
-              <Breadcrumb />
+              {(!parsedDepartmentRoute || parsedDepartmentRoute.isPersonPage) && <Breadcrumb />}
               <PageReveal routeKey={getRouteSectionKey(pathname)}>
                 {children}
               </PageReveal>

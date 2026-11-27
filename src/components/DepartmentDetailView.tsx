@@ -27,12 +27,16 @@ import {
   Search,
   Sparkles,
   Target,
-  UserCheck,
   UserRound,
   Users,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { resolveDepartmentImage } from '../lib/departmentMedia';
+import {
+  DEPARTMENT_NAV_ITEMS,
+  isDepartmentTab,
+  type DepartmentTab,
+} from '../lib/departmentNav';
 import { getDepartmentNotices } from '../lib/departmentNotices';
 import {
   findDepartmentPerson,
@@ -53,14 +57,6 @@ import { PersonThumbnail } from './PersonProfileView';
 import { usePust } from './PustContext';
 import { ResilientImage } from './ResilientImage';
 import { ShareProfileModal } from './ShareProfileModal';
-
-type DepartmentTab =
-  | 'overview'
-  | 'faculty'
-  | 'officers'
-  | 'research'
-  | 'notices'
-  | 'contact';
 
 function buildDepartmentVision(dept: DepartmentRecord): string {
   const focusLead =
@@ -292,6 +288,8 @@ export function DepartmentDetailView({
     user,
     bookmarkedIds,
     editMode,
+    departmentTab,
+    setDepartmentTab,
     openEditModal,
     navigateTo,
     setActiveNotice,
@@ -301,9 +299,9 @@ export function DepartmentDetailView({
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedProfileId = searchParams.get('profile');
-  const requestedTab = searchParams.get('tab') as DepartmentTab | null;
+  const requestedTab = searchParams.get('tab');
 
-  const [activeTab, setActiveTab] = useState<DepartmentTab>('overview');
+  const activeTab: DepartmentTab = departmentTab;
   const [designationFilter, setDesignationFilter] = useState<string>('All');
   const [memberQuery, setMemberQuery] = useState('');
   const [noticeQuery, setNoticeQuery] = useState('');
@@ -319,15 +317,10 @@ export function DepartmentDetailView({
   } | null>(null);
 
   useEffect(() => {
-    if (
-      requestedTab &&
-      (['overview', 'faculty', 'officers', 'research', 'notices', 'contact'] as const).includes(
-        requestedTab
-      )
-    ) {
-      setActiveTab(requestedTab);
+    if (isDepartmentTab(requestedTab)) {
+      setDepartmentTab(requestedTab, { scrollToTop: false });
     }
-  }, [requestedTab]);
+  }, [requestedTab, setDepartmentTab]);
 
   const normalizedCode = code.trim().toUpperCase();
   const { data: queriedDepartment } = useQuery({
@@ -459,23 +452,11 @@ export function DepartmentDetailView({
   const chairmanMessageParagraphs = buildChairmanMessage(department, chairman.name);
   const teacherTotal = department.facultyCount ?? facultyMembers.length;
   const totalRosterCount = facultyMembers.length + contractualFaculty.length;
-
-  const departmentTabs: Array<{ id: DepartmentTab; label: string; count?: number }> = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'faculty', label: 'Faculty Members', count: totalRosterCount },
-    { id: 'officers', label: 'Officers & Staff', count: officers.length },
-    { id: 'research', label: 'Programs & Research' },
-    { id: 'notices', label: 'Notice Board', count: deptNotices.length },
-    { id: 'contact', label: 'Contact & Location' },
-  ];
+  const activeNavMeta =
+    DEPARTMENT_NAV_ITEMS.find((item) => item.id === activeTab) ?? DEPARTMENT_NAV_ITEMS[0];
 
   function switchDepartmentTab(nextTab: DepartmentTab) {
-    setActiveTab(nextTab);
-    if (typeof document !== 'undefined') {
-      document
-        .getElementById('dept-subnav')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    setDepartmentTab(nextTab, { scrollToTop: true });
   }
 
   function roleCategoryToGroup(roleCategory: PersonRoleCategory): DepartmentPersonGroup {
@@ -534,36 +515,181 @@ export function DepartmentDetailView({
 
   return (
     <main className="flex-1 bg-[#F9F8F5]">
-      {/* 1. Architectural Departmental Hero Cover Banner */}
-      <header className="relative bg-pust-950 text-white overflow-hidden border-b border-gold-500/35">
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <ResilientImage
-            src={coverPhoto}
-            alt={`Department of ${department.name}, Pabna University of Science and Technology`}
-            containerClassName="w-full h-full m-0"
-            frameClassName="w-full h-full bg-pust-950"
-            fallbackMinHeightClassName="min-h-0"
-            className="w-full h-full object-cover opacity-45"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#190203]/95 via-[#2B0406]/82 to-[#190203]/68" />
-        </div>
+      {activeTab === 'overview' ? (
+        <>
+          {/* 1. Architectural Departmental Hero Cover Banner */}
+          <header className="relative bg-pust-950 text-white overflow-hidden border-b border-gold-500/35">
+            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+              <ResilientImage
+                src={coverPhoto}
+                alt={`Department of ${department.name}, Pabna University of Science and Technology`}
+                containerClassName="w-full h-full m-0"
+                frameClassName="w-full h-full bg-pust-950"
+                fallbackMinHeightClassName="min-h-0"
+                className="w-full h-full object-cover opacity-45"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#190203]/95 via-[#2B0406]/82 to-[#190203]/68" />
+            </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Link
-              href="/academics/departments"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold-200 hover:text-white hover:underline underline-offset-4 transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              All Academic Departments
-            </Link>
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold-300 font-semibold">
+                  {department.faculty}
+                  <span aria-hidden="true"> · </span>
+                  {department.officialCode ? `Dept Code ${department.officialCode}` : department.code}
+                  <span aria-hidden="true"> · </span>
+                  Established {department.established}
+                </p>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {canAdminEdit && (
+                    <EditTriggerButton
+                      onClick={() => openEditModal({ kind: 'department', department })}
+                      label="Edit Department"
+                      variant="dark"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    disabled={bookmarkBusy}
+                    onClick={handleToggleBookmark}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg border border-white/25 bg-white/10 text-white hover:bg-white hover:text-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                  >
+                    {isBookmarked ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : (
+                      <Bookmark className="w-3.5 h-3.5" />
+                    )}
+                    {user
+                      ? isBookmarked
+                        ? 'Saved in Portal'
+                        : 'Bookmark Department'
+                      : 'Sign in to Bookmark'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="max-w-4xl space-y-3">
+                <h1 className="font-serif text-fluid-h1 font-semibold text-white tracking-tight leading-tight text-balance">
+                  Department of {department.name}
+                </h1>
+                <p className="text-sm sm:text-base text-stone-100/95 leading-relaxed max-w-3xl">
+                  {department.summary}
+                </p>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-stone-200 font-mono tabular-nums">
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-gold-300 shrink-0" />
+                  {department.building}, Rajapur Campus
+                </span>
+                {department.contactPhone && (
+                  <a
+                    href={`tel:${sanitizeTelHref(department.contactPhone)}`}
+                    className="inline-flex items-center gap-1.5 hover:text-gold-300 transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-gold-300 shrink-0" />
+                    {department.contactPhone}
+                  </a>
+                )}
+                {department.contactEmail && (
+                  <a
+                    href={`mailto:${department.contactEmail}`}
+                    className="inline-flex items-center gap-1.5 hover:text-gold-300 transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-gold-300 shrink-0" />
+                    {department.contactEmail}
+                  </a>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* 2. Full-Width 4-Column Departmental Key Fact Ribbon */}
+          <div className="bg-white border-b border-stone-200">
+            <dl className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
+              <div className="py-4 pr-4 sm:px-5 first:sm:pl-0">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Established
+                </dt>
+                <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {department.established}
+                </dd>
+                <p className="font-mono text-[11px] text-pust-800 mt-0.5 tabular-nums">
+                  {department.officialCode ? `Code ${department.officialCode} · ` : ''}
+                  {department.code}
+                </p>
+              </div>
+
+              <div className="py-4 pl-4 sm:px-5">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Academic Personnel
+                </dt>
+                <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {teacherTotal} Teachers
+                </dd>
+                <p className="font-mono text-[11px] text-lapis-800 mt-0.5 tabular-nums">
+                  {officers.length} Departmental {officers.length === 1 ? 'Officer' : 'Officers'}
+                </p>
+              </div>
+
+              <div className="py-4 pr-4 sm:px-5">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Undergraduate Intake
+                </dt>
+                <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {department.intakeSeats} Seats
+                </dd>
+                <p className="font-mono text-[11px] text-slate-600 mt-0.5 truncate">
+                  {department.degrees.join(' · ')}
+                </p>
+              </div>
+
+              <div className="py-4 pl-4 sm:px-5">
+                <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Research &amp; Laboratories
+                </dt>
+                <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {department.researchTotal !== undefined
+                    ? `${department.researchTotal.toLocaleString('en-US')} Works`
+                    : `${deptPublications.length} Indexed`}
+                </dd>
+                <p className="font-mono text-[11px] text-sage-800 mt-0.5 tabular-nums">
+                  {department.laboratories.length} Academic Laboratories
+                </p>
+              </div>
+            </dl>
+          </div>
+        </>
+      ) : (
+        /* Compact Departmental Sub-Page Masthead for Dedicated Navbar Views */
+        <header className="relative bg-pust-950 text-white border-b border-gold-500/35">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold-300 font-semibold">
+                Department of {department.name}
+                <span aria-hidden="true"> · </span>
+                {activeNavMeta.mastheadKicker}
+              </p>
+              <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-tight text-balance">
+                {activeNavMeta.mastheadTitle}
+              </h1>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => switchDepartmentTab('overview')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-white/25 bg-white/10 text-white hover:bg-white hover:text-pust-950 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Department Overview
+              </button>
               {canAdminEdit && (
                 <EditTriggerButton
                   onClick={() => openEditModal({ kind: 'department', department })}
-                  label="Edit Department"
+                  label="Edit Dept"
                   variant="dark"
                 />
               )}
@@ -571,154 +697,17 @@ export function DepartmentDetailView({
                 type="button"
                 disabled={bookmarkBusy}
                 onClick={handleToggleBookmark}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg border border-white/25 bg-white/10 text-white hover:bg-white hover:text-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-white/25 bg-white/10 text-white hover:bg-white hover:text-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
               >
                 {isBookmarked ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-                {user
-                  ? isBookmarked
-                    ? 'Saved in Portal'
-                    : 'Bookmark Department'
-                  : 'Sign in to Bookmark'}
+                {isBookmarked ? 'Saved' : 'Save'}
               </button>
             </div>
           </div>
+        </header>
+      )}
 
-          <div className="max-w-4xl space-y-3">
-            <p className="font-mono text-xs uppercase tracking-[0.16em] text-gold-300 font-semibold">
-              {department.faculty}
-              <span aria-hidden="true"> · </span>
-              {department.officialCode ? `Dept Code ${department.officialCode}` : department.code}
-              <span aria-hidden="true"> · </span>
-              Established {department.established}
-            </p>
-            <h1 className="font-serif text-fluid-h1 font-semibold text-white tracking-tight leading-tight text-balance">
-              Department of {department.name}
-            </h1>
-            <p className="text-sm sm:text-base text-stone-100/95 leading-relaxed max-w-3xl">
-              {department.summary}
-            </p>
-          </div>
-
-          <div className="pt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-stone-200 font-mono tabular-nums">
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-gold-300 shrink-0" />
-              {department.building}, Rajapur Campus
-            </span>
-            {department.contactPhone && (
-              <a
-                href={`tel:${sanitizeTelHref(department.contactPhone)}`}
-                className="inline-flex items-center gap-1.5 hover:text-gold-300 transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5 text-gold-300 shrink-0" />
-                {department.contactPhone}
-              </a>
-            )}
-            {department.contactEmail && (
-              <a
-                href={`mailto:${department.contactEmail}`}
-                className="inline-flex items-center gap-1.5 hover:text-gold-300 transition-colors"
-              >
-                <Mail className="w-3.5 h-3.5 text-gold-300 shrink-0" />
-                {department.contactEmail}
-              </a>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* 2. Full-Width 4-Column Departmental Key Fact Ribbon */}
-      <div className="bg-white border-b border-stone-200">
-        <dl className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
-          <div className="py-4 pr-4 sm:px-5 first:sm:pl-0">
-            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-              Established
-            </dt>
-            <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-              {department.established}
-            </dd>
-            <p className="font-mono text-[11px] text-pust-800 mt-0.5 tabular-nums">
-              {department.officialCode ? `Code ${department.officialCode} · ` : ''}
-              {department.code}
-            </p>
-          </div>
-
-          <div className="py-4 pl-4 sm:px-5">
-            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-              Academic Personnel
-            </dt>
-            <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-              {teacherTotal} Teachers
-            </dd>
-            <p className="font-mono text-[11px] text-lapis-800 mt-0.5 tabular-nums">
-              {officers.length} Departmental {officers.length === 1 ? 'Officer' : 'Officers'}
-            </p>
-          </div>
-
-          <div className="py-4 pr-4 sm:px-5">
-            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-              Undergraduate Intake
-            </dt>
-            <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-              {department.intakeSeats} Seats
-            </dd>
-            <p className="font-mono text-[11px] text-slate-600 mt-0.5 truncate">
-              {department.degrees.join(' · ')}
-            </p>
-          </div>
-
-          <div className="py-4 pl-4 sm:px-5">
-            <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
-              Research &amp; Laboratories
-            </dt>
-            <dd className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-              {department.researchTotal !== undefined
-                ? `${department.researchTotal.toLocaleString('en-US')} Works`
-                : `${deptPublications.length} Indexed`}
-            </dd>
-            <p className="font-mono text-[11px] text-sage-800 mt-0.5 tabular-nums">
-              {department.laboratories.length} Academic Laboratories
-            </p>
-          </div>
-        </dl>
-      </div>
-
-      {/* 3. Departmental Sub-Navigation Menu (DUET Microsite Style) */}
-      <div id="dept-subnav" className="bg-[#FAF8F4] border-b border-stone-200 scroll-mt-20">
-        <nav
-          aria-label={`${department.name} departmental sections`}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center overflow-x-auto no-scrollbar gap-1.5 py-3"
-        >
-          {departmentTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                aria-current={isActive ? 'page' : undefined}
-                onClick={() => switchDepartmentTab(tab.id)}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isActive
-                    ? 'bg-pust-900 text-white shadow-2xs'
-                    : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
-                }`}
-              >
-                <span>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span
-                    className={`font-mono text-[11px] tabular-nums ${
-                      isActive ? 'text-gold-200' : 'text-slate-500'
-                    }`}
-                  >
-                    ({tab.count})
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* 4. Active Departmental Sub-Page Stage */}
+      {/* 3. Active Departmental Sub-Page Stage */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
         <SubPagePanel subKey={activeTab} className="space-y-12">
           {activeTab === 'overview' && (
