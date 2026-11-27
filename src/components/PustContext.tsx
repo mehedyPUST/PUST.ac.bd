@@ -692,6 +692,7 @@ export function PustShell({
                 departmentCode={parsedDepartmentRoute.code}
                 isPersonPage={parsedDepartmentRoute.isPersonPage}
                 activeTab={departmentTab}
+                profile={profile}
                 departments={departments}
                 user={user}
                 editMode={effectiveEditMode}
