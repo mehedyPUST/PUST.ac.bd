@@ -180,7 +180,7 @@ export function DepartmentNavbar({
           {/* Full-bleed Department + University Title Band Backdrop */}
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-[52px] lg:h-[60px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b border-gold-500/35"
+            className="absolute inset-x-0 top-0 h-[58px] sm:h-[64px] lg:h-[74px] xl:h-[80px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b border-gold-500/35"
           />
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -193,23 +193,23 @@ export function DepartmentNavbar({
                 setMobileSearchOpen(false);
               }}
               title="Pabna University of Science and Technology — Main Website"
-              className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-start lg:self-stretch"
+              className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3.5 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-start lg:self-stretch"
             >
-              <PustCrest size={28} className="lg:hidden" />
-              <PustCrest size={60} className="hidden lg:block xl:hidden" />
-              <PustCrest size={72} className="hidden xl:block" />
+              <PustCrest size={32} className="lg:hidden" />
+              <PustCrest size={68} className="hidden lg:block xl:hidden" />
+              <PustCrest size={80} className="hidden xl:block" />
             </Link>
 
             {/* Right Column: Tier 1 Two-Line Department & University Lockup + Tier 2 Department Nav */}
             <div className="flex-1 min-w-0 flex flex-col">
               {/* Tier 1: Stacked "Department of ..." + "Pabna University of Science and Technology, Pabna." */}
-              <div className="h-[52px] lg:h-[60px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
+              <div className="h-[58px] sm:h-[64px] lg:h-[74px] xl:h-[80px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
                 <div className="min-w-0 flex-1 flex flex-col justify-center">
                   <button
                     type="button"
                     onClick={() => handleTabClick('overview')}
                     title={departmentTitle}
-                    className="text-left font-serif text-[clamp(0.78rem,3.1vw,1rem)] sm:text-base lg:text-[1.15rem] xl:text-[1.25rem] font-semibold tracking-tight text-white hover:text-gold-200 transition-colors leading-[1.18] truncate cursor-pointer"
+                    className="text-left font-serif text-[clamp(0.9rem,3.6vw,1.1rem)] sm:text-lg lg:text-[1.4rem] xl:text-[1.6rem] font-semibold tracking-tight text-white hover:text-gold-200 transition-colors leading-[1.15] truncate cursor-pointer"
                   >
                     {departmentTitle}
                   </button>
@@ -221,7 +221,7 @@ export function DepartmentNavbar({
                       setMobileSearchOpen(false);
                     }}
                     title="Return to Pabna University of Science and Technology Main Website"
-                    className="block text-[clamp(0.625rem,2.3vw,0.75rem)] sm:text-xs lg:text-[13px] font-medium text-stone-100/95 hover:text-gold-200 transition-colors leading-[1.2] truncate"
+                    className="block mt-0.5 text-[clamp(0.7rem,2.5vw,0.82rem)] sm:text-[13.5px] lg:text-[15px] xl:text-[16.5px] font-medium text-stone-100/95 hover:text-gold-200 transition-colors leading-[1.2] truncate"
                   >
                     Pabna University of Science and Technology, Pabna.
                   </Link>
@@ -480,7 +480,7 @@ export function DepartmentNavbar({
         <div className="lg:hidden bg-white border-t border-stone-200">
           <nav
             aria-label={`${departmentTitle} mobile navigation`}
-            className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center overflow-x-auto no-scrollbar gap-4 h-10 text-xs font-medium text-slate-800"
+            className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center overflow-x-auto no-scrollbar gap-4 h-9 text-xs font-medium text-slate-800"
           >
             {DEPARTMENT_NAV_ITEMS.map((item) => {
               const isActive = effectiveActiveTab === item.id;
@@ -490,7 +490,7 @@ export function DepartmentNavbar({
                   type="button"
                   aria-current={isActive ? 'page' : undefined}
                   onClick={() => handleTabClick(item.id)}
-                  className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`h-9 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
                       ? 'border-pust-800 text-pust-900 font-semibold'
                       : 'border-transparent text-slate-700 hover:text-pust-900'
@@ -562,7 +562,7 @@ export function DepartmentNavbar({
             <div
               aria-hidden="true"
               onClick={() => setMobileSearchOpen(false)}
-              className="fixed inset-x-0 top-12 bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+              className="fixed inset-x-0 top-[58px] sm:top-[64px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
             />
             <div className="relative z-10 lg:hidden border-t border-stone-200 bg-white px-3.5 py-3 shadow-md">
               <GlobalSearchBar
