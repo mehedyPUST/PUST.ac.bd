@@ -232,6 +232,7 @@ export function PublicSubPages({
 
   const deptGroupsRef = useRef<HTMLDivElement>(null);
   const noticesBoardRef = useRef<HTMLDivElement>(null);
+  const pendingNoticeCatRef = useRef<'All' | NoticeCategory | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -274,6 +275,12 @@ export function PublicSubPages({
   }
 
   useEffect(() => {
+    if (route === '/notices' && pendingNoticeCatRef.current) {
+      setSelectedNoticeCat(pendingNoticeCatRef.current);
+      pendingNoticeCatRef.current = null;
+      return;
+    }
+    pendingNoticeCatRef.current = null;
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
   }, [route]);
 
@@ -2699,22 +2706,54 @@ export function PublicSubPages({
   }
 
   // 6. NOTICES PAGES (/notices & /notices/*)
-  const noticeSubTabs: Array<{ label: string; route: AppRoute }> = [
-    { label: 'All Notices', route: '/notices' },
-    { label: 'General Notice', route: '/notices/general' },
-    { label: 'Job Notice', route: '/notices/job' },
-    { label: 'Press Release', route: '/notices/press-release' },
-    { label: 'NOC', route: '/notices/noc' },
-    { label: 'Result Notice', route: '/notices/result' },
-  ];
+  const noticeCategoryRoutes: Partial<Record<'All' | NoticeCategory, AppRoute>> = {
+    All: '/notices',
+    General: '/notices/general',
+    'Job & Tender': '/notices/job',
+    'Press Release': '/notices/press-release',
+    'NOC & Orders': '/notices/noc',
+    Result: '/notices/result',
+  };
+
+  const noticeCategoryHeadingLabels: Partial<Record<'All' | NoticeCategory, string>> = {
+    All: 'University Notice Board',
+    General: 'General Notices',
+    'Job & Tender': 'Job & Tender Notices',
+    'Press Release': 'Press Releases',
+    'NOC & Orders': 'NOC & Official Orders',
+    Result: 'Examination Result Notices',
+    Admission: 'Admission Notices',
+    Academic: 'Academic Notices',
+    Examination: 'Examination Circulars',
+    Course: 'Course & Syllabus Notices',
+  };
+
   const activeNoticeHeading =
-    noticeSubTabs.find((t) => t.route === route && route !== '/notices')?.label ||
-    'University Notice Board';
+    noticeCategoryHeadingLabels[selectedNoticeCat] || 'University Notice Board';
+
+  function handleSelectNoticeCategory(cat: 'All' | NoticeCategory) {
+    const targetRoute = noticeCategoryRoutes[cat];
+    if (targetRoute) {
+      pendingNoticeCatRef.current = null;
+      setSelectedNoticeCat(cat);
+      if (route !== targetRoute) {
+        onNavigate(targetRoute);
+      }
+      return;
+    }
+    if (route !== '/notices') {
+      pendingNoticeCatRef.current = cat;
+      setSelectedNoticeCat(cat);
+      onNavigate('/notices');
+      return;
+    }
+    setSelectedNoticeCat(cat);
+  }
 
   return (
     <main className="flex-1 bg-[#F9F8F5]">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="space-y-5 pb-6 border-b border-slate-200">
+        <div className="space-y-5 pb-6 border-b border-stone-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -2738,27 +2777,8 @@ export function PublicSubPages({
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <nav
-              aria-label="Notice categories"
-              className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 lg:pb-0 min-w-0"
-            >
-              {noticeSubTabs.map((tab) => (
-                <Link
-                  key={tab.route}
-                  href={tab.route}
-                  className={`h-10 inline-flex items-center justify-center px-3.5 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    route === tab.route
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="relative w-full lg:w-72 shrink-0">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="relative w-full md:w-80">
               <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
@@ -2769,21 +2789,46 @@ export function PublicSubPages({
                 className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-stone-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
               />
             </div>
-          </div>
-        </div>
 
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 py-4 border-b border-stone-200">
-          <div
-            role="group"
-            aria-label="Filter notices by category"
-            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0 min-w-0 flex-1"
+            <div
+              role="group"
+              aria-label="Filter notices by board scope"
+              className="inline-flex items-center self-start md:self-auto p-1 rounded-xl bg-white border border-stone-200 overflow-x-auto max-w-full shrink-0"
+            >
+              {(
+                [
+                  { id: 'all', label: 'All Boards' },
+                  { id: 'central', label: 'Central Board' },
+                  { id: 'department', label: 'Department & Course' },
+                ] as const
+              ).map((scope) => (
+                <button
+                  key={scope.id}
+                  type="button"
+                  onClick={() => setNoticeBoardScope(scope.id)}
+                  className={`h-8 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    noticeBoardScope === scope.id
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-[#FAF9F6]'
+                  }`}
+                >
+                  {scope.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <nav
+            aria-label="Notice categories"
+            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0 min-w-0"
           >
             {NOTICE_FILTERS.map((cat) => (
               <button
                 key={cat}
                 type="button"
-                onClick={() => setSelectedNoticeCat(cat)}
-                className={`h-9 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                aria-pressed={selectedNoticeCat === cat}
+                onClick={() => handleSelectNoticeCategory(cat)}
+                className={`h-9 inline-flex items-center justify-center px-3.5 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
                     ? 'bg-pust-900 text-white border-pust-900'
                     : 'bg-white border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
@@ -2792,34 +2837,7 @@ export function PublicSubPages({
                 {cat}
               </button>
             ))}
-          </div>
-
-          <div
-            role="group"
-            aria-label="Filter notices by board scope"
-            className="inline-flex items-center self-start xl:self-auto p-1 rounded-xl bg-white border border-stone-200 overflow-x-auto max-w-full shrink-0"
-          >
-            {(
-              [
-                { id: 'all', label: 'All Boards' },
-                { id: 'central', label: 'Central Board' },
-                { id: 'department', label: 'Department & Course' },
-              ] as const
-            ).map((scope) => (
-              <button
-                key={scope.id}
-                type="button"
-                onClick={() => setNoticeBoardScope(scope.id)}
-                className={`h-7 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  noticeBoardScope === scope.id
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-700 hover:text-slate-950 hover:bg-[#FAF9F6]'
-                }`}
-              >
-                {scope.label}
-              </button>
-            ))}
-          </div>
+          </nav>
         </div>
 
         <SubPagePanel subKey={route}>
@@ -2846,9 +2864,13 @@ export function PublicSubPages({
             <button
               type="button"
               onClick={() => {
+                pendingNoticeCatRef.current = null;
                 setSelectedNoticeCat('All');
                 setNoticeBoardScope('all');
                 setNoticeQuery('');
+                if (route !== '/notices') {
+                  onNavigate('/notices');
+                }
               }}
               className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
             >
