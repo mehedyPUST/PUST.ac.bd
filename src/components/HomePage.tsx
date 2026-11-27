@@ -441,14 +441,14 @@ export function HomePage({
 
         {/* University Headline, CTAs & Operational Utility Ribbon */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-10 sm:pb-14">
-          <div className="space-y-6 text-left">
+          <div className="space-y-6 text-center max-w-4xl mx-auto">
             {loadingData && !profile ? (
               <HeroSummarySkeleton />
             ) : profile ? (
               <div className="space-y-4">
                 <div
                   data-gsap-hero
-                  className="flex flex-wrap items-center justify-between gap-3"
+                  className="flex flex-wrap items-center justify-center gap-3"
                 >
                   <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
                     {profile.heroEyebrow ||
@@ -464,21 +464,21 @@ export function HomePage({
                 </div>
                 <h1
                   data-gsap-hero
-                  className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950 max-w-4xl"
+                  className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950 max-w-4xl mx-auto"
                 >
                   {profile.heroTitle}
                 </h1>
                 {profile.heroSubtitle && (
                   <p
                     data-gsap-hero
-                    className="text-fluid-lead text-slate-700 max-w-3xl"
+                    className="text-fluid-lead text-slate-700 max-w-3xl mx-auto"
                   >
                     {profile.heroSubtitle}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2 text-left">
+              <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2 text-center">
                 <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                   Pabna University of Science and Technology
                 </h1>
@@ -490,7 +490,7 @@ export function HomePage({
 
             <div
               data-gsap-hero
-              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2.5 sm:gap-3 pt-1"
+              className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-2.5 sm:gap-3 pt-1"
             >
               <Link
                 href="/portal"
