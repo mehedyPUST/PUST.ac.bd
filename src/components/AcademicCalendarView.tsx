@@ -19,6 +19,7 @@ import {
 import { downloadIcsCalendar } from '../lib/calendarExport';
 import type { AcademicCalendarCategory, AcademicCalendarItem } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 
 export type CalendarFilterCategory = 'all' | AcademicCalendarCategory;
 
@@ -388,110 +389,116 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
   return (
     <div className="editable-region space-y-6">
       {/* Quick Upcoming Jump Strip */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button
-          type="button"
-          onClick={() =>
-            nextHighlights.exam
-              ? focusEventOnCalendar(nextHighlights.exam)
-              : setCategoryFilter('exam')
-          }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-pust-700/55 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
-              <BookOpen className="w-3.5 h-3.5" />
-              Next Examination
-            </span>
-            {nextHighlights.exam && (
-              <span className="font-mono text-[11px] text-pust-900 tabular-nums">
-                {getRelativeDayLabel(
-                  nextHighlights.exam.date,
-                  nextHighlights.exam.effectiveEndDate,
-                  todayIso
-                ).label}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+        <MotionReveal delay={0} className="h-full">
+          <button
+            type="button"
+            onClick={() =>
+              nextHighlights.exam
+                ? focusEventOnCalendar(nextHighlights.exam)
+                : setCategoryFilter('exam')
+            }
+            className="h-full w-full text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-pust-700/55 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
+                <BookOpen className="w-3.5 h-3.5" />
+                Next Examination
               </span>
-            )}
-          </div>
-          <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 line-clamp-1">
-            {nextHighlights.exam ? nextHighlights.exam.event : 'No upcoming exams scheduled'}
-          </p>
-          <p className="font-mono text-xs text-slate-500 tabular-nums">
-            {nextHighlights.exam
-              ? formatDateRange(nextHighlights.exam.date, nextHighlights.exam.endDate)
-              : 'Filter Exam schedule'}
-          </p>
-        </button>
+              {nextHighlights.exam && (
+                <span className="font-mono text-[11px] text-pust-900 tabular-nums">
+                  {getRelativeDayLabel(
+                    nextHighlights.exam.date,
+                    nextHighlights.exam.effectiveEndDate,
+                    todayIso
+                  ).label}
+                </span>
+              )}
+            </div>
+            <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 line-clamp-1">
+              {nextHighlights.exam ? nextHighlights.exam.event : 'No upcoming exams scheduled'}
+            </p>
+            <p className="font-mono text-xs text-slate-500 tabular-nums">
+              {nextHighlights.exam
+                ? formatDateRange(nextHighlights.exam.date, nextHighlights.exam.endDate)
+                : 'Filter Exam schedule'}
+            </p>
+          </button>
+        </MotionReveal>
 
-        <button
-          type="button"
-          onClick={() =>
-            nextHighlights.holiday
-              ? focusEventOnCalendar(nextHighlights.holiday)
-              : setCategoryFilter('holiday')
-          }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-emerald-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">
-              <Sun className="w-3.5 h-3.5" />
-              Next Holiday / Recess
-            </span>
-            {nextHighlights.holiday && (
-              <span className="font-mono text-[11px] text-emerald-900 tabular-nums">
-                {getRelativeDayLabel(
-                  nextHighlights.holiday.date,
-                  nextHighlights.holiday.effectiveEndDate,
-                  todayIso
-                ).label}
+        <MotionReveal delay={0.05} className="h-full">
+          <button
+            type="button"
+            onClick={() =>
+              nextHighlights.holiday
+                ? focusEventOnCalendar(nextHighlights.holiday)
+                : setCategoryFilter('holiday')
+            }
+            className="h-full w-full text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-emerald-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-emerald-800 font-semibold">
+                <Sun className="w-3.5 h-3.5" />
+                Next Holiday / Recess
               </span>
-            )}
-          </div>
-          <p className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900 line-clamp-1">
-            {nextHighlights.holiday ? nextHighlights.holiday.event : 'No upcoming holidays listed'}
-          </p>
-          <p className="font-mono text-xs text-slate-500 tabular-nums">
-            {nextHighlights.holiday
-              ? formatDateRange(nextHighlights.holiday.date, nextHighlights.holiday.endDate)
-              : 'Filter Holiday list'}
-          </p>
-        </button>
+              {nextHighlights.holiday && (
+                <span className="font-mono text-[11px] text-emerald-900 tabular-nums">
+                  {getRelativeDayLabel(
+                    nextHighlights.holiday.date,
+                    nextHighlights.holiday.effectiveEndDate,
+                    todayIso
+                  ).label}
+                </span>
+              )}
+            </div>
+            <p className="font-serif text-base font-medium text-slate-900 group-hover:text-emerald-900 line-clamp-1">
+              {nextHighlights.holiday ? nextHighlights.holiday.event : 'No upcoming holidays listed'}
+            </p>
+            <p className="font-mono text-xs text-slate-500 tabular-nums">
+              {nextHighlights.holiday
+                ? formatDateRange(nextHighlights.holiday.date, nextHighlights.holiday.endDate)
+                : 'Filter Holiday list'}
+            </p>
+          </button>
+        </MotionReveal>
 
-        <button
-          type="button"
-          onClick={() =>
-            nextHighlights.deadline
-              ? focusEventOnCalendar(nextHighlights.deadline)
-              : setCategoryFilter('deadline')
-          }
-          className="text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-amber-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-amber-800 font-semibold">
-              <Clock className="w-3.5 h-3.5" />
-              Next Semester Deadline
-            </span>
-            {nextHighlights.deadline && (
-              <span className="font-mono text-[11px] text-amber-900 tabular-nums">
-                {getRelativeDayLabel(
-                  nextHighlights.deadline.date,
-                  nextHighlights.deadline.effectiveEndDate,
-                  todayIso
-                ).label}
+        <MotionReveal delay={0.1} className="h-full">
+          <button
+            type="button"
+            onClick={() =>
+              nextHighlights.deadline
+                ? focusEventOnCalendar(nextHighlights.deadline)
+                : setCategoryFilter('deadline')
+            }
+            className="h-full w-full text-left p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] hover:border-amber-700/50 hover:bg-white transition-colors space-y-1.5 cursor-pointer group"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-amber-800 font-semibold">
+                <Clock className="w-3.5 h-3.5" />
+                Next Semester Deadline
               </span>
-            )}
-          </div>
-          <p className="font-serif text-base font-medium text-slate-900 group-hover:text-amber-900 line-clamp-1">
-            {nextHighlights.deadline
-              ? nextHighlights.deadline.event
-              : 'No upcoming deadlines pending'}
-          </p>
-          <p className="font-mono text-xs text-slate-500 tabular-nums">
-            {nextHighlights.deadline
-              ? formatDateRange(nextHighlights.deadline.date, nextHighlights.deadline.endDate)
-              : 'Filter Semester Deadlines'}
-          </p>
-        </button>
+              {nextHighlights.deadline && (
+                <span className="font-mono text-[11px] text-amber-900 tabular-nums">
+                  {getRelativeDayLabel(
+                    nextHighlights.deadline.date,
+                    nextHighlights.deadline.effectiveEndDate,
+                    todayIso
+                  ).label}
+                </span>
+              )}
+            </div>
+            <p className="font-serif text-base font-medium text-slate-900 group-hover:text-amber-900 line-clamp-1">
+              {nextHighlights.deadline
+                ? nextHighlights.deadline.event
+                : 'No upcoming deadlines pending'}
+            </p>
+            <p className="font-mono text-xs text-slate-500 tabular-nums">
+              {nextHighlights.deadline
+                ? formatDateRange(nextHighlights.deadline.date, nextHighlights.deadline.endDate)
+                : 'Filter Semester Deadlines'}
+            </p>
+          </button>
+        </MotionReveal>
       </div>
 
       {/* Category Filters & Timeframe / View Switcher */}
@@ -684,7 +691,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
       ) : viewMode === 'month' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Interactive Monthly Grid */}
-          <div className="lg:col-span-7 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+          <MotionReveal className="lg:col-span-7 rounded-2xl border border-stone-200 bg-white overflow-hidden">
             <div className="px-4 sm:px-5 py-3.5 bg-[#FAF9F6] border-b border-stone-200 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <h2 className="font-serif text-lg sm:text-xl font-medium text-slate-900 truncate">
@@ -851,10 +858,10 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 Sun–Thu Classes · Fri–Sat Weekly Off
               </span>
             </div>
-          </div>
+          </MotionReveal>
 
           {/* Right Column: Selected Day / Monthly Schedule Inspector */}
-          <div className="lg:col-span-5 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+          <MotionReveal delay={0.07} className="lg:col-span-5 rounded-2xl border border-stone-200 bg-white overflow-hidden">
             <div className="px-5 py-3.5 bg-[#FAF9F6] border-b border-stone-200 flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold text-left">
@@ -984,13 +991,14 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 })}
               </div>
             )}
-          </div>
+          </MotionReveal>
         </div>
       ) : (
         /* Timeline View Grouped Chronologically by Month */
         <div className="space-y-6">
-          {timelineGroups.map(([monthKey, groupItems]) => (
-            <section key={monthKey} className="space-y-3">
+          {timelineGroups.map(([monthKey, groupItems], groupIdx) => (
+            <MotionReveal key={monthKey} delay={(groupIdx % 4) * 0.04}>
+              <section className="space-y-3">
               <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
                 <h2 className="font-serif text-xl font-medium text-slate-900">
                   {formatMonthHeading(monthKey)}
@@ -1082,6 +1090,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 })}
               </div>
             </section>
+            </MotionReveal>
           ))}
         </div>
       )}
@@ -1120,7 +1129,7 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
   if (upcoming.length === 0) return null;
 
   return (
-    <div className="pt-8 border-t border-slate-200 space-y-4">
+    <MotionReveal className="pt-8 border-t border-slate-200 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
@@ -1165,14 +1174,15 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((item) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+        {filtered.map((item, idx) => {
           const meta = CATEGORY_META[item.resolvedCategory];
           const rel = getRelativeDayLabel(item.date, item.effectiveEndDate, todayIso);
           return (
-            <div
+            <MotionCard
               key={item.id}
-              className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col justify-between gap-2.5"
+              delay={idx * 0.04}
+              className="h-full p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col justify-between gap-2.5"
             >
               <div className="space-y-1">
                 <div className="flex items-center justify-between gap-2 text-xs">
@@ -1195,10 +1205,10 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
                 </span>
                 <span className="text-slate-500 truncate">{item.term}</span>
               </div>
-            </div>
+            </MotionCard>
           );
         })}
       </div>
-    </div>
+    </MotionReveal>
   );
 }

@@ -41,7 +41,7 @@ import type { AppRoute } from '../lib/routes';
 import { AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
-import { MotionCard, SubPagePanel } from './MotionPrimitives';
+import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import {
   CardsGridSkeleton,
   HeroSummarySkeleton,
@@ -503,7 +503,7 @@ export function PublicSubPages({
 
                 return (
                   <>
-                    <div className={visionPart ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
+                    <MotionReveal className={visionPart ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
                       <h2 className="font-serif text-2xl font-semibold text-slate-950">
                         Our Mission
                       </h2>
@@ -519,17 +519,17 @@ export function PublicSubPages({
                           ))}
                         </ul>
                       )}
-                    </div>
+                    </MotionReveal>
 
                     {visionPart && (
-                      <div className="lg:col-span-5 space-y-3">
+                      <MotionReveal delay={0.08} className="lg:col-span-5 space-y-3">
                         <h2 className="font-serif text-2xl font-semibold text-slate-950">
                           Our Vision
                         </h2>
                         <blockquote className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 font-serif text-lg sm:text-xl italic leading-relaxed text-slate-950 text-left">
                           {visionPart}
                         </blockquote>
-                      </div>
+                      </MotionReveal>
                     )}
                   </>
                 );
@@ -537,14 +537,14 @@ export function PublicSubPages({
             </div>
           ) : activeSlug === 'our-university' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className={profile ? 'lg:col-span-7' : 'lg:col-span-12'}>
+              <MotionReveal className={profile ? 'lg:col-span-7' : 'lg:col-span-12'}>
                 <p className={`flow-root prose-justify ${profile ? '' : 'max-w-[66ch] '}text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800`}>
                   {activeSection.body}
                 </p>
-              </div>
+              </MotionReveal>
 
               {profile && (
-                <div className="lg:col-span-5 space-y-5">
+                <MotionReveal delay={0.08} className="lg:col-span-5 space-y-5">
                   <div className="editable-region space-y-2">
                     <div className="flex justify-end empty:hidden">
                       <EditTriggerButton
@@ -589,18 +589,18 @@ export function PublicSubPages({
                       </div>
                     )}
                   </dl>
-                </div>
+                </MotionReveal>
               )}
             </div>
           ) : activeSlug === 'history' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className="lg:col-span-7">
+              <MotionReveal className="lg:col-span-7">
                 <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
                 </p>
-              </div>
+              </MotionReveal>
 
-              <div className="lg:col-span-5 space-y-5">
+              <MotionReveal delay={0.08} className="lg:col-span-5 space-y-5">
                 <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
                   <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6]">
                     <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800 text-left">
@@ -644,16 +644,16 @@ export function PublicSubPages({
                     )}
                   </dl>
                 </div>
-              </div>
+              </MotionReveal>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className="lg:col-span-7">
+              <MotionReveal className="lg:col-span-7">
                 <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
                 </p>
-              </div>
-              <div className="lg:col-span-5">
+              </MotionReveal>
+              <MotionReveal delay={0.08} className="lg:col-span-5">
                 <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
                   <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6]">
                     <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800 text-left">
@@ -679,7 +679,7 @@ export function PublicSubPages({
                     </li>
                   </ul>
                 </div>
-              </div>
+              </MotionReveal>
             </div>
           )}
 
@@ -910,7 +910,7 @@ export function PublicSubPages({
               )}
 
               {/* Official PUST Specialized Institute (IIED) */}
-              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              <MotionReveal className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                 <div className="space-y-1.5 max-w-3xl">
                   <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
                     University Institute · pust.ac.bd/academic/Institute
@@ -933,9 +933,9 @@ export function PublicSubPages({
                   Official IIED Portal
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
-              </div>
+              </MotionReveal>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
+              <MotionReveal delay={0.05} className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
                 <p className="text-sm text-slate-700">
                   All degree programs operate under the Outcome-Based Education (OBE) framework and
                   4.00 grading ordinance.
@@ -965,7 +965,7 @@ export function PublicSubPages({
                       : 'Browse Departments'}
                   </button>
                 </div>
-              </div>
+              </MotionReveal>
             </div>
           ) : isFacultiesView ? (
             <div className="editable-region space-y-8">
@@ -1147,7 +1147,7 @@ export function PublicSubPages({
 
               return (
                 <div className="editable-region space-y-8">
-                  <div className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <MotionReveal className="p-5 rounded-2xl bg-[#F7F7F5] border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <p className="font-mono text-xs uppercase tracking-wider text-pust-800">
                         100% Paperless &amp; Official Download Hub
@@ -1172,10 +1172,10 @@ export function PublicSubPages({
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  </div>
+                  </MotionReveal>
 
                   {/* Section 1: Interactive Fillable & Portal Workflows */}
-                  <div className="space-y-3">
+                  <MotionReveal className="space-y-3">
                     <h2 className="font-serif text-xl font-medium text-slate-900">
                       Interactive Fillable &amp; Portal Workflows
                     </h2>
@@ -1231,11 +1231,11 @@ export function PublicSubPages({
                       ))}
                       </div>
                     )}
-                  </div>
+                  </MotionReveal>
 
                   {/* Section 2: Official PUST PDF/DOCX Forms Directory */}
                   {officialForms.length > 0 && (
-                    <div className="space-y-4 pt-4 border-t border-slate-200">
+                    <MotionReveal className="space-y-4 pt-4 border-t border-slate-200">
                       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                         <div>
                           <p className="font-mono text-xs uppercase tracking-widest text-lapis-700">
@@ -1346,14 +1346,14 @@ export function PublicSubPages({
                           ))}
                         </div>
                       )}
-                    </div>
+                    </MotionReveal>
                   )}
                 </div>
               );
             })()
           ) : route === '/academics/calendar' ? (
             <div className="space-y-6">
-              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <MotionReveal className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
@@ -1393,7 +1393,7 @@ export function PublicSubPages({
                     </dd>
                   </div>
                 </dl>
-              </div>
+              </MotionReveal>
               <AcademicCalendarView items={resolved.academicExtras.academicCalendar} />
             </div>
           ) : route === '/academics/scholarship' ? (
@@ -1425,7 +1425,7 @@ export function PublicSubPages({
                   ))}
                 </div>
               )}
-              <div className="p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+              <MotionReveal className="p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
                 <div className="space-y-1">
                   <p className="font-mono uppercase tracking-wider text-pust-800 font-semibold">
                     Scholarship &amp; Financial Aid Coordination
@@ -1443,7 +1443,7 @@ export function PublicSubPages({
                 >
                   Student Advisor Office →
                 </button>
-              </div>
+              </MotionReveal>
             </div>
           ) : route === '/academics/seminars' ? (
             <div className="editable-region space-y-5">
@@ -1962,7 +1962,7 @@ export function PublicSubPages({
                   </button>
                 </div>
               ) : (
-                <div className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
+                <MotionReveal className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
                   {admissionNotices.map((n) => (
                     <div
                       key={n.id}
@@ -1991,7 +1991,7 @@ export function PublicSubPages({
                       <p className="text-sm text-slate-600">{n.summary}</p>
                     </div>
                   ))}
-                </div>
+                </MotionReveal>
               )}
             </div>
           ) : loadingData && !profile ? (
@@ -2033,23 +2033,25 @@ export function PublicSubPages({
                 ))}
               </div>
 
-              <GstEligibilityChecker
-                departments={departments}
-                onSelectDepartment={onSelectDepartment}
-                onPrefillInquiry={(deptCode, message) => {
-                  setInqProgram('Undergraduate (GST)');
-                  setInqDept(deptCode);
-                  setInqMessage(message);
-                  if (typeof document !== 'undefined') {
-                    document
-                      .getElementById('admission-inquiry-form')
-                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
-              />
+              <MotionReveal delay={0.04}>
+                <GstEligibilityChecker
+                  departments={departments}
+                  onSelectDepartment={onSelectDepartment}
+                  onPrefillInquiry={(deptCode, message) => {
+                    setInqProgram('Undergraduate (GST)');
+                    setInqDept(deptCode);
+                    setInqMessage(message);
+                    if (typeof document !== 'undefined') {
+                      document
+                        .getElementById('admission-inquiry-form')
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                />
+              </MotionReveal>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-5 space-y-6">
+                <MotionReveal className="lg:col-span-5 space-y-6">
                   <p className="text-[15px] text-slate-700 leading-relaxed text-left">
                     {route === '/admissions/graduate'
                       ? resolved.admissionsConfig.gradText
@@ -2168,13 +2170,14 @@ export function PublicSubPages({
                       </div>
                     )}
                   </div>
-                </div>
+                </MotionReveal>
 
-                <div
-                  id="admission-inquiry-form"
-                  className="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 scroll-mt-28"
-                >
-                  <h2 className="font-serif text-2xl font-medium text-slate-900">
+                <MotionReveal delay={0.08} className="lg:col-span-7">
+                  <div
+                    id="admission-inquiry-form"
+                    className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 scroll-mt-28"
+                  >
+                    <h2 className="font-serif text-2xl font-medium text-slate-900">
                     Submit an Admission Inquiry
                   </h2>
                   <p className="text-sm text-slate-600 mt-1 mb-6">
@@ -2305,7 +2308,8 @@ export function PublicSubPages({
                       {inqSubmitting ? 'Submitting Inquiry...' : 'Send Admission Inquiry'}
                     </button>
                   </form>
-                </div>
+                  </div>
+                </MotionReveal>
               </div>
             </div>
           )}
@@ -2411,7 +2415,7 @@ export function PublicSubPages({
           </div>
 
           <SubPagePanel subKey={currentFac.route} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            <div className="lg:col-span-6 space-y-6">
+            <MotionReveal className="lg:col-span-6 space-y-6">
               <p className="text-base leading-relaxed text-slate-700">{currentFac.body}</p>
 
               <dl className="rounded-2xl border border-stone-200 bg-[#FAF9F6] divide-y divide-stone-200 text-sm overflow-hidden">
@@ -2473,8 +2477,8 @@ export function PublicSubPages({
                   </div>
                 );
               })()}
-            </div>
-            <div className="lg:col-span-6">
+            </MotionReveal>
+            <MotionReveal delay={0.08} className="lg:col-span-6">
               <ResilientImage
                 src={currentFac.img}
                 alt={currentFac.title}
@@ -2482,7 +2486,7 @@ export function PublicSubPages({
                 className="w-full aspect-[4/3] object-cover"
                 priority
               />
-            </div>
+            </MotionReveal>
           </SubPagePanel>
         </section>
       </main>
@@ -2878,10 +2882,11 @@ export function PublicSubPages({
             </button>
           </div>
         ) : (
-          <div
-            ref={noticesBoardRef}
-            className="rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
-          >
+          <MotionReveal>
+            <div
+              ref={noticesBoardRef}
+              className="rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
+            >
             <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
               <div className="lg:col-span-2">Date &amp; Category</div>
               <div className="lg:col-span-7">Official Circular</div>
@@ -2951,6 +2956,7 @@ export function PublicSubPages({
               ))}
             </div>
           </div>
+          </MotionReveal>
         )}
         </SubPagePanel>
       </section>

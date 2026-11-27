@@ -45,6 +45,7 @@ import type {
 } from '../types/pust';
 import { CmsImageField, INPUT_CLASS, LABEL_CLASS } from './admin-edit/shared';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { ShareProfileModal } from './ShareProfileModal';
 
@@ -1661,75 +1662,86 @@ export function PersonProfileView({
         {/* Topic Dossier Sections */}
         <div className="space-y-5">
           {topicSections.map((section, idx) => {
-            const isWarmCrimson = idx % 2 === 0;
+            const isLapisBand = idx % 2 === 1;
             const isEditingThis =
               section.editableKey !== undefined && editingSection === section.editableKey;
             return (
-              <section
-                key={section.key}
-                className={`rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3.5 ${
-                  isWarmCrimson ? 'bg-[#FAF9F6]' : 'bg-white'
-                }`}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-stone-200">
-                  <h2
-                    className={`font-mono text-xs uppercase tracking-widest font-semibold ${
-                      isWarmCrimson ? 'text-pust-800' : 'text-slate-700'
+              <MotionReveal key={section.key} distance={20} delay={Math.min(idx * 0.03, 0.15)}>
+                <section
+                  className={`rounded-2xl border p-5 sm:p-6 space-y-3.5 ${
+                    isLapisBand
+                      ? 'bg-[#F3F6FA] border-lapis-200/80'
+                      : 'bg-white border-stone-200'
+                  }`}
+                >
+                  <div
+                    className={`flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b ${
+                      isLapisBand ? 'border-lapis-200/80' : 'border-stone-200'
                     }`}
                   >
-                    {section.title}
-                  </h2>
-                  <div className="flex items-center gap-2.5">
-                    {section.rightSlot}
-                    {canEdit && section.editableKey && !isEditingThis && (
-                      <EditTriggerButton
-                        label="Edit"
-                        variant="compact"
-                        onClick={() => startInlineEdit(section.editableKey!)}
-                      />
-                    )}
+                    <h2
+                      className={`font-mono text-xs uppercase tracking-widest font-semibold ${
+                        isLapisBand ? 'text-lapis-800' : 'text-pust-800'
+                      }`}
+                    >
+                      {section.title}
+                    </h2>
+                    <div className="flex items-center gap-2.5">
+                      {section.rightSlot}
+                      {canEdit && section.editableKey && !isEditingThis && (
+                        <EditTriggerButton
+                          label="Edit"
+                          variant="compact"
+                          onClick={() => startInlineEdit(section.editableKey!)}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-                {section.content}
-              </section>
+                  {section.content}
+                </section>
+              </MotionReveal>
             );
           })}
 
           {canEdit && missingEditableTopics.length > 0 && (
-            <div className="rounded-2xl border border-dashed border-amber-400/80 bg-amber-50/45 p-4 sm:p-5 space-y-3">
-              <p className="font-mono text-[11px] uppercase tracking-wider font-semibold text-amber-900">
-                Add Missing Profile Sections
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {missingEditableTopics.map((topic) => (
-                  <button
-                    key={topic.key}
-                    type="button"
-                    onClick={() => startInlineEdit(topic.key)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-amber-300 text-amber-950 hover:bg-amber-100 transition-colors cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    {topic.label}
-                  </button>
-                ))}
+            <MotionReveal distance={18}>
+              <div className="rounded-2xl border border-dashed border-amber-400/80 bg-amber-50/45 p-4 sm:p-5 space-y-3">
+                <p className="font-mono text-[11px] uppercase tracking-wider font-semibold text-amber-900">
+                  Add Missing Profile Sections
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {missingEditableTopics.map((topic) => (
+                    <button
+                      key={topic.key}
+                      type="button"
+                      onClick={() => startInlineEdit(topic.key)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-amber-300 text-amber-950 hover:bg-amber-100 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      {topic.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            </MotionReveal>
           )}
         </div>
 
         {/* Footer Return Row */}
-        <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-          <p className="font-mono text-xs text-slate-500">
-            PUST {department.code} Directory Record
-          </p>
-          <Link
-            href={deptHref}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            All Teachers &amp; Officers of {department.code}
-          </Link>
-        </div>
+        <MotionReveal distance={16}>
+          <div className="pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-mono text-xs text-slate-500">
+              PUST {department.code} Directory Record
+            </p>
+            <Link
+              href={deptHref}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              All Teachers &amp; Officers of {department.code}
+            </Link>
+          </div>
+        </MotionReveal>
       </section>
 
       <ShareProfileModal

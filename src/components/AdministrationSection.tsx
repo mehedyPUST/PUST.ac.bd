@@ -19,7 +19,7 @@ import type { AppRoute } from '../lib/routes';
 import { AdministrationOfficeDossier, AllOfficesDirectory } from './AdministrationOfficeDossier';
 import { AdministrationSidebar } from './AdministrationSidebar';
 import { EditTriggerButton } from './EditTriggerButton';
-import { SubPagePanel } from './MotionPrimitives';
+import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
@@ -434,7 +434,8 @@ export function AdministrationSection({
           {showVcBand && (
             <section className="space-y-6">
               {currentVc ? (
-                <article className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                <MotionReveal>
+                  <article className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
                   <div className="grid grid-cols-1 xl:grid-cols-12 items-stretch">
                     {/* VC Portrait & Desk Accession Column */}
                     <div className="xl:col-span-4 bg-[#FAF9F6] border-b xl:border-b-0 xl:border-r border-stone-200 p-6 flex flex-col justify-between gap-6">
@@ -540,28 +541,32 @@ export function AdministrationSection({
                       )}
                     </div>
                   </div>
-                </article>
+                  </article>
+                </MotionReveal>
               ) : (
-                <div className="rounded-2xl border border-stone-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <h2 className="font-serif text-xl font-medium text-slate-900">
-                      Vice-Chancellor Profile Not Configured
-                    </h2>
-                    <p className="text-sm text-slate-600 text-left">
-                      No current Vice-Chancellor dossier is published in the university directory yet.
-                    </p>
+                <MotionReveal>
+                  <div className="rounded-2xl border border-stone-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <h2 className="font-serif text-xl font-medium text-slate-900">
+                        Vice-Chancellor Profile Not Configured
+                      </h2>
+                      <p className="text-sm text-slate-600 text-left">
+                        No current Vice-Chancellor dossier is published in the university directory yet.
+                      </p>
+                    </div>
+                    <EditTriggerButton
+                      target={{ kind: 'vc' }}
+                      label="Add VC Profile"
+                      icon="add"
+                      variant="compact"
+                    />
                   </div>
-                  <EditTriggerButton
-                    target={{ kind: 'vc' }}
-                    label="Add VC Profile"
-                    icon="add"
-                    variant="compact"
-                  />
-                </div>
+                </MotionReveal>
               )}
 
               {/* Vice-Chancellor Chronological Archive */}
-              <div className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <MotionReveal>
+                <div className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
                 <div className="px-6 py-4 border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-mono text-xs font-semibold text-lapis-700 tabular-nums">
@@ -638,7 +643,8 @@ export function AdministrationSection({
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+                </div>
+              </MotionReveal>
             </section>
           )}
 
@@ -648,7 +654,8 @@ export function AdministrationSection({
           )}
 
           {/* Band 4: Executive Administration Ledger (Principal Officers & Desks) */}
-          <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-6">
+          <MotionReveal>
+            <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-6">
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 border-b border-stone-200 pb-6">
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-pust-800 text-left">
@@ -795,12 +802,14 @@ export function AdministrationSection({
                 })}
               </dl>
             )}
-          </section>
+            </section>
+          </MotionReveal>
 
           {/* Band 5: Public Accountability (APA) & Statutory Governance Architecture */}
           <section className="space-y-8">
             {(route === '/administration/apa' || route === '/administration') && (
-              <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-8 space-y-8">
+              <MotionReveal>
+                <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-8 space-y-8">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-stone-200 pb-5">
                   <div className="space-y-1">
                     <p className="text-xs font-semibold text-gold-700 text-left">
@@ -842,10 +851,12 @@ export function AdministrationSection({
                     </div>
                   ))}
                 </div>
-              </div>
+                </div>
+              </MotionReveal>
             )}
 
-            <div className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
+            <MotionReveal>
+              <div className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
               <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5 border-b border-stone-200 pb-6">
                 <div className="space-y-1 max-w-2xl">
                   <p className="text-xs font-semibold text-pust-800 text-left">
@@ -903,8 +914,9 @@ export function AdministrationSection({
                     const alternatingSurface = getAlternatingUnitCardClass(unit.category, occIdx);
 
                     return (
-                      <article
+                      <MotionCard
                         key={unit.code}
+                        delay={(occIdx % 6) * 0.04}
                         className={`h-full flex flex-col justify-between p-5 rounded-xl border transition-all ${
                           matchesRoute
                             ? 'bg-pust-50/75 border-pust-800 ring-1 ring-pust-800/30'
@@ -930,7 +942,7 @@ export function AdministrationSection({
                             {unit.description}
                           </p>
                         </div>
-                      </article>
+                      </MotionCard>
                     );
                   });
                 })()}
@@ -953,7 +965,8 @@ export function AdministrationSection({
                   </Link>
                 </div>
               </div>
-            </div>
+              </div>
+            </MotionReveal>
           </section>
         </div>
       </div>

@@ -15,6 +15,7 @@ import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { animateStagger } from '../lib/gsap';
 import type { NoticeRecord } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { NoticeListSkeleton } from './PustSkeletons';
 
@@ -189,8 +190,9 @@ export function CareerView() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 items-stretch">
+            <MotionCard
+              delay={0}
               data-gsap-career-kpi
               className="rounded-xl border border-slate-200 bg-white px-5 py-4"
             >
@@ -203,8 +205,9 @@ export function CareerView() {
               <p className="text-xs text-slate-600 mt-0.5">
                 Administrative Building, Rajapur Campus
               </p>
-            </div>
-            <div
+            </MotionCard>
+            <MotionCard
+              delay={0.05}
               data-gsap-career-kpi
               className="rounded-xl border border-slate-200 bg-white px-5 py-4"
             >
@@ -217,8 +220,9 @@ export function CareerView() {
               <p className="text-xs text-slate-600 mt-0.5 tabular-nums">
                 {profile?.facultyMembersCount ?? 212} faculty &amp; institutional staff
               </p>
-            </div>
-            <div
+            </MotionCard>
+            <MotionCard
+              delay={0.1}
               data-gsap-career-kpi
               className="rounded-xl border border-slate-200 bg-white px-5 py-4"
             >
@@ -231,7 +235,7 @@ export function CareerView() {
               <p className="font-mono text-xs text-slate-600 mt-0.5 tabular-nums">
                 {registrarContact.phone} · Sun–Thu 09:00–17:00
               </p>
-            </div>
+            </MotionCard>
           </div>
         </div>
 
@@ -322,73 +326,75 @@ export function CareerView() {
               </button>
             </div>
           ) : (
-            <div
-              ref={circularListRef}
-              className="rounded-2xl border border-stone-200 bg-white overflow-hidden"
-            >
-              <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
-                <div className="lg:col-span-2">Date &amp; Track</div>
-                <div className="lg:col-span-7">Position / Circular Summary</div>
-                <div className="lg:col-span-3 text-right">Memo Reference</div>
-              </div>
+            <MotionReveal>
+              <div
+                ref={circularListRef}
+                className="rounded-2xl border border-stone-200 bg-white overflow-hidden"
+              >
+                <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+                  <div className="lg:col-span-2">Date &amp; Track</div>
+                  <div className="lg:col-span-7">Position / Circular Summary</div>
+                  <div className="lg:col-span-3 text-right">Memo Reference</div>
+                </div>
 
-              <div className="divide-y divide-slate-200">
-                {careerNotices.map((notice) => {
-                  const tender = isTenderNotice(notice);
-                  return (
-                    <div
-                      key={notice.id}
-                      data-gsap-career-row
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setActiveNotice(notice)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setActiveNotice(notice);
-                        }
-                      }}
-                      className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer"
-                    >
-                      <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
-                        <span className="text-slate-600 font-medium whitespace-nowrap">
-                          {notice.publishedAt}
-                        </span>
-                        <span className="font-semibold text-pust-700 uppercase tracking-wide text-[11px] leading-tight">
-                          {tender ? 'Procurement / Tender' : 'Recruitment'}
-                        </span>
-                      </div>
-
-                      <div className="lg:col-span-7 min-w-0">
-                        <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
-                          {notice.title}
-                        </h3>
-                        <p className="prose-justify text-sm text-slate-700 mt-1.5 leading-relaxed">
-                          {notice.summary}
-                        </p>
-                      </div>
-
-                      <div className="lg:col-span-3 min-w-0 pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 font-mono text-xs tabular-nums">
-                        <span className="font-medium text-slate-700 lg:text-right break-words">
-                          {notice.referenceNo}
-                        </span>
-                        <div className="flex items-center gap-2.5 shrink-0">
-                          <EditTriggerButton
-                            target={{ kind: 'notice', notice }}
-                            label="Edit"
-                            variant="compact"
-                          />
-                          <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950">
-                            View Circular
-                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                <div className="divide-y divide-slate-200">
+                  {careerNotices.map((notice) => {
+                    const tender = isTenderNotice(notice);
+                    return (
+                      <div
+                        key={notice.id}
+                        data-gsap-career-row
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setActiveNotice(notice)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setActiveNotice(notice);
+                          }
+                        }}
+                        className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer"
+                      >
+                        <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
+                          <span className="text-slate-600 font-medium whitespace-nowrap">
+                            {notice.publishedAt}
+                          </span>
+                          <span className="font-semibold text-pust-700 uppercase tracking-wide text-[11px] leading-tight">
+                            {tender ? 'Procurement / Tender' : 'Recruitment'}
                           </span>
                         </div>
+
+                        <div className="lg:col-span-7 min-w-0">
+                          <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
+                            {notice.title}
+                          </h3>
+                          <p className="prose-justify text-sm text-slate-700 mt-1.5 leading-relaxed">
+                            {notice.summary}
+                          </p>
+                        </div>
+
+                        <div className="lg:col-span-3 min-w-0 pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 font-mono text-xs tabular-nums">
+                          <span className="font-medium text-slate-700 lg:text-right break-words">
+                            {notice.referenceNo}
+                          </span>
+                          <div className="flex items-center gap-2.5 shrink-0">
+                            <EditTriggerButton
+                              target={{ kind: 'notice', notice }}
+                              label="Edit"
+                              variant="compact"
+                            />
+                            <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950">
+                              View Circular
+                              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </MotionReveal>
           )}
 
           <div className="flex justify-end">
@@ -416,14 +422,15 @@ export function CareerView() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
             {RECRUITMENT_TRACKS.map((track, idx) => {
               const isEven = idx % 2 === 0;
               return (
-                <div
+                <MotionCard
                   key={track.title}
+                  delay={idx * 0.05}
                   data-gsap-career-track
-                  className={`rounded-2xl border border-stone-200 p-6 flex flex-col justify-between gap-4 ${
+                  className={`h-full rounded-2xl border border-stone-200 p-6 flex flex-col justify-between gap-4 ${
                     isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                   }`}
                 >
@@ -441,7 +448,7 @@ export function CareerView() {
                   <p className="pt-3 border-t border-stone-200 font-mono text-xs text-slate-600 text-left">
                     Baseline Criteria: {track.qualification}
                   </p>
-                </div>
+                </MotionCard>
               );
             })}
           </div>
@@ -453,7 +460,7 @@ export function CareerView() {
           aria-labelledby="application-forms-heading"
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-28"
         >
-          <div className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5">
+          <MotionReveal className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5">
             <div className="pb-3 border-b border-stone-200">
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
                 Statutory Procedure
@@ -484,9 +491,12 @@ export function CareerView() {
                 </li>
               ))}
             </ol>
-          </div>
+          </MotionReveal>
 
-          <div className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5">
+          <MotionReveal
+            delay={0.08}
+            className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5"
+          >
             <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">
@@ -581,7 +591,7 @@ export function CareerView() {
                 </a>
               </div>
             </div>
-          </div>
+          </MotionReveal>
         </section>
       </section>
     </main>

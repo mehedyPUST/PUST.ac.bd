@@ -33,6 +33,7 @@ import {
   Workflow,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { MotionReveal } from './MotionPrimitives';
 import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
 import { PwaInstallButton } from './PwaManager';
@@ -552,7 +553,7 @@ export function PortalView({
         </div>
 
         {/* Split Institutional Auth Studio Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl border border-stone-200 overflow-hidden">
+        <MotionReveal distance={18} className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl border border-stone-200 overflow-hidden">
           {/* Left Column: Deep Oxblood Maroon Sidebar */}
           <div className="lg:col-span-5 bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-8">
             <div className="space-y-6">
@@ -1268,7 +1269,7 @@ export function PortalView({
               )}
             </div>
           </div>
-        </div>
+        </MotionReveal>
       </section>
     );
   }

@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { getAlternatingOfficeCardClass } from '../lib/cardTheme';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import type {
   AdministrationOfficeRecord,
   AdminOfficeCategory,
@@ -227,7 +228,8 @@ export function AdministrationOfficeDossier({
   const totalPersonnel = (office.head ? 1 : 0) + office.officers.length;
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
+    <MotionReveal>
+      <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
       {/* Office Accession Desk Header & Contact Strip */}
       <div className="space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-6">
@@ -316,13 +318,15 @@ export function AdministrationOfficeDossier({
             </h3>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PersonnelEntry
-              person={office.head}
-              isHead
-              accentClass={accent.text}
-              copiedEmail={copiedEmail}
-              onCopyEmail={onCopyEmail}
-            />
+            <MotionCard delay={0.04} className="h-full">
+              <PersonnelEntry
+                person={office.head}
+                isHead
+                accentClass={accent.text}
+                copiedEmail={copiedEmail}
+                onCopyEmail={onCopyEmail}
+              />
+            </MotionCard>
           </div>
         </div>
       )}
@@ -390,23 +394,25 @@ export function AdministrationOfficeDossier({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
             {filteredOfficers.map((officer, idx) => (
-              <PersonnelEntry
-                key={officer.id}
-                person={officer}
-                accentClass={accent.text}
-                surfaceClass={
-                  idx % 2 === 0
-                    ? 'bg-white border-stone-200 hover:border-pust-700/45'
-                    : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
-                }
-                copiedEmail={copiedEmail}
-                onCopyEmail={onCopyEmail}
-              />
+              <MotionCard key={officer.id} delay={(idx % 6) * 0.04} className="h-full">
+                <PersonnelEntry
+                  person={officer}
+                  accentClass={accent.text}
+                  surfaceClass={
+                    idx % 2 === 0
+                      ? 'bg-white border-stone-200 hover:border-pust-700/45'
+                      : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
+                  }
+                  copiedEmail={copiedEmail}
+                  onCopyEmail={onCopyEmail}
+                />
+              </MotionCard>
             ))}
           </div>
         )}
       </div>
-    </section>
+      </section>
+    </MotionReveal>
   );
 }
 
@@ -442,10 +448,11 @@ export function AllOfficesDirectory({
   }, [offices, category, query]);
 
   return (
-    <section
-      id="all-offices-directory"
-      className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
-    >
+    <MotionReveal>
+      <section
+        id="all-offices-directory"
+        className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
+      >
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-stone-200 pb-6">
         <div className="space-y-1.5 max-w-2xl">
           <p className="text-xs font-semibold text-pust-800 text-left">
@@ -544,57 +551,59 @@ export function AllOfficesDirectory({
               const accent = getWingAccent(office.category);
               const cardSurface = getAlternatingOfficeCardClass(office.category, occIdx);
               return (
-                <Link
-                  key={office.slug}
-                  href={office.route}
-                  className={`group h-full flex flex-col justify-between p-5 rounded-xl border transition-all duration-150 text-left ${
-                    isCurrent ? `${accent.activeBg} ring-1 ring-pust-800/20` : cardSurface
-                  }`}
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-2 text-xs text-slate-600 font-mono tabular-nums">
-                      <span className={`font-semibold ${accent.text}`}>{office.code}</span>
-                      <span>
-                        {officerCount > 0
-                          ? `${officerCount} ${officerCount === 1 ? 'Officer' : 'Officers'}`
-                          : office.head
-                          ? 'Head Listed'
-                          : 'Unit Desk'}
-                      </span>
-                    </div>
-                    <h3 className="font-serif text-lg font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug text-left">
-                      {office.name}
-                    </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 text-left">
-                      {office.summary}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 mt-5 border-t border-slate-200/80 space-y-2">
-                    {office.head && (
-                      <p className="text-xs font-medium text-slate-800 truncate text-left">
-                        {office.head.name} ·{' '}
-                        <span className="text-slate-600 font-normal">{office.head.designation}</span>
+                <MotionCard key={office.slug} delay={(occIdx % 6) * 0.03} className="h-full">
+                  <Link
+                    href={office.route}
+                    className={`group h-full flex flex-col justify-between p-5 rounded-xl border transition-all duration-150 text-left ${
+                      isCurrent ? `${accent.activeBg} ring-1 ring-pust-800/20` : cardSurface
+                    }`}
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 text-xs text-slate-600 font-mono tabular-nums">
+                        <span className={`font-semibold ${accent.text}`}>{office.code}</span>
+                        <span>
+                          {officerCount > 0
+                            ? `${officerCount} ${officerCount === 1 ? 'Officer' : 'Officers'}`
+                            : office.head
+                            ? 'Head Listed'
+                            : 'Unit Desk'}
+                        </span>
+                      </div>
+                      <h3 className="font-serif text-lg font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug text-left">
+                        {office.name}
+                      </h3>
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 text-left">
+                        {office.summary}
                       </p>
-                    )}
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <span className="font-mono text-[11px] text-slate-600 truncate">
-                        {office.officeEmail || office.officePhone || 'Rajapur Campus'}
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1 font-semibold group-hover:translate-x-0.5 transition-transform shrink-0 ${accent.text}`}
-                      >
-                        Open Dossier
-                        <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </span>
                     </div>
-                  </div>
-                </Link>
+
+                    <div className="pt-4 mt-5 border-t border-slate-200/80 space-y-2">
+                      {office.head && (
+                        <p className="text-xs font-medium text-slate-800 truncate text-left">
+                          {office.head.name} ·{' '}
+                          <span className="text-slate-600 font-normal">{office.head.designation}</span>
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between gap-2 text-xs">
+                        <span className="font-mono text-[11px] text-slate-600 truncate">
+                          {office.officeEmail || office.officePhone || 'Rajapur Campus'}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 font-semibold group-hover:translate-x-0.5 transition-transform shrink-0 ${accent.text}`}
+                        >
+                          Open Dossier
+                          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </MotionCard>
               );
             });
           })()}
         </div>
       )}
-    </section>
+      </section>
+    </MotionReveal>
   );
 }

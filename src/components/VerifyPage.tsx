@@ -18,7 +18,7 @@ import { pustApi } from '../lib/api';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import type { VerificationLookupResult } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionReveal } from './MotionPrimitives';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
 import { PageHeaderAndSectionSkeleton, PortalRecordsSkeleton } from './PustSkeletons';
@@ -139,7 +139,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       </header>
 
       {/* Search & Quick Examples */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 space-y-5 print:hidden">
+      <MotionReveal className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 space-y-5 print:hidden">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -184,7 +184,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             </div>
           </div>
         )}
-      </div>
+      </MotionReveal>
 
       {/* Results Area */}
       {loading && <PortalRecordsSkeleton rows={3} />}
@@ -354,8 +354,11 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
 
       {/* Helpful footer bridge */}
       {!result && (
-        <div className="editable-region grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden">
-          <div className="bg-white rounded-xl border border-stone-200 p-5 space-y-2">
+        <div className="editable-region grid grid-cols-1 sm:grid-cols-2 gap-4 print:hidden items-stretch">
+          <MotionCard
+            delay={0}
+            className="h-full bg-white rounded-xl border border-stone-200 p-5 space-y-2"
+          >
             <FileCheck2 className="w-5 h-5 text-pust-800" />
             <h3 className="font-serif text-lg font-medium text-slate-900 text-left">
               {verifyPageConfig.employerCardTitle}
@@ -363,8 +366,11 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
             <p className="text-xs text-slate-600 leading-relaxed text-left">
               {verifyPageConfig.employerCardBody}
             </p>
-          </div>
-          <div className="bg-white rounded-xl border border-stone-200 p-5 flex flex-col justify-between gap-3">
+          </MotionCard>
+          <MotionCard
+            delay={0.06}
+            className="h-full bg-white rounded-xl border border-stone-200 p-5 flex flex-col justify-between gap-3"
+          >
             <div className="space-y-1.5">
               <h3 className="font-serif text-lg font-medium text-slate-900 text-left">
                 {verifyPageConfig.portalCardTitle}
@@ -382,7 +388,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                 Open Campus Portal <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
-          </div>
+          </MotionCard>
         </div>
       )}
     </section>

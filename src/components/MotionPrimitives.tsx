@@ -93,7 +93,7 @@ export function MotionReveal({
     <motion.div
       initial={{ opacity: 0, ...initialOffset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: '0px 0px -72px 0px' }}
+      viewport={{ once: true, amount: 'some', margin: '0px 0px -24px 0px' }}
       transition={{ duration, delay, ease: EDITORIAL_EASE }}
       className={className}
     >
@@ -128,10 +128,10 @@ export function MotionCard({
   return (
     <motion.div
       {...rest}
-      initial={{ opacity: 0, y: 28, scale: 0.985 }}
+      initial={{ opacity: 0, y: 24, scale: 0.985 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: '0px 0px -56px 0px' }}
-      transition={{ duration: 0.52, delay, ease: EDITORIAL_EASE }}
+      viewport={{ once: true, amount: 'some', margin: '0px 0px -20px 0px' }}
+      transition={{ duration: 0.5, delay, ease: EDITORIAL_EASE }}
       className={resolvedClass}
     >
       {children}

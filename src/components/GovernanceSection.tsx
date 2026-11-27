@@ -165,7 +165,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
         {activeRoute === '/governance/pust-act' && (
           <div className="space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              <div className="lg:col-span-7 space-y-5">
+              <MotionReveal className="lg:col-span-7 space-y-5">
                 <h2 className="font-serif text-2xl font-semibold text-slate-950">
                   Statutory Mandate Under the PUST Act (Act No. 43 of 2001)
                 </h2>
@@ -180,54 +180,57 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </MotionReveal>
 
-              <aside className="lg:col-span-5 bg-[#FAF9F6] rounded-2xl border border-stone-200 overflow-hidden">
-                <div className="p-6 space-y-5">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
-                    Official Bangladesh Laws Citation
-                  </p>
-                  <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
-                    {governanceContent.actCitations.map((item, idx) => (
-                      <div
-                        key={`${item.label}-${idx}`}
-                        className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
-                      >
-                        <dt className="text-slate-700 font-medium">{item.label}</dt>
-                        <dd className="font-mono font-semibold text-slate-950 sm:text-right break-words">
-                          {item.value}
-                        </dd>
+              <MotionReveal delay={0.05} className="lg:col-span-5">
+                <aside className="bg-[#FAF9F6] rounded-2xl border border-stone-200 overflow-hidden">
+                  <div className="p-6 space-y-5">
+                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
+                      Official Bangladesh Laws Citation
+                    </p>
+                    <dl className="divide-y divide-stone-200 border-y border-stone-200 text-sm">
+                      {governanceContent.actCitations.map((item, idx) => (
+                        <div
+                          key={`${item.label}-${idx}`}
+                          className="py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4"
+                        >
+                          <dt className="text-slate-700 font-medium">{item.label}</dt>
+                          <dd className="font-mono font-semibold text-slate-950 sm:text-right break-words">
+                            {item.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                    {governanceContent.officialActUrl && (
+                      <div className="flex flex-wrap gap-2.5 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setShowActPreview((prev) => !prev)}
+                          className="btn-primary-sheen inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg text-white cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
+                        </button>
+                        <a
+                          href={governanceContent.officialActUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
+                        >
+                          Open Source Page
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </div>
-                    ))}
-                  </dl>
-                  {governanceContent.officialActUrl && (
-                    <div className="flex flex-wrap gap-2.5 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setShowActPreview((prev) => !prev)}
-                        className="btn-primary-sheen inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg text-white cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        {showActPreview ? 'Hide Official Page Preview' : 'Preview Official Act Page'}
-                      </button>
-                      <a
-                        href={governanceContent.officialActUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors"
-                      >
-                        Open Source Page
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </aside>
+                    )}
+                  </div>
+                </aside>
+              </MotionReveal>
             </div>
 
             {/* Live Embedded Preview of Official Bangladesh Laws Page */}
             {showActPreview && governanceContent.officialActUrl && (
-              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <MotionReveal>
+                <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
                 <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
@@ -280,7 +283,8 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     expandedPreview ? 'h-[520px] sm:h-[780px]' : 'h-[380px] sm:h-[520px]'
                   }`}
                 />
-              </div>
+                </div>
+              </MotionReveal>
             )}
           </div>
         )}
@@ -288,7 +292,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
         {activeRoute === '/governance/regent-board' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-7 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <MotionReveal className="lg:col-span-7 rounded-2xl border border-stone-200 bg-white overflow-hidden">
                 <div className="px-5 py-4 border-b border-stone-200 bg-[#FAF9F6]">
                   <h2 className="font-serif text-xl font-medium text-slate-900">
                     Composition of the Regent Board
@@ -310,7 +314,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </MotionReveal>
 
               <MotionReveal className="lg:col-span-5 space-y-4 bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6">
                 <h2 className="font-serif text-xl font-semibold text-slate-950">
@@ -329,12 +333,14 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
         {activeRoute === '/governance/academic-council' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 space-y-5">
-              <h2 className="font-serif text-2xl font-semibold text-slate-950">
-                Mandate &amp; Jurisdiction of the Academic Council
-              </h2>
-              <p className="text-[15.5px] leading-[1.78] text-slate-800">
-                {governanceContent.academicCouncilIntro}
-              </p>
+              <MotionReveal className="space-y-5">
+                <h2 className="font-serif text-2xl font-semibold text-slate-950">
+                  Mandate &amp; Jurisdiction of the Academic Council
+                </h2>
+                <p className="text-[15.5px] leading-[1.78] text-slate-800">
+                  {governanceContent.academicCouncilIntro}
+                </p>
+              </MotionReveal>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                 {governanceContent.academicCouncilCards.map((card, idx) => (
                   <MotionCard
@@ -351,7 +357,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               </div>
             </div>
 
-            <div className="lg:col-span-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-4">
+            <MotionReveal delay={0.05} className="lg:col-span-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-4">
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
                 Council Structure
               </p>
@@ -372,13 +378,13 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
               >
                 View All Faculty Deans &amp; Departments →
               </Link>
-            </div>
+            </MotionReveal>
           </div>
         )}
 
         {activeRoute === '/governance/finance-committee' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-7 space-y-5">
+            <MotionReveal className="lg:col-span-7 space-y-5">
               <h2 className="font-serif text-2xl font-semibold text-slate-950">
                 Financial Stewardship &amp; Audit Oversight
               </h2>
@@ -393,9 +399,9 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </MotionReveal>
 
-            <div className="lg:col-span-5 bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 space-y-4">
+            <MotionReveal delay={0.05} className="lg:col-span-5 bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 space-y-4">
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 text-left">
                 Committee Leadership
               </p>
@@ -410,14 +416,14 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                   </div>
                 ))}
               </dl>
-            </div>
+            </MotionReveal>
           </div>
         )}
 
         {activeRoute === '/governance/academic-ordinance' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-6 space-y-4">
+              <MotionReveal className="lg:col-span-6 space-y-4">
                 <h2 className="font-serif text-2xl font-semibold text-slate-950">
                   Unified 4.00 Grading Scale &amp; Credit Rules
                 </h2>
@@ -438,9 +444,9 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </MotionReveal>
 
-              <div className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <MotionReveal delay={0.05} className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white overflow-hidden">
                 <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6]">
                   <h3 className="font-serif text-lg font-semibold text-slate-950">
                     PUST Official Letter Grade &amp; Grade Point Table
@@ -474,10 +480,12 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </MotionReveal>
             </div>
 
-            <CgpaCalculator />
+            <MotionReveal>
+              <CgpaCalculator />
+            </MotionReveal>
           </div>
         )}
       </SubPagePanel>

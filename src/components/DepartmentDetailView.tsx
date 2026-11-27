@@ -38,7 +38,8 @@ import type {
   DepartmentRecord,
 } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionCard } from './MotionPrimitives';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
+import { PersonProfileModal } from './PersonProfileModal';
 import { PersonThumbnail } from './PersonProfileView';
 import { usePust } from './PustContext';
 import { ShareProfileModal } from './ShareProfileModal';
@@ -50,6 +51,7 @@ function PersonProfileCard({
   accentClass,
   delay = 0,
   canEdit = false,
+  onViewPerson,
   onEditPerson,
   onSharePerson,
 }: {
@@ -59,6 +61,7 @@ function PersonProfileCard({
   accentClass: string;
   delay?: number;
   canEdit?: boolean;
+  onViewPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
   onEditPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
   onSharePerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
@@ -80,9 +83,19 @@ function PersonProfileCard({
           <PersonThumbnail person={person} roleCategory={roleCategory} size="sm" />
           <div className="min-w-0 flex-1">
             <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-900 leading-snug">
-              <Link href={profileHref} className="hover:text-pust-900 hover:underline underline-offset-4">
-                {person.name}
-              </Link>
+              {onViewPerson ? (
+                <button
+                  type="button"
+                  onClick={() => onViewPerson(person, roleCategory)}
+                  className="text-left hover:text-pust-900 hover:underline underline-offset-4 cursor-pointer"
+                >
+                  {person.name}
+                </button>
+              ) : (
+                <Link href={profileHref} className="hover:text-pust-900 hover:underline underline-offset-4">
+                  {person.name}
+                </Link>
+              )}
             </h3>
             <p className="text-xs sm:text-sm font-medium text-pust-900 mt-0.5 leading-snug">
               {person.designation}
@@ -193,14 +206,26 @@ function PersonProfileCard({
               <span className="hidden sm:inline">Share</span>
             </button>
           )}
-          <Link
-            href={profileHref}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 shadow-xs"
-          >
-            <UserRound className="w-3.5 h-3.5 shrink-0" />
-            View Profile
-            <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
-          </Link>
+          {onViewPerson ? (
+            <button
+              type="button"
+              onClick={() => onViewPerson(person, roleCategory)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 shadow-xs cursor-pointer"
+            >
+              <UserRound className="w-3.5 h-3.5 shrink-0" />
+              View Profile
+              <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+            </button>
+          ) : (
+            <Link
+              href={profileHref}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/30 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap shrink-0 shadow-xs"
+            >
+              <UserRound className="w-3.5 h-3.5 shrink-0" />
+              View Profile
+              <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+            </Link>
+          )}
         </div>
       </div>
     </MotionCard>
@@ -230,6 +255,10 @@ export function DepartmentDetailView({
   const [designationFilter, setDesignationFilter] = useState<string>('All');
   const [memberQuery, setMemberQuery] = useState('');
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
+  const [profileModalTarget, setProfileModalTarget] = useState<{
+    person: DepartmentPersonRecord;
+    roleCategory: PersonRoleCategory;
+  } | null>(null);
   const [shareTarget, setShareTarget] = useState<{
     person: DepartmentPersonRecord;
     roleCategory: PersonRoleCategory;
@@ -501,7 +530,7 @@ export function DepartmentDetailView({
 
         {/* Chairman & Department at a Glance */}
         <div className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <MotionReveal className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
             <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-slate-950">
               Teachers of Department of {department.name}
             </h2>
@@ -512,7 +541,7 @@ export function DepartmentDetailView({
                 ? `Total Teacher: ${facultyMembers.length}`
                 : department.building}
             </p>
-          </div>
+          </MotionReveal>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* Chairman Card */}
@@ -523,6 +552,7 @@ export function DepartmentDetailView({
                 roleCategory="Chairman"
                 accentClass="bg-white border-stone-200 hover:border-pust-700/45 h-full"
                 canEdit={canAdminEdit}
+                onViewPerson={(person, roleCategory) => setProfileModalTarget({ person, roleCategory })}
                 onEditPerson={handleEditPerson}
                 onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
               />
@@ -618,10 +648,8 @@ export function DepartmentDetailView({
         </div>
 
         {/* Departmental Notices */}
-        <div
-          id="departmental-notices"
-          className="space-y-4 pt-4 border-t border-slate-200 scroll-mt-24"
-        >
+        <MotionReveal className="pt-4 border-t border-slate-200">
+          <div id="departmental-notices" className="space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -755,11 +783,12 @@ export function DepartmentDetailView({
               ))}
             </div>
           )}
-        </div>
+          </div>
+        </MotionReveal>
 
         {/* Faculty Members */}
         <div id="faculty-members" className="space-y-6 pt-2 border-t border-slate-200 scroll-mt-24">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <MotionReveal className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-lapis-800 shrink-0" />
@@ -816,7 +845,7 @@ export function DepartmentDetailView({
                 </div>
               </div>
             )}
-          </div>
+          </MotionReveal>
 
           {facultyMembers.length === 0 ? (
             <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600 prose-justify">
@@ -857,6 +886,7 @@ export function DepartmentDetailView({
                       : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
+                  onViewPerson={(person, roleCategory) => setProfileModalTarget({ person, roleCategory })}
                   onEditPerson={handleEditPerson}
                   onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
@@ -867,7 +897,7 @@ export function DepartmentDetailView({
 
         {/* Faculty Members (Contractual) */}
         <div className="space-y-4 pt-2 border-t border-stone-200">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <MotionReveal className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <GraduationCap className="w-4 h-4 text-gold-700 shrink-0" />
               <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
@@ -885,7 +915,7 @@ export function DepartmentDetailView({
             <span className="font-mono text-xs text-slate-500 tabular-nums">
               {contractualFaculty.length} Listed
             </span>
-          </div>
+          </MotionReveal>
 
           {contractualFaculty.length === 0 ? (
             <div className="px-5 py-4 rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs sm:text-sm text-slate-600 prose-justify">
@@ -907,6 +937,7 @@ export function DepartmentDetailView({
                       : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
+                  onViewPerson={(person, roleCategory) => setProfileModalTarget({ person, roleCategory })}
                   onEditPerson={handleEditPerson}
                   onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
@@ -917,7 +948,7 @@ export function DepartmentDetailView({
 
         {/* Officers */}
         <div id="department-officers" className="space-y-4 pt-2 border-t border-stone-200 scroll-mt-24">
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <MotionReveal className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <UserCheck className="w-4 h-4 text-pust-800 shrink-0" />
               <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
@@ -935,7 +966,7 @@ export function DepartmentDetailView({
             <span className="font-mono text-xs text-slate-500 tabular-nums">
               {officers.length} {officers.length === 1 ? 'Officer' : 'Officers'}
             </span>
-          </div>
+          </MotionReveal>
 
           {officers.length === 0 ? (
             <div className="px-5 py-4 rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs sm:text-sm text-slate-600 prose-justify">
@@ -957,6 +988,7 @@ export function DepartmentDetailView({
                       : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
                   }
                   canEdit={canAdminEdit}
+                  onViewPerson={(person, roleCategory) => setProfileModalTarget({ person, roleCategory })}
                   onEditPerson={handleEditPerson}
                   onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
                 />
@@ -970,7 +1002,7 @@ export function DepartmentDetailView({
           id="department-research"
           className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-stone-200 scroll-mt-24"
         >
-          <div className="rounded-2xl border border-stone-200 bg-white p-6 space-y-4">
+          <MotionCard delay={0} className="rounded-2xl border border-stone-200 bg-white p-6 space-y-4">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-pust-800 shrink-0" />
               <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-900">
@@ -987,9 +1019,9 @@ export function DepartmentDetailView({
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
 
-          <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-4">
+          <MotionCard delay={0.05} className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-4">
             <div className="flex items-center gap-2">
               <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
               <h2 className="font-mono text-xs uppercase tracking-widest font-semibold text-pust-900">
@@ -1006,7 +1038,7 @@ export function DepartmentDetailView({
                 </li>
               ))}
             </ul>
-          </div>
+          </MotionCard>
         </div>
 
         {/* Departmental Publications */}
@@ -1015,18 +1047,19 @@ export function DepartmentDetailView({
             id="department-publications"
             className="space-y-4 pt-4 border-t border-stone-200 scroll-mt-24"
           >
-            <div className="flex items-center gap-2">
+            <MotionReveal className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
               <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-900">
                 Featured Research Output
               </h2>
-            </div>
+            </MotionReveal>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {deptPublications.map((pub, idx) => {
                 const isEven = idx % 2 === 0;
                 return (
-                  <div
+                  <MotionCard
                     key={pub.id}
+                    delay={(idx % 4) * 0.04}
                     className={`p-4 sm:p-5 rounded-2xl border border-stone-200 hover:border-pust-700/45 space-y-2 transition-colors ${
                       isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                     }`}
@@ -1052,13 +1085,27 @@ export function DepartmentDetailView({
                         </a>
                       )}
                     </div>
-                  </div>
+                  </MotionCard>
                 );
               })}
             </div>
           </div>
         )}
       </section>
+
+      {profileModalTarget && (
+        <PersonProfileModal
+          open={true}
+          onClose={() => setProfileModalTarget(null)}
+          person={profileModalTarget.person}
+          department={department}
+          roleCategory={profileModalTarget.roleCategory}
+          publications={publications}
+          canEdit={canAdminEdit}
+          onEditPerson={handleEditPerson}
+          onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
+        />
+      )}
 
       {shareTarget && (
         <ShareProfileModal

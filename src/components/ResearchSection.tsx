@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { BookOpen, Check, Copy, ExternalLink, Search } from 'lucide-react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { EditTriggerButton } from './EditTriggerButton';
-import { MotionCard } from './MotionPrimitives';
+import { MotionCard, MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { ResilientImage } from './ResilientImage';
 import type { DepartmentRecord, JournalRecord, PublicationRecord } from '../types/pust';
@@ -85,7 +85,7 @@ export function ResearchSection({
   }
 
   const publicationsBlock = (
-    <div className={focus === 'journals' ? 'lg:col-span-6 space-y-6' : 'lg:col-span-7 space-y-6'}>
+    <MotionReveal className={focus === 'journals' ? 'lg:col-span-6 space-y-6' : 'lg:col-span-7 space-y-6'}>
       <div className="space-y-4 pb-4 border-b border-stone-200">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
@@ -230,13 +230,14 @@ export function ResearchSection({
               </article>
             );
           })}
-        </div>
+          </div>
       )}
-    </div>
+    </MotionReveal>
   );
 
   const journalsBlock = (
-    <div
+    <MotionReveal
+      delay={0.05}
       className={`${
         focus === 'journals' ? 'lg:col-span-6' : 'lg:col-span-5'
       } bg-[#FAF9F6] rounded-2xl border border-stone-200 overflow-hidden`}
@@ -288,7 +289,7 @@ export function ResearchSection({
           </a>
         </div>
       </div>
-    </div>
+    </MotionReveal>
   );
 
   return (
@@ -296,7 +297,8 @@ export function ResearchSection({
       <div className="space-y-12">
         {/* Verified Institutional Research Output Summary */}
         {deptResearchList.length > 0 && (
-          <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <MotionReveal>
+            <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-800 flex items-center gap-1.5 text-left">
@@ -355,7 +357,8 @@ export function ResearchSection({
                 );
               })}
             </div>
-          </div>
+            </div>
+          </MotionReveal>
         )}
 
         {/* Peer-Reviewed Publications & PUST Journals */}
@@ -376,7 +379,7 @@ export function ResearchSection({
         {/* Campus Facilities, Library & Student Life */}
         {showInfrastructure && (
           <div id="campus" className="editable-region pt-12 border-t border-stone-200 space-y-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+            <MotionReveal className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
               <div className="lg:col-span-7">
                 <div className="flex flex-wrap items-center gap-3">
                   <p className="font-mono text-xs uppercase tracking-widest text-pust-800 text-left">
@@ -397,7 +400,7 @@ export function ResearchSection({
                   {academicExtras.researchIntro}
                 </p>
               </div>
-            </div>
+            </MotionReveal>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
               {academicExtras.researchInfraCards.map((card, idx) => {

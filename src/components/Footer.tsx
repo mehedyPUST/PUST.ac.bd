@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { formatFooterDescription, resolveUniversityContent } from '../lib/cmsDefaults';
 import type { AppRoute } from '../lib/routes';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PustCrest } from './PustCrest';
 import { PwaInstallButton } from './PwaManager';
@@ -57,7 +58,7 @@ export function Footer({ onNavigate }: FooterProps) {
       id="footer"
       className="editable-region bg-gradient-to-b from-[#3A0407] via-[#270204] to-[#160102] text-stone-100 border-t border-gold-500/40 print:hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
+      <MotionReveal distance={18} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8">
         {/* About PUST */}
         <div className="lg:col-span-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -216,7 +217,7 @@ export function Footer({ onNavigate }: FooterProps) {
             </p>
           )}
         </div>
-      </div>
+      </MotionReveal>
 
       <div className="border-t border-white/10 bg-black/35">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-200">
