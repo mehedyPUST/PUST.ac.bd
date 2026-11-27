@@ -1295,7 +1295,7 @@ export function HomePage({
               )}
             </div>
           ) : (
-            <div ref={eventGridRef} className="grid grid-cols-1 gap-5">
+            <div ref={eventGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {(() => {
                 const categoryCounts: Record<string, number> = {};
                 return visibleEvents.slice(0, 4).map((item, idx) => {
@@ -1318,9 +1318,9 @@ export function HomePage({
                           setActiveMedia(item);
                         }
                       }}
-                      className={`text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col sm:flex-row overflow-hidden`}
+                      className={`text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col overflow-hidden`}
                     >
-                      <div className="relative w-full sm:w-64 md:w-72 shrink-0 overflow-hidden bg-slate-900 aspect-[16/10] sm:aspect-auto sm:min-h-[168px]">
+                      <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
                         <ResilientImage
                           src={thumbUrl}
                           alt={item.title}
@@ -1340,7 +1340,7 @@ export function HomePage({
                           </span>
                         )}
                       </div>
-                      <div className="p-6 space-y-2 flex-1 flex flex-col justify-center">
+                      <div className="p-5 space-y-1.5 flex-1 flex flex-col">
                         <p
                           className={`font-mono text-[11px] tabular-nums font-semibold ${eventTheme.accentClass}`}
                         >
@@ -1350,10 +1350,10 @@ export function HomePage({
                             <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
                           )}
                         </p>
-                        <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors text-left">
+                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors text-left">
                           {item.title}
                         </h3>
-                        <p className="text-sm text-slate-700 leading-relaxed line-clamp-2 text-left">
+                        <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2 text-left">
                           {item.description}
                         </p>
                       </div>
