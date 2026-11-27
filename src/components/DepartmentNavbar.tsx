@@ -156,10 +156,6 @@ export function DepartmentNavbar({
     ? `Department of ${currentDepartment.name}`
     : `Department of ${departmentCode}`;
 
-  const departmentCompactLabel = currentDepartment
-    ? currentDepartment.name
-    : departmentCode;
-
   const effectiveActiveTab: DepartmentTab = isPersonPage ? 'faculty' : activeTab;
 
   function handleTabClick(tab: DepartmentTab) {
@@ -334,15 +330,15 @@ export function DepartmentNavbar({
 
               {/* Tier 2 (Desktop): Department Navigation in the Site Navbar Position */}
               <div className="hidden lg:flex h-11 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
-                <div className="min-w-0 flex items-center gap-3.5 xl:gap-5">
+                <div className="min-w-0 flex items-center gap-3 xl:gap-4">
                   {/* Active Department Name Anchor */}
                   <button
                     type="button"
                     onClick={() => handleTabClick('overview')}
                     title={departmentTitle}
-                    className="font-serif text-sm xl:text-[15px] font-semibold text-pust-900 hover:text-pust-950 truncate max-w-[175px] xl:max-w-[235px] whitespace-nowrap shrink-0 cursor-pointer"
+                    className="font-serif text-sm xl:text-[15px] font-semibold text-pust-900 hover:text-pust-950 truncate max-w-[220px] xl:max-w-[310px] 2xl:max-w-[380px] whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    {departmentCompactLabel}
+                    {departmentTitle}
                   </button>
 
                   <span aria-hidden="true" className="h-4 w-px bg-stone-300 shrink-0" />
@@ -350,7 +346,7 @@ export function DepartmentNavbar({
                   {/* Department Section Links */}
                   <nav
                     aria-label={`${departmentTitle} navigation`}
-                    className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
+                    className="flex items-center gap-3 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
                   >
                     {DEPARTMENT_NAV_ITEMS.map((item) => {
                       const isActive = effectiveActiveTab === item.id;
