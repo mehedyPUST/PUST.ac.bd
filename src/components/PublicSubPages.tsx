@@ -27,17 +27,14 @@ import {
 import { pustApi } from '../lib/api';
 import { downloadIcsCalendar } from '../lib/calendarExport';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
-import { resolveDepartmentImage } from '../lib/departmentMedia';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
   parseYouTubeVideoId,
 } from '../lib/media';
-import {
-  getAlternatingDepartmentCardClass,
-  getAlternatingEventCardTheme,
-} from '../lib/cardTheme';
+import { getAlternatingEventCardTheme } from '../lib/cardTheme';
 import type { AppRoute } from '../lib/routes';
+import { AcademicsShowcase } from './AcademicsShowcase';
 import { AcademicCalendarView } from './AcademicCalendarView';
 import { EditTriggerButton } from './EditTriggerButton';
 import { GstEligibilityChecker } from './GstEligibilityChecker';
@@ -67,14 +64,6 @@ import type {
   UniversityProfile,
 } from '../types/pust';
 
-const FACULTY_FILTERS: Array<{ label: string; value: 'All' | FacultyName }> = [
-  { label: 'All', value: 'All' },
-  { label: 'Engineering & Technology', value: 'Faculty of Engineering and Technology' },
-  { label: 'Science', value: 'Faculty of Science' },
-  { label: 'Business Studies', value: 'Faculty of Business Studies' },
-  { label: 'Humanities & Social Science', value: 'Faculty of Humanities and Social Science' },
-  { label: 'Life & Earth Science', value: 'Faculty of Life and Earth Science' },
-];
 
 const NOTICE_FILTERS: Array<'All' | NoticeCategory> = [
   'All',
@@ -341,7 +330,9 @@ export function PublicSubPages({
         d.code.toLowerCase().includes(q) ||
         (d.officialCode || '').toLowerCase().includes(q) ||
         d.faculty.toLowerCase().includes(q) ||
-        d.chairmanName.toLowerCase().includes(q);
+        d.chairmanName.toLowerCase().includes(q) ||
+        d.summary.toLowerCase().includes(q) ||
+        d.researchFocus.some((focus) => focus.toLowerCase().includes(q));
       return matchesFaculty && matchesQuery;
     });
   }, [departments, selectedFaculty, deptQuery]);
@@ -739,17 +730,18 @@ export function PublicSubPages({
       route: AppRoute;
       matchRoutes?: AppRoute[];
     }> = [
-      { label: 'Programs', route: '/academics/programs' },
+      { label: 'Overview', route: '/academics', matchRoutes: ['/academics'] },
+      {
+        label: 'Departments',
+        route: '/academics/departments',
+        matchRoutes: ['/academics/departments', '/academics/chairmen'],
+      },
       {
         label: 'Faculties & Deans',
         route: '/academics/faculty',
         matchRoutes: ['/academics/faculty', '/academics/deans'],
       },
-      {
-        label: 'Departments',
-        route: '/academics/departments',
-        matchRoutes: ['/academics', '/academics/departments', '/academics/chairmen'],
-      },
+      { label: 'Programs', route: '/academics/programs' },
       { label: 'Calendar', route: '/academics/calendar' },
       { label: 'Forms', route: '/academics/forms-download' },
       { label: 'Scholarships', route: '/academics/scholarship' },
@@ -761,54 +753,128 @@ export function PublicSubPages({
       },
     ];
 
+    const isAcademicsLanding = route === '/academics';
     const isFacultiesView = route === '/academics/faculty' || route === '/academics/deans';
     const isResearchView = route === '/academics/journals' || route === '/academics/publications';
-    const activeHeading =
-      route === '/academics/programs'
-        ? 'Academic Programs'
-        : isFacultiesView
-        ? 'Faculties & Deans'
-        : route === '/academics/calendar'
-        ? 'Academic Calendar'
-        : route === '/academics/forms-download'
-        ? 'Forms Download'
-        : route === '/academics/scholarship'
-        ? 'Scholarships'
-        : route === '/academics/seminars'
-        ? 'Seminars & Workshops'
-        : isResearchView
-        ? 'Journals & Research'
-        : 'Departments & Chairmen';
+    const activeHeading = isAcademicsLanding
+      ? 'Academics & Constituent Faculties'
+      : route === '/academics/programs'
+      ? 'Academic Programs'
+      : isFacultiesView
+      ? 'Faculties & Deans'
+      : route === '/academics/calendar'
+      ? 'Academic Calendar'
+      : route === '/academics/forms-download'
+      ? 'Forms Download'
+      : route === '/academics/scholarship'
+      ? 'Scholarships'
+      : route === '/academics/seminars'
+      ? 'Seminars & Workshops'
+      : isResearchView
+      ? 'Journals & Research'
+      : 'Departments & Chairmen';
+
+    const activeSubtitle = isAcademicsLanding
+      ? 'Outcome-Based Education across five constituent faculties, twenty-one departments, and multidisciplinary laboratories at Rajapur, Pabna.'
+      : route === '/academics/programs'
+      ? 'Undergraduate, postgraduate, and doctoral pathways governed by the PUST Academic Ordinance.'
+      : isFacultiesView
+      ? 'Faculty leadership, Dean offices, and departmental affiliation across all academic disciplines.'
+      : route === '/academics/calendar'
+      ? 'Official semester schedules, term-end examinations, Convocation dates, and campus holidays.'
+      : route === '/academics/forms-download'
+      ? 'Fillable university requisition forms and official registrar templates.'
+      : route === '/academics/scholarship'
+      ? 'Merit awards, UGC stipends, research fellowships, and residential fee waivers.'
+      : route === '/academics/seminars'
+      ? 'University symposia, IQAC curriculum workshops, and departmental colloquia.'
+      : isResearchView
+      ? 'Peer-reviewed university journals, faculty publications, and laboratory infrastructure.'
+      : 'Browse all academic departments, chairmen, intake seats, and research groups by faculty.';
 
     const totalTeachers =
       departments.some((d) => (d.facultyCount ?? 0) > 0)
         ? departments.reduce((sum, d) => sum + (d.facultyCount ?? 0), 0)
         : profile?.facultyMembersCount ?? 0;
-    const summaryParts = [
-      profile?.facultiesCount ? `${profile.facultiesCount} Faculties` : null,
-      departments.length > 0
-        ? `${departments.length} Departments`
-        : profile?.departmentsCount
-        ? `${profile.departmentsCount} Departments`
-        : null,
-      totalTeachers > 0 ? `${totalTeachers} Teachers` : null,
-    ].filter(Boolean);
 
     return (
       <main className="flex-1 bg-[#F9F8F5]">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-              <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
-                {activeHeading}
-              </h1>
-              {summaryParts.length > 0 && (
-                <p className="font-mono text-xs font-medium text-slate-700 tabular-nums">
-                  {summaryParts.join(' · ')}
+        <header className="bg-pust-950 text-white border-b border-gold-500/35">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-12">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+              <div className="space-y-3 max-w-3xl">
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold-300/95 font-medium text-left">
+                  Pabna University of Science and Technology · Academic Portal
                 </p>
-              )}
+                <h1 className="font-serif text-fluid-h1 font-semibold text-white tracking-tight [text-wrap:balance] text-left">
+                  {activeHeading}
+                </h1>
+                <p className="text-sm sm:text-base text-stone-300 leading-relaxed max-w-2xl text-left">
+                  {activeSubtitle}
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-4 shrink-0 lg:border-l lg:border-white/15 lg:pl-8">
+                <dl className="flex items-center gap-6 text-left">
+                  <div>
+                    <dt className="font-mono text-[10px] uppercase tracking-wider text-stone-400">
+                      Faculties
+                    </dt>
+                    <dd className="font-serif text-2xl font-semibold text-white tabular-nums">
+                      {String(profile?.facultiesCount ?? 5).padStart(2, '0')}
+                    </dd>
+                  </div>
+                  <div className="h-8 w-px bg-white/15" aria-hidden="true" />
+                  <div>
+                    <dt className="font-mono text-[10px] uppercase tracking-wider text-stone-400">
+                      Departments
+                    </dt>
+                    <dd className="font-serif text-2xl font-semibold text-white tabular-nums">
+                      {departments.length > 0 ? departments.length : profile?.departmentsCount ?? 21}
+                    </dd>
+                  </div>
+                  {totalTeachers > 0 && (
+                    <>
+                      <div className="h-8 w-px bg-white/15" aria-hidden="true" />
+                      <div>
+                        <dt className="font-mono text-[10px] uppercase tracking-wider text-stone-400">
+                          Faculty
+                        </dt>
+                        <dd className="font-serif text-2xl font-semibold text-gold-300 tabular-nums">
+                          {totalTeachers}
+                        </dd>
+                      </div>
+                    </>
+                  )}
+                </dl>
+
+                {isAcademicsLanding && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      href="/academics/programs"
+                      className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white text-pust-950 hover:bg-gold-100 transition-colors whitespace-nowrap"
+                    >
+                      Degree Programs
+                    </Link>
+                    <Link
+                      href="/academics/calendar"
+                      className="px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-white/25 text-white hover:border-gold-300 hover:text-gold-200 transition-colors whitespace-nowrap"
+                    >
+                      Academic Calendar
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
+          </div>
+        </header>
+
+        <nav
+          aria-label="Academics sections"
+          className="bg-white border-b border-stone-200"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex overflow-x-auto no-scrollbar gap-1 -mx-2 px-2 py-2.5">
               {academicSubTabs.map((tab) => {
                 const isActive = tab.matchRoutes
                   ? tab.matchRoutes.includes(route)
@@ -818,14 +884,14 @@ export function PublicSubPages({
                     key={tab.route}
                     href={tab.route}
                     onClick={() => {
-                      if (tab.route === '/academics/departments') {
+                      if (tab.route === '/academics/departments' || tab.route === '/academics') {
                         setSelectedFaculty('All');
                       }
                     }}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-900 text-white border border-pust-900'
-                        : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
+                        ? 'bg-pust-900 text-white'
+                        : 'text-slate-700 hover:bg-stone-100 hover:text-pust-900'
                     }`}
                   >
                     {tab.label}
@@ -834,6 +900,9 @@ export function PublicSubPages({
               })}
             </div>
           </div>
+        </nav>
+
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12 space-y-10">
 
           <SubPagePanel subKey={activeHeading}>
           {route !== '/academics/departments' &&
@@ -1538,209 +1607,25 @@ export function PublicSubPages({
               showInfrastructure={false}
             />
           ) : (
-            // Unified Faculty-Grouped Departments & Chairmen Directory (/academics, /academics/departments, /academics/chairmen)
-            (() => {
-              const knownFacultyOrder = FACULTY_FILTERS.filter((f) => f.value !== 'All').map(
-                (f) => f.value as string
-              );
-              const allFacultyNames = Array.from(
-                new Set([
-                  ...knownFacultyOrder,
-                  ...filteredDepartments.map((d) => d.faculty),
-                ])
-              );
-              const groupedFaculties = allFacultyNames
-                .map((facultyName) => ({
-                  facultyName,
-                  depts: filteredDepartments.filter((d) => d.faculty === facultyName),
-                }))
-                .filter((g) => g.depts.length > 0);
-
-              return (
-                <div className="editable-region space-y-8">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
-                      {FACULTY_FILTERS.map((tab) => (
-                        <button
-                          key={tab.value}
-                          type="button"
-                          onClick={() => setSelectedFaculty(tab.value)}
-                          className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            selectedFaculty === tab.value
-                              ? 'bg-pust-900 text-white border border-pust-900'
-                              : 'bg-white border border-stone-200 text-slate-800 hover:text-pust-900 hover:border-pust-700/50'
-                          }`}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 w-full lg:w-auto shrink-0">
-                      <EditTriggerButton
-                        target={{ kind: 'department', department: null }}
-                        label="Add Department"
-                        icon="add"
-                        variant="compact"
-                      />
-
-                      <div className="relative w-full sm:w-72 lg:w-64">
-                        <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="search"
-                          value={deptQuery}
-                          onChange={(e) => setDeptQuery(e.target.value)}
-                          placeholder="Search department, code, or chair..."
-                          aria-label="Search departments"
-                          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 bg-[#FAF7F0] text-slate-950 focus:outline-none focus:border-pust-700 focus:bg-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {loadingData ? (
-                    <CardsGridSkeleton count={6} />
-                  ) : dataError ? (
-                    <div className="p-6 rounded-xl border border-red-200 bg-red-50 text-sm text-red-800">
-                      {dataError}
-                    </div>
-                  ) : groupedFaculties.length === 0 ? (
-                    <div className="p-10 rounded-2xl border border-slate-200 bg-[#FAF7F0] text-center space-y-3">
-                      <p className="text-sm text-slate-700">
-                        No academic departments match your current search or faculty filter.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedFaculty('All');
-                          setDeptQuery('');
-                        }}
-                        className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-800 text-white cursor-pointer"
-                      >
-                        Reset Department Filters
-                      </button>
-                    </div>
-                  ) : (
-                    <div ref={deptGroupsRef} className="space-y-10">
-                      {groupedFaculties.map(({ facultyName, depts }, facultyIdx) => {
-                        const groupTeachers = depts.reduce(
-                          (sum, d) => sum + (d.facultyCount ?? 0),
-                          0
-                        );
-
-                        return (
-                          <div key={facultyName} data-gsap-dept-group className="space-y-4">
-                            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 pb-2.5 border-b border-slate-200">
-                              <h2 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950">
-                                {facultyName}
-                              </h2>
-                              <p className="font-mono text-xs font-medium text-slate-600 tabular-nums shrink-0">
-                                {depts.length} {depts.length === 1 ? 'Department' : 'Departments'}
-                                {groupTeachers > 0 ? ` · ${groupTeachers} Teachers` : ''}
-                              </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
-                              {depts.map((dept, idx) => {
-                                const isOpening = openingDeptCode === dept.code;
-                                const coverPhoto = resolveDepartmentImage(dept);
-                                const deptGradient = getAlternatingDepartmentCardClass(
-                                  facultyName,
-                                  idx
-                                );
-                                return (
-                                  <MotionCard
-                                    key={dept.id}
-                                    delay={(idx % 6) * 0.03}
-                                    className={`relative h-full text-left rounded-2xl border ${deptGradient} transition-colors flex flex-col justify-between overflow-hidden group ${
-                                      isOpening ? 'ring-2 ring-pust-800/45 border-pust-800' : ''
-                                    }`}
-                                  >
-                                    {isOpening && (
-                                      <div className="absolute inset-0 z-20 bg-white/80 flex items-center justify-center p-4 pointer-events-none">
-                                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white border border-pust-800/30 shadow-md text-xs font-semibold text-pust-900">
-                                          <Loader2 className="w-4 h-4 animate-spin text-pust-800 shrink-0" />
-                                          <span>Loading {dept.code}...</span>
-                                        </div>
-                                      </div>
-                                    )}
-                                    <div className="absolute top-3 right-3 z-10">
-                                      <EditTriggerButton
-                                        target={{ kind: 'department', department: dept }}
-                                        label="Edit"
-                                        variant="overlay"
-                                      />
-                                    </div>
-                                    <Link
-                                      href={getDepartmentHref(dept)}
-                                      prefetch={true}
-                                      aria-busy={isOpening}
-                                      onMouseEnter={() => prefetchDepartment(dept)}
-                                      onFocus={() => prefetchDepartment(dept)}
-                                      onClick={() => handleOpenDepartmentLink(dept)}
-                                      className="flex-1 flex flex-col justify-between rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pust-800"
-                                    >
-                                      <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-slate-200/80 bg-[#F5F2EB]">
-                                        <ResilientImage
-                                          src={coverPhoto}
-                                          alt={`Department of ${dept.name}, PUST`}
-                                          containerClassName="w-full h-full m-0"
-                                          frameClassName="w-full h-full bg-[#F5F2EB]"
-                                          fallbackMinHeightClassName="min-h-0"
-                                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                                          priority={facultyIdx === 0 && idx < 6}
-                                        />
-                                        <div
-                                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent"
-                                          aria-hidden="true"
-                                        />
-                                      </div>
-
-                                      <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                                        <div className="space-y-1.5">
-                                          <p className="font-mono text-xs font-semibold text-pust-700 tabular-nums">
-                                            {dept.officialCode ? `${dept.officialCode} · ` : ''}
-                                            {dept.code}
-                                          </p>
-                                          <h3 className="font-serif text-lg sm:text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
-                                            {dept.name}
-                                          </h3>
-                                        </div>
-
-                                        <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-3 text-xs">
-                                          <span className="text-slate-700 truncate">
-                                            Chair:{' '}
-                                            <span className="font-semibold text-slate-950">
-                                              {dept.chairmanName}
-                                            </span>
-                                          </span>
-                                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-slate-700 tabular-nums shrink-0">
-                                            {isOpening
-                                              ? 'Opening...'
-                                              : dept.facultyCount
-                                              ? `${dept.facultyCount} Teachers`
-                                              : ''}
-                                            {isOpening ? (
-                                              <Loader2 className="w-3.5 h-3.5 animate-spin text-pust-800" />
-                                            ) : (
-                                              <ArrowRight className="w-3.5 h-3.5 text-pust-700 transition-transform duration-200 group-hover:translate-x-0.5" />
-                                            )}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </Link>
-                                  </MotionCard>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })()
+            <AcademicsShowcase
+              isLanding={isAcademicsLanding}
+              departments={departments}
+              filteredDepartments={filteredDepartments}
+              profile={profile}
+              resolved={resolved}
+              selectedFaculty={selectedFaculty}
+              onSelectFaculty={setSelectedFaculty}
+              deptQuery={deptQuery}
+              onDeptQueryChange={setDeptQuery}
+              openingDeptCode={openingDeptCode}
+              loadingData={loadingData}
+              dataError={dataError}
+              onRetry={onRetry}
+              getDepartmentHref={getDepartmentHref}
+              prefetchDepartment={prefetchDepartment}
+              onOpenDepartmentLink={handleOpenDepartmentLink}
+              deptGroupsRef={deptGroupsRef}
+            />
           )}
           </SubPagePanel>
         </section>
