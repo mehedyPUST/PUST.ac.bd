@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Compass, MapPin } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Compass,
+  MapPin,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { animateStagger } from '../lib/gsap';
@@ -117,6 +124,17 @@ export function CampusMapSection() {
     }
   }
 
+  const activeListIndex = filteredBuildings.findIndex((b) => b.id === activeBuilding.id);
+  const currentListPos = activeListIndex >= 0 ? activeListIndex : 0;
+
+  function stepBuilding(delta: number) {
+    const list = filteredBuildings.length > 0 ? filteredBuildings : campusBuildings;
+    if (list.length === 0) return;
+    const baseIdx = list.findIndex((b) => b.id === activeBuilding.id);
+    const nextIdx = ((baseIdx >= 0 ? baseIdx : 0) + delta + list.length) % list.length;
+    setSelectedBuildingId(list[nextIdx].id);
+  }
+
   return (
     <section
       ref={mapSectionRef}
@@ -125,7 +143,7 @@ export function CampusMapSection() {
       className="editable-region bg-[#F5F3EE] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Section Header + Zone Filter */}
+        {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
           <div>
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -151,36 +169,73 @@ export function CampusMapSection() {
           </div>
         </div>
 
-        <div
-          role="group"
-          aria-label="Filter campus buildings by precinct"
-          className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
-        >
-          {ZONES.map((zone) => {
-            const active = selectedZone === zone;
-            return (
-              <button
-                key={zone}
-                type="button"
-                onClick={() => handleZoneChange(zone)}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  active
-                    ? 'bg-pust-900 text-white'
-                    : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
-                }`}
-              >
-                {zone === 'All' ? 'All Precincts' : zone}
-              </button>
-            );
-          })}
+        {/* Precinct Filter Bar + Active Building Stepper */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div
+            role="group"
+            aria-label="Filter campus buildings by precinct"
+            className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
+          >
+            {ZONES.map((zone) => {
+              const active = selectedZone === zone;
+              return (
+                <button
+                  key={zone}
+                  type="button"
+                  onClick={() => handleZoneChange(zone)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer min-h-[36px] ${
+                    active
+                      ? 'bg-pust-900 text-white'
+                      : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
+                  }`}
+                >
+                  {zone === 'All' ? 'All Precincts' : zone}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="inline-flex items-center self-start md:self-auto gap-1.5 rounded-lg bg-white border border-stone-200 p-1">
+            <button
+              type="button"
+              onClick={() => stepBuilding(-1)}
+              aria-label="Previous campus building"
+              className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-2 font-mono text-xs font-semibold tabular-nums text-slate-700 whitespace-nowrap">
+              {String(currentListPos + 1).padStart(2, '0')} /{' '}
+              {String(filteredBuildings.length || campusBuildings.length).padStart(2, '0')}
+            </span>
+            <button
+              type="button"
+              onClick={() => stepBuilding(1)}
+              aria-label="Next campus building"
+              className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* 1-Column Interactive Blueprint + Selected Building Detail Card */}
-        <div className="grid grid-cols-1 gap-8">
-          {/* Interactive Architectural Blueprint */}
-          <div className="flex flex-col gap-4">
-            <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-stone-200 overflow-hidden select-none">
-              {/* Architectural Blueprint SVG Layer */}
+        {/* Unified Architectural Folio: Interactive Blueprint (7) + Building Guide Monograph (5) */}
+        <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          {/* Left Column: Architectural Drafting Sheet & Building Directory */}
+          <div className="lg:col-span-7 flex flex-col justify-between bg-[#FAF7F0] border-b lg:border-b-0 lg:border-r border-stone-200">
+            {/* Plan Header Strip */}
+            <div className="px-5 sm:px-6 py-3 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-700">
+                Rajapur Campus Site Plan · 30 Acres
+              </p>
+              <div className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-600 tabular-nums">
+                <Compass className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                <span>{campusMapMeta.coordinates}</span>
+              </div>
+            </div>
+
+            {/* Interactive Architectural Blueprint Canvas */}
+            <div className="relative w-full aspect-[16/10] bg-[#FAF7F0] select-none overflow-hidden">
               <svg
                 viewBox="0 0 800 500"
                 className="w-full h-full block"
@@ -197,9 +252,18 @@ export function CampusMapSection() {
                     <path
                       d="M 40 0 L 0 0 0 40"
                       fill="none"
-                      stroke="#E7E5E4"
+                      stroke="#E5E0D5"
                       strokeWidth="0.75"
                     />
+                  </pattern>
+                  <pattern
+                    id="quad-hatch"
+                    width="8"
+                    height="8"
+                    patternTransform="rotate(45 0 0)"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#6A9978" strokeOpacity="0.16" strokeWidth="1" />
                   </pattern>
                 </defs>
 
@@ -207,162 +271,254 @@ export function CampusMapSection() {
                 <rect width="800" height="500" fill="#FAF7F0" />
                 <rect width="800" height="500" fill="url(#campus-grid)" />
 
-                {/* Landscaped Campus Grounds Boundary */}
+                {/* Top & Left Architectural Survey Grid Labels (A-D / 1-4) */}
+                <g className="fill-stone-400 font-mono text-[9px] font-semibold">
+                  <text x="145" y="16" textAnchor="middle">GRID A</text>
+                  <text x="305" y="16" textAnchor="middle">GRID B</text>
+                  <text x="485" y="16" textAnchor="middle">GRID C</text>
+                  <text x="665" y="16" textAnchor="middle">GRID D</text>
+                  <text x="15" y="88" textAnchor="middle">1</text>
+                  <text x="15" y="190" textAnchor="middle">2</text>
+                  <text x="15" y="290" textAnchor="middle">3</text>
+                  <text x="15" y="385" textAnchor="middle">4</text>
+                </g>
+
+                {/* Campus Boundary Perimeter */}
                 <rect
                   x="28"
                   y="24"
                   width="744"
                   height="408"
-                  fill="#F1ECE1"
+                  rx="2"
+                  fill="#F3EFE5"
                   stroke="#B8B0A2"
                   strokeWidth="1.5"
+                />
+                <rect
+                  x="33"
+                  y="29"
+                  width="734"
+                  height="398"
+                  fill="none"
+                  stroke="#D6CFC2"
+                  strokeWidth="0.75"
+                  strokeDasharray="4 4"
                 />
 
                 {/* Central Green Quadrangle Lawn */}
                 <rect
-                  x="255"
-                  y="148"
-                  width="290"
-                  height="155"
-                  fill="#DCECE1"
+                  x="278"
+                  y="144"
+                  width="254"
+                  height="136"
+                  fill="#DDF0E3"
                   stroke="#6A9978"
                   strokeWidth="1.2"
                 />
+                <rect x="278" y="144" width="254" height="136" fill="url(#quad-hatch)" />
+                {/* Quadrangle Diagonal Pathways */}
+                <line x1="278" y1="144" x2="532" y2="280" stroke="#FAF8F4" strokeWidth="2.5" strokeOpacity="0.8" />
+                <line x1="532" y1="144" x2="278" y2="280" stroke="#FAF8F4" strokeWidth="2.5" strokeOpacity="0.8" />
 
-                {/* Campus Lake / Reflecting Pond */}
+                {/* Campus Reflecting Lake (East-North Sector, clear of Hall pins) */}
                 <path
-                  d="M 430 100 C 460 88, 520 92, 535 112 C 548 128, 515 142, 470 138 C 430 135, 412 114, 430 100 Z"
+                  d="M 608 78 C 642 66, 704 72, 718 96 C 730 116, 696 132, 650 128 C 608 124, 592 94, 608 78 Z"
                   fill="#CFE3F0"
                   stroke="#4B7B99"
                   strokeWidth="1.3"
                 />
+                <path
+                  d="M 624 96 Q 656 90 688 99"
+                  fill="none"
+                  stroke="#FFFFFF"
+                  strokeOpacity="0.6"
+                  strokeWidth="1.2"
+                />
                 <text
-                  x="480"
-                  y="119"
+                  x="658"
+                  y="108"
                   textAnchor="middle"
                   className="fill-slate-800 font-mono text-[9.5px] font-semibold"
                 >
                   Campus Lake
                 </text>
 
-                {/* Central Playground / Sports Field */}
+                {/* Central Playground & Athletics Oval */}
                 <rect
                   x="56"
-                  y="286"
-                  width="176"
+                  y="296"
+                  width="184"
                   height="112"
-                  fill="#DCECE1"
+                  fill="#DDF0E3"
                   stroke="#6A9978"
                   strokeDasharray="4 3"
                   strokeWidth="1.2"
                 />
+                <rect
+                  x="76"
+                  y="314"
+                  width="144"
+                  height="76"
+                  rx="38"
+                  fill="none"
+                  stroke="#5E8C6C"
+                  strokeWidth="1.1"
+                />
                 <text
-                  x="144"
-                  y="346"
+                  x="148"
+                  y="356"
                   textAnchor="middle"
-                  className="fill-emerald-900 font-mono text-[10px] font-semibold"
+                  className="fill-emerald-950 font-mono text-[10px] font-semibold"
                 >
                   Central Playground
                 </text>
 
+                {/* Subtle Landscaped Canopy Clusters */}
+                <g fill="#B7D7C1" fillOpacity="0.7" stroke="#6A9978" strokeWidth="0.8">
+                  <circle cx="72" cy="70" r="10" />
+                  <circle cx="88" cy="82" r="8" />
+                  <circle cx="72" cy="212" r="11" />
+                  <circle cx="742" cy="210" r="10" />
+                  <circle cx="734" cy="228" r="8" />
+                  <circle cx="290" cy="402" r="9" />
+                  <circle cx="486" cy="402" r="9" />
+                </g>
+
                 {/* Main Internal Campus Roads & Walkways */}
                 <path
-                  d="M 384 432 L 384 140 M 140 225 L 670 225 M 170 118 L 620 118 M 170 118 L 170 275 M 618 118 L 618 355"
+                  d="M 384 432 L 384 128 M 136 234 L 664 234 M 176 122 L 585 122 M 176 122 L 176 284 M 614 134 L 614 358 M 256 335 L 558 335"
                   fill="none"
-                  stroke="#D6D3CD"
-                  strokeWidth="8"
+                  stroke="#D6D1C7"
+                  strokeWidth="10"
                   strokeLinecap="square"
                 />
                 <path
-                  d="M 384 432 L 384 140 M 140 225 L 670 225 M 170 118 L 620 118 M 170 118 L 170 275 M 618 118 L 618 355"
+                  d="M 384 432 L 384 128 M 136 234 L 664 234 M 176 122 L 585 122 M 176 122 L 176 284 M 614 134 L 614 358 M 256 335 L 558 335"
                   fill="none"
-                  stroke="#FAF8F4"
-                  strokeWidth="4"
+                  stroke="#FCFBF8"
+                  strokeWidth="5"
                   strokeLinecap="square"
                 />
 
-                {/* Architectural Building Footprints */}
-                {/* Wazed Engineering Bhaban */}
-                <rect
-                  x="110"
-                  y="68"
-                  width="132"
-                  height="74"
-                  fill={activeBuilding.id === 'wazed-bhaban' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
-                {/* Residential Halls Sector */}
+                {/* Architectural Building Footprints (Aligned to xPercent/yPercent centers) */}
+                {/* 1. Wazed Engineering Bhaban (center ~176, 115) */}
                 <g>
+                  <rect x="111" y="77" width="136" height="78" fill="#D6D1C7" />
                   <rect
-                    x="412"
-                    y="42"
-                    width="82"
-                    height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E7E5E4'}
-                    stroke="#78716C"
-                    strokeWidth="1.2"
+                    x="108"
+                    y="74"
+                    width="136"
+                    height="78"
+                    fill={activeBuilding.id === 'wazed-bhaban' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'wazed-bhaban' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
                   />
                   <rect
-                    x="510"
-                    y="42"
-                    width="96"
-                    height="36"
-                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E7E5E4'}
+                    x="152"
+                    y="96"
+                    width="48"
+                    height="32"
+                    fill="#FAF7F0"
+                    fillOpacity="0.45"
                     stroke="#78716C"
-                    strokeWidth="1.2"
+                    strokeOpacity="0.4"
+                    strokeWidth="0.8"
                   />
                 </g>
-                {/* Academic Building I */}
-                <rect
-                  x="128"
-                  y="196"
-                  width="116"
-                  height="68"
-                  fill={activeBuilding.id === 'academic-1' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
-                {/* Central Library */}
-                <rect
-                  x="348"
-                  y="168"
-                  width="112"
-                  height="64"
-                  fill={activeBuilding.id === 'central-library' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
-                {/* Central Auditorium & Plaza */}
-                <rect
-                  x="556"
-                  y="186"
-                  width="104"
-                  height="66"
-                  fill={activeBuilding.id === 'convocation-plaza' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
-                {/* Administrative Building */}
-                <rect
-                  x="324"
-                  y="302"
-                  width="124"
-                  height="68"
-                  fill={activeBuilding.id === 'admin-bhaban' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
-                {/* TSC & Medical Center */}
-                <rect
-                  x="560"
-                  y="314"
-                  width="112"
-                  height="60"
-                  fill={activeBuilding.id === 'medical-tsc' ? '#7A0B10' : '#E7E5E4'}
-                  stroke="#78716C"
-                  strokeWidth="1.2"
-                />
+
+                {/* 2. Residential Halls Sector (center ~496, 90) */}
+                <g>
+                  <rect x="423" y="57" width="72" height="64" fill="#D6D1C7" />
+                  <rect x="507" y="57" width="76" height="64" fill="#D6D1C7" />
+                  <rect
+                    x="420"
+                    y="54"
+                    width="72"
+                    height="64"
+                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'residential-halls' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                  <rect
+                    x="504"
+                    y="54"
+                    width="76"
+                    height="64"
+                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'residential-halls' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
+
+                {/* 3. Academic Building I (center ~200, 235) */}
+                <g>
+                  <rect x="139" y="201" width="128" height="72" fill="#D6D1C7" />
+                  <rect
+                    x="136"
+                    y="198"
+                    width="128"
+                    height="72"
+                    fill={activeBuilding.id === 'academic-1' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'academic-1' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
+
+                {/* 4. Central Library (center ~408, 205) */}
+                <g>
+                  <rect x="351" y="171" width="120" height="72" fill="#D6D1C7" />
+                  <rect
+                    x="348"
+                    y="168"
+                    width="120"
+                    height="72"
+                    fill={activeBuilding.id === 'central-library' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'central-library' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
+
+                {/* 5. Central Auditorium & Plaza (center ~608, 225) */}
+                <g>
+                  <rect x="555" y="191" width="112" height="72" fill="#D6D1C7" />
+                  <rect
+                    x="552"
+                    y="188"
+                    width="112"
+                    height="72"
+                    fill={activeBuilding.id === 'convocation-plaza' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'convocation-plaza' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
+
+                {/* 6. Administrative Building (center ~384, 335) */}
+                <g>
+                  <rect x="321" y="303" width="132" height="68" fill="#D6D1C7" />
+                  <rect
+                    x="318"
+                    y="300"
+                    width="132"
+                    height="68"
+                    fill={activeBuilding.id === 'admin-bhaban' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'admin-bhaban' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
+
+                {/* 7. TSC & Medical Center (center ~616, 345) */}
+                <g>
+                  <rect x="561" y="315" width="116" height="64" fill="#D6D1C7" />
+                  <rect
+                    x="558"
+                    y="312"
+                    width="116"
+                    height="64"
+                    fill={activeBuilding.id === 'medical-tsc' ? '#7A0B10' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'medical-tsc' ? '#4A0508' : '#78716C'}
+                    strokeWidth="1.4"
+                  />
+                </g>
 
                 {/* Southern Boundary: Dhaka–Pabna Highway + Main Gate */}
                 <rect x="0" y="446" width="800" height="54" fill="#1E293B" />
@@ -382,28 +538,21 @@ export function CampusMapSection() {
                 >
                   DHAKA–PABNA HIGHWAY (N6) · RAJAPUR
                 </text>
-                <rect x="348" y="424" width="72" height="22" fill="#7A0B10" />
+                <rect x="344" y="422" width="80" height="24" rx="2" fill="#7A0B10" />
                 <text
                   x="384"
-                  y="439"
+                  y="438"
                   textAnchor="middle"
-                  className="fill-white font-mono text-[9px] font-semibold"
+                  className="fill-white font-mono text-[9.5px] font-semibold tracking-wider"
                 >
                   MAIN GATE
                 </text>
               </svg>
 
-              {/* Top-Right Compass / Scale Overlay */}
-              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/95 border border-slate-200 absolute top-3 right-3 font-mono text-[10px] text-slate-600">
-                <Compass className="w-3.5 h-3.5 text-pust-800" />
-                <span>{campusMapMeta.coordinates}</span>
-              </div>
-
               {/* Interactive Clickable Building Name Hotspots */}
               {campusBuildings.map((b) => {
                 const isSelected = activeBuilding.id === b.id;
-                const isInZone =
-                  selectedZone === 'All' || b.zone === selectedZone;
+                const isInZone = selectedZone === 'All' || b.zone === selectedZone;
 
                 return (
                   <button
@@ -417,12 +566,12 @@ export function CampusMapSection() {
                       left: `${b.xPercent}%`,
                       top: `${b.yPercent}%`,
                     }}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border shadow-xs transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold border transition-all whitespace-nowrap cursor-pointer inline-flex items-center gap-1 sm:gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                       isSelected
-                        ? 'z-20 bg-pust-800 text-white border-pust-900 shadow-sm scale-[1.03]'
+                        ? 'z-20 bg-pust-800 text-white border-pust-950 shadow-md scale-[1.04]'
                         : isInZone
-                        ? 'z-10 bg-white/95 text-slate-900 border-slate-300 hover:border-pust-600 hover:text-pust-800'
-                        : 'z-0 bg-white/65 text-slate-400 border-slate-200 hover:bg-white hover:text-slate-700'
+                        ? 'z-10 bg-white/95 text-slate-900 border-stone-300 shadow-xs hover:border-pust-700 hover:text-pust-900'
+                        : 'z-0 bg-white/65 text-slate-400 border-stone-200 hover:bg-white hover:text-slate-700'
                     }`}
                   >
                     <MapPin
@@ -437,17 +586,20 @@ export function CampusMapSection() {
               })}
             </div>
 
-            {/* Direct Clickable Building Directory Grid */}
-            <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
-              <div className="px-6 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2">
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-600 text-left">
-                  Campus Buildings Index ({filteredBuildings.length})
+            {/* Compact Building Selector Directory Strip */}
+            <div className="border-t border-stone-200 bg-white p-4 sm:p-5 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600">
+                  Buildings Index ({filteredBuildings.length})
                 </p>
-                <span className="font-mono text-[11px] text-stone-500">Select building</span>
+                <span className="font-mono text-[11px] text-stone-500 tabular-nums">
+                  {selectedZone === 'All' ? 'All Precincts' : selectedZone}
+                </span>
               </div>
+
               <div
                 ref={buildingIndexRef}
-                className="grid grid-cols-1 divide-y divide-stone-200 bg-white"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-2"
               >
                 {filteredBuildings.map((b) => {
                   const isSelected = activeBuilding.id === b.id;
@@ -457,16 +609,17 @@ export function CampusMapSection() {
                       data-gsap-building-btn
                       type="button"
                       onClick={() => setSelectedBuildingId(b.id)}
-                      className={`px-6 py-3.5 text-left transition-colors duration-150 flex items-center justify-between gap-2 cursor-pointer ${
+                      aria-pressed={isSelected}
+                      className={`min-h-[42px] px-3.5 py-2 rounded-lg border text-left transition-colors duration-150 flex items-center justify-between gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                         isSelected
-                          ? 'bg-pust-900 text-white'
-                          : 'bg-white text-slate-900 hover:bg-[#FAF9F6]'
+                          ? 'bg-pust-900 text-white border-pust-950'
+                          : 'bg-[#FAF9F6] text-slate-900 border-stone-200 hover:border-pust-700/45 hover:bg-white'
                       }`}
                     >
-                      <span className="text-xs font-medium truncate">{b.name}</span>
+                      <span className="text-xs font-semibold truncate">{b.shortName}</span>
                       <span
                         className={`font-mono text-[10px] shrink-0 tabular-nums ${
-                          isSelected ? 'text-gold-200 font-semibold' : 'text-stone-500'
+                          isSelected ? 'text-gold-300 font-semibold' : 'text-stone-500'
                         }`}
                       >
                         {b.code}
@@ -478,27 +631,27 @@ export function CampusMapSection() {
             </div>
           </div>
 
-          {/* Active Building Photo & Architectural Dossier */}
-          <div className="flex">
+          {/* Right Column: Active Building Photo & Architectural Dossier */}
+          <div className="lg:col-span-5 flex flex-col justify-between bg-white">
             <AnimatePresence mode="wait">
               <motion.article
                 key={activeBuilding.id}
                 initial={{ opacity: 0.4, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0.4 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full rounded-2xl bg-white border border-stone-200 transition-colors flex flex-col justify-between overflow-hidden"
+                transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                className="flex-1 flex flex-col justify-between"
               >
                 <div>
                   <ResilientImage
                     src={activeBuilding.photo}
                     alt={activeBuilding.name}
                     caption={activeBuilding.caption}
-                    containerClassName="p-6 pb-0"
-                    className="w-full aspect-[16/9] max-h-[380px] object-cover"
+                    containerClassName="p-5 sm:p-6 pb-0"
+                    className="w-full aspect-[16/10] object-cover"
                   />
 
-                  <div className="p-6 space-y-4">
+                  <div className="p-5 sm:p-6 space-y-4">
                     <div>
                       <div className="flex items-center justify-between gap-3">
                         <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
@@ -506,55 +659,63 @@ export function CampusMapSection() {
                         </p>
                         <EditTriggerButton
                           target={{ kind: 'campus-building', buildingId: activeBuilding.id }}
-                          label="Edit Building"
+                          label="Edit"
                           variant="compact"
                         />
                       </div>
-                      <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1">
+                      <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1.5 leading-snug">
                         {activeBuilding.name}
                       </h3>
                     </div>
 
-                    <p className="text-fluid-body text-slate-800 leading-relaxed text-left">
+                    <p className="text-sm text-slate-700 leading-relaxed text-left">
                       {activeBuilding.summary}
                     </p>
 
                     <dl className="divide-y divide-stone-200 border-y border-stone-200 text-xs sm:text-sm">
-                      <div className="py-2.5 space-y-0.5">
-                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+                      <div className="py-3 space-y-1">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-500">
                           Offices &amp; Academic Units
                         </dt>
-                        <dd className="text-slate-900 font-medium leading-relaxed prose-justify">{activeBuilding.offices}</dd>
+                        <dd className="text-slate-900 font-medium leading-relaxed text-left">
+                          {activeBuilding.offices}
+                        </dd>
                       </div>
-                      <div className="py-2.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
-                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 shrink-0">
-                          Visiting Hours
+                      <div className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-500 inline-flex items-center gap-1.5 shrink-0">
+                          <Clock className="w-3.5 h-3.5 text-pust-700 shrink-0" />
+                          <span>Visiting Hours</span>
                         </dt>
-                        <dd className="font-mono text-xs font-medium text-slate-950 sm:text-right tabular-nums">
+                        <dd className="font-mono text-xs font-semibold text-slate-950 sm:text-right tabular-nums">
                           {activeBuilding.hours}
                         </dd>
                       </div>
-                      <div className="py-2.5 space-y-0.5">
-                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+                      <div className="py-3 space-y-1">
+                        <dt className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-500">
                           Key Facilities
                         </dt>
-                        <dd className="text-slate-800 leading-relaxed prose-justify">{activeBuilding.facilities}</dd>
+                        <dd className="text-slate-800 leading-relaxed text-left">
+                          {activeBuilding.facilities}
+                        </dd>
                       </div>
                     </dl>
                   </div>
                 </div>
 
-                <div className="px-6 pb-6 pt-1 flex items-center justify-between gap-4">
+                <div className="px-5 sm:px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-4">
                   <Link
                     href={activeBuilding.route}
-                    className="btn-primary-sheen group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold text-white whitespace-nowrap"
+                    className="btn-primary-sheen group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold text-white whitespace-nowrap shrink-0"
                   >
                     <span>{activeBuilding.routeLabel}</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                   </Link>
-                  <span className="font-mono text-[11px] font-medium text-slate-600 tabular-nums">
-                    {campusBuildings.findIndex((b) => b.id === activeBuilding.id) + 1} /{' '}
-                    {campusBuildings.length}
+                  <span className="font-mono text-[11px] font-semibold text-slate-600 tabular-nums whitespace-nowrap">
+                    Building{' '}
+                    {String(
+                      campusBuildings.findIndex((b) => b.id === activeBuilding.id) + 1
+                    ).padStart(2, '0')}{' '}
+                    of {String(campusBuildings.length).padStart(2, '0')}
                   </span>
                 </div>
               </motion.article>
