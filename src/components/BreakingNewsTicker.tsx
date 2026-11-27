@@ -40,9 +40,9 @@ export function BreakingNewsTicker({
     return (
       <section
         aria-label="Latest university news and notices"
-        className="border-b border-stone-200/75 bg-[#FAF9F6] print:hidden"
+        className="pt-2 sm:pt-2.5 border-b border-stone-200/75 bg-[#FAF9F6] print:hidden"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center gap-3 border-t border-stone-200/75 bg-white sm:border-x sm:border-t sm:border-b-0 sm:rounded-t-lg">
           <div className="h-5 w-28 rounded bg-stone-200 animate-pulse" />
           <div className="h-4 flex-1 max-w-md rounded bg-stone-200/80 animate-pulse" />
         </div>
@@ -119,10 +119,10 @@ export function BreakingNewsTicker({
     <section
       aria-label="Latest university news and notices"
       data-breaking-ticker="true"
-      className="border-b border-stone-200/75 bg-[#FAF9F6] print:hidden"
+      className="pt-2 sm:pt-2.5 border-b border-stone-200/75 bg-[#FAF9F6] print:hidden"
     >
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div className="flex items-center h-10 sm:border-x sm:border-stone-200/75 bg-white">
+        <div className="flex items-center h-10 border-t border-stone-200/75 sm:border-x sm:border-t sm:border-b-0 sm:rounded-t-lg sm:overflow-hidden bg-white">
           {/* Institutional Bulletin Tag */}
           <div className="shrink-0 h-full bg-pust-800 text-white px-3 sm:px-4 inline-flex items-center gap-2">
             <Radio className="w-3.5 h-3.5 text-gold-300 shrink-0" />
