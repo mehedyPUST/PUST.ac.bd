@@ -261,7 +261,7 @@ export function Navbar({
           className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[52px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
         />
 
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-stretch">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
           {/* Left Column: Official University Crest */}
           <Link
             href="/"

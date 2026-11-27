@@ -124,9 +124,9 @@ export function CampusMapSection() {
       aria-labelledby="campus-map-heading"
       className="editable-region bg-[#F5F3EE] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Section Header + Zone Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-stone-200 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
           <div>
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               {campusMapMeta.eyebrow}
@@ -137,41 +137,42 @@ export function CampusMapSection() {
             >
               {campusMapMeta.title}
             </h2>
-            <p className="text-fluid-body text-slate-700 mt-1.5 max-w-2xl text-left">
+            <p className="text-fluid-body text-slate-700 mt-1.5 max-w-3xl text-left">
               {campusMapMeta.subtitle}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="shrink-0">
             <EditTriggerButton
               target={{ kind: 'campus-building', buildingId: activeBuilding?.id }}
               label="Edit Map & Buildings"
               variant="compact"
             />
-            <div
-              role="group"
-              aria-label="Filter campus buildings by precinct"
-              className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
-            >
-              {ZONES.map((zone) => {
-                const active = selectedZone === zone;
-                return (
-                  <button
-                    key={zone}
-                    type="button"
-                    onClick={() => handleZoneChange(zone)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      active
-                        ? 'bg-pust-900 text-white'
-                        : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
-                    }`}
-                  >
-                    {zone === 'All' ? 'All Precincts' : zone}
-                  </button>
-                );
-              })}
-            </div>
           </div>
+        </div>
+
+        <div
+          role="group"
+          aria-label="Filter campus buildings by precinct"
+          className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
+        >
+          {ZONES.map((zone) => {
+            const active = selectedZone === zone;
+            return (
+              <button
+                key={zone}
+                type="button"
+                onClick={() => handleZoneChange(zone)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  active
+                    ? 'bg-pust-900 text-white'
+                    : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
+                }`}
+              >
+                {zone === 'All' ? 'All Precincts' : zone}
+              </button>
+            );
+          })}
         </div>
 
         {/* 1-Column Interactive Blueprint + Selected Building Detail Card */}
@@ -438,7 +439,7 @@ export function CampusMapSection() {
 
             {/* Direct Clickable Building Directory Grid */}
             <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
-              <div className="px-4 py-3 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2">
+              <div className="px-6 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2">
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-stone-600 text-left">
                   Campus Buildings Index ({filteredBuildings.length})
                 </p>
@@ -456,7 +457,7 @@ export function CampusMapSection() {
                       data-gsap-building-btn
                       type="button"
                       onClick={() => setSelectedBuildingId(b.id)}
-                      className={`px-4 py-3 text-left transition-colors duration-150 flex items-center justify-between gap-2 cursor-pointer ${
+                      className={`px-6 py-3.5 text-left transition-colors duration-150 flex items-center justify-between gap-2 cursor-pointer ${
                         isSelected
                           ? 'bg-pust-900 text-white'
                           : 'bg-white text-slate-900 hover:bg-[#FAF9F6]'
@@ -493,7 +494,7 @@ export function CampusMapSection() {
                     src={activeBuilding.photo}
                     alt={activeBuilding.name}
                     caption={activeBuilding.caption}
-                    containerClassName="p-4 pb-0"
+                    containerClassName="p-6 pb-0"
                     className="w-full aspect-[16/9] max-h-[380px] object-cover"
                   />
 

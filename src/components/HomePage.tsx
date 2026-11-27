@@ -440,15 +440,15 @@ export function HomePage({
         </div>
 
         {/* University Headline, CTAs & Operational Utility Ribbon */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-          <div className="max-w-4xl mx-auto sm:text-center space-y-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-10 sm:pb-14">
+          <div className="space-y-6 text-left">
             {loadingData && !profile ? (
               <HeroSummarySkeleton />
             ) : profile ? (
               <div className="space-y-4">
                 <div
                   data-gsap-hero
-                  className="flex flex-wrap items-center sm:justify-center gap-3"
+                  className="flex flex-wrap items-center justify-between gap-3"
                 >
                   <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
                     {profile.heroEyebrow ||
@@ -464,21 +464,21 @@ export function HomePage({
                 </div>
                 <h1
                   data-gsap-hero
-                  className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950"
+                  className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950 max-w-4xl"
                 >
                   {profile.heroTitle}
                 </h1>
                 {profile.heroSubtitle && (
                   <p
                     data-gsap-hero
-                    className="text-fluid-lead text-slate-700 max-w-2xl sm:mx-auto"
+                    className="text-fluid-lead text-slate-700 max-w-3xl"
                   >
                     {profile.heroSubtitle}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2 text-left sm:text-center">
+              <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2 text-left">
                 <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
                   Pabna University of Science and Technology
                 </h1>
@@ -490,7 +490,7 @@ export function HomePage({
 
             <div
               data-gsap-hero
-              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-center gap-2.5 sm:gap-3 pt-1"
+              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2.5 sm:gap-3 pt-1"
             >
               <Link
                 href="/portal"
@@ -519,10 +519,10 @@ export function HomePage({
 
           {/* Operational Utility Ribbon (1-Column Stack) */}
           {profile && (
-            <dl className="mt-8 grid grid-cols-1 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white overflow-hidden">
+            <dl className="mt-8 grid grid-cols-1 divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white overflow-hidden">
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Established
@@ -533,7 +533,7 @@ export function HomePage({
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Academic Scope
@@ -544,7 +544,7 @@ export function HomePage({
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Community
@@ -559,7 +559,7 @@ export function HomePage({
               >
                 <Link
                   href="/verify"
-                  className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                  className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
                 >
                   <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center gap-2">
                     <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
@@ -646,9 +646,9 @@ export function HomePage({
                 </div>
 
                 {/* Welcome Message Body */}
-                <div className="p-6 sm:p-8 lg:p-10 space-y-6">
+                <div className="p-6 sm:p-8 space-y-6">
                   {vcBodyParagraphs.length > 0 ? (
-                    <div className="space-y-4 flow-root prose-justify max-w-[75ch] text-fluid-body text-slate-800 leading-[1.78]">
+                    <div className="space-y-4 flow-root prose-justify text-fluid-body text-slate-800 leading-[1.78]">
                       {vcBodyParagraphs.map((paragraph, idx) => (
                         <p
                           key={idx}
@@ -742,7 +742,7 @@ export function HomePage({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-5 grid grid-cols-1 gap-4"
+                  className="p-6 grid grid-cols-1 gap-4"
                 >
                   {previousVcs.length === 0 ? (
                     <p className="text-sm text-slate-600 col-span-full py-2 text-left">
@@ -753,7 +753,7 @@ export function HomePage({
                       <MotionCard
                         key={vc.id}
                         delay={idx * 0.03}
-                        className="rounded-xl border border-stone-200 bg-white hover:border-pust-700/45 p-5 space-y-2 flex flex-col justify-between transition-colors"
+                        className="rounded-xl border border-stone-200 bg-white hover:border-pust-700/45 p-6 space-y-2 flex flex-col justify-between transition-colors"
                       >
                         <div className="space-y-1.5">
                           <div className="flex items-start justify-between gap-2">
@@ -786,9 +786,9 @@ export function HomePage({
 
           {/* About PUST Brief & Sub-Topic Links (1-Column Stack) */}
           <MotionReveal>
-            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 grid grid-cols-1 gap-5">
+            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-8 grid grid-cols-1 gap-5">
               <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div>
                     <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
                       About PUST
@@ -978,7 +978,7 @@ export function HomePage({
                               onSelectNotice(notice);
                             }
                           }}
-                          className={`w-full text-left px-6 py-4 hover:bg-[#FAF9F6] transition-colors space-y-1.5 group cursor-pointer ${
+                          className={`w-full text-left px-6 py-5 hover:bg-[#FAF9F6] transition-colors space-y-1.5 group cursor-pointer ${
                             idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/65'
                           }`}
                         >
@@ -1014,7 +1014,7 @@ export function HomePage({
           </div>
 
           <div className="editable-region space-y-5">
-            <div className="pb-4 border-b border-stone-200 flex items-end justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   {institutionalLinksEyebrow || 'Digital Services & Directory'}
@@ -1043,7 +1043,7 @@ export function HomePage({
                     <Link
                       key={item.id}
                       href={item.route}
-                      className={`w-full text-left px-5 py-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
+                      className={`w-full text-left px-6 py-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
                         idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                       }`}
                     >
@@ -1119,9 +1119,12 @@ export function HomePage({
               ))}
             </div>
 
-            <div ref={pubListRef} className="divide-y divide-stone-200 border-y border-stone-200">
+            <div
+              ref={pubListRef}
+              className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200"
+            >
               {visiblePublications.length === 0 ? (
-                <p className="py-6 text-sm text-slate-600 text-left">
+                <p className="px-6 py-6 text-sm text-slate-600 text-left">
                   No peer-reviewed publications found for the selected department.
                 </p>
               ) : (
@@ -1129,7 +1132,7 @@ export function HomePage({
                   <article
                     key={pub.id}
                     data-gsap-pub-row
-                    className={`py-4 px-3 -mx-3 rounded-xl hover:bg-stone-50 transition-colors space-y-1.5 ${
+                    className={`px-6 py-5 hover:bg-stone-50 transition-colors space-y-1.5 ${
                       idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                     }`}
                   >
@@ -1156,17 +1159,17 @@ export function HomePage({
           </div>
 
           {/* Official PUST Journals (1-Column Stack) */}
-          <aside className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 space-y-5">
-            <div className="flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
+          <aside className="editable-region space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                   University Periodicals
                 </p>
-                <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-1">
+                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
                   Official PUST Journals
-                </h3>
+                </h2>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 <EditTriggerButton
                   target={{ kind: 'journals' }}
                   label="Edit Journals"
@@ -1174,31 +1177,43 @@ export function HomePage({
                 />
                 <Link
                   href="/academics/journals"
-                  className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
                 >
-                  Journals →
+                  All Journals
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>
 
-            <div className="divide-y divide-stone-200">
+            <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200">
               {loadingData && !profile ? (
-                <NoticeListSkeleton rows={3} />
+                <div className="p-6">
+                  <NoticeListSkeleton rows={3} />
+                </div>
               ) : (profile?.journals ?? []).length === 0 ? (
-                <p className="py-4 text-sm text-slate-700 text-left">
+                <p className="px-6 py-6 text-sm text-slate-700 text-left">
                   No university journals are currently listed.
                 </p>
               ) : (
-                (profile?.journals ?? []).map((journal) => (
-                  <div key={journal.id} className="py-4 first:pt-1 last:pb-1 space-y-1.5">
-                    <p className="font-mono text-xs font-medium text-stone-500 tabular-nums">{journal.issn}</p>
-                    <h4 className="font-serif text-base font-semibold text-slate-950 text-left">
+                (profile?.journals ?? []).map((journal, idx) => (
+                  <div
+                    key={journal.id}
+                    className={`px-6 py-5 space-y-1.5 ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
+                    }`}
+                  >
+                    <p className="font-mono text-xs font-medium text-stone-500 tabular-nums">
+                      {journal.issn}
+                    </p>
+                    <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">
                       {journal.title}
-                    </h4>
-                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed text-left">
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
                       {journal.scope}
                     </p>
-                    <p className="text-xs font-semibold text-gold-700 text-left">{journal.currentIssue}</p>
+                    <p className="text-xs font-semibold text-gold-700 text-left">
+                      {journal.currentIssue}
+                    </p>
                   </div>
                 ))
               )}
@@ -1212,8 +1227,8 @@ export function HomePage({
         id="news-events"
         className="bg-transparent py-14 lg:py-16 scroll-mt-28"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 Campus Chronicles &amp; Seminars
@@ -1223,23 +1238,7 @@ export function HomePage({
               </h2>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80">
-                {NEWS_EVENT_CATS.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setEventCategory(cat)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      eventCategory === cat
-                        ? 'bg-white text-slate-950 shadow-xs'
-                        : 'text-stone-600 hover:text-slate-950'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-3 shrink-0">
               <EditTriggerButton
                 target={{ kind: 'gallery', item: null }}
                 label="Add Event"
@@ -1248,12 +1247,33 @@ export function HomePage({
               />
               <Link
                 href="/gallery"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
               >
                 Full Archive
-                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
+          </div>
+
+          <div
+            className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+            role="group"
+            aria-label="Filter news and events by category"
+          >
+            {NEWS_EVENT_CATS.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setEventCategory(cat)}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  eventCategory === cat
+                    ? 'bg-white text-slate-950 shadow-xs'
+                    : 'text-stone-600 hover:text-slate-950'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
           {loadingData && galleryItems.length === 0 ? (
@@ -1320,7 +1340,7 @@ export function HomePage({
                           </span>
                         )}
                       </div>
-                      <div className="p-5 space-y-2 flex-1 flex flex-col justify-center">
+                      <div className="p-6 space-y-2 flex-1 flex flex-col justify-center">
                         <p
                           className={`font-mono text-[11px] tabular-nums font-semibold ${eventTheme.accentClass}`}
                         >
@@ -1365,7 +1385,7 @@ export function HomePage({
               </div>
             </div>
             {upcomingSeminars.length === 0 ? (
-              <p className="p-5 text-sm text-slate-700">
+              <p className="px-6 py-5 text-sm text-slate-700">
                 No upcoming seminars or workshops are currently scheduled.
               </p>
             ) : (
@@ -1377,7 +1397,7 @@ export function HomePage({
                   <div
                     key={ev.id}
                     data-gsap-seminar-item
-                    className={`p-5 space-y-1.5 transition-colors ${
+                    className={`px-6 py-4 space-y-1.5 transition-colors ${
                       idx % 2 === 0
                         ? 'bg-white hover:bg-[#FAF9F6]'
                         : 'bg-[#FAF9F6] hover:bg-white'
