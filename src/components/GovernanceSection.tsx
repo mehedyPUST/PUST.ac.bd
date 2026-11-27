@@ -116,25 +116,25 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
     <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header + Sub-Navigation Bar */}
       <div className="border-b border-slate-200 pb-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
+        <div className="space-y-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               Statutory Governance · {activeTab.code}
             </p>
-            <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 mt-1.5 tracking-tight">
-              {route === '/governance'
-                ? 'University Governance & Statutory Framework'
-                : activeTab.heading}
-            </h1>
-            <p className="text-fluid-lead text-slate-700 mt-2.5 max-w-3xl leading-[1.72]">
-              {activeTab.subtitle}
-            </p>
+            <EditTriggerButton
+              target={{ kind: 'governance', tab: activeTab.tabKey }}
+              label={`Edit ${activeTab.label}`}
+              variant="compact"
+            />
           </div>
-          <EditTriggerButton
-            target={{ kind: 'governance', tab: activeTab.tabKey }}
-            label={`Edit ${activeTab.label}`}
-            variant="compact"
-          />
+          <h1 className="font-serif text-fluid-h1 font-semibold text-slate-950 tracking-tight">
+            {route === '/governance'
+              ? 'University Governance & Statutory Framework'
+              : activeTab.heading}
+          </h1>
+          <p className="text-fluid-lead text-slate-700 leading-[1.72] w-full">
+            {activeTab.subtitle}
+          </p>
         </div>
 
         <nav
