@@ -42,11 +42,11 @@ interface NavbarProps {
 }
 
 const HOME_SUBTOPICS = [
-  { label: 'Vice-Chancellor’s Message', fullLabel: 'Office of the Vice-Chancellor’s Message', href: '/#vc-message' },
-  { label: 'Notice Board', fullLabel: 'Official University Notice Board', href: '/#notice-board' },
-  { label: 'Recent Publications', fullLabel: 'Recent Faculty & Research Publications', href: '/#recent-publications' },
-  { label: 'News and Events', fullLabel: 'University News and Campus Events', href: '/#news-events' },
-  { label: 'Campus Map', fullLabel: 'Interactive Campus Map & Building Guide', href: '/#campus-map' },
+  { label: 'Vice-Chancellor’s Message', fullLabel: 'Vice-Chancellor’s Message', href: '/#vc-message' },
+  { label: 'Notice Board', fullLabel: 'Notice Board', href: '/#notice-board' },
+  { label: 'Recent Publications', fullLabel: 'Recent Publications', href: '/#recent-publications' },
+  { label: 'News and Events', fullLabel: 'News & Events', href: '/#news-events' },
+  { label: 'Campus Map', fullLabel: 'Campus Map', href: '/#campus-map' },
 ];
 
 const FACULTY_DISPLAY_ORDER: FacultyName[] = [
@@ -58,61 +58,62 @@ const FACULTY_DISPLAY_ORDER: FacultyName[] = [
 ];
 
 const MOBILE_GROUP_FULL_LABELS: Record<string, string> = {
-  governance: 'Governance & Statutory Authorities',
-  about: 'About the University',
-  administration: 'University Administration & Offices',
-  academic: 'Academic Affairs & Sections',
-  facilities: 'Campus Facilities & Student Services',
-  notices: 'Official Notices & Circulars',
-  admission: 'University Admissions',
+  governance: 'Governance',
+  about: 'About University',
+  administration: 'Administration',
+  academic: 'Academics',
+  facilities: 'Facilities',
+  notices: 'Notices',
+  admission: 'Admissions',
 };
 
 const MOBILE_ROUTE_FULL_LABELS: Partial<Record<AppRoute, string>> = {
-  '/governance/pust-act': 'Pabna University of Science and Technology Act, 2001',
-  '/governance/regent-board': 'University Regent Board',
-  '/governance/academic-council': 'University Academic Council',
-  '/governance/finance-committee': 'University Finance Committee',
-  '/governance/academic-ordinance': 'Academic Ordinance & Grading System',
-  '/about/our-university': 'Our University Profile & Overview',
-  '/about/mission-vision': 'Institutional Mission, Vision & Core Objectives',
-  '/about/history': 'University Heritage & Founding History',
-  '/about/plans': 'Strategic Masterplans & Development Roadmap',
+  '/governance/pust-act': 'PUST Act (2001)',
+  '/governance/regent-board': 'Regent Board',
+  '/governance/academic-council': 'Academic Council',
+  '/governance/finance-committee': 'Finance Committee',
+  '/governance/academic-ordinance': 'Academic Ordinance & Grading',
+  '/about/our-university': 'Our University',
+  '/about/mission-vision': 'Mission & Vision',
+  '/about/history': 'History & Heritage',
+  '/about/plans': 'Strategic Plans',
   '/administration/vc-office': 'Office of the Vice-Chancellor',
   '/administration/pro-vc-office': 'Office of the Pro-Vice-Chancellor',
   '/administration/treasurer-office': 'Office of the Treasurer',
   '/administration/registrar-office': 'Office of the Registrar',
-  '/administration/controller-office': 'Office of the Controller of Examinations',
-  '/administration/male-hall-1': 'July 06 Hall (Male Residential Hall – 1)',
-  '/administration/female-hall-1': 'Matribhasha Hall (Female Residential Hall – 1)',
-  '/administration/ict-cell': 'Information & Communication Technology (ICT) Cell',
-  '/administration/iqac': 'Institutional Quality Assurance Cell (IQAC)',
-  '/administration/male-hall-2': 'Swadhinota Hall (Male Residential Hall – 2)',
-  '/administration/female-hall-2': 'Ganatantra Hall (Female Residential Hall – 2)',
-  '/administration/rttc': 'Research & Technology Transfer Cell (RTTC)',
-  '/administration/apa': 'Annual Performance Agreement (APA) & Citizen’s Charter',
-  '/academics': 'Academic Affairs & Curriculum Overview',
-  '/academics/programs': 'Undergraduate, Graduate & Doctoral Degree Programs',
-  '/academics/faculty': 'Academic Faculties & Offices of the Deans',
-  '/academics/departments': 'Academic Departments & Offices of the Chairmen',
-  '/academics/calendar': 'University Academic Calendar & Examination Schedules',
-  '/academics/forms-download': 'Official Academic Forms & Templates Download',
-  '/academics/scholarship': 'Scholarships, Stipends & Financial Aid Programs',
-  '/academics/seminars': 'Academic Seminars, Symposia & Workshops',
-  '/academics/publications': 'Peer-Reviewed Publications & University Journals',
-  '/facilities/library': 'Central Library & Information Center (CLIC)',
-  '/facilities/transport': 'University Transportation Pool',
-  '/facilities/residence': 'Residential Halls & Student Accommodation',
-  '/facilities/medical': 'PUST Medical Section & Health Center',
-  '/facilities/ict-sheba': 'ICT Cell & Digital Campus Services (ICT Sheba)',
-  '/notices/general': 'General University Circulars & Notices',
-  '/notices/job': 'Recruitment, Job & Tender Notices',
-  '/notices/press-release': 'Official University Press Releases',
-  '/notices/noc': 'No Objection Certificates (NOC) & Official Orders',
-  '/notices/result': 'Semester Examination Result Notices',
-  '/admissions/undergraduate': 'Undergraduate Admissions (GST Integrated Test)',
+  '/administration/controller-office': 'Controller of Examinations',
+  '/administration/male-hall-1': 'July 06 Hall (Male Hall – 1)',
+  '/administration/female-hall-1': 'Matribhasha Hall (Female Hall – 1)',
+  '/administration/ict-cell': 'ICT Cell',
+  '/administration/iqac': 'Quality Assurance Cell (IQAC)',
+  '/administration/male-hall-2': 'Swadhinota Hall (Male Hall – 2)',
+  '/administration/female-hall-2': 'Ganatantra Hall (Female Hall – 2)',
+  '/administration/rttc': 'Research & Technology Transfer Cell',
+  '/administration/all-office': 'All Offices Directory',
+  '/administration/apa': 'Annual Performance Agreement (APA)',
+  '/academics': 'Academic Overview',
+  '/academics/programs': 'Academic Degree Programs',
+  '/academics/faculty': 'Faculties & Deans',
+  '/academics/departments': 'Departments & Chairmen',
+  '/academics/calendar': 'Academic Calendar',
+  '/academics/forms-download': 'Academic Forms Download',
+  '/academics/scholarship': 'Scholarships & Financial Aid',
+  '/academics/seminars': 'Seminars & Workshops',
+  '/academics/publications': 'Journals & Publications',
+  '/facilities/library': 'Central Library',
+  '/facilities/transport': 'Transport Service',
+  '/facilities/residence': 'Residential Halls',
+  '/facilities/medical': 'Medical Center',
+  '/facilities/ict-sheba': 'ICT Cell & Digital Services',
+  '/notices/general': 'General Notices',
+  '/notices/job': 'Job & Tender Notices',
+  '/notices/press-release': 'Press Releases',
+  '/notices/noc': 'NOC & Official Orders',
+  '/notices/result': 'Examination Results',
+  '/admissions/undergraduate': 'Undergraduate Admissions (GST)',
   '/admissions/graduate': 'Graduate & Postgraduate Admissions',
-  '/admissions/evening-programs': 'Evening & Executive Degree Programs',
-  '/admissions/notice': 'Official Admission Circulars & Schedules',
+  '/admissions/evening-programs': 'Evening & Executive Programs',
+  '/admissions/notice': 'Admission Notices',
 };
 
 export function Navbar({
@@ -1029,11 +1030,11 @@ export function Navbar({
                         route === '/' ? 'text-pust-900 font-semibold' : 'text-slate-900 hover:text-pust-900'
                       }`}
                     >
-                      University Homepage
+                      Home
                     </button>
                     <button
                       type="button"
-                      aria-label="Toggle University Homepage sections"
+                      aria-label="Toggle Home sections"
                       aria-expanded={mobileExpanded === 'home'}
                       onClick={() => setMobileExpanded(mobileExpanded === 'home' ? null : 'home')}
                       className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-500 hover:text-pust-900 cursor-pointer shrink-0"
@@ -1153,7 +1154,7 @@ export function Navbar({
                                 <span className="inline-flex items-center gap-2 min-w-0">
                                   <GraduationCap className="w-4 h-4 shrink-0 text-pust-800" />
                                   <span>
-                                    Browse All {departments.length} Academic Departments
+                                    Browse All {departments.length} Departments
                                   </span>
                                 </span>
                                 <ChevronRight className="w-4 h-4 shrink-0 text-pust-700" />
@@ -1176,7 +1177,7 @@ export function Navbar({
                                   : 'text-slate-900 hover:text-pust-900'
                               }`}
                             >
-                              <span>All Academic Departments</span>
+                              <span>Departments</span>
                               <span className="font-mono text-[11px] font-medium text-slate-500 tabular-nums shrink-0">
                                 {departments.length}
                               </span>
@@ -1253,7 +1254,7 @@ export function Navbar({
                       : 'text-slate-900 hover:text-pust-900'
                   }`}
                 >
-                  Public Document &amp; Certificate Verification
+                  Document Verification
                 </button>
                 <button
                   type="button"
@@ -1264,7 +1265,7 @@ export function Navbar({
                       : 'text-slate-900 hover:text-pust-900'
                   }`}
                 >
-                  University News, Convocation &amp; Events Gallery
+                  News &amp; Events Gallery
                 </button>
               </nav>
 
@@ -1276,10 +1277,10 @@ export function Navbar({
                   className="w-full min-h-[42px] inline-flex items-center justify-center px-3.5 py-2 rounded-lg text-[13px] font-semibold btn-primary-sheen transition-all"
                 >
                   {route === '/portal'
-                    ? 'Return to Public Website'
+                    ? 'Public Website'
                     : user
-                    ? `${user.name.split(' ')[0]} · Digital Campus Portal`
-                    : 'Open Digital Campus Portal'}
+                    ? `${user.name.split(' ')[0]} · Campus Portal`
+                    : 'Digital Campus Portal'}
                 </Link>
                 <PwaInstallButton variant="drawer" allowGuideFallback />
               </div>
