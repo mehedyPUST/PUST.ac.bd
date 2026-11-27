@@ -126,6 +126,55 @@ test('parseRouteFromPath, getRouteSectionKey, and getBreadcrumbsForPath support 
     { label: 'Departments', href: '/academics/departments' },
     { label: 'Department of PHY' },
   ]);
+  assert.equal(parseRouteFromPath('/academics/departments/phy/people/phy-fac-1'), '/academics/departments');
+  assert.equal(
+    getRouteSectionKey('/academics/departments/phy/people/phy-fac-1'),
+    'department-person:phy:phy-fac-1'
+  );
+  assert.deepEqual(
+    getBreadcrumbsForPath('/academics/departments/phy/people/phy-fac-1', {
+      departments: [
+        {
+          id: 'dept-phy',
+          code: 'PHY',
+          name: 'Physics',
+          facultyMembers: [{ id: 'phy-fac-1', name: 'Dr. Md. Khairul Alam' }],
+        },
+      ],
+    }),
+    [
+      { label: 'Home', href: '/' },
+      { label: 'Academics', href: '/academics' },
+      { label: 'Departments', href: '/academics/departments' },
+      { label: 'Physics (PHY)', href: '/academics/departments/phy' },
+      { label: 'Dr. Md. Khairul Alam' },
+    ]
+  );
+  const { findDepartmentPerson } = await import('./departmentPeople');
+  const sampleDept = {
+    id: 'dept-phy',
+    code: 'PHY',
+    name: 'Physics',
+    faculty: 'Faculty of Science' as const,
+    established: 2010,
+    degrees: ['B.Sc. (Hons.)'],
+    intakeSeats: 40,
+    building: 'Academic Building I',
+    chairmanName: 'Dr. Md. Khairul Alam',
+    summary: 'Physics',
+    researchFocus: [],
+    laboratories: [],
+    facultyMembers: [
+      { id: 'phy-fac-1', name: 'Dr. Md. Khairul Alam', designation: 'Professor', phones: [], emails: [] },
+    ],
+    officers: [
+      { id: 'phy-off-1', name: 'Md. Abdul Hakim', designation: 'Senior Instrument Engineer', phones: [], emails: [] },
+    ],
+  };
+  assert.equal(findDepartmentPerson(sampleDept, 'dept-phy-chair')?.roleCategory, 'Chairman');
+  assert.equal(findDepartmentPerson(sampleDept, 'phy-fac-1')?.roleCategory, 'Faculty Member');
+  assert.equal(findDepartmentPerson(sampleDept, 'phy-off-1')?.roleCategory, 'Department Officer');
+  assert.equal(findDepartmentPerson(sampleDept, 'missing-id'), null);
   assert.equal(parseRouteFromPath('/career'), '/career');
   assert.deepEqual(getBreadcrumbsForPath('/career'), [
     { label: 'Home', href: '/' },

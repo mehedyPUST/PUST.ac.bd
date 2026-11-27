@@ -250,6 +250,10 @@ export function getRouteSectionKey(pathname: string): string {
   const clean = pathname.replace(/\/+$/, '') || '/';
   if (clean === '/') return 'home';
   if (clean.startsWith('/academics/departments/')) {
+    const segments = clean.slice('/academics/departments/'.length).split('/').filter(Boolean);
+    if (segments.length >= 3 && segments[1] === 'people') {
+      return `department-person:${segments[0].toLowerCase()}:${segments[2]}`;
+    }
     return `department-detail:${clean.slice('/academics/departments/'.length).toLowerCase()}`;
   }
   for (const prefix of [
@@ -305,8 +309,24 @@ const STANDALONE_ROUTE_LABELS: Record<string, string> = {
   '/offline': 'Offline Mode',
 };
 
+export interface BreadcrumbDepartmentPersonRef {
+  id: string;
+  name: string;
+}
+
+export interface BreadcrumbDepartmentRef {
+  id?: string;
+  code: string;
+  name: string;
+  chairmanName?: string;
+  chairmanProfile?: BreadcrumbDepartmentPersonRef;
+  facultyMembers?: ReadonlyArray<BreadcrumbDepartmentPersonRef>;
+  contractualFacultyMembers?: ReadonlyArray<BreadcrumbDepartmentPersonRef>;
+  officers?: ReadonlyArray<BreadcrumbDepartmentPersonRef>;
+}
+
 export interface BreadcrumbOptions {
-  departments?: ReadonlyArray<{ code: string; name: string }>;
+  departments?: ReadonlyArray<BreadcrumbDepartmentRef>;
 }
 
 export function getBreadcrumbsForPath(
@@ -355,16 +375,47 @@ export function getBreadcrumbsForPath(
   }
 
   if (clean.startsWith('/academics/departments/')) {
-    const rawSegment = clean.slice('/academics/departments/'.length).split('/')[0] || '';
+    const segments = clean.slice('/academics/departments/'.length).split('/').filter(Boolean);
+    const rawSegment = segments[0] || '';
     const deptCode = decodeURIComponent(rawSegment).trim().toUpperCase();
     const matchedDept = options?.departments?.find(
       (dept) => dept.code.trim().toUpperCase() === deptCode
     );
+    const deptLabel = matchedDept
+      ? `${matchedDept.name} (${matchedDept.code})`
+      : `Department of ${deptCode}`;
+
     crumbs.push({ label: 'Academics', href: '/academics' });
     crumbs.push({ label: 'Departments', href: '/academics/departments' });
-    crumbs.push({
-      label: matchedDept ? `${matchedDept.name} (${matchedDept.code})` : `Department of ${deptCode}`,
-    });
+
+    if (segments.length >= 3 && segments[1] === 'people') {
+      const personId = decodeURIComponent(segments[2]).trim();
+      const deptHref = `/academics/departments/${encodeURIComponent(
+        (matchedDept?.code || deptCode).toLowerCase()
+      )}`;
+      crumbs.push({ label: deptLabel, href: deptHref });
+
+      let personName: string | undefined;
+      if (matchedDept) {
+        if (matchedDept.chairmanProfile?.id === personId) {
+          personName = matchedDept.chairmanProfile.name;
+        } else if (matchedDept.id && `${matchedDept.id}-chair` === personId) {
+          personName = matchedDept.chairmanName;
+        } else {
+          const allPeople = [
+            ...(matchedDept.facultyMembers ?? []),
+            ...(matchedDept.contractualFacultyMembers ?? []),
+            ...(matchedDept.officers ?? []),
+          ];
+          personName = allPeople.find((p) => p.id === personId)?.name;
+        }
+      }
+
+      crumbs.push({ label: personName || 'Profile' });
+      return crumbs;
+    }
+
+    crumbs.push({ label: deptLabel });
     return crumbs;
   }
 

@@ -293,19 +293,162 @@ export function HomePage({
         onSelectEvent={(item) => setActiveMedia(item)}
       />
 
-      {/* 1. Banner */}
+      {/* 1. Full-Width Banner & Institutional Hero */}
       <section
         ref={heroSectionRef}
         id="banner"
-        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28"
+        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28 overflow-x-clip"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10 sm:pt-8 sm:pb-12 lg:pt-14 lg:pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-stretch">
-            <div className="order-2 lg:order-1 lg:col-span-6 flex flex-col justify-between py-1 lg:py-2">
+        {/* Full Page Width Campus Banner Carousel */}
+        <div
+          className="relative w-full"
+          onMouseEnter={() => setBannerPaused(true)}
+          onMouseLeave={() => setBannerPaused(false)}
+          onFocusCapture={() => setBannerPaused(true)}
+          onBlurCapture={() => setBannerPaused(false)}
+        >
+          <div className="group relative w-full h-[280px] sm:h-[380px] md:h-[460px] lg:h-[520px] xl:h-[580px] overflow-hidden bg-slate-900 border-b border-stone-200">
+            {loadingData && !currentSlide ? (
+              <div className="w-full h-full bg-stone-200 animate-pulse" />
+            ) : currentSlide ? (
+              <>
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={currentSlide.id}
+                    initial={{ opacity: 0.4 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0.4 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute inset-0 w-full h-full"
+                  >
+                    <div ref={bannerStageRef} className="w-full h-full">
+                      <ResilientImage
+                        src={currentSlide.imageUrl}
+                        alt={
+                          currentSlide.alt ||
+                          currentSlide.caption ||
+                          'Pabna University of Science and Technology campus banner'
+                        }
+                        containerClassName="w-full h-full"
+                        frameClassName="bg-slate-900"
+                        className="w-full h-full object-cover"
+                        priority
+                      />
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+
+                <div className="absolute inset-x-0 top-0 z-10 pointer-events-none">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 flex items-center justify-between gap-3">
+                    <div className="pointer-events-auto">
+                      <EditTriggerButton
+                        target={{ kind: 'banner', slideId: currentSlide.id }}
+                        label="Edit Banner"
+                        variant="overlay"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFullViewSlide(currentSlide)}
+                      aria-label={`View full image: ${currentSlide.caption}`}
+                      className="pointer-events-auto ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 text-white text-xs font-medium border border-white/20 shadow-md opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                      View Full
+                    </button>
+                  </div>
+                </div>
+
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-transparent pt-16 pb-4 sm:pb-5 text-white">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                    <p className="text-xs sm:text-sm md:text-base font-serif italic text-white leading-snug line-clamp-2 text-left drop-shadow-xs max-w-3xl pointer-events-none">
+                      {currentSlide.caption}
+                    </p>
+                    {slides.length > 1 && (
+                      <div
+                        className="flex items-center gap-3 shrink-0"
+                        aria-label="Banner slide controls"
+                      >
+                        <div className="flex items-center gap-1">
+                          {slides.map((s, idx) => (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => setActiveSlideIdx(idx)}
+                              aria-label={`View slide ${idx + 1}: ${s.caption}`}
+                              aria-current={idx === activeSlideIdx ? 'true' : undefined}
+                              className="py-1.5 px-0.5 inline-flex items-center justify-center cursor-pointer group/dot"
+                            >
+                              <span
+                                className={`block h-1.5 rounded-xs transition-all ${
+                                  idx === activeSlideIdx
+                                    ? 'w-7 bg-amber-300'
+                                    : 'w-3 bg-white/40 group-hover/dot:bg-white/75'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <span className="font-mono text-[11px] font-semibold tabular-nums text-amber-200 shrink-0">
+                          {String(activeSlideIdx + 1).padStart(2, '0')} /{' '}
+                          {String(slides.length).padStart(2, '0')}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {slides.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
+                      }
+                      aria-label="Previous banner slide"
+                      className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
+                      aria-label="Next banner slide"
+                      className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="relative w-full h-full">
+                <ResilientImage
+                  src=""
+                  alt="No banner slides published"
+                  containerClassName="w-full h-full"
+                  className="w-full h-full"
+                />
+                <EditTriggerButton
+                  target={{ kind: 'banner' }}
+                  label="Add Banner Slide"
+                  icon="add"
+                  variant="overlay"
+                  className="absolute top-4 left-4 z-10"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* University Headline, CTAs & Operational Utility Ribbon */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-end">
+            <div className="lg:col-span-7">
               {loadingData && !profile ? (
                 <HeroSummarySkeleton />
               ) : profile ? (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div
                     data-gsap-hero
                     className="flex flex-wrap items-center justify-between gap-2"
@@ -331,7 +474,7 @@ export function HomePage({
                   {profile.heroSubtitle && (
                     <p
                       data-gsap-hero
-                      className="text-fluid-lead text-slate-700 max-w-xl text-left"
+                      className="text-fluid-lead text-slate-700 max-w-2xl text-left"
                     >
                       {profile.heroSubtitle}
                     </p>
@@ -347,184 +490,40 @@ export function HomePage({
                   </p>
                 </div>
               )}
-
-              <div
-                data-gsap-hero
-                className="mt-8 pt-6 border-t border-stone-200 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3"
-              >
-                <Link
-                  href="/portal"
-                  className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-4 sm:px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
-                >
-                  Open Digital Campus Portal
-                </Link>
-                <Link
-                  href="/academics/departments"
-                  className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-2.5 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
-                >
-                  {profile?.departmentsCount
-                    ? `Explore ${profile.departmentsCount} Departments`
-                    : 'Explore Departments'}
-                </Link>
-                <Link
-                  href="/verify"
-                  className="order-2 sm:order-3 group inline-flex items-center justify-center sm:justify-start text-center min-h-[44px] gap-1.5 px-2.5 sm:px-2.5 py-2.5 sm:py-2 rounded-lg border border-stone-300 bg-white text-slate-900 sm:border-transparent sm:bg-transparent text-xs sm:text-sm font-semibold sm:text-pust-800 hover:border-pust-700 hover:text-pust-950 transition-colors leading-tight sm:whitespace-nowrap shrink-0"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
-                  <span className="underline-offset-4 group-hover:underline">Verify Document</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </Link>
-              </div>
             </div>
 
             <div
-              className="order-1 lg:order-2 lg:col-span-6 flex flex-col"
-              onMouseEnter={() => setBannerPaused(true)}
-              onMouseLeave={() => setBannerPaused(false)}
-              onFocusCapture={() => setBannerPaused(true)}
-              onBlurCapture={() => setBannerPaused(false)}
+              data-gsap-hero
+              className="lg:col-span-5 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap lg:justify-end sm:items-center sm:gap-3"
             >
-              <div className="group relative w-full h-full min-h-[300px] lg:min-h-[420px] overflow-hidden rounded-xl border border-stone-200 bg-slate-900 shadow-[0_20px_48px_-24px_rgba(28,25,23,0.28)]">
-                {loadingData && !currentSlide ? (
-                  <div className="w-full h-full min-h-[300px] lg:min-h-[420px] bg-stone-200 animate-pulse" />
-                ) : currentSlide ? (
-                  <>
-                    <AnimatePresence initial={false}>
-                      <motion.div
-                        key={currentSlide.id}
-                        initial={{ opacity: 0.4 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0.4 }}
-                        transition={{ duration: 0.18 }}
-                        className="absolute inset-0 w-full h-full"
-                      >
-                        <div ref={bannerStageRef} className="w-full h-full">
-                          <ResilientImage
-                            src={currentSlide.imageUrl}
-                            alt={
-                              currentSlide.alt ||
-                              currentSlide.caption ||
-                              'Pabna University of Science and Technology campus banner'
-                            }
-                            containerClassName="w-full h-full"
-                            frameClassName="bg-slate-900"
-                            className="w-full h-full min-h-[300px] lg:min-h-[420px] object-cover"
-                            priority
-                          />
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-
-                    <EditTriggerButton
-                      target={{ kind: 'banner', slideId: currentSlide.id }}
-                      label="Edit Banner"
-                      variant="overlay"
-                      className="absolute top-3 left-3 z-10"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => setFullViewSlide(currentSlide)}
-                      aria-label={`View full image: ${currentSlide.caption}`}
-                      className="absolute top-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 text-white text-xs font-medium border border-white/20 shadow-md opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      View Full
-                    </button>
-
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-transparent pt-14 pb-4 px-4 sm:px-5 text-white pointer-events-none">
-                      <div className="flex items-end justify-between gap-4">
-                        <p className="text-xs sm:text-sm font-serif italic text-white leading-snug line-clamp-2 text-left drop-shadow-xs">
-                          {currentSlide.caption}
-                        </p>
-                        {slides.length > 1 && (
-                          <span className="font-mono text-[11px] font-semibold tabular-nums text-amber-200 shrink-0">
-                            {String(activeSlideIdx + 1).padStart(2, '0')} /{' '}
-                            {String(slides.length).padStart(2, '0')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {slides.length > 1 && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
-                          }
-                          aria-label="Previous banner slide"
-                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
-                          aria-label="Next banner slide"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <div className="relative w-full h-full min-h-[300px] lg:min-h-[420px]">
-                    <ResilientImage
-                      src=""
-                      alt="No banner slides published"
-                      containerClassName="w-full h-full"
-                      className="w-full h-full"
-                    />
-                    <EditTriggerButton
-                      target={{ kind: 'banner' }}
-                      label="Add Banner Slide"
-                      icon="add"
-                      variant="overlay"
-                      className="absolute top-3 left-3 z-10"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {slides.length > 1 && (
-                <div
-                  className="mt-2 flex items-center justify-between gap-3"
-                  aria-label="Banner slide controls"
-                >
-                  <div className="flex items-center gap-1">
-                    {slides.map((s, idx) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setActiveSlideIdx(idx)}
-                        aria-label={`View slide ${idx + 1}: ${s.caption}`}
-                        aria-current={idx === activeSlideIdx ? 'true' : undefined}
-                        className="py-2 px-0.5 inline-flex items-center justify-center cursor-pointer group"
-                      >
-                        <span
-                          className={`block h-1 rounded-xs transition-all ${
-                            idx === activeSlideIdx
-                              ? 'w-7 bg-pust-800'
-                              : 'w-3 bg-stone-300 group-hover:bg-stone-500'
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="font-mono text-[11px] font-medium text-stone-500 tabular-nums shrink-0">
-                    {String(activeSlideIdx + 1).padStart(2, '0')} /{' '}
-                    {String(slides.length).padStart(2, '0')} Campus Highlights
-                  </p>
-                </div>
-              )}
+              <Link
+                href="/portal"
+                className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-4 sm:px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
+              >
+                Open Digital Campus Portal
+              </Link>
+              <Link
+                href="/academics/departments"
+                className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-2.5 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
+              >
+                {profile?.departmentsCount
+                  ? `Explore ${profile.departmentsCount} Departments`
+                  : 'Explore Departments'}
+              </Link>
+              <Link
+                href="/verify"
+                className="order-2 sm:order-3 group inline-flex items-center justify-center sm:justify-start text-center min-h-[44px] gap-1.5 px-2.5 sm:px-2.5 py-2.5 sm:py-2 rounded-lg border border-stone-300 bg-white text-slate-900 sm:border-transparent sm:bg-transparent text-xs sm:text-sm font-semibold sm:text-pust-800 hover:border-pust-700 hover:text-pust-950 transition-colors leading-tight sm:whitespace-nowrap shrink-0"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
+                <span className="underline-offset-4 group-hover:underline">Verify Document</span>
+                <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
             </div>
           </div>
 
           {/* Operational Utility Ribbon */}
           {profile && (
-            <dl className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-stone-200 bg-white overflow-hidden">
+            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-stone-200 bg-white overflow-hidden">
               <div
                 data-gsap-ribbon
                 className="bg-white px-5 py-4 border-b lg:border-b-0 sm:border-r border-stone-200"
