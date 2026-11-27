@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { resolveUniversityContent } from '../lib/cmsDefaults';
-import { animateStagger, gsap, prefersReducedMotion } from '../lib/gsap';
+import { gsap, prefersReducedMotion } from '../lib/gsap';
 import {
   getYouTubeEmbedUrl,
   getYouTubeThumbnailUrl,
@@ -112,16 +112,7 @@ export function HomePage({
   const [bannerPaused, setBannerPaused] = useState(false);
   const [fullViewSlide, setFullViewSlide] = useState<BannerSlideRecord | null>(null);
 
-  const heroSectionRef = useRef<HTMLElement>(null);
   const bannerStageRef = useRef<HTMLDivElement>(null);
-  const noticeListRef = useRef<HTMLDivElement>(null);
-  const pubListRef = useRef<HTMLDivElement>(null);
-  const eventGridRef = useRef<HTMLDivElement>(null);
-  const seminarGridRef = useRef<HTMLDivElement>(null);
-
-  const prevNoticeCatRef = useRef(noticeCategory);
-  const prevPubFilterRef = useRef(pubDeptFilter);
-  const prevEventCatRef = useRef(eventCategory);
   const prevSlideIdxRef = useRef(activeSlideIdx);
 
   useEffect(() => {
@@ -154,37 +145,6 @@ export function HomePage({
 
     return () => ctx.revert();
   }, [activeSlideIdx]);
-
-  // GSAP stagger on filter changes
-  useEffect(() => {
-    if (prevNoticeCatRef.current === noticeCategory) return;
-    prevNoticeCatRef.current = noticeCategory;
-    return animateStagger(noticeListRef.current, '[data-gsap-notice-row]', {
-      y: 8,
-      duration: 0.28,
-      stagger: 0.04,
-    });
-  }, [noticeCategory]);
-
-  useEffect(() => {
-    if (prevPubFilterRef.current === pubDeptFilter) return;
-    prevPubFilterRef.current = pubDeptFilter;
-    return animateStagger(pubListRef.current, '[data-gsap-pub-row]', {
-      y: 8,
-      duration: 0.28,
-      stagger: 0.04,
-    });
-  }, [pubDeptFilter]);
-
-  useEffect(() => {
-    if (prevEventCatRef.current === eventCategory) return;
-    prevEventCatRef.current = eventCategory;
-    return animateStagger(eventGridRef.current, '[data-gsap-event-card]', {
-      y: 10,
-      duration: 0.3,
-      stagger: 0.045,
-    });
-  }, [eventCategory]);
 
   const currentSlide = slides[activeSlideIdx] || slides[0] || null;
 
@@ -295,7 +255,6 @@ export function HomePage({
 
       {/* 1. Full-Width Banner & Institutional Hero */}
       <section
-        ref={heroSectionRef}
         id="banner"
         className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28 overflow-x-clip"
       >
@@ -519,59 +478,49 @@ export function HomePage({
 
           {/* Operational Utility Ribbon (1-Column Stack) */}
           {profile && (
-            <dl className="mt-8 grid grid-cols-1 divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white overflow-hidden">
-              <div
-                data-gsap-ribbon
-                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
-              >
-                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
-                  Established
-                </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
-                  {profile.establishedYear} · Act No. 43 of 2001
-                </dd>
-              </div>
-              <div
-                data-gsap-ribbon
-                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
-              >
-                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
-                  Academic Scope
-                </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
-                  {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
-                </dd>
-              </div>
-              <div
-                data-gsap-ribbon
-                className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
-              >
-                <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
-                  Community
-                </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
-                  {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
-                </dd>
-              </div>
-              <div
-                data-gsap-ribbon
-                className="bg-pust-800 hover:bg-pust-900 text-white transition-colors group"
-              >
-                <Link
-                  href="/verify"
-                  className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
-                >
-                  <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center gap-2">
-                    <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
-                    <span>Public Registry</span>
+            <MotionReveal distance={22} delay={0.04}>
+              <dl className="mt-8 grid grid-cols-1 divide-y divide-stone-200 rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                <div className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
+                    Established
                   </dt>
-                  <dd className="font-mono tabular-nums text-sm font-semibold text-white flex items-center gap-1.5">
-                    <span>Verify Certificates &amp; Receipts</span>
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                  <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
+                    {profile.establishedYear} · Act No. 43 of 2001
                   </dd>
-                </Link>
-              </div>
-            </dl>
+                </div>
+                <div className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
+                    Academic Scope
+                  </dt>
+                  <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
+                    {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
+                  </dd>
+                </div>
+                <div className="bg-white px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
+                    Community
+                  </dt>
+                  <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
+                    {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
+                  </dd>
+                </div>
+                <div className="bg-pust-800 hover:bg-pust-900 text-white transition-colors group">
+                  <Link
+                    href="/verify"
+                    className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                  >
+                    <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center gap-2">
+                      <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
+                      <span>Public Registry</span>
+                    </dt>
+                    <dd className="font-mono tabular-nums text-sm font-semibold text-white flex items-center gap-1.5">
+                      <span>Verify Certificates &amp; Receipts</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                    </dd>
+                  </Link>
+                </div>
+              </dl>
+            </MotionReveal>
           )}
         </div>
       </section>
@@ -742,88 +691,90 @@ export function HomePage({
           )}
 
           {/* Vice-Chancellor History (Directly below the VC Picture & Message Card) */}
-          <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] overflow-hidden">
-            <div className="px-6 py-4 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-stone-500">
-                  Institutional Leadership Archive
-                  {profile?.establishedYear ? ` · ${profile.establishedYear} – Present` : ''}
-                </p>
-                <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-0.5">
-                  Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
-                </h3>
-              </div>
-              <div className="flex flex-wrap items-center gap-2.5">
-                <EditTriggerButton
-                  target={{ kind: 'vc', vcId: 'new-former' }}
-                  label="Add Former VC"
-                  icon="add"
-                  variant="compact"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPreviousVcs((prev) => !prev)}
-                  aria-expanded={showPreviousVcs}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-stone-300 bg-white text-pust-800 hover:bg-pust-800 hover:text-white hover:border-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  {showPreviousVcs ? 'Hide History' : 'Show History'}
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      showPreviousVcs ? 'rotate-180' : ''
-                    }`}
+          <MotionReveal delay={0.04}>
+            <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] overflow-hidden">
+              <div className="px-6 py-4 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-stone-500">
+                    Institutional Leadership Archive
+                    {profile?.establishedYear ? ` · ${profile.establishedYear} – Present` : ''}
+                  </p>
+                  <h3 className="font-serif text-fluid-h3 font-semibold text-slate-950 mt-0.5">
+                    Vice-Chancellor History ({previousVcs.length} Former Vice-Chancellors)
+                  </h3>
+                </div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <EditTriggerButton
+                    target={{ kind: 'vc', vcId: 'new-former' }}
+                    label="Add Former VC"
+                    icon="add"
+                    variant="compact"
                   />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPreviousVcs((prev) => !prev)}
+                    aria-expanded={showPreviousVcs}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-stone-300 bg-white text-pust-800 hover:bg-pust-800 hover:text-white hover:border-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    {showPreviousVcs ? 'Hide History' : 'Show History'}
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        showPreviousVcs ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <AnimatePresence initial={false}>
-              {showPreviousVcs && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-6 grid grid-cols-1 gap-4"
-                >
-                  {previousVcs.length === 0 ? (
-                    <p className="text-sm text-slate-600 col-span-full py-2 text-left">
-                      No former Vice-Chancellor records archived yet.
-                    </p>
-                  ) : (
-                    previousVcs.map((vc, idx) => (
-                      <MotionCard
-                        key={vc.id}
-                        delay={idx * 0.03}
-                        className="rounded-xl border border-stone-200 bg-white hover:border-pust-700/45 p-6 space-y-2 flex flex-col justify-between transition-colors"
-                      >
-                        <div className="space-y-1.5">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-mono text-xs font-semibold tabular-nums text-pust-800">
-                              {String(idx + 1).padStart(2, '0')} · {vc.tenure}
-                            </span>
-                            <EditTriggerButton
-                              target={{ kind: 'vc', vcId: vc.id }}
-                              label="Edit"
-                              variant="compact"
-                            />
+              <AnimatePresence initial={false}>
+                {showPreviousVcs && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    className="p-6 grid grid-cols-1 gap-4"
+                  >
+                    {previousVcs.length === 0 ? (
+                      <p className="text-sm text-slate-600 col-span-full py-2 text-left">
+                        No former Vice-Chancellor records archived yet.
+                      </p>
+                    ) : (
+                      previousVcs.map((vc, idx) => (
+                        <MotionCard
+                          key={vc.id}
+                          delay={idx * 0.05}
+                          className="rounded-xl border border-stone-200 bg-white hover:border-pust-700/45 p-6 space-y-2 flex flex-col justify-between transition-colors"
+                        >
+                          <div className="space-y-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-mono text-xs font-semibold tabular-nums text-pust-800">
+                                {String(idx + 1).padStart(2, '0')} · {vc.tenure}
+                              </span>
+                              <EditTriggerButton
+                                target={{ kind: 'vc', vcId: vc.id }}
+                                label="Edit"
+                                variant="compact"
+                              />
+                            </div>
+                            <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
+                              {vc.name}
+                            </h4>
+                            <p className="text-xs font-mono font-medium uppercase tracking-wider text-stone-500 text-left">
+                              {vc.title}
+                            </p>
+                            <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">
+                              {vc.message}
+                            </p>
                           </div>
-                          <h4 className="font-serif text-base font-semibold text-slate-950 leading-snug">
-                            {vc.name}
-                          </h4>
-                          <p className="text-xs font-mono font-medium uppercase tracking-wider text-stone-500 text-left">
-                            {vc.title}
-                          </p>
-                          <p className="text-xs text-slate-700 leading-relaxed pt-0.5 text-left">
-                            {vc.message}
-                          </p>
-                        </div>
-                      </MotionCard>
-                    ))
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                        </MotionCard>
+                      ))
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </MotionReveal>
 
           {/* About PUST Brief & Sub-Topic Links (1-Column Stack) */}
           <MotionReveal>
@@ -901,175 +852,183 @@ export function HomePage({
       >
         <div className="grid grid-cols-1 gap-12">
           <div className="space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                  Notice Board
-                </p>
-                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
-                  Recent University Circulars
-                </h2>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <EditTriggerButton
-                  target={{ kind: 'notice', notice: null }}
-                  label="Add Notice"
-                  icon="add"
-                  variant="compact"
-                />
-                <Link
-                  href="/notices"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
-                >
-                  All Notices
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
+            <MotionReveal>
+              <div className="space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+                  <div>
+                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                      Notice Board
+                    </p>
+                    <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
+                      Recent University Circulars
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <EditTriggerButton
+                      target={{ kind: 'notice', notice: null }}
+                      label="Add Notice"
+                      icon="add"
+                      variant="compact"
+                    />
+                    <Link
+                      href="/notices"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
+                    >
+                      All Notices
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
 
-            <div
-              className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
-              role="group"
-              aria-label="Filter circulars by category"
-            >
-              {NOTICE_CATS.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setNoticeCategory(cat)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    noticeCategory === cat
-                      ? 'bg-white text-slate-950 shadow-xs'
-                      : 'text-stone-600 hover:text-slate-950'
-                  }`}
+                <div
+                  className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+                  role="group"
+                  aria-label="Filter circulars by category"
                 >
-                  {cat}
-                </button>
-              ))}
-            </div>
+                  {NOTICE_CATS.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setNoticeCategory(cat)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        noticeCategory === cat
+                          ? 'bg-white text-slate-950 shadow-xs'
+                          : 'text-stone-600 hover:text-slate-950'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </MotionReveal>
 
             {loadingData && notices.length === 0 ? (
               <NoticeListSkeleton rows={4} />
             ) : (
-              <div ref={noticeListRef} className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
-                <div className="divide-y divide-stone-200">
-                  {featuredNotices.length === 0 ? (
-                    <div className="p-8 text-center space-y-3">
-                      <p className="text-sm text-slate-600">
-                        No circulars currently listed under{' '}
-                        <span className="font-medium text-slate-900">{noticeCategory}</span>.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setNoticeCategory('All')}
-                        className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-stone-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
-                      >
-                        Show All Circulars
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      {leadNotice && (
-                        <div
-                          key={leadNotice.id}
-                          data-gsap-notice-row
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => onSelectNotice(leadNotice)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              onSelectNotice(leadNotice);
-                            }
-                          }}
-                          className="w-full text-left p-6 bg-[#FAF9F6] hover:bg-stone-100/70 transition-colors space-y-2 group cursor-pointer"
+              <MotionReveal key={`notice-list-${noticeCategory}`} distance={26} delay={0.04}>
+                <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="divide-y divide-stone-200">
+                    {featuredNotices.length === 0 ? (
+                      <div className="p-8 text-center space-y-3">
+                        <p className="text-sm text-slate-600">
+                          No circulars currently listed under{' '}
+                          <span className="font-medium text-slate-900">{noticeCategory}</span>.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setNoticeCategory('All')}
+                          className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-stone-50 text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <p className="font-mono text-xs text-slate-600 tabular-nums">
-                              {leadNotice.publishedAt} ·{' '}
-                              <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
-                              {leadNotice.referenceNo}
-                              {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
-                            </p>
-                            <EditTriggerButton
-                              target={{ kind: 'notice', notice: leadNotice }}
-                              label="Edit"
-                              variant="compact"
-                            />
-                          </div>
-                          <h3 className="font-serif text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                            {leadNotice.title}
-                          </h3>
-                          <p className="prose-justify text-sm text-slate-700 leading-relaxed">
-                            {leadNotice.summary}
-                          </p>
-                        </div>
-                      )}
+                          Show All Circulars
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {leadNotice && (
+                          <MotionReveal key={leadNotice.id} distance={18} delay={0.02}>
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => onSelectNotice(leadNotice)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  onSelectNotice(leadNotice);
+                                }
+                              }}
+                              className="w-full text-left p-6 bg-[#FAF9F6] hover:bg-stone-100/70 transition-colors space-y-2 group cursor-pointer"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="font-mono text-xs text-slate-600 tabular-nums">
+                                  {leadNotice.publishedAt} ·{' '}
+                                  <span className="font-semibold text-pust-800">{leadNotice.category}</span> ·{' '}
+                                  {leadNotice.referenceNo}
+                                  {leadNotice.visibility === 'registered' && ' · Campus Members Only'}
+                                </p>
+                                <EditTriggerButton
+                                  target={{ kind: 'notice', notice: leadNotice }}
+                                  label="Edit"
+                                  variant="compact"
+                                />
+                              </div>
+                              <h3 className="font-serif text-xl font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                                {leadNotice.title}
+                              </h3>
+                              <p className="prose-justify text-sm text-slate-700 leading-relaxed">
+                                {leadNotice.summary}
+                              </p>
+                            </div>
+                          </MotionReveal>
+                        )}
 
-                      {secondaryNotices.map((notice, idx) => (
-                        <div
-                          key={notice.id}
-                          data-gsap-notice-row
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => onSelectNotice(notice)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              onSelectNotice(notice);
-                            }
-                          }}
-                          className={`w-full text-left px-6 py-5 hover:bg-[#FAF9F6] transition-colors space-y-1.5 group cursor-pointer ${
-                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/65'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <p className="font-mono text-xs text-slate-600 tabular-nums">
-                              {notice.publishedAt} ·{' '}
-                              <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
-                              {notice.referenceNo}
-                              {notice.visibility === 'registered' && ' · Campus Members Only'}
-                            </p>
-                            <EditTriggerButton
-                              target={{ kind: 'notice', notice }}
-                              label="Edit"
-                              variant="compact"
-                            />
-                          </div>
-                          <div className="flex items-baseline justify-between gap-3">
-                            <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                              {notice.title}
-                            </h3>
-                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-0.5 transition-all shrink-0 hidden sm:block" />
-                          </div>
-                          <p className="text-sm text-slate-700 leading-relaxed line-clamp-2 text-left">
-                            {notice.summary}
-                          </p>
-                        </div>
-                      ))}
-                    </>
-                  )}
+                        {secondaryNotices.map((notice, idx) => (
+                          <MotionReveal key={notice.id} distance={18} delay={(idx + 1) * 0.05}>
+                            <div
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => onSelectNotice(notice)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  onSelectNotice(notice);
+                                }
+                              }}
+                              className={`w-full text-left px-6 py-5 hover:bg-[#FAF9F6] transition-colors space-y-1.5 group cursor-pointer ${
+                                idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/65'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="font-mono text-xs text-slate-600 tabular-nums">
+                                  {notice.publishedAt} ·{' '}
+                                  <span className="font-semibold text-pust-800">{notice.category}</span> ·{' '}
+                                  {notice.referenceNo}
+                                  {notice.visibility === 'registered' && ' · Campus Members Only'}
+                                </p>
+                                <EditTriggerButton
+                                  target={{ kind: 'notice', notice }}
+                                  label="Edit"
+                                  variant="compact"
+                                />
+                              </div>
+                              <div className="flex items-baseline justify-between gap-3">
+                                <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                                  {notice.title}
+                                </h3>
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-0.5 transition-all shrink-0 hidden sm:block" />
+                              </div>
+                              <p className="text-sm text-slate-700 leading-relaxed line-clamp-2 text-left">
+                                {notice.summary}
+                              </p>
+                            </div>
+                          </MotionReveal>
+                        ))}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </MotionReveal>
             )}
           </div>
 
           <div className="editable-region space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                  {institutionalLinksEyebrow || 'Digital Services & Directory'}
-                </p>
-                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
-                  {institutionalLinksHeading || 'Institutional Sections'}
-                </h2>
+            <MotionReveal>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+                <div>
+                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                    {institutionalLinksEyebrow || 'Digital Services & Directory'}
+                  </p>
+                  <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
+                    {institutionalLinksHeading || 'Institutional Sections'}
+                  </h2>
+                </div>
+                <EditTriggerButton
+                  target={{ kind: 'institutional-links' }}
+                  label="Edit Links"
+                  variant="compact"
+                />
               </div>
-              <EditTriggerButton
-                target={{ kind: 'institutional-links' }}
-                label="Edit Links"
-                variant="compact"
-              />
-            </div>
+            </MotionReveal>
 
             {loadingData && !profile ? (
               <NoticeListSkeleton rows={4} />
@@ -1078,29 +1037,32 @@ export function HomePage({
                 No institutional directory links configured yet.
               </div>
             ) : (
-              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
-                <div className="divide-y divide-stone-200">
-                  {institutionalLinks.map((item, idx) => (
-                    <Link
-                      key={item.id}
-                      href={item.route}
-                      className={`w-full text-left px-6 py-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
-                        idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
-                      }`}
-                    >
-                      <div>
-                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed text-left">
-                          {item.desc}
-                        </p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
-                    </Link>
-                  ))}
+              <MotionReveal distance={24} delay={0.04}>
+                <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="divide-y divide-stone-200">
+                    {institutionalLinks.map((item, idx) => (
+                      <MotionReveal key={item.id} distance={16} delay={idx * 0.045}>
+                        <Link
+                          href={item.route}
+                          className={`w-full text-left px-6 py-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group cursor-pointer ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
+                          }`}
+                        >
+                          <div>
+                            <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors">
+                              {item.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-700 mt-0.5 leading-relaxed text-left">
+                              {item.desc}
+                            </p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-1 shrink-0 transition-all duration-200" />
+                        </Link>
+                      </MotionReveal>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </MotionReveal>
             )}
           </div>
         </div>
@@ -1113,152 +1075,160 @@ export function HomePage({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-12">
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                  Faculty Research Output
-                </p>
-                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
-                  Recent Publications
-                </h2>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <EditTriggerButton
-                  target={{ kind: 'publication', publication: null }}
-                  label="Add Publication"
-                  icon="add"
-                  variant="compact"
-                />
-                <Link
-                  href="/academics/publications"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
-                >
-                  All Publications
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            <div
-              className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
-              role="group"
-              aria-label="Filter publications by department"
-            >
-              {pubDeptFilters.map((code) => (
-                <button
-                  key={code}
-                  type="button"
-                  onClick={() => setPubDeptFilter(code)}
-                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    pubDeptFilter === code
-                      ? 'bg-white text-slate-950 shadow-xs'
-                      : 'text-stone-600 hover:text-slate-950'
-                  }`}
-                >
-                  {code}
-                </button>
-              ))}
-            </div>
-
-            <div
-              ref={pubListRef}
-              className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200"
-            >
-              {visiblePublications.length === 0 ? (
-                <p className="px-6 py-6 text-sm text-slate-600 text-left">
-                  No peer-reviewed publications found for the selected department.
-                </p>
-              ) : (
-                visiblePublications.map((pub, idx) => (
-                  <article
-                    key={pub.id}
-                    data-gsap-pub-row
-                    className={`px-6 py-5 hover:bg-stone-50 transition-colors space-y-1.5 ${
-                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
-                        {pub.departmentCode} · {pub.domain} · {pub.year}
-                      </p>
-                      <EditTriggerButton
-                        target={{ kind: 'publication', publication: pub }}
-                        label="Edit"
-                        variant="compact"
-                      />
-                    </div>
-                    <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
-                      {pub.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
-                      Authors: {pub.authors}
+            <MotionReveal>
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+                  <div>
+                    <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                      Faculty Research Output
                     </p>
-                  </article>
-                ))
-              )}
-            </div>
+                    <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
+                      Recent Publications
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <EditTriggerButton
+                      target={{ kind: 'publication', publication: null }}
+                      label="Add Publication"
+                      icon="add"
+                      variant="compact"
+                    />
+                    <Link
+                      href="/academics/publications"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
+                    >
+                      All Publications
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+
+                <div
+                  className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+                  role="group"
+                  aria-label="Filter publications by department"
+                >
+                  {pubDeptFilters.map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => setPubDeptFilter(code)}
+                      className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        pubDeptFilter === code
+                          ? 'bg-white text-slate-950 shadow-xs'
+                          : 'text-stone-600 hover:text-slate-950'
+                      }`}
+                    >
+                      {code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </MotionReveal>
+
+            <MotionReveal key={`pub-list-${pubDeptFilter}`} distance={26} delay={0.04}>
+              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200">
+                {visiblePublications.length === 0 ? (
+                  <p className="px-6 py-6 text-sm text-slate-600 text-left">
+                    No peer-reviewed publications found for the selected department.
+                  </p>
+                ) : (
+                  visiblePublications.map((pub, idx) => (
+                    <MotionReveal key={pub.id} distance={18} delay={idx * 0.055}>
+                      <article
+                        className={`px-6 py-5 hover:bg-stone-50 transition-colors space-y-1.5 ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
+                            {pub.departmentCode} · {pub.domain} · {pub.year}
+                          </p>
+                          <EditTriggerButton
+                            target={{ kind: 'publication', publication: pub }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                        </div>
+                        <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
+                          {pub.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
+                          Authors: {pub.authors}
+                        </p>
+                      </article>
+                    </MotionReveal>
+                  ))
+                )}
+              </div>
+            </MotionReveal>
           </div>
 
           {/* Official PUST Journals (1-Column Stack) */}
           <aside className="editable-region space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
-              <div>
-                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                  University Periodicals
-                </p>
-                <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
-                  Official PUST Journals
-                </h2>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <EditTriggerButton
-                  target={{ kind: 'journals' }}
-                  label="Edit Journals"
-                  variant="compact"
-                />
-                <Link
-                  href="/academics/journals"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
-                >
-                  All Journals
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200">
-              {loadingData && !profile ? (
-                <div className="p-6">
-                  <NoticeListSkeleton rows={3} />
+            <MotionReveal>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
+                <div>
+                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                    University Periodicals
+                  </p>
+                  <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
+                    Official PUST Journals
+                  </h2>
                 </div>
-              ) : (profile?.journals ?? []).length === 0 ? (
-                <p className="px-6 py-6 text-sm text-slate-700 text-left">
-                  No university journals are currently listed.
-                </p>
-              ) : (
-                (profile?.journals ?? []).map((journal, idx) => (
-                  <div
-                    key={journal.id}
-                    className={`px-6 py-5 space-y-1.5 ${
-                      idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
-                    }`}
+                <div className="flex items-center gap-3 shrink-0">
+                  <EditTriggerButton
+                    target={{ kind: 'journals' }}
+                    label="Edit Journals"
+                    variant="compact"
+                  />
+                  <Link
+                    href="/academics/journals"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
                   >
-                    <p className="font-mono text-xs font-medium text-stone-500 tabular-nums">
-                      {journal.issn}
-                    </p>
-                    <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">
-                      {journal.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
-                      {journal.scope}
-                    </p>
-                    <p className="text-xs font-semibold text-gold-700 text-left">
-                      {journal.currentIssue}
-                    </p>
+                    All Journals
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </MotionReveal>
+
+            <MotionReveal distance={24} delay={0.04}>
+              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200">
+                {loadingData && !profile ? (
+                  <div className="p-6">
+                    <NoticeListSkeleton rows={3} />
                   </div>
-                ))
-              )}
-            </div>
+                ) : (profile?.journals ?? []).length === 0 ? (
+                  <p className="px-6 py-6 text-sm text-slate-700 text-left">
+                    No university journals are currently listed.
+                  </p>
+                ) : (
+                  (profile?.journals ?? []).map((journal, idx) => (
+                    <MotionReveal key={journal.id} distance={16} delay={idx * 0.05}>
+                      <div
+                        className={`px-6 py-5 space-y-1.5 ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
+                        }`}
+                      >
+                        <p className="font-mono text-xs font-medium text-stone-500 tabular-nums">
+                          {journal.issn}
+                        </p>
+                        <h3 className="font-serif text-lg font-semibold text-slate-950 text-left">
+                          {journal.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
+                          {journal.scope}
+                        </p>
+                        <p className="text-xs font-semibold text-gold-700 text-left">
+                          {journal.currentIssue}
+                        </p>
+                      </div>
+                    </MotionReveal>
+                  ))
+                )}
+              </div>
+            </MotionReveal>
           </aside>
         </div>
       </section>
@@ -1269,53 +1239,57 @@ export function HomePage({
         className="bg-transparent py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
-            <div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                Campus Chronicles &amp; Seminars
-              </p>
-              <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
-                News and Events
-              </h2>
-            </div>
+          <MotionReveal>
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+                <div>
+                  <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                    Campus Chronicles &amp; Seminars
+                  </p>
+                  <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1">
+                    News and Events
+                  </h2>
+                </div>
 
-            <div className="flex items-center gap-3 shrink-0">
-              <EditTriggerButton
-                target={{ kind: 'gallery', item: null }}
-                label="Add Event"
-                icon="add"
-                variant="compact"
-              />
-              <Link
-                href="/gallery"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
-              >
-                Full Archive
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
-            </div>
-          </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <EditTriggerButton
+                    target={{ kind: 'gallery', item: null }}
+                    label="Add Event"
+                    icon="add"
+                    variant="compact"
+                  />
+                  <Link
+                    href="/gallery"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 group"
+                  >
+                    Full Archive
+                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
 
-          <div
-            className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
-            role="group"
-            aria-label="Filter news and events by category"
-          >
-            {NEWS_EVENT_CATS.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setEventCategory(cat)}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  eventCategory === cat
-                    ? 'bg-white text-slate-950 shadow-xs'
-                    : 'text-stone-600 hover:text-slate-950'
-                }`}
+              <div
+                className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80"
+                role="group"
+                aria-label="Filter news and events by category"
               >
-                {cat}
-              </button>
-            ))}
-          </div>
+                {NEWS_EVENT_CATS.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setEventCategory(cat)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      eventCategory === cat
+                        ? 'bg-white text-slate-950 shadow-xs'
+                        : 'text-stone-600 hover:text-slate-950'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </MotionReveal>
 
           {loadingData && galleryItems.length === 0 ? (
             <MediaGridSkeleton count={4} />
@@ -1336,7 +1310,10 @@ export function HomePage({
               )}
             </div>
           ) : (
-            <div ref={eventGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div
+              key={`events-grid-${eventCategory}`}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
               {(() => {
                 const categoryCounts: Record<string, number> = {};
                 return visibleEvents.slice(0, 4).map((item, idx) => {
@@ -1348,8 +1325,7 @@ export function HomePage({
                   return (
                     <MotionCard
                       key={item.id}
-                      data-gsap-event-card
-                      delay={idx * 0.04}
+                      delay={idx * 0.075}
                       role="button"
                       tabIndex={0}
                       onClick={() => setActiveMedia(item)}
@@ -1406,55 +1382,54 @@ export function HomePage({
           )}
 
           {/* Scheduled University Seminars & Milestones */}
-          <div className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
-            <div className="px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                Upcoming Seminars, Workshops &amp; Academic Milestones
-              </p>
-              <div className="flex items-center gap-3">
-                <EditTriggerButton
-                  target={{ kind: 'seminars' }}
-                  label="Edit Seminars"
-                  variant="compact"
-                />
-                <Link
-                  href="/academics/seminars"
-                  className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
-                >
-                  All Seminars &amp; Workshops →
-                </Link>
-              </div>
-            </div>
-            {upcomingSeminars.length === 0 ? (
-              <p className="px-6 py-5 text-sm text-slate-700">
-                No upcoming seminars or workshops are currently scheduled.
-              </p>
-            ) : (
-              <div
-                ref={seminarGridRef}
-                className="grid grid-cols-1 divide-y divide-stone-200"
-              >
-                {upcomingSeminars.map((ev, idx) => (
-                  <div
-                    key={ev.id}
-                    data-gsap-seminar-item
-                    className={`px-6 py-4 space-y-1.5 transition-colors ${
-                      idx % 2 === 0
-                        ? 'bg-white hover:bg-[#FAF9F6]'
-                        : 'bg-[#FAF9F6] hover:bg-white'
-                    }`}
+          <MotionReveal distance={26} delay={0.04}>
+            <div className="editable-region rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <div className="px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                  Upcoming Seminars, Workshops &amp; Academic Milestones
+                </p>
+                <div className="flex items-center gap-3">
+                  <EditTriggerButton
+                    target={{ kind: 'seminars' }}
+                    label="Edit Seminars"
+                    variant="compact"
+                  />
+                  <Link
+                    href="/academics/seminars"
+                    className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
                   >
-                    <p className="font-mono text-xs font-semibold tabular-nums text-pust-700">
-                      {ev.date} · {ev.organizer}
-                    </p>
-                    <h3 className="font-serif text-base font-semibold text-slate-950 leading-snug">
-                      {ev.title}
-                    </h3>
-                  </div>
-                ))}
+                    All Seminars &amp; Workshops →
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
+              {upcomingSeminars.length === 0 ? (
+                <p className="px-6 py-5 text-sm text-slate-700">
+                  No upcoming seminars or workshops are currently scheduled.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 divide-y divide-stone-200">
+                  {upcomingSeminars.map((ev, idx) => (
+                    <MotionReveal key={ev.id} distance={16} delay={idx * 0.055}>
+                      <div
+                        className={`px-6 py-4 space-y-1.5 transition-colors ${
+                          idx % 2 === 0
+                            ? 'bg-white hover:bg-[#FAF9F6]'
+                            : 'bg-[#FAF9F6] hover:bg-white'
+                        }`}
+                      >
+                        <p className="font-mono text-xs font-semibold tabular-nums text-pust-700">
+                          {ev.date} · {ev.organizer}
+                        </p>
+                        <h3 className="font-serif text-base font-semibold text-slate-950 leading-snug">
+                          {ev.title}
+                        </h3>
+                      </div>
+                    </MotionReveal>
+                  ))}
+                </div>
+              )}
+            </div>
+          </MotionReveal>
         </div>
       </section>
 

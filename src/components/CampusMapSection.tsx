@@ -15,6 +15,7 @@ import { resolveUniversityContent } from '../lib/cmsDefaults';
 import { animateStagger } from '../lib/gsap';
 import type { CampusZoneType } from '../types/pust';
 import { EditTriggerButton } from './EditTriggerButton';
+import { MotionReveal } from './MotionPrimitives';
 import { usePust } from './PustContext';
 import { PageHeaderAndSectionSkeleton } from './PustSkeletons';
 import { ResilientImage } from './ResilientImage';
@@ -143,84 +144,89 @@ export function CampusMapSection() {
       className="editable-region bg-[#F5F3EE] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-              {campusMapMeta.eyebrow}
-            </p>
-            <h2
-              id="campus-map-heading"
-              className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1"
-            >
-              {campusMapMeta.title}
-            </h2>
-            <p className="text-fluid-body text-slate-700 mt-1.5 max-w-3xl text-left">
-              {campusMapMeta.subtitle}
-            </p>
-          </div>
-
-          <div className="shrink-0">
-            <EditTriggerButton
-              target={{ kind: 'campus-building', buildingId: activeBuilding?.id }}
-              label="Edit Map & Buildings"
-              variant="compact"
-            />
-          </div>
-        </div>
-
-        {/* Precinct Filter Bar + Active Building Stepper */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div
-            role="group"
-            aria-label="Filter campus buildings by precinct"
-            className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
-          >
-            {ZONES.map((zone) => {
-              const active = selectedZone === zone;
-              return (
-                <button
-                  key={zone}
-                  type="button"
-                  onClick={() => handleZoneChange(zone)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer min-h-[36px] ${
-                    active
-                      ? 'bg-pust-900 text-white'
-                      : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
-                  }`}
+        <MotionReveal>
+          <div className="space-y-6">
+            {/* Section Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
+              <div>
+                <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
+                  {campusMapMeta.eyebrow}
+                </p>
+                <h2
+                  id="campus-map-heading"
+                  className="font-serif text-fluid-h2 font-semibold text-slate-950 mt-1"
                 >
-                  {zone === 'All' ? 'All Precincts' : zone}
-                </button>
-              );
-            })}
-          </div>
+                  {campusMapMeta.title}
+                </h2>
+                <p className="text-fluid-body text-slate-700 mt-1.5 max-w-3xl text-left">
+                  {campusMapMeta.subtitle}
+                </p>
+              </div>
 
-          <div className="inline-flex items-center self-start md:self-auto gap-1.5 rounded-lg bg-white border border-stone-200 p-1">
-            <button
-              type="button"
-              onClick={() => stepBuilding(-1)}
-              aria-label="Previous campus building"
-              className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="px-2 font-mono text-xs font-semibold tabular-nums text-slate-700 whitespace-nowrap">
-              {String(currentListPos + 1).padStart(2, '0')} /{' '}
-              {String(filteredBuildings.length || campusBuildings.length).padStart(2, '0')}
-            </span>
-            <button
-              type="button"
-              onClick={() => stepBuilding(1)}
-              aria-label="Next campus building"
-              className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              <div className="shrink-0">
+                <EditTriggerButton
+                  target={{ kind: 'campus-building', buildingId: activeBuilding?.id }}
+                  label="Edit Map & Buildings"
+                  variant="compact"
+                />
+              </div>
+            </div>
+
+            {/* Precinct Filter Bar + Active Building Stepper */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div
+                role="group"
+                aria-label="Filter campus buildings by precinct"
+                className="inline-flex overflow-x-auto no-scrollbar sm:flex-wrap gap-1 p-1 rounded-lg bg-white border border-stone-200 max-w-full"
+              >
+                {ZONES.map((zone) => {
+                  const active = selectedZone === zone;
+                  return (
+                    <button
+                      key={zone}
+                      type="button"
+                      onClick={() => handleZoneChange(zone)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer min-h-[36px] ${
+                        active
+                          ? 'bg-pust-900 text-white'
+                          : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
+                      }`}
+                    >
+                      {zone === 'All' ? 'All Precincts' : zone}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="inline-flex items-center self-start md:self-auto gap-1.5 rounded-lg bg-white border border-stone-200 p-1">
+                <button
+                  type="button"
+                  onClick={() => stepBuilding(-1)}
+                  aria-label="Previous campus building"
+                  className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="px-2 font-mono text-xs font-semibold tabular-nums text-slate-700 whitespace-nowrap">
+                  {String(currentListPos + 1).padStart(2, '0')} /{' '}
+                  {String(filteredBuildings.length || campusBuildings.length).padStart(2, '0')}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => stepBuilding(1)}
+                  aria-label="Next campus building"
+                  className="w-9 h-9 inline-flex items-center justify-center rounded-md text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </MotionReveal>
 
         {/* Unified Architectural Folio: Interactive Blueprint (7) + Building Guide Monograph (5) */}
-        <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
+        <MotionReveal distance={32} delay={0.06}>
+          <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
           {/* Left Column: Architectural Drafting Sheet & Building Directory */}
           <div className="lg:col-span-7 flex flex-col justify-between bg-[#FAF7F0] border-b lg:border-b-0 lg:border-r border-stone-200">
             {/* Plan Header Strip */}
@@ -721,7 +727,8 @@ export function CampusMapSection() {
               </motion.article>
             </AnimatePresence>
           </div>
-        </div>
+          </div>
+        </MotionReveal>
       </div>
     </section>
   );

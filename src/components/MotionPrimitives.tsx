@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { motion, useReducedMotion, type HTMLMotionProps } from 'motion/react';
 
 const EDITORIAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -62,33 +62,79 @@ export function SubPagePanel({
 export function MotionReveal({
   children,
   className = '',
+  delay = 0,
+  duration = 0.58,
+  distance = 32,
+  direction = 'up',
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  duration?: number;
+  distance?: number;
+  direction?: 'up' | 'left' | 'right' | 'none';
 }) {
-  return <div className={className}>{children}</div>;
+  const reduceMotion = useReducedMotion();
+
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const initialOffset =
+    direction === 'up'
+      ? { y: distance, x: 0 }
+      : direction === 'left'
+      ? { x: distance, y: 0 }
+      : direction === 'right'
+      ? { x: -distance, y: 0 }
+      : { x: 0, y: 0 };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, ...initialOffset }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -72px 0px' }}
+      transition={{ duration, delay, ease: EDITORIAL_EASE }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 export function MotionCard({
   children,
   className = '',
-  delay: _delay = 0,
+  delay = 0,
   interactive = true,
   ...rest
-}: HTMLAttributes<HTMLDivElement> & {
+}: HTMLMotionProps<'div'> & {
   children: ReactNode;
   className?: string;
   delay?: number;
   interactive?: boolean;
 }) {
-  void _delay;
+  const reduceMotion = useReducedMotion();
+  const resolvedClass = interactive ? `card-hover-lift ${className}` : className;
+
+  if (reduceMotion) {
+    return (
+      <motion.div {...rest} className={resolvedClass}>
+        {children}
+      </motion.div>
+    );
+  }
+
   return (
-    <div
+    <motion.div
       {...rest}
-      className={interactive ? `card-hover-lift ${className}` : className}
+      initial={{ opacity: 0, y: 28, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '0px 0px -56px 0px' }}
+      transition={{ duration: 0.52, delay, ease: EDITORIAL_EASE }}
+      className={resolvedClass}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
