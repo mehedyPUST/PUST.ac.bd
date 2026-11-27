@@ -258,7 +258,7 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[74px] xl:h-[80px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
+          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[58px] xl:h-[62px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -271,17 +271,17 @@ export function Navbar({
               setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3.5 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-center lg:self-stretch"
+            className="relative z-10 my-1 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-2.5 xl:px-3 lg:py-0.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
           >
-            <PustCrest size={32} className="lg:hidden" />
-            <PustCrest size={68} className="hidden lg:block xl:hidden" />
-            <PustCrest size={80} className="hidden xl:block" />
+            <PustCrest size={34} className="lg:hidden" />
+            <PustCrest size={88} className="hidden lg:block xl:hidden" />
+            <PustCrest size={92} className="hidden xl:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Est. Tagline (Left) & Expanded Search (Right) */}
-            <div className="min-h-[58px] sm:min-h-[64px] lg:h-[74px] xl:h-[80px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
+            <div className="h-[54px] sm:h-[58px] lg:h-[58px] xl:h-[62px] py-0.5 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
               <div className="min-w-0 flex-1 flex items-center gap-3">
                 <Link
                   href="/"
@@ -290,7 +290,7 @@ export function Navbar({
                     setMobileMenuOpen(false);
                     setMobileSearchOpen(false);
                   }}
-                  className="block font-serif text-[clamp(0.75rem,3vw,0.95rem)] leading-[1.18] sm:text-base lg:text-[clamp(1.2rem,0.95rem+0.6vw,1.625rem)] sm:leading-none font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
+                  className="block font-serif text-[clamp(0.76rem,2.9vw,0.92rem)] leading-[1.16] sm:text-base lg:text-[clamp(1.15rem,0.95rem+0.45vw,1.45rem)] sm:leading-none font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
                 >
                   Pabna University of Science and Technology
                 </Link>
@@ -394,10 +394,10 @@ export function Navbar({
             </div>
 
             {/* Tier 2: Desktop Navigation Links Strip + Portal */}
-            <div className="hidden lg:flex h-11 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
+            <div className="hidden lg:flex h-10 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
               <nav
                 aria-label="Primary navigation"
-                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
+                className="flex items-center gap-3.5 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.9rem)] font-medium text-slate-900"
               >
                 {/* Home */}
                 <div
@@ -410,7 +410,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'home'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route === '/'
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -449,7 +449,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'governance'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/governance')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -492,7 +492,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'about'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/about')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -535,7 +535,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'administration'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/administration')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -578,7 +578,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'academic'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/academics')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -621,7 +621,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'facilities'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/facilities')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -664,7 +664,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'notices'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/notices')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -707,7 +707,7 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'admission'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/admissions')
                         ? 'border-pust-800 text-pust-800 font-semibold'
                         : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -741,7 +741,7 @@ export function Navbar({
                 <Link
                   href="/verify"
                   onClick={() => setHoveredGroup(null)}
-                  className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                  className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                     route === '/verify'
                       ? 'border-pust-800 text-pust-800 font-semibold'
                       : 'border-transparent hover:text-pust-900 hover:border-pust-200'
@@ -939,7 +939,7 @@ export function Navbar({
           <div
             aria-hidden="true"
             onClick={() => setMobileSearchOpen(false)}
-            className="fixed inset-x-0 top-[58px] sm:top-[64px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-x-0 top-[54px] sm:top-[58px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
           />
           <div className="relative z-10 lg:hidden border-t border-stone-200 bg-white px-3.5 py-3 shadow-md">
             <GlobalSearchBar
