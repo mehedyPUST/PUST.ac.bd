@@ -30,7 +30,7 @@ const GOVERNANCE_TABS: Array<{
     tabKey: 'pust-act',
     label: 'PUST Act',
     code: 'ACT NO. 43 OF 2001 · PASSED 15 JULY 2001 · EFFECTIVE 12 OCT 2008',
-    heading: 'PUST Act — Pabna University of Science and Technology Act, 2001',
+    heading: 'Pabna University of Science and Technology Act, 2001',
     subtitle:
       'Statutory charter enacted by the Parliament of Bangladesh (Act No. 43 of 2001, passed 15 July 2001 and operationalized via Gazette notification on 12 October 2008) establishing PUST as a public university for science and technology.',
   },
