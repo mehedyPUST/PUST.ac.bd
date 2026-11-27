@@ -16,7 +16,6 @@ import {
   Search,
   X,
 } from 'lucide-react';
-import { DEFAULT_NAVBAR_TAGLINE } from '../lib/cmsDefaults';
 import {
   DEPARTMENT_NAV_ITEMS,
   type DepartmentTab,
@@ -57,7 +56,6 @@ export function DepartmentNavbar({
   departmentCode,
   isPersonPage,
   activeTab,
-  profile,
   departments,
   user,
   editMode = false,
@@ -179,10 +177,10 @@ export function DepartmentNavbar({
         className="sticky top-0 z-40 bg-white shadow-[0_1px_4px_-1px_rgba(28,25,23,0.1)] print:hidden"
       >
         <div className="relative z-10">
-          {/* Full-bleed University Title Band Backdrop (Preserved from PUST Navbar) */}
+          {/* Full-bleed Department + University Title Band Backdrop */}
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-12 lg:h-[52px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b border-gold-500/35"
+            className="absolute inset-x-0 top-0 h-[52px] lg:h-[60px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] border-b border-gold-500/35"
           />
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -197,16 +195,24 @@ export function DepartmentNavbar({
               title="Pabna University of Science and Technology — Main Website"
               className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-3 xl:px-4 lg:py-2 flex items-center justify-center shrink-0 self-start lg:self-stretch"
             >
-              <PustCrest size={26} className="lg:hidden" />
-              <PustCrest size={58} className="hidden lg:block xl:hidden" />
-              <PustCrest size={68} className="hidden xl:block" />
+              <PustCrest size={28} className="lg:hidden" />
+              <PustCrest size={60} className="hidden lg:block xl:hidden" />
+              <PustCrest size={72} className="hidden xl:block" />
             </Link>
 
-            {/* Right Column: Tier 1 University Name Band + Tier 2 Department Nav */}
+            {/* Right Column: Tier 1 Two-Line Department & University Lockup + Tier 2 Department Nav */}
             <div className="flex-1 min-w-0 flex flex-col">
-              {/* Tier 1: University Name Band + Tagline & Search */}
-              <div className="h-12 lg:h-[52px] py-1 lg:py-0 pl-2 sm:pl-3 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
-                <div className="min-w-0 flex-1 flex items-center gap-3">
+              {/* Tier 1: Stacked "Department of ..." + "Pabna University of Science and Technology, Pabna." */}
+              <div className="h-[52px] lg:h-[60px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
+                <div className="min-w-0 flex-1 flex flex-col justify-center">
+                  <button
+                    type="button"
+                    onClick={() => handleTabClick('overview')}
+                    title={departmentTitle}
+                    className="text-left font-serif text-[clamp(0.78rem,3.1vw,1rem)] sm:text-base lg:text-[1.15rem] xl:text-[1.25rem] font-semibold tracking-tight text-white hover:text-gold-200 transition-colors leading-[1.18] truncate cursor-pointer"
+                  >
+                    {departmentTitle}
+                  </button>
                   <Link
                     href="/"
                     onClick={() => {
@@ -214,18 +220,11 @@ export function DepartmentNavbar({
                       setMobileDrawerOpen(false);
                       setMobileSearchOpen(false);
                     }}
-                    className="block font-serif text-[clamp(0.68rem,2.7vw,0.875rem)] leading-[1.18] sm:text-base lg:text-[clamp(1.05rem,0.85rem+0.6vw,1.45rem)] sm:leading-none font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
+                    title="Return to Pabna University of Science and Technology Main Website"
+                    className="block text-[clamp(0.625rem,2.3vw,0.75rem)] sm:text-xs lg:text-[13px] font-medium text-stone-100/95 hover:text-gold-200 transition-colors leading-[1.2] truncate"
                   >
-                    Pabna University of Science and Technology
+                    Pabna University of Science and Technology, Pabna.
                   </Link>
-
-                  <span
-                    aria-hidden="true"
-                    className="hidden xl:block h-4 w-px bg-white/30 shrink-0"
-                  />
-                  <span className="hidden xl:inline text-xs font-semibold tracking-wide text-gold-300 whitespace-nowrap shrink-0">
-                    {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
-                  </span>
                 </div>
 
                 <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
@@ -330,44 +329,29 @@ export function DepartmentNavbar({
 
               {/* Tier 2 (Desktop): Department Navigation in the Site Navbar Position */}
               <div className="hidden lg:flex h-11 pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 bg-white items-center justify-between gap-4">
-                <div className="min-w-0 flex items-center gap-3 xl:gap-4">
-                  {/* Active Department Name Anchor */}
-                  <button
-                    type="button"
-                    onClick={() => handleTabClick('overview')}
-                    title={departmentTitle}
-                    className="font-serif text-sm xl:text-[15px] font-semibold text-pust-900 hover:text-pust-950 truncate max-w-[220px] xl:max-w-[310px] 2xl:max-w-[380px] whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    {departmentTitle}
-                  </button>
-
-                  <span aria-hidden="true" className="h-4 w-px bg-stone-300 shrink-0" />
-
-                  {/* Department Section Links */}
-                  <nav
-                    aria-label={`${departmentTitle} navigation`}
-                    className="flex items-center gap-3 xl:gap-5 2xl:gap-6 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
-                  >
-                    {DEPARTMENT_NAV_ITEMS.map((item) => {
-                      const isActive = effectiveActiveTab === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          aria-current={isActive ? 'page' : undefined}
-                          onClick={() => handleTabClick(item.id)}
-                          className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            isActive
-                              ? 'border-pust-800 text-pust-800 font-semibold'
-                              : 'border-transparent hover:text-pust-900 hover:border-pust-200'
-                          }`}
-                        >
-                          {item.shortLabel}
-                        </button>
-                      );
-                    })}
-                  </nav>
-                </div>
+                <nav
+                  aria-label={`${departmentTitle} navigation`}
+                  className="flex items-center gap-5 xl:gap-7 text-[clamp(0.8125rem,0.75rem+0.12vw,0.92rem)] font-medium text-slate-900"
+                >
+                  {DEPARTMENT_NAV_ITEMS.map((item) => {
+                    const isActive = effectiveActiveTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        aria-current={isActive ? 'page' : undefined}
+                        onClick={() => handleTabClick(item.id)}
+                        className={`inline-block py-2.5 border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          isActive
+                            ? 'border-pust-800 text-pust-800 font-semibold'
+                            : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        }`}
+                      >
+                        {item.shortLabel}
+                      </button>
+                    );
+                  })}
+                </nav>
 
                 {/* Desktop Right Actions: Department Switcher, Edit Mode & Portal */}
                 <div className="flex items-center gap-2 shrink-0">
