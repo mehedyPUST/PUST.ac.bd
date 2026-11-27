@@ -441,68 +441,66 @@ export function HomePage({
 
         {/* University Headline, CTAs & Operational Utility Ribbon */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-end">
-            <div className="lg:col-span-7">
-              {loadingData && !profile ? (
-                <HeroSummarySkeleton />
-              ) : profile ? (
-                <div className="space-y-4">
-                  <div
-                    data-gsap-hero
-                    className="flex flex-wrap items-center justify-between gap-2"
-                  >
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
-                      {profile.heroEyebrow ||
-                        (profile.convocationDate
-                          ? `Rajapur, Pabna-6600 · First Convocation: ${profile.convocationDate}`
-                          : 'Rajapur, Pabna-6600')}
-                    </p>
-                    <EditTriggerButton
-                      target={{ kind: 'hero-profile' }}
-                      label="Edit Hero & Stats"
-                      variant="compact"
-                    />
-                  </div>
-                  <h1
-                    data-gsap-hero
-                    className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950"
-                  >
-                    {profile.heroTitle}
-                  </h1>
-                  {profile.heroSubtitle && (
-                    <p
-                      data-gsap-hero
-                      className="text-fluid-lead text-slate-700 max-w-2xl text-left"
-                    >
-                      {profile.heroSubtitle}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2">
-                  <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
-                    Pabna University of Science and Technology
-                  </h1>
-                  <p className="text-fluid-body text-slate-700 text-left">
-                    University profile summary is currently unavailable.
+          <div className="max-w-4xl mx-auto sm:text-center space-y-6">
+            {loadingData && !profile ? (
+              <HeroSummarySkeleton />
+            ) : profile ? (
+              <div className="space-y-4">
+                <div
+                  data-gsap-hero
+                  className="flex flex-wrap items-center sm:justify-center gap-3"
+                >
+                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-pust-700">
+                    {profile.heroEyebrow ||
+                      (profile.convocationDate
+                        ? `Rajapur, Pabna-6600 · First Convocation: ${profile.convocationDate}`
+                        : 'Rajapur, Pabna-6600')}
                   </p>
+                  <EditTriggerButton
+                    target={{ kind: 'hero-profile' }}
+                    label="Edit Hero & Stats"
+                    variant="compact"
+                  />
                 </div>
-              )}
-            </div>
+                <h1
+                  data-gsap-hero
+                  className="font-serif text-fluid-hero font-semibold tracking-tight text-slate-950"
+                >
+                  {profile.heroTitle}
+                </h1>
+                {profile.heroSubtitle && (
+                  <p
+                    data-gsap-hero
+                    className="text-fluid-lead text-slate-700 max-w-2xl sm:mx-auto"
+                  >
+                    {profile.heroSubtitle}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 rounded-2xl border border-stone-200 bg-white space-y-2 text-left sm:text-center">
+                <h1 className="font-serif text-fluid-h2 font-semibold text-slate-950">
+                  Pabna University of Science and Technology
+                </h1>
+                <p className="text-fluid-body text-slate-700">
+                  University profile summary is currently unavailable.
+                </p>
+              </div>
+            )}
 
             <div
               data-gsap-hero
-              className="lg:col-span-5 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap lg:justify-end sm:items-center sm:gap-3"
+              className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 pt-1"
             >
               <Link
                 href="/portal"
-                className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-4 sm:px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
+                className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
               >
                 Open Digital Campus Portal
               </Link>
               <Link
                 href="/academics/departments"
-                className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-2.5 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
+                className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-3 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
               >
                 {profile?.departmentsCount
                   ? `Explore ${profile.departmentsCount} Departments`
@@ -510,11 +508,11 @@ export function HomePage({
               </Link>
               <Link
                 href="/verify"
-                className="order-2 sm:order-3 group inline-flex items-center justify-center sm:justify-start text-center min-h-[44px] gap-1.5 px-2.5 sm:px-2.5 py-2.5 sm:py-2 rounded-lg border border-stone-300 bg-white text-slate-900 sm:border-transparent sm:bg-transparent text-xs sm:text-sm font-semibold sm:text-pust-800 hover:border-pust-700 hover:text-pust-950 transition-colors leading-tight sm:whitespace-nowrap shrink-0"
+                className="order-2 sm:order-3 group inline-flex items-center justify-center text-center min-h-[44px] gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-900 text-xs sm:text-sm font-semibold transition-colors leading-tight sm:whitespace-nowrap shrink-0"
               >
                 <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
-                <span className="underline-offset-4 group-hover:underline">Verify Document</span>
-                <ArrowUpRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span>Verify Document</span>
+                <ArrowUpRight className="w-3.5 h-3.5 shrink-0 text-pust-700 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
             </div>
           </div>
