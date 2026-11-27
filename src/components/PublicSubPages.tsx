@@ -770,8 +770,10 @@ export function PublicSubPages({
       ? 'Scholarships'
       : route === '/academics/seminars'
       ? 'Seminars & Workshops'
+      : route === '/academics/publications'
+      ? 'Publications & Research'
       : isResearchView
-      ? 'Journals & Research'
+      ? 'University Journals & Research'
       : 'Departments & Chairmen';
 
     const activeSubtitle = isAcademicsLanding
@@ -788,8 +790,10 @@ export function PublicSubPages({
       ? 'Merit awards, UGC stipends, research fellowships, and residential fee waivers.'
       : route === '/academics/seminars'
       ? 'University symposia, IQAC curriculum workshops, and departmental colloquia.'
+      : route === '/academics/publications'
+      ? 'Peer-reviewed faculty publications, department research output indices, and university periodicals across five faculties.'
       : isResearchView
-      ? 'Peer-reviewed university journals, faculty publications, and laboratory infrastructure.'
+      ? 'Official peer-reviewed periodicals of Pabna University of Science and Technology alongside recent faculty research.'
       : 'Browse all academic departments, chairmen, intake seats, and research groups by faculty.';
 
     const totalTeachers =
