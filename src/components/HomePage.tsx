@@ -299,15 +299,15 @@ export function HomePage({
         id="banner"
         className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28 overflow-x-clip"
       >
-        {/* Full Page Width Campus Banner Carousel */}
+        {/* Page-Aligned Full-Width Campus Banner Carousel */}
         <div
-          className="relative w-full"
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7"
           onMouseEnter={() => setBannerPaused(true)}
           onMouseLeave={() => setBannerPaused(false)}
           onFocusCapture={() => setBannerPaused(true)}
           onBlurCapture={() => setBannerPaused(false)}
         >
-          <div className="group relative w-full h-[280px] sm:h-[380px] md:h-[460px] lg:h-[520px] xl:h-[580px] overflow-hidden bg-slate-900 border-b border-stone-200">
+          <div className="group relative w-full h-[240px] sm:h-[340px] md:h-[420px] lg:h-[480px] overflow-hidden rounded-xl border border-stone-200 bg-slate-900 shadow-[0_20px_48px_-24px_rgba(28,25,23,0.24)]">
             {loadingData && !currentSlide ? (
               <div className="w-full h-full bg-stone-200 animate-pulse" />
             ) : currentSlide ? (
@@ -338,29 +338,27 @@ export function HomePage({
                   </motion.div>
                 </AnimatePresence>
 
-                <div className="absolute inset-x-0 top-0 z-10 pointer-events-none">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 flex items-center justify-between gap-3">
-                    <div className="pointer-events-auto">
-                      <EditTriggerButton
-                        target={{ kind: 'banner', slideId: currentSlide.id }}
-                        label="Edit Banner"
-                        variant="overlay"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setFullViewSlide(currentSlide)}
-                      aria-label={`View full image: ${currentSlide.caption}`}
-                      className="pointer-events-auto ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 text-white text-xs font-medium border border-white/20 shadow-md opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      View Full
-                    </button>
+                <div className="absolute inset-x-0 top-0 z-10 px-4 sm:px-6 pt-4 flex items-center justify-between gap-3 pointer-events-none">
+                  <div className="pointer-events-auto">
+                    <EditTriggerButton
+                      target={{ kind: 'banner', slideId: currentSlide.id }}
+                      label="Edit Banner"
+                      variant="overlay"
+                    />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setFullViewSlide(currentSlide)}
+                    aria-label={`View full image: ${currentSlide.caption}`}
+                    className="pointer-events-auto ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/80 text-white text-xs font-medium border border-white/20 shadow-md opacity-95 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 hover:bg-slate-950 transition-opacity duration-150 cursor-pointer whitespace-nowrap"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    View Full
+                  </button>
                 </div>
 
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-transparent pt-16 pb-4 sm:pb-5 text-white">
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-transparent pt-14 pb-4 px-4 sm:px-6 text-white">
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                     <p className="text-xs sm:text-sm md:text-base font-serif italic text-white leading-snug line-clamp-2 text-left drop-shadow-xs max-w-3xl pointer-events-none">
                       {currentSlide.caption}
                     </p>
@@ -406,7 +404,7 @@ export function HomePage({
                         setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)
                       }
                       aria-label="Previous banner slide"
-                      className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                      className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -414,7 +412,7 @@ export function HomePage({
                       type="button"
                       onClick={() => setActiveSlideIdx((prev) => (prev + 1) % slides.length)}
                       aria-label="Next banner slide"
-                      className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 inline-flex items-center justify-center rounded-lg bg-slate-950/70 backdrop-blur-xs border border-white/15 text-white hover:bg-slate-950/90 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto transition-all duration-200 cursor-pointer"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
