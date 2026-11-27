@@ -195,68 +195,88 @@ export function PustShell({
     }
   }, [user]);
 
+  const ADMIN_EDIT_MODE_STORAGE_KEY = 'pust_admin_edit_mode';
+
+  const persistEditModePreference = useCallback((enabled: boolean) => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (enabled) {
+        window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, '1');
+        window.sessionStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, '1');
+      } else {
+        window.localStorage.removeItem(ADMIN_EDIT_MODE_STORAGE_KEY);
+        window.sessionStorage.removeItem(ADMIN_EDIT_MODE_STORAGE_KEY);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined' || !authResolved) return;
     if (!isAdmin) {
       setEditModeState(false);
       setCmsDirectoryOpen(false);
       setEditTarget(null);
-      try {
-        window.sessionStorage.removeItem('pust_admin_edit_mode');
-      } catch {
-        // ignore storage errors
-      }
+      persistEditModePreference(false);
       return;
     }
     try {
-      if (window.sessionStorage.getItem('pust_admin_edit_mode') === '1') {
+      const saved =
+        window.localStorage.getItem(ADMIN_EDIT_MODE_STORAGE_KEY) === '1' ||
+        window.sessionStorage.getItem(ADMIN_EDIT_MODE_STORAGE_KEY) === '1';
+      if (saved) {
         setEditModeState(true);
+        window.localStorage.setItem(ADMIN_EDIT_MODE_STORAGE_KEY, '1');
       }
     } catch {
       // ignore storage errors
     }
-  }, [isAdmin, authResolved]);
+  }, [isAdmin, authResolved, persistEditModePreference]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isAdmin) return;
+    function handleStorageSync(event: StorageEvent) {
+      if (event.key !== ADMIN_EDIT_MODE_STORAGE_KEY) return;
+      setEditModeState(event.newValue === '1');
+    }
+    window.addEventListener('storage', handleStorageSync);
+    return () => window.removeEventListener('storage', handleStorageSync);
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (effectiveEditMode) {
+      document.body.setAttribute('data-edit-mode', 'true');
+    } else {
+      document.body.removeAttribute('data-edit-mode');
+    }
+    return () => {
+      document.body.removeAttribute('data-edit-mode');
+    };
+  }, [effectiveEditMode]);
 
   const setEditMode = useCallback(
     (enabled: boolean) => {
       if (!isAdmin) {
         setEditModeState(false);
+        persistEditModePreference(false);
         return;
       }
       setEditModeState(enabled);
-      if (typeof window !== 'undefined') {
-        try {
-          if (enabled) {
-            window.sessionStorage.setItem('pust_admin_edit_mode', '1');
-          } else {
-            window.sessionStorage.removeItem('pust_admin_edit_mode');
-          }
-        } catch {
-          // ignore storage errors
-        }
-      }
+      persistEditModePreference(enabled);
     },
-    [isAdmin]
+    [isAdmin, persistEditModePreference]
   );
 
   const toggleEditMode = useCallback(() => {
     if (!isAdmin) return;
     setEditModeState((prev) => {
       const next = !prev;
-      if (typeof window !== 'undefined') {
-        try {
-          if (next) {
-            window.sessionStorage.setItem('pust_admin_edit_mode', '1');
-          } else {
-            window.sessionStorage.removeItem('pust_admin_edit_mode');
-          }
-        } catch {
-          // ignore storage errors
-        }
-      }
+      persistEditModePreference(next);
       return next;
     });
-  }, [isAdmin]);
+  }, [isAdmin, persistEditModePreference]);
 
   const openEditModal = useCallback(
     (target: EditModalTarget) => {
@@ -715,10 +735,7 @@ export function PustShell({
       <SkeletonTheme baseColor="#ECECE8" highlightColor="#F8F8F6" borderRadius={8}>
         <MotionConfig reducedMotion="user">
           <PustContext.Provider value={value}>
-          <div
-            data-edit-mode={effectiveEditMode ? 'true' : undefined}
-            className="min-h-screen flex flex-col bg-transparent text-ink-900"
-          >
+          <div className="min-h-screen flex flex-col bg-transparent text-ink-900">
             <AnimatePresence>
               {isNavigating && (
                 <motion.div

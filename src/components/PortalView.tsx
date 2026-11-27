@@ -24,7 +24,6 @@ import {
   Lock,
   LogOut,
   Mail,
-  Pencil,
   Receipt,
   Search,
   ShieldCheck,
@@ -35,6 +34,7 @@ import {
   Workflow,
 } from 'lucide-react';
 import { pustApi } from '../lib/api';
+import { AdminModeSwitch } from './AdminModeSwitch';
 import { MotionReveal } from './MotionPrimitives';
 import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
@@ -1528,19 +1528,11 @@ export function PortalView({
             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               {user.role === 'admin' && (
                 <>
-                  <button
-                    type="button"
-                    onClick={toggleEditMode}
-                    aria-pressed={editMode}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap cursor-pointer ${
-                      editMode
-                        ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
-                        : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
-                    }`}
-                  >
-                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                    <span>{editMode ? 'Exit Live Edit' : 'Live Edit Mode'}</span>
-                  </button>
+                  <AdminModeSwitch
+                    checked={editMode}
+                    onToggle={toggleEditMode}
+                    variant="desktop"
+                  />
                   <button
                     type="button"
                     onClick={openCmsDirectory}

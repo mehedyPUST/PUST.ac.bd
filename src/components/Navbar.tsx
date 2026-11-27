@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from 'motion/react';
 import {
   ChevronDown,
   ChevronRight,
-  Eye,
   GraduationCap,
   LayoutGrid,
   Menu,
@@ -27,6 +26,7 @@ import type {
   GovernanceTabKind,
   UniversityProfile,
 } from '../types/pust';
+import { AdminModeSwitch } from './AdminModeSwitch';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { PustCrest } from './PustCrest';
 import { PwaInstallButton } from './PwaManager';
@@ -341,23 +341,13 @@ export function Navbar({
                   {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
                 </button>
 
-                {/* Mobile Admin Edit Mode Toggle */}
+                {/* Mobile Admin Mode Toggle Switch */}
                 {user?.role === 'admin' && onToggleEditMode && (
-                  <button
-                    type="button"
-                    onClick={onToggleEditMode}
-                    aria-pressed={editMode}
-                    aria-label={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    title={editMode ? 'Exit Edit Mode' : 'Switch to Edit Mode'}
-                    className={`lg:hidden min-h-[32px] min-w-[32px] inline-flex items-center justify-center gap-1 px-1.5 sm:px-2 py-1 rounded-md text-[11px] font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      editMode
-                        ? 'bg-amber-400 text-slate-950'
-                        : 'bg-pust-800 text-amber-200 border border-amber-300/40 hover:bg-pust-700'
-                    }`}
-                  >
-                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                    <span className="hidden sm:inline">{editMode ? 'Editing' : 'Edit'}</span>
-                  </button>
+                  <AdminModeSwitch
+                    checked={editMode}
+                    onToggle={onToggleEditMode}
+                    variant="mobile"
+                  />
                 )}
 
                 {/* Mobile Portal CTA & Menu Trigger */}
@@ -754,31 +744,14 @@ export function Navbar({
                 </Link>
               </nav>
 
-              {/* Desktop Admin Edit Mode & Portal Action */}
+              {/* Desktop Admin Mode Toggle Switch & Portal Action */}
               <div className="flex items-center gap-2 shrink-0">
                 {user?.role === 'admin' && onToggleEditMode && (
-                  <button
-                    type="button"
-                    onClick={onToggleEditMode}
-                    aria-pressed={editMode}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      editMode
-                        ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
-                        : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
-                    }`}
-                  >
-                    {editMode ? (
-                      <>
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Exit Edit</span>
-                      </>
-                    ) : (
-                      <>
-                        <Pencil className="w-3.5 h-3.5" />
-                        <span>Edit Mode</span>
-                      </>
-                    )}
-                  </button>
+                  <AdminModeSwitch
+                    checked={editMode}
+                    onToggle={onToggleEditMode}
+                    variant="desktop"
+                  />
                 )}
 
                 <Link
