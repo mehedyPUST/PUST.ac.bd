@@ -174,8 +174,8 @@ export function BreakingNewsTicker({
             </div>
           </div>
 
-          {/* Controls & Notices Archive Link */}
-          <div className="shrink-0 h-full flex items-center border-l border-slate-200 bg-white">
+          {/* Controls & Notices Archive Link (matched bg-pust-800 bookend) */}
+          <div className="shrink-0 h-full flex items-center bg-pust-800 text-white">
             <button
               type="button"
               onClick={() => setPaused((prev) => !prev)}
@@ -184,18 +184,18 @@ export function BreakingNewsTicker({
               title={paused ? 'Resume ticker' : 'Pause ticker'}
               className={`w-9 h-full inline-flex items-center justify-center transition-colors cursor-pointer ${
                 paused
-                  ? 'bg-pust-100 text-pust-800'
-                  : 'text-slate-600 hover:text-pust-800 hover:bg-slate-100'
+                  ? 'bg-pust-950 text-gold-300'
+                  : 'text-white/90 hover:text-white hover:bg-pust-900'
               }`}
             >
               {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
             </button>
             <Link
               href="/notices"
-              className="hidden sm:inline-flex items-center gap-1 px-3.5 h-full border-l border-slate-200 text-xs font-semibold text-pust-800 hover:bg-pust-800 hover:text-white whitespace-nowrap transition-colors"
+              className="hidden sm:inline-flex items-center gap-1 px-3.5 h-full border-l border-white/15 text-xs font-semibold text-white hover:bg-pust-900 whitespace-nowrap transition-colors"
             >
-              All Notices
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>All Notices</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-gold-300 shrink-0" />
             </Link>
           </div>
         </div>
