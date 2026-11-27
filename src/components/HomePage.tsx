@@ -490,17 +490,17 @@ export function HomePage({
 
             <div
               data-gsap-hero
-              className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3 pt-1"
+              className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-center gap-2.5 sm:gap-3 pt-1"
             >
               <Link
                 href="/portal"
-                className="order-3 col-span-2 sm:order-1 inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
+                className="inline-flex items-center justify-center min-h-[44px] px-5 py-3 rounded-lg text-sm font-semibold btn-primary-sheen transition-all duration-200 whitespace-nowrap shrink-0"
               >
                 Open Digital Campus Portal
               </Link>
               <Link
                 href="/academics/departments"
-                className="order-1 sm:order-2 inline-flex items-center justify-center text-center min-h-[44px] px-3 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight sm:whitespace-nowrap shrink-0"
+                className="inline-flex items-center justify-center text-center min-h-[44px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-all duration-200 leading-tight whitespace-nowrap shrink-0"
               >
                 {profile?.departmentsCount
                   ? `Explore ${profile.departmentsCount} Departments`
@@ -508,7 +508,7 @@ export function HomePage({
               </Link>
               <Link
                 href="/verify"
-                className="order-2 sm:order-3 group inline-flex items-center justify-center text-center min-h-[44px] gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-900 text-xs sm:text-sm font-semibold transition-colors leading-tight sm:whitespace-nowrap shrink-0"
+                className="group inline-flex items-center justify-center text-center min-h-[44px] gap-1.5 px-4 py-2.5 sm:py-3 rounded-lg border border-stone-300 bg-white text-slate-900 hover:border-pust-700 hover:text-pust-900 text-xs sm:text-sm font-semibold transition-colors leading-tight whitespace-nowrap shrink-0"
               >
                 <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 shrink-0" />
                 <span>Verify Document</span>
@@ -517,39 +517,39 @@ export function HomePage({
             </div>
           </div>
 
-          {/* Operational Utility Ribbon */}
+          {/* Operational Utility Ribbon (1-Column Stack) */}
           {profile && (
-            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-stone-200 bg-white overflow-hidden">
+            <dl className="mt-8 grid grid-cols-1 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white overflow-hidden">
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b lg:border-b-0 sm:border-r border-stone-200"
+                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Established
                 </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
                   {profile.establishedYear} · Act No. 43 of 2001
                 </dd>
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b lg:border-b-0 lg:border-r border-stone-200"
+                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Academic Scope
                 </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
                   {profile.facultiesCount} Faculties · {profile.departmentsCount} Departments
                 </dd>
               </div>
               <div
                 data-gsap-ribbon
-                className="bg-white px-5 py-4 border-b sm:border-b-0 sm:border-r border-stone-200"
+                className="bg-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
               >
                 <dt className="text-[11px] uppercase tracking-[0.14em] text-stone-500 font-semibold">
                   Community
                 </dt>
-                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950 mt-1">
+                <dd className="font-mono tabular-nums text-[clamp(0.875rem,0.82rem+0.15vw,1rem)] font-semibold text-slate-950">
                   {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
                 </dd>
               </div>
@@ -557,12 +557,15 @@ export function HomePage({
                 data-gsap-ribbon
                 className="bg-pust-800 hover:bg-pust-900 text-white transition-colors group"
               >
-                <Link href="/verify" className="block h-full px-5 py-4">
-                  <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center justify-between">
-                    <span>Public Registry</span>
+                <Link
+                  href="/verify"
+                  className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
+                >
+                  <dt className="text-[11px] uppercase tracking-[0.14em] font-semibold text-gold-300 flex items-center gap-2">
                     <FileCheck2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
+                    <span>Public Registry</span>
                   </dt>
-                  <dd className="font-mono tabular-nums text-sm font-semibold text-white mt-1 flex items-center gap-1.5">
+                  <dd className="font-mono tabular-nums text-sm font-semibold text-white flex items-center gap-1.5">
                     <span>Verify Certificates &amp; Receipts</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                   </dd>
@@ -584,112 +587,97 @@ export function HomePage({
             <HeroSummarySkeleton />
           ) : currentVc ? (
             <MotionReveal>
-              <article className="editable-region rounded-2xl bg-white border border-stone-200 overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-                  {/* Portrait & Office Info (Left Column) */}
-                  <div className="lg:col-span-4 bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-stone-200 p-6 sm:p-8 flex flex-col justify-between gap-6">
-                    <div className="space-y-5">
-                      <div className="max-w-[240px] mx-auto lg:max-w-none overflow-hidden rounded-xl border border-stone-200 bg-white">
-                        <ResilientImage
-                          src={currentVc.photoUrl || ''}
-                          alt={currentVc.name}
-                          className="w-full aspect-[3/4] object-cover object-top"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-700">
-                          Office of the Vice-Chancellor
-                        </p>
-                        <p className="font-mono text-xs font-medium text-stone-600 tabular-nums">
-                          Tenure: {currentVc.tenure}
-                        </p>
-                        <div className="font-mono text-xs text-slate-700 tabular-nums pt-2.5 border-t border-stone-200 space-y-1">
-                          {currentVc.email && (
-                            <a
-                              href={`mailto:${currentVc.email}`}
-                              className="block font-semibold text-pust-800 hover:underline break-all"
-                            >
-                              {currentVc.email}
-                            </a>
-                          )}
-                          {currentVc.phone && (
-                            <a
-                              href={`tel:${currentVc.phone.replace(/\s+/g, '')}`}
-                              className="block hover:text-slate-950"
-                            >
-                              {currentVc.phone}
-                            </a>
-                          )}
-                        </div>
-                      </div>
+              <article className="editable-region rounded-2xl bg-white border border-stone-200 overflow-hidden flex flex-col">
+                {/* Portrait & Office Header (Top Band of 1-Column Card) */}
+                <div className="bg-[#FAF9F6] border-b border-stone-200 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+                    <div className="w-36 sm:w-40 shrink-0 overflow-hidden rounded-xl border border-stone-200 bg-white">
+                      <ResilientImage
+                        src={currentVc.photoUrl || ''}
+                        alt={currentVc.name}
+                        className="w-full aspect-[3/4] object-cover object-top"
+                      />
                     </div>
-
-                    <div className="pt-4 border-t border-stone-200 flex items-center justify-between gap-3">
-                      <Link
-                        href="/administration/vc-office"
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
-                      >
-                        Vice-Chancellor Office
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                    <div className="space-y-2">
+                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-700">
+                        Office of the Vice-Chancellor · {currentVc.tenure}
+                      </p>
+                      <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950">
+                        {currentVc.name}
+                      </h2>
+                      <p className="text-sm font-medium text-stone-600 text-left">
+                        Honorable Vice-Chancellor, Pabna University of Science and Technology
+                      </p>
+                      <div className="font-mono text-xs text-slate-700 tabular-nums pt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                        {currentVc.email && (
+                          <a
+                            href={`mailto:${currentVc.email}`}
+                            className="font-semibold text-pust-800 hover:underline break-all"
+                          >
+                            {currentVc.email}
+                          </a>
+                        )}
+                        {currentVc.phone && (
+                          <a
+                            href={`tel:${currentVc.phone.replace(/\s+/g, '')}`}
+                            className="hover:text-slate-950"
+                          >
+                            {currentVc.phone}
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Welcome Message (Right Column) */}
-                  <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-6 flex flex-col justify-between">
-                    <div className="space-y-6">
-                      <header className="space-y-1.5 border-b border-stone-200 pb-5">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
-                            Welcome Message · {currentVc.tenure}
-                          </p>
-                          <EditTriggerButton
-                            target={{ kind: 'vc' }}
-                            label="Edit VC Profile & Message"
-                            variant="compact"
-                          />
-                        </div>
-                        <h2 className="font-serif text-fluid-h2 font-semibold text-slate-950">
-                          {currentVc.name}
-                        </h2>
-                        <p className="text-sm font-medium text-stone-600 text-left">
-                          Honorable Vice-Chancellor, Pabna University of Science and Technology
-                        </p>
-                      </header>
-
-                      {vcBodyParagraphs.length > 0 ? (
-                        <div className="space-y-4 flow-root prose-justify max-w-[66ch] text-fluid-body text-slate-800 leading-[1.78]">
-                          {vcBodyParagraphs.map((paragraph, idx) => (
-                            <p
-                              key={idx}
-                              className={
-                                idx === 0
-                                  ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-700'
-                                  : ''
-                              }
-                            >
-                              {paragraph}
-                            </p>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-700 text-left">
-                          No welcome message published for this profile yet.
-                        </p>
-                      )}
-                    </div>
-
-                    {vcClosingLine && (
-                      <div className="pt-4 border-t border-stone-200 space-y-1">
-                        <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
-                          {vcClosingLine}
-                        </p>
-                        <p className="text-sm font-semibold text-slate-700 text-left">
-                          {currentVc.name} · Vice-Chancellor
-                        </p>
-                      </div>
-                    )}
+                  <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-3 shrink-0">
+                    <EditTriggerButton
+                      target={{ kind: 'vc' }}
+                      label="Edit VC Profile & Message"
+                      variant="compact"
+                    />
+                    <Link
+                      href="/administration/vc-office"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap"
+                    >
+                      Vice-Chancellor Office
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
+                </div>
+
+                {/* Welcome Message Body */}
+                <div className="p-6 sm:p-8 lg:p-10 space-y-6">
+                  {vcBodyParagraphs.length > 0 ? (
+                    <div className="space-y-4 flow-root prose-justify max-w-[75ch] text-fluid-body text-slate-800 leading-[1.78]">
+                      {vcBodyParagraphs.map((paragraph, idx) => (
+                        <p
+                          key={idx}
+                          className={
+                            idx === 0
+                              ? 'first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-[0.84] first-letter:text-pust-700'
+                              : ''
+                          }
+                        >
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-700 text-left">
+                      No welcome message published for this profile yet.
+                    </p>
+                  )}
+
+                  {vcClosingLine && (
+                    <div className="pt-4 border-t border-stone-200 space-y-1">
+                      <p className="font-serif italic text-lg font-medium text-slate-950 text-left">
+                        {vcClosingLine}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700 text-left">
+                        {currentVc.name} · Vice-Chancellor
+                      </p>
+                    </div>
+                  )}
                 </div>
               </article>
             </MotionReveal>
@@ -754,7 +742,7 @@ export function HomePage({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  className="p-5 grid grid-cols-1 gap-4"
                 >
                   {previousVcs.length === 0 ? (
                     <p className="text-sm text-slate-600 col-span-full py-2 text-left">
@@ -796,10 +784,10 @@ export function HomePage({
             </AnimatePresence>
           </div>
 
-          {/* About PUST Brief & Sub-Topic Links */}
+          {/* About PUST Brief & Sub-Topic Links (1-Column Stack) */}
           <MotionReveal>
-            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-4 space-y-3">
+            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 grid grid-cols-1 gap-5">
+              <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-mono text-xs font-semibold uppercase tracking-widest text-gold-700">
@@ -842,7 +830,7 @@ export function HomePage({
                   </Link>
                 </div>
               </div>
-              <div className="lg:col-span-8 space-y-3">
+              <div className="space-y-3 pt-4 border-t border-stone-200">
                 {ourUniversity ? (
                   <p className="text-fluid-body text-slate-800 line-clamp-3 prose-justify">
                     {ourUniversity.body}
@@ -870,8 +858,8 @@ export function HomePage({
         id="notice-board"
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16 scroll-mt-28"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          <div className="lg:col-span-7 space-y-5">
+        <div className="grid grid-cols-1 gap-12">
+          <div className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -1025,7 +1013,7 @@ export function HomePage({
             )}
           </div>
 
-          <div className="editable-region lg:col-span-5 space-y-5">
+          <div className="editable-region space-y-5">
             <div className="pb-4 border-b border-stone-200 flex items-end justify-between gap-3">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -1082,8 +1070,8 @@ export function HomePage({
         id="recent-publications"
         className="bg-white border-t border-b border-stone-200 py-14 lg:py-16 scroll-mt-28"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          <div className="lg:col-span-7 space-y-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-12">
+          <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -1167,8 +1155,8 @@ export function HomePage({
             </div>
           </div>
 
-          {/* Official PUST Journals Sidebar */}
-          <aside className="lg:col-span-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 space-y-5">
+          {/* Official PUST Journals (1-Column Stack) */}
+          <aside className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-7 space-y-5">
             <div className="flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -1287,7 +1275,7 @@ export function HomePage({
               )}
             </div>
           ) : (
-            <div ref={eventGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div ref={eventGridRef} className="grid grid-cols-1 gap-5">
               {(() => {
                 const categoryCounts: Record<string, number> = {};
                 return visibleEvents.slice(0, 4).map((item, idx) => {
@@ -1310,9 +1298,9 @@ export function HomePage({
                           setActiveMedia(item);
                         }
                       }}
-                      className={`text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col overflow-hidden`}
+                      className={`text-left rounded-2xl border ${eventTheme.cardClass} transition-colors group cursor-pointer flex flex-col sm:flex-row overflow-hidden`}
                     >
-                      <div className="relative w-full overflow-hidden bg-slate-900 aspect-[4/3]">
+                      <div className="relative w-full sm:w-64 md:w-72 shrink-0 overflow-hidden bg-slate-900 aspect-[16/10] sm:aspect-auto sm:min-h-[168px]">
                         <ResilientImage
                           src={thumbUrl}
                           alt={item.title}
@@ -1332,7 +1320,7 @@ export function HomePage({
                           </span>
                         )}
                       </div>
-                      <div className="p-4 space-y-1.5 flex-1">
+                      <div className="p-5 space-y-2 flex-1 flex flex-col justify-center">
                         <p
                           className={`font-mono text-[11px] tabular-nums font-semibold ${eventTheme.accentClass}`}
                         >
@@ -1342,10 +1330,10 @@ export function HomePage({
                             <span className="text-amber-800 font-semibold"> · MEMBERS ONLY</span>
                           )}
                         </p>
-                        <h3 className="font-serif text-base font-semibold text-slate-950 group-hover:text-pust-800 transition-colors text-left">
+                        <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors text-left">
                           {item.title}
                         </h3>
-                        <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed line-clamp-2 text-left">
+                        <p className="text-sm text-slate-700 leading-relaxed line-clamp-2 text-left">
                           {item.description}
                         </p>
                       </div>
@@ -1383,7 +1371,7 @@ export function HomePage({
             ) : (
               <div
                 ref={seminarGridRef}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-stone-200"
+                className="grid grid-cols-1 divide-y divide-stone-200"
               >
                 {upcomingSeminars.map((ev, idx) => (
                   <div

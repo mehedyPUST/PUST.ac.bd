@@ -174,10 +174,10 @@ export function CampusMapSection() {
           </div>
         </div>
 
-        {/* 12-Column Interactive Blueprint + Selected Building Detail Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Left: Interactive Architectural Blueprint */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+        {/* 1-Column Interactive Blueprint + Selected Building Detail Card */}
+        <div className="grid grid-cols-1 gap-8">
+          {/* Interactive Architectural Blueprint */}
+          <div className="flex flex-col gap-4">
             <div className="relative w-full aspect-[16/10] rounded-2xl bg-white border border-stone-200 overflow-hidden select-none">
               {/* Architectural Blueprint SVG Layer */}
               <svg
@@ -446,7 +446,7 @@ export function CampusMapSection() {
               </div>
               <div
                 ref={buildingIndexRef}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-stone-200"
+                className="grid grid-cols-1 divide-y divide-stone-200 bg-white"
               >
                 {filteredBuildings.map((b) => {
                   const isSelected = activeBuilding.id === b.id;
@@ -477,8 +477,8 @@ export function CampusMapSection() {
             </div>
           </div>
 
-          {/* Right: Active Building Photo & Architectural Dossier */}
-          <div className="lg:col-span-5 flex">
+          {/* Active Building Photo & Architectural Dossier */}
+          <div className="flex">
             <AnimatePresence mode="wait">
               <motion.article
                 key={activeBuilding.id}
@@ -494,7 +494,7 @@ export function CampusMapSection() {
                     alt={activeBuilding.name}
                     caption={activeBuilding.caption}
                     containerClassName="p-4 pb-0"
-                    className="w-full aspect-[4/3] object-cover"
+                    className="w-full aspect-[16/9] max-h-[380px] object-cover"
                   />
 
                   <div className="p-6 space-y-4">
