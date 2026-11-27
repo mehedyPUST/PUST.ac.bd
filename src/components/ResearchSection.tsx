@@ -216,7 +216,7 @@ export function ResearchSection({
         focus === 'journals' ? 'lg:col-span-6 space-y-6' : 'lg:col-span-8 space-y-6'
       }
     >
-      <div className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 space-y-4">
+      <div className="editable-region rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-pust-800 text-left">
@@ -428,7 +428,7 @@ export function ResearchSection({
         focus === 'journals' ? 'lg:col-span-6' : 'lg:col-span-4'
       } space-y-6`}
     >
-      <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 space-y-5">
+      <div className="editable-region bg-[#FAF9F6] rounded-2xl border border-stone-200 p-6 space-y-5">
         <div className="border-b border-stone-200 pb-4 flex items-end justify-between gap-3">
           <div>
             <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-gold-700 text-left">

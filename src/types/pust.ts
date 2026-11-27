@@ -799,7 +799,12 @@ export type EditModalTarget =
   | { kind: 'banner'; slideId?: string }
   | { kind: 'vc'; vcId?: string }
   | { kind: 'about'; slug: AboutContentRecord['slug'] }
-  | { kind: 'notice'; notice?: NoticeRecord | null; defaultDepartmentCode?: string }
+  | {
+      kind: 'notice';
+      notice?: NoticeRecord | null;
+      defaultDepartmentCode?: string;
+      defaultCategory?: NoticeCategory;
+    }
   | { kind: 'gallery'; item?: GalleryItemRecord | null }
   | { kind: 'publication'; publication?: PublicationRecord | null }
   | { kind: 'journals' }
@@ -812,6 +817,7 @@ export type EditModalTarget =
     }
   | { kind: 'leadership'; officerIndex?: number }
   | { kind: 'unit'; unitCode?: string }
+  | { kind: 'admin-office'; officeSlug?: string }
   | { kind: 'institutional-links' }
   | { kind: 'seminars' }
   | { kind: 'campus-building'; buildingId?: string }

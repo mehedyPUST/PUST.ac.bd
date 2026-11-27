@@ -12,6 +12,7 @@ import type {
   FacilityItemConfig,
   FacultyDeanItem,
   FacultyName,
+  OfficialFormItem,
   ResearchInfraCard,
   ScholarshipItem,
 } from '../../types/pust';
@@ -63,6 +64,10 @@ export function AcademicAndFacilitiesEditors({
   const [forms, setForms] = useState<DigitalFormItem[]>(() =>
     structuredClone(resolved.academicExtras.downloadForms)
   );
+  const [officialForms, setOfficialForms] = useState<OfficialFormItem[]>(() =>
+    structuredClone(resolved.academicExtras.officialForms || [])
+  );
+  const [formsTab, setFormsTab] = useState<'digital' | 'official'>('digital');
   const [researchIntro, setResearchIntro] = useState(resolved.academicExtras.researchIntro);
   const [infraCards, setInfraCards] = useState<ResearchInfraCard[]>(() =>
     structuredClone(resolved.academicExtras.researchInfraCards)
@@ -534,6 +539,79 @@ export function AcademicAndFacilitiesEditors({
                 className={INPUT_CLASS}
               />
             </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div>
+                <label className={LABEL_CLASS}>Office Phone (Optional)</label>
+                <input
+                  type="text"
+                  value={d.phone || ''}
+                  onChange={(e) =>
+                    setDeans((prev) =>
+                      prev.map((r, i) =>
+                        i === idx ? { ...r, phone: e.target.value || undefined } : r
+                      )
+                    )
+                  }
+                  placeholder="+880..."
+                  className={`${INPUT_CLASS} font-mono`}
+                />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Qualification (Optional)</label>
+                <input
+                  type="text"
+                  value={d.qualification || ''}
+                  onChange={(e) =>
+                    setDeans((prev) =>
+                      prev.map((r, i) =>
+                        i === idx ? { ...r, qualification: e.target.value || undefined } : r
+                      )
+                    )
+                  }
+                  placeholder="Ph.D. (University)"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div>
+                <label className={LABEL_CLASS}>Publications Count</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={5000}
+                  value={d.publicationCount ?? ''}
+                  onChange={(e) =>
+                    setDeans((prev) =>
+                      prev.map((r, i) =>
+                        i === idx
+                          ? {
+                              ...r,
+                              publicationCount:
+                                e.target.value === '' ? undefined : Number(e.target.value),
+                            }
+                          : r
+                      )
+                    )
+                  }
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </div>
+            <div>
+              <label className={LABEL_CLASS}>Research Focus (Optional)</label>
+              <input
+                type="text"
+                value={d.researchArea || ''}
+                onChange={(e) =>
+                  setDeans((prev) =>
+                    prev.map((r, i) =>
+                      i === idx ? { ...r, researchArea: e.target.value || undefined } : r
+                    )
+                  )
+                }
+                placeholder="Primary research domain"
+                className={INPUT_CLASS}
+              />
+            </div>
           </div>
         ))}
         <SubEditorFooter saving={saving} onClose={onClose} />
@@ -774,145 +852,295 @@ export function AcademicAndFacilitiesEditors({
               ...f,
               fields: f.fields.map((x) => x.trim()).filter(Boolean),
             })),
+            officialForms: officialForms.map((ofItem, idx) => ({
+              serial: Number(ofItem.serial) || idx + 1,
+              title: ofItem.title.trim(),
+              category: ofItem.category,
+              ...(ofItem.pdfUrl?.trim() ? { pdfUrl: ofItem.pdfUrl.trim() } : {}),
+              ...(ofItem.docUrl?.trim() ? { docUrl: ofItem.docUrl.trim() } : {}),
+            })),
           });
         }}
         className="space-y-4"
       >
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-slate-600">
-            Manage printable &amp; digital portal forms on Academics → Forms Download.
-          </p>
-          <button
-            type="button"
-            onClick={() =>
-              setForms((prev) => [
-                ...prev,
-                {
-                  code: `PUST-FORM-0${prev.length + 1}`,
-                  title: 'New Institutional Application Form',
-                  office: 'Office of the Registrar',
-                  note: 'Submit online via the PUST Digital Campus Portal.',
-                  portalTarget: '/portal',
-                  portalLabel: 'Open Campus Portal',
-                  fields: ['Applicant Full Name', 'Academic ID', 'Department Code'],
-                },
-              ])
-            }
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 cursor-pointer"
-          >
-            <Plus className="w-3 h-3" /> Add Form
-          </button>
-        </div>
-        {forms.map((f, idx) => (
-          <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-xs font-semibold text-pust-800">{f.code}</span>
-              {forms.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setForms((prev) => prev.filter((_, i) => i !== idx))}
-                  className="text-xs text-red-700 hover:underline cursor-pointer"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <input
-                type="text"
-                required
-                value={f.code}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, code: e.target.value } : r))
-                  )
-                }
-                placeholder="Form Code"
-                className={`${INPUT_CLASS} font-mono`}
-              />
-              <input
-                type="text"
-                required
-                value={f.title}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, title: e.target.value } : r))
-                  )
-                }
-                placeholder="Form Title"
-                className={`${INPUT_CLASS} sm:col-span-2`}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input
-                type="text"
-                required
-                value={f.office}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, office: e.target.value } : r))
-                  )
-                }
-                placeholder="Receiving Authority"
-                className={INPUT_CLASS}
-              />
-              <input
-                type="text"
-                required
-                value={f.note}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, note: e.target.value } : r))
-                  )
-                }
-                placeholder="Guidance Note"
-                className={INPUT_CLASS}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input
-                type="text"
-                required
-                value={f.portalTarget}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, portalTarget: e.target.value } : r))
-                  )
-                }
-                placeholder="Portal Route (e.g. /portal?tab=exams)"
-                className={`${INPUT_CLASS} font-mono`}
-              />
-              <input
-                type="text"
-                required
-                value={f.portalLabel}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) => (i === idx ? { ...r, portalLabel: e.target.value } : r))
-                  )
-                }
-                placeholder="Portal CTA Label"
-                className={INPUT_CLASS}
-              />
-            </div>
-            <div>
-              <label className={LABEL_CLASS}>Template Fields (one per line)</label>
-              <textarea
-                rows={3}
-                required
-                value={f.fields.join('\n')}
-                onChange={(e) =>
-                  setForms((prev) =>
-                    prev.map((r, i) =>
-                      i === idx ? { ...r, fields: e.target.value.split('\n') } : r
-                    )
-                  )
-                }
-                className={INPUT_CLASS}
-              />
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200">
+          <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200 gap-1">
+            <button
+              type="button"
+              onClick={() => setFormsTab('digital')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer ${
+                formsTab === 'digital' ? 'bg-pust-900 text-white' : 'text-slate-700 hover:text-slate-950'
+              }`}
+            >
+              Interactive Portal Forms ({forms.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormsTab('official')}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer ${
+                formsTab === 'official' ? 'bg-pust-900 text-white' : 'text-slate-700 hover:text-slate-950'
+              }`}
+            >
+              Official PDF / DOCX Archive ({officialForms.length})
+            </button>
           </div>
-        ))}
+
+          {formsTab === 'digital' ? (
+            <button
+              type="button"
+              onClick={() =>
+                setForms((prev) => [
+                  ...prev,
+                  {
+                    code: `PUST-FORM-0${prev.length + 1}`,
+                    title: 'New Institutional Application Form',
+                    office: 'Office of the Registrar',
+                    note: 'Submit online via the PUST Digital Campus Portal.',
+                    portalTarget: '/portal',
+                    portalLabel: 'Open Campus Portal',
+                    fields: ['Applicant Full Name', 'Academic ID', 'Department Code'],
+                  },
+                ])
+              }
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 cursor-pointer"
+            >
+              <Plus className="w-3 h-3" /> Add Interactive Form
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() =>
+                setOfficialForms((prev) => [
+                  ...prev,
+                  {
+                    serial: prev.length + 1,
+                    title: 'New Official Form (PDF / DOCX)',
+                    category: 'Faculty, Officer & Leave',
+                    pdfUrl: '',
+                    docUrl: '',
+                  },
+                ])
+              }
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 cursor-pointer"
+            >
+              <Plus className="w-3 h-3" /> Add Official Form
+            </button>
+          )}
+        </div>
+
+        {formsTab === 'digital' ? (
+          <div className="space-y-4">
+            <p className="text-xs text-slate-600">
+              Manage interactive printable &amp; digital portal forms on Academics → Forms Download.
+            </p>
+            {forms.map((f, idx) => (
+              <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-semibold text-pust-800">{f.code}</span>
+                  {forms.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setForms((prev) => prev.filter((_, i) => i !== idx))}
+                      className="text-xs text-red-700 hover:underline cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={f.code}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, code: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Form Code"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                  <input
+                    type="text"
+                    required
+                    value={f.title}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, title: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Form Title"
+                    className={`${INPUT_CLASS} sm:col-span-2`}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={f.office}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, office: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Receiving Authority"
+                    className={INPUT_CLASS}
+                  />
+                  <input
+                    type="text"
+                    required
+                    value={f.note}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, note: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Guidance Note"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={f.portalTarget}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, portalTarget: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Portal Route (e.g. /portal?tab=exams)"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                  <input
+                    type="text"
+                    required
+                    value={f.portalLabel}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, portalLabel: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Portal CTA Label"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>Template Fields (one per line)</label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={f.fields.join('\n')}
+                    onChange={(e) =>
+                      setForms((prev) =>
+                        prev.map((r, i) =>
+                          i === idx ? { ...r, fields: e.target.value.split('\n') } : r
+                        )
+                      )
+                    }
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-xs text-slate-600">
+              Manage downloadable PDF/DOCX forms shown on Academics → Forms Download and the Career Recruitment Portal.
+            </p>
+            {officialForms.map((ofItem, idx) => (
+              <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-semibold text-lapis-800">
+                    Form #{ofItem.serial}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOfficialForms((prev) => prev.filter((_, i) => i !== idx))}
+                    className="text-xs text-red-700 hover:underline cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={999}
+                    required
+                    value={ofItem.serial}
+                    onChange={(e) =>
+                      setOfficialForms((prev) =>
+                        prev.map((r, i) =>
+                          i === idx ? { ...r, serial: Number(e.target.value) || 1 } : r
+                        )
+                      )
+                    }
+                    placeholder="Serial"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                  <select
+                    value={ofItem.category}
+                    onChange={(e) =>
+                      setOfficialForms((prev) =>
+                        prev.map((r, i) =>
+                          i === idx
+                            ? {
+                                ...r,
+                                category: e.target.value as OfficialFormItem['category'],
+                              }
+                            : r
+                        )
+                      )
+                    }
+                    className={INPUT_CLASS}
+                  >
+                    <option value="Student & Academic">Student &amp; Academic</option>
+                    <option value="Faculty, Officer & Leave">Faculty, Officer &amp; Leave</option>
+                    <option value="Accounts & Transport">Accounts &amp; Transport</option>
+                  </select>
+                  <input
+                    type="text"
+                    required
+                    value={ofItem.title}
+                    onChange={(e) =>
+                      setOfficialForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, title: e.target.value } : r))
+                      )
+                    }
+                    placeholder="Official Form Title"
+                    className={`${INPUT_CLASS} sm:col-span-2`}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={ofItem.pdfUrl || ''}
+                    onChange={(e) =>
+                      setOfficialForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, pdfUrl: e.target.value } : r))
+                      )
+                    }
+                    placeholder="PDF URL (https://... or /assets/...)"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                  <input
+                    type="text"
+                    value={ofItem.docUrl || ''}
+                    onChange={(e) =>
+                      setOfficialForms((prev) =>
+                        prev.map((r, i) => (i === idx ? { ...r, docUrl: e.target.value } : r))
+                      )
+                    }
+                    placeholder="DOCX URL (optional)"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         <SubEditorFooter saving={saving} onClose={onClose} />
       </form>
     );

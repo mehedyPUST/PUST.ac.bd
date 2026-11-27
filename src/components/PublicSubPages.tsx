@@ -478,7 +478,7 @@ export function PublicSubPages({
               )}
             </div>
           ) : activeSlug === 'mission-vision' && activeSection.body ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="editable-region grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {(() => {
                 const parts = activeSection.body.split(/\n\s*Our Vision\s*\n/i);
                 const missionPart = (parts[0] || '').replace(/^Our Mission\s*\n/i, '').trim();
@@ -527,7 +527,7 @@ export function PublicSubPages({
               })()}
             </div>
           ) : activeSlug === 'our-university' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="editable-region grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <MotionReveal className={profile ? 'lg:col-span-7' : 'lg:col-span-12'}>
                 <p className={`flow-root prose-justify ${profile ? '' : 'max-w-[66ch] '}text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800`}>
                   {activeSection.body}
@@ -584,7 +584,7 @@ export function PublicSubPages({
               )}
             </div>
           ) : activeSlug === 'history' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="editable-region grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <MotionReveal className="lg:col-span-7">
                 <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
@@ -638,7 +638,7 @@ export function PublicSubPages({
               </MotionReveal>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="editable-region grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               <MotionReveal className="lg:col-span-7">
                 <p className="flow-root prose-justify text-[15.5px] sm:text-base leading-[1.78] text-slate-800 whitespace-pre-line first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3.5 first-letter:leading-[0.86] first-letter:text-pust-800">
                   {activeSection.body}
@@ -1813,10 +1813,10 @@ export function PublicSubPages({
 
           <SubPagePanel subKey={route === '/admissions' ? '/admissions/undergraduate' : route}>
           {route === '/admissions/notice' ? (
-            <div className="space-y-4">
+            <div className="editable-region space-y-4">
               <div className="flex justify-end empty:hidden">
                 <EditTriggerButton
-                  target={{ kind: 'notice', notice: null }}
+                  target={{ kind: 'notice', notice: null, defaultCategory: 'Admission' }}
                   label="Add Admission Notice"
                   icon="add"
                   variant="compact"
@@ -2464,7 +2464,7 @@ export function PublicSubPages({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            <div className="editable-region grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {(() => {
                 const categoryCounts: Record<string, number> = {};
                 return items.map((item, idx) => {
@@ -2662,7 +2662,11 @@ export function PublicSubPages({
                 {filteredNotices.length} {filteredNotices.length === 1 ? 'circular' : 'circulars'}
               </span>
               <EditTriggerButton
-                target={{ kind: 'notice', notice: null }}
+                target={{
+                  kind: 'notice',
+                  notice: null,
+                  defaultCategory: selectedNoticeCat !== 'All' ? selectedNoticeCat : undefined,
+                }}
                 label="New Notice"
                 icon="add"
                 variant="compact"
@@ -2774,7 +2778,7 @@ export function PublicSubPages({
           <MotionReveal>
             <div
               ref={noticesBoardRef}
-              className="rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
+              className="editable-region rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
             >
             <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
               <div className="lg:col-span-2">Date &amp; Category</div>

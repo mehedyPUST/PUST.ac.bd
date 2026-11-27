@@ -443,15 +443,17 @@
 }
 
 [data-edit-mode="true"] .editable-region {
-  outline: 1.5px dashed rgba(217, 119, 6, 0.55);
+  outline: 1.5px dashed rgba(217, 119, 6, 0.58);
   outline-offset: 4px;
   border-radius: 0.75rem;
-  transition: outline-color 150ms ease, background-color 150ms ease;
+  transition: outline-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
 }
 
-[data-edit-mode="true"] .editable-region:hover {
-  outline-color: rgba(158, 27, 31, 0.8);
-  background-color: rgba(158, 27, 31, 0.03);
+[data-edit-mode="true"] .editable-region:hover,
+[data-edit-mode="true"] .editable-region:focus-within {
+  outline-color: rgba(158, 27, 31, 0.85);
+  background-color: rgba(251, 191, 36, 0.045);
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08);
 }
 
 @media print {

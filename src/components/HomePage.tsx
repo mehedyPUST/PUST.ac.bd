@@ -778,7 +778,7 @@ export function HomePage({
 
           {/* About PUST Brief & Sub-Topic Links (1-Column Stack) */}
           <MotionReveal>
-            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-8 grid grid-cols-1 gap-5">
+            <div className="editable-region rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 sm:p-8 grid grid-cols-1 gap-5">
               <div className="space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div>
@@ -851,7 +851,7 @@ export function HomePage({
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="grid grid-cols-1 gap-12">
-          <div className="space-y-5">
+          <div className="editable-region space-y-5">
             <MotionReveal>
               <div className="space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
@@ -1074,7 +1074,7 @@ export function HomePage({
         className="bg-white border-t border-b border-stone-200 py-14 lg:py-16 scroll-mt-28"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-12">
-          <div className="space-y-6">
+          <div className="editable-region space-y-6">
             <MotionReveal>
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">
@@ -1238,7 +1238,7 @@ export function HomePage({
         id="news-events"
         className="bg-transparent py-14 lg:py-16 scroll-mt-28"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <MotionReveal>
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-stone-200">

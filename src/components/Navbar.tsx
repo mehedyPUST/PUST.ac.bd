@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Eye,
   GraduationCap,
+  LayoutGrid,
   Menu,
   Pencil,
   Plus,
@@ -38,6 +39,7 @@ interface NavbarProps {
   editMode?: boolean;
   onToggleEditMode?: () => void;
   onOpenEditModal?: (target: EditModalTarget) => void;
+  onOpenCmsDirectory?: () => void;
   onNavigate: (route: AppRoute | string) => void;
 }
 
@@ -124,6 +126,7 @@ export function Navbar({
   editMode = false,
   onToggleEditMode,
   onOpenEditModal,
+  onOpenCmsDirectory,
   onNavigate,
 }: NavbarProps) {
   const pathname = usePathname() || '/';
@@ -828,7 +831,20 @@ export function Navbar({
             onOpenEditModal({ kind: 'about', slug });
           } else if (k === 'facility') {
             onOpenEditModal({ kind: 'facility', route });
+          } else if (k === 'department') {
+            onOpenEditModal({ kind: 'department', department: null });
+          } else if (k === 'gallery') {
+            onOpenEditModal({ kind: 'gallery', item: null });
+          } else if (k === 'notice') {
+            onOpenEditModal({
+              kind: 'notice',
+              notice: null,
+              defaultCategory: contextual.noticeCategory,
+            });
+          } else if (k === 'admin-office') {
+            onOpenEditModal({ kind: 'admin-office', officeSlug: contextual.officeSlug });
           } else if (
+            k === 'hero-profile' ||
             k === 'verify-page' ||
             k === 'admissions-info' ||
             k === 'degree-programs' ||
@@ -837,8 +853,8 @@ export function Navbar({
             k === 'scholarships' ||
             k === 'download-forms' ||
             k === 'seminars' ||
-            k === 'research-infra' ||
-            k === 'apa-benchmarks'
+            k === 'apa-benchmarks' ||
+            k === 'journals'
           ) {
             onOpenEditModal({ kind: k });
           }
@@ -850,12 +866,24 @@ export function Navbar({
               <div className="hidden md:flex items-center gap-2 shrink-0">
                 <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
                 <span className="font-semibold">Admin Edit Mode Active</span>
+                <kbd className="hidden xl:inline px-1.5 py-0.5 rounded bg-amber-200/70 border border-amber-300 font-mono text-[10px] font-semibold text-amber-950">
+                  Alt+E
+                </kbd>
                 <span className="hidden 2xl:inline text-amber-900">
-                  — Click any inline Edit trigger across sections, cards, maps, governance, or
-                  footer to modify directly.
+                  — Edit sections inline or open any module from the CMS Directory.
                 </span>
               </div>
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar md:flex-wrap pb-0.5 md:pb-0">
+                {onOpenCmsDirectory && (
+                  <button
+                    type="button"
+                    onClick={onOpenCmsDirectory}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-pust-900 text-white font-semibold hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <LayoutGrid className="w-3 h-3" />
+                    CMS Directory
+                  </button>
+                )}
                 {onOpenEditModal && (
                   <>
                     {contextual && (
@@ -899,14 +927,6 @@ export function Navbar({
                     >
                       <Pencil className="w-3 h-3" />
                       Campus Map
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onOpenEditModal({ kind: 'seminars' })}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <Pencil className="w-3 h-3" />
-                      Seminars
                     </button>
                     <button
                       type="button"

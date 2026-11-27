@@ -1412,10 +1412,63 @@ export function moveArrayItem<T>(items: T[], index: number, direction: -1 | 1): 
   return copy;
 }
 
+export interface ContextualEditResolution {
+  label: string;
+  targetKind:
+    | 'hero-profile'
+    | 'verify-page'
+    | 'governance'
+    | 'admissions-info'
+    | 'facility'
+    | 'about'
+    | 'degree-programs'
+    | 'faculty-deans'
+    | 'academic-calendar'
+    | 'scholarships'
+    | 'download-forms'
+    | 'seminars'
+    | 'journals'
+    | 'department'
+    | 'gallery'
+    | 'notice'
+    | 'admin-office'
+    | 'apa-benchmarks';
+  officeSlug?: string;
+  noticeCategory?:
+    | 'General'
+    | 'Admission'
+    | 'Academic'
+    | 'Examination'
+    | 'Result'
+    | 'Course'
+    | 'Job & Tender'
+    | 'NOC & Orders'
+    | 'Press Release';
+}
+
 export function resolveContextualEditTarget(
   route: string
-): { label: string; targetKind: string } | null {
+): ContextualEditResolution | null {
+  if (route === '/') return { label: 'Edit Hero & Stats', targetKind: 'hero-profile' };
   if (route === '/verify') return { label: 'Edit Verify Page', targetKind: 'verify-page' };
+  if (route === '/gallery') return { label: 'Add Media / Event', targetKind: 'gallery' };
+  if (route === '/career')
+    return { label: 'Post Job Circular', targetKind: 'notice', noticeCategory: 'Job & Tender' };
+  if (route.startsWith('/notices')) {
+    const noticeCategory =
+      route === '/notices/job'
+        ? 'Job & Tender'
+        : route === '/notices/press-release'
+        ? 'Press Release'
+        : route === '/notices/noc'
+        ? 'NOC & Orders'
+        : route === '/notices/result'
+        ? 'Result'
+        : route === '/notices/general'
+        ? 'General'
+        : undefined;
+    return { label: 'Publish Notice', targetKind: 'notice', noticeCategory };
+  }
   if (route.startsWith('/governance'))
     return { label: 'Edit Governance Section', targetKind: 'governance' };
   if (route.startsWith('/admissions'))
@@ -1423,6 +1476,12 @@ export function resolveContextualEditTarget(
   if (route.startsWith('/facilities'))
     return { label: 'Edit Facility Page', targetKind: 'facility' };
   if (route.startsWith('/about')) return { label: 'Edit About & Milestones', targetKind: 'about' };
+  if (
+    route === '/academics' ||
+    route === '/academics/departments' ||
+    route === '/academics/chairmen'
+  )
+    return { label: 'Add Department', targetKind: 'department' };
   if (route === '/academics/programs')
     return { label: 'Edit Programs', targetKind: 'degree-programs' };
   if (route === '/academics/faculty' || route === '/academics/deans')
@@ -1436,8 +1495,20 @@ export function resolveContextualEditTarget(
   if (route === '/academics/seminars')
     return { label: 'Edit Seminars', targetKind: 'seminars' };
   if (route === '/academics/publications' || route === '/academics/journals')
-    return { label: 'Edit Research Infra', targetKind: 'research-infra' };
+    return { label: 'Edit Journals', targetKind: 'journals' };
+  if (route === '/administration/all-office')
+    return { label: 'Manage 33 Offices', targetKind: 'admin-office' };
+  if (
+    route.startsWith('/administration/') &&
+    route !== '/administration/apa' &&
+    route !== '/administration/executive' &&
+    route !== '/administration/offices'
+  ) {
+    const slug = route.replace(/^\/administration\//, '').split('/')[0];
+    return { label: 'Edit Office Dossier', targetKind: 'admin-office', officeSlug: slug };
+  }
   if (route.startsWith('/administration'))
     return { label: 'Edit Admin & APA', targetKind: 'apa-benchmarks' };
   return null;
 }
+

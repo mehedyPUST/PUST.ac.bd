@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { getAlternatingOfficeCardClass } from '../lib/cardTheme';
+import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal } from './MotionPrimitives';
 import type {
   AdministrationOfficeRecord,
@@ -229,7 +230,7 @@ export function AdministrationOfficeDossier({
 
   return (
     <MotionReveal>
-      <section className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
+      <section className="editable-region rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
       {/* Office Accession Desk Header & Contact Strip */}
       <div className="space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-6">
@@ -254,13 +255,20 @@ export function AdministrationOfficeDossier({
             </h2>
           </div>
 
-          <Link
-            href="/administration/all-office"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F8F8F6] border border-slate-300 text-slate-900 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 self-start lg:self-auto"
-          >
-            Browse All 33 Offices
-            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start lg:self-auto">
+            <EditTriggerButton
+              target={{ kind: 'admin-office', officeSlug: office.slug }}
+              label="Edit Office Dossier"
+              variant="compact"
+            />
+            <Link
+              href="/administration/all-office"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F8F8F6] border border-slate-300 text-slate-900 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
+            >
+              Browse All 33 Offices
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
 
         {(office.officeEmail || office.officePhone || office.deskEmail || office.location) && (
@@ -451,7 +459,7 @@ export function AllOfficesDirectory({
     <MotionReveal>
       <section
         id="all-offices-directory"
-        className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
+        className="editable-region rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8"
       >
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-stone-200 pb-6">
         <div className="space-y-1.5 max-w-2xl">
@@ -467,30 +475,37 @@ export function AllOfficesDirectory({
           </p>
         </div>
 
-        <div className="w-full lg:w-80 relative">
-          <Search
-            className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-            aria-hidden="true"
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full xl:w-auto">
+          <EditTriggerButton
+            target={{ kind: 'admin-office' }}
+            label="Manage 33 Offices"
+            variant="compact"
           />
-          <input
-            type="text"
-            role="searchbox"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search 33 offices, heads, or staff..."
-            aria-label="Filter all 33 administration offices"
-            className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#F8F8F6] border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 focus:bg-white"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label="Clear directory search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
-            >
-              <X className="w-3.5 h-3.5" aria-hidden="true" />
-            </button>
-          )}
+          <div className="w-full lg:w-80 relative">
+            <Search
+              className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              aria-hidden="true"
+            />
+            <input
+              type="text"
+              role="searchbox"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search 33 offices, heads, or staff..."
+              aria-label="Filter all 33 administration offices"
+              className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#F8F8F6] border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 focus:bg-white"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear directory search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

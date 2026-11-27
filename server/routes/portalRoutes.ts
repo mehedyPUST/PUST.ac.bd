@@ -496,6 +496,13 @@ const profileUpdateSchema = z.object({
             email: z.string().trim().email().max(120),
             code: z.string().trim().min(2).max(80),
             depts: z.string().trim().min(2).max(400),
+            phone: z.string().trim().max(40).optional(),
+            personalEmail: z
+              .union([z.string().trim().email().max(120), z.literal('')])
+              .optional(),
+            qualification: z.string().trim().max(300).optional(),
+            researchArea: z.string().trim().max(400).optional(),
+            publicationCount: z.number().int().min(0).max(5000).optional(),
           })
         )
         .max(15),
@@ -528,6 +535,38 @@ const profileUpdateSchema = z.object({
           })
         )
         .max(20),
+      officialForms: z
+        .array(
+          z.object({
+            serial: z.number().int().min(1).max(999),
+            title: z.string().trim().min(2).max(240),
+            category: z.enum([
+              'Student & Academic',
+              'Faculty, Officer & Leave',
+              'Accounts & Transport',
+            ]),
+            pdfUrl: z
+              .string()
+              .trim()
+              .max(2000)
+              .refine(
+                (v) => !v || isSafeMediaUrl(v),
+                'PDF URL must be a valid https://, http://, or relative / path.'
+              )
+              .optional(),
+            docUrl: z
+              .string()
+              .trim()
+              .max(2000)
+              .refine(
+                (v) => !v || isSafeMediaUrl(v),
+                'DOC URL must be a valid https://, http://, or relative / path.'
+              )
+              .optional(),
+          })
+        )
+        .max(60)
+        .optional(),
       researchIntro: z.string().trim().min(5).max(1000),
       researchInfraCards: z
         .array(
@@ -613,6 +652,89 @@ const profileUpdateSchema = z.object({
         .max(8),
       copyrightText: z.string().trim().min(4).max(240),
     })
+    .optional(),
+  adminOffices: z
+    .array(
+      z.object({
+        slug: z.string().trim().min(2).max(80),
+        route: safeLinkField,
+        code: z.string().trim().min(1).max(20),
+        name: z.string().trim().min(2).max(160),
+        category: z.enum([
+          'Executive Leadership',
+          'Administrative Sections & Offices',
+          'Student Welfare & Campus Services',
+          'Residential Halls & Accommodation',
+          'Research, ICT & Quality Cells',
+        ]),
+        summary: z.string().trim().min(5).max(1000),
+        officeEmail: z.union([z.string().trim().email().max(120), z.literal('')]).optional(),
+        officePhone: z.string().trim().max(40).optional(),
+        deskEmail: z.union([z.string().trim().email().max(120), z.literal('')]).optional(),
+        deskPhone: z.string().trim().max(40).optional(),
+        location: z.string().trim().max(200).optional(),
+        officersLabel: z.string().trim().max(80).optional(),
+        head: z
+          .object({
+            id: z.string().trim().min(1).max(80),
+            name: z.string().trim().min(2).max(140),
+            designation: z.string().trim().min(2).max(140),
+            qualification: z.string().trim().max(400).optional(),
+            researchArea: z.string().trim().max(400).optional(),
+            officeLocation: z.string().trim().max(200).optional(),
+            phones: z
+              .array(
+                z.object({
+                  value: z.string().trim().min(2).max(160),
+                  type: z.enum(['Personal', 'Office', 'IP Phone', 'PABX']),
+                })
+              )
+              .max(6)
+              .optional(),
+            emails: z
+              .array(
+                z.object({
+                  value: z.string().trim().email().max(160),
+                  type: z.enum(['Personal', 'Office', 'IP Phone', 'PABX']),
+                })
+              )
+              .max(6)
+              .optional(),
+          })
+          .optional(),
+        officers: z
+          .array(
+            z.object({
+              id: z.string().trim().min(1).max(80),
+              name: z.string().trim().min(2).max(140),
+              designation: z.string().trim().min(2).max(140),
+              qualification: z.string().trim().max(400).optional(),
+              researchArea: z.string().trim().max(400).optional(),
+              officeLocation: z.string().trim().max(200).optional(),
+              phones: z
+                .array(
+                  z.object({
+                    value: z.string().trim().min(2).max(160),
+                    type: z.enum(['Personal', 'Office', 'IP Phone', 'PABX']),
+                  })
+                )
+                .max(6)
+                .optional(),
+              emails: z
+                .array(
+                  z.object({
+                    value: z.string().trim().email().max(160),
+                    type: z.enum(['Personal', 'Office', 'IP Phone', 'PABX']),
+                  })
+                )
+                .max(6)
+                .optional(),
+            })
+          )
+          .max(80),
+      })
+    )
+    .max(60)
     .optional(),
 });
 
@@ -723,6 +845,16 @@ const publicationSchema = z.object({
   domain: z.string().trim().min(2).max(120),
   year: z.number().int().min(1990).max(2100),
   venue: z.string().trim().min(2).max(240),
+  doi: z.string().trim().max(200).optional(),
+  url: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine(
+      (v) => !v || isSafeMediaUrl(v),
+      'Publication URL must be a valid https://, http://, or local asset path.'
+    )
+    .optional(),
 });
 
 const bannerCreateSchema = z.object({

@@ -818,7 +818,7 @@ export function DepartmentDetailView({
                   </MotionReveal>
 
                   {/* About & Vision / Mission */}
-                  <MotionReveal className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-6">
+                  <MotionReveal className="editable-region rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-6">
                     <div className="pb-3 border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <p className="font-mono text-xs uppercase tracking-widest font-semibold text-lapis-800">
@@ -828,9 +828,18 @@ export function DepartmentDetailView({
                           About Department of {department.name}
                         </h2>
                       </div>
-                      <span className="font-mono text-xs text-slate-500 tabular-nums">
-                        Est. {department.established}
-                      </span>
+                      <div className="flex items-center gap-2.5">
+                        {canAdminEdit && (
+                          <EditTriggerButton
+                            label="Edit Dept Info"
+                            variant="compact"
+                            onClick={() => openEditModal({ kind: 'department', department })}
+                          />
+                        )}
+                        <span className="font-mono text-xs text-slate-500 tabular-nums">
+                          Est. {department.established}
+                        </span>
+                      </div>
                     </div>
 
                     <p className="flow-root prose-justify text-[15px] leading-[1.78] text-slate-800 first-letter:font-serif first-letter:text-5xl first-letter:font-semibold first-letter:float-left first-letter:mr-3 first-letter:leading-[0.86] first-letter:text-pust-800">
@@ -1542,7 +1551,7 @@ export function DepartmentDetailView({
               </div>
 
               {/* Departmental Publications */}
-              <div className="space-y-4 pt-4 border-t border-stone-200">
+              <div className="editable-region space-y-4 pt-4 border-t border-stone-200">
                 <MotionReveal className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
@@ -1550,13 +1559,23 @@ export function DepartmentDetailView({
                       Featured Research Output ({deptPublications.length})
                     </h2>
                   </div>
-                  <Link
-                    href="/academics/publications"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline"
-                  >
-                    Central Publications Index
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
+                  <div className="flex items-center gap-2.5">
+                    {canAdminEdit && (
+                      <EditTriggerButton
+                        icon="add"
+                        label="Add Publication"
+                        variant="compact"
+                        onClick={() => openEditModal({ kind: 'publication', publication: null })}
+                      />
+                    )}
+                    <Link
+                      href="/academics/publications"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 hover:underline"
+                    >
+                      Central Publications Index
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </MotionReveal>
 
                 {deptPublications.length === 0 ? (
@@ -1576,13 +1595,22 @@ export function DepartmentDetailView({
                             : 'bg-[#F3F6FA] border-lapis-200/80 hover:border-lapis-600/50'
                         }`}
                       >
-                        <p
-                          className={`font-mono text-[11px] font-semibold text-left ${
-                            idx % 2 === 0 ? 'text-pust-800' : 'text-lapis-800'
-                          }`}
-                        >
-                          {pub.year} · {pub.domain}
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p
+                            className={`font-mono text-[11px] font-semibold text-left ${
+                              idx % 2 === 0 ? 'text-pust-800' : 'text-lapis-800'
+                            }`}
+                          >
+                            {pub.year} · {pub.domain}
+                          </p>
+                          {canAdminEdit && (
+                            <EditTriggerButton
+                              label="Edit"
+                              variant="compact"
+                              onClick={() => openEditModal({ kind: 'publication', publication: pub })}
+                            />
+                          )}
+                        </div>
                         <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
                           {pub.title}
                         </h3>

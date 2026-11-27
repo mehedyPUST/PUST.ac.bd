@@ -20,9 +20,11 @@ import {
   GraduationCap,
   KeyRound,
   LayoutDashboard,
+  LayoutGrid,
   Lock,
   LogOut,
   Mail,
+  Pencil,
   Receipt,
   Search,
   ShieldCheck,
@@ -132,7 +134,7 @@ export function PortalView({
   onCmsChange,
   onBackToSite,
 }: PortalViewProps) {
-  const { navigateTo, setActiveNotice } = usePust();
+  const { navigateTo, setActiveNotice, editMode, toggleEditMode, openCmsDirectory } = usePust();
 
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
@@ -1474,6 +1476,16 @@ export function PortalView({
           </nav>
 
           <div className="hidden lg:block p-3 border-t border-stone-200 bg-[#FAF9F6] space-y-2">
+            {user.role === 'admin' && (
+              <button
+                type="button"
+                onClick={openCmsDirectory}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Site-Wide CMS Directory
+              </button>
+            )}
             <PwaInstallButton variant="portal" />
             <button
               type="button"
@@ -1503,7 +1515,7 @@ export function PortalView({
         {/* Main Workspace Surface */}
         <div className="flex-1 min-w-0 w-full space-y-6">
           {/* Top Contextual Breadcrumb Header */}
-          <div className="bg-white rounded-2xl border border-stone-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="bg-white rounded-2xl border border-stone-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <p className="font-mono text-xs text-slate-500 text-left">
                 Digital Campus / {ROLE_LABELS[user.role]} /{' '}
@@ -1513,9 +1525,36 @@ export function PortalView({
                 {activeTabMeta.label}
               </h1>
             </div>
-            <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full text-left">
-              {user.email} · {user.hallAffiliation}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              {user.role === 'admin' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={toggleEditMode}
+                    aria-pressed={editMode}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap cursor-pointer ${
+                      editMode
+                        ? 'bg-amber-400 text-slate-950 border-amber-500 hover:bg-amber-300'
+                        : 'bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100'
+                    }`}
+                  >
+                    {editMode ? <Eye className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                    <span>{editMode ? 'Exit Live Edit' : 'Live Edit Mode'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openCmsDirectory}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap cursor-pointer"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span>CMS Directory</span>
+                  </button>
+                </>
+              )}
+              <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full text-left">
+                {user.email} · {user.hallAffiliation}
+              </p>
+            </div>
           </div>
 
           {/* Tab 1: Role-Tailored Overview, Action Launcher, Digital Receipts, Bulletins & Bookmarks */}

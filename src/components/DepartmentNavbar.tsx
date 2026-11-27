@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Eye,
   Home,
+  LayoutGrid,
   Menu,
   Pencil,
   Plus,
@@ -50,6 +51,7 @@ interface DepartmentNavbarProps {
   onSelectTab: (tab: DepartmentTab) => void;
   onToggleEditMode?: () => void;
   onOpenEditModal?: (target: EditModalTarget) => void;
+  onOpenCmsDirectory?: () => void;
   onNavigate: (target: string) => void;
 }
 
@@ -63,6 +65,7 @@ export function DepartmentNavbar({
   onSelectTab,
   onToggleEditMode,
   onOpenEditModal,
+  onOpenCmsDirectory,
   onNavigate,
 }: DepartmentNavbarProps) {
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -541,8 +544,21 @@ export function DepartmentNavbar({
                 <span className="font-semibold">
                   Editing {currentDepartment.code} Department Portal
                 </span>
+                <kbd className="hidden xl:inline px-1.5 py-0.5 rounded bg-amber-200/70 border border-amber-300 font-mono text-[10px] font-semibold text-amber-950">
+                  Alt+E
+                </kbd>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
+                {onOpenCmsDirectory && (
+                  <button
+                    type="button"
+                    onClick={onOpenCmsDirectory}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-pust-900 text-white font-semibold hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <LayoutGrid className="w-3 h-3" />
+                    CMS Directory
+                  </button>
+                )}
                 {onOpenEditModal && (
                   <>
                     <button
@@ -568,6 +584,14 @@ export function DepartmentNavbar({
                     >
                       <Plus className="w-3 h-3" />
                       Post {currentDepartment.code} Notice
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onOpenEditModal({ kind: 'publication', publication: null })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-amber-400 text-amber-950 font-semibold hover:bg-amber-100 whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add Publication
                     </button>
                   </>
                 )}

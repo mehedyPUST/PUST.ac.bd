@@ -175,7 +175,7 @@ export function CareerView() {
                 {careerNotices.length === 1 ? 'circular' : 'circulars'}
               </span>
               <EditTriggerButton
-                target={{ kind: 'notice', notice: null }}
+                target={{ kind: 'notice', notice: null, defaultCategory: 'Job & Tender' }}
                 label="Post Job Notice"
                 icon="add"
                 variant="compact"
@@ -240,7 +240,7 @@ export function CareerView() {
         </div>
 
         {/* Active Job & Tender Circulars */}
-        <section aria-labelledby="career-circulars-heading" className="space-y-5">
+        <section aria-labelledby="career-circulars-heading" className="editable-region space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -495,7 +495,7 @@ export function CareerView() {
 
           <MotionReveal
             delay={0.08}
-            className="lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5"
+            className="editable-region lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5"
           >
             <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-200">
               <div>
@@ -509,12 +509,19 @@ export function CareerView() {
                   Official Job Application Forms
                 </h2>
               </div>
-              <Link
-                href="/academics/forms-download"
-                className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0 mt-1"
-              >
-                All Forms
-              </Link>
+              <div className="flex items-center gap-2.5 shrink-0 mt-1">
+                <EditTriggerButton
+                  target={{ kind: 'download-forms' }}
+                  label="Edit Forms"
+                  variant="compact"
+                />
+                <Link
+                  href="/academics/forms-download"
+                  className="text-xs font-semibold text-pust-800 hover:underline whitespace-nowrap shrink-0"
+                >
+                  All Forms
+                </Link>
+              </div>
             </div>
 
             <p className="prose-justify text-sm text-slate-700 leading-relaxed">

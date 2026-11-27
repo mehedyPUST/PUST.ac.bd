@@ -40,6 +40,7 @@ import type {
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
+import { AdminCmsDirectoryModal } from './AdminCmsDirectoryModal';
 import { AdminEditModal } from './AdminEditModal';
 import { Breadcrumb } from './Breadcrumb';
 import { DepartmentModal } from './DepartmentModal';
@@ -67,6 +68,9 @@ interface PustContextValue {
   editMode: boolean;
   setEditMode: (enabled: boolean) => void;
   toggleEditMode: () => void;
+  cmsDirectoryOpen: boolean;
+  openCmsDirectory: () => void;
+  closeCmsDirectory: () => void;
   openEditModal: (target: EditModalTarget) => void;
   closeEditModal: () => void;
   setUser: (user: AuthUser | null) => void;
@@ -161,6 +165,7 @@ export function PustShell({
   const [activeDepartment, setActiveDepartment] = useState<DepartmentRecord | null>(null);
   const [activeNotice, setActiveNotice] = useState<NoticeRecord | null>(null);
   const [editMode, setEditModeState] = useState(false);
+  const [cmsDirectoryOpen, setCmsDirectoryOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<EditModalTarget | null>(null);
   const [authResolved, setAuthResolved] = useState(false);
   const [isTransitionPending, startTransition] = useTransition();
@@ -194,6 +199,7 @@ export function PustShell({
     if (typeof window === 'undefined' || !authResolved) return;
     if (!isAdmin) {
       setEditModeState(false);
+      setCmsDirectoryOpen(false);
       setEditTarget(null);
       try {
         window.sessionStorage.removeItem('pust_admin_edit_mode');
@@ -263,6 +269,38 @@ export function PustShell({
   const closeEditModal = useCallback(() => {
     setEditTarget(null);
   }, []);
+
+  const openCmsDirectory = useCallback(() => {
+    if (!isAdmin) return;
+    setCmsDirectoryOpen(true);
+  }, [isAdmin]);
+
+  const closeCmsDirectory = useCallback(() => {
+    setCmsDirectoryOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isAdmin) return;
+    function handleAdminShortcut(e: KeyboardEvent) {
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.key.toLowerCase() !== 'e') {
+        return;
+      }
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      e.preventDefault();
+      toggleEditMode();
+    }
+    window.addEventListener('keydown', handleAdminShortcut);
+    return () => window.removeEventListener('keydown', handleAdminShortcut);
+  }, [isAdmin, toggleEditMode]);
 
   const scrollToHashId = useCallback((hashId: string) => {
     if (typeof window === 'undefined' || !hashId) return;
@@ -611,6 +649,9 @@ export function PustShell({
       editMode: effectiveEditMode,
       setEditMode,
       toggleEditMode,
+      cmsDirectoryOpen: isAdmin && cmsDirectoryOpen,
+      openCmsDirectory,
+      closeCmsDirectory,
       openEditModal,
       closeEditModal,
       setUser,
@@ -648,6 +689,10 @@ export function PustShell({
       effectiveEditMode,
       setEditMode,
       toggleEditMode,
+      isAdmin,
+      cmsDirectoryOpen,
+      openCmsDirectory,
+      closeCmsDirectory,
       openEditModal,
       closeEditModal,
       isNavigating,
@@ -696,9 +741,10 @@ export function PustShell({
                 departments={departments}
                 user={user}
                 editMode={effectiveEditMode}
-                onSelectTab={setDepartmentTab}
                 onToggleEditMode={toggleEditMode}
                 onOpenEditModal={openEditModal}
+                onOpenCmsDirectory={openCmsDirectory}
+                onSelectTab={setDepartmentTab}
                 onNavigate={navigateTo}
               />
             ) : (
@@ -710,6 +756,7 @@ export function PustShell({
                 editMode={effectiveEditMode}
                 onToggleEditMode={toggleEditMode}
                 onOpenEditModal={openEditModal}
+                onOpenCmsDirectory={openCmsDirectory}
                 onNavigate={navigateTo}
               />
             )}
@@ -757,6 +804,23 @@ export function PustShell({
             onRefreshNotices={loadNotices}
             onRefreshDepartments={loadDepartments}
             onRefreshPublications={loadPublications}
+          />
+
+          <AdminCmsDirectoryModal
+            open={isAdmin && cmsDirectoryOpen}
+            onClose={closeCmsDirectory}
+            route={route}
+            currentDepartment={
+              parsedDepartmentRoute
+                ? departments.find(
+                    (d) => d.code.toUpperCase() === parsedDepartmentRoute.code.toUpperCase()
+                  ) ?? null
+                : null
+            }
+            editMode={effectiveEditMode}
+            onToggleEditMode={toggleEditMode}
+            onSelectTarget={openEditModal}
+            onNavigate={navigateTo}
           />
           <PwaRegistrar />
           <OfflineIndicator />

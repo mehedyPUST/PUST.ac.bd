@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, Plus, Save, Trash2, Upload, X } from 'lucide-react'
 import { pustApi } from '../lib/api';
 import { detectAttachmentType } from '../lib/media';
 import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilitiesEditors';
+import { AdminOfficeEditor } from './admin-edit/AdminOfficeEditor';
 import { CampusAndGovernanceEditors } from './admin-edit/CampusAndGovernanceEditors';
 import { DepartmentPersonEditor } from './admin-edit/DepartmentPersonEditor';
 import { HomeAndFooterEditors } from './admin-edit/HomeAndFooterEditors';
@@ -170,6 +171,8 @@ export function AdminEditModal({
   const [pubDomain, setPubDomain] = useState('');
   const [pubYear, setPubYear] = useState(2026);
   const [pubVenue, setPubVenue] = useState('');
+  const [pubDoi, setPubDoi] = useState('');
+  const [pubUrl, setPubUrl] = useState('');
 
   // 8. Journals state
   const [journalsList, setJournalsList] = useState<JournalRecord[]>([]);
@@ -287,7 +290,9 @@ export function AdminEditModal({
             : `PUST/REG/${new Date().getFullYear()}/`
         );
         setNoticeTitle('');
-        setNoticeCategory(defaultDept ? 'Academic' : 'General');
+        setNoticeCategory(
+          target.defaultCategory || (defaultDept ? 'Academic' : 'General')
+        );
         setNoticeDeptCode(defaultDept || 'REG');
         setNoticeScope(defaultDept ? 'department' : 'central');
         setNoticeVisibility('public');
@@ -328,6 +333,8 @@ export function AdminEditModal({
         setPubDomain(p.domain);
         setPubYear(p.year);
         setPubVenue(p.venue);
+        setPubDoi(p.doi || '');
+        setPubUrl(p.url || '');
       } else {
         setPubTitle('');
         setPubAuthors('');
@@ -335,6 +342,8 @@ export function AdminEditModal({
         setPubDomain('');
         setPubYear(new Date().getFullYear());
         setPubVenue('');
+        setPubDoi('');
+        setPubUrl('');
       }
     } else if (target.kind === 'journals') {
       setJournalsList(structuredClone(profile?.journals || []));
@@ -664,6 +673,8 @@ export function AdminEditModal({
           domain: pubDomain.trim(),
           year: Number(pubYear),
           venue: pubVenue.trim(),
+          ...(pubDoi.trim() ? { doi: pubDoi.trim() } : { doi: undefined }),
+          ...(pubUrl.trim() ? { url: pubUrl.trim() } : { url: undefined }),
         };
         if (target.publication) {
           await pustApi.updatePublication(target.publication.id, payload);
@@ -781,6 +792,7 @@ export function AdminEditModal({
 
   const isModularTarget =
     target.kind === 'department-person' ||
+    target.kind === 'admin-office' ||
     target.kind === 'institutional-links' ||
     target.kind === 'seminars' ||
     target.kind === 'verify-page' ||
@@ -839,6 +851,8 @@ export function AdminEditModal({
       ? 'Edit Executive Administration Directory'
       : target.kind === 'unit'
       ? 'Edit Statutory & Administrative Units'
+      : target.kind === 'admin-office'
+      ? 'Edit 33 Administration Offices & Personnel'
       : target.kind === 'institutional-links'
       ? 'Edit Institutional Sections & Quick Links'
       : target.kind === 'seminars'
@@ -971,6 +985,18 @@ export function AdminEditModal({
                 setSaving={setSaving}
                 setError={setError}
                 onRefreshDepartments={onRefreshDepartments}
+                onClose={onClose}
+              />
+            )}
+            {target.kind === 'admin-office' && (
+              <AdminOfficeEditor
+                key={`admin-office-${target.officeSlug || 'all'}`}
+                target={target}
+                profile={profile}
+                saving={saving}
+                setSaving={setSaving}
+                setError={setError}
+                onSaveProfile={handleSaveProfilePatch}
                 onClose={onClose}
               />
             )}
@@ -1730,6 +1756,28 @@ export function AdminEditModal({
                   onChange={(e) => setPubVenue(e.target.value)}
                   className={INPUT_CLASS}
                 />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={LABEL_CLASS}>DOI Identifier (Optional)</label>
+                  <input
+                    type="text"
+                    value={pubDoi}
+                    onChange={(e) => setPubDoi(e.target.value)}
+                    placeholder="e.g. 10.1109/ACCESS.2025.0001"
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                </div>
+                <div>
+                  <label className={LABEL_CLASS}>External Paper / DOI URL (Optional)</label>
+                  <input
+                    type="text"
+                    value={pubUrl}
+                    onChange={(e) => setPubUrl(e.target.value)}
+                    placeholder="https://doi.org/..."
+                    className={`${INPUT_CLASS} font-mono`}
+                  />
+                </div>
               </div>
             </div>
           )}
