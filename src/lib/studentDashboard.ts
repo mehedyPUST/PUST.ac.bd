@@ -622,3 +622,170 @@ export function buildStudentFeeSummary(params: {
       hallClearanceBlocked || hallDues.some((d) => d.status === 'Unpaid'),
   };
 }
+
+export interface CompletedCourseHistoryItem {
+  id: string;
+  code: string;
+  title: string;
+  credits: number;
+  semester: number;
+  session: string;
+  departmentCode: string;
+  marks: number;
+  letterGrade: string;
+  gradePoint: number;
+  publishedAt: string;
+  promotionStatus: string;
+}
+
+export interface EnrolledCourseHistoryItem {
+  id: string;
+  code: string;
+  title: string;
+  credits: number;
+  semester: number;
+  session: string;
+  departmentCode: string;
+  instructor: string;
+  sessionType: 'Lecture' | 'Laboratory';
+  enrollmentStatus: string;
+  isExamRegistered: boolean;
+}
+
+export interface StudentCourseHistorySummary {
+  enrolledCourses: EnrolledCourseHistoryItem[];
+  completedCourses: CompletedCourseHistoryItem[];
+  enrolledCredits: number;
+  completedCredits: number;
+  totalCredits: number;
+}
+
+export function buildStudentCourseHistory(params: {
+  results: ExamResultRecord[];
+  courses: CourseRecord[];
+  examApplications: ExamApplicationRecord[];
+  departments: DepartmentRecord[];
+  studentProfile: StudentRecord | null;
+  departmentCode?: string;
+}): StudentCourseHistorySummary {
+  const {
+    results,
+    courses,
+    examApplications,
+    departments,
+    studentProfile,
+    departmentCode,
+  } = params;
+
+  const targetDept = (
+    studentProfile?.departmentCode ||
+    departmentCode ||
+    ''
+  ).toUpperCase();
+  const targetSemester = studentProfile?.currentSemester;
+  const targetSession = studentProfile?.session;
+
+  const sortedResults = [...results].sort((a, b) => b.semester - a.semester);
+  const completedKeys = new Set<string>();
+  const completedCourses: CompletedCourseHistoryItem[] = [];
+
+  for (const res of sortedResults) {
+    const orderedCourses = [...res.courses].sort((a, b) =>
+      a.code.localeCompare(b.code)
+    );
+    for (const c of orderedCourses) {
+      const normalizedCode = c.code.toUpperCase();
+      completedKeys.add(`${res.semester}:${normalizedCode}`);
+      completedKeys.add(normalizedCode);
+      completedCourses.push({
+        id: `${res.id}-${normalizedCode}`,
+        code: normalizedCode,
+        title: c.title,
+        credits: c.credits,
+        semester: res.semester,
+        session: res.session,
+        departmentCode: res.departmentCode,
+        marks: c.marks,
+        letterGrade: c.letterGrade,
+        gradePoint: c.gradePoint,
+        publishedAt: res.publishedAt,
+        promotionStatus: res.promotionStatus,
+      });
+    }
+  }
+
+  const deptCourses = targetDept
+    ? courses.filter((c) => c.departmentCode.toUpperCase() === targetDept)
+    : courses;
+
+  const semesterScopedCourses =
+    targetSemester && deptCourses.some((c) => c.semester === targetSemester)
+      ? deptCourses.filter((c) => c.semester === targetSemester)
+      : deptCourses;
+
+  const sessionScopedCourses =
+    targetSession && semesterScopedCourses.some((c) => c.session === targetSession)
+      ? semesterScopedCourses.filter((c) => c.session === targetSession)
+      : semesterScopedCourses;
+
+  const enrolledCourses: EnrolledCourseHistoryItem[] = [];
+  const seenEnrolled = new Set<string>();
+
+  for (const course of [...sessionScopedCourses].sort((a, b) =>
+    a.code.localeCompare(b.code)
+  )) {
+    const normalizedCode = course.code.toUpperCase();
+    if (
+      completedKeys.has(`${course.semester}:${normalizedCode}`) ||
+      completedKeys.has(normalizedCode) ||
+      seenEnrolled.has(normalizedCode)
+    ) {
+      continue;
+    }
+    seenEnrolled.add(normalizedCode);
+
+    const dept = departments.find(
+      (d) => d.code.toUpperCase() === course.departmentCode.toUpperCase()
+    );
+    const matchedApp = examApplications.find(
+      (app) =>
+        app.semester === course.semester &&
+        app.selectedCourseCodes.some((code) => code.toUpperCase() === normalizedCode)
+    );
+
+    const enrollmentStatus = matchedApp
+      ? matchedApp.paymentStatus === 'Paid'
+        ? 'Exam Form Paid'
+        : 'Exam Form Pending'
+      : 'Enrolled (Ongoing)';
+
+    enrolledCourses.push({
+      id: course.id,
+      code: normalizedCode,
+      title: course.title,
+      credits: course.credits,
+      semester: course.semester,
+      session: course.session,
+      departmentCode: course.departmentCode,
+      instructor: getInstructorForCourse(course, dept),
+      sessionType: isLabCourse(course) ? 'Laboratory' : 'Lecture',
+      enrollmentStatus,
+      isExamRegistered: Boolean(matchedApp),
+    });
+  }
+
+  const enrolledCredits = Number(
+    enrolledCourses.reduce((sum, c) => sum + c.credits, 0).toFixed(1)
+  );
+  const completedCredits = Number(
+    completedCourses.reduce((sum, c) => sum + c.credits, 0).toFixed(1)
+  );
+
+  return {
+    enrolledCourses,
+    completedCourses,
+    enrolledCredits,
+    completedCredits,
+    totalCredits: Number((enrolledCredits + completedCredits).toFixed(1)),
+  };
+}

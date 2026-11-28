@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import {
   AlertCircle,
   ArrowRight,
+  BookOpen,
   Building2,
   Calendar,
   CheckCircle2,
@@ -21,6 +22,7 @@ import {
   REFERENCE_GPA_PROGRESSION,
   buildHistoricalGpaSeries,
   buildStudentClassSchedules,
+  buildStudentCourseHistory,
   buildStudentFeeSummary,
   summarizeStudentResults,
 } from '../../lib/studentDashboard';
@@ -41,6 +43,7 @@ interface StudentDashboardSectionProps {
 
 type DayFilter = 'ALL' | ClassScheduleDay;
 type FeeFilter = 'all' | 'due' | 'settled';
+type CourseHistoryFilter = 'all' | 'enrolled' | 'completed';
 
 export function StudentDashboardSection({
   onSelectTab,
@@ -72,6 +75,7 @@ export function StudentDashboardSection({
   const [selectedSemester, setSelectedSemester] = useState<'all' | number>('all');
   const [dayFilter, setDayFilter] = useState<DayFilter>('ALL');
   const [feeFilter, setFeeFilter] = useState<FeeFilter>('all');
+  const [courseHistoryFilter, setCourseHistoryFilter] = useState<CourseHistoryFilter>('all');
   const [previewDeptCode, setPreviewDeptCode] = useState<string>(
     () => departments[0]?.code || 'CSE'
   );
@@ -156,6 +160,44 @@ export function StudentDashboardSection({
 
   const isReferenceTimetable =
     effectiveSchedules.length > 0 && Boolean(effectiveSchedules[0]?.isReferenceSlot);
+
+  const courseHistory = useMemo(
+    () =>
+      buildStudentCourseHistory({
+        results: studentExamResults,
+        courses: studentCourses,
+        examApplications: studentExamApplications,
+        departments,
+        studentProfile,
+        departmentCode: activePreviewDeptCode,
+      }),
+    [
+      studentExamResults,
+      studentCourses,
+      studentExamApplications,
+      departments,
+      studentProfile,
+      activePreviewDeptCode,
+    ]
+  );
+
+  const previewCurriculumCourses = useMemo(() => {
+    const seen = new Set<string>();
+    return effectiveSchedules
+      .filter((slot) => {
+        if (seen.has(slot.courseCode)) return false;
+        seen.add(slot.courseCode);
+        return true;
+      })
+      .map((slot) => ({
+        code: slot.courseCode,
+        title: slot.courseTitle,
+        credits: slot.credits,
+        semester: slot.semester,
+        sessionType: slot.sessionType,
+        instructor: slot.instructor,
+      }));
+  }, [effectiveSchedules]);
 
   const defaultExamFeeBdt = studentFeeConfig?.defaultExamFeeBdt ?? 650;
   const certificateFeeBdt = studentFeeConfig?.certificateFeeBdt ?? 500;
@@ -914,7 +956,291 @@ export function StudentDashboardSection({
           </div>
         </article>
 
-        {/* Card 3: Schedule */}
+        {/* Card 3: Course History */}
+        <article
+          aria-labelledby="card-course-history"
+          className="xl:col-span-12 bg-white rounded-2xl border border-stone-200 overflow-hidden"
+        >
+          <div className="px-5 sm:px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-pust-50 border border-stone-200 flex items-center justify-center shrink-0">
+                <BookOpen className="w-4.5 h-4.5 text-pust-800" />
+              </div>
+              <div>
+                <h3
+                  id="card-course-history"
+                  className="font-serif text-lg font-medium text-slate-950 leading-snug"
+                >
+                  Course History
+                </h3>
+                <p className="text-xs text-slate-600">
+                  {isStudent
+                    ? 'Current semester enrollments and previously completed courses from your university transcript'
+                    : `Sample ${activePreviewDeptCode} departmental courses · Sign in to load completed grades and active enrollments`}
+                </p>
+              </div>
+            </div>
+
+            {isStudent && (
+              <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200 shrink-0 self-start lg:self-auto">
+                {(
+                  [
+                    {
+                      id: 'all',
+                      label: `All (${courseHistory.enrolledCourses.length + courseHistory.completedCourses.length})`,
+                    },
+                    {
+                      id: 'enrolled',
+                      label: `Current (${courseHistory.enrolledCourses.length})`,
+                    },
+                    {
+                      id: 'completed',
+                      label: `Completed (${courseHistory.completedCourses.length})`,
+                    },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setCourseHistoryFilter(tab.id)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
+                      courseHistoryFilter === tab.id
+                        ? 'bg-pust-900 text-white'
+                        : 'text-slate-700 hover:text-slate-950'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="p-5 sm:p-6 space-y-5">
+            {isStudent ? (
+              <>
+                {/* Credit & Course Count Strip */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-stone-200 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+                  <div className="p-3.5 space-y-0.5">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      Current Enrollments
+                    </p>
+                    <p className="font-mono text-sm font-bold text-slate-950 tabular-nums">
+                      {courseHistory.enrolledCourses.length} courses ·{' '}
+                      {courseHistory.enrolledCredits.toFixed(1)} cr
+                    </p>
+                  </div>
+                  <div className="p-3.5 space-y-0.5">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      Previously Completed
+                    </p>
+                    <p className="font-mono text-sm font-bold text-slate-950 tabular-nums">
+                      {courseHistory.completedCourses.length} courses ·{' '}
+                      {courseHistory.completedCredits.toFixed(1)} cr
+                    </p>
+                  </div>
+                  <div className="p-3.5 space-y-0.5">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      Total Tracked Credits
+                    </p>
+                    <p className="font-mono text-sm font-bold text-pust-900 tabular-nums">
+                      {courseHistory.totalCredits.toFixed(1)} credits
+                    </p>
+                  </div>
+                </div>
+
+                {/* Current Enrollments Table */}
+                {(courseHistoryFilter === 'all' || courseHistoryFilter === 'enrolled') && (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                        Current Semester Enrollments
+                      </p>
+                      {onSelectTab && (
+                        <button
+                          type="button"
+                          onClick={() => onSelectTab('exams')}
+                          className="text-xs font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+                        >
+                          Exam Registration →
+                        </button>
+                      )}
+                    </div>
+
+                    {courseHistory.enrolledCourses.length > 0 ? (
+                      <div className="overflow-x-auto rounded-xl border border-stone-200">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="border-b border-stone-200 bg-[#FAF9F6] font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              <th className="py-2.5 px-4 font-semibold">Course</th>
+                              <th className="py-2.5 px-4 font-semibold">Title</th>
+                              <th className="py-2.5 px-4 font-semibold">Term</th>
+                              <th className="py-2.5 px-4 font-semibold text-right">Credits</th>
+                              <th className="py-2.5 px-4 font-semibold">Instructor</th>
+                              <th className="py-2.5 px-4 font-semibold">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-stone-200">
+                            {courseHistory.enrolledCourses.map((course) => (
+                              <tr key={course.id} className="hover:bg-[#FAF9F6] transition-colors">
+                                <td className="py-2.5 px-4 font-mono font-semibold text-pust-900 whitespace-nowrap tabular-nums">
+                                  {course.code}
+                                </td>
+                                <td className="py-2.5 px-4">
+                                  <p className="font-medium text-slate-900">{course.title}</p>
+                                  <p className="text-[11px] text-slate-500">{course.sessionType}</p>
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-slate-700 whitespace-nowrap tabular-nums">
+                                  Sem {course.semester} · {course.session}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-right text-slate-700 tabular-nums">
+                                  {course.credits.toFixed(1)}
+                                </td>
+                                <td className="py-2.5 px-4 text-slate-700">{course.instructor}</td>
+                                <td className="py-2.5 px-4 whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1.5 font-medium text-slate-800">
+                                    {course.isExamRegistered ? (
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                                    ) : (
+                                      <Clock className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                                    )}
+                                    <span>{course.enrollmentStatus}</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 text-xs text-slate-600">
+                        No active course enrollments found for your current department and semester.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Previously Completed Courses Table */}
+                {(courseHistoryFilter === 'all' || courseHistoryFilter === 'completed') && (
+                  <div className="space-y-2.5">
+                    <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 font-semibold">
+                      Previously Completed Courses
+                    </p>
+
+                    {courseHistory.completedCourses.length > 0 ? (
+                      <div className="overflow-x-auto rounded-xl border border-stone-200">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="border-b border-stone-200 bg-[#FAF9F6] font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                              <th className="py-2.5 px-4 font-semibold">Course</th>
+                              <th className="py-2.5 px-4 font-semibold">Title</th>
+                              <th className="py-2.5 px-4 font-semibold">Term</th>
+                              <th className="py-2.5 px-4 font-semibold text-right">Credits</th>
+                              <th className="py-2.5 px-4 font-semibold text-right">Marks</th>
+                              <th className="py-2.5 px-4 font-semibold text-right">Grade</th>
+                              <th className="py-2.5 px-4 font-semibold">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-stone-200">
+                            {courseHistory.completedCourses.map((course) => (
+                              <tr key={course.id} className="hover:bg-[#FAF9F6] transition-colors">
+                                <td className="py-2.5 px-4 font-mono font-semibold text-pust-900 whitespace-nowrap tabular-nums">
+                                  {course.code}
+                                </td>
+                                <td className="py-2.5 px-4 font-medium text-slate-900">
+                                  {course.title}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-slate-700 whitespace-nowrap tabular-nums">
+                                  Sem {course.semester} · {course.session}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-right text-slate-700 tabular-nums">
+                                  {course.credits.toFixed(1)}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-right text-slate-700 tabular-nums">
+                                  {course.marks}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-right font-semibold text-slate-950 whitespace-nowrap tabular-nums">
+                                  {course.letterGrade} ({course.gradePoint.toFixed(2)})
+                                </td>
+                                <td className="py-2.5 px-4 whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1.5 font-medium text-emerald-900">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                                    <span>Completed</span>
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 text-xs text-slate-600">
+                        No previously completed courses published on your transcript yet.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="space-y-4">
+                {previewCurriculumCourses.length > 0 && (
+                  <div className="overflow-x-auto rounded-xl border border-stone-200">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-stone-200 bg-[#FAF9F6] font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                          <th className="py-2.5 px-4 font-semibold">Course</th>
+                          <th className="py-2.5 px-4 font-semibold">Title</th>
+                          <th className="py-2.5 px-4 font-semibold">Format</th>
+                          <th className="py-2.5 px-4 font-semibold text-right">Credits</th>
+                          <th className="py-2.5 px-4 font-semibold">Faculty Lead</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-200">
+                        {previewCurriculumCourses.map((course) => (
+                          <tr key={course.code} className="hover:bg-[#FAF9F6]">
+                            <td className="py-2.5 px-4 font-mono font-semibold text-pust-900 whitespace-nowrap tabular-nums">
+                              {course.code}
+                            </td>
+                            <td className="py-2.5 px-4 font-medium text-slate-900">
+                              {course.title}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700 whitespace-nowrap">
+                              {course.sessionType} · Sem {course.semester}
+                            </td>
+                            <td className="py-2.5 px-4 font-mono text-right text-slate-700 tabular-nums">
+                              {course.credits.toFixed(1)}
+                            </td>
+                            <td className="py-2.5 px-4 text-slate-700">{course.instructor}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <span className="text-slate-700 flex items-center gap-2">
+                    <Lock className="w-3.5 h-3.5 text-pust-800 shrink-0" />
+                    <span>
+                      Sign in with a student account to view your previously completed courses and active semester enrollments.
+                    </span>
+                  </span>
+                  {onFocusSignIn && (
+                    <button
+                      type="button"
+                      onClick={onFocusSignIn}
+                      className="font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      Sign In Above →
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </article>
+
+        {/* Card 4: Schedule */}
         <article
           aria-labelledby="card-student-schedule"
           className="xl:col-span-12 bg-white rounded-2xl border border-stone-200 overflow-hidden"

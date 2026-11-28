@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   buildHistoricalGpaSeries,
   buildStudentClassSchedules,
+  buildStudentCourseHistory,
   buildStudentFeeSummary,
   summarizeStudentResults,
 } from './studentDashboard';
@@ -300,4 +301,122 @@ test('buildHistoricalGpaSeries sorts semesters chronologically and tracks runnin
   assert.equal(series[1].runningCgpa, 3.63);
   assert.equal(series[2].runningCgpa, 3.75);
   assert.deepEqual(buildHistoricalGpaSeries([]), []);
+});
+
+test('buildStudentCourseHistory separates completed courses from current enrollments and reconciles credits', () => {
+  const results: ExamResultRecord[] = [
+    {
+      id: 'res-4',
+      academicId: '220101',
+      studentName: 'Mehedy Hasan',
+      departmentCode: 'CSE',
+      session: '2022-23',
+      semester: 4,
+      courses: [
+        { code: 'CSE-2201', title: 'Algorithms', credits: 3.0, marks: 82, gradePoint: 4.0, letterGrade: 'A+' },
+        { code: 'CSE-2203', title: 'Architecture', credits: 3.0, marks: 76, gradePoint: 3.75, letterGrade: 'A' },
+      ],
+      sgpa: 3.88,
+      promotionStatus: 'Promoted (Auto)',
+      published: true,
+      enteredBy: 'Committee',
+      publishedAt: '2026-10-30',
+    },
+  ];
+
+  const courses: CourseRecord[] = [
+    {
+      id: 'c-3101',
+      code: 'CSE-3101',
+      title: 'Operating Systems',
+      credits: 3.0,
+      departmentCode: 'CSE',
+      semester: 5,
+      session: '2022-23',
+      teacherEmail: 'faculty.cse@pust.ac.bd',
+    },
+    {
+      id: 'c-3106',
+      code: 'CSE-3106',
+      title: 'Database & Networking Lab',
+      credits: 1.5,
+      departmentCode: 'CSE',
+      semester: 5,
+      session: '2022-23',
+    },
+    // Completed course present in catalog should not duplicate into current enrollments
+    {
+      id: 'c-2201',
+      code: 'CSE-2201',
+      title: 'Algorithms',
+      credits: 3.0,
+      departmentCode: 'CSE',
+      semester: 4,
+      session: '2022-23',
+    },
+  ];
+
+  const examApps: ExamApplicationRecord[] = [
+    {
+      id: 'app-5',
+      circularId: 'circ-5',
+      examTitle: '5th Sem Exam',
+      studentId: 'stu-1',
+      academicId: '220101',
+      studentName: 'Mehedy Hasan',
+      departmentCode: 'CSE',
+      session: '2022-23',
+      semester: 5,
+      selectedCourseCodes: ['CSE-3101'],
+      totalCredits: 3,
+      formReference: 'FORM-5',
+      feeBdt: 1200,
+      paymentStatus: 'Paid',
+      verificationStatus: 'Approved',
+      hallClearanceChecked: true,
+      createdAt: '2026-11-20',
+    },
+  ];
+
+  const student: StudentRecord = {
+    id: 'stu-1',
+    academicId: '220101',
+    name: 'Mehedy Hasan',
+    email: 'mehedy.cse@pust.ac.bd',
+    phone: '017',
+    departmentCode: 'CSE',
+    session: '2022-23',
+    currentSemester: 5,
+    cgpa: 3.82,
+    completedSemesters: 4,
+    allResultsPublished: true,
+    hallName: 'July 06 Hall',
+    seatNumber: '304',
+    admissionDocuments: [],
+    chairmanNotes: '',
+    adminNotes: '',
+    disciplinaryStatus: 'Clear',
+    disciplinaryNotes: '',
+    approvalStatus: 'approved',
+  };
+
+  const history = buildStudentCourseHistory({
+    results,
+    courses,
+    examApplications: examApps,
+    departments: [mockDepartment],
+    studentProfile: student,
+  });
+
+  assert.equal(history.completedCourses.length, 2);
+  assert.equal(history.completedCredits, 6);
+  assert.equal(history.enrolledCourses.length, 2);
+  assert.equal(history.enrolledCredits, 4.5);
+  assert.equal(history.totalCredits, 10.5);
+  assert.equal(history.enrolledCourses[0].code, 'CSE-3101');
+  assert.equal(history.enrolledCourses[0].instructor, 'Dr. Md. Mahmudul Hasan');
+  assert.equal(history.enrolledCourses[0].enrollmentStatus, 'Exam Form Paid');
+  assert.equal(history.enrolledCourses[1].code, 'CSE-3106');
+  assert.equal(history.enrolledCourses[1].sessionType, 'Laboratory');
+  assert.equal(history.enrolledCourses[1].enrollmentStatus, 'Enrolled (Ongoing)');
 });
