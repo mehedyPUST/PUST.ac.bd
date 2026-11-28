@@ -311,8 +311,11 @@ export function PortalAuthGateway({
                 </p>
               </div>
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Institutional Email</label>
+                <label htmlFor="portal-signin-email" className="block font-medium text-slate-700 mb-1">
+                  Institutional Email
+                </label>
                 <input
+                  id="portal-signin-email"
                   type="email"
                   required
                   value={email}

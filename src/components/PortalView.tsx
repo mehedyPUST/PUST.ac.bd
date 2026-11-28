@@ -28,6 +28,7 @@ import { PortalOverviewPanel } from './portal/PortalOverviewPanel';
 import { PortalProfilePanel } from './portal/PortalProfilePanel';
 import { PortalStudentLedgerPanel } from './portal/PortalStudentLedgerPanel';
 import { RoleSwitcherControl } from './portal/RoleSwitcherControl';
+import { StudentDashboardSection } from './portal/StudentDashboardSection';
 import { TeacherProfilePanel } from './portal/TeacherProfilePanel';
 import {
   getActiveRoleTabs,
@@ -460,17 +461,35 @@ export function PortalView({
     });
   }
 
+  function focusSignInGateway() {
+    if (typeof window === 'undefined') return;
+    const emailEl = document.getElementById('portal-signin-email') as HTMLInputElement | null;
+    if (emailEl) {
+      emailEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => {
+        emailEl.focus({ preventScroll: true });
+      }, 250);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
   if (!user) {
     return (
-      <PortalAuthGateway
-        departments={departments}
-        bootstrapStatus={bootstrapStatus}
-        initialAuthError={logoutError}
-        requestedTab={requestedTabParam}
-        onAuthenticated={handleAuthenticated}
-        onNavigateVerify={() => navigateTo('/verify')}
-        onBackToSite={onBackToSite}
-      />
+      <div className="space-y-2 pb-12">
+        <PortalAuthGateway
+          departments={departments}
+          bootstrapStatus={bootstrapStatus}
+          initialAuthError={logoutError}
+          requestedTab={requestedTabParam}
+          onAuthenticated={handleAuthenticated}
+          onNavigateVerify={() => navigateTo('/verify')}
+          onBackToSite={onBackToSite}
+        />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <StudentDashboardSection onFocusSignIn={focusSignInGateway} />
+        </div>
+      </div>
     );
   }
 
@@ -709,44 +728,59 @@ export function PortalView({
             transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
           >
             {resolvedTab === 'overview' && (
-              <PortalOverviewPanel
-                user={user}
-                portalTabs={portalTabs}
-                studentSelf={studentSelf}
-                studentsCount={students.length}
-                loadingStudents={loadingStudents}
-                receipts={receipts}
-                targetedNotifications={targetedNotifications}
-                bookmarks={bookmarks}
-                roleContexts={roleContexts}
-                activeRoleKey={activeRoleKey}
-                switchingRole={switchingRole}
-                onSwitchRole={handleSwitchRole}
+              <div className="space-y-6">
+                <PortalOverviewPanel
+                  user={user}
+                  portalTabs={portalTabs}
+                  studentSelf={studentSelf}
+                  studentsCount={students.length}
+                  loadingStudents={loadingStudents}
+                  receipts={receipts}
+                  targetedNotifications={targetedNotifications}
+                  bookmarks={bookmarks}
+                  roleContexts={roleContexts}
+                  activeRoleKey={activeRoleKey}
+                  switchingRole={switchingRole}
+                  onSwitchRole={handleSwitchRole}
+                  onSelectTab={(tab) => selectTab(tab)}
+                  onOpenReceipt={openReceiptModal}
+                  onNavigateVerify={() => navigateTo('/verify')}
+                  onOpenNotice={(n) => setActiveNotice(n)}
+                  onRemoveBookmark={async (itemId) => {
+                    await pustApi.removeBookmark(itemId);
+                    await onBookmarksChange();
+                  }}
+                  onAddCoAdmin={
+                    user.role === 'admin'
+                      ? () => {
+                          setPendingDirectoryAction('create-admin');
+                          selectTab('users');
+                        }
+                      : undefined
+                  }
+                  pendingFacultyRequestsCount={pendingFacultyRequestCount}
+                  onReviewFacultyRequests={
+                    user.role === 'admin' || user.role === 'chairman'
+                      ? () => {
+                          setPendingDirectorySection('faculty-requests');
+                          selectTab('users');
+                        }
+                      : undefined
+                  }
+                />
+                {user.role === 'student' && (
+                  <StudentDashboardSection
+                    onSelectTab={(tab) => selectTab(tab)}
+                    onOpenReceipt={openReceiptModal}
+                  />
+                )}
+              </div>
+            )}
+
+            {resolvedTab === 'student-dashboard' && (
+              <StudentDashboardSection
                 onSelectTab={(tab) => selectTab(tab)}
                 onOpenReceipt={openReceiptModal}
-                onNavigateVerify={() => navigateTo('/verify')}
-                onOpenNotice={(n) => setActiveNotice(n)}
-                onRemoveBookmark={async (itemId) => {
-                  await pustApi.removeBookmark(itemId);
-                  await onBookmarksChange();
-                }}
-                onAddCoAdmin={
-                  user.role === 'admin'
-                    ? () => {
-                        setPendingDirectoryAction('create-admin');
-                        selectTab('users');
-                      }
-                    : undefined
-                }
-                pendingFacultyRequestsCount={pendingFacultyRequestCount}
-                onReviewFacultyRequests={
-                  user.role === 'admin' || user.role === 'chairman'
-                    ? () => {
-                        setPendingDirectorySection('faculty-requests');
-                        selectTab('users');
-                      }
-                    : undefined
-                }
               />
             )}
 

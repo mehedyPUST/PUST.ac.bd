@@ -22,6 +22,7 @@ import type { RoleAssignment, UserRole } from '../../types/pust';
 
 export type PortalTab =
   | 'overview'
+  | 'student-dashboard'
   | 'profile'
   | 'users'
   | 'audit'
@@ -36,6 +37,7 @@ export type PortalTab =
 
 export const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
+  'student-dashboard',
   'profile',
   'users',
   'audit',
@@ -123,6 +125,7 @@ function mergePortalTabs(base: PortalTabItem[], extra: PortalTabItem[]): PortalT
   }
   const order: PortalTab[] = [
     'overview',
+    'student-dashboard',
     'profile',
     'users',
     'students',
@@ -376,12 +379,18 @@ function getPrimaryRoleTabs(
     case 'student':
       return [
         overview,
+        {
+          id: 'student-dashboard',
+          label: 'Student Dashboard',
+          desc: 'Semester results, class schedules & fees',
+          icon: GraduationCap,
+        },
         memberProfile,
         {
           id: 'exams',
           label: 'Exams & Results',
           desc: 'Apply for exams, admit cards & CGPA',
-          icon: GraduationCap,
+          icon: FileCheck2,
         },
         {
           id: 'library',

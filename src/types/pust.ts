@@ -1313,3 +1313,42 @@ export interface DepartmentApprovalOverviewResponse {
   requests: DepartmentRequestRecord[];
   crossChecks: DepartmentPendingCrossChecks;
 }
+
+export type ClassScheduleDay = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu';
+
+export interface ClassScheduleSlot {
+  id: string;
+  day: ClassScheduleDay;
+  dayLabel: string;
+  startTime: string;
+  endTime: string;
+  courseCode: string;
+  courseTitle: string;
+  credits: number;
+  sessionType: 'Lecture' | 'Laboratory';
+  room: string;
+  building: string;
+  instructor: string;
+  departmentCode: string;
+  semester: number;
+  session: string;
+  isReferenceSlot?: boolean;
+}
+
+export type StudentFeeStatusKind = 'due' | 'submitted' | 'settled';
+
+export interface StudentFeeItem {
+  id: string;
+  category: 'Hall Fee' | 'Exam Fee' | 'Certificate Fee' | 'University Receipt';
+  title: string;
+  subtitle: string;
+  amountBdt: number;
+  status: StudentFeeStatusKind;
+  statusLabel: string;
+  referenceNo?: string;
+  dateLabel?: string;
+  actionTab: 'halls' | 'exams' | 'certificates';
+  actionLabel: string;
+  receipt?: PaymentReceiptRecord;
+}
+

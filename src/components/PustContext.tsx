@@ -21,6 +21,7 @@ import {
   parseDepartmentPath,
   type DepartmentTab,
 } from '../lib/departmentNav';
+import { buildStudentClassSchedules } from '../lib/studentDashboard';
 import { getRouteSectionKey, parseRouteFromPath, type AppRoute } from '../lib/routes';
 import { PageReveal } from './MotionPrimitives';
 import { OfflineIndicator, PwaRegistrar } from './PwaManager';
@@ -31,12 +32,21 @@ import type {
   BannerSlideRecord,
   BookmarkRecord,
   BootstrapStatus,
+  CertificateApplicationRecord,
+  ClassScheduleSlot,
+  CourseRecord,
   DepartmentRecord,
   EditModalTarget,
+  ExamApplicationRecord,
+  ExamResultRecord,
+  FeeConfig,
   GalleryItemRecord,
+  HallDueRecord,
   InquiryRecord,
   NoticeRecord,
+  PaymentReceiptRecord,
   PublicationRecord,
+  StudentRecord,
   UniversityProfile,
   ViceChancellorRecord,
 } from '../types/pust';
@@ -86,6 +96,19 @@ interface PustContextValue {
   loadDepartments: () => Promise<void>;
   loadPublications: () => Promise<void>;
   loadBookmarks: () => Promise<void>;
+  studentProfile: StudentRecord | null;
+  studentExamResults: ExamResultRecord[];
+  studentCourses: CourseRecord[];
+  studentClassSchedules: ClassScheduleSlot[];
+  studentExamApplications: ExamApplicationRecord[];
+  studentHallDues: HallDueRecord[];
+  studentCertificateApps: CertificateApplicationRecord[];
+  studentPaymentReceipts: PaymentReceiptRecord[];
+  studentFeeConfig: FeeConfig | null;
+  studentHallClearanceBlocked: boolean;
+  loadingStudentDashboard: boolean;
+  studentDashboardError: string | null;
+  loadStudentDashboard: () => Promise<void>;
   retryLoad: () => Promise<void>;
   submitInquiry: (payload: {
     fullName: string;
@@ -162,6 +185,22 @@ export function PustShell({
     storageBackend: 'memory',
   });
 
+  const [studentProfile, setStudentProfile] = useState<StudentRecord | null>(null);
+  const [studentExamResults, setStudentExamResults] = useState<ExamResultRecord[]>([]);
+  const [studentCourses, setStudentCourses] = useState<CourseRecord[]>([]);
+  const [studentExamApplications, setStudentExamApplications] = useState<ExamApplicationRecord[]>(
+    []
+  );
+  const [studentHallDues, setStudentHallDues] = useState<HallDueRecord[]>([]);
+  const [studentCertificateApps, setStudentCertificateApps] = useState<
+    CertificateApplicationRecord[]
+  >([]);
+  const [studentPaymentReceipts, setStudentPaymentReceipts] = useState<PaymentReceiptRecord[]>([]);
+  const [studentFeeConfig, setStudentFeeConfig] = useState<FeeConfig | null>(null);
+  const [studentHallClearanceBlocked, setStudentHallClearanceBlocked] = useState(false);
+  const [loadingStudentDashboard, setLoadingStudentDashboard] = useState(false);
+  const [studentDashboardError, setStudentDashboardError] = useState<string | null>(null);
+
   const [activeDepartment, setActiveDepartment] = useState<DepartmentRecord | null>(null);
   const [activeNotice, setActiveNotice] = useState<NoticeRecord | null>(null);
   const [editMode, setEditModeState] = useState(false);
@@ -189,11 +228,140 @@ export function PustShell({
   const isAdmin = user?.role === 'admin';
   const effectiveEditMode = isAdmin && editMode;
 
+  const userId = user?.id ?? null;
+  const userRole = user?.role ?? null;
+  const userDepartmentCode = user?.departmentCode ?? '';
+  const userSession = user?.session ?? '';
+
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setBookmarks([]);
     }
-  }, [user]);
+  }, [userId]);
+
+  const loadStudentDashboard = useCallback(async () => {
+    if (!userId || userRole !== 'student') {
+      setStudentProfile(null);
+      setStudentExamResults([]);
+      setStudentCourses([]);
+      setStudentExamApplications([]);
+      setStudentHallDues([]);
+      setStudentCertificateApps([]);
+      setStudentPaymentReceipts([]);
+      setStudentFeeConfig(null);
+      setStudentHallClearanceBlocked(false);
+      setLoadingStudentDashboard(false);
+      setStudentDashboardError(null);
+      return;
+    }
+
+    setLoadingStudentDashboard(true);
+    setStudentDashboardError(null);
+
+    try {
+      const [studentsRes, examsRes, hallsRes, receiptsRes, certsRes] = await Promise.allSettled([
+        pustApi.getStudents(
+          userDepartmentCode ? { department: userDepartmentCode } : undefined
+        ),
+        pustApi.getExamsOverview(),
+        pustApi.getHallsOverview(),
+        pustApi.getPaymentReceipts(),
+        pustApi.getCertificatesOverview(),
+      ]);
+
+      if (!mountedRef.current) return;
+
+      const resolvedStudent =
+        studentsRes.status === 'fulfilled' && studentsRes.value.students.length > 0
+          ? studentsRes.value.students[0]
+          : certsRes.status === 'fulfilled'
+            ? certsRes.value.student
+            : null;
+      setStudentProfile(resolvedStudent ?? null);
+
+      if (examsRes.status === 'fulfilled') {
+        setStudentExamResults(examsRes.value.results);
+        setStudentCourses(examsRes.value.courses);
+        setStudentExamApplications(examsRes.value.applications);
+        setStudentHallClearanceBlocked(Boolean(examsRes.value.hallClearanceBlocked));
+      } else {
+        setStudentExamResults([]);
+        setStudentCourses([]);
+        setStudentExamApplications([]);
+        setStudentHallClearanceBlocked(false);
+      }
+
+      if (hallsRes.status === 'fulfilled') {
+        setStudentHallDues(hallsRes.value.dues);
+      } else {
+        setStudentHallDues([]);
+      }
+
+      if (receiptsRes.status === 'fulfilled') {
+        setStudentPaymentReceipts(receiptsRes.value.receipts);
+      } else {
+        setStudentPaymentReceipts([]);
+      }
+
+      if (certsRes.status === 'fulfilled') {
+        setStudentCertificateApps(certsRes.value.applications);
+        setStudentFeeConfig(certsRes.value.feeConfig);
+      } else {
+        setStudentCertificateApps([]);
+        setStudentFeeConfig(null);
+      }
+
+      const settled = [studentsRes, examsRes, hallsRes, receiptsRes, certsRes];
+      const allRejected = settled.every((r) => r.status === 'rejected');
+      if (allRejected) {
+        const firstReason = settled.find((r) => r.status === 'rejected') as
+          | PromiseRejectedResult
+          | undefined;
+        setStudentDashboardError(
+          firstReason?.reason instanceof Error
+            ? firstReason.reason.message
+            : 'Unable to load student academic and fee records.'
+        );
+      }
+    } catch (err) {
+      if (!mountedRef.current) return;
+      setStudentDashboardError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to load student academic and fee records.'
+      );
+    } finally {
+      if (mountedRef.current) {
+        setLoadingStudentDashboard(false);
+      }
+    }
+  }, [userId, userRole, userDepartmentCode]);
+
+  useEffect(() => {
+    void loadStudentDashboard();
+  }, [loadStudentDashboard]);
+
+  const studentProfileSemester = studentProfile?.currentSemester;
+  const studentProfileSession = studentProfile?.session;
+
+  const studentClassSchedules = useMemo(
+    () =>
+      buildStudentClassSchedules({
+        courses: studentCourses,
+        departments,
+        departmentCode: userDepartmentCode || undefined,
+        currentSemester: studentProfileSemester,
+        session: studentProfileSession || userSession || undefined,
+      }),
+    [
+      studentCourses,
+      departments,
+      userDepartmentCode,
+      studentProfileSemester,
+      studentProfileSession,
+      userSession,
+    ]
+  );
 
   const ADMIN_EDIT_MODE_STORAGE_KEY = 'pust_admin_edit_mode';
 
@@ -687,6 +855,19 @@ export function PustShell({
       loadDepartments,
       loadPublications,
       loadBookmarks,
+      studentProfile,
+      studentExamResults,
+      studentCourses,
+      studentClassSchedules,
+      studentExamApplications,
+      studentHallDues,
+      studentCertificateApps,
+      studentPaymentReceipts,
+      studentFeeConfig,
+      studentHallClearanceBlocked,
+      loadingStudentDashboard,
+      studentDashboardError,
+      loadStudentDashboard,
       retryLoad,
       submitInquiry,
     }),
@@ -725,6 +906,19 @@ export function PustShell({
       loadDepartments,
       loadPublications,
       loadBookmarks,
+      studentProfile,
+      studentExamResults,
+      studentCourses,
+      studentClassSchedules,
+      studentExamApplications,
+      studentHallDues,
+      studentCertificateApps,
+      studentPaymentReceipts,
+      studentFeeConfig,
+      studentHallClearanceBlocked,
+      loadingStudentDashboard,
+      studentDashboardError,
+      loadStudentDashboard,
       retryLoad,
       submitInquiry,
     ]
