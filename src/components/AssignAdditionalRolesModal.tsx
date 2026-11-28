@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   Building2,
+  Calendar,
   CheckCircle2,
+  FileText,
   Plus,
   RefreshCw,
   Shield,
@@ -20,59 +22,105 @@ import type {
   UserRole,
 } from '../types/pust';
 
-const ADDITIONAL_ROLE_OPTIONS: {
-  value: UserRole;
+/** Catalog aligned with common Bangladesh public-university office orders. */
+const APPOINTMENT_CATALOG: {
+  appointmentType: RoleAssignment['appointmentType'];
   label: string;
+  description: string;
+  role: UserRole;
   defaultScopeType: RoleAssignment['scopeType'];
   defaultTitle: string;
+  typicalTermMonths: number | null;
 }[] = [
   {
-    value: 'chairman',
-    label: 'Department Chairman',
+    appointmentType: 'department_chairman',
+    label: 'Department Chairman / Head',
+    description: 'Heads an academic department (home or another department).',
+    role: 'chairman',
     defaultScopeType: 'department',
-    defaultTitle: 'Department Chairman',
+    defaultTitle: 'Chairman',
+    typicalTermMonths: 36,
   },
   {
-    value: 'hall',
-    label: 'Hall Provost / Officer',
+    appointmentType: 'hall_provost',
+    label: 'Hall Provost',
+    description: 'Residential hall head; usually a senior teacher on additional duty.',
+    role: 'hall',
     defaultScopeType: 'hall',
-    defaultTitle: 'Hall Provost',
+    defaultTitle: 'Provost',
+    typicalTermMonths: 12,
   },
   {
-    value: 'proctor',
-    label: 'Proctorial Officer',
+    appointmentType: 'assistant_provost',
+    label: 'Assistant Provost',
+    description: 'Supports hall administration under the Provost.',
+    role: 'hall',
+    defaultScopeType: 'hall',
+    defaultTitle: 'Assistant Provost',
+    typicalTermMonths: 12,
+  },
+  {
+    appointmentType: 'house_tutor',
+    label: 'House Tutor',
+    description: 'Hall residential tutor duty for a fixed term.',
+    role: 'hall',
+    defaultScopeType: 'hall',
+    defaultTitle: 'House Tutor',
+    typicalTermMonths: 12,
+  },
+  {
+    appointmentType: 'proctor',
+    label: 'Proctor',
+    description: 'University discipline and campus order (Proctorial body).',
+    role: 'proctor',
+    defaultScopeType: 'university',
+    defaultTitle: 'Proctor',
+    typicalTermMonths: 24,
+  },
+  {
+    appointmentType: 'assistant_proctor',
+    label: 'Assistant Proctor',
+    description: 'Supports the Proctor; common additional duty for teachers.',
+    role: 'proctor',
     defaultScopeType: 'university',
     defaultTitle: 'Assistant Proctor',
+    typicalTermMonths: 12,
   },
   {
-    value: 'dean',
-    label: 'Dean / Faculty Head',
+    appointmentType: 'student_advisor',
+    label: 'Student Advisor',
+    description: 'University or department student welfare and counselling advisor.',
+    role: 'advisor',
+    defaultScopeType: 'university',
+    defaultTitle: 'Student Advisor',
+    typicalTermMonths: 12,
+  },
+  {
+    appointmentType: 'dean',
+    label: 'Dean of Faculty',
+    description: 'Heads a faculty/school; appointed from senior professors.',
+    role: 'dean',
     defaultScopeType: 'faculty',
     defaultTitle: 'Dean',
+    typicalTermMonths: 36,
   },
   {
-    value: 'advisor',
-    label: 'Student Advisor',
-    defaultScopeType: 'department',
-    defaultTitle: 'Student Advisor',
-  },
-  {
-    value: 'registrar',
-    label: 'Registrar / Office Officer',
+    appointmentType: 'director_office',
+    label: 'Director / Office in-charge',
+    description: 'Acting director of a cell, lab, or central office.',
+    role: 'registrar',
     defaultScopeType: 'office',
-    defaultTitle: 'Office Officer',
+    defaultTitle: 'Director',
+    typicalTermMonths: 24,
   },
   {
-    value: 'library',
-    label: 'Library Officer',
-    defaultScopeType: 'office',
-    defaultTitle: 'Library Officer',
-  },
-  {
-    value: 'vc',
-    label: 'VC / Pro-VC assignment',
+    appointmentType: 'other',
+    label: 'Other additional duty',
+    description: 'Custom appointment with a clear title and scope.',
+    role: 'teacher',
     defaultScopeType: 'university',
-    defaultTitle: 'Pro-Vice-Chancellor',
+    defaultTitle: 'Additional Duty',
+    typicalTermMonths: 12,
   },
 ];
 
@@ -91,6 +139,22 @@ const FACULTY_OPTIONS = [
   'Faculty of Life and Earth Science',
 ];
 
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addMonthsIso(isoDate: string, months: number): string {
+  const d = new Date(isoDate + 'T12:00:00');
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+function formatTerm(a: RoleAssignment): string {
+  const from = a.effectiveFrom?.slice(0, 10) || '—';
+  const until = a.effectiveUntil?.slice(0, 10);
+  return until ? `${from} → ${until}` : `${from} → until further orders`;
+}
+
 export interface AssignAdditionalRolesModalProps {
   open: boolean;
   onClose: () => void;
@@ -107,28 +171,57 @@ export function AssignAdditionalRolesModal({
   onUpdated,
 }: AssignAdditionalRolesModalProps) {
   const [user, setUser] = useState(initialUser);
-  const [role, setRole] = useState<UserRole>('chairman');
+  const [appointmentType, setAppointmentType] =
+    useState<RoleAssignment['appointmentType']>('department_chairman');
+  const [title, setTitle] = useState('Chairman');
   const [scopeType, setScopeType] = useState<RoleAssignment['scopeType']>('department');
   const [scopeCode, setScopeCode] = useState('');
   const [scopeName, setScopeName] = useState('');
-  const [title, setTitle] = useState('Department Chairman');
+  const [effectiveFrom, setEffectiveFrom] = useState(todayIsoDate());
+  const [effectiveUntil, setEffectiveUntil] = useState('');
+  const [untilFurtherOrders, setUntilFurtherOrders] = useState(false);
+  const [orderReference, setOrderReference] = useState('');
+  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+
+  const catalogEntry = useMemo(
+    () =>
+      APPOINTMENT_CATALOG.find((c) => c.appointmentType === appointmentType) ||
+      APPOINTMENT_CATALOG[0],
+    [appointmentType]
+  );
+
+  const applyCatalogDefaults = useCallback((type: RoleAssignment['appointmentType']) => {
+    const entry =
+      APPOINTMENT_CATALOG.find((c) => c.appointmentType === type) || APPOINTMENT_CATALOG[0];
+    setAppointmentType(type);
+    setTitle(entry.defaultTitle);
+    setScopeType(entry.defaultScopeType);
+    setScopeCode('');
+    setScopeName(entry.defaultScopeType === 'university' ? 'University-wide' : '');
+    const from = todayIsoDate();
+    setEffectiveFrom(from);
+    if (entry.typicalTermMonths) {
+      setEffectiveUntil(addMonthsIso(from, entry.typicalTermMonths));
+      setUntilFurtherOrders(false);
+    } else {
+      setEffectiveUntil('');
+      setUntilFurtherOrders(true);
+    }
+    setOrderReference('');
+    setNotes('');
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     setUser(initialUser);
     setError(null);
     setFeedback(null);
-    const opt = ADDITIONAL_ROLE_OPTIONS[0];
-    setRole(opt.value);
-    setScopeType(opt.defaultScopeType);
-    setTitle(opt.defaultTitle);
-    setScopeCode('');
-    setScopeName('');
-  }, [open, initialUser]);
+    applyCatalogDefaults('department_chairman');
+  }, [open, initialUser, applyCatalogDefaults]);
 
   useEffect(() => {
     if (!open) return;
@@ -139,64 +232,68 @@ export function AssignAdditionalRolesModal({
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, onClose]);
 
-  const roleOption = useMemo(
-    () => ADDITIONAL_ROLE_OPTIONS.find((o) => o.value === role) || ADDITIONAL_ROLE_OPTIONS[0],
-    [role]
-  );
-
-  const handleRoleChange = useCallback((next: UserRole) => {
-    const opt = ADDITIONAL_ROLE_OPTIONS.find((o) => o.value === next);
-    setRole(next);
-    if (opt) {
-      setScopeType(opt.defaultScopeType);
-      setTitle(opt.defaultTitle);
-      setScopeCode('');
-      setScopeName('');
-    }
-  }, []);
-
   function applyDepartmentScope(code: string) {
     const dept = departments.find((d) => d.code.toUpperCase() === code.toUpperCase());
     setScopeCode(code.toUpperCase());
     setScopeName(dept ? `Department of ${dept.name}` : code.toUpperCase());
+    if (appointmentType === 'department_chairman' && dept) {
+      setTitle(`Chairman, Department of ${dept.name}`);
+    }
   }
 
   function applyHallScope(hall: string) {
     setScopeCode(hall);
     setScopeName(hall);
+    if (appointmentType === 'hall_provost') setTitle(`Provost, ${hall}`);
+    if (appointmentType === 'assistant_provost') setTitle(`Assistant Provost, ${hall}`);
+    if (appointmentType === 'house_tutor') setTitle(`House Tutor, ${hall}`);
   }
 
   function applyFacultyScope(faculty: string) {
     setScopeCode(faculty);
     setScopeName(faculty);
+    if (appointmentType === 'dean') setTitle(`Dean, ${faculty}`);
   }
 
   async function handleAssign(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
-    if (!scopeCode.trim() && (scopeType === 'department' || scopeType === 'hall' || scopeType === 'faculty')) {
-      setError('Select a department, hall, or faculty for this appointment.');
+    if (
+      !scopeCode.trim() &&
+      (scopeType === 'department' || scopeType === 'hall' || scopeType === 'faculty')
+    ) {
+      setError('Select the department, hall, or faculty this appointment applies to.');
+      return;
+    }
+    if (!title.trim()) {
+      setError('Official appointment title is required.');
       return;
     }
     setSubmitting(true);
     try {
       const res = await pustApi.assignAdditionalRole(user.id, {
-        role,
+        role: catalogEntry.role,
+        appointmentType,
         scopeType,
         scopeCode: scopeCode.trim() || undefined,
         scopeName: scopeName.trim() || undefined,
-        title: title.trim() || undefined,
+        title: title.trim(),
+        effectiveFrom,
+        ...(untilFurtherOrders || !effectiveUntil.trim()
+          ? {}
+          : { effectiveUntil: effectiveUntil.trim() }),
+        ...(orderReference.trim() ? { orderReference: orderReference.trim() } : {}),
+        ...(notes.trim() ? { notes: notes.trim() } : {}),
       });
       setUser(res.user);
       onUpdated?.(res.user);
       setFeedback(
-        `Assigned ${res.assignment.title || res.assignment.role} (${res.assignment.scopeName || res.assignment.scopeCode || res.assignment.scopeType}). Primary role stays ${res.user.role}.`
+        `Recorded appointment: ${res.assignment.title} (${formatTerm(res.assignment)}). Home department and primary role (${res.user.role}) are unchanged.`
       );
-      setScopeCode('');
-      setScopeName('');
+      applyCatalogDefaults(appointmentType);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to assign role.');
+      setError(err instanceof Error ? err.message : 'Unable to record appointment.');
     } finally {
       setSubmitting(false);
     }
@@ -210,9 +307,9 @@ export function AssignAdditionalRolesModal({
       const res = await pustApi.removeAdditionalRole(user.id, assignmentId);
       setUser(res.user);
       onUpdated?.(res.user);
-      setFeedback('Additional role removed.');
+      setFeedback('Appointment removed from this account.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to remove role.');
+      setError(err instanceof Error ? err.message : 'Unable to remove appointment.');
     } finally {
       setRemovingId(null);
     }
@@ -221,6 +318,7 @@ export function AssignAdditionalRolesModal({
   if (!open) return null;
 
   const assignments = user.additionalRoles || [];
+  const activeCount = assignments.filter((a) => a.status !== 'ended').length;
 
   return (
     <div
@@ -231,23 +329,23 @@ export function AssignAdditionalRolesModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
           <div className="min-w-0 space-y-1">
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-pust-200">
-              Multi-role appointments
+              Additional duty · office appointment
             </p>
             <h2
               id="assign-roles-title"
               className="font-serif text-lg sm:text-xl font-medium text-white leading-snug flex items-center gap-2"
             >
               <Shield className="w-5 h-5 shrink-0 text-pust-200" />
-              Assign additional roles
+              Administrative appointments
             </h2>
             <p className="text-xs text-pust-100/90 truncate">
-              {user.name} · primary: {user.role} · {user.departmentCode}
+              {user.name} · primary {user.role} · home dept {user.departmentCode}
             </p>
           </div>
           <button
@@ -261,11 +359,18 @@ export function AssignAdditionalRolesModal({
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
-          <p className="text-slate-600 leading-relaxed">
-            Keep the account as a <strong>teacher</strong> (or other primary role). Add hall provost,
-            chairman of another department, proctor, dean, student advisor, and similar appointments
-            here without changing the primary login role.
-          </p>
+          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-3.5 py-3 text-slate-700 leading-relaxed space-y-1.5">
+            <p>
+              <strong>Professional model:</strong> one portal identity per teacher. Home
+              department and primary role stay fixed. Chairman, hall provost, proctor, student
+              advisor, dean, and similar duties are recorded as <em>time-bound appointments</em>{' '}
+              (as on VC/office orders), not as a second login account.
+            </p>
+            <p className="text-[11px] text-slate-500">
+              Typical terms: Hall / Student Advisor ~1 year; Chairman / Dean ~2–3 years; or
+              “until further orders.”
+            </p>
+          </div>
 
           {error && (
             <div
@@ -286,30 +391,39 @@ export function AssignAdditionalRolesModal({
             </div>
           )}
 
-          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-3 space-y-2">
+          <div className="rounded-xl border border-stone-200 bg-white p-3 space-y-2">
             <p className="font-semibold text-slate-800 flex items-center gap-1.5">
               <Building2 className="w-3.5 h-3.5" />
-              Current additional roles ({assignments.length})
+              Current appointments ({activeCount} active)
             </p>
             {assignments.length === 0 ? (
-              <p className="text-slate-500">None yet — assign the first appointment below.</p>
+              <p className="text-slate-500">No additional duties yet.</p>
             ) : (
               <ul className="space-y-2">
                 {assignments.map((a) => (
                   <li
                     key={a.id}
-                    className="flex items-start justify-between gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2"
+                    className="flex items-start justify-between gap-2 rounded-lg border border-stone-200 bg-[#FAF9F6] px-3 py-2.5"
                   >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-900">
-                        {a.title || a.role}
-                        <span className="ml-1.5 font-mono text-[10px] font-normal text-slate-500">
-                          {a.role}
+                    <div className="min-w-0 space-y-0.5">
+                      <p className="font-semibold text-slate-900">{a.title}</p>
+                      <p className="text-slate-600">
+                        {a.scopeName || a.scopeCode || a.scopeType}
+                        <span className="ml-1.5 font-mono text-[10px] text-slate-500">
+                          {a.appointmentType || a.role}
                         </span>
                       </p>
-                      <p className="text-slate-600 truncate">
-                        {a.scopeName || a.scopeCode || a.scopeType}
+                      <p className="font-mono text-[11px] text-slate-500 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatTerm(a)}
+                        {a.status && a.status !== 'active' ? ` · ${a.status}` : ''}
                       </p>
+                      {a.orderReference && (
+                        <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                          <FileText className="w-3 h-3" />
+                          {a.orderReference}
+                        </p>
+                      )}
                     </div>
                     <button
                       type="button"
@@ -322,7 +436,7 @@ export function AssignAdditionalRolesModal({
                       ) : (
                         <Trash2 className="w-3.5 h-3.5" />
                       )}
-                      Remove
+                      End
                     </button>
                   </li>
                 ))}
@@ -333,36 +447,41 @@ export function AssignAdditionalRolesModal({
           <form onSubmit={handleAssign} className="space-y-3 border-t border-stone-200 pt-4">
             <p className="font-semibold text-slate-800 flex items-center gap-1.5">
               <Plus className="w-3.5 h-3.5" />
-              Add appointment
+              Record new appointment
             </p>
+
             <label className="block space-y-1">
-              <span className="font-medium text-slate-700">Role</span>
+              <span className="font-medium text-slate-700">Appointment type</span>
               <select
-                value={role}
-                onChange={(e) => handleRoleChange(e.target.value as UserRole)}
+                value={appointmentType}
+                onChange={(e) =>
+                  applyCatalogDefaults(e.target.value as RoleAssignment['appointmentType'])
+                }
                 className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
               >
-                {ADDITIONAL_ROLE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+                {APPOINTMENT_CATALOG.map((opt) => (
+                  <option key={opt.appointmentType} value={opt.appointmentType}>
                     {opt.label}
                   </option>
                 ))}
               </select>
+              <span className="text-[11px] text-slate-500 block">{catalogEntry.description}</span>
             </label>
+
             <label className="block space-y-1">
-              <span className="font-medium text-slate-700">Display title</span>
+              <span className="font-medium text-slate-700">Official title (as on order)</span>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={roleOption.defaultTitle}
+                required
                 className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
               />
             </label>
 
             {scopeType === 'department' && (
               <label className="block space-y-1">
-                <span className="font-medium text-slate-700">Department scope</span>
+                <span className="font-medium text-slate-700">Department (scope)</span>
                 <select
                   value={scopeCode}
                   onChange={(e) => applyDepartmentScope(e.target.value)}
@@ -373,6 +492,9 @@ export function AssignAdditionalRolesModal({
                   {departments.map((d) => (
                     <option key={d.code} value={d.code}>
                       {d.name} ({d.code})
+                      {d.code.toUpperCase() === user.departmentCode.toUpperCase()
+                        ? ' · home'
+                        : ''}
                     </option>
                   ))}
                 </select>
@@ -380,7 +502,7 @@ export function AssignAdditionalRolesModal({
             )}
             {scopeType === 'hall' && (
               <label className="block space-y-1">
-                <span className="font-medium text-slate-700">Hall</span>
+                <span className="font-medium text-slate-700">Residential hall</span>
                 <select
                   value={scopeCode}
                   onChange={(e) => applyHallScope(e.target.value)}
@@ -398,7 +520,7 @@ export function AssignAdditionalRolesModal({
             )}
             {scopeType === 'faculty' && (
               <label className="block space-y-1">
-                <span className="font-medium text-slate-700">Faculty</span>
+                <span className="font-medium text-slate-700">Faculty / school</span>
                 <select
                   value={scopeCode}
                   onChange={(e) => applyFacultyScope(e.target.value)}
@@ -416,7 +538,9 @@ export function AssignAdditionalRolesModal({
             )}
             {(scopeType === 'university' || scopeType === 'office') && (
               <label className="block space-y-1">
-                <span className="font-medium text-slate-700">Scope label (optional)</span>
+                <span className="font-medium text-slate-700">
+                  {scopeType === 'office' ? 'Office / cell name' : 'Scope label'}
+                </span>
                 <input
                   type="text"
                   value={scopeName}
@@ -424,11 +548,72 @@ export function AssignAdditionalRolesModal({
                     setScopeName(e.target.value);
                     setScopeCode(e.target.value);
                   }}
-                  placeholder={scopeType === 'university' ? 'University-wide' : 'Office name'}
+                  placeholder={
+                    scopeType === 'office' ? 'e.g. Central Laboratory' : 'University-wide'
+                  }
                   className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
                 />
               </label>
             )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Effective from</span>
+                <input
+                  type="date"
+                  value={effectiveFrom}
+                  onChange={(e) => setEffectiveFrom(e.target.value)}
+                  required
+                  className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
+                />
+              </label>
+              <label className="block space-y-1">
+                <span className="font-medium text-slate-700">Effective until</span>
+                <input
+                  type="date"
+                  value={effectiveUntil}
+                  onChange={(e) => {
+                    setEffectiveUntil(e.target.value);
+                    setUntilFurtherOrders(false);
+                  }}
+                  disabled={untilFurtherOrders}
+                  className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800 disabled:bg-stone-100"
+                />
+              </label>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={untilFurtherOrders}
+                onChange={(e) => {
+                  setUntilFurtherOrders(e.target.checked);
+                  if (e.target.checked) setEffectiveUntil('');
+                }}
+                className="rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+              />
+              <span className="text-slate-700">Until further orders (no fixed end date)</span>
+            </label>
+
+            <label className="block space-y-1">
+              <span className="font-medium text-slate-700">Office order / memo ref (optional)</span>
+              <input
+                type="text"
+                value={orderReference}
+                onChange={(e) => setOrderReference(e.target.value)}
+                placeholder="e.g. PUST/Reg/Admin/2026/…"
+                className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
+              />
+            </label>
+            <label className="block space-y-1">
+              <span className="font-medium text-slate-700">Notes (optional)</span>
+              <input
+                type="text"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Internal note for admin record"
+                className="w-full h-9 px-3 rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pust-800/30 focus:border-pust-800"
+              />
+            </label>
 
             <div className="flex items-center justify-end gap-2 pt-1">
               <button
@@ -446,12 +631,12 @@ export function AssignAdditionalRolesModal({
                 {submitting ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    Assigning…
+                    Saving…
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-3.5 h-3.5" />
-                    Assign role
+                    Record appointment
                   </>
                 )}
               </button>

@@ -33,14 +33,27 @@ export interface JwtClaims {
   additionalRoles?: RoleAssignment[];
 }
 
-/** True if primary role or any additional appointment matches. */
+function isAppointmentInForce(a: RoleAssignment, now = Date.now()): boolean {
+  if (a.status === 'ended') return false;
+  const from = a.effectiveFrom ? new Date(a.effectiveFrom).getTime() : 0;
+  if (!Number.isNaN(from) && from > now) return false;
+  if (a.effectiveUntil) {
+    const until = new Date(a.effectiveUntil).getTime();
+    if (!Number.isNaN(until) && until < now) return false;
+  }
+  return a.status === 'active' || a.status === 'scheduled' || !a.status;
+}
+
+/** True if primary role or any currently in-force additional appointment matches. */
 export function claimsHaveRole(
   user: { role: UserRole; additionalRoles?: RoleAssignment[] } | null | undefined,
   ...allowed: UserRole[]
 ): boolean {
   if (!user) return false;
   if (allowed.includes(user.role)) return true;
-  return (user.additionalRoles || []).some((a) => allowed.includes(a.role));
+  return (user.additionalRoles || []).some(
+    (a) => isAppointmentInForce(a) && allowed.includes(a.role)
+  );
 }
 
 export interface AuthenticatedRequest extends Request {

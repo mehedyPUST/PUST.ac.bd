@@ -104,12 +104,30 @@ const userRoleEnum = z.enum([
   'advisor',
 ]);
 
+const appointmentTypeEnum = z.enum([
+  'department_chairman',
+  'hall_provost',
+  'assistant_provost',
+  'house_tutor',
+  'proctor',
+  'assistant_proctor',
+  'student_advisor',
+  'dean',
+  'director_office',
+  'other',
+]);
+
 const assignRoleSchema = z.object({
   role: userRoleEnum,
+  appointmentType: appointmentTypeEnum,
   scopeType: z.enum(['department', 'faculty', 'hall', 'university', 'office']),
   scopeCode: z.string().trim().max(80).optional(),
   scopeName: z.string().trim().max(120).optional(),
-  title: z.string().trim().max(80).optional(),
+  title: z.string().trim().min(2).max(80),
+  effectiveFrom: z.string().trim().min(8).max(40),
+  effectiveUntil: z.string().trim().min(8).max(40).optional(),
+  orderReference: z.string().trim().max(80).optional(),
+  notes: z.string().trim().max(300).optional(),
 });
 
 const adminCreateUserSchema = z.object({
@@ -1777,26 +1795,60 @@ portalRouter.post(
     const existing = Array.isArray(target.additionalRoles) ? [...target.additionalRoles] : [];
     const duplicate = existing.find(
       (a) =>
+        a.status !== 'ended' &&
+        a.appointmentType === data.appointmentType &&
         a.role === data.role &&
         (a.scopeCode || '').toUpperCase() === (data.scopeCode || '').toUpperCase() &&
         a.scopeType === data.scopeType
     );
     if (duplicate) {
       res.status(409).json({
-        error: `This account already has ${data.role} for ${data.scopeName || data.scopeCode || data.scopeType}.`,
+        error: `This account already holds an active ${data.title} appointment for ${data.scopeName || data.scopeCode || data.scopeType}.`,
       });
       return;
     }
 
+    const fromDate = new Date(data.effectiveFrom);
+    if (Number.isNaN(fromDate.getTime())) {
+      res.status(400).json({ error: 'Invalid effective-from date.' });
+      return;
+    }
+    let untilIso: string | undefined;
+    if (data.effectiveUntil?.trim()) {
+      const untilDate = new Date(data.effectiveUntil);
+      if (Number.isNaN(untilDate.getTime())) {
+        res.status(400).json({ error: 'Invalid effective-until date.' });
+        return;
+      }
+      if (untilDate.getTime() < fromDate.getTime()) {
+        res.status(400).json({ error: 'End date must be on or after the start date.' });
+        return;
+      }
+      untilIso = data.effectiveUntil.trim();
+    }
+    const now = Date.now();
+    const status: 'active' | 'ended' | 'scheduled' =
+      untilIso && new Date(untilIso).getTime() < now
+        ? 'ended'
+        : fromDate.getTime() > now
+        ? 'scheduled'
+        : 'active';
+
     const assignment = {
       id: `role-${crypto.randomUUID()}`,
       role: data.role,
+      appointmentType: data.appointmentType,
       scopeType: data.scopeType,
-      ...(data.scopeCode?.trim() ? { scopeCode: data.scopeCode.trim() } : {}),
-      ...(data.scopeName?.trim() ? { scopeName: data.scopeName.trim() } : {}),
-      ...(data.title?.trim() ? { title: data.title.trim() } : {}),
+      title: data.title.trim(),
+      effectiveFrom: data.effectiveFrom.trim(),
+      status,
       assignedAt: new Date().toISOString(),
       assignedBy: req.authUser!.email,
+      ...(data.scopeCode?.trim() ? { scopeCode: data.scopeCode.trim() } : {}),
+      ...(data.scopeName?.trim() ? { scopeName: data.scopeName.trim() } : {}),
+      ...(untilIso ? { effectiveUntil: untilIso } : {}),
+      ...(data.orderReference?.trim() ? { orderReference: data.orderReference.trim() } : {}),
+      ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
     };
     const nextRoles = [...existing, assignment];
     const updated = await pustRepo.updateUser(target.id, { additionalRoles: nextRoles });

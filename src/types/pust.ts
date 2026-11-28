@@ -20,19 +20,43 @@ export type UserRole =
 
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 
-/** Scoped extra appointment on top of the primary portal role (usually teacher). */
+/**
+ * Administrative / service appointment on a primary faculty identity.
+ * Bangladesh public universities typically keep one teacher account and add
+ * time-bound duties (Chairman, Hall Provost, Proctor, Student Advisor, Dean)
+ * without changing home department or primary portal role.
+ */
 export interface RoleAssignment {
   id: string;
+  /** Portal capability this appointment unlocks */
   role: UserRole;
-  /** Where this appointment applies */
+  /** Standard university appointment catalog key */
+  appointmentType:
+    | 'department_chairman'
+    | 'hall_provost'
+    | 'assistant_provost'
+    | 'house_tutor'
+    | 'proctor'
+    | 'assistant_proctor'
+    | 'student_advisor'
+    | 'dean'
+    | 'director_office'
+    | 'other';
   scopeType: 'department' | 'faculty' | 'hall' | 'university' | 'office';
-  /** e.g. CSE, Faculty of Science, July 06 Hall */
   scopeCode?: string;
   scopeName?: string;
-  /** Display title e.g. Hall Provost, Student Advisor, Dean */
-  title?: string;
+  /** Title as on the office order (e.g. Hall Provost, Assistant Proctor) */
+  title: string;
+  /** Duty start date (ISO date YYYY-MM-DD or full ISO) */
+  effectiveFrom: string;
+  /** End date; omit for "until further orders" */
+  effectiveUntil?: string;
+  status: 'active' | 'ended' | 'scheduled';
+  /** Office order / memo number if available */
+  orderReference?: string;
   assignedAt: string;
   assignedBy?: string;
+  notes?: string;
 }
 
 export interface AuthUser {
@@ -104,10 +128,15 @@ export interface AdminUpdateUserPayload {
 
 export interface AdminAssignRolePayload {
   role: UserRole;
+  appointmentType: RoleAssignment['appointmentType'];
   scopeType: RoleAssignment['scopeType'];
   scopeCode?: string;
   scopeName?: string;
-  title?: string;
+  title: string;
+  effectiveFrom: string;
+  effectiveUntil?: string;
+  orderReference?: string;
+  notes?: string;
 }
 
 export interface SignupTokenRecord {
