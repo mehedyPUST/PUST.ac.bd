@@ -14,7 +14,7 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
-import type { UserRole } from '../../types/pust';
+import type { RoleAssignment, UserRole } from '../../types/pust';
 
 export type PortalTab =
   | 'overview'
@@ -55,6 +55,8 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   proctor: 'Proctor Office',
   library: 'Central Library Office',
   hall: 'Residential Hall Provost',
+  dean: 'Dean of Faculty',
+  advisor: 'Student Advisor',
 };
 
 export interface PortalTabItem {
@@ -62,9 +64,158 @@ export interface PortalTabItem {
   label: string;
   desc: string;
   icon: LucideIcon;
+  /** Short label when the tab comes from an additional appointment (not primary role). */
+  sourceBadge?: string;
 }
 
+function isAppointmentInForce(a: RoleAssignment, now = Date.now()): boolean {
+  if (a.status === 'ended') return false;
+  const from = a.effectiveFrom ? new Date(a.effectiveFrom).getTime() : 0;
+  if (!Number.isNaN(from) && from > now) return false;
+  if (a.effectiveUntil) {
+    const until = new Date(a.effectiveUntil).getTime();
+    if (!Number.isNaN(until) && until < now) return false;
+  }
+  return true;
+}
+
+/** Active additional appointment roles for portal navigation. */
+export function getEffectiveAdditionalRoles(
+  additionalRoles?: RoleAssignment[] | null
+): UserRole[] {
+  if (!additionalRoles?.length) return [];
+  const roles = new Set<UserRole>();
+  for (const a of additionalRoles) {
+    if (isAppointmentInForce(a)) roles.add(a.role);
+  }
+  return Array.from(roles);
+}
+
+export function userHasPortalRole(
+  user: { role: UserRole; additionalRoles?: RoleAssignment[] | null },
+  ...roles: UserRole[]
+): boolean {
+  if (roles.includes(user.role)) return true;
+  return getEffectiveAdditionalRoles(user.additionalRoles).some((r) => roles.includes(r));
+}
+
+/** Compact badge text for an appointment role in the sidebar. */
+export function appointmentBadgeLabel(
+  role: UserRole,
+  appt?: RoleAssignment | null
+): string {
+  const scope =
+    appt?.scopeCode ||
+    (appt?.scopeName ? appt.scopeName.replace(/\s+/g, ' ').slice(0, 18) : '') ||
+    '';
+  switch (role) {
+    case 'chairman':
+      return scope ? `Chair · ${scope}` : 'Chairman';
+    case 'hall':
+      return scope ? `Provost · ${scope}` : 'Hall Provost';
+    case 'proctor':
+      return 'Proctor';
+    case 'dean':
+      return scope ? `Dean · ${scope}` : 'Dean';
+    case 'advisor':
+      return 'Advisor';
+    case 'library':
+      return 'Library';
+    case 'registrar':
+      return 'Registrar';
+    case 'vc':
+      return 'VC Office';
+    case 'admin':
+      return 'Admin';
+    case 'teacher':
+      return 'Faculty';
+    default:
+      return ROLE_LABELS[role] || role;
+  }
+}
+
+function mergePortalTabs(base: PortalTabItem[], extra: PortalTabItem[]): PortalTabItem[] {
+  const byId = new Map<PortalTab, PortalTabItem>();
+  for (const tab of base) byId.set(tab.id, tab);
+  for (const tab of extra) {
+    if (!byId.has(tab.id)) byId.set(tab.id, tab);
+  }
+  const order: PortalTab[] = [
+    'overview',
+    'profile',
+    'users',
+    'students',
+    'approvals',
+    'exams',
+    'library',
+    'halls',
+    'certificates',
+    'workflow',
+    'governance',
+    'audit',
+  ];
+  const merged: PortalTabItem[] = [];
+  for (const id of order) {
+    const t = byId.get(id);
+    if (t) merged.push(t);
+  }
+  for (const [id, t] of byId) {
+    if (!order.includes(id)) merged.push(t);
+  }
+  return merged;
+}
+
+/**
+ * Sidebar tabs for the primary role, plus any in-force additional appointments
+ * (e.g. teacher who is also hall provost / department chairman / proctor).
+ * Tabs unlocked only by an appointment get a sourceBadge for the sidebar.
+ */
 export function getRoleTabs(
+  role: UserRole,
+  departmentCode: string,
+  hallAffiliation: string,
+  additionalRoles?: RoleAssignment[] | null
+): PortalTabItem[] {
+  const primary = getPrimaryRoleTabs(role, departmentCode, hallAffiliation);
+  const extraRoles = getEffectiveAdditionalRoles(additionalRoles).filter((r) => r !== role);
+  if (extraRoles.length === 0) return primary;
+
+  const primaryIds = new Set(primary.map((t) => t.id));
+  let merged = primary;
+  for (const extraRole of extraRoles) {
+    const appt =
+      additionalRoles?.find(
+        (a) => a.role === extraRole && isAppointmentInForce(a)
+      ) || null;
+    const scopeDept =
+      appt?.scopeType === 'department' && appt.scopeCode
+        ? appt.scopeCode
+        : departmentCode;
+    const scopeHall =
+      appt?.scopeType === 'hall'
+        ? appt.scopeName || appt.scopeCode || hallAffiliation
+        : hallAffiliation;
+    const badge = appointmentBadgeLabel(extraRole, appt);
+    const extraTabs = getPrimaryRoleTabs(extraRole, scopeDept, scopeHall)
+      .filter((t) => t.id !== 'overview' && t.id !== 'profile')
+      .map((t) =>
+        primaryIds.has(t.id)
+          ? t
+          : {
+              ...t,
+              sourceBadge: badge,
+            }
+      );
+    // Track ids already in merged so subsequent appointments don't overwrite badge
+    for (const t of extraTabs) {
+      if (!primaryIds.has(t.id)) primaryIds.add(t.id);
+    }
+    merged = mergePortalTabs(merged, extraTabs);
+  }
+  return merged;
+}
+
+function getPrimaryRoleTabs(
   role: UserRole,
   departmentCode: string,
   hallAffiliation: string
@@ -383,6 +534,58 @@ export function getRoleTabs(
           label: 'Examinations Overview',
           desc: 'Academic examination status',
           icon: FileCheck2,
+        },
+      ];
+    case 'dean':
+      return [
+        overview,
+        memberProfile,
+        {
+          id: 'students',
+          label: 'Faculty Student Overview',
+          desc: 'Cross-department student view',
+          icon: Users,
+        },
+        {
+          id: 'exams',
+          label: 'Faculty Exams Overview',
+          desc: 'Examination status across departments',
+          icon: FileCheck2,
+        },
+        {
+          id: 'governance',
+          label: 'Faculty Notices',
+          desc: 'Publish faculty-level circulars',
+          icon: Settings2,
+        },
+        {
+          id: 'approvals',
+          label: 'Faculty Requests',
+          desc: 'Review escalated departmental requests',
+          icon: ClipboardCheck,
+        },
+      ];
+    case 'advisor':
+      return [
+        overview,
+        memberProfile,
+        {
+          id: 'students',
+          label: 'Advisee Students',
+          desc: 'Student welfare & counselling roster',
+          icon: Users,
+        },
+        {
+          id: 'approvals',
+          label: 'Student Support Requests',
+          desc: 'Advise on leave and welfare requests',
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'governance',
+          label: 'Advisor Notices',
+          desc: 'Guidance & counselling circulars',
+          icon: Settings2,
         },
       ];
     default:

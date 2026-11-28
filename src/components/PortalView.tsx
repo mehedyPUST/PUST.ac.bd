@@ -30,6 +30,7 @@ import { TeacherProfilePanel } from './portal/TeacherProfilePanel';
 import {
   getRoleTabs,
   ROLE_LABELS,
+  userHasPortalRole,
   VALID_PORTAL_TABS,
   type PortalTab,
 } from './portal/portalMeta';
@@ -432,7 +433,12 @@ export function PortalView({
   }
 
   const mustChangePassword = Boolean(user.mustChangePassword);
-  const portalTabs = getRoleTabs(user.role, user.departmentCode, user.hallAffiliation);
+  const portalTabs = getRoleTabs(
+    user.role,
+    user.departmentCode,
+    user.hallAffiliation,
+    user.additionalRoles
+  );
   const resolvedTab: PortalTab = mustChangePassword
     ? 'profile'
     : portalTabs.some((t) => t.id === activeTab)
@@ -440,6 +446,8 @@ export function PortalView({
     : portalTabs[0].id;
   const activeTabMeta = portalTabs.find((t) => t.id === resolvedTab) || portalTabs[0];
   const studentSelf = user.role === 'student' ? students[0] ?? null : null;
+  const isPortalChairman = userHasPortalRole(user, 'chairman');
+  const isPortalAdmin = userHasPortalRole(user, 'admin');
 
   return (
     <section
@@ -460,6 +468,16 @@ export function PortalView({
                   <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
                     {user.name}
                   </p>
+                  {(user.additionalRoles || []).filter((a) => a.status !== 'ended').length >
+                    0 && (
+                    <p className="text-[10px] text-pust-100/90 leading-snug line-clamp-2 text-left mt-0.5">
+                      +{' '}
+                      {(user.additionalRoles || [])
+                        .filter((a) => a.status !== 'ended')
+                        .map((a) => a.title || ROLE_LABELS[a.role] || a.role)
+                        .join(' · ')}
+                    </p>
+                  )}
                 </div>
               </div>
               <button
@@ -513,6 +531,18 @@ export function PortalView({
                   <span className="min-w-0 lg:flex-1">
                     <span className="flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold lg:truncate">
                       <span className="truncate">{tab.label}</span>
+                      {tab.sourceBadge && !isLocked && (
+                        <span
+                          className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-amber-100 text-amber-900 border border-amber-200/80'
+                          }`}
+                          title={`From appointment: ${tab.sourceBadge}`}
+                        >
+                          {tab.sourceBadge}
+                        </span>
+                      )}
                       {isLocked && <Lock className="w-3 h-3 shrink-0" />}
                     </span>
                     <span
@@ -520,7 +550,11 @@ export function PortalView({
                         isActive ? 'text-pust-100/85' : 'text-slate-500'
                       }`}
                     >
-                      {isLocked ? 'Update temporary password first' : tab.desc}
+                      {isLocked
+                        ? 'Update temporary password first'
+                        : tab.sourceBadge
+                          ? `${tab.desc} · via ${tab.sourceBadge}`
+                          : tab.desc}
                     </span>
                   </span>
                 </button>
@@ -726,7 +760,7 @@ export function PortalView({
             {resolvedTab === 'halls' && <HallPanel user={user} />}
             {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
             {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
-            {resolvedTab === 'users' && user.role === 'admin' && (
+            {resolvedTab === 'users' && isPortalAdmin && (
               <AdminUserDirectoryPanel
                 currentUser={user}
                 departments={departments}
@@ -748,7 +782,7 @@ export function PortalView({
               />
             )}
 
-            {resolvedTab === 'users' && user.role === 'chairman' && (
+            {resolvedTab === 'users' && isPortalChairman && !isPortalAdmin && (
               <DepartmentPeoplePanel
                 currentUser={user}
                 departments={departments}
