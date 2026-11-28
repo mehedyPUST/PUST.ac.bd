@@ -28,9 +28,14 @@ import type {
   DepartmentRecord,
   DigitalDocumentMeta,
   PublicStatusLookupResult,
-  UserRole,
 } from '../../types/pust';
-import { computeDeterministicFileHash, type AuthMode } from './portalMeta';
+import {
+  computeDeterministicFileHash,
+  OFFICE_SIGNUP_CATEGORIES,
+  OFFICE_SIGNUP_OPTIONS,
+  resolveOfficerRoleSelection,
+  type AuthMode,
+} from './portalMeta';
 
 interface PortalAuthGatewayProps {
   departments: DepartmentRecord[];
@@ -119,10 +124,35 @@ export function PortalAuthGateway({
   const [offName, setOffName] = useState('');
   const [offEmail, setOffEmail] = useState('');
   const [offPassword, setOffPassword] = useState('');
-  const [offRole, setOffRole] = useState<Exclude<UserRole, 'admin' | 'student'>>('teacher');
+  const [offSelection, setOffSelection] = useState<string>('teacher');
   const [offDept, setOffDept] = useState('CSE');
   const [offAcademicId, setOffAcademicId] = useState('');
   const [offHall, setOffHall] = useState('July 06 Hall');
+
+  const resolvedOfficer = resolveOfficerRoleSelection(offSelection);
+  const offRole = resolvedOfficer.role;
+  const selectedOffice = resolvedOfficer.office;
+
+  function handleOfficerSelectionChange(nextSelection: string) {
+    setOffSelection(nextSelection);
+    const nextResolved = resolveOfficerRoleSelection(nextSelection);
+    if (nextResolved.office) {
+      setOffDept(nextResolved.office.code);
+      if (nextResolved.role === 'hall') {
+        setOffHall(nextResolved.office.defaultAffiliation);
+      }
+      return;
+    }
+    if (nextSelection === 'role:hall') {
+      setOffDept('HALL');
+      setOffHall('All Halls');
+      return;
+    }
+    const isAcademicDept = departments.some((d) => d.code === offDept);
+    if (!isAcademicDept) {
+      setOffDept(departments[0]?.code || 'CSE');
+    }
+  }
 
   // Admin Claim / Passcode
   const [adminName, setAdminName] = useState('PUST Admin Office');
@@ -230,6 +260,12 @@ export function PortalAuthGateway({
     setAuthMessage(null);
     setSubmitting(true);
     try {
+      const hallAffiliation =
+        offRole === 'hall'
+          ? offHall
+          : selectedOffice
+          ? selectedOffice.defaultAffiliation
+          : 'Academic Block';
       const res = await pustApi.registerOfficer({
         name: offName,
         email: offEmail,
@@ -237,7 +273,7 @@ export function PortalAuthGateway({
         role: offRole,
         departmentCode: offDept,
         academicId: offAcademicId,
-        hallAffiliation: offRole === 'hall' ? offHall : 'Academic Block',
+        hallAffiliation,
       });
       setAuthMessage(res.pendingMessage);
       setStatusQuery(offEmail);
@@ -713,7 +749,9 @@ export function PortalAuthGateway({
                 <span>
                   {offRole === 'teacher'
                     ? `Teachers in ${offDept} are approved directly by the ${offDept} Department Chairman.`
-                    : 'Registrar, VC, Chairman, Proctor, Library, and Hall officer accounts require Admin Office verification.'}
+                    : selectedOffice
+                    ? `Applications for ${selectedOffice.name} (${selectedOffice.code}) are verified by the Admin Office.`
+                    : 'Department Chairmen, Hall Provosts, and institutional officers require Admin Office verification.'}
                 </span>
               </div>
 
@@ -733,22 +771,34 @@ export function PortalAuthGateway({
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                    Official Role
+                    Official Role / Office
                   </label>
                   <select
-                    value={offRole}
-                    onChange={(e) =>
-                      setOffRole(e.target.value as Exclude<UserRole, 'admin' | 'student'>)
-                    }
+                    value={offSelection}
+                    onChange={(e) => handleOfficerSelectionChange(e.target.value)}
                     className="w-full min-h-[42px] px-3.5 py-2 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                   >
-                    <option value="teacher">Teacher (Chairman Approval)</option>
-                    <option value="chairman">Department Chairman (Admin Approval)</option>
-                    <option value="registrar">Registrar Office (Admin Approval)</option>
-                    <option value="vc">Vice-Chancellor Office (Admin Approval)</option>
-                    <option value="proctor">Proctor Office (Admin Approval)</option>
-                    <option value="library">Library Office (Admin Approval)</option>
-                    <option value="hall">Hall Provost / Office (Admin Approval)</option>
+                    <optgroup label="Academic & Departmental Roles">
+                      <option value="teacher">Teacher / Faculty Member (Chairman Approval)</option>
+                      <option value="chairman">Department Chairman (Admin Approval)</option>
+                    </optgroup>
+                    {OFFICE_SIGNUP_CATEGORIES.map((category) => {
+                      const items = OFFICE_SIGNUP_OPTIONS.filter((o) => o.category === category);
+                      return (
+                        <optgroup key={category} label={`${category} (Admin Approval)`}>
+                          {items.map((office) => (
+                            <option key={office.optionValue} value={office.optionValue}>
+                              {office.name} ({office.code})
+                            </option>
+                          ))}
+                          {category === 'Residential Halls & Accommodation' && (
+                            <option value="role:hall">
+                              Central Hall Administration — All Halls (HALL)
+                            </option>
+                          )}
+                        </optgroup>
+                      );
+                    })}
                   </select>
                 </div>
                 <div>
@@ -797,15 +847,22 @@ export function PortalAuthGateway({
                     onChange={(e) => setOffDept(e.target.value)}
                     className="w-full min-h-[42px] px-3.5 py-2 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                   >
-                    {departments.map((d) => (
-                      <option key={d.id} value={d.code}>
-                        {d.code} — {d.name}
-                      </option>
-                    ))}
-                    <option value="ADMIN">Central Administration</option>
-                    <option value="LIB">Central Library</option>
-                    <option value="HALL">Hall Office</option>
-                    <option value="PROCTOR">Proctorial Office</option>
+                    <optgroup label="Academic Departments">
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.code}>
+                          {d.code} — {d.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="University Offices & Units">
+                      {OFFICE_SIGNUP_OPTIONS.map((office) => (
+                        <option key={office.slug} value={office.code}>
+                          {office.code} — {office.name}
+                        </option>
+                      ))}
+                      <option value="ADMIN">ADMIN — Central Administration</option>
+                      <option value="HALL">HALL — Central Hall Administration</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div>
@@ -833,9 +890,11 @@ export function PortalAuthGateway({
                     >
                       <option value="July 06 Hall">July 06 Hall</option>
                       <option value="Male Hall-1">Male Hall-1</option>
-                      <option value="Male Hall-2">Male Hall-2</option>
-                      <option value="Female Hall-1">Female Hall-1</option>
-                      <option value="Female Hall-2">Female Hall-2</option>
+                      <option value="Male Hall-2">Male Hall-2 (Swadhinota Hall)</option>
+                      <option value="Female Hall-1">Female Hall-1 (Matribhasha Hall)</option>
+                      <option value="Female Hall-2">Female Hall-2 (Ganatantra Hall)</option>
+                      <option value="Dormitory">Dormitory</option>
+                      <option value="Guest House">Guest House</option>
                       <option value="All Halls">Central Hall Administration (All Halls)</option>
                     </select>
                   </div>

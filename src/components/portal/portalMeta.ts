@@ -11,7 +11,70 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
-import type { UserRole } from '../../types/pust';
+import { DEFAULT_ADMIN_OFFICES } from '../../lib/adminOffices';
+import type { AdministrationOfficeRecord, UserRole } from '../../types/pust';
+
+export type OfficerBackendRole = Exclude<UserRole, 'admin' | 'student'>;
+export type OfficeSignupCategory = AdministrationOfficeRecord['category'];
+
+export interface OfficerOfficeOption {
+  optionValue: string;
+  slug: string;
+  code: string;
+  name: string;
+  category: OfficeSignupCategory;
+  mappedRole: OfficerBackendRole;
+  defaultAffiliation: string;
+}
+
+export const OFFICE_SIGNUP_CATEGORIES: OfficeSignupCategory[] = [
+  'Executive Leadership',
+  'Administrative Sections & Offices',
+  'Student Welfare & Campus Services',
+  'Residential Halls & Accommodation',
+  'Research, ICT & Quality Cells',
+];
+
+const HALL_OFFICE_AFFILIATION: Record<string, string> = {
+  'male-hall-1': 'July 06 Hall',
+  'female-hall-1': 'Female Hall-1',
+  'male-hall-2': 'Male Hall-2',
+  'female-hall-2': 'Female Hall-2',
+  dormitory: 'Dormitory',
+  'guest-house': 'Guest House',
+};
+
+function mapOfficeSlugToRole(slug: string): OfficerBackendRole {
+  if (slug === 'vc-office' || slug === 'pro-vc-office') return 'vc';
+  if (slug === 'central-library') return 'library';
+  if (slug === 'proctor-office') return 'proctor';
+  if (slug in HALL_OFFICE_AFFILIATION) return 'hall';
+  return 'registrar';
+}
+
+export const OFFICE_SIGNUP_OPTIONS: OfficerOfficeOption[] = DEFAULT_ADMIN_OFFICES.map((office) => ({
+  optionValue: `office:${office.slug}`,
+  slug: office.slug,
+  code: office.code,
+  name: office.name,
+  category: office.category,
+  mappedRole: mapOfficeSlugToRole(office.slug),
+  defaultAffiliation: HALL_OFFICE_AFFILIATION[office.slug] ?? office.name.slice(0, 60),
+}));
+
+export function resolveOfficerRoleSelection(selection: string): {
+  role: OfficerBackendRole;
+  office: OfficerOfficeOption | null;
+} {
+  if (selection === 'teacher') return { role: 'teacher', office: null };
+  if (selection === 'chairman') return { role: 'chairman', office: null };
+  if (selection === 'role:hall') return { role: 'hall', office: null };
+  const matchedOffice = OFFICE_SIGNUP_OPTIONS.find((o) => o.optionValue === selection) ?? null;
+  if (matchedOffice) {
+    return { role: matchedOffice.mappedRole, office: matchedOffice };
+  }
+  return { role: 'registrar', office: null };
+}
 
 export type AuthMode = 'login' | 'student-token' | 'officer' | 'admin-claim' | 'admin-passcode';
 
