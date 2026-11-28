@@ -1706,53 +1706,56 @@ export function DepartmentDetailView({
                     dossier or in the central PUST research archive.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {deptPublications.map((pub, idx) => (
-                      <MotionCard
-                        key={pub.id}
-                        delay={(idx % 4) * 0.04}
-                        className={`p-4 sm:p-5 rounded-2xl border transition-colors space-y-2 ${
-                          idx % 2 === 0
-                            ? 'bg-white border-stone-200 hover:border-pust-700/45'
-                            : 'bg-[#F3F6FA] border-lapis-200/80 hover:border-lapis-600/50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <p
-                            className={`font-mono text-[11px] font-semibold text-left ${
-                              idx % 2 === 0 ? 'text-pust-800' : 'text-lapis-800'
-                            }`}
-                          >
-                            {pub.year} · {pub.domain}
-                          </p>
-                          {canAdminEdit && (
-                            <EditTriggerButton
-                              label="Edit"
-                              variant="compact"
-                              onClick={() => openEditModal({ kind: 'publication', publication: pub })}
-                            />
-                          )}
-                        </div>
-                        <h3 className="font-serif text-base font-medium text-slate-900 leading-snug">
-                          {pub.title}
-                        </h3>
-                        <p className="text-xs text-slate-600 text-left">{pub.authors}</p>
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                          <span className="text-slate-600">{pub.venue}</span>
-                          {pub.url && (
-                            <a
-                              href={pub.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline"
-                            >
-                              DOI
-                              <ArrowUpRight className="w-3.5 h-3.5" />
-                            </a>
-                          )}
-                        </div>
-                      </MotionCard>
-                    ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                    {deptPublications.map((pub, idx) => {
+                      const externalUrl =
+                        pub.url || (pub.doi ? `https://doi.org/${pub.doi}` : undefined);
+                      return (
+                        <MotionCard
+                          key={pub.id}
+                          delay={(idx % 4) * 0.04}
+                          className="h-full p-5 rounded-2xl border border-stone-200 bg-white hover:border-pust-700/45 transition-colors flex flex-col justify-between gap-4"
+                        >
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between gap-2 pb-2 border-b border-stone-200/80">
+                              <p className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums text-left">
+                                {pub.year} · {pub.domain}
+                              </p>
+                              {canAdminEdit && (
+                                <EditTriggerButton
+                                  label="Edit"
+                                  variant="compact"
+                                  onClick={() => openEditModal({ kind: 'publication', publication: pub })}
+                                />
+                              )}
+                            </div>
+                            <h3 className="font-serif text-base font-medium text-slate-950 leading-snug text-left [text-wrap:pretty]">
+                              {pub.title}
+                            </h3>
+                            <p className="text-xs text-slate-600 leading-relaxed text-left">
+                              <span className="text-slate-500">Authors:</span> {pub.authors}
+                            </p>
+                          </div>
+
+                          <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between gap-3 text-xs">
+                            <span className="text-slate-600 truncate min-w-0">
+                              {pub.venue || `${pub.departmentCode} Research Archive`}
+                            </span>
+                            {externalUrl && (
+                              <a
+                                href={externalUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 font-mono font-semibold text-pust-900 hover:underline whitespace-nowrap shrink-0"
+                              >
+                                {pub.doi ? 'DOI' : 'Paper'}
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </MotionCard>
+                      );
+                    })}
                   </div>
                 )}
               </div>

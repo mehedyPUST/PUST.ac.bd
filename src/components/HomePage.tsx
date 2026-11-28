@@ -1137,39 +1137,93 @@ export function HomePage({
             </MotionReveal>
 
             <MotionReveal key={`pub-list-${pubDeptFilter}`} distance={26} delay={0.04}>
-              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden divide-y divide-stone-200">
-                {visiblePublications.length === 0 ? (
-                  <p className="px-6 py-6 text-sm text-slate-600 text-left">
-                    No peer-reviewed publications found for the selected department.
-                  </p>
-                ) : (
-                  visiblePublications.map((pub, idx) => (
-                    <MotionReveal key={pub.id} distance={18} delay={idx * 0.055}>
-                      <article
-                        className={`px-6 py-5 hover:bg-stone-50 transition-colors space-y-1.5 ${
-                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums">
-                            {pub.departmentCode} · {pub.domain} · {pub.year}
-                          </p>
-                          <EditTriggerButton
-                            target={{ kind: 'publication', publication: pub }}
-                            label="Edit"
-                            variant="compact"
-                          />
-                        </div>
-                        <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
-                          {pub.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left">
-                          Authors: {pub.authors}
-                        </p>
-                      </article>
-                    </MotionReveal>
-                  ))
+              <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                {visiblePublications.length > 0 && (
+                  <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+                    <div className="lg:col-span-2">Year &amp; Dept</div>
+                    <div className="lg:col-span-7">Publication &amp; Authors</div>
+                    <div className="lg:col-span-3 text-right">Index &amp; Action</div>
+                  </div>
                 )}
+                <div className="divide-y divide-stone-200">
+                  {visiblePublications.length === 0 ? (
+                    <p className="px-6 py-6 text-sm text-slate-600 text-left">
+                      No peer-reviewed publications found for the selected department.
+                    </p>
+                  ) : (
+                    visiblePublications.map((pub, idx) => {
+                      const externalUrl =
+                        pub.url || (pub.doi ? `https://doi.org/${pub.doi}` : undefined);
+                      return (
+                        <MotionReveal key={pub.id} distance={18} delay={idx * 0.055}>
+                          <article
+                            className={`px-5 sm:px-6 py-5 hover:bg-pust-50/45 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start ${
+                              idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/70'
+                            }`}
+                          >
+                            {/* Left: Year & Department */}
+                            <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
+                              <span className="text-slate-700 font-semibold whitespace-nowrap">
+                                {pub.year}
+                              </span>
+                              <span className="font-semibold text-pust-800 uppercase tracking-wide text-[11px] leading-tight">
+                                {pub.departmentCode} · {pub.domain}
+                              </span>
+                            </div>
+
+                            {/* Center: Title, Authors & Venue */}
+                            <div className="lg:col-span-7 min-w-0 space-y-1.5">
+                              <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left [text-wrap:pretty]">
+                                {pub.title}
+                              </h3>
+                              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed text-left max-w-3xl">
+                                <span className="text-slate-500">Authors:</span> {pub.authors}
+                              </p>
+                              {pub.venue && (
+                                <p className="text-xs text-slate-600 leading-relaxed text-left max-w-3xl">
+                                  <span className="text-slate-500">Venue:</span> {pub.venue}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Right: DOI / Index & Action */}
+                            <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-stone-200/80 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
+                              <span className="font-medium text-slate-600 lg:text-right break-all">
+                                {pub.doi ? `DOI: ${pub.doi}` : `${pub.departmentCode} Indexed`}
+                              </span>
+                              <div className="flex items-center gap-2.5 shrink-0">
+                                <EditTriggerButton
+                                  target={{ kind: 'publication', publication: pub }}
+                                  label="Edit"
+                                  variant="compact"
+                                />
+                                {externalUrl ? (
+                                  <a
+                                    href={externalUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 hover:text-pust-950 hover:underline whitespace-nowrap"
+                                  >
+                                    {pub.doi ? 'Open DOI' : 'View Paper'}
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                  </a>
+                                ) : (
+                                  <Link
+                                    href="/academics/publications"
+                                    className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 hover:text-pust-950 hover:underline whitespace-nowrap"
+                                  >
+                                    Details
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          </article>
+                        </MotionReveal>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </MotionReveal>
           </div>

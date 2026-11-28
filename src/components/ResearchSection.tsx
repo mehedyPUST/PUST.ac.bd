@@ -343,35 +343,39 @@ export function ResearchSection({
       ) : (
         <div className="space-y-5">
           {featuredPub && (
-            <article className="rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+            <article className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200/80">
                 <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums text-left">
                   01 · Featured Study · {featuredPub.departmentCode} · {featuredPub.domain} ·{' '}
                   {featuredPub.year}
                 </p>
                 {featuredPub.doi && (
-                  <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  <span className="font-mono text-[11px] text-slate-500 tabular-nums break-all">
                     DOI: {featuredPub.doi}
                   </span>
                 )}
               </div>
 
-              <h3 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 leading-snug text-left">
+              <h3 className="font-serif text-xl sm:text-2xl font-semibold text-slate-950 leading-snug text-left [text-wrap:pretty]">
                 {featuredPub.title}
               </h3>
 
-              <div className="space-y-1 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <p className="text-left">
-                  <span className="font-medium text-slate-500">Authors:</span>{' '}
-                  {featuredPub.authors}
-                </p>
+              <dl className="grid grid-cols-1 sm:grid-cols-12 gap-y-1.5 sm:gap-x-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <dt className="sm:col-span-2 font-mono text-[11px] uppercase tracking-wider text-slate-500 pt-0.5">
+                  Authors
+                </dt>
+                <dd className="sm:col-span-10 text-left">{featuredPub.authors}</dd>
                 {featuredPub.venue && (
-                  <p className="text-left">
-                    <span className="font-medium text-slate-500">Published in:</span>{' '}
-                    <span className="font-medium text-slate-900">{featuredPub.venue}</span>
-                  </p>
+                  <>
+                    <dt className="sm:col-span-2 font-mono text-[11px] uppercase tracking-wider text-slate-500 pt-0.5">
+                      Published In
+                    </dt>
+                    <dd className="sm:col-span-10 font-medium text-slate-900 text-left">
+                      {featuredPub.venue}
+                    </dd>
+                  </>
                 )}
-              </div>
+              </dl>
 
               <div className="pt-3 border-t border-stone-200/80 flex flex-wrap items-center justify-between gap-3">
                 {renderPublicationActions(featuredPub)}
@@ -380,40 +384,67 @@ export function ResearchSection({
           )}
 
           {catalogPubs.length > 0 && (
-            <div className="rounded-2xl border border-stone-200 bg-white divide-y divide-stone-200 overflow-hidden">
-              {catalogPubs.map((pub, idx) => {
-                const entryNumber = String(featuredPub ? idx + 2 : idx + 1).padStart(2, '0');
-                return (
-                  <article
-                    key={pub.id}
-                    className={`p-5 sm:p-6 space-y-2.5 transition-colors hover:bg-[#FAF9F6] ${
-                      idx % 2 === 1 ? 'bg-[#FAF9F6]/50' : 'bg-white'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <p className="font-mono text-xs font-semibold text-pust-800 tabular-nums text-left">
-                        {entryNumber} · {pub.departmentCode} · {pub.domain} · {pub.year}
-                      </p>
-                      {pub.doi && (
-                        <span className="font-mono text-[11px] text-slate-500 tabular-nums">
-                          DOI: {pub.doi}
+            <div className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+              <div className="hidden sm:grid sm:grid-cols-12 sm:gap-5 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+                <div className="sm:col-span-2">Index &amp; Year</div>
+                <div className="sm:col-span-10">Publication Details &amp; Citations</div>
+              </div>
+              <div className="divide-y divide-stone-200">
+                {catalogPubs.map((pub, idx) => {
+                  const entryNumber = String(featuredPub ? idx + 2 : idx + 1).padStart(2, '0');
+                  return (
+                    <article
+                      key={pub.id}
+                      className={`p-5 sm:p-6 transition-colors hover:bg-pust-50/35 grid grid-cols-1 sm:grid-cols-12 gap-y-3 sm:gap-x-5 items-start ${
+                        idx % 2 === 1 ? 'bg-[#FAF9F6]/65' : 'bg-white'
+                      }`}
+                    >
+                      {/* Left Rail: Index, Year, Dept */}
+                      <div className="sm:col-span-2 flex flex-row sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-2 sm:gap-1 pt-0.5 font-mono text-xs tabular-nums">
+                        <span className="font-semibold text-slate-500">{entryNumber}</span>
+                        <span className="font-semibold text-slate-900">{pub.year}</span>
+                        <span className="font-semibold text-pust-800 uppercase tracking-wide text-[11px]">
+                          {pub.departmentCode}
                         </span>
-                      )}
-                    </div>
+                      </div>
 
-                    <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left">
-                      {pub.title}
-                    </h3>
+                      {/* Main Content Column */}
+                      <div className="sm:col-span-10 min-w-0 space-y-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-mono text-[11px] font-semibold text-pust-800 text-left">
+                            {pub.domain}
+                          </span>
+                          {pub.doi && (
+                            <span className="font-mono text-[11px] text-slate-500 tabular-nums break-all">
+                              DOI: {pub.doi}
+                            </span>
+                          )}
+                        </div>
 
-                    <p className="text-xs text-slate-700 leading-relaxed text-left">
-                      <span className="text-slate-500">Authors:</span> {pub.authors}
-                      {pub.venue ? ` · ${pub.venue}` : ''}
-                    </p>
+                        <h3 className="font-serif text-lg font-semibold text-slate-950 leading-snug text-left [text-wrap:pretty]">
+                          {pub.title}
+                        </h3>
 
-                    <div className="pt-1">{renderPublicationActions(pub)}</div>
-                  </article>
-                );
-              })}
+                        <div className="space-y-1 text-xs text-slate-700 leading-relaxed">
+                          <p className="text-left">
+                            <span className="text-slate-500">Authors:</span> {pub.authors}
+                          </p>
+                          {pub.venue && (
+                            <p className="text-left">
+                              <span className="text-slate-500">Venue:</span>{' '}
+                              <span className="font-medium text-slate-900">{pub.venue}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pt-2.5 border-t border-stone-200/70">
+                          {renderPublicationActions(pub)}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
