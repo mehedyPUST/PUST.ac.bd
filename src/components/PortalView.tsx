@@ -436,23 +436,23 @@ export function PortalView({
 
         {/* Main Workspace Viewport */}
         <div className="flex-1 min-w-0 w-full space-y-6">
-          {/* Top Contextual Breadcrumb Header */}
-          <header className="bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="min-w-0 space-y-0.5">
-              <p className="font-mono text-[11px] text-slate-500 text-left truncate">
-                Digital Campus / {ROLE_LABELS[user.role]} /{' '}
-                <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
-              </p>
-              <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-950 leading-tight truncate">
-                {activeTabMeta.label}
-              </h1>
-              <p className="font-mono text-[11px] text-slate-500 tabular-nums truncate text-left">
-                {user.email} · {user.hallAffiliation}
-              </p>
-            </div>
+          {/* Top Contextual Breadcrumb Header (hidden on Profile tab, which renders its own header card) */}
+          {resolvedTab !== 'profile' && (
+            <header className="bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="min-w-0 space-y-0.5">
+                <p className="font-mono text-[11px] text-slate-500 text-left truncate">
+                  Digital Campus / {ROLE_LABELS[user.role]} /{' '}
+                  <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
+                </p>
+                <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-950 leading-tight truncate">
+                  {activeTabMeta.label}
+                </h1>
+                <p className="font-mono text-[11px] text-slate-500 tabular-nums truncate text-left">
+                  {user.email} · {user.hallAffiliation}
+                </p>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-2 md:justify-end shrink-0">
-              {resolvedTab !== 'profile' && (
+              <div className="flex flex-wrap items-center gap-2 md:justify-end shrink-0">
                 <button
                   type="button"
                   onClick={() => selectTab('profile')}
@@ -461,34 +461,34 @@ export function PortalView({
                   <User className="w-3.5 h-3.5 text-pust-800" />
                   <span>My Profile</span>
                 </button>
-              )}
-              <button
-                type="button"
-                onClick={onBackToSite}
-                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Public Site</span>
-              </button>
-              {user.role === 'admin' && (
-                <>
-                  <AdminModeSwitch
-                    checked={editMode}
-                    onToggle={toggleEditMode}
-                    variant="desktop"
-                  />
-                  <button
-                    type="button"
-                    onClick={openCmsDirectory}
-                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <LayoutGrid className="w-3.5 h-3.5" />
-                    <span>CMS Directory</span>
-                  </button>
-                </>
-              )}
-            </div>
-          </header>
+                <button
+                  type="button"
+                  onClick={onBackToSite}
+                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Public Site</span>
+                </button>
+                {user.role === 'admin' && (
+                  <>
+                    <AdminModeSwitch
+                      checked={editMode}
+                      onToggle={toggleEditMode}
+                      variant="desktop"
+                    />
+                    <button
+                      type="button"
+                      onClick={openCmsDirectory}
+                      className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span>CMS Directory</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </header>
+          )}
 
           {logoutError && (
             <div
