@@ -22,6 +22,7 @@ import { usePust } from '../PustContext';
 import { PortalRecordsSkeleton } from '../PustSkeletons';
 import { DigitalCheckoutModal, type CheckoutTarget } from './DigitalCheckoutModal';
 import { DigitalDocumentModal, type DigitalDocumentData } from './DigitalDocumentModal';
+import { ExamCommitteeGradesDashboard } from './ExamCommitteeGradesDashboard';
 import type {
   AuthUser,
   CourseRecord,
@@ -172,8 +173,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [pendingPromoModes, setPendingPromoModes] = useState<
     Record<string, 'auto' | 'manual_promoted' | 'manual_repeat'>
   >({});
+  const [rawGradesTermKey, setRawGradesTermKey] = useState<string | null>(null);
 
   const initializedCircularRef = useRef(false);
+  const manualGradebookLockRef = useRef<{ academicId: string; semester: number } | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -352,6 +355,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         setStudentLookupError(null);
 
         if (syncTermAndCourses) {
+          manualGradebookLockRef.current = null;
           const targetSem = Math.max(1, Math.min(10, data.student.currentSemester || 1));
           setResYear(Math.ceil(targetSem / 2));
           setResTermSem(targetSem % 2 === 1 ? 1 : 2);
@@ -390,9 +394,11 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         setPreviousStudentResults(data.previousResults);
         setStudentLookupError(null);
 
-        const targetSem = Math.max(1, Math.min(10, data.student.currentSemester || 1));
-        setResYear(Math.ceil(targetSem / 2));
-        setResTermSem(targetSem % 2 === 1 ? 1 : 2);
+        if (manualGradebookLockRef.current?.academicId !== data.student.academicId) {
+          const targetSem = Math.max(1, Math.min(10, data.student.currentSemester || 1));
+          setResYear(Math.ceil(targetSem / 2));
+          setResTermSem(targetSem % 2 === 1 ? 1 : 2);
+        }
       } catch (err) {
         if (cancelled) return;
         setRetrievedStudent(null);
@@ -407,7 +413,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [resAcademicId, user.role]);
+  }, [resAcademicId, user.role, myActiveCommittees.length]);
 
   const deptCourses = useMemo(() => {
     if (retrievedStudent) {
@@ -465,6 +471,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       return;
     }
     const key = `${retrievedStudent.id}:${computedResSemester}`;
+    if (
+      manualGradebookLockRef.current &&
+      manualGradebookLockRef.current.academicId === retrievedStudent.academicId &&
+      manualGradebookLockRef.current.semester === computedResSemester
+    ) {
+      lastGradebookKeyRef.current = key;
+      return;
+    }
     if (lastGradebookKeyRef.current === key) return;
     if (matchingGradebookTermCourses.length > 0) {
       lastGradebookKeyRef.current = key;
@@ -479,6 +493,37 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       );
     }
   }, [retrievedStudent, computedResSemester, matchingGradebookTermCourses]);
+
+  const handleLoadRawGradesIntoGradebook = useCallback(
+    (payload: {
+      academicId: string;
+      semester: number;
+      rows: Array<{ code: string; title: string; credits: number; marks: number }>;
+    }) => {
+      const targetSem = Math.max(1, Math.min(10, payload.semester || 1));
+      const trimmedId = payload.academicId.trim();
+      manualGradebookLockRef.current = { academicId: trimmedId, semester: targetSem };
+      setResAcademicId(trimmedId);
+      setResYear(Math.ceil(targetSem / 2));
+      setResTermSem(targetSem % 2 === 1 ? 1 : 2);
+      setCourseRows(
+        payload.rows.map((r, idx) => ({
+          key: `raw-load-${r.code}-${idx}`,
+          code: r.code,
+          title: r.title,
+          credits: r.credits,
+          marks: r.marks,
+        }))
+      );
+      setFeedback(
+        `Loaded ${payload.rows.length} reviewed course grade(s) for Academic ID ${trimmedId} (Semester ${targetSem}) into the SGPA Gradebook.`
+      );
+      document
+        .getElementById('gradebook-builder-section')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    []
+  );
 
   const totalGradebookCredits = useMemo(
     () => courseRows.reduce((sum, r) => sum + (Number(r.credits) || 0), 0),
@@ -1192,13 +1237,27 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                         <button
                           type="button"
                           onClick={() => setActiveCommitteeIdForArrange(cm.id)}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer ${
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer whitespace-nowrap shrink-0 ${
                             isSelected
                               ? 'bg-pust-900 text-white'
                               : 'bg-white border border-slate-300 text-slate-800 hover:border-pust-800'
                           }`}
                         >
                           {isSelected ? 'Active for Exam Arrangement' : 'Select Term to Arrange'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRawGradesTermKey(
+                              `${cm.departmentCode.toUpperCase()}::${cm.session}::${cm.semester}`
+                            );
+                            document
+                              .getElementById('exam-committee-raw-grades-dashboard')
+                              ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-300 text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap shrink-0"
+                        >
+                          Review Raw Grades
                         </button>
                       </div>
                     </div>
@@ -2602,9 +2661,23 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         </div>
       )}
 
+      {/* Dedicated Exam Committee Raw Course Grades Scrutiny & Pre-Finalization Dashboard */}
+      {canEnterMarks && (
+        <ExamCommitteeGradesDashboard
+          user={user}
+          departments={departments}
+          courses={courses}
+          activeCommittees={myActiveCommittees}
+          preselectedTermKey={rawGradesTermKey}
+          onRefreshExamOverview={refresh}
+          onLoadStudentGradesToGradebook={handleLoadRawGradesIntoGradebook}
+        />
+      )}
+
       {/* Teacher / Chairman / Admin Interactive Multi-Course Gradebook Builder */}
       {canEnterMarks && (
         <form
+          id="gradebook-builder-section"
           onSubmit={handlePublishResult}
           className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs"
         >
@@ -2664,7 +2737,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   type="text"
                   required
                   value={resAcademicId}
-                  onChange={(e) => setResAcademicId(e.target.value)}
+                  onChange={(e) => {
+                    manualGradebookLockRef.current = null;
+                    setResAcademicId(e.target.value);
+                  }}
                   placeholder="e.g. 220101"
                   className="w-full min-w-0 px-3 py-2 text-xs font-mono bg-transparent text-slate-900 focus:outline-none tabular-nums"
                 />
@@ -2690,7 +2766,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <select
                 id="gradebook-year"
                 value={resYear}
-                onChange={(e) => setResYear(Number(e.target.value))}
+                onChange={(e) => {
+                  manualGradebookLockRef.current = null;
+                  setResYear(Number(e.target.value));
+                }}
                 className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
               >
                 {ACADEMIC_YEARS.map((yr) => (
@@ -2711,7 +2790,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <select
                 id="gradebook-term-semester"
                 value={resTermSem}
-                onChange={(e) => setResTermSem(Number(e.target.value))}
+                onChange={(e) => {
+                  manualGradebookLockRef.current = null;
+                  setResTermSem(Number(e.target.value));
+                }}
                 className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
               >
                 {YEAR_SEMESTERS.map((sem) => (

@@ -337,6 +337,37 @@ const resultForwardSchema = z.object({
   target: z.enum(['chairman', 'admin']),
 });
 
+const rawGradeSubmitSchema = z.object({
+  academicId: z.string().trim().min(3).max(32),
+  courseCode: z.string().trim().min(2).max(20),
+  courseTitle: z.string().trim().min(2).max(120).optional(),
+  credits: z.number().min(0.5).max(6).optional(),
+  departmentCode: z.string().trim().min(2).max(16),
+  session: z.string().trim().min(4).max(20),
+  semester: z.number().int().min(1).max(10),
+  continuousMarks: z.number().min(0).max(40).optional(),
+  finalExamMarks: z.number().min(0).max(60).optional(),
+  totalMarks: z.number().min(0).max(100).optional(),
+});
+
+const rawGradeReviewSchema = z.object({
+  status: z.enum(['submitted', 'reviewed']),
+  committeeNote: z.string().trim().max(300).optional(),
+  continuousMarks: z.number().min(0).max(40).optional(),
+  finalExamMarks: z.number().min(0).max(60).optional(),
+  totalMarks: z.number().min(0).max(100).optional(),
+});
+
+const rawGradeFinalizeSchema = z.object({
+  academicId: z.string().trim().min(3).max(32),
+  session: z.string().trim().min(4).max(20),
+  semester: z.number().int().min(1).max(10),
+  rawGradeIds: z.array(z.string().trim().min(3).max(80)).min(1).max(15),
+  submissionTarget: z.enum(['chairman', 'admin', 'publish']).default('chairman'),
+  promotionMode: z.enum(['auto', 'manual_promoted', 'manual_repeat']).default('auto'),
+  committeeId: z.string().trim().max(80).optional(),
+});
+
 const certApplySchema = z.object({
   certificateType: z.enum(['Temporary Certificate', 'Provisional Transcript']),
   paymentMethod: z.string().trim().min(2).max(40),
@@ -3964,6 +3995,527 @@ portalRouter.patch(
     );
 
     res.json({ result: updated });
+  }
+);
+
+// Raw Course Grades (Teachers submit course marks; Exam Committees view, filter, review & finalize)
+portalRouter.get(
+  '/exams/raw-grades',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const authUser = req.authUser!;
+    const activeCommittees = await getActiveCommitteesForUser(authUser);
+    const isAdmin = authUser.role === 'admin';
+    const isChairman = authUser.role === 'chairman';
+    const isTeacher = authUser.role === 'teacher';
+
+    if (!isAdmin && !isChairman && !isTeacher && activeCommittees.length === 0) {
+      res.status(403).json({
+        error: 'Raw course grade records are restricted to faculty and Exam Committee members.',
+      });
+      return;
+    }
+
+    const activeTermKeys = new Set(
+      activeCommittees.map(
+        (c) => `${c.departmentCode.toUpperCase()}::${c.session}::${c.semester}`
+      )
+    );
+    const actorDept = authUser.departmentCode.toUpperCase();
+    const actorEmail = authUser.email.toLowerCase();
+
+    let grades = await pustRepo.listRawCourseGrades();
+    if (!isAdmin) {
+      if (isChairman) {
+        grades = grades.filter((g) => g.departmentCode.toUpperCase() === actorDept);
+      } else if (activeCommittees.length > 0) {
+        grades = grades.filter((g) => {
+          const termKey = `${g.departmentCode.toUpperCase()}::${g.session}::${g.semester}`;
+          const isMine =
+            g.submittedByUserId === authUser.sub ||
+            g.submittedByEmail.toLowerCase() === actorEmail;
+          return activeTermKeys.has(termKey) || (isTeacher && isMine);
+        });
+      } else {
+        // Non-committee teacher sees only grades they submitted
+        grades = grades.filter(
+          (g) =>
+            g.submittedByUserId === authUser.sub ||
+            g.submittedByEmail.toLowerCase() === actorEmail
+        );
+      }
+    }
+
+    const qDept = typeof req.query.departmentCode === 'string' ? req.query.departmentCode.trim().toUpperCase() : '';
+    const qSession = typeof req.query.session === 'string' ? req.query.session.trim() : '';
+    const qSem = typeof req.query.semester === 'string' ? Number(req.query.semester) : 0;
+    const qCourse = typeof req.query.courseCode === 'string' ? req.query.courseCode.trim().toUpperCase() : '';
+    const qStatus = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+
+    if (qDept) grades = grades.filter((g) => g.departmentCode.toUpperCase() === qDept);
+    if (qSession) grades = grades.filter((g) => g.session === qSession);
+    if (qSem > 0) grades = grades.filter((g) => g.semester === qSem);
+    if (qCourse) grades = grades.filter((g) => g.courseCode.toUpperCase() === qCourse);
+    if (qStatus === 'submitted' || qStatus === 'reviewed' || qStatus === 'finalized') {
+      grades = grades.filter((g) => g.status === qStatus);
+    }
+
+    grades.sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+    res.json({ rawGrades: grades });
+  }
+);
+
+portalRouter.post(
+  '/exams/raw-grades',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = rawGradeSubmitSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Provide valid course grade details and marks (0–100).' });
+      return;
+    }
+
+    const authUser = req.authUser!;
+    const normDept = parsed.data.departmentCode.toUpperCase();
+    const normCode = parsed.data.courseCode.toUpperCase();
+
+    const matchingCommittee = await findMatchingActiveCommittee(
+      authUser,
+      normDept,
+      parsed.data.session,
+      parsed.data.semester
+    );
+    const isAdmin = authUser.role === 'admin';
+    const isDeptChairman =
+      authUser.role === 'chairman' && authUser.departmentCode.toUpperCase() === normDept;
+    const isDeptTeacher =
+      authUser.role === 'teacher' && authUser.departmentCode.toUpperCase() === normDept;
+
+    if (!isAdmin && !isDeptChairman && !isDeptTeacher && !matchingCommittee) {
+      res.status(403).json({
+        error: 'Only departmental teachers, Chairman, Admin, or active Exam Committee members may submit raw course grades.',
+      });
+      return;
+    }
+
+    const stu = await pustRepo.findStudentByAcademicId(parsed.data.academicId);
+    if (!stu) {
+      res.status(404).json({ error: `Student Academic ID "${parsed.data.academicId}" not found.` });
+      return;
+    }
+    if (stu.departmentCode.toUpperCase() !== normDept) {
+      res.status(403).json({
+        error: `Student ${stu.academicId} belongs to ${stu.departmentCode}, outside ${normDept}.`,
+      });
+      return;
+    }
+
+    let continuousMarks = parsed.data.continuousMarks;
+    let finalExamMarks = parsed.data.finalExamMarks;
+    let totalMarks = parsed.data.totalMarks;
+
+    if (continuousMarks !== undefined || finalExamMarks !== undefined) {
+      const ca = Math.max(0, Math.min(40, Math.round(continuousMarks ?? 0)));
+      const fe = Math.max(0, Math.min(60, Math.round(finalExamMarks ?? 0)));
+      continuousMarks = ca;
+      finalExamMarks = fe;
+      totalMarks = Math.min(100, ca + fe);
+    } else if (totalMarks !== undefined) {
+      totalMarks = Math.max(0, Math.min(100, Math.round(totalMarks)));
+      continuousMarks = Math.min(40, Math.round(totalMarks * 0.4));
+      finalExamMarks = totalMarks - continuousMarks;
+    } else {
+      res.status(400).json({ error: 'Provide either continuous + final exam marks or total marks.' });
+      return;
+    }
+
+    const catalogCourse = (await pustRepo.listCourses()).find(
+      (c) => c.departmentCode.toUpperCase() === normDept && c.code.toUpperCase() === normCode
+    );
+    const courseTitle = parsed.data.courseTitle?.trim() || catalogCourse?.title || normCode;
+    const credits = parsed.data.credits ?? catalogCourse?.credits ?? 3;
+    const grade = marksToGrade(totalMarks);
+
+    const existing = (await pustRepo.listRawCourseGrades()).find(
+      (g) =>
+        g.departmentCode.toUpperCase() === normDept &&
+        g.session === parsed.data.session &&
+        g.semester === parsed.data.semester &&
+        g.courseCode.toUpperCase() === normCode &&
+        g.academicId === stu.academicId
+    );
+    if (existing?.status === 'finalized') {
+      res.status(409).json({
+        error: `${normCode} marks for ${stu.academicId} have already been finalized by the Exam Committee.`,
+      });
+      return;
+    }
+
+    const nowIso = new Date().toISOString();
+    const recordPayload = {
+      departmentCode: normDept,
+      session: parsed.data.session,
+      semester: parsed.data.semester,
+      courseCode: normCode,
+      courseTitle,
+      credits,
+      academicId: stu.academicId,
+      studentName: stu.name,
+      continuousMarks,
+      finalExamMarks,
+      totalMarks,
+      letterGrade: grade.letterGrade,
+      gradePoint: grade.gradePoint,
+      submittedByUserId: authUser.sub,
+      submittedByName: authUser.name,
+      submittedByEmail: authUser.email,
+      submittedAt: nowIso,
+      status: 'submitted' as const,
+      reviewedBy: undefined,
+      reviewedAt: undefined,
+    };
+
+    const rawGrade = existing
+      ? await pustRepo.updateRawCourseGrade(existing.id, recordPayload)
+      : await pustRepo.createRawCourseGrade(recordPayload);
+
+    await pustRepo.logAudit(
+      authUser.name,
+      authUser.role,
+      'Submitted raw course grade',
+      `${normCode} · ${stu.academicId} (${totalMarks}/100 · ${grade.letterGrade})`
+    );
+
+    res.status(existing ? 200 : 201).json({ rawGrade });
+  }
+);
+
+portalRouter.patch(
+  '/exams/raw-grades/:id/review',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = rawGradeReviewSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid raw grade review payload.' });
+      return;
+    }
+
+    const target = (await pustRepo.listRawCourseGrades()).find((g) => g.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Raw course grade record not found.' });
+      return;
+    }
+    if (target.status === 'finalized') {
+      res.status(409).json({ error: 'Finalized course grades cannot be modified.' });
+      return;
+    }
+
+    const authUser = req.authUser!;
+    const isAdmin = authUser.role === 'admin';
+    const isDeptChairman =
+      authUser.role === 'chairman' &&
+      authUser.departmentCode.toUpperCase() === target.departmentCode.toUpperCase();
+    const matchingCommittee = await findMatchingActiveCommittee(
+      authUser,
+      target.departmentCode,
+      target.session,
+      target.semester
+    );
+
+    if (!isAdmin && !isDeptChairman && !matchingCommittee) {
+      res.status(403).json({
+        error:
+          'Only active Exam Committee members for this session & semester (or Chairman/Admin) may review raw grades.',
+      });
+      return;
+    }
+
+    let continuousMarks = target.continuousMarks;
+    let finalExamMarks = target.finalExamMarks;
+    let totalMarks = target.totalMarks;
+    let letterGrade = target.letterGrade;
+    let gradePoint = target.gradePoint;
+
+    if (
+      parsed.data.continuousMarks !== undefined ||
+      parsed.data.finalExamMarks !== undefined ||
+      parsed.data.totalMarks !== undefined
+    ) {
+      if (parsed.data.continuousMarks !== undefined || parsed.data.finalExamMarks !== undefined) {
+        continuousMarks = Math.round(parsed.data.continuousMarks ?? target.continuousMarks);
+        finalExamMarks = Math.round(parsed.data.finalExamMarks ?? target.finalExamMarks);
+        totalMarks = Math.min(100, continuousMarks + finalExamMarks);
+      } else if (parsed.data.totalMarks !== undefined) {
+        totalMarks = Math.round(parsed.data.totalMarks);
+        continuousMarks = Math.min(40, Math.round(totalMarks * 0.4));
+        finalExamMarks = totalMarks - continuousMarks;
+      }
+      const g = marksToGrade(totalMarks);
+      letterGrade = g.letterGrade;
+      gradePoint = g.gradePoint;
+    }
+
+    const updated = await pustRepo.updateRawCourseGrade(target.id, {
+      status: parsed.data.status,
+      continuousMarks,
+      finalExamMarks,
+      totalMarks,
+      letterGrade,
+      gradePoint,
+      ...(parsed.data.committeeNote !== undefined
+        ? { committeeNote: parsed.data.committeeNote }
+        : {}),
+      reviewedBy: matchingCommittee
+        ? `${authUser.name} (${matchingCommittee.title})`
+        : authUser.name,
+      reviewedAt: new Date().toISOString(),
+    });
+
+    await pustRepo.logAudit(
+      authUser.name,
+      authUser.role,
+      `Marked raw course grade ${parsed.data.status}`,
+      `${target.courseCode} · ${target.academicId} (${totalMarks}/100)`
+    );
+
+    res.json({ rawGrade: updated });
+  }
+);
+
+portalRouter.post(
+  '/exams/raw-grades/finalize',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = rawGradeFinalizeSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Select valid raw course grades to consolidate and finalize.' });
+      return;
+    }
+
+    const stu = await pustRepo.findStudentByAcademicId(parsed.data.academicId);
+    if (!stu) {
+      res.status(404).json({ error: 'Student academic ID not found.' });
+      return;
+    }
+
+    const authUser = req.authUser!;
+    const isAdmin = authUser.role === 'admin';
+    const isDeptChairman =
+      authUser.role === 'chairman' &&
+      authUser.departmentCode.toUpperCase() === stu.departmentCode.toUpperCase();
+    let linkedCommittee = await findMatchingActiveCommittee(
+      authUser,
+      stu.departmentCode,
+      parsed.data.session,
+      parsed.data.semester
+    );
+
+    if (parsed.data.committeeId) {
+      const explicit = (await pustRepo.listExamCommittees()).find(
+        (c) => c.id === parsed.data.committeeId
+      );
+      if (
+        !explicit ||
+        explicit.status !== 'active' ||
+        explicit.departmentCode.toUpperCase() !== stu.departmentCode.toUpperCase() ||
+        explicit.session !== parsed.data.session ||
+        explicit.semester !== parsed.data.semester
+      ) {
+        res.status(403).json({
+          error: 'Specified Exam Committee does not match this student term.',
+        });
+        return;
+      }
+      if (!isAdmin && !isDeptChairman && !isUserInExamCommittee(explicit, authUser)) {
+        res.status(403).json({ error: 'You are not an active member of this Exam Committee.' });
+        return;
+      }
+      linkedCommittee = explicit;
+    }
+
+    if (!isAdmin && !isDeptChairman && !linkedCommittee) {
+      res.status(403).json({
+        error:
+          'Only active Exam Committee members for this session & semester (or Chairman/Admin) may finalize raw grades.',
+      });
+      return;
+    }
+
+    const allRaw = await pustRepo.listRawCourseGrades();
+    const idSet = new Set(parsed.data.rawGradeIds);
+    const matched = allRaw.filter((g) => idSet.has(g.id));
+    if (matched.length !== idSet.size) {
+      res.status(404).json({ error: 'One or more selected raw grade records were not found.' });
+      return;
+    }
+
+    for (const g of matched) {
+      if (
+        g.academicId !== stu.academicId ||
+        g.departmentCode.toUpperCase() !== stu.departmentCode.toUpperCase() ||
+        g.session !== parsed.data.session ||
+        g.semester !== parsed.data.semester
+      ) {
+        res.status(400).json({
+          error: `Raw grade ${g.courseCode} does not match ${stu.academicId} · ${parsed.data.session} · Semester ${parsed.data.semester}.`,
+        });
+        return;
+      }
+      if (g.status === 'finalized') {
+        res.status(409).json({
+          error: `Raw grade ${g.courseCode} for ${stu.academicId} is already finalized.`,
+        });
+        return;
+      }
+    }
+
+    let totalWeighted = 0;
+    let totalCredits = 0;
+    let hasFail = false;
+
+    const evaluatedCourses = matched.map((g) => {
+      const grade = marksToGrade(g.totalMarks);
+      if (grade.gradePoint === 0) hasFail = true;
+      totalWeighted += grade.gradePoint * g.credits;
+      totalCredits += g.credits;
+      return {
+        code: g.courseCode,
+        title: g.courseTitle,
+        credits: g.credits,
+        marks: g.totalMarks,
+        ...grade,
+      };
+    });
+
+    const sgpa = totalCredits > 0 ? Number((totalWeighted / totalCredits).toFixed(2)) : 0;
+    let promotionStatus: 'Promoted (Auto)' | 'Promoted (Manual)' | 'Probation / Repeat' =
+      !hasFail && sgpa >= 2.0 ? 'Promoted (Auto)' : 'Probation / Repeat';
+    if (parsed.data.promotionMode === 'manual_promoted') promotionStatus = 'Promoted (Manual)';
+    if (parsed.data.promotionMode === 'manual_repeat') promotionStatus = 'Probation / Repeat';
+
+    let status: 'pending_chairman' | 'pending_admin' | 'published';
+    let publishImmediately = false;
+    let forwardedTo: 'chairman' | 'admin' | undefined;
+
+    if (isAdmin) {
+      if (parsed.data.submissionTarget === 'publish') {
+        status = 'published';
+        publishImmediately = true;
+      } else {
+        status = parsed.data.submissionTarget === 'admin' ? 'pending_admin' : 'pending_chairman';
+        forwardedTo = parsed.data.submissionTarget;
+      }
+    } else if (isDeptChairman) {
+      if (parsed.data.submissionTarget === 'admin') {
+        status = 'pending_admin';
+        forwardedTo = 'admin';
+      } else {
+        status = 'published';
+        publishImmediately = true;
+      }
+    } else {
+      // Exam Committee members forward either to Chairman or to Admin Office
+      if (parsed.data.submissionTarget === 'admin') {
+        status = 'pending_admin';
+        forwardedTo = 'admin';
+      } else {
+        status = 'pending_chairman';
+        forwardedTo = 'chairman';
+      }
+    }
+
+    const nowIso = new Date().toISOString();
+    const result = await pustRepo.createExamResult({
+      academicId: stu.academicId,
+      studentName: stu.name,
+      departmentCode: stu.departmentCode,
+      session: parsed.data.session,
+      semester: parsed.data.semester,
+      courses: evaluatedCourses,
+      sgpa,
+      promotionStatus,
+      status,
+      published: publishImmediately,
+      enteredBy: linkedCommittee
+        ? `${authUser.name} (${linkedCommittee.title})`
+        : authUser.name,
+      ...(linkedCommittee
+        ? { committeeId: linkedCommittee.id, committeeTitle: linkedCommittee.title }
+        : {}),
+      ...(forwardedTo
+        ? {
+            forwardedTo,
+            forwardedBy: authUser.name,
+            forwardedAt: nowIso,
+          }
+        : {}),
+      ...(publishImmediately ? { reviewedBy: authUser.name } : {}),
+      publishedAt: nowIso.slice(0, 10),
+    });
+
+    for (const g of matched) {
+      await pustRepo.updateRawCourseGrade(g.id, {
+        status: 'finalized',
+        finalizedResultId: result.id,
+        finalizedAt: nowIso,
+        reviewedBy: g.reviewedBy || authUser.name,
+        reviewedAt: g.reviewedAt || nowIso,
+      });
+    }
+
+    let cumulativeCgpa: number | undefined;
+    if (publishImmediately) {
+      cumulativeCgpa = await computeCumulativeCgpa(stu.academicId, sgpa);
+      const promoted = promotionStatus.startsWith('Promoted');
+      const nextCompleted = promoted
+        ? Math.max(stu.completedSemesters, parsed.data.semester)
+        : stu.completedSemesters;
+      const rules = await pustRepo.getAutomationConfig();
+      await pustRepo.updateStudentById(stu.id, {
+        ...(promoted
+          ? {
+              currentSemester: Math.max(stu.currentSemester, parsed.data.semester + 1),
+              completedSemesters: nextCompleted,
+              ...(nextCompleted >= 8 && rules.autoPromoteGraduatingResults
+                ? { allResultsPublished: true }
+                : {}),
+            }
+          : {}),
+        cgpa: cumulativeCgpa,
+      });
+
+      await pustRepo.createNotice({
+        referenceNo: `PUST/${stu.departmentCode}/RES/${new Date().getFullYear()}-${parsed.data.semester}`,
+        title: `Semester ${parsed.data.semester} Examination Result Published — ${stu.departmentCode} (${parsed.data.session})`,
+        category: 'Result',
+        publishedAt: nowIso.slice(0, 10),
+        departmentCode: stu.departmentCode,
+        boardScope: 'department',
+        visibility: 'registered',
+        targetSession: parsed.data.session,
+        summary: `Semester ${parsed.data.semester} result published for ${stu.academicId} (SGPA ${sgpa.toFixed(
+          2
+        )} · ${promotionStatus}).`,
+        body: `Registered departmental students in session ${parsed.data.session} may inspect their verified Semester ${parsed.data.semester} grade sheet under Portal -> Exams & Results.`,
+        authorName: authUser.name,
+        authorRole: authUser.role,
+      });
+    }
+
+    await pustRepo.logAudit(
+      authUser.name,
+      authUser.role,
+      'Consolidated raw course grades into semester result',
+      `${stu.academicId} · Sem ${parsed.data.semester} (${matched.length} courses · SGPA ${sgpa.toFixed(2)})`
+    );
+
+    res.status(201).json({
+      result,
+      finalizedCount: matched.length,
+      pendingChairmanReview: status === 'pending_chairman',
+      pendingAdminReview: status === 'pending_admin',
+      ...(cumulativeCgpa !== undefined ? { cumulativeCgpa } : {}),
+    });
   }
 );
 

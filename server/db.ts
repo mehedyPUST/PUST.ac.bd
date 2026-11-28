@@ -32,6 +32,7 @@ import type {
   PaymentReceiptRecord,
   PublicationRecord,
   PublicStatusLookupResult,
+  RawCourseGradeRecord,
   SignupTokenRecord,
   StudentRecord,
   UniversityProfile,
@@ -58,6 +59,7 @@ import {
   SEED_PAYMENT_GATEWAYS,
   SEED_PAYMENT_RECEIPTS,
   SEED_PUBLICATIONS,
+  SEED_RAW_COURSE_GRADES,
   SEED_STUDENTS,
   SEED_UNIVERSITY_PROFILE,
   SEED_VC_PROFILES,
@@ -118,6 +120,7 @@ class PustRepository {
   private examCommittees: ExamCommitteeRecord[] = [];
   private examApps: ExamApplicationRecord[] = [...SEED_EXAM_APPLICATIONS];
   private examResults: ExamResultRecord[] = [...SEED_EXAM_RESULTS];
+  private rawCourseGrades: RawCourseGradeRecord[] = [...SEED_RAW_COURSE_GRADES];
   private certificateApps: CertificateApplicationRecord[] = [...SEED_CERTIFICATE_APPLICATIONS];
   private paymentGateways: PaymentGatewayConfig[] = [...SEED_PAYMENT_GATEWAYS];
   private paymentReceipts: PaymentReceiptRecord[] = [...SEED_PAYMENT_RECEIPTS];
@@ -269,6 +272,7 @@ class PustRepository {
     await seedIfEmpty('exam_circulars', SEED_EXAM_CIRCULARS);
     await seedIfEmpty('exam_applications', SEED_EXAM_APPLICATIONS);
     await seedIfEmpty('exam_results', SEED_EXAM_RESULTS);
+    await seedIfEmpty('raw_course_grades', SEED_RAW_COURSE_GRADES);
     await seedIfEmpty('hall_circulars', SEED_HALL_CIRCULARS);
     await seedIfEmpty('hall_dues', SEED_HALL_DUES);
     await seedIfEmpty('library_cards', SEED_LIBRARY_CARDS);
@@ -1302,6 +1306,17 @@ class PustRepository {
     });
   updateExamResult = (id: string, patch: Partial<ExamResultRecord>) =>
     this.updateItem('exam_results', this.examResults, id, patch);
+
+  listRawCourseGrades = () => this.getAll('raw_course_grades', this.rawCourseGrades);
+  createRawCourseGrade = (input: Omit<RawCourseGradeRecord, 'id'>) =>
+    this.insertItem('raw_course_grades', this.rawCourseGrades, {
+      id: `rawg-${crypto.randomUUID()}`,
+      ...input,
+    });
+  updateRawCourseGrade = (id: string, patch: Partial<RawCourseGradeRecord>) =>
+    this.updateItem('raw_course_grades', this.rawCourseGrades, id, patch);
+  deleteRawCourseGrade = (id: string) =>
+    this.removeItem('raw_course_grades', this.rawCourseGrades, id);
 
   // Certificate Application & 4-Office Clearance
   listCertificateApplications = () =>

@@ -47,6 +47,7 @@ import type {
   PaymentReceiptRecord,
   PublicationRecord,
   PublicStatusLookupResult,
+  RawCourseGradeRecord,
   SignupTokenRecord,
   StudentRecord,
   UniversityProfile,
@@ -683,6 +684,78 @@ export const pustApi = {
         body: JSON.stringify({ target }),
       }
     ),
+
+  getRawCourseGrades: (filters?: {
+    departmentCode?: string;
+    session?: string;
+    semester?: number;
+    courseCode?: string;
+    status?: string;
+  }) => {
+    const qs = new URLSearchParams();
+    if (filters?.departmentCode) qs.set('departmentCode', filters.departmentCode);
+    if (filters?.session) qs.set('session', filters.session);
+    if (filters?.semester) qs.set('semester', String(filters.semester));
+    if (filters?.courseCode) qs.set('courseCode', filters.courseCode);
+    if (filters?.status) qs.set('status', filters.status);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return apiFetch<{ rawGrades: RawCourseGradeRecord[] }>(`/api/portal/exams/raw-grades${suffix}`);
+  },
+
+  submitRawCourseGrade: (payload: {
+    academicId: string;
+    courseCode: string;
+    courseTitle?: string;
+    credits?: number;
+    departmentCode: string;
+    session: string;
+    semester: number;
+    continuousMarks?: number;
+    finalExamMarks?: number;
+    totalMarks?: number;
+  }) =>
+    apiFetch<{ rawGrade: RawCourseGradeRecord }>('/api/portal/exams/raw-grades', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  reviewRawCourseGrade: (
+    id: string,
+    payload: {
+      status: 'submitted' | 'reviewed';
+      committeeNote?: string;
+      continuousMarks?: number;
+      finalExamMarks?: number;
+      totalMarks?: number;
+    }
+  ) =>
+    apiFetch<{ rawGrade: RawCourseGradeRecord }>(
+      `/api/portal/exams/raw-grades/${encodeURIComponent(id)}/review`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  finalizeRawCourseGrades: (payload: {
+    academicId: string;
+    session: string;
+    semester: number;
+    rawGradeIds: string[];
+    submissionTarget?: 'chairman' | 'admin' | 'publish';
+    promotionMode?: 'auto' | 'manual_promoted' | 'manual_repeat';
+    committeeId?: string;
+  }) =>
+    apiFetch<{
+      result: ExamResultRecord;
+      finalizedCount: number;
+      pendingChairmanReview?: boolean;
+      pendingAdminReview?: boolean;
+      cumulativeCgpa?: number;
+    }>('/api/portal/exams/raw-grades/finalize', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 
   approvePendingExamResult: (
     id: string,

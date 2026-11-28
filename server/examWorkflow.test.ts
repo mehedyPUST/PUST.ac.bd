@@ -6,7 +6,13 @@ import type { AddressInfo } from 'node:net';
 import { getApiApp } from './apiApp';
 import { AUTH_COOKIE_NAME, signAuthToken } from './auth';
 import { pustRepo } from './db';
-import type { AuthUser, CourseRecord, ExamCommitteeRecord, ExamResultRecord } from '../src/types/pust';
+import type {
+  AuthUser,
+  CourseRecord,
+  ExamCommitteeRecord,
+  ExamResultRecord,
+  RawCourseGradeRecord,
+} from '../src/types/pust';
 
 async function withServer(run: (baseUrl: string) => Promise<void>): Promise<void> {
   const app = await getApiApp();
@@ -492,3 +498,333 @@ test('Department Chairman course management, teacher assignment, Exam Committee 
     assert.equal(delCourseRes.status, 200);
   });
 });
+
+test('Exam Committee Dashboard raw course grades viewing, filtering, moderation, and consolidation before finalizing', async () => {
+  await pustRepo.init();
+
+  const [cseChair, committeeTeacher, otherTeacher, eeeTeacher, cseStudentUser] =
+    await Promise.all([
+      ensureTestUser({
+        name: 'Dr. Mahmudul Hasan (CSE Chair)',
+        email: 'chair.cse.examwf@pust.ac.bd',
+        role: 'chairman',
+        departmentCode: 'CSE',
+        academicId: 'FAC-CSE-EW-01',
+        hallAffiliation: 'Academic Block',
+        designation: 'Professor & Chairman',
+      }),
+      ensureTestUser({
+        name: 'Dr. Farhana Yasmin',
+        email: 'farhana.cse.examwf@pust.ac.bd',
+        role: 'teacher',
+        departmentCode: 'CSE',
+        academicId: 'FAC-CSE-EW-02',
+        hallAffiliation: 'Academic Block',
+        designation: 'Associate Professor',
+      }),
+      ensureTestUser({
+        name: 'Md. Rakibul Islam',
+        email: 'rakibul.cse.examwf@pust.ac.bd',
+        role: 'teacher',
+        departmentCode: 'CSE',
+        academicId: 'FAC-CSE-EW-03',
+        hallAffiliation: 'Academic Block',
+        designation: 'Assistant Professor',
+      }),
+      ensureTestUser({
+        name: 'Engr. Kamrul Hasan (EEE Teacher)',
+        email: 'teacher.eee.examwf@pust.ac.bd',
+        role: 'teacher',
+        departmentCode: 'EEE',
+        academicId: 'FAC-EEE-EW-02',
+        hallAffiliation: 'Academic Block',
+        designation: 'Lecturer',
+      }),
+      ensureTestUser({
+        name: 'Nusrat Jahan',
+        email: 'student.cse.examwf@pust.ac.bd',
+        role: 'student',
+        departmentCode: 'CSE',
+        academicId: '220199',
+        hallAffiliation: 'Matribhasha Hall (Female Hall 1)',
+      }),
+    ]);
+
+  const testSession = '2022-23';
+  const testSemester = 5;
+  const suffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+  const courseOne = `CSE-R1${suffix}`;
+  const courseTwo = `CSE-R2${suffix}`;
+
+  for (const c of await pustRepo.listExamCommittees()) {
+    if (c.departmentCode === 'CSE' && c.session === testSession && c.semester === testSemester) {
+      await pustRepo.deleteExamCommittee(c.id);
+    }
+  }
+
+  const createdRawIds: string[] = [];
+
+  await withServer(async (baseUrl) => {
+    // 1. Auth & role checks on GET /api/portal/exams/raw-grades
+    const unauthRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`);
+    assert.equal(unauthRes.status, 401);
+
+    const studentRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      headers: authHeaders(cseStudentUser),
+    });
+    assert.equal(studentRes.status, 403);
+
+    // 2. Chairman creates an active Exam Committee for (CSE, 2022-23, Sem 5) with committeeTeacher
+    const createCommitteeRes = await fetch(`${baseUrl}/api/portal/exams/committees`, {
+      method: 'POST',
+      headers: authHeaders(cseChair),
+      body: JSON.stringify({
+        departmentCode: 'CSE',
+        session: testSession,
+        semester: testSemester,
+        title: `CSE Scrutiny Committee ${testSession} Sem ${testSemester}`,
+        members: [{ userId: committeeTeacher.id, committeeRole: 'chair' }],
+      }),
+    });
+    assert.equal(createCommitteeRes.status, 201);
+    const { committee } = (await createCommitteeRes.json()) as {
+      committee: ExamCommitteeRecord;
+    };
+
+    // 3. Teachers submit raw course marks (continuous 0-40 + final 0-60)
+    // Cross-department teacher blocked (403)
+    const crossSubmitRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      method: 'POST',
+      headers: authHeaders(eeeTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        departmentCode: 'CSE',
+        session: testSession,
+        semester: testSemester,
+        courseCode: courseOne,
+        courseTitle: 'Distributed Systems',
+        credits: 3,
+        continuousMarks: 30,
+        finalExamMarks: 45,
+      }),
+    });
+    assert.equal(crossSubmitRes.status, 403);
+
+    const subOneRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      method: 'POST',
+      headers: authHeaders(otherTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        departmentCode: 'CSE',
+        session: testSession,
+        semester: testSemester,
+        courseCode: courseOne,
+        courseTitle: 'Distributed Systems',
+        credits: 3,
+        continuousMarks: 32,
+        finalExamMarks: 46,
+      }),
+    });
+    assert.equal(subOneRes.status, 201);
+    const { rawGrade: rawOne } = (await subOneRes.json()) as { rawGrade: RawCourseGradeRecord };
+    createdRawIds.push(rawOne.id);
+    assert.equal(rawOne.totalMarks, 78);
+    assert.equal(rawOne.letterGrade, 'A');
+    assert.equal(rawOne.gradePoint, 3.75);
+    assert.equal(rawOne.status, 'submitted');
+
+    const subTwoRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      method: 'POST',
+      headers: authHeaders(committeeTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        departmentCode: 'CSE',
+        session: testSession,
+        semester: testSemester,
+        courseCode: courseTwo,
+        courseTitle: 'Compiler Design',
+        credits: 3,
+        continuousMarks: 28,
+        finalExamMarks: 42,
+      }),
+    });
+    assert.equal(subTwoRes.status, 201);
+    const { rawGrade: rawTwo } = (await subTwoRes.json()) as { rawGrade: RawCourseGradeRecord };
+    createdRawIds.push(rawTwo.id);
+    assert.equal(rawTwo.totalMarks, 70);
+    assert.equal(rawTwo.letterGrade, 'A-');
+    assert.equal(rawTwo.gradePoint, 3.5);
+
+    // 4. Scope isolation: non-committee teacher sees ONLY own submission & cannot review or finalize
+    const nonCommitteeListRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      headers: authHeaders(otherTeacher),
+    });
+    assert.equal(nonCommitteeListRes.status, 200);
+    const nonCommitteeList = (await nonCommitteeListRes.json()) as {
+      rawGrades: RawCourseGradeRecord[];
+    };
+    assert.ok(nonCommitteeList.rawGrades.some((g) => g.id === rawOne.id));
+    assert.ok(!nonCommitteeList.rawGrades.some((g) => g.id === rawTwo.id));
+
+    const blockedReviewRes = await fetch(
+      `${baseUrl}/api/portal/exams/raw-grades/${encodeURIComponent(rawOne.id)}/review`,
+      {
+        method: 'PATCH',
+        headers: authHeaders(otherTeacher),
+        body: JSON.stringify({ status: 'reviewed' }),
+      }
+    );
+    assert.equal(blockedReviewRes.status, 403);
+
+    const blockedFinalizeRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades/finalize`, {
+      method: 'POST',
+      headers: authHeaders(otherTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        session: testSession,
+        semester: testSemester,
+        rawGradeIds: [rawOne.id],
+        submissionTarget: 'chairman',
+      }),
+    });
+    assert.equal(blockedFinalizeRes.status, 403);
+
+    // 5. Active Exam Committee member views ALL submissions for the committee term & filters via query params
+    const committeeFilteredRes = await fetch(
+      `${baseUrl}/api/portal/exams/raw-grades?departmentCode=CSE&session=${encodeURIComponent(
+        testSession
+      )}&semester=${testSemester}&status=submitted&courseCode=${encodeURIComponent(courseOne)}`,
+      {
+        headers: authHeaders(committeeTeacher),
+      }
+    );
+    assert.equal(committeeFilteredRes.status, 200);
+    const filteredJson = (await committeeFilteredRes.json()) as {
+      rawGrades: RawCourseGradeRecord[];
+    };
+    assert.equal(filteredJson.rawGrades.length, 1);
+    assert.equal(filteredJson.rawGrades[0].id, rawOne.id);
+
+    // 6. Committee member moderates marks & verifies rawOne before finalization
+    const reviewRes = await fetch(
+      `${baseUrl}/api/portal/exams/raw-grades/${encodeURIComponent(rawOne.id)}/review`,
+      {
+        method: 'PATCH',
+        headers: authHeaders(committeeTeacher),
+        body: JSON.stringify({
+          status: 'reviewed',
+          continuousMarks: 34,
+          finalExamMarks: 47,
+          committeeNote: 'Script re-totaled; 1 grace mark verified.',
+        }),
+      }
+    );
+    assert.equal(reviewRes.status, 200);
+    const { rawGrade: moderated } = (await reviewRes.json()) as {
+      rawGrade: RawCourseGradeRecord;
+    };
+    assert.equal(moderated.status, 'reviewed');
+    assert.equal(moderated.totalMarks, 81);
+    assert.equal(moderated.letterGrade, 'A+');
+    assert.equal(moderated.gradePoint, 4);
+    assert.equal(moderated.committeeNote, 'Script re-totaled; 1 grace mark verified.');
+
+    // 7. Committee member consolidates & forwards rawOne to Chairman (locks rawOne as finalized)
+    const finalizeChairRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades/finalize`, {
+      method: 'POST',
+      headers: authHeaders(committeeTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        session: testSession,
+        semester: testSemester,
+        rawGradeIds: [rawOne.id],
+        submissionTarget: 'chairman',
+        promotionMode: 'auto',
+        committeeId: committee.id,
+      }),
+    });
+    assert.equal(finalizeChairRes.status, 201);
+    const finalizeChairJson = (await finalizeChairRes.json()) as {
+      result: ExamResultRecord;
+      finalizedCount: number;
+    };
+    assert.equal(finalizeChairJson.finalizedCount, 1);
+    assert.equal(finalizeChairJson.result.status, 'pending_chairman');
+    assert.equal(finalizeChairJson.result.sgpa, 4);
+
+    // Finalized raw grade is locked against re-edit, re-review, and re-finalization (409)
+    const editLockedRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades`, {
+      method: 'POST',
+      headers: authHeaders(otherTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        departmentCode: 'CSE',
+        session: testSession,
+        semester: testSemester,
+        courseCode: courseOne,
+        continuousMarks: 20,
+        finalExamMarks: 20,
+      }),
+    });
+    assert.equal(editLockedRes.status, 409);
+
+    const reviewLockedRes = await fetch(
+      `${baseUrl}/api/portal/exams/raw-grades/${encodeURIComponent(rawOne.id)}/review`,
+      {
+        method: 'PATCH',
+        headers: authHeaders(committeeTeacher),
+        body: JSON.stringify({ status: 'submitted' }),
+      }
+    );
+    assert.equal(reviewLockedRes.status, 409);
+
+    const refinalizeLockedRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades/finalize`, {
+      method: 'POST',
+      headers: authHeaders(committeeTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        session: testSession,
+        semester: testSemester,
+        rawGradeIds: [rawOne.id],
+        submissionTarget: 'chairman',
+      }),
+    });
+    assert.equal(refinalizeLockedRes.status, 409);
+
+    // 8. Committee member consolidates rawTwo directly to Admin Office
+    const finalizeAdminRes = await fetch(`${baseUrl}/api/portal/exams/raw-grades/finalize`, {
+      method: 'POST',
+      headers: authHeaders(committeeTeacher),
+      body: JSON.stringify({
+        academicId: '220199',
+        session: testSession,
+        semester: testSemester,
+        rawGradeIds: [rawTwo.id],
+        submissionTarget: 'admin',
+        promotionMode: 'auto',
+        committeeId: committee.id,
+      }),
+    });
+    assert.equal(finalizeAdminRes.status, 201);
+    const finalizeAdminJson = (await finalizeAdminRes.json()) as {
+      result: ExamResultRecord;
+    };
+    assert.equal(finalizeAdminJson.result.status, 'pending_admin');
+    assert.equal(finalizeAdminJson.result.forwardedTo, 'admin');
+    assert.equal(finalizeAdminJson.result.sgpa, 3.5);
+
+    // Cleanup test raw grades & committee
+    for (const rawId of createdRawIds) {
+      await pustRepo.deleteRawCourseGrade(rawId);
+    }
+    const delCommitteeRes = await fetch(
+      `${baseUrl}/api/portal/exams/committees/${encodeURIComponent(committee.id)}`,
+      {
+        method: 'DELETE',
+        headers: authHeaders(cseChair),
+      }
+    );
+    assert.equal(delCommitteeRes.status, 200);
+  });
+});
+

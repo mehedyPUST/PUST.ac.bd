@@ -557,6 +557,35 @@ export interface ExamResultRecord {
   publishedAt: string;
 }
 
+export type RawGradeStatus = 'submitted' | 'reviewed' | 'finalized';
+
+export interface RawCourseGradeRecord {
+  id: string;
+  departmentCode: string;
+  session: string;
+  semester: number;
+  courseCode: string;
+  courseTitle: string;
+  credits: number;
+  academicId: string;
+  studentName: string;
+  continuousMarks: number;
+  finalExamMarks: number;
+  totalMarks: number;
+  letterGrade: string;
+  gradePoint: number;
+  submittedByUserId: string;
+  submittedByName: string;
+  submittedByEmail: string;
+  submittedAt: string;
+  status: RawGradeStatus;
+  committeeNote?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  finalizedResultId?: string;
+  finalizedAt?: string;
+}
+
 export type ClearanceOfficeKey = 'chairman' | 'hall' | 'library' | 'proctor';
 
 export interface OfficeClearanceState {
