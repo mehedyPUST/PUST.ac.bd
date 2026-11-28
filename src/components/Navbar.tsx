@@ -266,11 +266,11 @@ export function Navbar({
               setMobileMenuOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-2 lg:my-0 rounded-md lg:rounded-none bg-white p-1.5 lg:px-2.5 xl:px-3 lg:py-0.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
+            className="relative z-10 my-2 lg:my-0 rounded-md lg:rounded-none bg-white p-1.5 lg:px-2.5 xl:px-3 lg:py-1.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
           >
-            <PustCrest size={26} className="lg:hidden" />
-            <PustCrest size={88} className="hidden lg:block xl:hidden" />
-            <PustCrest size={92} className="hidden xl:block" />
+            <PustCrest size={24} className="lg:hidden" />
+            <PustCrest size={54} className="hidden lg:block xl:hidden" />
+            <PustCrest size={60} className="hidden xl:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}

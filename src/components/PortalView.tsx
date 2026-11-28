@@ -716,15 +716,16 @@ export function PortalView({
       }`}
     >
       <div className="max-w-[1600px] mx-auto px-3 sm:px-5 py-3 sm:py-4 min-h-screen flex flex-col lg:flex-row gap-4 items-stretch">
-        {/* Left Sidebar Column (Desktop) */}
+        {/* Left Sidebar Column (Desktop — Sticky Grid 1 & Grid 3) */}
         <div
-          className={`hidden lg:flex flex-col gap-3.5 shrink-0 transition-all duration-200 ${
+          className={`hidden lg:flex flex-col gap-3.5 shrink-0 transition-all duration-200 lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] ${
             sidebarCollapsed ? 'w-[82px]' : 'w-[258px]'
           }`}
         >
-          {/* Floating Brand Card */}
+          {/* Grid 1: Floating Brand Card */}
           <div
-            className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 h-[62px] flex items-center ${
+            data-portal-grid="user-dashboard"
+            className={`shrink-0 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 h-[62px] flex items-center ${
               sidebarCollapsed ? 'justify-center' : 'gap-3'
             }`}
           >
@@ -743,10 +744,11 @@ export function PortalView({
             )}
           </div>
 
-          {/* Floating Sidebar Navigation Card */}
+          {/* Grid 3: Floating Sidebar Navigation Card */}
           <aside
+            data-portal-grid="sidebar-links"
             aria-label="Portal workspace navigation"
-            className="relative flex-1 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6.25rem)]"
+            className="relative flex-1 min-h-0 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
           >
             {/* Floating Collapse Edge Toggle */}
             <button
@@ -831,10 +833,10 @@ export function PortalView({
 
         {/* Right Workspace Column */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
-          {/* Top Bar Card */}
+          {/* Grid 2: Top Bar Card (Sticky aligned with Grid 1) */}
           <header
             data-portal-grid="university-name"
-            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 sm:px-5 py-2.5 min-h-[62px] flex items-center justify-between gap-3 sticky top-3 z-30"
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 sm:px-5 py-2.5 min-h-[62px] flex items-center justify-between gap-3 sticky top-3 lg:top-4 z-30"
           >
             {/* Left: Mobile Trigger + Breadcrumb */}
             <div className="flex items-center gap-2.5 min-w-0">
