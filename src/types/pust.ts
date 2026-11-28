@@ -54,6 +54,9 @@ export interface AdminCreateUserPayload {
   approvalStatus?: ApprovalStatus;
   assignedCourses?: string[];
   assignedSessions?: string[];
+  claimedFacultyMemberId?: string;
+  claimedDepartmentCode?: string;
+  claimedFacultyGroup?: 'faculty' | 'contractual';
 }
 
 export interface AdminUpdateUserPayload {
@@ -70,6 +73,9 @@ export interface AdminUpdateUserPayload {
   approvalStatus?: ApprovalStatus;
   assignedCourses?: string[];
   assignedSessions?: string[];
+  claimedFacultyMemberId?: string | null;
+  claimedDepartmentCode?: string | null;
+  claimedFacultyGroup?: 'faculty' | 'contractual' | null;
 }
 
 export interface SignupTokenRecord {

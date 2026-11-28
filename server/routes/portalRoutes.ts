@@ -81,6 +81,9 @@ const adminCreateUserSchema = z.object({
   approvalStatus: z.enum(['pending', 'approved', 'rejected']).default('approved'),
   assignedCourses: z.array(z.string().trim().min(2).max(24)).max(20).optional(),
   assignedSessions: z.array(z.string().trim().min(4).max(20)).max(12).optional(),
+  claimedFacultyMemberId: z.string().trim().min(1).max(80).optional(),
+  claimedDepartmentCode: z.string().trim().min(2).max(24).optional(),
+  claimedFacultyGroup: z.enum(['faculty', 'contractual']).optional(),
 });
 
 const adminUpdateUserSchema = z
@@ -1157,6 +1160,67 @@ portalRouter.post(
     const effectiveDeptCode =
       actor.role === 'chairman' ? actor.departmentCode.toUpperCase() : targetDeptCode;
 
+    let linkedClaimPatch: {
+      claimedFacultyMemberId?: string;
+      claimedDepartmentCode?: string;
+      claimedFacultyGroup?: 'faculty' | 'contractual';
+    } = {};
+
+    if (data.claimedFacultyMemberId) {
+      if (data.role !== 'teacher' && data.role !== 'chairman') {
+        res.status(400).json({
+          error: 'Only Faculty / Teacher or Department Chairman accounts can be linked to a department faculty profile.',
+        });
+        return;
+      }
+
+      const claimedDept = (data.claimedDepartmentCode || effectiveDeptCode).toUpperCase();
+      if (claimedDept !== effectiveDeptCode) {
+        res.status(400).json({
+          error: 'Linked faculty profile department must match the account department.',
+        });
+        return;
+      }
+
+      const deptRecord = await pustRepo.getDepartmentByCode(effectiveDeptCode);
+      if (!deptRecord) {
+        res.status(404).json({ error: `Department ${effectiveDeptCode} not found.` });
+        return;
+      }
+
+      const regularMatch = (deptRecord.facultyMembers || []).find(
+        (m) => m.id === data.claimedFacultyMemberId
+      );
+      const contractualMatch = (deptRecord.contractualFacultyMembers || []).find(
+        (m) => m.id === data.claimedFacultyMemberId
+      );
+      if (!regularMatch && !contractualMatch) {
+        res.status(404).json({
+          error: 'Selected faculty profile was not found in that department directory.',
+        });
+        return;
+      }
+
+      const existingUsers = await pustRepo.listUsers();
+      const existingClaimant = existingUsers.find(
+        (u) =>
+          u.claimedDepartmentCode?.toUpperCase() === effectiveDeptCode &&
+          u.claimedFacultyMemberId === data.claimedFacultyMemberId
+      );
+      if (existingClaimant) {
+        res.status(409).json({
+          error: `This faculty profile is already claimed by ${existingClaimant.name}.`,
+        });
+        return;
+      }
+
+      linkedClaimPatch = {
+        claimedFacultyMemberId: data.claimedFacultyMemberId,
+        claimedDepartmentCode: effectiveDeptCode,
+        claimedFacultyGroup: regularMatch ? 'faculty' : 'contractual',
+      };
+    }
+
     try {
       const created = await pustRepo.createUser({
         name: data.name,
@@ -1179,6 +1243,7 @@ portalRouter.post(
         ...(data.designation?.trim() ? { designation: data.designation.trim() } : {}),
         assignedCourses: data.role === 'teacher' ? data.assignedCourses || [] : [],
         assignedSessions: data.role === 'teacher' ? data.assignedSessions || [] : [],
+        ...linkedClaimPatch,
       });
 
       if (data.role === 'student') {

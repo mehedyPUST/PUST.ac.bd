@@ -133,7 +133,7 @@ export function PortalView({
     'create-admin' | 'create-officer' | null
   >(null);
   const [pendingDirectorySection, setPendingDirectorySection] = useState<
-    'accounts' | 'faculty-requests' | DepartmentPeopleSection | null
+    'accounts' | 'existing-profiles' | 'faculty-requests' | DepartmentPeopleSection | null
   >(null);
   const [pendingFacultyRequestCount, setPendingFacultyRequestCount] = useState(0);
 
@@ -152,12 +152,15 @@ export function PortalView({
     }
     if (
       user.role === 'admin' &&
-      (requestedSectionParam === 'accounts' || requestedSectionParam === 'faculty-requests')
+      (requestedSectionParam === 'accounts' ||
+        requestedSectionParam === 'existing-profiles' ||
+        requestedSectionParam === 'faculty-requests')
     ) {
       setPendingDirectorySection(requestedSectionParam);
     } else if (
       user.role === 'chairman' &&
       (requestedSectionParam === 'teachers' ||
+        requestedSectionParam === 'existing-profiles' ||
         requestedSectionParam === 'faculty-requests' ||
         requestedSectionParam === 'students' ||
         requestedSectionParam === 'activity')
@@ -614,6 +617,7 @@ export function PortalView({
                 initialAction={pendingDirectoryAction}
                 initialSection={
                   pendingDirectorySection === 'accounts' ||
+                  pendingDirectorySection === 'existing-profiles' ||
                   pendingDirectorySection === 'faculty-requests'
                     ? pendingDirectorySection
                     : null
@@ -632,6 +636,7 @@ export function PortalView({
                 departments={departments}
                 initialSection={
                   pendingDirectorySection === 'teachers' ||
+                  pendingDirectorySection === 'existing-profiles' ||
                   pendingDirectorySection === 'faculty-requests' ||
                   pendingDirectorySection === 'students' ||
                   pendingDirectorySection === 'activity'

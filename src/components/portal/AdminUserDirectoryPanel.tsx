@@ -15,16 +15,19 @@ import {
   Trash2,
   UserCheck,
   UserPlus,
+  Users,
   X,
   XCircle,
 } from 'lucide-react';
 import { DEFAULT_ADMIN_OFFICES } from '../../lib/adminOffices';
 import { pustApi } from '../../lib/api';
+import { isSafeMediaUrl } from '../../lib/media';
 import { AdminFacultyRequestsPanel } from './AdminFacultyRequestsPanel';
 import type {
   AdministrationOfficeRecord,
   ApprovalStatus,
   AuthUser,
+  DepartmentPersonRecord,
   DepartmentRecord,
   UserRole,
 } from '../../types/pust';
@@ -34,12 +37,23 @@ interface AdminUserDirectoryPanelProps {
   departments: DepartmentRecord[];
   offices?: AdministrationOfficeRecord[];
   initialAction?: 'create-admin' | 'create-officer' | null;
-  initialSection?: 'accounts' | 'faculty-requests' | null;
+  initialSection?: 'accounts' | 'existing-profiles' | 'faculty-requests' | null;
   onConsumeInitialAction?: () => void;
   onConsumeInitialSection?: () => void;
   onUsersChanged?: () => void;
   onCmsChange?: () => Promise<void>;
   onPendingFacultyRequestsChange?: (count: number) => void;
+}
+
+interface ExistingProfileEntry {
+  key: string;
+  departmentCode: string;
+  departmentName: string;
+  departmentBuilding: string;
+  group: 'faculty' | 'contractual';
+  groupLabel: string;
+  member: DepartmentPersonRecord;
+  claimedBy: AuthUser | null;
 }
 
 interface OfficeUnitOption {
@@ -137,8 +151,14 @@ export function AdminUserDirectoryPanel({
   onCmsChange,
   onPendingFacultyRequestsChange,
 }: AdminUserDirectoryPanelProps) {
-  const [activeSection, setActiveSection] = useState<'accounts' | 'faculty-requests'>(
-    initialSection === 'faculty-requests' ? 'faculty-requests' : 'accounts'
+  const [activeSection, setActiveSection] = useState<
+    'accounts' | 'existing-profiles' | 'faculty-requests'
+  >(
+    initialSection === 'faculty-requests'
+      ? 'faculty-requests'
+      : initialSection === 'existing-profiles'
+      ? 'existing-profiles'
+      : 'accounts'
   );
   const [pendingFacultyCount, setPendingFacultyCount] = useState(0);
   const [users, setUsers] = useState<AuthUser[]>([]);
@@ -146,11 +166,23 @@ export function AdminUserDirectoryPanel({
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  // Filters
+  // Filters (Accounts)
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'officers' | UserRole>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | ApprovalStatus>('all');
   const [unitFilter, setUnitFilter] = useState('ALL');
+
+  // Filters & Preview (Existing Profiles)
+  const [profileSearch, setProfileSearch] = useState('');
+  const [profileDeptFilter, setProfileDeptFilter] = useState('ALL');
+  const [profileGroupFilter, setProfileGroupFilter] = useState<'all' | 'faculty' | 'contractual'>(
+    'all'
+  );
+  const [profileClaimFilter, setProfileClaimFilter] = useState<'all' | 'claimed' | 'unclaimed'>(
+    'all'
+  );
+  const [previewProfile, setPreviewProfile] = useState<ExistingProfileEntry | null>(null);
+  const [linkingProfile, setLinkingProfile] = useState<ExistingProfileEntry | null>(null);
 
   // Create Officer / Teacher Modal
   const [showCreateOfficerModal, setShowCreateOfficerModal] = useState(false);
@@ -286,18 +318,30 @@ export function AdminUserDirectoryPanel({
 
   useEffect(() => {
     const hasOpenModal =
-      showCreateOfficerModal || showCreateAdminModal || Boolean(editingUser) || Boolean(passwordTarget);
+      showCreateOfficerModal ||
+      showCreateAdminModal ||
+      Boolean(editingUser) ||
+      Boolean(passwordTarget) ||
+      Boolean(previewProfile);
     if (!hasOpenModal) return;
     function onKey(e: KeyboardEvent) {
       if (e.key !== 'Escape') return;
       setShowCreateOfficerModal(false);
+      setLinkingProfile(null);
       setShowCreateAdminModal(false);
       setEditingUser(null);
       setPasswordTarget(null);
+      setPreviewProfile(null);
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [showCreateOfficerModal, showCreateAdminModal, editingUser, passwordTarget]);
+  }, [
+    showCreateOfficerModal,
+    showCreateAdminModal,
+    editingUser,
+    passwordTarget,
+    previewProfile,
+  ]);
 
   const summary = useMemo(() => {
     const total = users.length;
@@ -354,11 +398,105 @@ export function AdminUserDirectoryPanel({
       });
   }, [users, roleFilter, statusFilter, unitFilter, searchQuery]);
 
+  const existingProfiles = useMemo<ExistingProfileEntry[]>(() => {
+    const claimedLookup = new Map<string, AuthUser>();
+    for (const u of users) {
+      if (!u.claimedFacultyMemberId) continue;
+      const deptKey = (u.claimedDepartmentCode || u.departmentCode).toUpperCase();
+      claimedLookup.set(`${deptKey}:${u.claimedFacultyMemberId}`, u);
+    }
+
+    const entries: ExistingProfileEntry[] = [];
+    for (const dept of departments) {
+      const deptCode = dept.code.toUpperCase();
+      for (const member of dept.facultyMembers || []) {
+        entries.push({
+          key: `${deptCode}:faculty:${member.id}`,
+          departmentCode: deptCode,
+          departmentName: dept.name,
+          departmentBuilding: dept.building || 'Academic Block',
+          group: 'faculty',
+          groupLabel: 'Regular Faculty',
+          member,
+          claimedBy: claimedLookup.get(`${deptCode}:${member.id}`) || null,
+        });
+      }
+      for (const member of dept.contractualFacultyMembers || []) {
+        entries.push({
+          key: `${deptCode}:contractual:${member.id}`,
+          departmentCode: deptCode,
+          departmentName: dept.name,
+          departmentBuilding: dept.building || 'Academic Block',
+          group: 'contractual',
+          groupLabel: 'Contractual / Adjunct',
+          member,
+          claimedBy: claimedLookup.get(`${deptCode}:${member.id}`) || null,
+        });
+      }
+    }
+    return entries;
+  }, [departments, users]);
+
+  const existingProfilesSummary = useMemo(() => {
+    const total = existingProfiles.length;
+    const claimed = existingProfiles.filter((e) => Boolean(e.claimedBy)).length;
+    const unclaimed = total - claimed;
+    const departmentsCount = new Set(existingProfiles.map((e) => e.departmentCode)).size;
+    return { total, claimed, unclaimed, departmentsCount };
+  }, [existingProfiles]);
+
+  const filteredExistingProfiles = useMemo(() => {
+    const q = profileSearch.trim().toLowerCase();
+    return existingProfiles
+      .filter((entry) => {
+        if (profileDeptFilter !== 'ALL' && entry.departmentCode !== profileDeptFilter) {
+          return false;
+        }
+        if (profileGroupFilter !== 'all' && entry.group !== profileGroupFilter) {
+          return false;
+        }
+        if (profileClaimFilter === 'claimed' && !entry.claimedBy) return false;
+        if (profileClaimFilter === 'unclaimed' && entry.claimedBy) return false;
+        if (q) {
+          const hay = [
+            entry.member.name,
+            entry.member.designation,
+            entry.member.qualification || '',
+            entry.member.researchArea || '',
+            entry.member.officeLocation || '',
+            entry.departmentCode,
+            entry.departmentName,
+            ...(entry.member.emails || []).map((e) => e.value),
+            entry.claimedBy?.name || '',
+            entry.claimedBy?.email || '',
+          ]
+            .join(' ')
+            .toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (!a.claimedBy && b.claimedBy) return -1;
+        if (a.claimedBy && !b.claimedBy) return 1;
+        const deptCmp = a.departmentCode.localeCompare(b.departmentCode);
+        if (deptCmp !== 0) return deptCmp;
+        return a.member.name.localeCompare(b.member.name);
+      });
+  }, [
+    existingProfiles,
+    profileSearch,
+    profileDeptFilter,
+    profileGroupFilter,
+    profileClaimFilter,
+  ]);
+
   const openCreateOfficerModal = useCallback(() => {
     const defaultOpt =
       officeCatalog.find((o) => o.group === 'Academic Departments') || officeCatalog[0];
     setError(null);
     setFeedback(null);
+    setLinkingProfile(null);
     setOfficerUnitKey(defaultOpt?.key || 'central:ADMIN');
     setOfficerRole(defaultOpt?.defaultRole || 'teacher');
     setOfficerDeptCode(defaultOpt?.code || 'CSE');
@@ -375,6 +513,38 @@ export function AdminUserDirectoryPanel({
     setOfficerSessions('');
     setShowCreateOfficerModal(true);
   }, [officeCatalog]);
+
+  const openAddPeopleFromProfile = useCallback(
+    (entry: ExistingProfileEntry) => {
+      const existingDeptTeachers = users.filter(
+        (u) => u.departmentCode.toUpperCase() === entry.departmentCode && u.role === 'teacher'
+      ).length;
+      const suggestedId = `PUST-${entry.departmentCode}-FAC-${String(existingDeptTeachers + 1).padStart(2, '0')}`;
+      const primaryEmail = entry.member.emails?.[0]?.value || '';
+      const deptOpt = officeCatalog.find((o) => o.key === `dept:${entry.departmentCode}`);
+
+      setError(null);
+      setFeedback(null);
+      setPreviewProfile(null);
+      setLinkingProfile(entry);
+      setOfficerUnitKey(deptOpt?.key || `dept:${entry.departmentCode}`);
+      setOfficerRole('teacher');
+      setOfficerDeptCode(entry.departmentCode);
+      setOfficerOfficeName(`Department of ${entry.departmentName}`);
+      setOfficerHallAffiliation(entry.member.officeLocation || entry.departmentBuilding);
+      setOfficerName(entry.member.name);
+      setOfficerDesignation(entry.member.designation || 'Faculty Member');
+      setOfficerEmail(primaryEmail);
+      setOfficerAcademicId(suggestedId);
+      setOfficerPassword('');
+      setShowOfficerPassword(false);
+      setOfficerStatus('approved');
+      setOfficerCourses('');
+      setOfficerSessions('');
+      setShowCreateOfficerModal(true);
+    },
+    [officeCatalog, users]
+  );
 
   function handleOfficerUnitChange(nextKey: string) {
     setOfficerUnitKey(nextKey);
@@ -474,10 +644,27 @@ export function AdminUserDirectoryPanel({
         approvalStatus: officerStatus,
         assignedCourses: courses,
         assignedSessions: sessions,
+        ...(linkingProfile &&
+        (officerRole === 'teacher' || officerRole === 'chairman') &&
+        officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode
+          ? {
+              claimedFacultyMemberId: linkingProfile.member.id,
+              claimedDepartmentCode: linkingProfile.departmentCode,
+              claimedFacultyGroup: linkingProfile.group,
+            }
+          : {}),
       });
+      const wasLinked = Boolean(
+        linkingProfile &&
+          (officerRole === 'teacher' || officerRole === 'chairman') &&
+          officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode
+      );
       setShowCreateOfficerModal(false);
+      setLinkingProfile(null);
       setFeedback(
-        `Created ${ROLE_DISPLAY_NAMES[res.user.role]} account for ${res.user.name} (${res.user.officeName || res.user.departmentCode}).`
+        wasLinked
+          ? `Added ${res.user.name} to portal and linked to existing ${res.user.departmentCode} directory profile.`
+          : `Created ${ROLE_DISPLAY_NAMES[res.user.role]} account for ${res.user.name} (${res.user.officeName || res.user.departmentCode}).`
       );
       await loadUsers();
       onUsersChanged?.();
@@ -640,9 +827,9 @@ export function AdminUserDirectoryPanel({
 
   return (
     <div className="space-y-6">
-      {/* Workspace Mode Switcher: Accounts Directory vs Faculty Profile Approvals */}
+      {/* Workspace Mode Switcher: Accounts Directory vs Existing Profiles vs Faculty Profile Approvals */}
       <div className="bg-white rounded-2xl border border-stone-200 p-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-stone-100 border border-stone-200">
+        <div className="inline-flex flex-wrap items-center gap-1 p-1 rounded-xl bg-stone-100 border border-stone-200">
           <button
             type="button"
             onClick={() => setActiveSection('accounts')}
@@ -654,6 +841,20 @@ export function AdminUserDirectoryPanel({
           >
             <UserPlus className="w-3.5 h-3.5" />
             <span>Directory Accounts ({summary.total})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('existing-profiles')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              activeSection === 'existing-profiles'
+                ? 'bg-white text-slate-950 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>
+              Existing Profiles ({existingProfilesSummary.total})
+            </span>
           </button>
           <button
             type="button"
@@ -674,6 +875,8 @@ export function AdminUserDirectoryPanel({
         <p className="text-xs text-slate-600 px-1">
           {activeSection === 'accounts'
             ? 'Manage portal accounts, roles, office assignments & passwords'
+            : activeSection === 'existing-profiles'
+            ? 'Inspect public faculty profiles, claimed vs unclaimed status & add as people'
             : 'Review and approve teacher directory claims & profile edits'}
         </p>
       </div>
@@ -686,6 +889,311 @@ export function AdminUserDirectoryPanel({
           }}
           onCmsChange={onCmsChange}
         />
+      ) : activeSection === 'existing-profiles' ? (
+        <div className="space-y-6">
+          {feedback && (
+            <div
+              role="status"
+              className="px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-900 flex items-center justify-between gap-3"
+            >
+              <span>{feedback}</span>
+              <button
+                type="button"
+                onClick={() => setFeedback(null)}
+                className="text-emerald-700 hover:text-emerald-950 cursor-pointer"
+                aria-label="Dismiss notification"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {error && (
+            <div
+              role="alert"
+              className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900 flex items-center justify-between gap-3"
+            >
+              <span>{error}</span>
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                className="text-red-700 hover:text-red-950 cursor-pointer"
+                aria-label="Dismiss error"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+              <div className="space-y-1">
+                <h2 className="font-serif text-xl font-medium text-slate-950">
+                  Existing Public Faculty Profiles &amp; Claim Status
+                </h2>
+                <p className="text-xs text-slate-600 max-w-3xl">
+                  All faculty profiles currently listed across university academic departments. Check whether each profile is claimed by a portal user account or unclaimed, and add unclaimed profiles directly as portal people.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => void loadUsers()}
+                  disabled={loading}
+                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                  <span>Refresh Status</span>
+                </button>
+              </div>
+            </div>
+
+            <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Existing Profiles</dt>
+                <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {existingProfilesSummary.total}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Claimed by People</dt>
+                <dd className="font-mono text-2xl font-semibold text-emerald-700 tabular-nums mt-0.5">
+                  {existingProfilesSummary.claimed}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Unclaimed Profiles</dt>
+                <dd className="font-mono text-2xl font-semibold text-amber-800 tabular-nums mt-0.5">
+                  {existingProfilesSummary.unclaimed}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Departments</dt>
+                <dd className="font-mono text-2xl font-semibold text-pust-900 tabular-nums mt-0.5">
+                  {existingProfilesSummary.departmentsCount}
+                </dd>
+              </div>
+            </dl>
+
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-1">
+              <div className="lg:col-span-5 relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="search"
+                  value={profileSearch}
+                  onChange={(e) => setProfileSearch(e.target.value)}
+                  placeholder="Search existing profiles by name, designation, email, or dept..."
+                  className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+              <div className="lg:col-span-4">
+                <select
+                  value={profileDeptFilter}
+                  onChange={(e) => setProfileDeptFilter(e.target.value)}
+                  aria-label="Filter existing profiles by department"
+                  className="w-full h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                >
+                  <option value="ALL">All Academic Departments</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.code.toUpperCase()}>
+                      {d.code} — {d.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="lg:col-span-3">
+                <select
+                  value={profileGroupFilter}
+                  onChange={(e) =>
+                    setProfileGroupFilter(e.target.value as 'all' | 'faculty' | 'contractual')
+                  }
+                  aria-label="Filter existing profiles by faculty group"
+                  className="w-full h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                >
+                  <option value="all">All Faculty Groups</option>
+                  <option value="faculty">Regular Faculty</option>
+                  <option value="contractual">Contractual / Adjunct</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">
+                {(
+                  [
+                    { id: 'all', label: `All (${existingProfilesSummary.total})` },
+                    { id: 'unclaimed', label: `Unclaimed (${existingProfilesSummary.unclaimed})` },
+                    { id: 'claimed', label: `Claimed (${existingProfilesSummary.claimed})` },
+                  ] as const
+                ).map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setProfileClaimFilter(item.id)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
+                      profileClaimFilter === item.id
+                        ? 'bg-white text-slate-950 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-950'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              <p className="font-mono text-xs text-slate-600 tabular-nums">
+                Showing {filteredExistingProfiles.length} of {existingProfiles.length} profiles
+              </p>
+            </div>
+
+            {filteredExistingProfiles.length === 0 ? (
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-2">
+                <p className="text-sm font-medium text-slate-800">
+                  No existing faculty profiles match your current filters.
+                </p>
+                {(profileSearch ||
+                  profileDeptFilter !== 'ALL' ||
+                  profileGroupFilter !== 'all' ||
+                  profileClaimFilter !== 'all') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileSearch('');
+                      setProfileDeptFilter('ALL');
+                      setProfileGroupFilter('all');
+                      setProfileClaimFilter('all');
+                    }}
+                    className="px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-stone-200">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                      <th className="py-3 px-3 w-12 font-mono">S.N</th>
+                      <th className="py-3 px-3">Person &amp; Contact</th>
+                      <th className="py-3 px-3">Department &amp; Group</th>
+                      <th className="py-3 px-3">Claim Status</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-200">
+                    {filteredExistingProfiles.map((entry, idx) => {
+                      const primaryEmail = entry.member.emails?.[0]?.value || '—';
+                      const primaryPhone = entry.member.phones?.[0]?.value;
+                      const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]';
+                      return (
+                        <tr key={entry.key} className={`${rowBg} hover:bg-[#F3EFE8]/60 transition-colors`}>
+                          <td className="py-3 px-3 font-mono text-slate-500 tabular-nums align-top">
+                            {idx + 1}
+                          </td>
+                          <td className="py-3 px-3 align-top">
+                            <div className="flex items-start gap-2.5 min-w-[210px]">
+                              <div className="w-9 h-9 rounded-full bg-pust-50 border border-stone-200 text-pust-900 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
+                                {entry.member.photoUrl && isSafeMediaUrl(entry.member.photoUrl) ? (
+                                  <img
+                                    src={entry.member.photoUrl}
+                                    alt={entry.member.name}
+                                    referrerPolicy="no-referrer"
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <span>{entry.member.name.slice(0, 2).toUpperCase()}</span>
+                                )}
+                              </div>
+                              <div className="min-w-0 space-y-0.5">
+                                <p className="font-semibold text-sm text-slate-950">
+                                  {entry.member.name}
+                                </p>
+                                <p className="text-xs text-slate-700">{entry.member.designation}</p>
+                                <p className="font-mono text-[11px] text-slate-500 break-all">
+                                  {primaryEmail}
+                                  {primaryPhone ? ` · ${primaryPhone}` : ''}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 align-top">
+                            <p className="font-medium text-slate-900">
+                              {entry.departmentName} ({entry.departmentCode})
+                            </p>
+                            <p className="text-[11px] text-slate-600">{entry.groupLabel}</p>
+                            {entry.member.officeLocation && (
+                              <p className="font-mono text-[11px] text-slate-500 truncate max-w-[220px]">
+                                {entry.member.officeLocation}
+                              </p>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 align-top">
+                            {entry.claimedBy ? (
+                              <div className="space-y-0.5 min-w-[180px]">
+                                <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                  <span>Claimed</span>
+                                </span>
+                                <p className="text-slate-900 font-medium">
+                                  {entry.claimedBy.name}
+                                </p>
+                                <p className="font-mono text-[11px] text-slate-500 break-all">
+                                  {entry.claimedBy.email} · {entry.claimedBy.academicId}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="space-y-0.5 min-w-[150px]">
+                                <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
+                                  <XCircle className="w-3.5 h-3.5 shrink-0" />
+                                  <span>Unclaimed</span>
+                                </span>
+                                <p className="text-[11px] text-slate-500">
+                                  No portal account linked
+                                </p>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 align-top text-right whitespace-nowrap">
+                            <div className="inline-flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewProfile(entry)}
+                                className="h-8 inline-flex items-center gap-1 px-2.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>View</span>
+                              </button>
+                              {entry.claimedBy ? (
+                                <button
+                                  type="button"
+                                  onClick={() => openEditModalFor(entry.claimedBy!)}
+                                  className="h-8 inline-flex items-center gap-1 px-3 rounded-lg border border-stone-300 bg-white text-slate-800 font-medium hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  <span>Manage Account</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => openAddPeopleFromProfile(entry)}
+                                  className="h-8 inline-flex items-center gap-1 px-3 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 transition-colors cursor-pointer"
+                                >
+                                  <UserPlus className="w-3.5 h-3.5" />
+                                  <span>Add as People</span>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
       ) : (
         <>
       {/* Feedback & Error Alerts */}
@@ -973,6 +1481,17 @@ export function AdminUserDirectoryPanel({
                           <p className="font-mono text-[11px] text-slate-600 tabular-nums">
                             ID: {u.academicId}
                           </p>
+                          {(u.role === 'teacher' || u.claimedFacultyMemberId) && (
+                            <p
+                              className={`text-[11px] font-medium ${
+                                u.claimedFacultyMemberId ? 'text-emerald-700' : 'text-amber-800'
+                              }`}
+                            >
+                              {u.claimedFacultyMemberId
+                                ? `Profile Claimed (${u.claimedDepartmentCode || u.departmentCode})`
+                                : 'Profile Unclaimed'}
+                            </p>
+                          )}
                           {u.role === 'teacher' &&
                             ((u.assignedCourses?.length ?? 0) > 0 ||
                               (u.assignedSessions?.length ?? 0) > 0) && (
@@ -1110,7 +1629,10 @@ export function AdminUserDirectoryPanel({
       {showCreateOfficerModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto"
-          onClick={() => setShowCreateOfficerModal(false)}
+          onClick={() => {
+            setShowCreateOfficerModal(false);
+            setLinkingProfile(null);
+          }}
         >
           <div
             className="w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
@@ -1121,16 +1643,23 @@ export function AdminUserDirectoryPanel({
                 <Building2 className="w-4 h-4 text-pust-900 shrink-0" />
                 <div>
                   <h3 className="font-serif text-lg font-medium text-slate-950">
-                    Create Officer or Teacher Account
+                    {linkingProfile
+                      ? `Add ${linkingProfile.member.name} as Portal People`
+                      : 'Create Officer or Teacher Account'}
                   </h3>
                   <p className="text-xs text-slate-600">
-                    Provision faculty or administrative officer credentials for any university office or department.
+                    {linkingProfile
+                      ? `Creates a portal account for ${linkingProfile.departmentCode} and automatically claims this existing directory profile.`
+                      : 'Provision faculty or administrative officer credentials for any university office or department.'}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setShowCreateOfficerModal(false)}
+                onClick={() => {
+                  setShowCreateOfficerModal(false);
+                  setLinkingProfile(null);
+                }}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 cursor-pointer"
                 aria-label="Close modal"
               >
@@ -1139,6 +1668,18 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleCreateOfficerSubmit} className="p-6 space-y-4 text-xs">
+              {linkingProfile && (
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
+                  <span className="text-slate-700">
+                    Linking to existing profile:{' '}
+                    <strong className="text-slate-950">{linkingProfile.member.name}</strong> (
+                    {linkingProfile.departmentCode} · {linkingProfile.groupLabel})
+                  </span>
+                  <span className="font-mono text-[11px] font-semibold text-pust-800 shrink-0">
+                    Auto-Claim
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="sm:col-span-2">
                   <label className="block font-medium text-slate-700 mb-1">
@@ -1347,7 +1888,10 @@ export function AdminUserDirectoryPanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setShowCreateOfficerModal(false)}
+                  onClick={() => {
+                    setShowCreateOfficerModal(false);
+                    setLinkingProfile(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -1878,6 +2422,166 @@ export function AdminUserDirectoryPanel({
         </div>
       )}
         </>
+      )}
+
+      {/* Modal 5: Existing Profile Preview & Claim Status */}
+      {previewProfile && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Existing Faculty Profile Details"
+          onClick={() => setPreviewProfile(null)}
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-pust-900 text-white flex items-center justify-center font-serif text-base font-semibold shrink-0 overflow-hidden">
+                  {previewProfile.member.photoUrl &&
+                  isSafeMediaUrl(previewProfile.member.photoUrl) ? (
+                    <img
+                      src={previewProfile.member.photoUrl}
+                      alt={previewProfile.member.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{previewProfile.member.name.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] text-pust-800 font-semibold">
+                    {previewProfile.departmentCode} · {previewProfile.groupLabel}
+                  </p>
+                  <h3 className="font-serif text-lg font-medium text-slate-950 truncate">
+                    {previewProfile.member.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 truncate">
+                    {previewProfile.member.designation}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewProfile(null)}
+                aria-label="Close preview modal"
+                className="p-2 rounded-lg border border-stone-200 bg-white text-slate-600 hover:text-slate-950 cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Portal Claim Status
+                </span>
+                {previewProfile.claimedBy ? (
+                  <span className="font-medium text-emerald-700">
+                    Claimed by {previewProfile.claimedBy.name} ({previewProfile.claimedBy.email})
+                  </span>
+                ) : (
+                  <span className="font-semibold text-amber-800">
+                    Unclaimed — Not yet linked to a portal user account
+                  </span>
+                )}
+              </div>
+
+              {previewProfile.member.bio && (
+                <div className="space-y-1">
+                  <p className="font-semibold text-slate-900">Biography</p>
+                  <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                    {previewProfile.member.bio}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-semibold text-slate-900">Office &amp; Qualification</p>
+                  <p className="text-slate-700 mt-1">
+                    {previewProfile.member.officeLocation || previewProfile.departmentBuilding}
+                  </p>
+                  {previewProfile.member.qualification && (
+                    <p className="text-slate-600 mt-1">{previewProfile.member.qualification}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">Contact Details</p>
+                  <div className="space-y-1 mt-1 font-mono text-[11px] text-slate-700">
+                    {previewProfile.member.emails?.map((em, i) => (
+                      <p key={i}>
+                        {em.value} ({em.type})
+                      </p>
+                    ))}
+                    {previewProfile.member.phones?.map((ph, i) => (
+                      <p key={i}>
+                        {ph.value} ({ph.type})
+                      </p>
+                    ))}
+                    {(!previewProfile.member.emails || previewProfile.member.emails.length === 0) &&
+                      (!previewProfile.member.phones ||
+                        previewProfile.member.phones.length === 0) && <p>—</p>}
+                  </div>
+                </div>
+              </div>
+
+              {previewProfile.member.researchArea && (
+                <div>
+                  <p className="font-semibold text-slate-900">Research Area</p>
+                  <p className="text-slate-700 mt-1">{previewProfile.member.researchArea}</p>
+                </div>
+              )}
+
+              {previewProfile.member.education && previewProfile.member.education.length > 0 && (
+                <div>
+                  <p className="font-semibold text-slate-900">Education</p>
+                  <ul className="list-disc pl-4 text-slate-700 mt-1 space-y-0.5">
+                    {previewProfile.member.education.map((ed, i) => (
+                      <li key={i}>{ed}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setPreviewProfile(null)}
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer"
+              >
+                Close
+              </button>
+              {previewProfile.claimedBy ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = previewProfile.claimedBy!;
+                    setPreviewProfile(null);
+                    openEditModalFor(target);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-stone-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Manage Linked Account</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openAddPeopleFromProfile(previewProfile)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Add as People</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -94,7 +94,7 @@ export function getRoleTabs(
         {
           id: 'users',
           label: 'User Directory',
-          desc: 'Officers, teachers & admin accounts',
+          desc: 'Accounts, existing profiles & claim status',
           icon: UserCog,
         },
         {

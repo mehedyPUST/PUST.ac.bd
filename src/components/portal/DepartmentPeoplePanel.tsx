@@ -23,16 +23,31 @@ import {
   XCircle,
 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
+import { isSafeMediaUrl } from '../../lib/media';
 import { AdminFacultyRequestsPanel } from './AdminFacultyRequestsPanel';
 import type {
   ApprovalStatus,
   AuditLogRecord,
   AuthUser,
+  DepartmentPersonRecord,
   DepartmentRecord,
   SignupTokenRecord,
 } from '../../types/pust';
 
-export type DepartmentPeopleSection = 'teachers' | 'faculty-requests' | 'students' | 'activity';
+export type DepartmentPeopleSection =
+  | 'teachers'
+  | 'existing-profiles'
+  | 'faculty-requests'
+  | 'students'
+  | 'activity';
+
+interface DeptExistingProfileEntry {
+  key: string;
+  member: DepartmentPersonRecord;
+  group: 'faculty' | 'contractual';
+  groupLabel: string;
+  claimedBy: AuthUser | null;
+}
 
 interface DepartmentPeoplePanelProps {
   currentUser: AuthUser;
@@ -112,10 +127,17 @@ export function DepartmentPeoplePanel({
   // Filters
   const [teacherSearch, setTeacherSearch] = useState('');
   const [teacherStatusFilter, setTeacherStatusFilter] = useState<'all' | ApprovalStatus>('all');
+  const [existingSearch, setExistingSearch] = useState('');
+  const [existingClaimFilter, setExistingClaimFilter] = useState<'all' | 'claimed' | 'unclaimed'>('all');
+  const [existingGroupFilter, setExistingGroupFilter] = useState<'all' | 'faculty' | 'contractual'>('all');
   const [studentSearch, setStudentSearch] = useState('');
   const [studentSessionFilter, setStudentSessionFilter] = useState('ALL');
   const [studentStatusFilter, setStudentStatusFilter] = useState<'all' | ApprovalStatus>('all');
   const [activitySearch, setActivitySearch] = useState('');
+
+  // Preview & linking existing faculty profile
+  const [previewProfile, setPreviewProfile] = useState<DeptExistingProfileEntry | null>(null);
+  const [linkingProfile, setLinkingProfile] = useState<DeptExistingProfileEntry | null>(null);
 
   // Modal: Create Teacher
   const [showCreateTeacherModal, setShowCreateTeacherModal] = useState(false);
@@ -232,15 +254,18 @@ export function DepartmentPeoplePanel({
       showCreateStudentModal ||
       showTokenModal ||
       Boolean(editingUser) ||
-      Boolean(passwordTarget);
+      Boolean(passwordTarget) ||
+      Boolean(previewProfile);
     if (!anyModal) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       setShowCreateTeacherModal(false);
+      setLinkingProfile(null);
       setShowCreateStudentModal(false);
       setShowTokenModal(false);
       setEditingUser(null);
       setPasswordTarget(null);
+      setPreviewProfile(null);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -250,6 +275,7 @@ export function DepartmentPeoplePanel({
     showTokenModal,
     editingUser,
     passwordTarget,
+    previewProfile,
   ]);
 
   const teachers = useMemo(
@@ -349,14 +375,101 @@ export function DepartmentPeoplePanel({
     );
   }, [activityLogs, activitySearch]);
 
+  const existingProfiles = useMemo<DeptExistingProfileEntry[]>(() => {
+    if (!departmentObj) return [];
+    const entries: DeptExistingProfileEntry[] = [];
+    const appendGroup = (
+      members: DepartmentPersonRecord[] | undefined,
+      group: 'faculty' | 'contractual',
+      groupLabel: string
+    ) => {
+      for (const member of members || []) {
+        const claimedBy =
+          users.find(
+            (u) =>
+              u.claimedFacultyMemberId === member.id &&
+              (u.claimedDepartmentCode || u.departmentCode).toUpperCase() === deptCode
+          ) || null;
+        entries.push({
+          key: `${deptCode}:${group}:${member.id}`,
+          member,
+          group,
+          groupLabel,
+          claimedBy,
+        });
+      }
+    };
+    appendGroup(departmentObj.facultyMembers, 'faculty', 'Regular Faculty');
+    appendGroup(
+      departmentObj.contractualFacultyMembers,
+      'contractual',
+      'Contractual / Adjunct'
+    );
+    return entries;
+  }, [departmentObj, deptCode, users]);
+
+  const existingProfilesSummary = useMemo(() => {
+    const total = existingProfiles.length;
+    const claimed = existingProfiles.filter((p) => Boolean(p.claimedBy)).length;
+    return {
+      total,
+      claimed,
+      unclaimed: total - claimed,
+    };
+  }, [existingProfiles]);
+
+  const filteredExistingProfiles = useMemo(() => {
+    const q = existingSearch.trim().toLowerCase();
+    return existingProfiles.filter((entry) => {
+      if (existingGroupFilter !== 'all' && entry.group !== existingGroupFilter) return false;
+      if (existingClaimFilter === 'claimed' && !entry.claimedBy) return false;
+      if (existingClaimFilter === 'unclaimed' && entry.claimedBy) return false;
+      if (!q) return true;
+      const hay = [
+        entry.member.name,
+        entry.member.designation,
+        entry.member.officeLocation || '',
+        ...(entry.member.emails || []).map((em) => em.value),
+        ...(entry.member.phones || []).map((ph) => ph.value),
+        entry.claimedBy?.name || '',
+        entry.claimedBy?.email || '',
+        entry.claimedBy?.academicId || '',
+      ]
+        .join(' ')
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [existingProfiles, existingSearch, existingGroupFilter, existingClaimFilter]);
+
   function openCreateTeacher() {
     setError(null);
     setFeedback(null);
+    setLinkingProfile(null);
     setTName('');
     setTDesignation('Lecturer');
     setTEmail('');
     setTAcademicId('');
     setTBuilding(defaultBuilding);
+    setTPassword('');
+    setShowTPassword(false);
+    setTStatus('approved');
+    setTCourses('');
+    setTSessions('');
+    setShowCreateTeacherModal(true);
+  }
+
+  function openAddPeopleFromProfile(entry: DeptExistingProfileEntry) {
+    setError(null);
+    setFeedback(null);
+    setPreviewProfile(null);
+    setLinkingProfile(entry);
+    const primaryEmail = entry.member.emails?.[0]?.value?.trim() || '';
+    const slugSuffix = entry.member.id.replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+    setTName(entry.member.name);
+    setTDesignation(entry.member.designation || 'Lecturer');
+    setTEmail(primaryEmail);
+    setTAcademicId(`PUST-${deptCode}-FAC-${slugSuffix || '01'}`);
+    setTBuilding(entry.member.officeLocation || defaultBuilding);
     setTPassword('');
     setShowTPassword(false);
     setTStatus('approved');
@@ -437,9 +550,22 @@ export function DepartmentPeoplePanel({
         approvalStatus: tStatus,
         assignedCourses: courses,
         assignedSessions: sessions,
+        ...(linkingProfile
+          ? {
+              claimedFacultyMemberId: linkingProfile.member.id,
+              claimedDepartmentCode: deptCode,
+              claimedFacultyGroup: linkingProfile.group,
+            }
+          : {}),
       });
+      const wasLinked = Boolean(linkingProfile);
       setShowCreateTeacherModal(false);
-      setFeedback(`Provisioned ${deptCode} teacher account for ${res.user.name} (${res.user.email}).`);
+      setLinkingProfile(null);
+      setFeedback(
+        wasLinked
+          ? `Added ${res.user.name} (${res.user.email}) as ${deptCode} people and linked existing directory profile.`
+          : `Provisioned ${deptCode} teacher account for ${res.user.name} (${res.user.email}).`
+      );
       await loadData();
       onUsersChanged?.();
     } catch (err) {
@@ -722,6 +848,18 @@ export function DepartmentPeoplePanel({
             </button>
             <button
               type="button"
+              onClick={() => setActiveSection('existing-profiles')}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                activeSection === 'existing-profiles'
+                  ? 'bg-white text-slate-950 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Existing Profiles ({existingProfiles.length})</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveSection('faculty-requests')}
               className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeSection === 'faculty-requests'
@@ -873,11 +1011,11 @@ export function DepartmentPeoplePanel({
                           {t.claimedFacultyMemberId ? (
                             <p className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 mt-0.5">
                               <UserCheck className="w-3.5 h-3.5 shrink-0" />
-                              <span>Linked to Public Directory</span>
+                              <span>Claimed · Public Directory</span>
                             </p>
                           ) : (
-                            <p className="text-[11px] text-slate-500 mt-0.5">
-                              Directory profile unclaimed
+                            <p className="text-[11px] text-amber-800 font-medium mt-0.5">
+                              Unclaimed
                             </p>
                           )}
                         </td>
@@ -954,6 +1092,224 @@ export function DepartmentPeoplePanel({
                               <KeyRound className="w-3.5 h-3.5" />
                               <span>Password</span>
                             </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SECTION 1B: EXISTING DEPARTMENT FACULTY PROFILES & CLAIM STATUS */}
+      {activeSection === 'existing-profiles' && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-stone-200 pb-4">
+            <div className="space-y-1">
+              <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-950">
+                Existing {deptCode} Public Faculty Profiles &amp; Claim Status
+              </h3>
+              <p className="text-xs text-slate-600 max-w-3xl">
+                Review every faculty profile published under {deptTitle}. Profiles linked to a portal account are marked Claimed; click Add as People on any Unclaimed profile to create and link a teacher account.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-mono text-xs text-emerald-700 font-semibold tabular-nums">
+                {existingProfilesSummary.claimed} Claimed
+              </span>
+              <span className="text-stone-300">·</span>
+              <span className="font-mono text-xs text-amber-800 font-semibold tabular-nums">
+                {existingProfilesSummary.unclaimed} Unclaimed
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5 flex-1">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="search"
+                  value={existingSearch}
+                  onChange={(e) => setExistingSearch(e.target.value)}
+                  placeholder={`Search ${deptCode} profiles by name, email, office...`}
+                  className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+
+              <select
+                value={existingGroupFilter}
+                onChange={(e) =>
+                  setExistingGroupFilter(e.target.value as 'all' | 'faculty' | 'contractual')
+                }
+                aria-label="Filter existing profiles by faculty group"
+                className="h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              >
+                <option value="all">All Faculty Groups</option>
+                <option value="faculty">Regular Faculty</option>
+                <option value="contractual">Contractual / Adjunct</option>
+              </select>
+
+              <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">
+                {(
+                  [
+                    { id: 'all', label: `All (${existingProfilesSummary.total})` },
+                    { id: 'unclaimed', label: `Unclaimed (${existingProfilesSummary.unclaimed})` },
+                    { id: 'claimed', label: `Claimed (${existingProfilesSummary.claimed})` },
+                  ] as const
+                ).map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setExistingClaimFilter(item.id)}
+                    className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
+                      existingClaimFilter === item.id
+                        ? 'bg-white text-slate-950 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-950'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="font-mono text-xs text-slate-600 tabular-nums">
+              Showing {filteredExistingProfiles.length} of {existingProfiles.length}
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map((row) => (
+                <div
+                  key={row}
+                  className="h-12 rounded-xl bg-stone-100 animate-pulse border border-stone-200"
+                />
+              ))}
+            </div>
+          ) : filteredExistingProfiles.length === 0 ? (
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-2">
+              <Users className="w-6 h-6 text-slate-400 mx-auto" />
+              <p className="text-sm font-medium text-slate-900">
+                No {deptCode} existing profiles match the current filter
+              </p>
+              <p className="text-xs text-slate-600">
+                Adjust your search or claim status filter to view published faculty members.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-stone-200">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                    <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
+                    <th className="py-2.5 px-3">Person &amp; Contact</th>
+                    <th className="py-2.5 px-3">Group &amp; Office</th>
+                    <th className="py-2.5 px-3">Claim Status</th>
+                    <th className="py-2.5 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-200">
+                  {filteredExistingProfiles.map((entry, idx) => {
+                    const primaryEmail = entry.member.emails?.[0]?.value || '—';
+                    const primaryPhone = entry.member.phones?.[0]?.value;
+                    return (
+                      <tr
+                        key={entry.key}
+                        className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+                      >
+                        <td className="py-3 px-3 font-mono text-slate-500 tabular-nums align-top">
+                          {idx + 1}
+                        </td>
+                        <td className="py-3 px-3 align-top">
+                          <div className="flex items-start gap-2.5 min-w-[200px]">
+                            <div className="w-9 h-9 rounded-full bg-pust-50 border border-stone-200 text-pust-900 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
+                              {entry.member.photoUrl && isSafeMediaUrl(entry.member.photoUrl) ? (
+                                <img
+                                  src={entry.member.photoUrl}
+                                  alt={entry.member.name}
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span>{entry.member.name.slice(0, 2).toUpperCase()}</span>
+                              )}
+                            </div>
+                            <div className="min-w-0 space-y-0.5">
+                              <p className="font-semibold text-slate-950">{entry.member.name}</p>
+                              <p className="text-[11px] text-slate-600">
+                                {entry.member.designation}
+                              </p>
+                              <p className="font-mono text-[11px] text-slate-500 break-all">
+                                {primaryEmail}
+                                {primaryPhone ? ` · ${primaryPhone}` : ''}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 align-top">
+                          <p className="font-medium text-slate-900">{entry.groupLabel}</p>
+                          <p className="font-mono text-[11px] text-slate-500 mt-0.5">
+                            {entry.member.officeLocation || defaultBuilding}
+                          </p>
+                        </td>
+                        <td className="py-3 px-3 align-top">
+                          {entry.claimedBy ? (
+                            <div className="space-y-0.5 min-w-[170px]">
+                              <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                <span>Claimed</span>
+                              </span>
+                              <p className="font-medium text-slate-900">{entry.claimedBy.name}</p>
+                              <p className="font-mono text-[11px] text-slate-500 break-all">
+                                {entry.claimedBy.email} · {entry.claimedBy.academicId}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-0.5 min-w-[140px]">
+                              <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
+                                <XCircle className="w-3.5 h-3.5 shrink-0" />
+                                <span>Unclaimed</span>
+                              </span>
+                              <p className="text-[11px] text-slate-500">
+                                No portal account linked
+                              </p>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 align-top text-right whitespace-nowrap">
+                          <div className="inline-flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewProfile(entry)}
+                              className="h-8 inline-flex items-center gap-1 px-2.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>View</span>
+                            </button>
+                            {entry.claimedBy ? (
+                              <button
+                                type="button"
+                                onClick={() => openEditModal(entry.claimedBy!)}
+                                className="h-8 inline-flex items-center gap-1 px-3 rounded-lg border border-stone-300 bg-white text-slate-800 font-medium hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Manage Account</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => openAddPeopleFromProfile(entry)}
+                                className="h-8 inline-flex items-center gap-1 px-3 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 transition-colors cursor-pointer"
+                              >
+                                <UserPlus className="w-3.5 h-3.5" />
+                                <span>Add as People</span>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1387,7 +1743,10 @@ export function DepartmentPeoplePanel({
           role="dialog"
           aria-modal="true"
           aria-label="Add Department Teacher"
-          onClick={() => setShowCreateTeacherModal(false)}
+          onClick={() => {
+            setShowCreateTeacherModal(false);
+            setLinkingProfile(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -1400,12 +1759,17 @@ export function DepartmentPeoplePanel({
                   Scoped to {deptTitle}
                 </p>
                 <h3 className="font-serif text-lg font-medium text-slate-950">
-                  Add {deptCode} Teacher Account
+                  {linkingProfile
+                    ? `Add ${linkingProfile.member.name} as ${deptCode} People`
+                    : `Add ${deptCode} Teacher Account`}
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setShowCreateTeacherModal(false)}
+                onClick={() => {
+                  setShowCreateTeacherModal(false);
+                  setLinkingProfile(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -1414,6 +1778,21 @@ export function DepartmentPeoplePanel({
             </div>
 
             <form onSubmit={handleCreateTeacher} className="p-6 space-y-4 text-xs">
+              {linkingProfile && (
+                <div className="rounded-xl border border-pust-800/20 bg-pust-50/70 px-3.5 py-2.5 flex items-start justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <p className="font-semibold text-pust-900">
+                      Linking existing {deptCode} directory profile
+                    </p>
+                    <p className="text-[11px] text-slate-700">
+                      {linkingProfile.member.name} · {linkingProfile.member.designation} ({linkingProfile.groupLabel})
+                    </p>
+                  </div>
+                  <span className="font-mono text-[11px] font-semibold text-pust-800 shrink-0">
+                    Auto-Claim
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">Full Name</label>
@@ -1550,7 +1929,10 @@ export function DepartmentPeoplePanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setShowCreateTeacherModal(false)}
+                  onClick={() => {
+                    setShowCreateTeacherModal(false);
+                    setLinkingProfile(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -1560,7 +1942,11 @@ export function DepartmentPeoplePanel({
                   disabled={creatingTeacher}
                   className="px-5 py-2 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
                 >
-                  {creatingTeacher ? 'Creating Teacher...' : `Create ${deptCode} Teacher`}
+                  {creatingTeacher
+                    ? 'Saving Account...'
+                    : linkingProfile
+                    ? 'Add as People & Link Profile'
+                    : `Create ${deptCode} Teacher`}
                 </button>
               </div>
             </form>
@@ -2131,6 +2517,166 @@ export function DepartmentPeoplePanel({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 6: EXISTING PUBLIC PROFILE PREVIEW */}
+      {previewProfile && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Existing Faculty Profile Details"
+          onClick={() => setPreviewProfile(null)}
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-pust-900 text-white flex items-center justify-center font-serif text-base font-semibold shrink-0 overflow-hidden">
+                  {previewProfile.member.photoUrl &&
+                  isSafeMediaUrl(previewProfile.member.photoUrl) ? (
+                    <img
+                      src={previewProfile.member.photoUrl}
+                      alt={previewProfile.member.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{previewProfile.member.name.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] text-pust-800 font-semibold">
+                    {deptCode} · {previewProfile.groupLabel}
+                  </p>
+                  <h3 className="font-serif text-lg font-medium text-slate-950 truncate">
+                    {previewProfile.member.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 truncate">
+                    {previewProfile.member.designation}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewProfile(null)}
+                aria-label="Close preview modal"
+                className="p-2 rounded-lg border border-stone-200 bg-white text-slate-600 hover:text-slate-950 cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                  Portal Claim Status
+                </span>
+                {previewProfile.claimedBy ? (
+                  <span className="font-medium text-emerald-700">
+                    Claimed by {previewProfile.claimedBy.name} ({previewProfile.claimedBy.email})
+                  </span>
+                ) : (
+                  <span className="font-semibold text-amber-800">
+                    Unclaimed — Not yet linked to a portal account
+                  </span>
+                )}
+              </div>
+
+              {previewProfile.member.bio && (
+                <div className="space-y-1">
+                  <p className="font-semibold text-slate-900">Biography</p>
+                  <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                    {previewProfile.member.bio}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-semibold text-slate-900">Office &amp; Qualification</p>
+                  <p className="text-slate-700 mt-1">
+                    {previewProfile.member.officeLocation || defaultBuilding}
+                  </p>
+                  {previewProfile.member.qualification && (
+                    <p className="text-slate-600 mt-1">{previewProfile.member.qualification}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">Contact Details</p>
+                  <div className="space-y-1 mt-1 font-mono text-[11px] text-slate-700">
+                    {previewProfile.member.emails?.map((em, i) => (
+                      <p key={i}>
+                        {em.value} ({em.type})
+                      </p>
+                    ))}
+                    {previewProfile.member.phones?.map((ph, i) => (
+                      <p key={i}>
+                        {ph.value} ({ph.type})
+                      </p>
+                    ))}
+                    {(!previewProfile.member.emails || previewProfile.member.emails.length === 0) &&
+                      (!previewProfile.member.phones ||
+                        previewProfile.member.phones.length === 0) && <p>—</p>}
+                  </div>
+                </div>
+              </div>
+
+              {previewProfile.member.researchArea && (
+                <div>
+                  <p className="font-semibold text-slate-900">Research Area</p>
+                  <p className="text-slate-700 mt-1">{previewProfile.member.researchArea}</p>
+                </div>
+              )}
+
+              {previewProfile.member.education && previewProfile.member.education.length > 0 && (
+                <div>
+                  <p className="font-semibold text-slate-900">Education</p>
+                  <ul className="list-disc pl-4 text-slate-700 mt-1 space-y-0.5">
+                    {previewProfile.member.education.map((ed, i) => (
+                      <li key={i}>{ed}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setPreviewProfile(null)}
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer"
+              >
+                Close
+              </button>
+              {previewProfile.claimedBy ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = previewProfile.claimedBy!;
+                    setPreviewProfile(null);
+                    openEditModal(target);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-stone-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Manage Linked Account</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openAddPeopleFromProfile(previewProfile)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Add as People</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
