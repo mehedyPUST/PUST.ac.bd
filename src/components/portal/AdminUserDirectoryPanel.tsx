@@ -50,7 +50,7 @@ interface ExistingProfileEntry {
   departmentCode: string;
   departmentName: string;
   departmentBuilding: string;
-  group: 'faculty' | 'contractual';
+  group: 'faculty' | 'contractual' | 'officer';
   groupLabel: string;
   member: DepartmentPersonRecord;
   claimedBy: AuthUser | null;
@@ -162,6 +162,7 @@ export function AdminUserDirectoryPanel({
   );
   const [pendingFacultyCount, setPendingFacultyCount] = useState(0);
   const [users, setUsers] = useState<AuthUser[]>([]);
+  const [liveDepartments, setLiveDepartments] = useState<DepartmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -175,9 +176,9 @@ export function AdminUserDirectoryPanel({
   // Filters & Preview (Existing Profiles)
   const [profileSearch, setProfileSearch] = useState('');
   const [profileDeptFilter, setProfileDeptFilter] = useState('ALL');
-  const [profileGroupFilter, setProfileGroupFilter] = useState<'all' | 'faculty' | 'contractual'>(
-    'all'
-  );
+  const [profileGroupFilter, setProfileGroupFilter] = useState<
+    'all' | 'faculty' | 'contractual' | 'officer'
+  >('all');
   const [profileClaimFilter, setProfileClaimFilter] = useState<'all' | 'claimed' | 'unclaimed'>(
     'all'
   );
@@ -287,15 +288,24 @@ export function AdminUserDirectoryPanel({
     return options;
   }, [departments, offices]);
 
+  const resolvedDepartments = useMemo(
+    () => (liveDepartments.length > 0 ? liveDepartments : departments),
+    [liveDepartments, departments]
+  );
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [res, reqRes] = await Promise.all([
+      const [res, reqRes, deptRes] = await Promise.all([
         pustApi.getUsers(),
         pustApi.getAdminFacultyProfileRequests().catch(() => ({ requests: [] })),
+        pustApi.getDepartments().catch(() => null),
       ]);
       setUsers(res.users);
+      if (deptRes && Array.isArray(deptRes.departments)) {
+        setLiveDepartments(deptRes.departments);
+      }
       const pendingCount = reqRes.requests.filter((r) => r.status === 'pending').length;
       setPendingFacultyCount(pendingCount);
       onPendingFacultyRequestsChange?.(pendingCount);
@@ -407,7 +417,7 @@ export function AdminUserDirectoryPanel({
     }
 
     const entries: ExistingProfileEntry[] = [];
-    for (const dept of departments) {
+    for (const dept of resolvedDepartments) {
       const deptCode = dept.code.toUpperCase();
       for (const member of dept.facultyMembers || []) {
         entries.push({
@@ -433,9 +443,21 @@ export function AdminUserDirectoryPanel({
           claimedBy: claimedLookup.get(`${deptCode}:${member.id}`) || null,
         });
       }
+      for (const member of dept.officers || []) {
+        entries.push({
+          key: `${deptCode}:officer:${member.id}`,
+          departmentCode: deptCode,
+          departmentName: dept.name,
+          departmentBuilding: dept.building || 'Academic Block',
+          group: 'officer',
+          groupLabel: 'Department Officer',
+          member,
+          claimedBy: claimedLookup.get(`${deptCode}:${member.id}`) || null,
+        });
+      }
     }
     return entries;
-  }, [departments, users]);
+  }, [resolvedDepartments, users]);
 
   const existingProfilesSummary = useMemo(() => {
     const total = existingProfiles.length;
@@ -994,7 +1016,7 @@ export function AdminUserDirectoryPanel({
                   className="w-full h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                 >
                   <option value="ALL">All Academic Departments</option>
-                  {departments.map((d) => (
+                  {resolvedDepartments.map((d) => (
                     <option key={d.id} value={d.code.toUpperCase()}>
                       {d.code} — {d.name}
                     </option>
@@ -1005,14 +1027,17 @@ export function AdminUserDirectoryPanel({
                 <select
                   value={profileGroupFilter}
                   onChange={(e) =>
-                    setProfileGroupFilter(e.target.value as 'all' | 'faculty' | 'contractual')
+                    setProfileGroupFilter(
+                      e.target.value as 'all' | 'faculty' | 'contractual' | 'officer'
+                    )
                   }
-                  aria-label="Filter existing profiles by faculty group"
+                  aria-label="Filter existing profiles by group"
                   className="w-full h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                 >
-                  <option value="all">All Faculty Groups</option>
+                  <option value="all">All Profiles (Faculty &amp; Officers)</option>
                   <option value="faculty">Regular Faculty</option>
                   <option value="contractual">Contractual / Adjunct</option>
+                  <option value="officer">Department Officers</option>
                 </select>
               </div>
             </div>

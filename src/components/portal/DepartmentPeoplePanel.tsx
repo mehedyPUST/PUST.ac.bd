@@ -44,7 +44,7 @@ export type DepartmentPeopleSection =
 interface DeptExistingProfileEntry {
   key: string;
   member: DepartmentPersonRecord;
-  group: 'faculty' | 'contractual';
+  group: 'faculty' | 'contractual' | 'officer';
   groupLabel: string;
   claimedBy: AuthUser | null;
 }
@@ -102,9 +102,13 @@ export function DepartmentPeoplePanel({
   onPendingFacultyRequestsChange,
 }: DepartmentPeoplePanelProps) {
   const deptCode = currentUser.departmentCode.toUpperCase();
+  const [liveDepartment, setLiveDepartment] = useState<DepartmentRecord | null>(null);
   const departmentObj = useMemo(
-    () => departments.find((d) => d.code.toUpperCase() === deptCode) || null,
-    [departments, deptCode]
+    () =>
+      (liveDepartment && liveDepartment.code.toUpperCase() === deptCode ? liveDepartment : null) ||
+      departments.find((d) => d.code.toUpperCase() === deptCode) ||
+      null,
+    [liveDepartment, departments, deptCode]
   );
   const deptTitle = departmentObj ? `${departmentObj.name} (${deptCode})` : `Department of ${deptCode}`;
   const defaultBuilding = departmentObj?.building || 'Academic Building';
@@ -129,7 +133,9 @@ export function DepartmentPeoplePanel({
   const [teacherStatusFilter, setTeacherStatusFilter] = useState<'all' | ApprovalStatus>('all');
   const [existingSearch, setExistingSearch] = useState('');
   const [existingClaimFilter, setExistingClaimFilter] = useState<'all' | 'claimed' | 'unclaimed'>('all');
-  const [existingGroupFilter, setExistingGroupFilter] = useState<'all' | 'faculty' | 'contractual'>('all');
+  const [existingGroupFilter, setExistingGroupFilter] = useState<
+    'all' | 'faculty' | 'contractual' | 'officer'
+  >('all');
   const [studentSearch, setStudentSearch] = useState('');
   const [studentSessionFilter, setStudentSessionFilter] = useState('ALL');
   const [studentStatusFilter, setStudentStatusFilter] = useState<'all' | ApprovalStatus>('all');
@@ -198,13 +204,17 @@ export function DepartmentPeoplePanel({
     setLoading(true);
     setError(null);
     try {
-      const [usersRes, tokensRes, reqRes] = await Promise.all([
+      const [usersRes, tokensRes, reqRes, deptRes] = await Promise.all([
         pustApi.getUsers(),
         pustApi.getSignupTokens(),
         pustApi.getAdminFacultyProfileRequests().catch(() => ({ requests: [] })),
+        pustApi.getDepartmentByCode(deptCode).catch(() => null),
       ]);
       setUsers(usersRes.users);
       setTokens(tokensRes.tokens);
+      if (deptRes?.department) {
+        setLiveDepartment(deptRes.department);
+      }
       const pendingCount = reqRes.requests.filter((r) => r.status === 'pending').length;
       setPendingFacultyCount(pendingCount);
       onPendingFacultyRequestsChange?.(pendingCount);
@@ -380,7 +390,7 @@ export function DepartmentPeoplePanel({
     const entries: DeptExistingProfileEntry[] = [];
     const appendGroup = (
       members: DepartmentPersonRecord[] | undefined,
-      group: 'faculty' | 'contractual',
+      group: 'faculty' | 'contractual' | 'officer',
       groupLabel: string
     ) => {
       for (const member of members || []) {
@@ -405,6 +415,7 @@ export function DepartmentPeoplePanel({
       'contractual',
       'Contractual / Adjunct'
     );
+    appendGroup(departmentObj.officers, 'officer', 'Department Officer');
     return entries;
   }, [departmentObj, deptCode, users]);
 
@@ -810,6 +821,15 @@ export function DepartmentPeoplePanel({
             <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
               {teachers.length}
             </dd>
+            {existingProfilesSummary.total > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveSection('existing-profiles')}
+                className="text-[11px] font-medium text-pust-800 hover:underline mt-0.5 cursor-pointer text-left tabular-nums"
+              >
+                {existingProfilesSummary.total} existing profiles ({existingProfilesSummary.unclaimed} unclaimed)
+              </button>
+            )}
           </div>
           <div className="rounded-xl border border-stone-200 bg-[#FBF6EE] px-4 py-3">
             <dt className="text-[11px] font-medium text-slate-600">Pending Profile Edits</dt>
@@ -952,6 +972,32 @@ export function DepartmentPeoplePanel({
             </button>
           </div>
 
+          {existingProfilesSummary.total > 0 && (
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <p className="text-slate-700">
+                <strong className="text-slate-950 tabular-nums">
+                  {existingProfilesSummary.total}
+                </strong>{' '}
+                existing public profiles published under {deptCode} (faculty &amp; officers):{' '}
+                <span className="font-semibold text-emerald-700 tabular-nums">
+                  {existingProfilesSummary.claimed} claimed
+                </span>
+                {' · '}
+                <span className="font-semibold text-amber-800 tabular-nums">
+                  {existingProfilesSummary.unclaimed} unclaimed
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setActiveSection('existing-profiles')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-pust-900 font-semibold hover:border-pust-800 cursor-pointer whitespace-nowrap"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>View Existing Profiles ({existingProfilesSummary.total})</span>
+              </button>
+            </div>
+          )}
+
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((row) => (
@@ -968,7 +1014,7 @@ export function DepartmentPeoplePanel({
                 No {deptCode} teacher accounts match the current filter
               </p>
               <p className="text-xs text-slate-600">
-                Create a faculty account directly for your department or clear active search filters.
+                Create a faculty account directly for your department, add an account from Existing Profiles, or clear active search filters.
               </p>
             </div>
           ) : (
@@ -1110,10 +1156,10 @@ export function DepartmentPeoplePanel({
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-stone-200 pb-4">
             <div className="space-y-1">
               <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-950">
-                Existing {deptCode} Public Faculty Profiles &amp; Claim Status
+                Existing {deptCode} Faculty &amp; Officer Profiles · Claim Status
               </h3>
               <p className="text-xs text-slate-600 max-w-3xl">
-                Review every faculty profile published under {deptTitle}. Profiles linked to a portal account are marked Claimed; click Add as People on any Unclaimed profile to create and link a teacher account.
+                Review every faculty and officer profile published under {deptTitle}. Profiles linked to a portal account are marked Claimed; click Add as People on any Unclaimed profile to create and link an account.
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -1143,14 +1189,17 @@ export function DepartmentPeoplePanel({
               <select
                 value={existingGroupFilter}
                 onChange={(e) =>
-                  setExistingGroupFilter(e.target.value as 'all' | 'faculty' | 'contractual')
+                  setExistingGroupFilter(
+                    e.target.value as 'all' | 'faculty' | 'contractual' | 'officer'
+                  )
                 }
-                aria-label="Filter existing profiles by faculty group"
+                aria-label="Filter existing profiles by group"
                 className="h-9 px-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
               >
-                <option value="all">All Faculty Groups</option>
+                <option value="all">All Profiles (Faculty &amp; Officers)</option>
                 <option value="faculty">Regular Faculty</option>
                 <option value="contractual">Contractual / Adjunct</option>
+                <option value="officer">Department Officers</option>
               </select>
 
               <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">

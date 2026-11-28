@@ -83,7 +83,7 @@ const adminCreateUserSchema = z.object({
   assignedSessions: z.array(z.string().trim().min(4).max(20)).max(12).optional(),
   claimedFacultyMemberId: z.string().trim().min(1).max(80).optional(),
   claimedDepartmentCode: z.string().trim().min(2).max(24).optional(),
-  claimedFacultyGroup: z.enum(['faculty', 'contractual']).optional(),
+  claimedFacultyGroup: z.enum(['faculty', 'contractual', 'officer']).optional(),
 });
 
 const adminUpdateUserSchema = z
@@ -1163,7 +1163,7 @@ portalRouter.post(
     let linkedClaimPatch: {
       claimedFacultyMemberId?: string;
       claimedDepartmentCode?: string;
-      claimedFacultyGroup?: 'faculty' | 'contractual';
+      claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
     } = {};
 
     if (data.claimedFacultyMemberId) {
@@ -1194,9 +1194,12 @@ portalRouter.post(
       const contractualMatch = (deptRecord.contractualFacultyMembers || []).find(
         (m) => m.id === data.claimedFacultyMemberId
       );
-      if (!regularMatch && !contractualMatch) {
+      const officerMatch = (deptRecord.officers || []).find(
+        (m) => m.id === data.claimedFacultyMemberId
+      );
+      if (!regularMatch && !contractualMatch && !officerMatch) {
         res.status(404).json({
-          error: 'Selected faculty profile was not found in that department directory.',
+          error: 'Selected directory profile was not found in that department.',
         });
         return;
       }
@@ -1209,7 +1212,7 @@ portalRouter.post(
       );
       if (existingClaimant) {
         res.status(409).json({
-          error: `This faculty profile is already claimed by ${existingClaimant.name}.`,
+          error: `This directory profile is already claimed by ${existingClaimant.name}.`,
         });
         return;
       }
@@ -1217,7 +1220,11 @@ portalRouter.post(
       linkedClaimPatch = {
         claimedFacultyMemberId: data.claimedFacultyMemberId,
         claimedDepartmentCode: effectiveDeptCode,
-        claimedFacultyGroup: regularMatch ? 'faculty' : 'contractual',
+        claimedFacultyGroup: regularMatch
+          ? 'faculty'
+          : contractualMatch
+          ? 'contractual'
+          : 'officer',
       };
     }
 
@@ -4277,6 +4284,7 @@ portalRouter.get(
         (department.contractualFacultyMembers || []).find(
           (m) => m.id === liveUser.claimedFacultyMemberId
         ) ||
+        (department.officers || []).find((m) => m.id === liveUser.claimedFacultyMemberId) ||
         null;
     }
 
@@ -4323,7 +4331,8 @@ portalRouter.post(
     const contractualMatch = (department.contractualFacultyMembers || []).find(
       (m) => m.id === parsed.data.memberId
     );
-    const targetMember = regularMatch || contractualMatch;
+    const officerMatch = (department.officers || []).find((m) => m.id === parsed.data.memberId);
+    const targetMember = regularMatch || contractualMatch || officerMatch;
     if (!targetMember) {
       res.status(404).json({
         error: `Profile not found in the ${department.code} Department directory.`,
@@ -4331,7 +4340,11 @@ portalRouter.post(
       return;
     }
 
-    const resolvedGroup: 'faculty' | 'contractual' = regularMatch ? 'faculty' : 'contractual';
+    const resolvedGroup: 'faculty' | 'contractual' | 'officer' = regularMatch
+      ? 'faculty'
+      : contractualMatch
+      ? 'contractual'
+      : 'officer';
     const allUsers = await pustRepo.listUsers();
     const alreadyClaimedBy = allUsers.find(
       (u) =>
@@ -4455,7 +4468,8 @@ portalRouter.post(
         (department.facultyMembers || []).find((m) => m.id === liveUser.claimedFacultyMemberId) ||
         (department.contractualFacultyMembers || []).find(
           (m) => m.id === liveUser.claimedFacultyMemberId
-        );
+        ) ||
+        (department.officers || []).find((m) => m.id === liveUser.claimedFacultyMemberId);
       if (!existingMember) {
         res.status(404).json({ error: 'Your claimed directory profile no longer exists.' });
         return;
@@ -4467,13 +4481,19 @@ portalRouter.post(
       (r) => r.teacherUserId === liveUser.id && r.status === 'pending'
     );
 
+    const resolvedRequestGroup: 'faculty' | 'contractual' =
+      requestType === 'edit_claimed'
+        ? liveUser.claimedFacultyGroup === 'contractual'
+          ? 'contractual'
+          : liveUser.claimedFacultyGroup === 'faculty'
+          ? 'faculty'
+          : facultyGroup
+        : facultyGroup;
+
     let savedRequest: FacultyProfileRequestRecord;
     if (existingPending) {
       const updated = await pustRepo.updateFacultyProfileRequest(existingPending.id, {
-        facultyGroup:
-          requestType === 'edit_claimed'
-            ? liveUser.claimedFacultyGroup || facultyGroup
-            : facultyGroup,
+        facultyGroup: resolvedRequestGroup,
         requestType,
         targetMemberId:
           requestType === 'edit_claimed' ? liveUser.claimedFacultyMemberId : undefined,
@@ -4490,10 +4510,7 @@ portalRouter.post(
         teacherEmail: liveUser.email,
         teacherAcademicId: liveUser.academicId,
         departmentCode: department.code,
-        facultyGroup:
-          requestType === 'edit_claimed'
-            ? liveUser.claimedFacultyGroup || facultyGroup
-            : facultyGroup,
+        facultyGroup: resolvedRequestGroup,
         requestType,
         targetMemberId:
           requestType === 'edit_claimed' ? liveUser.claimedFacultyMemberId : undefined,

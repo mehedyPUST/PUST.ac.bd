@@ -35,7 +35,7 @@ export interface AuthUser {
   assignedSessions?: string[];
   claimedDepartmentCode?: string;
   claimedFacultyMemberId?: string;
-  claimedFacultyGroup?: 'faculty' | 'contractual';
+  claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
   createdAt: string;
 }
 
@@ -56,7 +56,7 @@ export interface AdminCreateUserPayload {
   assignedSessions?: string[];
   claimedFacultyMemberId?: string;
   claimedDepartmentCode?: string;
-  claimedFacultyGroup?: 'faculty' | 'contractual';
+  claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
 }
 
 export interface AdminUpdateUserPayload {
@@ -75,7 +75,7 @@ export interface AdminUpdateUserPayload {
   assignedSessions?: string[];
   claimedFacultyMemberId?: string | null;
   claimedDepartmentCode?: string | null;
-  claimedFacultyGroup?: 'faculty' | 'contractual' | null;
+  claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer' | null;
 }
 
 export interface SignupTokenRecord {

@@ -250,7 +250,9 @@ export function TeacherProfilePanel({
         setReadingSource(res.claimedMember ? 'pending' : 'pending');
       } else if (res.claimedMember) {
         setEditorMode('edit_claimed');
-        setFacultyGroup(res.user.claimedFacultyGroup || 'faculty');
+        setFacultyGroup(
+          res.user.claimedFacultyGroup === 'contractual' ? 'contractual' : 'faculty'
+        );
         setDraft(draftFromPerson(res.claimedMember, res.user));
         setReadingSource('live');
       } else {
@@ -425,7 +427,7 @@ export function TeacherProfilePanel({
     const resolvedMode = mode || (claimedMember ? 'edit_claimed' : 'create_new');
     setEditorMode(resolvedMode);
     if (resolvedMode === 'edit_claimed' && claimedMember) {
-      setFacultyGroup(user.claimedFacultyGroup || 'faculty');
+      setFacultyGroup(user.claimedFacultyGroup === 'contractual' ? 'contractual' : 'faculty');
       setDraft(
         draftFromPerson(
           pendingRequest?.requestType === 'edit_claimed'
@@ -902,9 +904,13 @@ export function TeacherProfilePanel({
                 </span>
                 <span aria-hidden="true">·</span>
                 <span>
-                  {(claimedMember
+                  {claimedMember
                     ? user.claimedFacultyGroup === 'contractual'
-                    : pendingRequest?.facultyGroup === 'contractual')
+                      ? 'Contractual / Adjunct Faculty'
+                      : user.claimedFacultyGroup === 'officer'
+                      ? 'Department Officer'
+                      : 'Regular Faculty'
+                    : pendingRequest?.facultyGroup === 'contractual'
                     ? 'Contractual / Adjunct Faculty'
                     : 'Regular Faculty'}
                 </span>

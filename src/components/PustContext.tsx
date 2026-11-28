@@ -534,15 +534,19 @@ export function PustShell({
         setAuthResolved(true);
         setBootstrapStatus(statusRes);
         if (meRes.user) {
-          const [bmRes, noticeRes, profileRes] = await Promise.all([
+          const [bmRes, noticeRes, profileRes, deptRes] = await Promise.all([
             pustApi.getBookmarks().catch(() => ({ bookmarks: [] })),
             pustApi.getNotices().catch(() => null),
             pustApi.getUniversityProfile().catch(() => null),
+            pustApi.getDepartments().catch(() => null),
           ]);
           if (!mountedRef.current) return;
           setBookmarks(bmRes.bookmarks);
           if (noticeRes && Array.isArray(noticeRes.notices)) {
             setNotices(noticeRes.notices);
+          }
+          if (deptRes && Array.isArray(deptRes.departments)) {
+            setDepartments(deptRes.departments);
           }
           if (profileRes) {
             if (profileRes.profile) setProfile(profileRes.profile);
