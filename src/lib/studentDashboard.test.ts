@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildHistoricalGpaSeries,
   buildStudentClassSchedules,
   buildStudentFeeSummary,
   summarizeStudentResults,
@@ -235,4 +236,68 @@ test('buildStudentFeeSummary aggregates dues and receipts without double-countin
   // 1800 + 650 = 2450 (receipt r-1 matched due-1 so it is not double-counted)
   assert.equal(feeSummary.totalSettledBdt, 2450);
   assert.equal(feeSummary.hallClearanceBlocked, true);
+});
+
+test('buildHistoricalGpaSeries sorts semesters chronologically and tracks running weighted CGPA', () => {
+  const unsortedResults: ExamResultRecord[] = [
+    {
+      id: 'res-3',
+      academicId: '220101',
+      studentName: 'Mehedy Hasan',
+      departmentCode: 'CSE',
+      session: '2022-23',
+      semester: 3,
+      courses: [
+        { code: 'CSE-2101', title: 'OOP', credits: 3, marks: 85, gradePoint: 4.0, letterGrade: 'A+' },
+      ],
+      sgpa: 4.0,
+      promotionStatus: 'Promoted (Auto)',
+      published: true,
+      enteredBy: 'Committee',
+      publishedAt: '2025-09-01',
+    },
+    {
+      id: 'res-1',
+      academicId: '220101',
+      studentName: 'Mehedy Hasan',
+      departmentCode: 'CSE',
+      session: '2022-23',
+      semester: 1,
+      courses: [
+        { code: 'CSE-1101', title: 'C Programming', credits: 3, marks: 73, gradePoint: 3.5, letterGrade: 'A-' },
+      ],
+      sgpa: 3.5,
+      promotionStatus: 'Promoted (Auto)',
+      published: true,
+      enteredBy: 'Committee',
+      publishedAt: '2024-06-01',
+    },
+    {
+      id: 'res-2',
+      academicId: '220101',
+      studentName: 'Mehedy Hasan',
+      departmentCode: 'CSE',
+      session: '2022-23',
+      semester: 2,
+      courses: [
+        { code: 'CSE-1201', title: 'Data Structures', credits: 3, marks: 77, gradePoint: 3.75, letterGrade: 'A' },
+      ],
+      sgpa: 3.75,
+      promotionStatus: 'Promoted (Auto)',
+      published: true,
+      enteredBy: 'Committee',
+      publishedAt: '2025-01-01',
+    },
+  ];
+
+  const series = buildHistoricalGpaSeries(unsortedResults);
+  assert.deepEqual(
+    series.map((p) => p.label),
+    ['Sem 1', 'Sem 2', 'Sem 3']
+  );
+  assert.equal(series[0].sgpa, 3.5);
+  assert.equal(series[0].runningCgpa, 3.5);
+  assert.equal(series[1].runningCgpa, 3.63);
+  assert.equal(series[2].runningCgpa, 3.75);
+  assert.deepEqual(buildHistoricalGpaSeries([]), []);
 });

@@ -343,6 +343,111 @@ export function summarizeStudentResults(
   };
 }
 
+export interface GpaChartPoint {
+  semester: number;
+  label: string;
+  sgpa: number;
+  runningCgpa: number;
+  credits: number;
+  coursesCount: number;
+  session: string;
+  promotionStatus: string;
+  publishedAt: string;
+  isSample?: boolean;
+}
+
+export const REFERENCE_GPA_PROGRESSION: GpaChartPoint[] = [
+  {
+    semester: 1,
+    label: 'Sem 1',
+    sgpa: 3.62,
+    runningCgpa: 3.62,
+    credits: 18.0,
+    coursesCount: 6,
+    session: 'Sample',
+    promotionStatus: 'Promoted',
+    publishedAt: 'Sample',
+    isSample: true,
+  },
+  {
+    semester: 2,
+    label: 'Sem 2',
+    sgpa: 3.75,
+    runningCgpa: 3.69,
+    credits: 19.5,
+    coursesCount: 6,
+    session: 'Sample',
+    promotionStatus: 'Promoted',
+    publishedAt: 'Sample',
+    isSample: true,
+  },
+  {
+    semester: 3,
+    label: 'Sem 3',
+    sgpa: 3.84,
+    runningCgpa: 3.74,
+    credits: 20.0,
+    coursesCount: 7,
+    session: 'Sample',
+    promotionStatus: 'Promoted',
+    publishedAt: 'Sample',
+    isSample: true,
+  },
+  {
+    semester: 4,
+    label: 'Sem 4',
+    sgpa: 3.79,
+    runningCgpa: 3.75,
+    credits: 19.5,
+    coursesCount: 6,
+    session: 'Sample',
+    promotionStatus: 'Promoted',
+    publishedAt: 'Sample',
+    isSample: true,
+  },
+];
+
+export function buildHistoricalGpaSeries(results: ExamResultRecord[]): GpaChartPoint[] {
+  if (!results.length) return [];
+
+  const chronological = [...results].sort((a, b) => a.semester - b.semester);
+  let cumulativeWeightedPoints = 0;
+  let cumulativeCredits = 0;
+
+  return chronological.map((res) => {
+    const termCredits = res.courses.reduce((sum, c) => sum + c.credits, 0);
+    const termWeightedPoints = res.courses.reduce(
+      (sum, c) => sum + c.credits * c.gradePoint,
+      0
+    );
+
+    if (termCredits > 0) {
+      cumulativeWeightedPoints += termWeightedPoints;
+      cumulativeCredits += termCredits;
+    } else {
+      cumulativeWeightedPoints += res.sgpa;
+      cumulativeCredits += 1;
+    }
+
+    const runningCgpa =
+      cumulativeCredits > 0
+        ? Number((cumulativeWeightedPoints / cumulativeCredits).toFixed(2))
+        : Number(res.sgpa.toFixed(2));
+
+    return {
+      semester: res.semester,
+      label: `Sem ${res.semester}`,
+      sgpa: Number(res.sgpa.toFixed(2)),
+      runningCgpa,
+      credits: Number(termCredits.toFixed(1)),
+      coursesCount: res.courses.length,
+      session: res.session,
+      promotionStatus: res.promotionStatus,
+      publishedAt: res.publishedAt,
+    };
+  });
+}
+
 export interface StudentFeeSummary {
   items: StudentFeeItem[];
   totalSettledBdt: number;
