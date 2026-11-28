@@ -89,7 +89,7 @@ export function AccountSecurityPasswordCard({
 
   return (
     <div
-      className={`rounded-2xl border overflow-hidden ${
+      className={`rounded-lg border overflow-hidden ${
         mustChange
           ? 'border-amber-300 bg-[#FBF6EE]'
           : 'border-stone-200 bg-white'

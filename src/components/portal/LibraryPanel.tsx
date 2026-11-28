@@ -192,7 +192,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Module Header */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             {user.role === 'student'
@@ -232,7 +232,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Student Actions, Visual 3-Step Pipeline & Digital Library Card */}
       {user.role === 'student' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Library Membership Pipeline
@@ -299,7 +299,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
             )}
           </div>
 
-          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs">
+          <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-3 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               My Digital Library Card
             </h3>
@@ -312,7 +312,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
               cards.map((card) => (
                 <div
                   key={card.id}
-                  className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-2xl p-6 space-y-3.5 shadow-sm"
+                  className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-lg p-6 space-y-3.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2.5">
                     <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200 flex items-center gap-1.5">
@@ -362,7 +362,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Chairman Queue */}
       {user.role === 'chairman' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Department Chairman Library Seal &amp; Forwarding Queue
             </h3>
@@ -450,7 +450,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Issued Library Cards — Dept. of {user.departmentCode} ({cards.length})
             </h3>
@@ -488,7 +488,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Library Office / Admin Queue & Borrowing Log */}
       {(user.role === 'library' || user.role === 'admin') && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Library Verification &amp; Digital Card Issuance
             </h3>
@@ -552,7 +552,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
           </div>
 
           {cards.length > 0 && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-3 shadow-xs">
+            <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-3 shadow-xs">
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Active Issued Library Cards ({cards.length})
               </h3>
@@ -581,7 +581,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
 
           <form
             onSubmit={handleBorrowBook}
-            className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+            className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
           >
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Record Book Borrowing
@@ -631,7 +631,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
 
       {/* Borrowing & Return History Table */}
       {(user.role === 'student' || user.role === 'library' || user.role === 'admin') && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
           <h3 className="font-serif text-lg font-medium text-slate-900">
             Book Borrowing &amp; Return Ledger
           </h3>

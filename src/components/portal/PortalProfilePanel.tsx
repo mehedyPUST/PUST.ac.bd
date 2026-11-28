@@ -108,7 +108,7 @@ export function PortalProfilePanel({
       )}
 
       {/* Unified Identity & Institutional Credentials Card */}
-      <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+      <div className="bg-white rounded-lg border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
         <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs font-mono text-slate-600">
             <span className="font-semibold text-pust-800 uppercase tracking-wider">
@@ -152,7 +152,7 @@ export function PortalProfilePanel({
         <div className="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           <div className="lg:col-span-7 space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-pust-900 text-white font-serif text-xl font-semibold flex items-center justify-center shrink-0">
+              <div className="w-16 h-16 rounded-lg bg-pust-900 text-white font-serif text-xl font-semibold flex items-center justify-center shrink-0">
                 {initials || 'PU'}
               </div>
               <div className="min-w-0 space-y-1">
@@ -364,7 +364,7 @@ export function PortalProfilePanel({
         <div className="xl:col-span-7 space-y-6">
           {user.role === 'student' && studentSelf ? (
             <>
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
                   <h3 className="font-serif text-lg font-medium text-slate-950">
                     Academic &amp; Administrative Remarks
@@ -407,7 +407,7 @@ export function PortalProfilePanel({
                 </dl>
               </div>
 
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
                   <div className="flex items-center gap-2">
                     <FileCheck2 className="w-4 h-4 text-pust-800" />
@@ -442,7 +442,7 @@ export function PortalProfilePanel({
               </div>
             </>
           ) : (
-            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
               <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
                 <h3 className="font-serif text-lg font-medium text-slate-950">
                   Authorized Modules &amp; Quick Navigation
@@ -486,7 +486,7 @@ export function PortalProfilePanel({
 
         {/* Right Rail: Saved Bookmarks & Digital Receipts */}
         <div className="xl:col-span-5 space-y-6">
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
             <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
               <div className="flex items-center gap-2">
                 <Bookmark className="w-4 h-4 text-pust-800" />
@@ -529,7 +529,7 @@ export function PortalProfilePanel({
           </div>
 
           {(user.role === 'student' || user.role === 'admin') && receipts.length > 0 && (
-            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
               <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-pust-800" />

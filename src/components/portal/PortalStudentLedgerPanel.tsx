@@ -80,7 +80,7 @@ export function PortalStudentLedgerPanel({
 
   if (user.role === 'student' && studentSelf) {
     return (
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-5">
         <div className="border-b border-stone-200 pb-3">
           <h2 className="font-serif text-xl font-medium text-slate-950">
             Student Academic Dossier
@@ -144,7 +144,7 @@ export function PortalStudentLedgerPanel({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+    <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3">
         <div>
           <h2 className="font-serif text-xl font-medium text-slate-950">

@@ -243,7 +243,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
             {user.role === 'student'
@@ -294,7 +294,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
       {/* Student Eligibility & Digital Checkout */}
       {user.role === 'student' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3.5">
             <div>
               <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -371,7 +371,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
       )}
 
       {/* Certificate Applications & 4-Office Independent Clearance Tracker */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
             <h3 className="font-serif text-lg font-medium text-slate-900">

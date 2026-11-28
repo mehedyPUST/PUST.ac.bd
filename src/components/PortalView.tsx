@@ -590,7 +590,7 @@ export function PortalView({
               title={collapsed ? tab.label : undefined}
               onClick={() => selectTab(tab.id)}
               className={`w-full flex items-center gap-2.5 rounded-lg text-[13px] transition-colors text-left ${
-                collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
+                collapsed ? 'justify-center px-1 py-2' : 'px-3 py-2'
               } ${
                 isActive
                   ? 'bg-[#EAF8F0] dark:bg-emerald-950/50 border border-[#BCE5CE] dark:border-emerald-800/70 text-[#0F7D42] dark:text-emerald-300 font-semibold cursor-pointer'
@@ -621,17 +621,23 @@ export function PortalView({
   function renderSidebarFooter(collapsed: boolean) {
     if (!user) return null;
     return (
-      <div className="shrink-0 p-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+      <div
+        className={`shrink-0 border-t border-slate-100 dark:border-slate-800 space-y-1.5 ${
+          collapsed ? 'p-1.5' : 'p-2'
+        }`}
+      >
         {/* User Profile Card */}
         <div
-          className={`rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 ${
-            collapsed ? 'flex justify-center' : 'space-y-2'
+          className={`rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${
+            collapsed ? 'p-1 flex justify-center' : 'p-2 space-y-2'
           }`}
         >
           <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
             <span
               title={`${user.name} (${ROLE_LABELS[user.role]})`}
-              className="w-8 h-8 rounded-full bg-pust-800 text-white font-semibold text-xs flex items-center justify-center shrink-0"
+              className={`rounded-full bg-pust-800 text-white font-semibold flex items-center justify-center shrink-0 ${
+                collapsed ? 'w-7 h-7 text-[11px]' : 'w-8 h-8 text-xs'
+              }`}
             >
               {getInitials(user.name)}
             </span>
@@ -670,8 +676,8 @@ export function PortalView({
           aria-label="Toggle portal dark mode"
           title={collapsed ? (portalDark ? 'Switch to light mode' : 'Switch to dark mode') : undefined}
           onClick={togglePortalDark}
-          className={`w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 flex items-center ${
-            collapsed ? 'justify-center' : 'justify-between'
+          className={`w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-1.5 flex items-center ${
+            collapsed ? 'justify-center px-1' : 'justify-between px-3'
           } gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer`}
         >
           <span className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200">
@@ -699,7 +705,9 @@ export function PortalView({
           type="button"
           title={collapsed ? 'Sign Out' : undefined}
           onClick={handleLogout}
-          className="w-full rounded-lg border border-red-200 dark:border-red-900/60 bg-red-50/40 dark:bg-red-950/25 hover:bg-red-50 dark:hover:bg-red-950/45 px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors cursor-pointer whitespace-nowrap"
+          className={`w-full rounded-lg border border-red-200 dark:border-red-900/60 bg-red-50/40 dark:bg-red-950/25 hover:bg-red-50 dark:hover:bg-red-950/45 py-1.5 flex items-center justify-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors cursor-pointer whitespace-nowrap ${
+            collapsed ? 'px-1' : 'px-3'
+          }`}
         >
           <LogOut className="w-3.5 h-3.5 shrink-0" />
           {!collapsed && <span>Sign Out</span>}
@@ -719,14 +727,14 @@ export function PortalView({
         {/* Left Sidebar Column (Desktop — Sticky Grid 1 & Grid 3) */}
         <div
           className={`hidden lg:flex flex-col gap-2.5 shrink-0 transition-all duration-200 lg:sticky lg:top-0 lg:pt-2.5 lg:pb-2.5 lg:self-start lg:h-screen ${
-            sidebarCollapsed ? 'w-[78px]' : 'w-[252px]'
+            sidebarCollapsed ? 'w-[56px]' : 'w-[252px]'
           }`}
         >
           {/* Grid 1: Floating Brand Card */}
           <div
             data-portal-grid="user-dashboard"
-            className={`shrink-0 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 h-[58px] flex items-center ${
-              sidebarCollapsed ? 'justify-center' : 'gap-2.5'
+            className={`shrink-0 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-2 h-[58px] flex items-center ${
+              sidebarCollapsed ? 'justify-center px-1.5' : 'gap-2.5 px-3'
             }`}
           >
             <div className="w-8 h-8 rounded-md bg-pust-50 dark:bg-pust-950/60 border border-pust-200/80 dark:border-pust-800/60 flex items-center justify-center shrink-0">
@@ -767,7 +775,9 @@ export function PortalView({
             <nav
               ref={navRailRef}
               aria-label="Campus portal workspace modules"
-              className="flex-1 min-h-0 overflow-y-auto px-2.5 py-3 space-y-4 no-scrollbar"
+              className={`flex-1 min-h-0 overflow-y-auto no-scrollbar ${
+                sidebarCollapsed ? 'px-1.5 py-2.5 space-y-2' : 'px-2.5 py-3 space-y-4'
+              }`}
             >
               {renderNavGroup('Academics & Services', primaryGroupTabs, sidebarCollapsed)}
               {renderNavGroup('Governance & Account', secondaryGroupTabs, sidebarCollapsed)}

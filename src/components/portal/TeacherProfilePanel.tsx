@@ -583,7 +583,7 @@ export function TeacherProfilePanel({
 
       {/* Pending / Finalized Approval Status Banner */}
       {pendingRequest && (
-        <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="rounded-lg border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
             <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
@@ -632,7 +632,7 @@ export function TeacherProfilePanel({
       )}
 
       {!pendingRequest && latestFinalizedRequest && latestFinalizedRequest.status === 'rejected' && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 flex items-start justify-between gap-3">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-5 py-4 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <XCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
@@ -648,7 +648,7 @@ export function TeacherProfilePanel({
       )}
 
       {!pendingRequest && latestFinalizedRequest && latestFinalizedRequest.status === 'approved' && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3.5 flex items-start gap-3">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-3.5 flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-emerald-950">
@@ -664,9 +664,9 @@ export function TeacherProfilePanel({
 
       {/* Loading Skeleton for Claimed Profile */}
       {waitingInitialClaimCheck && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-2xl bg-stone-100 animate-pulse" />
+            <div className="w-20 h-20 rounded-lg bg-stone-100 animate-pulse" />
             <div className="space-y-2 flex-1">
               <div className="h-4 w-48 bg-stone-100 animate-pulse rounded" />
               <div className="h-6 w-72 bg-stone-100 animate-pulse rounded" />
@@ -686,7 +686,7 @@ export function TeacherProfilePanel({
         !claimedMember &&
         !isEditing &&
         (browseDirectoryWhenUnclaimed || pendingRequest?.requestType !== 'create_new') && (
-        <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+        <div className="bg-white rounded-lg border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
           <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-mono text-pust-800 font-semibold">
               <Building2 className="w-3.5 h-3.5 shrink-0" />
@@ -900,7 +900,7 @@ export function TeacherProfilePanel({
         (Boolean(claimedMember) || !browseDirectoryWhenUnclaimed) && (
         <div className="space-y-6">
           {/* Identity & Actions Header Card */}
-          <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+          <div className="bg-white rounded-lg border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
             {/* Dedicated Uniform Top Action Toolbar */}
             <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 min-w-0">
@@ -1012,7 +1012,7 @@ export function TeacherProfilePanel({
 
             <div className="p-5 sm:p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                <div className="w-20 h-20 rounded-2xl bg-pust-900 text-white border border-stone-200 flex items-center justify-center font-serif text-2xl font-semibold shrink-0 overflow-hidden">
+                <div className="w-20 h-20 rounded-lg bg-pust-900 text-white border border-stone-200 flex items-center justify-center font-serif text-2xl font-semibold shrink-0 overflow-hidden">
                   {readingProfile.photoUrl && isSafeMediaUrl(readingProfile.photoUrl) ? (
                     <img
                       src={readingProfile.photoUrl}
@@ -1095,7 +1095,7 @@ export function TeacherProfilePanel({
             {/* Left Rail: Contact, Research Focus & Education */}
             <div className="xl:col-span-4 space-y-5">
               {/* Contact & Office Card */}
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3.5">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 space-y-3.5">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
                   <Phone className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1170,7 +1170,7 @@ export function TeacherProfilePanel({
               </div>
 
               {/* Research Interests Card */}
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 space-y-3">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
                   <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1201,7 +1201,7 @@ export function TeacherProfilePanel({
               </div>
 
               {/* Education Card */}
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 space-y-3">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
                   <GraduationCap className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1230,7 +1230,7 @@ export function TeacherProfilePanel({
             {/* Right Rail: Biography, Experience, Courses, Projects & Publications */}
             <div className="xl:col-span-8 space-y-5">
               {/* Academic Biography */}
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-3">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4 text-pust-800 shrink-0" />
@@ -1261,7 +1261,7 @@ export function TeacherProfilePanel({
 
               {/* Teaching Experience & Conducted Courses (Equal-Height Row) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                <div className="bg-white rounded-lg border border-stone-200 p-5 flex flex-col space-y-3 h-full">
                   <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
                     <Briefcase className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1282,7 +1282,7 @@ export function TeacherProfilePanel({
                   )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                <div className="bg-white rounded-lg border border-stone-200 p-5 flex flex-col space-y-3 h-full">
                   <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
                     <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1306,7 +1306,7 @@ export function TeacherProfilePanel({
 
               {/* Active Research Projects & Awards (Equal-Height Row) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                <div className="bg-white rounded-lg border border-stone-200 p-5 flex flex-col space-y-3 h-full">
                   <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
                     <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1327,7 +1327,7 @@ export function TeacherProfilePanel({
                   )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                <div className="bg-white rounded-lg border border-stone-200 p-5 flex flex-col space-y-3 h-full">
                   <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
                     <Award className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
@@ -1349,7 +1349,7 @@ export function TeacherProfilePanel({
               </div>
 
               {/* Scholarly Publications (Journals & Conferences) */}
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
@@ -1429,7 +1429,7 @@ export function TeacherProfilePanel({
       {isEditing && (
         <form
           onSubmit={handleSubmitProfileRequest}
-          className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-amber-600 overflow-hidden"
+          className="bg-white rounded-lg border border-stone-200 border-t-2 border-t-amber-600 overflow-hidden"
         >
           <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs font-mono text-amber-800 font-semibold flex items-center gap-1.5">
@@ -1969,7 +1969,7 @@ export function TeacherProfilePanel({
 
       {/* Submission History Ledger */}
       {(claimedMember || requests.length > 0) && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
             <div>
               <h3 className="font-serif text-lg font-medium text-slate-950">
@@ -2066,7 +2066,7 @@ export function TeacherProfilePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="bg-white rounded-lg border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
               <div className="flex items-center gap-3 min-w-0">

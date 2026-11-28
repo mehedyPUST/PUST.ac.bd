@@ -238,7 +238,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
       onClick={onClose}
     >
       <div
-        className="print-only-document bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none"
+        className="print-only-document bg-white w-full max-w-2xl rounded-lg border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Toolbar hidden when printing */}

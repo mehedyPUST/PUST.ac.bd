@@ -107,7 +107,7 @@ export function ApprovalDashboardPanel({
       )}
 
       {overview && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3">
             <div>
               <h2 className="font-serif text-xl font-medium text-slate-950">
@@ -188,7 +188,7 @@ export function ApprovalDashboardPanel({
       {user.role === 'teacher' && (
         <form
           onSubmit={handleSubmitRequest}
-          className="bg-white rounded-2xl border border-stone-200 p-6 space-y-3 text-xs"
+          className="bg-white rounded-lg border border-stone-200 p-6 space-y-3 text-xs"
         >
           <h3 className="font-serif text-lg font-medium text-slate-950">
             Submit Departmental Request to Chairman
@@ -252,7 +252,7 @@ export function ApprovalDashboardPanel({
         </form>
       )}
 
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-3 text-xs">
+      <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-3 text-xs">
         <h3 className="font-serif text-lg font-medium text-slate-950">
           Departmental Requisitions ({overview?.requests.length ?? 0})
         </h3>

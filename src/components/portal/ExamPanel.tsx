@@ -1116,7 +1116,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Module Header */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
             {user.role === 'student'
@@ -1188,7 +1188,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       {(user.role === 'teacher' || isCommitteeOperator) && (
         <div className="space-y-6">
           {myActiveCommittees.length > 0 && (
-            <div className="bg-white rounded-2xl border border-pust-800/30 p-6 space-y-4 shadow-xs">
+            <div className="bg-white rounded-lg border border-pust-800/30 p-6 space-y-4 shadow-xs">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
                   <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800 flex items-center gap-1.5">
@@ -1268,7 +1268,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+            <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="font-serif text-lg font-medium text-slate-900">
                   Department Course Catalog ({deptCourses.length})
@@ -1317,7 +1317,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               )}
             </div>
 
-            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+            <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Active Examination Circulars &amp; Schedules
               </h3>
@@ -1353,7 +1353,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       {/* Student: Department Courses for Your Session & Semester + Exam Form Fill-up */}
       {user.role === 'student' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
@@ -1404,7 +1404,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-5 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Semester Examination Form Fill-up
             </h3>
@@ -1513,7 +1513,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <form
               onSubmit={handleCreateCourse}
-              className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+              className="lg:col-span-5 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
             >
               <div className="border-b border-slate-100 pb-3">
                 <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -1720,7 +1720,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             {/* Assign Courses to Teacher / Faculty Member */}
             <form
               onSubmit={handleSaveTeacherAssignments}
-              className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+              className="lg:col-span-7 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
             >
               <div className="border-b border-slate-100 pb-3 flex flex-wrap items-start justify-between gap-2">
                 <div>
@@ -1856,7 +1856,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           </div>
 
           {/* Department Course Catalog Management Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -1946,7 +1946,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <form
               onSubmit={handleCreateExamCommittee}
-              className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+              className="lg:col-span-5 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
             >
               <div className="border-b border-slate-100 pb-3">
                 <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
@@ -2114,7 +2114,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               </div>
             </form>
 
-            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+            <div className="lg:col-span-7 bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
                   <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -2192,7 +2192,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
 
       {/* Chairman / Admin / Exam Committee: Arrange Examination & Publish Exam Circular */}
       {canArrangeExams && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
           <form onSubmit={handleCreateExamCircular} className="space-y-4">
             <div className="border-b border-slate-100 pb-3 flex flex-wrap items-start justify-between gap-2">
               <div>
@@ -2553,7 +2553,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         user.role === 'chairman' ||
         user.role === 'admin' ||
         myActiveCommittees.length > 0) && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
           <h3 className="font-serif text-lg font-medium text-slate-900">
             Examination Registrations, Digital Payments &amp; Admit Cards
           </h3>
@@ -2679,7 +2679,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         <form
           id="gradebook-builder-section"
           onSubmit={handlePublishResult}
-          className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs"
+          className="bg-white rounded-lg border border-slate-200 p-6 space-y-5 shadow-xs"
         >
           <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
@@ -3172,7 +3172,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           user.role === 'chairman' ||
           user.role === 'admin' ||
           myActiveCommittees.length > 0) && (
-          <div className="bg-white rounded-2xl border border-amber-300 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-lg border border-amber-300 p-6 space-y-4 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
               <div>
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
@@ -3301,7 +3301,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         )}
 
       {/* Published Results Ledger */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
         <h3 className="font-serif text-lg font-medium text-slate-900">
           Published Semester Results &amp; Promotion Standing
         </h3>

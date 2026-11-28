@@ -151,7 +151,7 @@ export function DigitalCheckoutModal({
       }}
     >
       <div
-        className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto"
+        className="bg-white w-full max-w-lg rounded-lg border border-slate-200 shadow-2xl overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">

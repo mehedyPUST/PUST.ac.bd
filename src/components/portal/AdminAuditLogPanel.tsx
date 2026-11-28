@@ -221,7 +221,7 @@ export function AdminAuditLogPanel() {
   return (
     <div className="space-y-6">
       {/* Header & Controls */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
@@ -351,7 +351,7 @@ export function AdminAuditLogPanel() {
       {error && (
         <div
           role="alert"
-          className="rounded-2xl border border-red-200 bg-red-50 p-4 flex flex-wrap items-center justify-between gap-3 text-xs text-red-900"
+          className="rounded-lg border border-red-200 bg-red-50 p-4 flex flex-wrap items-center justify-between gap-3 text-xs text-red-900"
         >
           <span>{error}</span>
           <button
@@ -365,7 +365,7 @@ export function AdminAuditLogPanel() {
       )}
 
       {/* Structured Event Ledger */}
-      <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
         <div className="px-5 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <ScrollText className="w-4 h-4 text-pust-800" />
@@ -499,7 +499,7 @@ export function AdminAuditLogPanel() {
           onClick={() => setSelectedLog(null)}
         >
           <div
-            className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden"
+            className="w-full max-w-xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 bg-gradient-to-r from-pust-950 via-pust-900 to-pust-800 text-white flex items-center justify-between gap-3">

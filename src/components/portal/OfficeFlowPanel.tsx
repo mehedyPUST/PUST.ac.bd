@@ -184,7 +184,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
   if (loading && !overview) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-xs">
         <PortalRecordsSkeleton rows={4} />
       </div>
     );
@@ -193,7 +193,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white rounded-lg border border-stone-200 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <p className="font-mono text-xs uppercase tracking-widest text-pust-800 flex items-center gap-1.5 text-left">
             <Workflow className="w-3.5 h-3.5 shrink-0" />
@@ -318,7 +318,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
             ].map((card) => (
               <div
                 key={card.title}
-                className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 ${
+                className={`rounded-lg border p-5 flex flex-col justify-between gap-4 ${
                   card.passed
                     ? 'bg-white border-stone-200'
                     : 'bg-[#FAF9F6] border-amber-300/80'
@@ -364,7 +364,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
         <>
           {/* KPI Strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Total Active Items
               </p>
@@ -372,7 +372,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                 {overview.counts.total}
               </p>
             </div>
-            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Auto-Ready
               </p>
@@ -380,7 +380,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                 {overview.counts.ready}
               </p>
             </div>
-            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Held by Checks
               </p>
@@ -388,7 +388,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
                 {overview.counts.held}
               </p>
             </div>
-            <div className="bg-white rounded-2xl border border-stone-200 p-4">
+            <div className="bg-white rounded-lg border border-stone-200 p-4">
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500 text-left">
                 Manual Desk Review
               </p>
@@ -400,7 +400,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
           {/* Sweep Execution Report */}
           {sweepReport && (
-            <div className="bg-white rounded-2xl border border-pust-700/35 p-5 space-y-3">
+            <div className="bg-white rounded-lg border border-pust-700/35 p-5 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-3">
                 <div>
                   <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 text-left">
@@ -448,7 +448,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
           )}
 
           {/* Unified Cross-Office Queue */}
-          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-200 pb-4">
               <div className="inline-flex flex-wrap gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200/80">
                 {(
@@ -569,7 +569,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
       {/* Automation Policy Rules Grid */}
       {overview && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-3">
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-pust-800" />
@@ -632,7 +632,7 @@ export function OfficeFlowPanel({ user, onOpenTab }: OfficeFlowPanelProps) {
 
       {/* Recent Automated & Office Activity Feed */}
       {overview && overview.recentAuditLogs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
           <div className="flex items-center gap-2 border-b border-stone-200 pb-3">
             <Activity className="w-4 h-4 text-pust-800" />
             <h3 className="font-serif text-lg font-medium text-slate-900">

@@ -793,7 +793,7 @@ export function AdminCmsPanel({
   return (
     <div className="space-y-6">
       {/* Role-Specific Governance Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
@@ -862,7 +862,7 @@ export function AdminCmsPanel({
 
       {/* Teacher Assigned Courses & Sessions Context */}
       {user.role === 'teacher' && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+        <div className="bg-white rounded-lg border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
           <div className="flex items-center gap-2.5">
             <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
             <div>
@@ -928,7 +928,7 @@ export function AdminCmsPanel({
           <div className="space-y-6">
             <form
               onSubmit={handleCreateNotice}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4"
+              className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4"
             >
               <div className="border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -1332,7 +1332,7 @@ export function AdminCmsPanel({
             </form>
 
             {/* Published Circulars Registry & Management */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+            <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
                 <div>
                   <h3 className="font-serif text-lg font-medium text-slate-900 tabular-nums">
@@ -1459,7 +1459,7 @@ export function AdminCmsPanel({
       {/* 2. Student Portal Signup Tokens & User Approvals (Admin & Chairman) */}
       {activeSubTab === 'approvals' && (user.role === 'admin' || user.role === 'chairman') && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="border-b border-slate-200 pb-3">
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Generate Unique Student Portal Signup Token
@@ -1587,7 +1587,7 @@ export function AdminCmsPanel({
           </div>
 
           {/* Account Approvals */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Account Approvals (
@@ -1742,7 +1742,7 @@ export function AdminCmsPanel({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <form
               onSubmit={handleSaveAbout}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-3"
+              className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-3"
             >
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Edit About PUST Content (CMS)
@@ -1787,7 +1787,7 @@ export function AdminCmsPanel({
 
             <form
               onSubmit={handleSaveVc}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-3"
+              className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-3"
             >
               <h3 className="font-serif text-lg font-medium text-slate-900">
                 Vice-Chancellor CMS &amp; Archive Promotion
@@ -1849,7 +1849,7 @@ export function AdminCmsPanel({
           </div>
 
           {/* Homepage Hero Banner Carousel Manager */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -2078,7 +2078,7 @@ export function AdminCmsPanel({
           </div>
 
           {/* News & Events / Gallery CMS (Photos via ImageKit.io, YouTube Videos, Public/Registered Privacy) */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-900">
@@ -2353,7 +2353,7 @@ export function AdminCmsPanel({
 
       {/* 4. Payment Gateways & Fee Schedule */}
       {activeSubTab === 'finance' && user.role === 'admin' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-5">
           <div>
             <h3 className="font-serif text-lg font-medium text-slate-900">
               Digital Payment Gateways &amp; University Fee Schedule
@@ -2430,7 +2430,7 @@ export function AdminCmsPanel({
         (user.role === 'admin' || user.role === 'registrar' || user.role === 'vc') && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {(user.role === 'admin' || user.role === 'registrar') && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+              <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <h3 className="font-serif text-lg font-medium text-slate-900 tabular-nums">
                     Admission Inquiries ({inquiries.length})
@@ -2527,7 +2527,7 @@ export function AdminCmsPanel({
             )}
 
             <div
-              className={`bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-3 ${
+              className={`bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-3 ${
                 user.role === 'vc' ? 'lg:col-span-2' : ''
               }`}
             >

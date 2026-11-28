@@ -236,7 +236,7 @@ export function HallPanel({ user }: HallPanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Header */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
             {user.role === 'student'
@@ -270,7 +270,7 @@ export function HallPanel({ user }: HallPanelProps) {
       {(user.role === 'hall' || user.role === 'admin') && (
         <form
           onSubmit={handlePublishCircular}
-          className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+          className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
         >
           <h3 className="font-serif text-lg font-medium text-slate-900">
             Publish Hall Seat Vacancy Circular
@@ -332,7 +332,7 @@ export function HallPanel({ user }: HallPanelProps) {
       )}
 
       {/* Active Vacancy Circulars */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
         <h3 className="font-serif text-lg font-medium text-slate-900">
           Open Hall Seat Vacancy Circulars
         </h3>
@@ -389,7 +389,7 @@ export function HallPanel({ user }: HallPanelProps) {
       </div>
 
       {/* Seat Applications & Full Seat Change History */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
         <h3 className="font-serif text-lg font-medium text-slate-900">
           Hall Seat Applications &amp; Retained Seat History
         </h3>
@@ -492,7 +492,7 @@ export function HallPanel({ user }: HallPanelProps) {
       </div>
 
       {/* Hall Financial Dues & Digital Checkout + Clearances */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 className="font-serif text-lg font-medium text-slate-900">

@@ -1151,7 +1151,7 @@ export function AdminUserDirectoryPanel({
   return (
     <div className="space-y-6">
       {/* Workspace Mode Switcher: Accounts Directory vs Existing Profiles vs Faculty Profile Approvals */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white rounded-lg border border-stone-200 p-3 flex flex-wrap items-center justify-between gap-3">
         <div className="inline-flex flex-wrap items-center gap-1 p-1 rounded-xl bg-stone-100 border border-stone-200">
           <button
             type="button"
@@ -1287,7 +1287,7 @@ export function AdminUserDirectoryPanel({
             </div>
           )}
 
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+          <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
               <div className="space-y-1">
                 <h2 className="font-serif text-xl font-medium text-slate-950">
@@ -1637,7 +1637,7 @@ export function AdminUserDirectoryPanel({
       )}
 
       {/* Header & Provisioning Actions */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <h2 className="font-serif text-xl font-medium text-slate-950">
@@ -2659,7 +2659,7 @@ export function AdminUserDirectoryPanel({
           }}
         >
           <div
-            className="w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-2xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
@@ -3000,7 +3000,7 @@ export function AdminUserDirectoryPanel({
           }}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-lg bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
@@ -3213,7 +3213,7 @@ export function AdminUserDirectoryPanel({
           }}
         >
           <div
-            className="w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-2xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
@@ -3475,7 +3475,7 @@ export function AdminUserDirectoryPanel({
           }}
         >
           <div
-            className="w-full max-w-md bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-md bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
@@ -3606,7 +3606,7 @@ export function AdminUserDirectoryPanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="bg-white rounded-lg border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
@@ -3773,7 +3773,7 @@ export function AdminUserDirectoryPanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-lg bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">

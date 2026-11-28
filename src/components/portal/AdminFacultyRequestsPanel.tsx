@@ -318,7 +318,7 @@ export function AdminFacultyRequestsPanel({
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <h2 className="font-serif text-xl font-medium text-slate-950">
@@ -539,7 +539,7 @@ export function AdminFacultyRequestsPanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+            className="bg-white rounded-lg border border-stone-200 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
           >
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">

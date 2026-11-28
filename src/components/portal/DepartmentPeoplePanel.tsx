@@ -912,7 +912,7 @@ export function DepartmentPeoplePanel({
       )}
 
       {/* Header + 4-Column KPI Strip + Segmented Section Switcher */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <p className="font-mono text-[11px] font-semibold text-pust-800 uppercase tracking-wider">
@@ -1048,7 +1048,7 @@ export function DepartmentPeoplePanel({
 
       {/* SECTION 1: TEACHERS */}
       {activeSection === 'teachers' && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-stone-200 pb-4">
             <div className="flex flex-wrap items-center gap-2.5 flex-1">
               <div className="relative w-full sm:w-80">
@@ -1283,7 +1283,7 @@ export function DepartmentPeoplePanel({
 
       {/* SECTION 1B: EXISTING DEPARTMENT FACULTY PROFILES & CLAIM STATUS */}
       {activeSection === 'existing-profiles' && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+        <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-stone-200 pb-4">
             <div className="space-y-1">
               <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-950">
@@ -1518,7 +1518,7 @@ export function DepartmentPeoplePanel({
       {/* SECTION 3: STUDENTS & ONBOARDING TOKENS */}
       {activeSection === 'students' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 border-b border-stone-200 pb-4">
               <div className="flex flex-wrap items-center gap-2.5 flex-1">
                 <div className="relative w-full sm:w-72">
@@ -1728,7 +1728,7 @@ export function DepartmentPeoplePanel({
           </div>
 
           {/* Single-Use Student Onboarding Tokens Ledger */}
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3">
               <div>
                 <h3 className="font-serif text-lg font-medium text-slate-950">
@@ -1824,7 +1824,7 @@ export function DepartmentPeoplePanel({
 
       {/* SECTION 4: DEPARTMENT ACTIVITY LOG */}
       {activeSection === 'activity' && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+        <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4">
             <div>
               <h3 className="font-serif text-lg font-medium text-slate-950">
@@ -1932,7 +1932,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div>
@@ -2223,7 +2223,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div>
@@ -2403,7 +2403,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div>
@@ -2550,7 +2550,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-xl bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div>
@@ -2787,7 +2787,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+            className="w-full max-w-md bg-white rounded-lg border border-stone-200 shadow-2xl overflow-hidden my-auto"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -2917,7 +2917,7 @@ export function DepartmentPeoplePanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="bg-white rounded-lg border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
           >
             <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
               <div className="flex items-center gap-3 min-w-0">

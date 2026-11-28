@@ -583,7 +583,7 @@ export function ExamCommitteeGradesDashboard({
   return (
     <section
       id="exam-committee-raw-grades-dashboard"
-      className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs"
+      className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs"
     >
       {/* Top Workspace Bar */}
       <div className="px-6 py-5 border-b border-slate-200 flex flex-wrap items-start justify-between gap-4">
