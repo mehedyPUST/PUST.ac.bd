@@ -781,25 +781,51 @@ export function DepartmentDetailView({
                               {chairman.qualification}
                             </p>
                           )}
-                          <div className="pt-1 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-slate-700 tabular-nums">
-                            {chairman.emails[0] && (
-                              <a
-                                href={`mailto:${chairman.emails[0].value}`}
-                                className="inline-flex items-center gap-1.5 text-lapis-900 hover:text-pust-900 hover:underline"
-                              >
-                                <Mail className="w-3.5 h-3.5 shrink-0" />
-                                {chairman.emails[0].value}
-                              </a>
-                            )}
-                            {chairman.phones[0] && (
-                              <a
-                                href={`tel:${sanitizeTelHref(chairman.phones[0].value)}`}
-                                className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline"
-                              >
-                                <Phone className="w-3.5 h-3.5 text-pust-700 shrink-0" />
-                                {chairman.phones[0].value}
-                              </a>
-                            )}
+                          <div className="pt-1.5 flex flex-col gap-1.5 font-mono text-xs text-slate-700 tabular-nums">
+                            {(() => {
+                              const emailList = chairman.emails || [];
+                              const officialEmail =
+                                emailList.find((e) => e.type === 'Office')?.value?.trim() ||
+                                emailList.find((e) =>
+                                  /@pust\.ac\.bd$/i.test(e.value || '')
+                                )?.value?.trim() ||
+                                emailList[0]?.value?.trim() ||
+                                department.contactEmail?.trim() ||
+                                '';
+                              const officialPhone =
+                                (chairman.phones || []).find((p) => p.type === 'Office')?.value ||
+                                (chairman.phones || [])[0]?.value ||
+                                department.contactPhone ||
+                                '';
+                              return (
+                                <>
+                                  {officialEmail ? (
+                                    <a
+                                      href={`mailto:${officialEmail}`}
+                                      className="inline-flex items-center gap-1.5 text-lapis-900 hover:text-pust-900 hover:underline w-fit max-w-full"
+                                      title="Official email — Chairman's Desk"
+                                    >
+                                      <Mail className="w-3.5 h-3.5 shrink-0" />
+                                      <span className="truncate">
+                                        <span className="text-slate-500 font-sans text-[11px] mr-1.5 not-italic">
+                                          Official email
+                                        </span>
+                                        {officialEmail}
+                                      </span>
+                                    </a>
+                                  ) : null}
+                                  {officialPhone ? (
+                                    <a
+                                      href={`tel:${sanitizeTelHref(officialPhone)}`}
+                                      className="inline-flex items-center gap-1.5 hover:text-pust-900 hover:underline w-fit"
+                                    >
+                                      <Phone className="w-3.5 h-3.5 text-pust-700 shrink-0" />
+                                      {officialPhone}
+                                    </a>
+                                  ) : null}
+                                </>
+                              );
+                            })()}
                           </div>
                         </div>
                       </div>

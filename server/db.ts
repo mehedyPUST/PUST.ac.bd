@@ -219,6 +219,14 @@ class PustRepository {
     await db.collection('students').createIndex({ academicId: 1 }, { unique: true });
     await db.collection('notices').createIndex({ publishedAt: -1 });
     await db.collection('bookmarks').createIndex({ userId: 1, itemId: 1 }, { unique: true });
+    await db.collection('exam_results').createIndex({ id: 1 }, { unique: true }).catch(() => undefined);
+    // Remove accidental duplicate exam result documents that share the same business id
+    await this.deduplicateCollectionByField(
+      db,
+      'exam_results',
+      (doc) => String(doc.id || ''),
+      (doc) => (doc.published ? 2 : 0) + (doc.reviewedBy ? 1 : 0)
+    );
 
     const seedIfEmpty = async <T extends { id: string }>(name: string, docs: T[]) => {
       const c = db.collection<T>(name);
@@ -1248,7 +1256,18 @@ class PustRepository {
   updateExamApplication = (id: string, patch: Partial<ExamApplicationRecord>) =>
     this.updateItem('exam_applications', this.examApps, id, patch);
 
-  listExamResults = () => this.getAll('exam_results', this.examResults);
+  listExamResults = async () => {
+    const all = await this.getAll('exam_results', this.examResults);
+    // Guard against duplicate business ids (e.g. repeated seed upserts)
+    const seen = new Set<string>();
+    const unique: ExamResultRecord[] = [];
+    for (const row of all) {
+      if (!row?.id || seen.has(row.id)) continue;
+      seen.add(row.id);
+      unique.push(row);
+    }
+    return unique;
+  };
   createExamResult = (input: Omit<ExamResultRecord, 'id'>) =>
     this.insertItem('exam_results', this.examResults, {
       id: `res-${crypto.randomUUID()}`,

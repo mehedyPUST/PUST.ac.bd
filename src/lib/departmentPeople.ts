@@ -17,8 +17,36 @@ export function sanitizeTelHref(phone: string): string {
 }
 
 export function resolveDepartmentChairman(department: DepartmentRecord): DepartmentPersonRecord {
+  const deptOfficeEmail = department.contactEmail?.trim() || '';
+  const deptOfficePhone = department.contactPhone?.trim() || '';
+
+  function withOfficialContact(person: DepartmentPersonRecord): DepartmentPersonRecord {
+    const emails = [...(person.emails || [])];
+    const phones = [...(person.phones || [])];
+    // Prefer ensuring department official email is available as Office type
+    if (
+      deptOfficeEmail &&
+      !emails.some((e) => e.value.trim().toLowerCase() === deptOfficeEmail.toLowerCase())
+    ) {
+      emails.unshift({ value: deptOfficeEmail, type: 'Office' });
+    } else if (emails.length > 0 && !emails.some((e) => e.type === 'Office')) {
+      // Promote first institutional address to Office when no Office type exists
+      const pustIdx = emails.findIndex((e) => /@pust\.ac\.bd$/i.test(e.value));
+      if (pustIdx >= 0) {
+        emails[pustIdx] = { ...emails[pustIdx], type: 'Office' };
+      }
+    }
+    if (
+      deptOfficePhone &&
+      !phones.some((p) => p.value.replace(/\s/g, '') === deptOfficePhone.replace(/\s/g, ''))
+    ) {
+      phones.unshift({ value: deptOfficePhone, type: 'Office' });
+    }
+    return { ...person, emails, phones };
+  }
+
   if (department.chairmanProfile) {
-    return department.chairmanProfile;
+    return withOfficialContact(department.chairmanProfile);
   }
 
   const normalizedChair = department.chairmanName.trim().toLowerCase();
@@ -27,13 +55,13 @@ export function resolveDepartmentChairman(department: DepartmentRecord): Departm
   );
 
   if (matchedFaculty) {
-    return {
+    return withOfficialContact({
       ...matchedFaculty,
       id: `${department.id}-chair`,
       designation: matchedFaculty.designation.includes('Chairman')
         ? matchedFaculty.designation
         : `${matchedFaculty.designation} & Chairman`,
-    };
+    });
   }
 
   return {
@@ -41,12 +69,8 @@ export function resolveDepartmentChairman(department: DepartmentRecord): Departm
     name: department.chairmanName,
     designation: `Chairman, Department of ${department.name}`,
     officeLocation: `${department.building}`,
-    phones: department.contactPhone
-      ? [{ value: department.contactPhone, type: 'Office' }]
-      : [],
-    emails: department.contactEmail
-      ? [{ value: department.contactEmail, type: 'Office' }]
-      : [],
+    phones: deptOfficePhone ? [{ value: deptOfficePhone, type: 'Office' }] : [],
+    emails: deptOfficeEmail ? [{ value: deptOfficeEmail, type: 'Office' }] : [],
   };
 }
 

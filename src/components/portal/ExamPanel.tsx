@@ -146,7 +146,15 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       setCourses(data.courses);
       setCirculars(data.circulars);
       setApplications(data.applications);
-      setResults(data.results);
+      // Deduplicate by id — Mongo/seed can occasionally surface the same result twice
+      const seenResultIds = new Set<string>();
+      setResults(
+        (data.results || []).filter((r) => {
+          if (!r?.id || seenResultIds.has(r.id)) return false;
+          seenResultIds.add(r.id);
+          return true;
+        })
+      );
       setGateways(data.gateways);
       setHallBlocked(data.hallClearanceBlocked);
       setUnpaidHallDues(data.unpaidHallDues);
@@ -731,6 +739,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const publishedResults = results.filter(
     (r) => r.published && r.status !== 'pending_chairman'
   );
+  // Stable unique keys for React lists (guards against any residual duplicate ids)
+  const publishedResultKeys = publishedResults.map((r, idx) => `${r.id}::${r.academicId}::${r.semester}::${idx}`);
+  const pendingResultKeys = pendingResults.map((r, idx) => `${r.id}::${r.academicId}::${r.semester}::${idx}`);
 
   const canEnterMarks = ['teacher', 'chairman', 'admin'].includes(user.role);
 
@@ -1983,8 +1994,11 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           </div>
 
           <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
-            {pendingResults.map((r) => (
-              <div key={r.id} className="p-4 space-y-3 bg-amber-50/30 text-sm">
+            {pendingResults.map((r, idx) => (
+              <div
+                key={pendingResultKeys[idx] || `${r.id}-${r.academicId}-${r.semester}-${idx}`}
+                className="p-4 space-y-3 bg-amber-50/30 text-sm"
+              >
                 <div className="flex flex-wrap justify-between items-start gap-2">
                   <div>
                     <p className="font-medium text-slate-900">
@@ -2051,9 +2065,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
           <p className="text-sm text-slate-600">No semester results published yet.</p>
         ) : (
           <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
-            {publishedResults.map((r) => (
+            {publishedResults.map((r, idx) => (
               <div
-                key={r.id}
+                key={publishedResultKeys[idx] || `${r.id}-${r.academicId}-${r.semester}-${idx}`}
                 className="p-4 space-y-2.5 text-sm bg-white hover:bg-[#F7F7F5]/60 transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
