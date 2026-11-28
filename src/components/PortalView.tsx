@@ -13,6 +13,10 @@ import { AdminCmsPanel } from './portal/AdminCmsPanel';
 import { AdminUserDirectoryPanel } from './portal/AdminUserDirectoryPanel';
 import { ApprovalDashboardPanel } from './portal/ApprovalDashboardPanel';
 import { CertificatePanel } from './portal/CertificatePanel';
+import {
+  DepartmentPeoplePanel,
+  type DepartmentPeopleSection,
+} from './portal/DepartmentPeoplePanel';
 import { DigitalDocumentModal, type DigitalDocumentData } from './portal/DigitalDocumentModal';
 import { ExamPanel } from './portal/ExamPanel';
 import { HallPanel } from './portal/HallPanel';
@@ -128,7 +132,7 @@ export function PortalView({
     'create-admin' | 'create-officer' | null
   >(null);
   const [pendingDirectorySection, setPendingDirectorySection] = useState<
-    'accounts' | 'faculty-requests' | null
+    'accounts' | 'faculty-requests' | DepartmentPeopleSection | null
   >(null);
   const [pendingFacultyRequestCount, setPendingFacultyRequestCount] = useState(0);
 
@@ -150,11 +154,19 @@ export function PortalView({
       (requestedSectionParam === 'accounts' || requestedSectionParam === 'faculty-requests')
     ) {
       setPendingDirectorySection(requestedSectionParam);
+    } else if (
+      user.role === 'chairman' &&
+      (requestedSectionParam === 'teachers' ||
+        requestedSectionParam === 'faculty-requests' ||
+        requestedSectionParam === 'students' ||
+        requestedSectionParam === 'activity')
+    ) {
+      setPendingDirectorySection(requestedSectionParam);
     }
   }, [user, requestedTabParam, requestedActionParam, requestedSectionParam]);
 
   useEffect(() => {
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'admin' && user.role !== 'chairman')) {
       setPendingFacultyRequestCount(0);
       return;
     }
@@ -490,7 +502,7 @@ export function PortalView({
                 }
                 pendingFacultyRequestsCount={pendingFacultyRequestCount}
                 onReviewFacultyRequests={
-                  user.role === 'admin'
+                  user.role === 'admin' || user.role === 'chairman'
                     ? () => {
                         setPendingDirectorySection('faculty-requests');
                         selectTab('users');
@@ -549,8 +561,32 @@ export function PortalView({
                 departments={departments}
                 offices={profile?.adminOffices}
                 initialAction={pendingDirectoryAction}
-                initialSection={pendingDirectorySection}
+                initialSection={
+                  pendingDirectorySection === 'accounts' ||
+                  pendingDirectorySection === 'faculty-requests'
+                    ? pendingDirectorySection
+                    : null
+                }
                 onConsumeInitialAction={() => setPendingDirectoryAction(null)}
+                onConsumeInitialSection={() => setPendingDirectorySection(null)}
+                onUsersChanged={loadStudents}
+                onCmsChange={onCmsChange}
+                onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
+              />
+            )}
+
+            {resolvedTab === 'users' && user.role === 'chairman' && (
+              <DepartmentPeoplePanel
+                currentUser={user}
+                departments={departments}
+                initialSection={
+                  pendingDirectorySection === 'teachers' ||
+                  pendingDirectorySection === 'faculty-requests' ||
+                  pendingDirectorySection === 'students' ||
+                  pendingDirectorySection === 'activity'
+                    ? pendingDirectorySection
+                    : null
+                }
                 onConsumeInitialSection={() => setPendingDirectorySection(null)}
                 onUsersChanged={loadStudents}
                 onCmsChange={onCmsChange}

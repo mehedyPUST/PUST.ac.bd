@@ -25,6 +25,8 @@ export type EnrichedFacultyProfileRequest = FacultyProfileRequestRecord & {
 };
 
 interface AdminFacultyRequestsPanelProps {
+  actorRole?: 'admin' | 'chairman';
+  departmentCode?: string;
   onPendingCountChange?: (count: number) => void;
   onCmsChange?: () => Promise<void>;
 }
@@ -53,6 +55,8 @@ function formatLineList(items?: string[]): string {
 }
 
 export function AdminFacultyRequestsPanel({
+  actorRole = 'admin',
+  departmentCode,
   onPendingCountChange,
   onCmsChange,
 }: AdminFacultyRequestsPanelProps) {
@@ -313,10 +317,14 @@ export function AdminFacultyRequestsPanel({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <h2 className="font-serif text-xl font-medium text-slate-950">
-              Faculty Directory Profile Approvals
+              {actorRole === 'chairman' && departmentCode
+                ? `${departmentCode} Faculty Directory Profile Approvals`
+                : 'Faculty Directory Profile Approvals'}
             </h2>
             <p className="text-xs text-slate-600">
-              Inspect teacher-submitted edits and new directory profile requests before publishing changes to live public department pages.
+              {actorRole === 'chairman' && departmentCode
+                ? `Inspect ${departmentCode} teacher-submitted edits and new directory profile requests before publishing changes to the live department page.`
+                : 'Inspect teacher-submitted edits and new directory profile requests before publishing changes to live public department pages.'}
             </p>
           </div>
           <button
@@ -333,7 +341,9 @@ export function AdminFacultyRequestsPanel({
         {/* 4-Column KPI Strip */}
         <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="rounded-xl border border-stone-200 bg-[#FBF6EE] px-4 py-3">
-            <dt className="text-[11px] font-medium text-slate-600">Pending Admin Review</dt>
+            <dt className="text-[11px] font-medium text-slate-600">
+              {actorRole === 'chairman' ? 'Pending Dept Review' : 'Pending Admin Review'}
+            </dt>
             <dd className="font-mono text-2xl font-semibold text-amber-800 tabular-nums mt-0.5">
               {counts.pending}
             </dd>
@@ -648,7 +658,10 @@ export function AdminFacultyRequestsPanel({
               {inspecting.status === 'pending' ? (
                 <label className="block space-y-1.5 text-xs">
                   <span className="font-semibold text-slate-800">
-                    Administrator Decision Note (optional on approval, required when declining)
+                    {actorRole === 'chairman'
+                      ? 'Department Chairman Decision Note'
+                      : 'Administrator Decision Note'}{' '}
+                    (optional on approval, required when declining)
                   </span>
                   <textarea
                     rows={2}

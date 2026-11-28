@@ -1017,9 +1017,10 @@ portalRouter.get(
   async (req: AuthenticatedRequest, res) => {
     let users = await pustRepo.listUsers();
     if (req.authUser!.role === 'chairman') {
+      const actorDept = req.authUser!.departmentCode.toUpperCase();
       users = users.filter(
         (u) =>
-          u.departmentCode === req.authUser!.departmentCode &&
+          u.departmentCode.toUpperCase() === actorDept &&
           (u.role === 'student' || u.role === 'teacher')
       );
     }
@@ -1058,7 +1059,7 @@ portalRouter.patch(
     if (actorRole === 'chairman') {
       if (
         (target.role !== 'student' && target.role !== 'teacher') ||
-        target.departmentCode !== req.authUser!.departmentCode
+        target.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
       ) {
         res.status(403).json({
           error: 'Department Chairmen may only approve Teachers and Students in their own department.',
@@ -1126,7 +1127,7 @@ portalRouter.patch(
 
 portalRouter.post(
   '/users',
-  requireRoles('admin'),
+  requireRoles('admin', 'chairman'),
   async (req: AuthenticatedRequest, res) => {
     const parsed = adminCreateUserSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1134,7 +1135,28 @@ portalRouter.post(
       res.status(400).json({ error: firstIssue });
       return;
     }
+    const actor = req.authUser!;
     const data = parsed.data;
+    const targetDeptCode = data.departmentCode.toUpperCase();
+
+    if (actor.role === 'chairman') {
+      if (data.role !== 'teacher' && data.role !== 'student') {
+        res.status(403).json({
+          error: 'Department Chairmen may only provision Teacher and Student accounts.',
+        });
+        return;
+      }
+      if (targetDeptCode !== actor.departmentCode.toUpperCase()) {
+        res.status(403).json({
+          error: `Department Chairmen may only create accounts within ${actor.departmentCode}.`,
+        });
+        return;
+      }
+    }
+
+    const effectiveDeptCode =
+      actor.role === 'chairman' ? actor.departmentCode.toUpperCase() : targetDeptCode;
+
     try {
       const created = await pustRepo.createUser({
         name: data.name,
@@ -1142,12 +1164,18 @@ portalRouter.post(
         passwordHash: hashPassword(data.password),
         role: data.role,
         approvalStatus: data.approvalStatus,
-        departmentCode: data.departmentCode.toUpperCase(),
+        departmentCode: effectiveDeptCode,
         academicId: data.academicId,
         ...(data.session?.trim() ? { session: data.session.trim() } : {}),
         hallAffiliation: data.hallAffiliation,
-        ...(data.officeCode?.trim() ? { officeCode: data.officeCode.trim().toUpperCase() } : {}),
-        ...(data.officeName?.trim() ? { officeName: data.officeName.trim() } : {}),
+        ...(actor.role === 'admin' && data.officeCode?.trim()
+          ? { officeCode: data.officeCode.trim().toUpperCase() }
+          : {}),
+        ...(actor.role === 'chairman'
+          ? { officeName: `Department of ${effectiveDeptCode}` }
+          : data.officeName?.trim()
+          ? { officeName: data.officeName.trim() }
+          : {}),
         ...(data.designation?.trim() ? { designation: data.designation.trim() } : {}),
         assignedCourses: data.role === 'teacher' ? data.assignedCourses || [] : [],
         assignedSessions: data.role === 'teacher' ? data.assignedSessions || [] : [],
@@ -1161,7 +1189,7 @@ portalRouter.post(
           name: data.name,
           email: created.email,
           phone: 'N/A',
-          departmentCode: data.departmentCode.toUpperCase(),
+          departmentCode: effectiveDeptCode,
           session: data.session?.trim() || '2025-26',
           currentSemester: 1,
           cgpa: 0,
@@ -1169,9 +1197,17 @@ portalRouter.post(
           allResultsPublished: false,
           hallName: data.hallAffiliation,
           seatNumber: 'Unassigned',
-          admissionDocuments: ['Admin Provisioned'],
-          chairmanNotes: 'Provisioned directly via Admin User Directory.',
-          adminNotes: 'Verified by Admin Office.',
+          admissionDocuments: [
+            actor.role === 'chairman' ? 'Department Provisioned' : 'Admin Provisioned',
+          ],
+          chairmanNotes:
+            actor.role === 'chairman'
+              ? `Provisioned directly by ${effectiveDeptCode} Department Chairman.`
+              : 'Provisioned directly via Admin User Directory.',
+          adminNotes:
+            actor.role === 'chairman'
+              ? `Managed under ${effectiveDeptCode} Department.`
+              : 'Verified by Admin Office.',
           disciplinaryStatus: 'Clear',
           disciplinaryNotes: 'Clean record.',
           approvalStatus: data.approvalStatus,
@@ -1181,14 +1217,18 @@ portalRouter.post(
       const { passwordHash: _p, ...safeUser } = created;
       const isAdminAccount = safeUser.role === 'admin';
       await pustRepo.logAudit(
-        req.authUser!.name,
-        req.authUser!.role,
-        isAdminAccount ? 'Created administrator account' : 'Created user account',
-        `${safeUser.name} (${safeUser.role} · ${safeUser.officeName || safeUser.departmentCode})`,
+        actor.name,
+        actor.role,
+        isAdminAccount
+          ? 'Created administrator account'
+          : actor.role === 'chairman'
+          ? `Provisioned department ${safeUser.role} account`
+          : 'Created user account',
+        `${safeUser.name} (${safeUser.role} · ${safeUser.departmentCode})`,
         {
           category: isAdminAccount ? 'Privilege & Security' : 'Account & Access',
           severity: isAdminAccount ? 'critical' : 'elevated',
-          actorEmail: req.authUser!.email,
+          actorEmail: actor.email,
           details: `Email: ${safeUser.email} | Role: ${safeUser.role} | Unit: ${safeUser.officeName || safeUser.departmentCode} | Status: ${safeUser.approvalStatus}`,
         }
       );
@@ -1205,7 +1245,7 @@ portalRouter.post(
 
 portalRouter.patch(
   '/users/:id',
-  requireRoles('admin'),
+  requireRoles('admin', 'chairman'),
   async (req: AuthenticatedRequest, res) => {
     const parsed = adminUpdateUserSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1214,6 +1254,7 @@ portalRouter.patch(
       return;
     }
 
+    const actor = req.authUser!;
     const userId = String(req.params.id);
     const target = await pustRepo.findUserById(userId);
     if (!target) {
@@ -1222,7 +1263,34 @@ portalRouter.patch(
     }
 
     const patch = parsed.data;
-    if (target.id === req.authUser!.sub) {
+    if (actor.role === 'chairman') {
+      if (
+        (target.role !== 'teacher' && target.role !== 'student') ||
+        target.departmentCode.toUpperCase() !== actor.departmentCode.toUpperCase()
+      ) {
+        res.status(403).json({
+          error: `Department Chairmen may only manage Teacher and Student accounts in ${actor.departmentCode}.`,
+        });
+        return;
+      }
+      if (patch.role !== undefined && patch.role !== target.role) {
+        res.status(403).json({
+          error: 'Department Chairmen cannot change an account role.',
+        });
+        return;
+      }
+      if (
+        patch.departmentCode !== undefined &&
+        patch.departmentCode.toUpperCase() !== actor.departmentCode.toUpperCase()
+      ) {
+        res.status(403).json({
+          error: 'Department transfers require Central University Admin approval.',
+        });
+        return;
+      }
+    }
+
+    if (target.id === actor.sub) {
       if (patch.role && patch.role !== 'admin') {
         res.status(400).json({ error: 'You cannot demote your own active administrator role.' });
         return;
@@ -1253,17 +1321,17 @@ portalRouter.patch(
       const updated = await pustRepo.updateUser(target.id, {
         ...(patch.name !== undefined ? { name: patch.name } : {}),
         ...(patch.email !== undefined ? { email: patch.email } : {}),
-        ...(patch.role !== undefined ? { role: patch.role } : {}),
-        ...(patch.departmentCode !== undefined
+        ...(actor.role === 'admin' && patch.role !== undefined ? { role: patch.role } : {}),
+        ...(actor.role === 'admin' && patch.departmentCode !== undefined
           ? { departmentCode: patch.departmentCode.toUpperCase() }
           : {}),
         ...(patch.academicId !== undefined ? { academicId: patch.academicId } : {}),
         ...(patch.session !== undefined ? { session: patch.session } : {}),
         ...(patch.hallAffiliation !== undefined ? { hallAffiliation: patch.hallAffiliation } : {}),
-        ...(patch.officeCode !== undefined
+        ...(actor.role === 'admin' && patch.officeCode !== undefined
           ? { officeCode: patch.officeCode ? patch.officeCode.toUpperCase() : undefined }
           : {}),
-        ...(patch.officeName !== undefined
+        ...(actor.role === 'admin' && patch.officeName !== undefined
           ? { officeName: patch.officeName || undefined }
           : {}),
         ...(patch.designation !== undefined
@@ -1288,6 +1356,7 @@ portalRouter.patch(
             name: updated.name,
             email: updated.email,
             departmentCode: updated.departmentCode,
+            ...(updated.session ? { session: updated.session } : {}),
             hallName: updated.hallAffiliation,
             approvalStatus: updated.approvalStatus,
           });
@@ -1363,17 +1432,29 @@ portalRouter.patch(
 
 portalRouter.patch(
   '/users/:id/password',
-  requireRoles('admin'),
+  requireRoles('admin', 'chairman'),
   async (req: AuthenticatedRequest, res) => {
     const parsed = adminResetPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: 'New password must be at least 8 characters.' });
       return;
     }
+    const actor = req.authUser!;
     const target = await pustRepo.findUserById(String(req.params.id));
     if (!target) {
       res.status(404).json({ error: 'Account not found.' });
       return;
+    }
+    if (actor.role === 'chairman') {
+      if (
+        (target.role !== 'teacher' && target.role !== 'student') ||
+        target.departmentCode.toUpperCase() !== actor.departmentCode.toUpperCase()
+      ) {
+        res.status(403).json({
+          error: `Department Chairmen may only reset passwords for Teachers and Students in ${actor.departmentCode}.`,
+        });
+        return;
+      }
     }
     const ok = await pustRepo.updateUserPassword(target.id, hashPassword(parsed.data.newPassword));
     if (!ok) {
@@ -1381,15 +1462,15 @@ portalRouter.patch(
       return;
     }
     await pustRepo.logAudit(
-      req.authUser!.name,
-      req.authUser!.role,
-      'Reset user password',
-      `${target.name} (${target.role})`,
+      actor.name,
+      actor.role,
+      actor.role === 'chairman' ? 'Reset department user password' : 'Reset user password',
+      `${target.name} (${target.role} · ${target.departmentCode})`,
       {
         category: 'Privilege & Security',
         severity: 'critical',
-        actorEmail: req.authUser!.email,
-        details: `Administrative password reset for ${target.email} (credential redacted).`,
+        actorEmail: actor.email,
+        details: `Password reset for ${target.email} in ${target.departmentCode} (credential redacted).`,
       }
     );
     res.json({ updated: true });
@@ -1457,7 +1538,7 @@ portalRouter.patch(
     }
     if (
       req.authUser!.role === 'chairman' &&
-      target.departmentCode !== req.authUser!.departmentCode
+      target.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
     ) {
       res.status(403).json({
         error: 'Department Chairmen may only assign courses to teachers in their own department.',
@@ -1496,7 +1577,8 @@ portalRouter.get(
   async (req: AuthenticatedRequest, res) => {
     let tokens = await pustRepo.listSignupTokens();
     if (req.authUser!.role === 'chairman') {
-      tokens = tokens.filter((t) => t.departmentCode === req.authUser!.departmentCode);
+      const actorDept = req.authUser!.departmentCode.toUpperCase();
+      tokens = tokens.filter((t) => t.departmentCode.toUpperCase() === actorDept);
     }
     res.json({ tokens });
   }
@@ -1513,13 +1595,17 @@ portalRouter.post(
     }
     if (
       req.authUser!.role === 'chairman' &&
-      parsed.data.departmentCode !== req.authUser!.departmentCode
+      parsed.data.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
     ) {
       res.status(403).json({ error: 'Chairmen can only generate tokens for their own department.' });
       return;
     }
     const created = await pustRepo.createSignupToken({
       ...parsed.data,
+      departmentCode:
+        req.authUser!.role === 'chairman'
+          ? req.authUser!.departmentCode.toUpperCase()
+          : parsed.data.departmentCode.toUpperCase(),
       createdBy: req.authUser!.name,
     });
     await pustRepo.logAudit(
@@ -3415,12 +3501,33 @@ const auditQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(500).optional(),
 });
 
-portalRouter.get('/audit-logs', requireRoles('admin', 'vc', 'registrar'), async (req, res) => {
-  const parsed = auditQuerySchema.safeParse(req.query);
-  const filters = parsed.success ? parsed.data : {};
-  const logs = await pustRepo.listAuditLogs(filters);
-  res.json({ logs });
-});
+portalRouter.get(
+  '/audit-logs',
+  requireRoles('admin', 'vc', 'registrar', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = auditQuerySchema.safeParse(req.query);
+    const filters = parsed.success ? parsed.data : {};
+    let logs = await pustRepo.listAuditLogs(filters);
+
+    if (req.authUser!.role === 'chairman') {
+      const deptCode = req.authUser!.departmentCode.toUpperCase();
+      const escapedDeptCode = deptCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const deptUsers = (await pustRepo.listUsers()).filter(
+        (u) => u.departmentCode.toUpperCase() === deptCode
+      );
+      const deptEmails = new Set(deptUsers.map((u) => u.email.toLowerCase()));
+      const deptMarkerRegex = new RegExp(`(\\(|\\b)${escapedDeptCode}(\\)|\\b)`, 'i');
+      logs = logs.filter((entry) => {
+        if (entry.actorEmail && deptEmails.has(entry.actorEmail.toLowerCase())) return true;
+        if (deptMarkerRegex.test(entry.target || '')) return true;
+        if (entry.details && deptMarkerRegex.test(entry.details)) return true;
+        return false;
+      });
+    }
+
+    res.json({ logs });
+  }
+);
 
 // 9. Unified Digital Payment Checkout & Institutional Receipts Ledger
 portalRouter.get('/payments/receipts', requireAuth, async (req: AuthenticatedRequest, res) => {
@@ -4352,12 +4459,20 @@ portalRouter.post(
 
 portalRouter.get(
   '/admin/faculty-requests',
-  requireRoles('admin'),
-  async (_req: AuthenticatedRequest, res) => {
-    const [requests, departments] = await Promise.all([
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const actor = req.authUser!;
+    const [allRequests, departments] = await Promise.all([
       pustRepo.listFacultyProfileRequests(),
       pustRepo.listDepartments(),
     ]);
+
+    const requests =
+      actor.role === 'chairman'
+        ? allRequests.filter(
+            (r) => r.departmentCode.toUpperCase() === actor.departmentCode.toUpperCase()
+          )
+        : allRequests;
 
     const deptByCode = new Map(departments.map((d) => [d.code.toUpperCase(), d]));
     const enriched = requests.map((reqItem) => {
@@ -4380,7 +4495,7 @@ portalRouter.get(
 
 portalRouter.patch(
   '/admin/faculty-requests/:id/decision',
-  requireRoles('admin'),
+  requireRoles('admin', 'chairman'),
   async (req: AuthenticatedRequest, res) => {
     const parsed = facultyRequestDecisionSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -4388,11 +4503,23 @@ portalRouter.patch(
       return;
     }
 
+    const reviewer = req.authUser!;
     const target = await pustRepo.findFacultyProfileRequestById(String(req.params.id));
     if (!target) {
       res.status(404).json({ error: 'Faculty profile request not found.' });
       return;
     }
+
+    if (
+      reviewer.role === 'chairman' &&
+      target.departmentCode.toUpperCase() !== reviewer.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({
+        error: `Department Chairmen may only review faculty profile edits for ${reviewer.departmentCode}.`,
+      });
+      return;
+    }
+
     if (target.status !== 'pending') {
       res.status(409).json({
         error: `This profile request has already been finalized (${target.status}).`,
@@ -4409,25 +4536,24 @@ portalRouter.patch(
     }
 
     const now = new Date().toISOString();
-    const adminActor = req.authUser!;
 
     if (parsed.data.decision === 'reject') {
       const updated = await pustRepo.updateFacultyProfileRequest(target.id, {
         status: 'rejected',
         adminNote: note,
-        reviewedBy: adminActor.name,
+        reviewedBy: reviewer.name,
         reviewedAt: now,
       });
 
       await pustRepo.logAudit(
-        adminActor.name,
-        'admin',
+        reviewer.name,
+        reviewer.role,
         'Declined teacher profile edit',
         `${target.proposedProfile.name} (${target.departmentCode})`,
         {
           category: 'Governance & CMS',
           severity: 'elevated',
-          actorEmail: adminActor.email,
+          actorEmail: reviewer.email,
           details: `Declined ${target.requestType} request from ${target.teacherEmail}: ${note}`,
         }
       );
@@ -4500,14 +4626,16 @@ portalRouter.patch(
       status: 'approved',
       targetMemberId: appliedMember.id,
       targetMemberName: appliedMember.name,
-      adminNote: note || `Approved and published to ${department.code} Department directory.`,
-      reviewedBy: adminActor.name,
+      adminNote:
+        note ||
+        `Approved by ${reviewer.role === 'chairman' ? `${department.code} Department Chairman` : 'University Admin'} and published to ${department.code} directory.`,
+      reviewedBy: reviewer.name,
       reviewedAt: now,
     });
 
     await pustRepo.logAudit(
-      adminActor.name,
-      'admin',
+      reviewer.name,
+      reviewer.role,
       target.requestType === 'create_new'
         ? 'Approved new teacher directory profile'
         : 'Approved teacher profile edit',
@@ -4515,7 +4643,7 @@ portalRouter.patch(
       {
         category: 'Governance & CMS',
         severity: 'elevated',
-        actorEmail: adminActor.email,
+        actorEmail: reviewer.email,
         details: `Published profile update for ${target.teacherEmail} (${appliedMember.designation}) to ${department.code} directory.`,
       }
     );

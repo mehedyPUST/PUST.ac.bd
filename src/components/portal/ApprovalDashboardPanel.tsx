@@ -130,7 +130,7 @@ export function ApprovalDashboardPanel({
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
             <button
               type="button"
-              onClick={() => onOpenTab('governance')}
+              onClick={() => onOpenTab(user.role === 'chairman' ? 'users' : 'governance')}
               className="text-left p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] hover:border-pust-800 cursor-pointer"
             >
               <p className="text-slate-600">Pending Accounts</p>

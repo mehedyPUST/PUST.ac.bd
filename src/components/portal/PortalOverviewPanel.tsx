@@ -160,31 +160,36 @@ export function PortalOverviewPanel({
         </dl>
       </div>
 
-      {/* Admin Pending Teacher Profile Requests Alert */}
-      {user.role === 'admin' && pendingFacultyRequestsCount > 0 && onReviewFacultyRequests && (
-        <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-amber-950">
-                <span className="font-mono tabular-nums">{pendingFacultyRequestsCount}</span>{' '}
-                Faculty Profile Edit{pendingFacultyRequestsCount > 1 ? 's' : ''} Pending Approval
-              </p>
-              <p className="text-xs text-amber-900">
-                Department teachers have submitted directory profile edits or new profile entries awaiting Administrator verification.
-              </p>
+      {/* Admin / Chairman Pending Teacher Profile Requests Alert */}
+      {(user.role === 'admin' || user.role === 'chairman') &&
+        pendingFacultyRequestsCount > 0 &&
+        onReviewFacultyRequests && (
+          <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <p className="text-sm font-semibold text-amber-950">
+                  <span className="font-mono tabular-nums">{pendingFacultyRequestsCount}</span>{' '}
+                  {user.role === 'chairman' ? `${user.departmentCode} ` : ''}
+                  Faculty Profile Edit{pendingFacultyRequestsCount > 1 ? 's' : ''} Pending Approval
+                </p>
+                <p className="text-xs text-amber-900">
+                  {user.role === 'chairman'
+                    ? `${user.departmentCode} teachers have submitted directory profile edits or new profile entries awaiting Chairman or Admin verification.`
+                    : 'Department teachers have submitted directory profile edits or new profile entries awaiting Administrator verification.'}
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={onReviewFacultyRequests}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>Review Profile Requests</span>
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onReviewFacultyRequests}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Review Profile Requests</span>
-          </button>
-        </div>
-      )}
+        )}
 
       {/* Teacher Directory Profile Claim Prompt */}
       {user.role === 'teacher' && (

@@ -139,6 +139,12 @@ export function getRoleTabs(
       return [
         overview,
         {
+          id: 'users',
+          label: `${departmentCode} People`,
+          desc: 'Teachers, students, tokens & profile approvals',
+          icon: UserCog,
+        },
+        {
           id: 'approvals',
           label: `${departmentCode} Approvals`,
           desc: 'Account reviews & dept requests',

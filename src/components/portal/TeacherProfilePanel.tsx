@@ -581,7 +581,7 @@ export function TeacherProfilePanel({
             <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <p className="text-sm font-semibold text-amber-950">
-                Pending Administrator Approval
+                Pending Chairman / Admin Approval
               </p>
               <p className="text-xs text-amber-900">
                 Your{' '}
@@ -591,7 +591,7 @@ export function TeacherProfilePanel({
                     : 'profile edit'}
                 </span>{' '}
                 for <span className="font-semibold">{pendingRequest.proposedProfile.name}</span>{' '}
-                ({formatDateTime(pendingRequest.updatedAt)}) is under review. Live public records stay unchanged until approved by an Administrator.
+                ({formatDateTime(pendingRequest.updatedAt)}) is under review. Live public records stay unchanged until approved by your Department Chairman or University Admin.
               </p>
             </div>
           </div>
@@ -1881,7 +1881,7 @@ export function TeacherProfilePanel({
           {/* Submit Actions */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-200">
             <p className="text-xs text-slate-600">
-              Submitted profiles remain in <span className="font-semibold text-slate-900">Pending Approval</span> until verified by a University Administrator.
+              Submitted profiles remain in <span className="font-semibold text-slate-900">Pending Approval</span> until verified by your Department Chairman or University Admin.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -1912,8 +1912,8 @@ export function TeacherProfilePanel({
                     : pendingRequest
                     ? 'Update Pending Submission'
                     : editorMode === 'create_new'
-                    ? 'Submit New Profile for Admin Approval'
-                    : 'Submit Edit for Admin Approval'}
+                    ? 'Submit New Profile for Approval'
+                    : 'Submit Edit for Approval'}
                 </span>
               </button>
             </div>
