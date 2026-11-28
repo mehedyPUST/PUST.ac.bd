@@ -76,11 +76,16 @@ export function DigitalCheckoutModal({
 
   useEffect(() => {
     if (!target) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape' && !processing) onClose();
     }
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [target, processing, onClose]);
 
   if (!target) return null;
@@ -137,7 +142,7 @@ export function DigitalCheckoutModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"

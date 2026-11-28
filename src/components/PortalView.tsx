@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { LayoutGrid, LogOut } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
@@ -77,6 +77,9 @@ export function PortalView({
 
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const workspaceTopRef = useRef<HTMLElement>(null);
+  const navRailRef = useRef<HTMLElement>(null);
+  const tabButtonRefs = useRef<Partial<Record<PortalTab, HTMLButtonElement | null>>>({});
 
   // Combinable Student Database & Receipts State
   const [students, setStudents] = useState<StudentRecord[]>([]);
@@ -156,10 +159,54 @@ export function PortalView({
       .slice(0, 6);
   }, [notices, user]);
 
+  const selectTab = useCallback((nextTab: PortalTab, options?: { scrollToTop?: boolean }) => {
+    setActiveTab(nextTab);
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    if (nextTab === 'overview') {
+      url.searchParams.delete('tab');
+    } else {
+      url.searchParams.set('tab', nextTab);
+    }
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+
+    const shouldScroll = options?.scrollToTop ?? true;
+    if (shouldScroll) {
+      const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const rawTop = workspaceTopRef.current
+        ? workspaceTopRef.current.getBoundingClientRect().top + window.scrollY - 96
+        : 0;
+      const targetY = rawTop <= 60 ? 0 : rawTop;
+      if (Math.abs(window.scrollY - targetY) > 12 && window.scrollY > targetY) {
+        window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
+      }
+    }
+  }, []);
+
+  // Keep active mobile horizontal tab centered without affecting vertical page scroll
+  useEffect(() => {
+    if (!user || typeof window === 'undefined') return;
+    const navEl = navRailRef.current;
+    const btnEl = tabButtonRefs.current[activeTab];
+    if (!navEl || !btnEl) return;
+    if (navEl.scrollWidth <= navEl.clientWidth + 2) return;
+
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const targetLeft = btnEl.offsetLeft - (navEl.clientWidth - btnEl.offsetWidth) / 2;
+    navEl.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: reduced ? 'auto' : 'smooth',
+    });
+  }, [user, activeTab]);
+
   async function handleAuthenticated(authedUser: AuthUser) {
     setLogoutError(null);
     onUserChange(authedUser);
     await Promise.all([onBookmarksChange(), onNoticesChange(), onCmsChange()]);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
   }
 
   async function handleLogout() {
@@ -167,6 +214,9 @@ export function PortalView({
       await pustApi.logout();
       onUserChange(null);
       await Promise.all([onNoticesChange(), onCmsChange()]);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
     } catch (err) {
       setLogoutError(err instanceof Error ? err.message : 'Unable to sign out cleanly.');
     }
@@ -217,11 +267,11 @@ export function PortalView({
   const studentSelf = user.role === 'student' ? students[0] ?? null : null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <section ref={workspaceTopRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Responsive Workspace Sidebar (horizontal rail on mobile, sticky 272px column on lg+) */}
-        <aside className="w-full lg:w-[272px] shrink-0 bg-white rounded-2xl border border-stone-200 overflow-hidden lg:sticky lg:top-24">
-          <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-4 sm:p-5 space-y-2">
+        {/* Responsive Workspace Sidebar (horizontal rail on mobile, viewport-bounded sticky 272px column on lg+) */}
+        <aside className="w-full lg:w-[272px] shrink-0 bg-white rounded-2xl border border-stone-200 overflow-hidden lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:flex lg:flex-col">
+          <div className="shrink-0 bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-4 sm:p-5 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <PustCrest variant="light" size={30} className="shrink-0" />
@@ -251,8 +301,9 @@ export function PortalView({
           </div>
 
           <nav
+            ref={navRailRef}
             aria-label="Campus portal workspace modules"
-            className="flex lg:flex-col overflow-x-auto no-scrollbar lg:overflow-visible gap-1.5 lg:gap-1 p-2.5"
+            className="flex lg:flex-col overflow-x-auto no-scrollbar overscroll-x-contain lg:flex-1 lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain gap-1.5 lg:gap-1 p-2.5"
           >
             {portalTabs.map((tab) => {
               const Icon = tab.icon;
@@ -260,8 +311,11 @@ export function PortalView({
               return (
                 <button
                   key={tab.id}
+                  ref={(el) => {
+                    tabButtonRefs.current[tab.id] = el;
+                  }}
                   type="button"
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => selectTab(tab.id)}
                   className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-colors cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
                     isActive
                       ? 'bg-pust-900 text-white'
@@ -286,7 +340,7 @@ export function PortalView({
             })}
           </nav>
 
-          <div className="hidden lg:block p-3 border-t border-stone-200 bg-[#FAF9F6] space-y-2">
+          <div className="hidden lg:block shrink-0 p-3 border-t border-stone-200 bg-[#FAF9F6] space-y-2">
             {user.role === 'admin' && (
               <button
                 type="button"
@@ -369,84 +423,81 @@ export function PortalView({
             </div>
           )}
 
-          {/* Active Workspace Module */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={resolvedTab}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.16, ease: 'easeOut' }}
-            >
-              {resolvedTab === 'overview' && (
-                <PortalOverviewPanel
-                  user={user}
-                  portalTabs={portalTabs}
-                  studentSelf={studentSelf}
-                  studentsCount={students.length}
-                  loadingStudents={loadingStudents}
-                  receipts={receipts}
-                  targetedNotifications={targetedNotifications}
-                  bookmarks={bookmarks}
-                  onSelectTab={setActiveTab}
-                  onOpenReceipt={openReceiptModal}
-                  onNavigateVerify={() => navigateTo('/verify')}
-                  onOpenNotice={(n) => setActiveNotice(n)}
-                  onRemoveBookmark={async (itemId) => {
-                    await pustApi.removeBookmark(itemId);
-                    await onBookmarksChange();
-                  }}
-                />
-              )}
+          {/* Active Workspace Module (no exit-wait height collapse so scrolling stays silky smooth) */}
+          <motion.div
+            key={resolvedTab}
+            initial={{ opacity: 0.85, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {resolvedTab === 'overview' && (
+              <PortalOverviewPanel
+                user={user}
+                portalTabs={portalTabs}
+                studentSelf={studentSelf}
+                studentsCount={students.length}
+                loadingStudents={loadingStudents}
+                receipts={receipts}
+                targetedNotifications={targetedNotifications}
+                bookmarks={bookmarks}
+                onSelectTab={(tab) => selectTab(tab)}
+                onOpenReceipt={openReceiptModal}
+                onNavigateVerify={() => navigateTo('/verify')}
+                onOpenNotice={(n) => setActiveNotice(n)}
+                onRemoveBookmark={async (itemId) => {
+                  await pustApi.removeBookmark(itemId);
+                  await onBookmarksChange();
+                }}
+              />
+            )}
 
-              {resolvedTab === 'students' && (
-                <PortalStudentLedgerPanel
-                  user={user}
-                  departments={departments}
-                  students={students}
-                  studentSelf={studentSelf}
-                  loadingStudents={loadingStudents}
-                  stuDeptFilter={stuDeptFilter}
-                  stuSessionFilter={stuSessionFilter}
-                  stuSearch={stuSearch}
-                  onDeptFilterChange={setStuDeptFilter}
-                  onSessionFilterChange={setStuSessionFilter}
-                  onSearchChange={setStuSearch}
-                  onReloadStudents={loadStudents}
-                />
-              )}
+            {resolvedTab === 'students' && (
+              <PortalStudentLedgerPanel
+                user={user}
+                departments={departments}
+                students={students}
+                studentSelf={studentSelf}
+                loadingStudents={loadingStudents}
+                stuDeptFilter={stuDeptFilter}
+                stuSessionFilter={stuSessionFilter}
+                stuSearch={stuSearch}
+                onDeptFilterChange={setStuDeptFilter}
+                onSessionFilterChange={setStuSessionFilter}
+                onSearchChange={setStuSearch}
+                onReloadStudents={loadStudents}
+              />
+            )}
 
-              {resolvedTab === 'approvals' && (
-                <ApprovalDashboardPanel
-                  user={user}
-                  departments={departments}
-                  onOpenTab={(tab) => setActiveTab(tab as PortalTab)}
-                />
-              )}
+            {resolvedTab === 'approvals' && (
+              <ApprovalDashboardPanel
+                user={user}
+                departments={departments}
+                onOpenTab={(tab) => selectTab(tab as PortalTab)}
+              />
+            )}
 
-              {resolvedTab === 'workflow' && (
-                <OfficeFlowPanel user={user} onOpenTab={(tab) => setActiveTab(tab as PortalTab)} />
-              )}
+            {resolvedTab === 'workflow' && (
+              <OfficeFlowPanel user={user} onOpenTab={(tab) => selectTab(tab as PortalTab)} />
+            )}
 
-              {resolvedTab === 'library' && <LibraryPanel user={user} />}
-              {resolvedTab === 'halls' && <HallPanel user={user} />}
-              {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
-              {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
-              {resolvedTab === 'governance' && user.role !== 'student' && (
-                <AdminCmsPanel
-                  user={user}
-                  departments={departments}
-                  aboutSections={aboutSections}
-                  vcProfiles={vcProfiles}
-                  galleryItems={galleryItems}
-                  bannerSlides={bannerSlides}
-                  notices={notices}
-                  onNoticesChange={onNoticesChange}
-                  onCmsChange={onCmsChange}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
+            {resolvedTab === 'library' && <LibraryPanel user={user} />}
+            {resolvedTab === 'halls' && <HallPanel user={user} />}
+            {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
+            {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
+            {resolvedTab === 'governance' && user.role !== 'student' && (
+              <AdminCmsPanel
+                user={user}
+                departments={departments}
+                aboutSections={aboutSections}
+                vcProfiles={vcProfiles}
+                galleryItems={galleryItems}
+                bannerSlides={bannerSlides}
+                notices={notices}
+                onNoticesChange={onNoticesChange}
+                onCmsChange={onCmsChange}
+              />
+            )}
+          </motion.div>
         </div>
       </div>
 

@@ -117,11 +117,16 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
 
   useEffect(() => {
     if (!doc) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
     }
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [doc, onClose]);
 
   if (!doc) return null;
@@ -226,7 +231,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto print:static print:bg-white print:p-0"
+      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto overscroll-contain print:static print:bg-white print:p-0"
       role="dialog"
       aria-modal="true"
       aria-labelledby="digital-doc-title"

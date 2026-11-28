@@ -1334,7 +1334,7 @@ export function AdminCmsPanel({
                   No circulars match your current filter.
                 </p>
               ) : (
-                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-[420px] overflow-y-auto">
+                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-[420px] overflow-y-auto overscroll-contain">
                   {managedNotices.map((n) => {
                     const canManage =
                       user.role === 'admin' ||
@@ -2211,7 +2211,7 @@ export function AdminCmsPanel({
               </button>
             </form>
 
-            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-72 overflow-y-auto">
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-72 overflow-y-auto overscroll-contain">
               {galleryItems.map((item) => {
                 const ytId = item.mediaType === 'video' ? parseYouTubeVideoId(item.mediaUrl) : null;
                 const thumbUrl = ytId ? getYouTubeThumbnailUrl(ytId) : item.mediaUrl;
@@ -2411,7 +2411,7 @@ export function AdminCmsPanel({
                 {filteredInquiries.length === 0 ? (
                   <p className="text-xs text-slate-600">No inquiries match the selected status.</p>
                 ) : (
-                  <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-96 overflow-y-auto">
+                  <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-96 overflow-y-auto overscroll-contain">
                     {filteredInquiries.map((inq) => (
                       <div key={inq.id} className="p-3.5 space-y-2 bg-white">
                         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -2486,7 +2486,7 @@ export function AdminCmsPanel({
                   University Audit Trail ({auditLogs.length})
                 </h3>
               </div>
-              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-96 overflow-y-auto">
+              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-96 overflow-y-auto overscroll-contain">
                 {auditLogs.map((log) => (
                   <div key={log.id} className="p-3 font-mono bg-white">
                     <span className="text-pust-800 font-semibold">{log.action}</span> —{' '}

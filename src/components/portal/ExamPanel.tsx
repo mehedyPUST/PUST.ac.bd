@@ -1359,7 +1359,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   on the left or view all {circDept} courses.
                 </p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto overscroll-contain pr-1">
                   {circularVisibleCourses.map((c) => {
                     const active = circCourseCodes.includes(c.code);
                     return (

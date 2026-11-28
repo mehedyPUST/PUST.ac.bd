@@ -872,7 +872,7 @@ export function ApprovalDashboardPanel({
         </div>
 
         {/* Right Detail & Decision Dossier */}
-        <div className="lg:col-span-5 lg:sticky lg:top-24 bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+        <div className="lg:col-span-5 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto overscroll-contain bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
           {!selectedRequest ? (
             <div className="py-10 text-center space-y-2">
               <ClipboardCheck className="w-7 h-7 text-slate-400 mx-auto" />
