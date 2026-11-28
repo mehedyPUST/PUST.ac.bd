@@ -31,6 +31,8 @@ interface AdminUserDirectoryPanelProps {
   currentUser: AuthUser;
   departments: DepartmentRecord[];
   offices?: AdministrationOfficeRecord[];
+  initialAction?: 'create-admin' | 'create-officer' | null;
+  onConsumeInitialAction?: () => void;
   onUsersChanged?: () => void;
 }
 
@@ -121,6 +123,8 @@ export function AdminUserDirectoryPanel({
   currentUser,
   departments,
   offices,
+  initialAction,
+  onConsumeInitialAction,
   onUsersChanged,
 }: AdminUserDirectoryPanelProps) {
   const [users, setUsers] = useState<AuthUser[]>([]);
@@ -254,6 +258,21 @@ export function AdminUserDirectoryPanel({
     void loadUsers();
   }, [loadUsers]);
 
+  useEffect(() => {
+    const hasOpenModal =
+      showCreateOfficerModal || showCreateAdminModal || Boolean(editingUser) || Boolean(passwordTarget);
+    if (!hasOpenModal) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      setShowCreateOfficerModal(false);
+      setShowCreateAdminModal(false);
+      setEditingUser(null);
+      setPasswordTarget(null);
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showCreateOfficerModal, showCreateAdminModal, editingUser, passwordTarget]);
+
   const summary = useMemo(() => {
     const total = users.length;
     const admins = users.filter((u) => u.role === 'admin').length;
@@ -309,7 +328,7 @@ export function AdminUserDirectoryPanel({
       });
   }, [users, roleFilter, statusFilter, unitFilter, searchQuery]);
 
-  function openCreateOfficerModal() {
+  const openCreateOfficerModal = useCallback(() => {
     const defaultOpt =
       officeCatalog.find((o) => o.group === 'Academic Departments') || officeCatalog[0];
     setError(null);
@@ -329,7 +348,7 @@ export function AdminUserDirectoryPanel({
     setOfficerCourses('');
     setOfficerSessions('');
     setShowCreateOfficerModal(true);
-  }
+  }, [officeCatalog]);
 
   function handleOfficerUnitChange(nextKey: string) {
     setOfficerUnitKey(nextKey);
@@ -341,9 +360,13 @@ export function AdminUserDirectoryPanel({
     setOfficerHallAffiliation(found.defaultHallAffiliation);
   }
 
-  function openCreateAdminModal() {
-    const existingAdmins = users.filter((u) => u.role === 'admin').length;
-    const suggestedNum = String(existingAdmins + 1).padStart(2, '0');
+  const openCreateAdminModal = useCallback(() => {
+    const existingIds = new Set(users.map((u) => u.academicId.toUpperCase()));
+    let nextIdx = users.filter((u) => u.role === 'admin').length + 1;
+    while (existingIds.has(`PUST-ADMIN-${String(nextIdx).padStart(2, '0')}`)) {
+      nextIdx += 1;
+    }
+    const suggestedNum = String(nextIdx).padStart(2, '0');
     setError(null);
     setFeedback(null);
     setAdminName('');
@@ -356,7 +379,18 @@ export function AdminUserDirectoryPanel({
     setAdminBuilding('Administrative Building');
     setAdminStatus('approved');
     setShowCreateAdminModal(true);
-  }
+  }, [users]);
+
+  useEffect(() => {
+    if (!initialAction || loading) return;
+    if (initialAction === 'create-admin') {
+      openCreateAdminModal();
+      onConsumeInitialAction?.();
+    } else if (initialAction === 'create-officer') {
+      openCreateOfficerModal();
+      onConsumeInitialAction?.();
+    }
+  }, [initialAction, loading, openCreateAdminModal, openCreateOfficerModal, onConsumeInitialAction]);
 
   function openEditModalFor(u: AuthUser) {
     setError(null);
@@ -456,7 +490,9 @@ export function AdminUserDirectoryPanel({
         approvalStatus: adminStatus,
       });
       setShowCreateAdminModal(false);
-      setFeedback(`Created new Administrator account for ${res.user.name} (${res.user.email}).`);
+      setFeedback(
+        `Created co-administrator account for ${res.user.name} (${res.user.email}) with full system permissions.`
+      );
       await loadUsers();
       onUsersChanged?.();
     } catch (err) {
@@ -635,10 +671,11 @@ export function AdminUserDirectoryPanel({
             <button
               type="button"
               onClick={openCreateAdminModal}
+              title="Add another administrator with your exact same full system powers"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               <ShieldPlus className="w-4 h-4" />
-              <span>Create Admin Account</span>
+              <span>Add Co-Admin</span>
             </button>
             <button
               type="button"
@@ -1269,10 +1306,10 @@ export function AdminUserDirectoryPanel({
                 <ShieldPlus className="w-4 h-4 text-pust-900 shrink-0" />
                 <div>
                   <h3 className="font-serif text-lg font-medium text-slate-950">
-                    Create New Administrator Account
+                    Add Co-Administrator (Same Full Power)
                   </h3>
                   <p className="text-xs text-slate-600">
-                    Grant full portal governance, user provisioning, and CMS permissions.
+                    Provision an additional admin account with identical, unrestricted permissions.
                   </p>
                 </div>
               </div>
@@ -1287,8 +1324,11 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleCreateAdminSubmit} className="p-6 space-y-3.5 text-xs">
-              <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-950 leading-relaxed">
-                New administrator accounts receive unrestricted access to the User Directory, Public CMS, Payment Configuration, and Audit Trail.
+              <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-950 leading-relaxed space-y-1">
+                <p className="font-semibold">Full Administrative Parity</p>
+                <p>
+                  This account shares your exact system authority: User Directory &amp; Co-Admin provisioning, Audit Log inspection, Public CMS &amp; Edit Mode, Finance &amp; Gateways, and all Academic Office workflows.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -1420,8 +1460,8 @@ export function AdminUserDirectoryPanel({
                     onChange={(e) => setAdminStatus(e.target.value as ApprovalStatus)}
                     className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                   >
-                    <option value="approved">Approved (Active Immediately)</option>
-                    <option value="pending">Pending Review</option>
+                    <option value="approved">Approved — Immediate Full Admin Login</option>
+                    <option value="pending">Pending Review (Login blocked until approved)</option>
                   </select>
                 </div>
               </div>
@@ -1439,7 +1479,7 @@ export function AdminUserDirectoryPanel({
                   disabled={creatingAdmin}
                   className="px-5 py-2 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
                 >
-                  {creatingAdmin ? 'Creating Admin...' : 'Create Admin Account'}
+                  {creatingAdmin ? 'Creating Co-Admin...' : 'Create Co-Admin Account'}
                 </button>
               </div>
             </form>
@@ -1477,6 +1517,11 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleSaveUserEdit} className="p-6 space-y-4 text-xs">
+              {editRole === 'admin' && editingUser.role !== 'admin' && (
+                <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-950 leading-relaxed">
+                  Promoting this user to <strong>University Admin</strong> grants the exact same full system powers as your own administrator account.
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">Full Name</label>

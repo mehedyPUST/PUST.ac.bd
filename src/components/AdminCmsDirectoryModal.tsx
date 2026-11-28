@@ -15,6 +15,7 @@ import {
   Pencil,
   ScrollText,
   ShieldCheck,
+  ShieldPlus,
   Users,
   X,
 } from 'lucide-react';
@@ -349,6 +350,17 @@ export function AdminCmsDirectoryModal({
               >
                 <Users className="w-3.5 h-3.5" />
                 User Directory
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onNavigate('/portal?tab=users&action=create-admin');
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
+              >
+                <ShieldPlus className="w-3.5 h-3.5" />
+                Add Co-Admin
               </button>
               <button
                 type="button"

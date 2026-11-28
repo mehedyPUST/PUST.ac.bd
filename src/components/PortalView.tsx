@@ -122,6 +122,10 @@ export function PortalView({
 
   const searchParams = useSearchParams();
   const requestedTabParam = searchParams.get('tab') as PortalTab | null;
+  const requestedActionParam = searchParams.get('action');
+  const [pendingDirectoryAction, setPendingDirectoryAction] = useState<
+    'create-admin' | 'create-officer' | null
+  >(null);
 
   useEffect(() => {
     if (!user) return;
@@ -130,7 +134,13 @@ export function PortalView({
     } else {
       setActiveTab('overview');
     }
-  }, [user, requestedTabParam]);
+    if (
+      user.role === 'admin' &&
+      (requestedActionParam === 'create-admin' || requestedActionParam === 'create-officer')
+    ) {
+      setPendingDirectoryAction(requestedActionParam);
+    }
+  }, [user, requestedTabParam, requestedActionParam]);
 
   useEffect(() => {
     if (!user) return;
@@ -451,6 +461,14 @@ export function PortalView({
                   await pustApi.removeBookmark(itemId);
                   await onBookmarksChange();
                 }}
+                onAddCoAdmin={
+                  user.role === 'admin'
+                    ? () => {
+                        setPendingDirectoryAction('create-admin');
+                        selectTab('users');
+                      }
+                    : undefined
+                }
               />
             )}
 
@@ -492,6 +510,8 @@ export function PortalView({
                 currentUser={user}
                 departments={departments}
                 offices={profile?.adminOffices}
+                initialAction={pendingDirectoryAction}
+                onConsumeInitialAction={() => setPendingDirectoryAction(null)}
                 onUsersChanged={loadStudents}
               />
             )}

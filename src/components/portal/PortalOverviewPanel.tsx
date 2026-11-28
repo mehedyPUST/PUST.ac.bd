@@ -6,6 +6,7 @@ import {
   Bookmark,
   Receipt,
   ShieldCheck,
+  ShieldPlus,
   Trash2,
 } from 'lucide-react';
 import type {
@@ -31,6 +32,7 @@ interface PortalOverviewPanelProps {
   onNavigateVerify: () => void;
   onOpenNotice: (notice: NoticeRecord) => void;
   onRemoveBookmark: (itemId: string) => Promise<void>;
+  onAddCoAdmin?: () => void;
 }
 
 export function PortalOverviewPanel({
@@ -47,6 +49,7 @@ export function PortalOverviewPanel({
   onNavigateVerify,
   onOpenNotice,
   onRemoveBookmark,
+  onAddCoAdmin,
 }: PortalOverviewPanelProps) {
   const quickModules = portalTabs.filter((t) => t.id !== 'overview');
 
@@ -70,14 +73,26 @@ export function PortalOverviewPanel({
               {user.designation ? ` · ${user.designation}` : ''}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onNavigateVerify}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-xs font-semibold text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
-          >
-            <ShieldCheck className="w-4 h-4 text-pust-800" />
-            <span>Verify Documents</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {user.role === 'admin' && onAddCoAdmin && (
+              <button
+                type="button"
+                onClick={onAddCoAdmin}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-pust-900 text-xs font-semibold text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <ShieldPlus className="w-4 h-4" />
+                <span>Add Co-Admin</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onNavigateVerify}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-xs font-semibold text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <ShieldCheck className="w-4 h-4 text-pust-800" />
+              <span>Verify Documents</span>
+            </button>
+          </div>
         </div>
 
         <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
