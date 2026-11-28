@@ -252,6 +252,12 @@ export const pustApi = {
       method: 'POST',
     }),
 
+  switchRole: (roleKey: string) =>
+    apiFetch<{ user: AuthUser }>('/api/auth/switch-role', {
+      method: 'POST',
+      body: JSON.stringify({ roleKey }),
+    }),
+
   changePassword: (payload: { currentPassword: string; newPassword: string }) =>
     apiFetch<{ user: AuthUser }>('/api/auth/change-password', {
       method: 'POST',

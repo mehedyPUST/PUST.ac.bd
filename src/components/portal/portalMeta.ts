@@ -14,6 +14,10 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
+import {
+  isRoleAssignmentInForce,
+  ROLE_DISPLAY_LABELS,
+} from '../../lib/roleContext';
 import type { RoleAssignment, UserRole } from '../../types/pust';
 
 export type PortalTab =
@@ -45,19 +49,7 @@ export const VALID_PORTAL_TABS: PortalTab[] = [
   'governance',
 ];
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: 'University Admin Office',
-  registrar: 'Office of the Registrar',
-  vc: 'Vice-Chancellor Office',
-  chairman: 'Department Chairman',
-  teacher: 'Faculty / Teacher',
-  student: 'Student Portal',
-  proctor: 'Proctor Office',
-  library: 'Central Library Office',
-  hall: 'Residential Hall Provost',
-  dean: 'Dean of Faculty',
-  advisor: 'Student Advisor',
-};
+export const ROLE_LABELS: Record<UserRole, string> = ROLE_DISPLAY_LABELS;
 
 export interface PortalTabItem {
   id: PortalTab;
@@ -68,17 +60,6 @@ export interface PortalTabItem {
   sourceBadge?: string;
 }
 
-function isAppointmentInForce(a: RoleAssignment, now = Date.now()): boolean {
-  if (a.status === 'ended') return false;
-  const from = a.effectiveFrom ? new Date(a.effectiveFrom).getTime() : 0;
-  if (!Number.isNaN(from) && from > now) return false;
-  if (a.effectiveUntil) {
-    const until = new Date(a.effectiveUntil).getTime();
-    if (!Number.isNaN(until) && until < now) return false;
-  }
-  return true;
-}
-
 /** Active additional appointment roles for portal navigation. */
 export function getEffectiveAdditionalRoles(
   additionalRoles?: RoleAssignment[] | null
@@ -86,7 +67,7 @@ export function getEffectiveAdditionalRoles(
   if (!additionalRoles?.length) return [];
   const roles = new Set<UserRole>();
   for (const a of additionalRoles) {
-    if (isAppointmentInForce(a)) roles.add(a.role);
+    if (isRoleAssignmentInForce(a)) roles.add(a.role);
   }
   return Array.from(roles);
 }
@@ -185,7 +166,7 @@ export function getRoleTabs(
   for (const extraRole of extraRoles) {
     const appt =
       additionalRoles?.find(
-        (a) => a.role === extraRole && isAppointmentInForce(a)
+        (a) => a.role === extraRole && isRoleAssignmentInForce(a)
       ) || null;
     const scopeDept =
       appt?.scopeType === 'department' && appt.scopeCode
@@ -213,6 +194,14 @@ export function getRoleTabs(
     merged = mergePortalTabs(merged, extraTabs);
   }
   return merged;
+}
+
+export function getActiveRoleTabs(
+  role: UserRole,
+  departmentCode: string,
+  hallAffiliation: string
+): PortalTabItem[] {
+  return getPrimaryRoleTabs(role, departmentCode, hallAffiliation);
 }
 
 function getPrimaryRoleTabs(

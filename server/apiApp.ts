@@ -26,6 +26,10 @@ import {
   normalizeClearablePatch,
 } from '../src/lib/adminHelpers';
 import { isSafeMediaUrl } from '../src/lib/media';
+import {
+  getAvailableRoleContexts,
+  resolveActiveUserIdentity,
+} from '../src/lib/roleContext';
 
 const studentTokenRegisterSchema = z.object({
   signupToken: z.string().trim().min(5).max(40),
@@ -60,6 +64,10 @@ const officerRegisterSchema = z.object({
 const loginSchema = z.object({
   email: z.string().trim().email().max(120),
   password: z.string().min(1).max(128),
+});
+
+const switchRoleSchema = z.object({
+  roleKey: z.string().trim().min(1).max(80),
 });
 
 const changePasswordSchema = z.object({
@@ -336,7 +344,15 @@ export function mountApiRoutes(app: Express): void {
       return;
     }
     const { passwordHash: _ignored, ...safeUser } = liveUser;
-    res.json({ user: safeUser });
+    const resolvedUser = resolveActiveUserIdentity(safeUser, claims.activeRoleKey);
+    if (
+      claims.activeRoleKey &&
+      claims.activeRoleKey !== 'primary' &&
+      resolvedUser.activeRoleKey !== claims.activeRoleKey
+    ) {
+      setAuthCookie(req, res, signAuthToken(resolvedUser));
+    }
+    res.json({ user: resolvedUser });
   });
 
   // Student Signup via Unique Portal Token -> Pending Department Chairman Approval
@@ -474,9 +490,10 @@ export function mountApiRoutes(app: Express): void {
     }
 
     const { passwordHash: _ignored, ...safeUser } = user;
-    const token = signAuthToken(safeUser);
+    const resolvedUser = resolveActiveUserIdentity(safeUser, 'primary');
+    const token = signAuthToken(resolvedUser);
     setAuthCookie(req, res, token);
-    res.json({ user: safeUser });
+    res.json({ user: resolvedUser });
   });
 
   app.post('/api/auth/bootstrap-admin', async (req, res) => {
@@ -572,6 +589,79 @@ export function mountApiRoutes(app: Express): void {
     res.json({ ok: true });
   });
 
+  app.post('/api/auth/switch-role', requireAuth, async (req: AuthenticatedRequest, res) => {
+    const claims = req.authUser!;
+    const parsed = switchRoleSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Select a valid role or appointment to switch into.' });
+      return;
+    }
+
+    if (claims.sub === 'env-admin-office') {
+      if (parsed.data.roleKey !== 'primary') {
+        res.status(403).json({
+          error: 'No additional appointments are assigned to this environment admin session.',
+        });
+        return;
+      }
+      res.json({
+        user: {
+          id: claims.sub,
+          name: claims.name,
+          email: claims.email,
+          role: claims.role,
+          approvalStatus: claims.approvalStatus,
+          departmentCode: claims.departmentCode,
+          academicId: claims.academicId,
+          session: claims.session,
+          hallAffiliation: claims.hallAffiliation,
+          assignedCourses: claims.assignedCourses || [],
+          assignedSessions: claims.assignedSessions || [],
+          activeRoleKey: 'primary',
+          primaryRole: claims.role,
+          createdAt: '',
+        },
+      });
+      return;
+    }
+
+    const liveUser = await pustRepo.findUserById(claims.sub);
+    if (!liveUser || liveUser.approvalStatus !== 'approved') {
+      clearAuthCookie(req, res);
+      res.status(401).json({ error: 'Session is no longer valid.' });
+      return;
+    }
+
+    const { passwordHash: _ignored, ...safeUser } = liveUser;
+    const contexts = getAvailableRoleContexts(safeUser);
+    const targetContext = contexts.find((c) => c.key === parsed.data.roleKey);
+    if (!targetContext) {
+      res.status(403).json({
+        error: 'You are not authorized to switch to the requested role or appointment.',
+      });
+      return;
+    }
+
+    const switchedUser = resolveActiveUserIdentity(safeUser, targetContext.key);
+    const freshToken = signAuthToken(switchedUser);
+    setAuthCookie(req, res, freshToken);
+
+    await pustRepo.logAudit(
+      switchedUser.name,
+      switchedUser.role,
+      'Switched active portal role',
+      `${switchedUser.name} -> ${targetContext.title} (${targetContext.scopeLabel})`,
+      {
+        category: 'Account & Access',
+        severity: 'standard',
+        actorEmail: switchedUser.email,
+        details: `Active role context switched to ${switchedUser.role} (${switchedUser.officeName || switchedUser.hallAffiliation || switchedUser.departmentCode}).`,
+      }
+    );
+
+    res.json({ user: switchedUser });
+  });
+
   app.post('/api/auth/change-password', requireAuth, async (req: AuthenticatedRequest, res) => {
     const claims = req.authUser!;
     if (claims.sub === 'env-admin-office') {
@@ -627,25 +717,26 @@ export function mountApiRoutes(app: Express): void {
     };
     safeUser.mustChangePassword = false;
 
-    const freshToken = signAuthToken(safeUser);
+    const resolvedUser = resolveActiveUserIdentity(safeUser, claims.activeRoleKey);
+    const freshToken = signAuthToken(resolvedUser);
     setAuthCookie(req, res, freshToken);
 
     await pustRepo.logAudit(
-      safeUser.name,
-      safeUser.role,
+      resolvedUser.name,
+      resolvedUser.role,
       wasTemporary ? 'Updated temporary first-login password' : 'Changed account password',
-      `${safeUser.name} (${safeUser.role} · ${safeUser.departmentCode})`,
+      `${resolvedUser.name} (${resolvedUser.role} · ${resolvedUser.departmentCode})`,
       {
         category: 'Privilege & Security',
         severity: wasTemporary ? 'elevated' : 'standard',
-        actorEmail: safeUser.email,
+        actorEmail: resolvedUser.email,
         details: wasTemporary
           ? 'Completed required first-login temporary password replacement from member profile (credentials redacted).'
           : 'Self-service password updated from member profile (credentials redacted).',
       }
     );
 
-    res.json({ user: safeUser });
+    res.json({ user: resolvedUser });
   });
 
   // Role-restricted Notice Board publishing (Central, Department, Teacher Course/Session)

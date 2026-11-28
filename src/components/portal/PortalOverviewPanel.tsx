@@ -1,9 +1,11 @@
 'use client';
 
 import {
+  ArrowLeftRight,
   ArrowRight,
   Bell,
   Bookmark,
+  Check,
   Clock,
   Receipt,
   ShieldCheck,
@@ -11,6 +13,7 @@ import {
   Trash2,
   UserCheck,
 } from 'lucide-react';
+import type { RoleContextOption } from '../../lib/roleContext';
 import type {
   AuthUser,
   BookmarkRecord,
@@ -29,6 +32,10 @@ interface PortalOverviewPanelProps {
   receipts: PaymentReceiptRecord[];
   targetedNotifications: NoticeRecord[];
   bookmarks: BookmarkRecord[];
+  roleContexts?: RoleContextOption[];
+  activeRoleKey?: string;
+  switchingRole?: boolean;
+  onSwitchRole?: (roleKey: string) => void;
   onSelectTab: (tab: PortalTab) => void;
   onOpenReceipt: (receipt: PaymentReceiptRecord) => void;
   onNavigateVerify: () => void;
@@ -48,6 +55,10 @@ export function PortalOverviewPanel({
   receipts,
   targetedNotifications,
   bookmarks,
+  roleContexts = [],
+  activeRoleKey = 'primary',
+  switchingRole = false,
+  onSwitchRole,
   onSelectTab,
   onOpenReceipt,
   onNavigateVerify,
@@ -100,6 +111,52 @@ export function PortalOverviewPanel({
             </button>
           </div>
         </div>
+
+        {roleContexts.length > 1 && onSwitchRole && (
+          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <ArrowLeftRight className="w-3.5 h-3.5 text-pust-800" />
+                <span>Switch Active Role ({roleContexts.length} assigned)</span>
+              </p>
+              <span className="font-mono text-[11px] text-slate-500">
+                Single identity · scoped workspace
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {roleContexts.map((ctx) => {
+                const isActive = ctx.key === activeRoleKey;
+                return (
+                  <button
+                    key={ctx.key}
+                    type="button"
+                    disabled={switchingRole || isActive}
+                    onClick={() => onSwitchRole(ctx.key)}
+                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition-colors ${
+                      isActive
+                        ? 'bg-pust-900 border-pust-900 text-white cursor-default'
+                        : 'bg-white border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer disabled:opacity-60'
+                    }`}
+                  >
+                    {isActive && <Check className="w-3.5 h-3.5 shrink-0" />}
+                    <span className="min-w-0">
+                      <span className="block text-xs font-semibold leading-tight text-left">
+                        {ctx.title}
+                      </span>
+                      <span
+                        className={`block text-[10px] font-mono leading-tight mt-0.5 text-left ${
+                          isActive ? 'text-pust-100' : 'text-slate-500'
+                        }`}
+                      >
+                        {ctx.isPrimary ? `Primary · ${ctx.scopeLabel}` : ctx.scopeLabel}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {user.role === 'student' && studentSelf ? (

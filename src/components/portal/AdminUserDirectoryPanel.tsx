@@ -86,6 +86,8 @@ const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
   proctor: 'Proctorial Officer',
   library: 'Library Officer',
   hall: 'Hall Provost / Officer',
+  dean: 'Dean of Faculty',
+  advisor: 'Student Advisor',
   student: 'Student',
 };
 
@@ -585,6 +587,8 @@ export function AdminUserDirectoryPanel({
       teacher: 1,
       registrar: 2,
       vc: 2,
+      dean: 2,
+      advisor: 2,
       proctor: 2,
       library: 2,
       hall: 2,

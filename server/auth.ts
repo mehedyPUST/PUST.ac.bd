@@ -1,6 +1,10 @@
 import crypto from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import {
+  isRoleAssignmentInForce,
+  resolveActiveUserIdentity,
+} from '../src/lib/roleContext';
 import type { ApprovalStatus, AuthUser, RoleAssignment, UserRole } from '../src/types/pust';
 
 export const AUTH_COOKIE_NAME = 'pust_token';
@@ -31,28 +35,23 @@ export interface JwtClaims {
   assignedCourses?: string[];
   assignedSessions?: string[];
   additionalRoles?: RoleAssignment[];
+  activeRoleKey?: string;
+  primaryRole?: UserRole;
 }
 
-function isAppointmentInForce(a: RoleAssignment, now = Date.now()): boolean {
-  if (a.status === 'ended') return false;
-  const from = a.effectiveFrom ? new Date(a.effectiveFrom).getTime() : 0;
-  if (!Number.isNaN(from) && from > now) return false;
-  if (a.effectiveUntil) {
-    const until = new Date(a.effectiveUntil).getTime();
-    if (!Number.isNaN(until) && until < now) return false;
-  }
-  return a.status === 'active' || a.status === 'scheduled' || !a.status;
-}
-
-/** True if primary role or any currently in-force additional appointment matches. */
+/** True if active role, primary role, or any currently in-force additional appointment matches. */
 export function claimsHaveRole(
-  user: { role: UserRole; additionalRoles?: RoleAssignment[] } | null | undefined,
+  user:
+    | { role: UserRole; primaryRole?: UserRole; additionalRoles?: RoleAssignment[] }
+    | null
+    | undefined,
   ...allowed: UserRole[]
 ): boolean {
   if (!user) return false;
   if (allowed.includes(user.role)) return true;
+  if (user.primaryRole && allowed.includes(user.primaryRole)) return true;
   return (user.additionalRoles || []).some(
-    (a) => isAppointmentInForce(a) && allowed.includes(a.role)
+    (a) => isRoleAssignmentInForce(a) && allowed.includes(a.role)
   );
 }
 
@@ -103,6 +102,8 @@ export function signAuthToken(user: AuthUser): string {
     ...(user.additionalRoles && user.additionalRoles.length > 0
       ? { additionalRoles: user.additionalRoles }
       : {}),
+    ...(user.activeRoleKey ? { activeRoleKey: user.activeRoleKey } : {}),
+    ...(user.primaryRole ? { primaryRole: user.primaryRole } : {}),
   };
   return jwt.sign(claims, getJwtSecret(), {
     algorithm: 'HS256',
@@ -264,24 +265,29 @@ export function requireAuth(
         res.status(403).json({ error: 'Account pending approval by university authority' });
         return;
       }
+      const resolvedUser = resolveActiveUserIdentity(liveUser, claims.activeRoleKey);
       req.authUser = {
         sub: claims.sub,
-        name: liveUser.name,
-        email: liveUser.email,
-        role: liveUser.role,
-        approvalStatus: liveUser.approvalStatus,
-        departmentCode: liveUser.departmentCode,
-        academicId: liveUser.academicId,
-        ...(liveUser.session ? { session: liveUser.session } : {}),
-        hallAffiliation: liveUser.hallAffiliation,
-        ...(liveUser.officeCode ? { officeCode: liveUser.officeCode } : {}),
-        ...(liveUser.officeName ? { officeName: liveUser.officeName } : {}),
-        ...(liveUser.designation ? { designation: liveUser.designation } : {}),
-        ...(liveUser.assignedCourses ? { assignedCourses: liveUser.assignedCourses } : {}),
-        ...(liveUser.assignedSessions ? { assignedSessions: liveUser.assignedSessions } : {}),
-        ...(liveUser.additionalRoles && liveUser.additionalRoles.length > 0
-          ? { additionalRoles: liveUser.additionalRoles }
+        name: resolvedUser.name,
+        email: resolvedUser.email,
+        role: resolvedUser.role,
+        approvalStatus: resolvedUser.approvalStatus,
+        departmentCode: resolvedUser.departmentCode,
+        academicId: resolvedUser.academicId,
+        ...(resolvedUser.session ? { session: resolvedUser.session } : {}),
+        hallAffiliation: resolvedUser.hallAffiliation,
+        ...(resolvedUser.officeCode ? { officeCode: resolvedUser.officeCode } : {}),
+        ...(resolvedUser.officeName ? { officeName: resolvedUser.officeName } : {}),
+        ...(resolvedUser.designation ? { designation: resolvedUser.designation } : {}),
+        ...(resolvedUser.assignedCourses ? { assignedCourses: resolvedUser.assignedCourses } : {}),
+        ...(resolvedUser.assignedSessions
+          ? { assignedSessions: resolvedUser.assignedSessions }
           : {}),
+        ...(resolvedUser.additionalRoles && resolvedUser.additionalRoles.length > 0
+          ? { additionalRoles: resolvedUser.additionalRoles }
+          : {}),
+        ...(resolvedUser.activeRoleKey ? { activeRoleKey: resolvedUser.activeRoleKey } : {}),
+        ...(resolvedUser.primaryRole ? { primaryRole: resolvedUser.primaryRole } : {}),
       };
       next();
     })

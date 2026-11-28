@@ -1,8 +1,10 @@
 'use client';
 
 import {
+  ArrowLeftRight,
   ArrowRight,
   Bookmark,
+  Check,
   CheckCircle2,
   ExternalLink,
   FileCheck2,
@@ -11,6 +13,7 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
+import type { RoleContextOption } from '../../lib/roleContext';
 import type {
   AuthUser,
   BookmarkRecord,
@@ -31,6 +34,10 @@ interface PortalProfilePanelProps {
   receipts: PaymentReceiptRecord[];
   targetedNotifications: NoticeRecord[];
   bookmarks: BookmarkRecord[];
+  roleContexts?: RoleContextOption[];
+  activeRoleKey?: string;
+  switchingRole?: boolean;
+  onSwitchRole?: (roleKey: string) => void;
   onUserChange?: (user: AuthUser) => void;
   onSelectTab: (tab: PortalTab) => void;
   onOpenReceipt: (receipt: PaymentReceiptRecord) => void;
@@ -56,6 +63,10 @@ const ROLE_SCOPE_DESCRIPTIONS: Record<UserRole, string> = {
     'Oversee university-wide student records, review inquiries, publish central circulars, and audit governance actions.',
   vc:
     'Monitor institutional student records, executive notices, examinations, and campus-wide governance audit logs.',
+  dean:
+    'Oversee faculty-level student academic standing, examination schedules, and inter-departmental requests across constituent departments.',
+  advisor:
+    'Guide student welfare, counselling requests, and advisory notices across assigned cohorts.',
   admin:
     'Full institutional oversight across user approvals, departmental tokens, payment gateways, public CMS content, examinations, and final certificate issuance.',
 };
@@ -69,6 +80,10 @@ export function PortalProfilePanel({
   receipts,
   targetedNotifications,
   bookmarks,
+  roleContexts = [],
+  activeRoleKey = 'primary',
+  switchingRole = false,
+  onSwitchRole,
   onUserChange,
   onSelectTab,
   onOpenReceipt,
@@ -160,6 +175,43 @@ export function PortalProfilePanel({
             <p className="text-sm text-slate-600 leading-relaxed prose-justify">
               {ROLE_SCOPE_DESCRIPTIONS[user.role]}
             </p>
+
+            {roleContexts.length > 1 && onSwitchRole && (
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-3.5 space-y-2.5">
+                <p className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                  <ArrowLeftRight className="w-3.5 h-3.5 text-pust-800" />
+                  <span>Assigned Roles &amp; Appointments ({roleContexts.length})</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {roleContexts.map((ctx) => {
+                    const isActive = ctx.key === activeRoleKey;
+                    return (
+                      <button
+                        key={ctx.key}
+                        type="button"
+                        disabled={mustChangePassword || switchingRole || isActive}
+                        onClick={() => onSwitchRole(ctx.key)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+                          isActive
+                            ? 'bg-pust-900 border-pust-900 text-white font-semibold cursor-default'
+                            : 'bg-white border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer disabled:opacity-50'
+                        }`}
+                      >
+                        {isActive && <Check className="w-3.5 h-3.5 shrink-0" />}
+                        <span>{ctx.title}</span>
+                        <span
+                          className={`font-mono text-[10px] ${
+                            isActive ? 'text-pust-100' : 'text-slate-500'
+                          }`}
+                        >
+                          ({ctx.scopeLabel})
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           <dl className="lg:col-span-5 rounded-xl border border-stone-200 bg-[#FAF9F6] divide-y divide-stone-200 text-xs">

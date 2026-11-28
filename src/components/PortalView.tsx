@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ExternalLink, LayoutGrid, Lock, LogOut, User } from 'lucide-react';
+import { getAvailableRoleContexts } from '../lib/roleContext';
 import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
 import { PustCrest } from './PustCrest';
@@ -26,11 +27,11 @@ import { PortalAuthGateway } from './portal/PortalAuthGateway';
 import { PortalOverviewPanel } from './portal/PortalOverviewPanel';
 import { PortalProfilePanel } from './portal/PortalProfilePanel';
 import { PortalStudentLedgerPanel } from './portal/PortalStudentLedgerPanel';
+import { RoleSwitcherControl } from './portal/RoleSwitcherControl';
 import { TeacherProfilePanel } from './portal/TeacherProfilePanel';
 import {
-  getRoleTabs,
+  getActiveRoleTabs,
   ROLE_LABELS,
-  userHasPortalRole,
   VALID_PORTAL_TABS,
   type PortalTab,
 } from './portal/portalMeta';
@@ -86,6 +87,8 @@ export function PortalView({
 
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [switchingRole, setSwitchingRole] = useState(false);
+  const [roleSwitchError, setRoleSwitchError] = useState<string | null>(null);
   const workspaceTopRef = useRef<HTMLElement>(null);
   const navRailRef = useRef<HTMLElement>(null);
   const tabButtonRefs = useRef<Partial<Record<PortalTab, HTMLButtonElement | null>>>({});
@@ -372,8 +375,15 @@ export function PortalView({
     return () => window.cancelAnimationFrame(id);
   }, [user, activeTab, ensureActiveSidebarLinkVisible]);
 
+  const roleContexts = useMemo(
+    () => (user ? getAvailableRoleContexts(user) : []),
+    [user]
+  );
+  const activeRoleKey = user?.activeRoleKey || 'primary';
+
   async function handleAuthenticated(authedUser: AuthUser) {
     setLogoutError(null);
+    setRoleSwitchError(null);
     onUserChange(authedUser);
     await Promise.all([onBookmarksChange(), onNoticesChange(), onCmsChange()]);
     if (typeof window !== 'undefined') {
@@ -384,6 +394,7 @@ export function PortalView({
   async function handleLogout() {
     try {
       await pustApi.logout();
+      setRoleSwitchError(null);
       onUserChange(null);
       await Promise.all([onNoticesChange(), onCmsChange()]);
       if (typeof window !== 'undefined') {
@@ -391,6 +402,37 @@ export function PortalView({
       }
     } catch (err) {
       setLogoutError(err instanceof Error ? err.message : 'Unable to sign out cleanly.');
+    }
+  }
+
+  async function handleSwitchRole(roleKey: string) {
+    if (!user || switchingRole || roleKey === activeRoleKey) return;
+    setRoleSwitchError(null);
+    setSwitchingRole(true);
+    try {
+      const res = await pustApi.switchRole(roleKey);
+      const nextUser = res.user;
+      setPendingDirectoryAction(null);
+      setPendingDirectorySection(null);
+      onUserChange(nextUser);
+      const nextTabs = getActiveRoleTabs(
+        nextUser.role,
+        nextUser.departmentCode,
+        nextUser.hallAffiliation
+      );
+      const nextTab: PortalTab = nextUser.mustChangePassword
+        ? 'profile'
+        : nextTabs.some((t) => t.id === activeTab)
+        ? activeTab
+        : 'overview';
+      selectTab(nextTab, { scrollToTop: false });
+      await onNoticesChange();
+    } catch (err) {
+      setRoleSwitchError(
+        err instanceof Error ? err.message : 'Unable to switch active portal role.'
+      );
+    } finally {
+      setSwitchingRole(false);
     }
   }
 
@@ -433,11 +475,10 @@ export function PortalView({
   }
 
   const mustChangePassword = Boolean(user.mustChangePassword);
-  const portalTabs = getRoleTabs(
+  const portalTabs = getActiveRoleTabs(
     user.role,
     user.departmentCode,
-    user.hallAffiliation,
-    user.additionalRoles
+    user.hallAffiliation
   );
   const resolvedTab: PortalTab = mustChangePassword
     ? 'profile'
@@ -446,8 +487,8 @@ export function PortalView({
     : portalTabs[0].id;
   const activeTabMeta = portalTabs.find((t) => t.id === resolvedTab) || portalTabs[0];
   const studentSelf = user.role === 'student' ? students[0] ?? null : null;
-  const isPortalChairman = userHasPortalRole(user, 'chairman');
-  const isPortalAdmin = userHasPortalRole(user, 'admin');
+  const isPortalChairman = user.role === 'chairman';
+  const isPortalAdmin = user.role === 'admin';
 
   return (
     <section
@@ -468,14 +509,9 @@ export function PortalView({
                   <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
                     {user.name}
                   </p>
-                  {(user.additionalRoles || []).filter((a) => a.status !== 'ended').length >
-                    0 && (
-                    <p className="text-[10px] text-pust-100/90 leading-snug line-clamp-2 text-left mt-0.5">
-                      +{' '}
-                      {(user.additionalRoles || [])
-                        .filter((a) => a.status !== 'ended')
-                        .map((a) => a.title || ROLE_LABELS[a.role] || a.role)
-                        .join(' · ')}
+                  {activeRoleKey !== 'primary' && user.primaryRole && (
+                    <p className="text-[10px] text-pust-100/90 leading-snug truncate text-left mt-0.5">
+                      Primary: {ROLE_LABELS[user.primaryRole]}
                     </p>
                   )}
                 </div>
@@ -499,6 +535,14 @@ export function PortalView({
                 {user.email}
               </p>
             </div>
+            <RoleSwitcherControl
+              variant="sidebar"
+              contexts={roleContexts}
+              activeKey={activeRoleKey}
+              switching={switchingRole}
+              disabled={mustChangePassword}
+              onSwitch={handleSwitchRole}
+            />
           </div>
 
           <nav
@@ -603,6 +647,14 @@ export function PortalView({
               </div>
 
               <div className="flex flex-wrap items-center gap-2 md:justify-end shrink-0">
+                <RoleSwitcherControl
+                  variant="header"
+                  contexts={roleContexts}
+                  activeKey={activeRoleKey}
+                  switching={switchingRole}
+                  disabled={mustChangePassword}
+                  onSwitch={handleSwitchRole}
+                />
                 <button
                   type="button"
                   onClick={() => selectTab('profile')}
@@ -640,18 +692,18 @@ export function PortalView({
             </header>
           )}
 
-          {logoutError && (
+          {(logoutError || roleSwitchError) && (
             <div
               role="alert"
               className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
             >
-              {logoutError}
+              {roleSwitchError || logoutError}
             </div>
           )}
 
           {/* Active Workspace Module (no exit-wait height collapse so scrolling stays silky smooth) */}
           <motion.div
-            key={resolvedTab}
+            key={`${activeRoleKey}-${resolvedTab}`}
             initial={{ opacity: 0.85, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
@@ -666,6 +718,10 @@ export function PortalView({
                 receipts={receipts}
                 targetedNotifications={targetedNotifications}
                 bookmarks={bookmarks}
+                roleContexts={roleContexts}
+                activeRoleKey={activeRoleKey}
+                switchingRole={switchingRole}
+                onSwitchRole={handleSwitchRole}
                 onSelectTab={(tab) => selectTab(tab)}
                 onOpenReceipt={openReceiptModal}
                 onNavigateVerify={() => navigateTo('/verify')}
@@ -713,6 +769,10 @@ export function PortalView({
                   receipts={receipts}
                   targetedNotifications={targetedNotifications}
                   bookmarks={bookmarks}
+                  roleContexts={roleContexts}
+                  activeRoleKey={activeRoleKey}
+                  switchingRole={switchingRole}
+                  onSwitchRole={handleSwitchRole}
                   onUserChange={onUserChange}
                   onSelectTab={(tab) => selectTab(tab)}
                   onOpenReceipt={openReceiptModal}

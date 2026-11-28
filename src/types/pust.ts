@@ -80,6 +80,14 @@ export interface AuthUser {
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
   /** Extra appointments: hall provost, other-dept chairman, proctor, dean, advisor, etc. */
   additionalRoles?: RoleAssignment[];
+  /** Currently active role context key ('primary' or RoleAssignment.id) for multi-role sessions. */
+  activeRoleKey?: string;
+  primaryRole?: UserRole;
+  primaryDepartmentCode?: string;
+  primaryHallAffiliation?: string;
+  primaryOfficeCode?: string;
+  primaryOfficeName?: string;
+  primaryDesignation?: string;
   mustChangePassword?: boolean;
   createdAt: string;
 }
