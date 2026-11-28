@@ -22,6 +22,7 @@ import { OfficeFlowPanel } from './portal/OfficeFlowPanel';
 import { PortalAuthGateway } from './portal/PortalAuthGateway';
 import { PortalOverviewPanel } from './portal/PortalOverviewPanel';
 import { PortalStudentLedgerPanel } from './portal/PortalStudentLedgerPanel';
+import { TeacherProfilePanel } from './portal/TeacherProfilePanel';
 import {
   getRoleTabs,
   ROLE_LABELS,
@@ -123,9 +124,14 @@ export function PortalView({
   const searchParams = useSearchParams();
   const requestedTabParam = searchParams.get('tab') as PortalTab | null;
   const requestedActionParam = searchParams.get('action');
+  const requestedSectionParam = searchParams.get('section');
   const [pendingDirectoryAction, setPendingDirectoryAction] = useState<
     'create-admin' | 'create-officer' | null
   >(null);
+  const [pendingDirectorySection, setPendingDirectorySection] = useState<
+    'accounts' | 'faculty-requests' | null
+  >(null);
+  const [pendingFacultyRequestCount, setPendingFacultyRequestCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -140,7 +146,36 @@ export function PortalView({
     ) {
       setPendingDirectoryAction(requestedActionParam);
     }
-  }, [user, requestedTabParam, requestedActionParam]);
+    if (
+      user.role === 'admin' &&
+      (requestedSectionParam === 'accounts' || requestedSectionParam === 'faculty-requests')
+    ) {
+      setPendingDirectorySection(requestedSectionParam);
+    }
+  }, [user, requestedTabParam, requestedActionParam, requestedSectionParam]);
+
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      setPendingFacultyRequestCount(0);
+      return;
+    }
+    let cancelled = false;
+    pustApi
+      .getAdminFacultyProfileRequests()
+      .then((res) => {
+        if (!cancelled) {
+          setPendingFacultyRequestCount(
+            res.requests.filter((r) => r.status === 'pending').length
+          );
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPendingFacultyRequestCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -469,6 +504,25 @@ export function PortalView({
                       }
                     : undefined
                 }
+                pendingFacultyRequestsCount={pendingFacultyRequestCount}
+                onReviewFacultyRequests={
+                  user.role === 'admin'
+                    ? () => {
+                        setPendingDirectorySection('faculty-requests');
+                        selectTab('users');
+                      }
+                    : undefined
+                }
+              />
+            )}
+
+            {resolvedTab === 'profile' && user.role === 'teacher' && (
+              <TeacherProfilePanel
+                user={user}
+                onUserChange={onUserChange}
+                onViewDepartment={(code) =>
+                  navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
+                }
               />
             )}
 
@@ -511,8 +565,12 @@ export function PortalView({
                 departments={departments}
                 offices={profile?.adminOffices}
                 initialAction={pendingDirectoryAction}
+                initialSection={pendingDirectorySection}
                 onConsumeInitialAction={() => setPendingDirectoryAction(null)}
+                onConsumeInitialSection={() => setPendingDirectorySection(null)}
                 onUsersChanged={loadStudents}
+                onCmsChange={onCmsChange}
+                onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
               />
             )}
 

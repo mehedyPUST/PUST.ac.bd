@@ -13,12 +13,14 @@ import {
   Search,
   ShieldPlus,
   Trash2,
+  UserCheck,
   UserPlus,
   X,
   XCircle,
 } from 'lucide-react';
 import { DEFAULT_ADMIN_OFFICES } from '../../lib/adminOffices';
 import { pustApi } from '../../lib/api';
+import { AdminFacultyRequestsPanel } from './AdminFacultyRequestsPanel';
 import type {
   AdministrationOfficeRecord,
   ApprovalStatus,
@@ -32,8 +34,12 @@ interface AdminUserDirectoryPanelProps {
   departments: DepartmentRecord[];
   offices?: AdministrationOfficeRecord[];
   initialAction?: 'create-admin' | 'create-officer' | null;
+  initialSection?: 'accounts' | 'faculty-requests' | null;
   onConsumeInitialAction?: () => void;
+  onConsumeInitialSection?: () => void;
   onUsersChanged?: () => void;
+  onCmsChange?: () => Promise<void>;
+  onPendingFacultyRequestsChange?: (count: number) => void;
 }
 
 interface OfficeUnitOption {
@@ -124,9 +130,17 @@ export function AdminUserDirectoryPanel({
   departments,
   offices,
   initialAction,
+  initialSection,
   onConsumeInitialAction,
+  onConsumeInitialSection,
   onUsersChanged,
+  onCmsChange,
+  onPendingFacultyRequestsChange,
 }: AdminUserDirectoryPanelProps) {
+  const [activeSection, setActiveSection] = useState<'accounts' | 'faculty-requests'>(
+    initialSection === 'faculty-requests' ? 'faculty-requests' : 'accounts'
+  );
+  const [pendingFacultyCount, setPendingFacultyCount] = useState(0);
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -245,18 +259,30 @@ export function AdminUserDirectoryPanel({
     setLoading(true);
     setError(null);
     try {
-      const res = await pustApi.getUsers();
+      const [res, reqRes] = await Promise.all([
+        pustApi.getUsers(),
+        pustApi.getAdminFacultyProfileRequests().catch(() => ({ requests: [] })),
+      ]);
       setUsers(res.users);
+      const pendingCount = reqRes.requests.filter((r) => r.status === 'pending').length;
+      setPendingFacultyCount(pendingCount);
+      onPendingFacultyRequestsChange?.(pendingCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load user directory.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [onPendingFacultyRequestsChange]);
 
   useEffect(() => {
     void loadUsers();
   }, [loadUsers]);
+
+  useEffect(() => {
+    if (!initialSection) return;
+    setActiveSection(initialSection);
+    onConsumeInitialSection?.();
+  }, [initialSection, onConsumeInitialSection]);
 
   useEffect(() => {
     const hasOpenModal =
@@ -614,6 +640,54 @@ export function AdminUserDirectoryPanel({
 
   return (
     <div className="space-y-6">
+      {/* Workspace Mode Switcher: Accounts Directory vs Faculty Profile Approvals */}
+      <div className="bg-white rounded-2xl border border-stone-200 p-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-stone-100 border border-stone-200">
+          <button
+            type="button"
+            onClick={() => setActiveSection('accounts')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              activeSection === 'accounts'
+                ? 'bg-white text-slate-950 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Directory Accounts ({summary.total})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSection('faculty-requests')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+              activeSection === 'faculty-requests'
+                ? 'bg-white text-slate-950 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <UserCheck className="w-3.5 h-3.5" />
+            <span>
+              Faculty Profile Approvals
+              {pendingFacultyCount > 0 ? ` (${pendingFacultyCount} Pending)` : ''}
+            </span>
+          </button>
+        </div>
+        <p className="text-xs text-slate-600 px-1">
+          {activeSection === 'accounts'
+            ? 'Manage portal accounts, roles, office assignments & passwords'
+            : 'Review and approve teacher directory claims & profile edits'}
+        </p>
+      </div>
+
+      {activeSection === 'faculty-requests' ? (
+        <AdminFacultyRequestsPanel
+          onPendingCountChange={(count) => {
+            setPendingFacultyCount(count);
+            onPendingFacultyRequestsChange?.(count);
+          }}
+          onCmsChange={onCmsChange}
+        />
+      ) : (
+        <>
       {/* Feedback & Error Alerts */}
       {feedback && (
         <div
@@ -1802,6 +1876,8 @@ export function AdminUserDirectoryPanel({
             </form>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

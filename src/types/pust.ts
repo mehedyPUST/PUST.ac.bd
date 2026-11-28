@@ -33,6 +33,9 @@ export interface AuthUser {
   designation?: string;
   assignedCourses?: string[];
   assignedSessions?: string[];
+  claimedDepartmentCode?: string;
+  claimedFacultyMemberId?: string;
+  claimedFacultyGroup?: 'faculty' | 'contractual';
   createdAt: string;
 }
 
@@ -159,6 +162,29 @@ export interface DepartmentPersonRecord {
   conductedCourses?: string[];
   graduateSupervision?: string[];
   conferencesAttended?: string[];
+}
+
+export type FacultyProfileRequestType = 'edit_claimed' | 'create_new';
+export type FacultyProfileRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface FacultyProfileRequestRecord {
+  id: string;
+  teacherUserId: string;
+  teacherName: string;
+  teacherEmail: string;
+  teacherAcademicId: string;
+  departmentCode: string;
+  facultyGroup: 'faculty' | 'contractual';
+  requestType: FacultyProfileRequestType;
+  targetMemberId?: string;
+  targetMemberName?: string;
+  proposedProfile: Omit<DepartmentPersonRecord, 'id'>;
+  status: FacultyProfileRequestStatus;
+  adminNote?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DepartmentRecord {

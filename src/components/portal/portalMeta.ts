@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ScrollText,
   Settings2,
+  UserCheck,
   UserCog,
   Users,
   Workflow,
@@ -17,6 +18,7 @@ import type { UserRole } from '../../types/pust';
 
 export type PortalTab =
   | 'overview'
+  | 'profile'
   | 'users'
   | 'audit'
   | 'students'
@@ -30,6 +32,7 @@ export type PortalTab =
 
 export const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
+  'profile',
   'users',
   'audit',
   'students',
@@ -181,6 +184,12 @@ export function getRoleTabs(
     case 'teacher':
       return [
         overview,
+        {
+          id: 'profile',
+          label: 'My Faculty Profile',
+          desc: 'Claim or edit directory profile',
+          icon: UserCheck,
+        },
         {
           id: 'exams',
           label: 'Courses & Results Entry',

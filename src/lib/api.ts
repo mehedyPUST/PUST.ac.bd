@@ -14,6 +14,7 @@ import type {
   ClearanceOfficeKey,
   CourseRecord,
   DepartmentApprovalOverviewResponse,
+  DepartmentPersonRecord,
   DepartmentRecord,
   DepartmentRequestCategory,
   DepartmentRequestPriority,
@@ -22,6 +23,7 @@ import type {
   ExamApplicationRecord,
   ExamCircularRecord,
   ExamResultRecord,
+  FacultyProfileRequestRecord,
   FeeConfig,
   GalleryItemRecord,
   HallApplicationRecord,
@@ -704,7 +706,7 @@ export const pustApi = {
     ),
 
   uploadMediaToImageKit: (payload: {
-    purpose: 'banner' | 'notice' | 'gallery' | 'cms';
+    purpose: 'banner' | 'notice' | 'gallery' | 'cms' | 'faculty_photo';
     fileName: string;
     mimeType: string;
     dataBase64: string;
@@ -962,4 +964,60 @@ export const pustApi = {
         body: JSON.stringify(payload),
       }
     ),
+
+  // Portal: Teacher Directory Profile Claim & Admin Approval
+  getTeacherProfileStatus: () =>
+    apiFetch<{
+      user: AuthUser;
+      department: DepartmentRecord | null;
+      claimedMember: DepartmentPersonRecord | null;
+      claimedMap: Record<string, { claimedByMe: boolean; claimedByName?: string }>;
+      requests: FacultyProfileRequestRecord[];
+    }>('/api/portal/teacher/profile-status'),
+
+  claimTeacherProfile: (payload: { memberId: string; facultyGroup: 'faculty' | 'contractual' }) =>
+    apiFetch<{
+      user: AuthUser;
+      claimedMember: DepartmentPersonRecord;
+      facultyGroup: 'faculty' | 'contractual';
+    }>('/api/portal/teacher/claim-profile', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  unclaimTeacherProfile: () =>
+    apiFetch<{ user: AuthUser }>('/api/portal/teacher/claim-profile', {
+      method: 'DELETE',
+    }),
+
+  submitTeacherProfileRequest: (payload: {
+    requestType: 'edit_claimed' | 'create_new';
+    facultyGroup: 'faculty' | 'contractual';
+    targetMemberId?: string;
+    proposedProfile: Omit<DepartmentPersonRecord, 'id'>;
+  }) =>
+    apiFetch<{ request: FacultyProfileRequestRecord }>('/api/portal/teacher/profile-requests', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  getAdminFacultyProfileRequests: () =>
+    apiFetch<{
+      requests: Array<
+        FacultyProfileRequestRecord & { currentMember: DepartmentPersonRecord | null }
+      >;
+    }>('/api/portal/admin/faculty-requests'),
+
+  reviewAdminFacultyProfileRequest: (
+    id: string,
+    payload: { decision: 'approve' | 'reject'; adminNote?: string }
+  ) =>
+    apiFetch<{
+      request: FacultyProfileRequestRecord;
+      department?: DepartmentRecord | null;
+      member?: DepartmentPersonRecord;
+    }>(`/api/portal/admin/faculty-requests/${encodeURIComponent(id)}/decision`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
 };

@@ -11,7 +11,13 @@ import {
 } from '../auth';
 import { pustRepo } from '../db';
 import { isSafeMediaUrl } from '../../src/lib/media';
-import type { ClearanceOfficeKey, OfficeClearanceState, UserRole } from '../../src/types/pust';
+import type {
+  ClearanceOfficeKey,
+  DepartmentPersonRecord,
+  FacultyProfileRequestRecord,
+  OfficeClearanceState,
+  UserRole,
+} from '../../src/types/pust';
 import {
   autoClearHallDueIfEnabled,
   autoEvaluateCertificateApplication,
@@ -943,7 +949,7 @@ const bannerReorderSchema = z.object({
 });
 
 const mediaUploadSchema = z.object({
-  purpose: z.enum(['banner', 'notice', 'gallery', 'cms']),
+  purpose: z.enum(['banner', 'notice', 'gallery', 'cms', 'faculty_photo']),
   fileName: z.string().trim().min(1).max(160),
   mimeType: z.string().trim().min(3).max(100),
   dataBase64: z.string().min(8).max(14_000_000),
@@ -2997,6 +3003,10 @@ portalRouter.post('/media/upload', requireAuth, async (req: AuthenticatedRequest
     res.status(403).json({ error: 'Only Admin Office may upload homepage banner, gallery, or CMS media.' });
     return;
   }
+  if (purpose === 'faculty_photo' && !['admin', 'chairman', 'teacher'].includes(actor.role)) {
+    res.status(403).json({ error: 'Only faculty or Admin Office may upload faculty portraits.' });
+    return;
+  }
   if (purpose === 'notice' && !NOTICE_PUBLISHER_ROLES.has(actor.role)) {
     res.status(403).json({ error: 'Your role is not authorized to upload notice attachments.' });
     return;
@@ -4038,5 +4048,482 @@ portalRouter.post(
     );
 
     res.json({ request: updated });
+  }
+);
+
+// 12. Teacher Directory Profile Claim & Admin-Approved Profile Editing
+const teacherClaimSchema = z.object({
+  memberId: z.string().trim().min(1).max(80),
+  facultyGroup: z.enum(['faculty', 'contractual']).default('faculty'),
+});
+
+const teacherProfileRequestSchema = z.object({
+  requestType: z.enum(['edit_claimed', 'create_new']),
+  facultyGroup: z.enum(['faculty', 'contractual']).default('faculty'),
+  targetMemberId: z.string().trim().max(80).optional(),
+  proposedProfile: departmentPersonSchema.omit({ id: true }),
+});
+
+const facultyRequestDecisionSchema = z.object({
+  decision: z.enum(['approve', 'reject']),
+  adminNote: z.string().trim().max(600).optional(),
+});
+
+portalRouter.get(
+  '/teacher/profile-status',
+  requireRoles('teacher'),
+  async (req: AuthenticatedRequest, res) => {
+    const actor = req.authUser!;
+    const liveUser = await pustRepo.findUserById(actor.sub);
+    if (!liveUser) {
+      res.status(404).json({ error: 'Teacher account not found.' });
+      return;
+    }
+
+    const department = await pustRepo.getDepartmentByCode(liveUser.departmentCode);
+    const allUsers = await pustRepo.listUsers();
+    const claimedMap: Record<string, { claimedByMe: boolean; claimedByName?: string }> = {};
+
+    if (department) {
+      for (const u of allUsers) {
+        if (
+          u.claimedFacultyMemberId &&
+          u.claimedDepartmentCode?.toUpperCase() === department.code.toUpperCase()
+        ) {
+          claimedMap[u.claimedFacultyMemberId] = {
+            claimedByMe: u.id === liveUser.id,
+            claimedByName: u.id === liveUser.id ? liveUser.name : u.name,
+          };
+        }
+      }
+    }
+
+    let claimedMember: DepartmentPersonRecord | null = null;
+    if (department && liveUser.claimedFacultyMemberId) {
+      claimedMember =
+        (department.facultyMembers || []).find((m) => m.id === liveUser.claimedFacultyMemberId) ||
+        (department.contractualFacultyMembers || []).find(
+          (m) => m.id === liveUser.claimedFacultyMemberId
+        ) ||
+        null;
+    }
+
+    const allRequests = await pustRepo.listFacultyProfileRequests();
+    const requests = allRequests.filter((r) => r.teacherUserId === liveUser.id);
+    const { passwordHash: _ignored, ...safeUser } = liveUser;
+
+    res.json({
+      user: safeUser,
+      department,
+      claimedMember,
+      claimedMap,
+      requests,
+    });
+  }
+);
+
+portalRouter.post(
+  '/teacher/claim-profile',
+  requireRoles('teacher'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = teacherClaimSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Select a valid directory profile to claim.' });
+      return;
+    }
+
+    const actor = req.authUser!;
+    const liveUser = await pustRepo.findUserById(actor.sub);
+    if (!liveUser) {
+      res.status(404).json({ error: 'Teacher account not found.' });
+      return;
+    }
+
+    const department = await pustRepo.getDepartmentByCode(liveUser.departmentCode);
+    if (!department) {
+      res.status(404).json({ error: `Department ${liveUser.departmentCode} not found.` });
+      return;
+    }
+
+    const regularMatch = (department.facultyMembers || []).find(
+      (m) => m.id === parsed.data.memberId
+    );
+    const contractualMatch = (department.contractualFacultyMembers || []).find(
+      (m) => m.id === parsed.data.memberId
+    );
+    const targetMember = regularMatch || contractualMatch;
+    if (!targetMember) {
+      res.status(404).json({
+        error: `Profile not found in the ${department.code} Department directory.`,
+      });
+      return;
+    }
+
+    const resolvedGroup: 'faculty' | 'contractual' = regularMatch ? 'faculty' : 'contractual';
+    const allUsers = await pustRepo.listUsers();
+    const alreadyClaimedBy = allUsers.find(
+      (u) =>
+        u.id !== liveUser.id &&
+        u.claimedDepartmentCode?.toUpperCase() === department.code.toUpperCase() &&
+        u.claimedFacultyMemberId === targetMember.id
+    );
+    if (alreadyClaimedBy) {
+      res.status(409).json({
+        error: `This profile is already claimed by ${alreadyClaimedBy.name}. Contact Admin Office if reassignment is required.`,
+      });
+      return;
+    }
+
+    const updatedUser = await pustRepo.updateUser(liveUser.id, {
+      claimedDepartmentCode: department.code,
+      claimedFacultyMemberId: targetMember.id,
+      claimedFacultyGroup: resolvedGroup,
+      designation: targetMember.designation || liveUser.designation,
+    });
+
+    await pustRepo.logAudit(
+      liveUser.name,
+      'teacher',
+      'Claimed department directory profile',
+      `${targetMember.name} (${department.code} · ${targetMember.id})`,
+      {
+        category: 'Account & Access',
+        severity: 'elevated',
+        actorEmail: liveUser.email,
+        details: `Teacher ${liveUser.email} linked account to ${department.code} directory profile "${targetMember.name}" (${targetMember.designation}).`,
+      }
+    );
+
+    res.json({
+      user: updatedUser,
+      claimedMember: targetMember,
+      facultyGroup: resolvedGroup,
+    });
+  }
+);
+
+portalRouter.delete(
+  '/teacher/claim-profile',
+  requireRoles('teacher'),
+  async (req: AuthenticatedRequest, res) => {
+    const actor = req.authUser!;
+    const liveUser = await pustRepo.findUserById(actor.sub);
+    if (!liveUser) {
+      res.status(404).json({ error: 'Teacher account not found.' });
+      return;
+    }
+
+    const prevId = liveUser.claimedFacultyMemberId;
+    const updatedUser = await pustRepo.updateUser(liveUser.id, {
+      claimedDepartmentCode: undefined,
+      claimedFacultyMemberId: undefined,
+      claimedFacultyGroup: undefined,
+    });
+
+    if (prevId) {
+      await pustRepo.logAudit(
+        liveUser.name,
+        'teacher',
+        'Released claimed directory profile',
+        `${liveUser.departmentCode} · ${prevId}`,
+        {
+          category: 'Account & Access',
+          severity: 'standard',
+          actorEmail: liveUser.email,
+        }
+      );
+    }
+
+    res.json({ user: updatedUser });
+  }
+);
+
+portalRouter.post(
+  '/teacher/profile-requests',
+  requireRoles('teacher'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = teacherProfileRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error:
+          parsed.error.issues[0]?.message ||
+          'Provide valid faculty profile fields before submitting for Admin approval.',
+      });
+      return;
+    }
+
+    const actor = req.authUser!;
+    const liveUser = await pustRepo.findUserById(actor.sub);
+    if (!liveUser) {
+      res.status(404).json({ error: 'Teacher account not found.' });
+      return;
+    }
+
+    const department = await pustRepo.getDepartmentByCode(liveUser.departmentCode);
+    if (!department) {
+      res.status(404).json({ error: `Department ${liveUser.departmentCode} not found.` });
+      return;
+    }
+
+    const { requestType, facultyGroup, targetMemberId, proposedProfile } = parsed.data;
+    let targetMemberName: string | undefined;
+
+    if (requestType === 'edit_claimed') {
+      if (
+        !liveUser.claimedFacultyMemberId ||
+        liveUser.claimedDepartmentCode?.toUpperCase() !== department.code.toUpperCase() ||
+        (targetMemberId && targetMemberId !== liveUser.claimedFacultyMemberId)
+      ) {
+        res.status(403).json({
+          error: 'You may only submit edits for a directory profile claimed by your account.',
+        });
+        return;
+      }
+      const existingMember =
+        (department.facultyMembers || []).find((m) => m.id === liveUser.claimedFacultyMemberId) ||
+        (department.contractualFacultyMembers || []).find(
+          (m) => m.id === liveUser.claimedFacultyMemberId
+        );
+      if (!existingMember) {
+        res.status(404).json({ error: 'Your claimed directory profile no longer exists.' });
+        return;
+      }
+      targetMemberName = existingMember.name;
+    }
+
+    const existingPending = (await pustRepo.listFacultyProfileRequests()).find(
+      (r) => r.teacherUserId === liveUser.id && r.status === 'pending'
+    );
+
+    let savedRequest: FacultyProfileRequestRecord;
+    if (existingPending) {
+      const updated = await pustRepo.updateFacultyProfileRequest(existingPending.id, {
+        facultyGroup:
+          requestType === 'edit_claimed'
+            ? liveUser.claimedFacultyGroup || facultyGroup
+            : facultyGroup,
+        requestType,
+        targetMemberId:
+          requestType === 'edit_claimed' ? liveUser.claimedFacultyMemberId : undefined,
+        targetMemberName,
+        proposedProfile,
+        teacherName: liveUser.name,
+        teacherEmail: liveUser.email,
+      });
+      savedRequest = updated!;
+    } else {
+      savedRequest = await pustRepo.createFacultyProfileRequest({
+        teacherUserId: liveUser.id,
+        teacherName: liveUser.name,
+        teacherEmail: liveUser.email,
+        teacherAcademicId: liveUser.academicId,
+        departmentCode: department.code,
+        facultyGroup:
+          requestType === 'edit_claimed'
+            ? liveUser.claimedFacultyGroup || facultyGroup
+            : facultyGroup,
+        requestType,
+        targetMemberId:
+          requestType === 'edit_claimed' ? liveUser.claimedFacultyMemberId : undefined,
+        targetMemberName,
+        proposedProfile,
+        status: 'pending',
+      });
+    }
+
+    await pustRepo.logAudit(
+      liveUser.name,
+      'teacher',
+      requestType === 'create_new'
+        ? 'Submitted new teacher profile for admin approval'
+        : 'Submitted teacher profile edit for admin approval',
+      `${proposedProfile.name} (${department.code})`,
+      {
+        category: 'Governance & CMS',
+        severity: 'elevated',
+        actorEmail: liveUser.email,
+        details: `Request ${savedRequest.id} awaiting Admin Office approval before appearing in ${department.code} directory.`,
+      }
+    );
+
+    res.status(201).json({ request: savedRequest });
+  }
+);
+
+portalRouter.get(
+  '/admin/faculty-requests',
+  requireRoles('admin'),
+  async (_req: AuthenticatedRequest, res) => {
+    const [requests, departments] = await Promise.all([
+      pustRepo.listFacultyProfileRequests(),
+      pustRepo.listDepartments(),
+    ]);
+
+    const deptByCode = new Map(departments.map((d) => [d.code.toUpperCase(), d]));
+    const enriched = requests.map((reqItem) => {
+      const dept = deptByCode.get(reqItem.departmentCode.toUpperCase());
+      const currentMember =
+        reqItem.targetMemberId && dept
+          ? (dept.facultyMembers || []).find((m) => m.id === reqItem.targetMemberId) ||
+            (dept.contractualFacultyMembers || []).find((m) => m.id === reqItem.targetMemberId) ||
+            null
+          : null;
+      return {
+        ...reqItem,
+        currentMember,
+      };
+    });
+
+    res.json({ requests: enriched });
+  }
+);
+
+portalRouter.patch(
+  '/admin/faculty-requests/:id/decision',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = facultyRequestDecisionSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid review decision payload.' });
+      return;
+    }
+
+    const target = await pustRepo.findFacultyProfileRequestById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Faculty profile request not found.' });
+      return;
+    }
+    if (target.status !== 'pending') {
+      res.status(409).json({
+        error: `This profile request has already been finalized (${target.status}).`,
+      });
+      return;
+    }
+
+    const note = parsed.data.adminNote?.trim() || '';
+    if (parsed.data.decision === 'reject' && note.length < 4) {
+      res.status(400).json({
+        error: 'Provide a clear reason (at least 4 characters) when declining a profile edit.',
+      });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const adminActor = req.authUser!;
+
+    if (parsed.data.decision === 'reject') {
+      const updated = await pustRepo.updateFacultyProfileRequest(target.id, {
+        status: 'rejected',
+        adminNote: note,
+        reviewedBy: adminActor.name,
+        reviewedAt: now,
+      });
+
+      await pustRepo.logAudit(
+        adminActor.name,
+        'admin',
+        'Declined teacher profile edit',
+        `${target.proposedProfile.name} (${target.departmentCode})`,
+        {
+          category: 'Governance & CMS',
+          severity: 'elevated',
+          actorEmail: adminActor.email,
+          details: `Declined ${target.requestType} request from ${target.teacherEmail}: ${note}`,
+        }
+      );
+
+      res.json({ request: updated });
+      return;
+    }
+
+    // Approve & apply changes to live Department directory
+    const department = await pustRepo.getDepartmentByCode(target.departmentCode);
+    if (!department) {
+      res.status(404).json({ error: `Department ${target.departmentCode} not found.` });
+      return;
+    }
+
+    const regularList = [...(department.facultyMembers || [])];
+    const contractualList = [...(department.contractualFacultyMembers || [])];
+    let appliedMember: DepartmentPersonRecord;
+    let appliedGroup: 'faculty' | 'contractual' = target.facultyGroup;
+
+    if (target.requestType === 'edit_claimed' && target.targetMemberId) {
+      const regIdx = regularList.findIndex((m) => m.id === target.targetMemberId);
+      const conIdx = contractualList.findIndex((m) => m.id === target.targetMemberId);
+      appliedMember = {
+        id: target.targetMemberId,
+        ...target.proposedProfile,
+      };
+      if (regIdx >= 0) {
+        regularList[regIdx] = appliedMember;
+        appliedGroup = 'faculty';
+      } else if (conIdx >= 0) {
+        contractualList[conIdx] = appliedMember;
+        appliedGroup = 'contractual';
+      } else {
+        if (target.facultyGroup === 'contractual') {
+          contractualList.push(appliedMember);
+        } else {
+          regularList.push(appliedMember);
+        }
+      }
+    } else {
+      const newId = `fac-${department.code.toLowerCase().replace(/[^a-z0-9]/g, '')}-${crypto.randomUUID().slice(0, 6)}`;
+      appliedMember = {
+        id: newId,
+        ...target.proposedProfile,
+      };
+      if (target.facultyGroup === 'contractual') {
+        contractualList.push(appliedMember);
+        appliedGroup = 'contractual';
+      } else {
+        regularList.push(appliedMember);
+        appliedGroup = 'faculty';
+      }
+    }
+
+    const updatedDept = await pustRepo.updateDepartment(department.id, {
+      facultyMembers: regularList,
+      contractualFacultyMembers: contractualList,
+      facultyCount: Math.max(department.facultyCount ?? 0, regularList.length),
+    });
+
+    await pustRepo.updateUser(target.teacherUserId, {
+      claimedDepartmentCode: department.code,
+      claimedFacultyMemberId: appliedMember.id,
+      claimedFacultyGroup: appliedGroup,
+      designation: appliedMember.designation,
+    });
+
+    const updatedReq = await pustRepo.updateFacultyProfileRequest(target.id, {
+      status: 'approved',
+      targetMemberId: appliedMember.id,
+      targetMemberName: appliedMember.name,
+      adminNote: note || `Approved and published to ${department.code} Department directory.`,
+      reviewedBy: adminActor.name,
+      reviewedAt: now,
+    });
+
+    await pustRepo.logAudit(
+      adminActor.name,
+      'admin',
+      target.requestType === 'create_new'
+        ? 'Approved new teacher directory profile'
+        : 'Approved teacher profile edit',
+      `${appliedMember.name} (${department.code} · ${appliedMember.id})`,
+      {
+        category: 'Governance & CMS',
+        severity: 'elevated',
+        actorEmail: adminActor.email,
+        details: `Published profile update for ${target.teacherEmail} (${appliedMember.designation}) to ${department.code} directory.`,
+      }
+    );
+
+    res.json({
+      request: updatedReq,
+      department: updatedDept,
+      member: appliedMember,
+    });
   }
 );

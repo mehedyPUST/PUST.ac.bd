@@ -4,10 +4,12 @@ import {
   ArrowRight,
   Bell,
   Bookmark,
+  Clock,
   Receipt,
   ShieldCheck,
   ShieldPlus,
   Trash2,
+  UserCheck,
 } from 'lucide-react';
 import type {
   AuthUser,
@@ -33,6 +35,8 @@ interface PortalOverviewPanelProps {
   onOpenNotice: (notice: NoticeRecord) => void;
   onRemoveBookmark: (itemId: string) => Promise<void>;
   onAddCoAdmin?: () => void;
+  pendingFacultyRequestsCount?: number;
+  onReviewFacultyRequests?: () => void;
 }
 
 export function PortalOverviewPanel({
@@ -50,6 +54,8 @@ export function PortalOverviewPanel({
   onOpenNotice,
   onRemoveBookmark,
   onAddCoAdmin,
+  pendingFacultyRequestsCount = 0,
+  onReviewFacultyRequests,
 }: PortalOverviewPanelProps) {
   const quickModules = portalTabs.filter((t) => t.id !== 'overview');
 
@@ -153,6 +159,67 @@ export function PortalOverviewPanel({
           )}
         </dl>
       </div>
+
+      {/* Admin Pending Teacher Profile Requests Alert */}
+      {user.role === 'admin' && pendingFacultyRequestsCount > 0 && onReviewFacultyRequests && (
+        <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-amber-950">
+                <span className="font-mono tabular-nums">{pendingFacultyRequestsCount}</span>{' '}
+                Faculty Profile Edit{pendingFacultyRequestsCount > 1 ? 's' : ''} Pending Approval
+              </p>
+              <p className="text-xs text-amber-900">
+                Department teachers have submitted directory profile edits or new profile entries awaiting Administrator verification.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onReviewFacultyRequests}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>Review Profile Requests</span>
+          </button>
+        </div>
+      )}
+
+      {/* Teacher Directory Profile Claim Prompt */}
+      {user.role === 'teacher' && (
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <UserCheck
+              className={`w-5 h-5 shrink-0 mt-0.5 ${
+                user.claimedFacultyMemberId ? 'text-emerald-700' : 'text-pust-800'
+              }`}
+            />
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-slate-950">
+                {user.claimedFacultyMemberId
+                  ? `Department Directory Profile Claimed (${user.claimedDepartmentCode || user.departmentCode})`
+                  : `Claim or Create Your ${user.departmentCode} Faculty Profile`}
+              </p>
+              <p className="text-xs text-slate-600">
+                {user.claimedFacultyMemberId
+                  ? 'Your account is linked to your public department profile. Propose edits anytime for Administrator approval.'
+                  : 'Claim your existing teacher entry in the department directory, or submit a new faculty profile for Administrator approval.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onSelectTab('profile')}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>
+              {user.claimedFacultyMemberId ? 'Manage Faculty Profile' : 'Claim / Edit Profile'}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Quick Module Launch Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -16,6 +16,7 @@ import type {
   ExamApplicationRecord,
   ExamCircularRecord,
   ExamResultRecord,
+  FacultyProfileRequestRecord,
   FeeConfig,
   GalleryItemRecord,
   HallApplicationRecord,
@@ -126,6 +127,7 @@ class PustRepository {
   private auditLogs: AuditLogRecord[] = [];
   private inquiries: InquiryRecord[] = [...SEED_INQUIRIES];
   private departmentRequests: DepartmentRequestRecord[] = [...SEED_DEPARTMENT_REQUESTS];
+  private facultyProfileRequests: FacultyProfileRequestRecord[] = [];
   private bookmarks: BookmarkRecord[] = [];
   private automationConfig: AutomationRulesConfig = {
     autoClearPaidHallDues: true,
@@ -1387,6 +1389,40 @@ class PustRepository {
     patch: Partial<DepartmentRequestRecord>
   ): Promise<DepartmentRequestRecord | null> =>
     this.updateItem('department_requests', this.departmentRequests, id, {
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    });
+
+  // Teacher Directory Profile Claim & Edit Requests (Admin Approval Required)
+  listFacultyProfileRequests = async (): Promise<FacultyProfileRequestRecord[]> => {
+    const items = await this.getAll('faculty_profile_requests', this.facultyProfileRequests);
+    return items.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  };
+
+  findFacultyProfileRequestById = async (
+    id: string
+  ): Promise<FacultyProfileRequestRecord | null> => {
+    const items = await this.getAll('faculty_profile_requests', this.facultyProfileRequests);
+    return items.find((r) => r.id === id) ?? null;
+  };
+
+  createFacultyProfileRequest = (
+    input: Omit<FacultyProfileRequestRecord, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<FacultyProfileRequestRecord> => {
+    const now = new Date().toISOString();
+    return this.insertItem('faculty_profile_requests', this.facultyProfileRequests, {
+      id: `fpr-${crypto.randomUUID()}`,
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    });
+  };
+
+  updateFacultyProfileRequest = (
+    id: string,
+    patch: Partial<FacultyProfileRequestRecord>
+  ): Promise<FacultyProfileRequestRecord | null> =>
+    this.updateItem('faculty_profile_requests', this.facultyProfileRequests, id, {
       ...patch,
       updatedAt: new Date().toISOString(),
     });
