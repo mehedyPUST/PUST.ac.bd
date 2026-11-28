@@ -3,12 +3,22 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   AlertTriangle,
+  ArrowLeft,
+  Award,
+  BookOpen,
+  Briefcase,
   Building2,
   CheckCircle2,
   Clock,
+  Edit3,
   ExternalLink,
+  Eye,
+  FileText,
+  FlaskConical,
+  GraduationCap,
   Link2,
   Mail,
+  MapPin,
   Phone,
   Plus,
   RefreshCw,
@@ -78,6 +88,10 @@ function splitLines(text: string): string[] {
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
+}
+
+function sanitizeTelHref(phone: string): string {
+  return phone.replace(/[^\d+]/g, '');
 }
 
 function draftFromPerson(
@@ -190,8 +204,19 @@ export function TeacherProfilePanel({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [unclaiming, setUnclaiming] = useState(false);
+  const [confirmRelease, setConfirmRelease] = useState(false);
 
-  // Directory Search & Editor Mode
+  // Reading vs Editing Mode
+  const [isEditing, setIsEditing] = useState(false);
+  const [readingSource, setReadingSource] = useState<'live' | 'pending'>('live');
+  const [browseDirectoryWhenUnclaimed, setBrowseDirectoryWhenUnclaimed] = useState(false);
+  const [previewCandidate, setPreviewCandidate] = useState<{
+    member: DepartmentPersonRecord;
+    group: 'faculty' | 'contractual';
+    groupLabel: string;
+  } | null>(null);
+
+  // Directory Search & Editor State
   const [directorySearch, setDirectorySearch] = useState('');
   const [editorMode, setEditorMode] = useState<'edit_claimed' | 'create_new'>('create_new');
   const [facultyGroup, setFacultyGroup] = useState<'faculty' | 'contractual'>('faculty');
@@ -201,13 +226,16 @@ export function TeacherProfilePanel({
   const [draft, setDraft] = useState<ProfileDraft>(() => draftFromPerson(null, user));
 
   const applyLoadedState = useCallback(
-    (res: {
-      user: AuthUser;
-      department: DepartmentRecord | null;
-      claimedMember: DepartmentPersonRecord | null;
-      claimedMap: Record<string, { claimedByMe: boolean; claimedByName?: string }>;
-      requests: FacultyProfileRequestRecord[];
-    }) => {
+    (
+      res: {
+        user: AuthUser;
+        department: DepartmentRecord | null;
+        claimedMember: DepartmentPersonRecord | null;
+        claimedMap: Record<string, { claimedByMe: boolean; claimedByName?: string }>;
+        requests: FacultyProfileRequestRecord[];
+      },
+      options?: { preserveEditMode?: boolean }
+    ) => {
       onUserChange(res.user);
       setDepartment(res.department);
       setClaimedMember(res.claimedMember);
@@ -219,37 +247,58 @@ export function TeacherProfilePanel({
         setEditorMode(pendingReq.requestType);
         setFacultyGroup(pendingReq.facultyGroup);
         setDraft(draftFromPerson(pendingReq.proposedProfile, res.user));
+        setReadingSource(res.claimedMember ? 'pending' : 'pending');
       } else if (res.claimedMember) {
         setEditorMode('edit_claimed');
         setFacultyGroup(res.user.claimedFacultyGroup || 'faculty');
         setDraft(draftFromPerson(res.claimedMember, res.user));
+        setReadingSource('live');
       } else {
         setEditorMode('create_new');
         setFacultyGroup('faculty');
         setDraft(draftFromPerson(null, res.user));
+        setReadingSource('live');
+      }
+
+      if (!options?.preserveEditMode) {
+        // Default to Reading Mode whenever the teacher has a claimed profile or a submitted draft
+        setIsEditing(false);
       }
     },
     [onUserChange]
   );
 
-  const loadStatus = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await pustApi.getTeacherProfileStatus();
-      applyLoadedState(res);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Unable to load faculty directory profile status.'
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [applyLoadedState]);
+  const loadStatus = useCallback(
+    async (options?: { preserveEditMode?: boolean }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await pustApi.getTeacherProfileStatus();
+        applyLoadedState(res, options);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Unable to load faculty directory profile status.'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [applyLoadedState]
+  );
 
   useEffect(() => {
     void loadStatus();
   }, [loadStatus]);
+
+  // Close candidate preview modal with Escape
+  useEffect(() => {
+    if (!previewCandidate) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPreviewCandidate(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [previewCandidate]);
 
   const directoryEntries = useMemo(() => {
     if (!department) return [];
@@ -288,6 +337,35 @@ export function TeacherProfilePanel({
     [requests]
   );
 
+  // Active reading profile: either claimed live profile, pending draft, or create_new pending profile
+  const readingProfile = useMemo<Omit<DepartmentPersonRecord, 'id'> | null>(() => {
+    if (claimedMember) {
+      if (pendingRequest && readingSource === 'pending') {
+        return pendingRequest.proposedProfile;
+      }
+      return claimedMember;
+    }
+    if (pendingRequest?.requestType === 'create_new') {
+      return pendingRequest.proposedProfile;
+    }
+    return null;
+  }, [claimedMember, pendingRequest, readingSource]);
+
+  const readingMetrics = useMemo(() => {
+    if (!readingProfile) {
+      return { courses: 0, projects: 0, publications: 0, awards: 0 };
+    }
+    const pubs =
+      (readingProfile.journalArticles?.length || 0) +
+      (readingProfile.conferenceProceedings?.length || 0);
+    return {
+      courses: readingProfile.conductedCourses?.length || 0,
+      projects: readingProfile.activeResearchProjects?.length || 0,
+      publications: Math.max(pubs, readingProfile.totalPublications || 0),
+      awards: readingProfile.awards?.length || 0,
+    };
+  }, [readingProfile]);
+
   async function handleClaimProfile(
     member: DepartmentPersonRecord,
     group: 'faculty' | 'contractual'
@@ -295,6 +373,7 @@ export function TeacherProfilePanel({
     setError(null);
     setFeedback(null);
     setClaimingId(member.id);
+    setPreviewCandidate(null);
     try {
       const res = await pustApi.claimTeacherProfile({
         memberId: member.id,
@@ -305,8 +384,11 @@ export function TeacherProfilePanel({
       setEditorMode('edit_claimed');
       setFacultyGroup(res.facultyGroup);
       setDraft(draftFromPerson(res.claimedMember, res.user));
+      setReadingSource('live');
+      setIsEditing(false);
+      setBrowseDirectoryWhenUnclaimed(false);
       setFeedback(
-        `Claimed "${res.claimedMember.name}" from the ${res.user.departmentCode} directory. You can now propose edits below for Administrator approval.`
+        `Profile claimed for "${res.claimedMember.name}". Reviewing your profile in reading mode — click "Edit / Update Profile" anytime to propose changes for Administrator approval.`
       );
       await loadStatus();
     } catch (err) {
@@ -324,10 +406,12 @@ export function TeacherProfilePanel({
       const res = await pustApi.unclaimTeacherProfile();
       onUserChange(res.user);
       setClaimedMember(null);
+      setConfirmRelease(false);
       setEditorMode('create_new');
       setDraft(draftFromPerson(null, res.user));
+      setIsEditing(false);
       setFeedback(
-        'Released claimed directory profile. You may claim another entry or create a new profile for Admin review.'
+        'Released claimed directory profile. Select a profile from your department roster or create a new profile.'
       );
       await loadStatus();
     } catch (err) {
@@ -337,11 +421,28 @@ export function TeacherProfilePanel({
     }
   }
 
-  function switchToCreateNewMode() {
-    setEditorMode('create_new');
-    if (claimedMember && pendingRequest?.requestType !== 'create_new') {
-      setDraft(draftFromPerson(null, user));
+  function enterEditMode(mode?: 'edit_claimed' | 'create_new') {
+    const resolvedMode = mode || (claimedMember ? 'edit_claimed' : 'create_new');
+    setEditorMode(resolvedMode);
+    if (resolvedMode === 'edit_claimed' && claimedMember) {
+      setFacultyGroup(user.claimedFacultyGroup || 'faculty');
+      setDraft(
+        draftFromPerson(
+          pendingRequest?.requestType === 'edit_claimed'
+            ? pendingRequest.proposedProfile
+            : claimedMember,
+          user
+        )
+      );
+    } else {
+      setDraft(
+        draftFromPerson(
+          pendingRequest?.requestType === 'create_new' ? pendingRequest.proposedProfile : null,
+          user
+        )
+      );
     }
+    setIsEditing(true);
     setFeedback(null);
     setError(null);
   }
@@ -410,9 +511,12 @@ export function TeacherProfilePanel({
       });
       setFeedback(
         editorMode === 'create_new'
-          ? `New directory profile for "${res.request.proposedProfile.name}" submitted. It will appear on the public department page once approved by an Administrator.`
+          ? `New directory profile for "${res.request.proposedProfile.name}" submitted. It will publish to the public department page once approved by an Administrator.`
           : `Profile update for "${res.request.proposedProfile.name}" submitted and is awaiting Administrator approval.`
       );
+      setIsEditing(false);
+      setReadingSource('pending');
+      setBrowseDirectoryWhenUnclaimed(false);
       await loadStatus();
     } catch (err) {
       setError(
@@ -424,6 +528,8 @@ export function TeacherProfilePanel({
       setSubmittingRequest(false);
     }
   }
+
+  const waitingInitialClaimCheck = loading && Boolean(user.claimedFacultyMemberId) && !claimedMember;
 
   return (
     <div className="space-y-6">
@@ -470,7 +576,7 @@ export function TeacherProfilePanel({
 
       {/* Pending / Finalized Approval Status Banner */}
       {pendingRequest && (
-        <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="rounded-2xl border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
             <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
@@ -484,28 +590,52 @@ export function TeacherProfilePanel({
                     ? 'new directory profile'
                     : 'profile edit'}
                 </span>{' '}
-                submission for <span className="font-semibold">{pendingRequest.proposedProfile.name}</span>{' '}
-                ({formatDateTime(pendingRequest.updatedAt)}) is waiting for Admin review. Changes will go live on the public{' '}
-                {user.departmentCode} department page once approved.
+                for <span className="font-semibold">{pendingRequest.proposedProfile.name}</span>{' '}
+                ({formatDateTime(pendingRequest.updatedAt)}) is under review. Live public records stay unchanged until approved by an Administrator.
               </p>
             </div>
           </div>
-          <span className="font-mono text-[11px] font-semibold text-amber-900 whitespace-nowrap shrink-0 tabular-nums">
-            Awaiting Admin Review
-          </span>
+          {!isEditing && claimedMember && (
+            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-amber-100/80 border border-amber-200 shrink-0 self-start lg:self-auto">
+              <button
+                type="button"
+                onClick={() => setReadingSource('live')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  readingSource === 'live'
+                    ? 'bg-white text-slate-950 shadow-sm'
+                    : 'text-amber-950 hover:bg-white/60'
+                }`}
+              >
+                Live Profile
+              </button>
+              <button
+                type="button"
+                onClick={() => setReadingSource('pending')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  readingSource === 'pending'
+                    ? 'bg-white text-slate-950 shadow-sm'
+                    : 'text-amber-950 hover:bg-white/60'
+                }`}
+              >
+                Pending Draft
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {!pendingRequest && latestFinalizedRequest && latestFinalizedRequest.status === 'rejected' && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 flex items-start gap-3">
-          <XCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-red-950">
-              Previous Profile Request Declined by Administrator
-            </p>
-            <p className="text-xs text-red-900">
-              Reviewer Note: {latestFinalizedRequest.adminNote || 'No note provided.'} — Update your profile below and resubmit for review.
-            </p>
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <XCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-red-950">
+                Previous Profile Request Declined by Administrator
+              </p>
+              <p className="text-xs text-red-900">
+                Reviewer Note: {latestFinalizedRequest.adminNote || 'No note provided.'} — Click Edit / Update Profile to revise and resubmit.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -525,8 +655,30 @@ export function TeacherProfilePanel({
         </div>
       )}
 
-      {/* Section A: Department Directory Claim (only shown when teacher has not yet claimed a profile) */}
-      {!claimedMember && !(loading && user.claimedFacultyMemberId) ? (
+      {/* Loading Skeleton for Claimed Profile */}
+      {waitingInitialClaimCheck && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-2xl bg-stone-100 animate-pulse" />
+            <div className="space-y-2 flex-1">
+              <div className="h-4 w-48 bg-stone-100 animate-pulse rounded" />
+              <div className="h-6 w-72 bg-stone-100 animate-pulse rounded" />
+              <div className="h-3 w-60 bg-stone-100 animate-pulse rounded" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="h-16 rounded-xl bg-stone-100 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* UNCLAIMED FLOW: Show Claim Directory if teacher has not yet claimed a profile and is not editing */}
+      {!waitingInitialClaimCheck &&
+        !claimedMember &&
+        !isEditing &&
+        (browseDirectoryWhenUnclaimed || pendingRequest?.requestType !== 'create_new') && (
         <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
             <div className="space-y-1">
@@ -539,10 +691,10 @@ export function TeacherProfilePanel({
                 </span>
               </div>
               <h2 className="font-serif text-xl font-medium text-slate-950">
-                01. Claim Your Profile in the Department Directory
+                Claim Your Profile in the Department Directory
               </h2>
               <p className="text-xs text-slate-600 max-w-2xl">
-                If your name already appears in your department&apos;s faculty roster, claim your profile below to link your account. Not listed in the directory? Use Section 02 below to create and submit a new profile for Administrator approval.
+                Select your existing faculty entry below to link your account and inspect your profile in reading mode. Not listed in the directory? Create a new faculty profile for Administrator approval.
               </p>
             </div>
 
@@ -572,43 +724,33 @@ export function TeacherProfilePanel({
           <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-0.5">
               <p className="text-xs font-semibold text-slate-900">
-                No Directory Profile Claimed Yet
+                Not listed in the {user.departmentCode} directory?
               </p>
               <p className="text-xs text-slate-600">
-                Find your name in the {user.departmentCode} list below to claim it, or click &quot;Not Listed — Create My Profile&quot; to submit a new profile for Admin approval.
+                Compose your full academic profile directly and submit it for Administrator verification.
               </p>
             </div>
             <button
               type="button"
-              onClick={switchToCreateNewMode}
+              onClick={() => enterEditMode('create_new')}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              <span>Not Listed — Create My Profile</span>
+              <span>Create &amp; Edit My Profile</span>
             </button>
           </div>
 
           {/* Directory Search + List */}
           <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="relative flex-1 max-w-md">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="search"
-                  value={directorySearch}
-                  onChange={(e) => setDirectorySearch(e.target.value)}
-                  placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={switchToCreateNewMode}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Not in Directory? Create New Profile</span>
-              </button>
+            <div className="relative max-w-md">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="search"
+                value={directorySearch}
+                onChange={(e) => setDirectorySearch(e.target.value)}
+                placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
+                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
             </div>
 
             {loading ? (
@@ -626,11 +768,11 @@ export function TeacherProfilePanel({
                   No matching faculty entries found in {user.departmentCode}
                 </p>
                 <p className="text-xs text-slate-600">
-                  If your profile is not yet listed in the department directory, compose a new profile below and submit it for Administrator approval.
+                  If your profile is not yet listed, create a new profile and submit it for Administrator approval.
                 </p>
                 <button
                   type="button"
-                  onClick={switchToCreateNewMode}
+                  onClick={() => enterEditMode('create_new')}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
@@ -646,8 +788,8 @@ export function TeacherProfilePanel({
                       <th className="py-2.5 px-3">Faculty Member</th>
                       <th className="py-2.5 px-3">Designation &amp; Group</th>
                       <th className="py-2.5 px-3">Contact</th>
-                      <th className="py-2.5 px-3">Claim Status</th>
-                      <th className="py-2.5 px-3 text-right">Action</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-200">
@@ -704,14 +846,26 @@ export function TeacherProfilePanel({
                             )}
                           </td>
                           <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                            <button
-                              type="button"
-                              disabled={claimedByOther || claimingId === member.id}
-                              onClick={() => void handleClaimProfile(member, group)}
-                              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
-                            >
-                              {claimingId === member.id ? 'Claiming...' : 'Claim This Profile'}
-                            </button>
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPreviewCandidate({ member, group, groupLabel })
+                                }
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>View</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={claimedByOther || claimingId === member.id}
+                                onClick={() => void handleClaimProfile(member, group)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                              >
+                                {claimingId === member.id ? 'Claiming...' : 'Claim'}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -722,684 +876,1272 @@ export function TeacherProfilePanel({
             )}
           </div>
         </div>
-      ) : claimedMember ? (
-        <div className="bg-white rounded-2xl border border-stone-200 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-11 h-11 rounded-full bg-pust-900 text-white flex items-center justify-center font-serif text-sm font-semibold shrink-0 overflow-hidden">
-              {claimedMember.photoUrl && isSafeMediaUrl(claimedMember.photoUrl) ? (
-                <img
-                  src={claimedMember.photoUrl}
-                  alt={claimedMember.name}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{claimedMember.name.slice(0, 2).toUpperCase()}</span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
-                <UserCheck className="w-3.5 h-3.5 shrink-0" />
-                <span>
-                  Linked Profile · {department ? `${department.name} (${department.code})` : user.departmentCode}
-                </span>
-              </p>
-              <p className="font-serif text-lg font-medium text-slate-950 truncate">
-                {claimedMember.name}{' '}
-                <span className="font-sans text-xs font-normal text-slate-600">
-                  · {claimedMember.designation}
-                </span>
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {onViewDepartment && (
-              <button
-                type="button"
-                onClick={() => onViewDepartment(user.departmentCode)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>View Public Dept Page</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => void loadStatus()}
-              disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => void handleUnclaimProfile()}
-              disabled={unclaiming}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
-            >
-              <UserX className="w-3.5 h-3.5" />
-              <span>{unclaiming ? 'Releasing...' : 'Release Claim'}</span>
-            </button>
-          </div>
-        </div>
-      ) : null}
+      )}
 
-      {/* Section B: Faculty Profile Editor (Admin Approval Required) */}
-      <form
-        onSubmit={handleSubmitProfileRequest}
-        className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-6"
-      >
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
-          <div className="space-y-1">
-            <p className="text-xs font-mono text-amber-800 font-semibold flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Administrator Approval Required Before Publishing Live</span>
-            </p>
-            <h2 className="font-serif text-xl font-medium text-slate-950">
-              {claimedMember ? '01' : '02'}.{' '}
-              {editorMode === 'edit_claimed'
-                ? 'Edit Claimed Faculty Profile'
-                : 'Create & Edit New Directory Profile'}
-            </h2>
-            <p className="text-xs text-slate-600">
-              {editorMode === 'edit_claimed' && claimedMember
-                ? `Proposing updates for "${claimedMember.name}" (${user.departmentCode}). Live public profile stays unchanged until an Administrator approves your submission.`
-                : `Composing a new faculty entry for the ${user.departmentCode} Department directory. Upon Administrator approval, this profile will be published and automatically claimed by your account.`}
-            </p>
-          </div>
-
-          {!claimedMember && (
-            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200 shrink-0 self-start lg:self-auto">
-              <button
-                type="button"
-                onClick={switchToCreateNewMode}
-                className="px-3 py-1.5 text-xs font-medium rounded-md bg-white text-slate-950 shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                Create New Profile
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Portrait Photo Upload or Direct Link */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div className="lg:col-span-4 rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-slate-900">Faculty Portrait</span>
-              <div className="inline-flex items-center gap-1 p-0.5 rounded-md bg-stone-200/70">
-                <button
-                  type="button"
-                  onClick={() => setPhotoSourceMode('upload')}
-                  className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer whitespace-nowrap ${
-                    photoSourceMode === 'upload'
-                      ? 'bg-white text-slate-950 shadow-sm'
-                      : 'text-slate-600'
-                  }`}
-                >
-                  <Upload className="w-3 h-3" />
-                  <span>Upload</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPhotoSourceMode('link')}
-                  className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer whitespace-nowrap ${
-                    photoSourceMode === 'link'
-                      ? 'bg-white text-slate-950 shadow-sm'
-                      : 'text-slate-600'
-                  }`}
-                >
-                  <Link2 className="w-3 h-3" />
-                  <span>Direct Link</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-20 h-20 rounded-xl border border-stone-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
-                {draft.photoUrl && isSafeMediaUrl(draft.photoUrl) ? (
-                  <img
-                    src={draft.photoUrl}
-                    alt={draft.name || 'Faculty portrait'}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="font-serif text-lg font-semibold text-pust-800">
-                    {(draft.name || user.name).slice(0, 2).toUpperCase()}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0 space-y-2">
-                {photoSourceMode === 'upload' ? (
-                  <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>{uploadingPhoto ? 'Uploading...' : 'Choose Portrait'}</span>
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      onChange={handlePhotoFileSelect}
-                      disabled={uploadingPhoto}
-                      className="sr-only"
+      {/* READING MODE: Executive Academic Dossier View (default after claiming or submitting profile) */}
+      {!waitingInitialClaimCheck &&
+        !isEditing &&
+        readingProfile &&
+        (Boolean(claimedMember) || !browseDirectoryWhenUnclaimed) && (
+        <div className="space-y-6">
+          {/* Identity & Actions Header Card */}
+          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5 border-b border-stone-200 pb-5">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 min-w-0">
+                <div className="w-20 h-20 rounded-2xl bg-pust-900 text-white border border-stone-200 flex items-center justify-center font-serif text-2xl font-semibold shrink-0 overflow-hidden">
+                  {readingProfile.photoUrl && isSafeMediaUrl(readingProfile.photoUrl) ? (
+                    <img
+                      src={readingProfile.photoUrl}
+                      alt={readingProfile.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
                     />
-                  </label>
-                ) : (
-                  <input
-                    type="url"
-                    value={draft.photoUrl}
-                    onChange={(e) => setDraft((prev) => ({ ...prev, photoUrl: e.target.value }))}
-                    placeholder="https://ik.imagekit.io/..."
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:border-pust-800"
-                  />
-                )}
-                {draft.photoUrl && (
+                  ) : (
+                    <span>{readingProfile.name.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+
+                <div className="min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                    <span className="font-mono font-semibold text-pust-800">
+                      {department ? `${department.name} (${department.code})` : user.departmentCode}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                      {(claimedMember
+                        ? user.claimedFacultyGroup === 'contractual'
+                        : pendingRequest?.facultyGroup === 'contractual')
+                        ? 'Contractual / Adjunct Faculty'
+                        : 'Regular Faculty'}
+                    </span>
+                    {readingProfile.onStudyLeave && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-semibold text-amber-800">On Study Leave</span>
+                      </>
+                    )}
+                    {pendingRequest && readingSource === 'pending' && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-semibold text-amber-800">Draft Preview</span>
+                      </>
+                    )}
+                  </div>
+
+                  <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-950 leading-tight">
+                    {readingProfile.name}
+                  </h2>
+
+                  <p className="text-sm font-medium text-pust-900">
+                    {readingProfile.designation}
+                    {readingProfile.qualification ? ` · ${readingProfile.qualification}` : ''}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 pt-0.5">
+                    {readingProfile.officeLocation && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{readingProfile.officeLocation}</span>
+                      </span>
+                    )}
+                    {readingProfile.researchArea && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <FlaskConical className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{readingProfile.researchArea}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Controls */}
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => enterEditMode(claimedMember ? 'edit_claimed' : 'create_new')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>
+                    {pendingRequest ? 'Update Pending Edit' : 'Edit / Update Profile'}
+                  </span>
+                </button>
+
+                {onViewDepartment && (
                   <button
                     type="button"
-                    onClick={() => setDraft((prev) => ({ ...prev, photoUrl: '' }))}
-                    className="block text-[11px] text-red-700 hover:underline cursor-pointer"
+                    onClick={() => onViewDepartment(user.departmentCode)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    Remove portrait
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Public Dept Page</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => void loadStatus()}
+                  disabled={loading}
+                  aria-label="Refresh profile"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
+                </button>
+
+                {claimedMember &&
+                  (confirmRelease ? (
+                    <div className="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => void handleUnclaimProfile()}
+                        disabled={unclaiming}
+                        className="px-3 py-2 rounded-lg text-xs font-semibold bg-red-700 text-white hover:bg-red-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                      >
+                        {unclaiming ? 'Releasing...' : 'Confirm Release'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmRelease(false)}
+                        className="px-2.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:text-slate-950 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmRelease(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <UserX className="w-3.5 h-3.5" />
+                      <span>Release Claim</span>
+                    </button>
+                  ))}
+
+                {!claimedMember && (
+                  <button
+                    type="button"
+                    onClick={() => setBrowseDirectoryWhenUnclaimed(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Browse Dept Directory</span>
                   </button>
                 )}
               </div>
             </div>
+
+            {/* 4-Column Quantitative Academic Overview */}
+            <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Conducted Courses</dt>
+                <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {readingMetrics.courses}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#F5F7FA] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Active Research Projects</dt>
+                <dd className="font-mono text-2xl font-semibold text-pust-900 tabular-nums mt-0.5">
+                  {readingMetrics.projects}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Recorded Publications</dt>
+                <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {readingMetrics.publications}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FBF6EE] px-4 py-3">
+                <dt className="text-[11px] font-medium text-slate-600">Awards &amp; Honors</dt>
+                <dd className="font-mono text-2xl font-semibold text-amber-800 tabular-nums mt-0.5">
+                  {readingMetrics.awards}
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          {/* Core Identity Fields */}
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Full Name *</span>
-              <input
-                type="text"
-                required
-                minLength={2}
-                maxLength={140}
-                value={draft.name}
-                onChange={(e) => setDraft((prev) => ({ ...prev, name: e.target.value }))}
-                placeholder="Dr. Md. Ashikur Rahman"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </label>
+          {/* 2-Column Editorial Academic Dossier */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left Rail: Contact, Research Focus & Education */}
+            <div className="lg:col-span-4 space-y-5">
+              {/* Contact & Office Card */}
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3.5">
+                <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                  <Phone className="w-4 h-4 text-pust-800" />
+                  <h3 className="font-serif text-base font-medium text-slate-950">
+                    Contact &amp; Office
+                  </h3>
+                </div>
 
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Academic Designation *</span>
-              <input
-                type="text"
-                required
-                minLength={2}
-                maxLength={140}
-                value={draft.designation}
-                onChange={(e) => setDraft((prev) => ({ ...prev, designation: e.target.value }))}
-                placeholder="Associate Professor"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </label>
+                <div className="space-y-2.5 text-xs">
+                  <div>
+                    <p className="text-[11px] text-slate-500">Office Location</p>
+                    <p className="font-medium text-slate-900 mt-0.5">
+                      {readingProfile.officeLocation || 'Not specified'}
+                    </p>
+                  </div>
 
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Directory Group</span>
-              <select
-                value={facultyGroup}
-                disabled={editorMode === 'edit_claimed'}
-                onChange={(e) =>
-                  setFacultyGroup(e.target.value as 'faculty' | 'contractual')
-                }
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800 disabled:opacity-60"
-              >
-                <option value="faculty">Regular Faculty Member</option>
-                <option value="contractual">Contractual / Adjunct Faculty</option>
-              </select>
-            </label>
+                  <div>
+                    <p className="text-[11px] text-slate-500 mb-1">Telephone</p>
+                    {readingProfile.phones && readingProfile.phones.length > 0 ? (
+                      <ul className="space-y-1.5">
+                        {readingProfile.phones.map((p, idx) => (
+                          <li key={idx} className="flex items-center justify-between gap-2">
+                            <a
+                              href={`tel:${sanitizeTelHref(p.value)}`}
+                              className="font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums truncate"
+                            >
+                              {p.value}
+                            </a>
+                            <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                              {p.type}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-slate-500">No phone numbers listed</p>
+                    )}
+                  </div>
 
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Office Location</span>
-              <input
-                type="text"
-                maxLength={240}
-                value={draft.officeLocation}
-                onChange={(e) => setDraft((prev) => ({ ...prev, officeLocation: e.target.value }))}
-                placeholder="Room 402, Academic Building 2"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </label>
+                  <div>
+                    <p className="text-[11px] text-slate-500 mb-1">Email</p>
+                    {readingProfile.emails && readingProfile.emails.length > 0 ? (
+                      <ul className="space-y-1.5">
+                        {readingProfile.emails.map((em, idx) => (
+                          <li key={idx} className="flex items-center justify-between gap-2">
+                            <a
+                              href={`mailto:${em.value}`}
+                              className="font-mono text-slate-800 hover:text-pust-900 hover:underline truncate"
+                            >
+                              {em.value}
+                            </a>
+                            <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                              {em.type}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-slate-500">No email addresses listed</p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Highest Qualification</span>
-              <input
-                type="text"
-                maxLength={400}
-                value={draft.qualification}
-                onChange={(e) => setDraft((prev) => ({ ...prev, qualification: e.target.value }))}
-                placeholder="Ph.D. in Computer Science & Engineering"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </label>
-
-            <label className="space-y-1 text-xs">
-              <span className="font-semibold text-slate-700">Primary Research Area</span>
-              <input
-                type="text"
-                maxLength={400}
-                value={draft.researchArea}
-                onChange={(e) => setDraft((prev) => ({ ...prev, researchArea: e.target.value }))}
-                placeholder="Machine Learning, Edge IoT & Distributed Systems"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </label>
-          </div>
-        </div>
-
-        {/* Study Leave Checkbox + Biography */}
-        <div className="space-y-4">
-          <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-800 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={draft.onStudyLeave}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, onStudyLeave: e.target.checked }))
-              }
-              className="rounded border-stone-300 text-pust-900 focus:ring-pust-800"
-            />
-            <span>Currently on Study Leave (displays official Study Leave badge on department page)</span>
-          </label>
-
-          <label className="block space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">Academic Biography</span>
-            <textarea
-              rows={3}
-              maxLength={4000}
-              value={draft.bio}
-              onChange={(e) => setDraft((prev) => ({ ...prev, bio: e.target.value }))}
-              placeholder="Summarize academic background, teaching focus, and research leadership..."
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-        </div>
-
-        {/* Dynamic Contacts (Phones & Emails) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2 border-t border-stone-200">
-          {/* Phones */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-pust-800" />
-                <span>Phone Numbers</span>
-              </span>
-              {draft.phones.length < 6 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      phones: [...prev.phones, { value: '', type: 'Office' }],
-                    }))
-                  }
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-pust-900 hover:underline cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>Add Phone</span>
-                </button>
-              )}
-            </div>
-            <div className="space-y-2">
-              {draft.phones.map((phone, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <select
-                    value={phone.type}
-                    onChange={(e) => {
-                      const next = [...draft.phones];
-                      next[idx] = { ...next[idx], type: e.target.value as ContactChannelType };
-                      setDraft((prev) => ({ ...prev, phones: next }));
-                    }}
-                    className="w-28 px-2.5 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900"
-                  >
-                    {CONTACT_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
+              {/* Research Interests Card */}
+              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
+                <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                  <FlaskConical className="w-4 h-4 text-pust-800" />
+                  <h3 className="font-serif text-base font-medium text-slate-950">
+                    Research Focus
+                  </h3>
+                </div>
+                {readingProfile.researchArea && (
+                  <p className="text-xs font-medium text-slate-900 leading-relaxed">
+                    {readingProfile.researchArea}
+                  </p>
+                )}
+                {readingProfile.researchInterests &&
+                readingProfile.researchInterests.length > 0 ? (
+                  <ul className="divide-y divide-stone-200 text-xs text-slate-700">
+                    {readingProfile.researchInterests.map((item, idx) => (
+                      <li key={idx} className="py-2 first:pt-0 last:pb-0">
+                        {item}
+                      </li>
                     ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={phone.value}
-                    onChange={(e) => {
-                      const next = [...draft.phones];
-                      next[idx] = { ...next[idx], value: e.target.value };
-                      setDraft((prev) => ({ ...prev, phones: next }));
-                    }}
-                    placeholder="+880-17XX-XXXXXX"
-                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-                  />
-                  {draft.phones.length > 1 && (
+                  </ul>
+                ) : (
+                  !readingProfile.researchArea && (
+                    <p className="text-xs text-slate-500">
+                      No research areas listed yet.
+                    </p>
+                  )
+                )}
+              </div>
+
+              {/* Education Card */}
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+                <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                  <GraduationCap className="w-4 h-4 text-pust-800" />
+                  <h3 className="font-serif text-base font-medium text-slate-950">
+                    Education &amp; Degrees
+                  </h3>
+                </div>
+                {readingProfile.education && readingProfile.education.length > 0 ? (
+                  <ol className="space-y-2.5 text-xs text-slate-800">
+                    {readingProfile.education.map((deg, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                        <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums mt-0.5 shrink-0">
+                          {String(idx + 1).padStart(2, '0')}.
+                        </span>
+                        <span>{deg}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    No academic degrees added yet.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Right Rail: Biography, Experience, Courses, Projects & Publications */}
+            <div className="lg:col-span-8 space-y-5">
+              {/* Academic Biography */}
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-lg font-medium text-slate-950">
+                      Academic Biography
+                    </h3>
+                  </div>
+                  {!readingProfile.bio && (
                     <button
                       type="button"
-                      onClick={() =>
-                        setDraft((prev) => ({
-                          ...prev,
-                          phones: prev.phones.filter((_, i) => i !== idx),
-                        }))
-                      }
-                      aria-label="Remove phone row"
-                      className="p-2 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer"
+                      onClick={() => enterEditMode(claimedMember ? 'edit_claimed' : 'create_new')}
+                      className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      Add Biography
                     </button>
                   )}
                 </div>
-              ))}
-            </div>
-          </div>
+                {readingProfile.bio ? (
+                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line max-w-[72ch]">
+                    {readingProfile.bio}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    No biography published yet. Click &quot;Edit / Update Profile&quot; to compose your academic summary for Administrator review.
+                  </p>
+                )}
+              </div>
 
-          {/* Emails */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-pust-800" />
-                <span>Email Addresses</span>
-              </span>
-              {draft.emails.length < 6 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      emails: [...prev.emails, { value: '', type: 'Office' }],
-                    }))
-                  }
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-pust-900 hover:underline cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>Add Email</span>
-                </button>
-              )}
-            </div>
-            <div className="space-y-2">
-              {draft.emails.map((email, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <select
-                    value={email.type}
-                    onChange={(e) => {
-                      const next = [...draft.emails];
-                      next[idx] = { ...next[idx], type: e.target.value as ContactChannelType };
-                      setDraft((prev) => ({ ...prev, emails: next }));
-                    }}
-                    className="w-28 px-2.5 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900"
-                  >
-                    {CONTACT_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={email.value}
-                    onChange={(e) => {
-                      const next = [...draft.emails];
-                      next[idx] = { ...next[idx], value: e.target.value };
-                      setDraft((prev) => ({ ...prev, emails: next }));
-                    }}
-                    placeholder="faculty@pust.ac.bd"
-                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-                  />
-                  {draft.emails.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setDraft((prev) => ({
-                          ...prev,
-                          emails: prev.emails.filter((_, i) => i !== idx),
-                        }))
-                      }
-                      aria-label="Remove email row"
-                      className="p-2 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+              {/* Teaching Experience & Conducted Courses */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                    <Briefcase className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-base font-medium text-slate-950">
+                      Teaching Experience
+                    </h3>
+                  </div>
+                  {readingProfile.teachingExperience &&
+                  readingProfile.teachingExperience.length > 0 ? (
+                    <ul className="divide-y divide-stone-200 text-xs text-slate-800">
+                      {readingProfile.teachingExperience.map((item, idx) => (
+                        <li key={idx} className="py-2 first:pt-0 last:pb-0 leading-relaxed">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-slate-500">No teaching experience entries yet.</p>
                   )}
                 </div>
-              ))}
+
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                    <BookOpen className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-base font-medium text-slate-950">
+                      Conducted Courses
+                    </h3>
+                  </div>
+                  {readingProfile.conductedCourses &&
+                  readingProfile.conductedCourses.length > 0 ? (
+                    <ul className="divide-y divide-stone-200 text-xs text-slate-800">
+                      {readingProfile.conductedCourses.map((course, idx) => (
+                        <li key={idx} className="py-2 first:pt-0 last:pb-0 leading-relaxed">
+                          {course}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-slate-500">No conducted courses listed yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Active Research Projects & Awards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                    <FlaskConical className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-base font-medium text-slate-950">
+                      Active Research Projects
+                    </h3>
+                  </div>
+                  {readingProfile.activeResearchProjects &&
+                  readingProfile.activeResearchProjects.length > 0 ? (
+                    <ul className="divide-y divide-stone-200 text-xs text-slate-800">
+                      {readingProfile.activeResearchProjects.map((proj, idx) => (
+                        <li key={idx} className="py-2 first:pt-0 last:pb-0 leading-relaxed">
+                          {proj}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-slate-500">No active research projects listed.</p>
+                  )}
+                </div>
+
+                <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
+                    <Award className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-base font-medium text-slate-950">
+                      Awards &amp; Distinctions
+                    </h3>
+                  </div>
+                  {readingProfile.awards && readingProfile.awards.length > 0 ? (
+                    <ul className="divide-y divide-stone-200 text-xs text-slate-800">
+                      {readingProfile.awards.map((award, idx) => (
+                        <li key={idx} className="py-2 first:pt-0 last:pb-0 leading-relaxed">
+                          {award}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-slate-500">No awards recorded yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Scholarly Publications (Journals & Conferences) */}
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-lg font-medium text-slate-950">
+                      Publications &amp; Scholarly Works
+                    </h3>
+                  </div>
+                  <span className="font-mono text-xs text-slate-500 tabular-nums">
+                    {readingMetrics.publications} listed
+                  </span>
+                </div>
+
+                {(!readingProfile.journalArticles || readingProfile.journalArticles.length === 0) &&
+                (!readingProfile.conferenceProceedings ||
+                  readingProfile.conferenceProceedings.length === 0) ? (
+                  <p className="text-xs text-slate-500">
+                    No journal articles or conference proceedings added yet.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {readingProfile.journalArticles &&
+                      readingProfile.journalArticles.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-mono text-xs font-semibold text-pust-800">
+                            Journal Articles ({readingProfile.journalArticles.length})
+                          </h4>
+                          <ol className="divide-y divide-stone-200 text-xs text-slate-800">
+                            {readingProfile.journalArticles.map((art, idx) => (
+                              <li
+                                key={idx}
+                                className="py-2 flex items-start gap-2.5 leading-relaxed"
+                              >
+                                <span className="font-mono text-[11px] text-slate-500 tabular-nums shrink-0 mt-0.5">
+                                  {String(idx + 1).padStart(2, '0')}.
+                                </span>
+                                <span>{art}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+
+                    {readingProfile.conferenceProceedings &&
+                      readingProfile.conferenceProceedings.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-stone-200">
+                          <h4 className="font-mono text-xs font-semibold text-pust-800">
+                            Conference Proceedings ({readingProfile.conferenceProceedings.length})
+                          </h4>
+                          <ol className="divide-y divide-stone-200 text-xs text-slate-800">
+                            {readingProfile.conferenceProceedings.map((conf, idx) => (
+                              <li
+                                key={idx}
+                                className="py-2 flex items-start gap-2.5 leading-relaxed"
+                              >
+                                <span className="font-mono text-[11px] text-slate-500 tabular-nums shrink-0 mt-0.5">
+                                  {String(idx + 1).padStart(2, '0')}.
+                                </span>
+                                <span>{conf}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Multi-line Academic & Publication Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-stone-200">
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">Education (one degree per line)</span>
-            <textarea
-              rows={3}
-              value={draft.educationText}
-              onChange={(e) => setDraft((prev) => ({ ...prev, educationText: e.target.value }))}
-              placeholder="Ph.D. in CSE, BUET&#10;M.Sc. in CSE, PUST&#10;B.Sc. in CSE, PUST"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
+      {/* EDITING MODE: Full Faculty Profile Editor (Admin Approval Required) */}
+      {isEditing && (
+        <form
+          onSubmit={handleSubmitProfileRequest}
+          className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-6"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+            <div className="space-y-1">
+              <p className="text-xs font-mono text-amber-800 font-semibold flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Administrator Approval Required Before Publishing Live</span>
+              </p>
+              <h2 className="font-serif text-xl font-medium text-slate-950">
+                {editorMode === 'edit_claimed'
+                  ? 'Update Faculty Profile'
+                  : 'Create New Directory Profile'}
+              </h2>
+              <p className="text-xs text-slate-600">
+                {editorMode === 'edit_claimed' && claimedMember
+                  ? `Proposing updates for "${claimedMember.name}" (${user.departmentCode}). Changes stay pending until reviewed by an Administrator.`
+                  : `Composing a new faculty entry for the ${user.departmentCode} Department directory. Upon Administrator approval, this profile publishes and links to your account.`}
+              </p>
+            </div>
 
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Teaching Experience (one role per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.teachingExperienceText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, teachingExperienceText: e.target.value }))
-              }
-              placeholder="Associate Professor, Dept. of CSE, PUST (2022–Present)&#10;Assistant Professor, Dept. of CSE, PUST (2018–2022)"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Research Interests (one topic per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.researchInterestsText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, researchInterestsText: e.target.value }))
-              }
-              placeholder="Federated Learning&#10;Medical Image Segmentation"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Conducted Courses (one course per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.conductedCoursesText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, conductedCoursesText: e.target.value }))
-              }
-              placeholder="CSE-3101 Operating Systems&#10;CSE-4105 Machine Learning"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Active Research Projects (one project per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.activeResearchProjectsText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, activeResearchProjectsText: e.target.value }))
-              }
-              placeholder="Edge-AI Flood Telemetry Network for Pabna Basin (UGC Funded)"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Awards &amp; Honors (one item per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.awardsText}
-              onChange={(e) => setDraft((prev) => ({ ...prev, awardsText: e.target.value }))}
-              placeholder="Best Paper Award, IEEE Region 10 Symposium 2024"
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Journal Articles (one citation per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.journalArticlesText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, journalArticlesText: e.target.value }))
-              }
-              placeholder="Author et al., Title, IEEE Access, 2025."
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-
-          <label className="space-y-1 text-xs">
-            <span className="font-semibold text-slate-700">
-              Conference Proceedings (one citation per line)
-            </span>
-            <textarea
-              rows={3}
-              value={draft.conferenceProceedingsText}
-              onChange={(e) =>
-                setDraft((prev) => ({ ...prev, conferenceProceedingsText: e.target.value }))
-              }
-              placeholder="Author et al., Title, Proc. ICCIT, 2024."
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-            />
-          </label>
-        </div>
-
-        {/* Submit Actions */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-200">
-          <p className="text-xs text-slate-600">
-            Submitted profiles remain in a <span className="font-semibold text-slate-900">Pending Approval</span> state until verified by a University Administrator.
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            {claimedMember && editorMode === 'edit_claimed' && (
-              <button
-                type="button"
-                onClick={() => setDraft(draftFromPerson(claimedMember, user))}
-                className="px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                Reset to Live Directory Values
-              </button>
-            )}
             <button
-              type="submit"
-              disabled={submittingRequest || uploadingPhoto}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start lg:self-auto"
             >
-              <Send className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-3.5 h-3.5" />
               <span>
-                {submittingRequest
-                  ? 'Submitting...'
-                  : pendingRequest
-                  ? 'Update Pending Submission'
-                  : editorMode === 'create_new'
-                  ? 'Submit New Profile for Admin Approval'
-                  : 'Submit Edit for Admin Approval'}
+                {readingProfile ? 'Back to Reading Mode' : 'Back to Directory'}
               </span>
             </button>
           </div>
-        </div>
-      </form>
 
-      {/* Section C: Submission History Ledger */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
-        <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
-          <div>
-            <h3 className="font-serif text-lg font-medium text-slate-950">
-              {claimedMember ? '02' : '03'}. Profile Approval Submission History
-            </h3>
-            <p className="text-xs text-slate-600">
-              Audit trail of directory updates and new faculty profile requests submitted from your account.
-            </p>
-          </div>
-          <span className="font-mono text-xs text-slate-500 tabular-nums">
-            {requests.length} total
-          </span>
-        </div>
-
-        {requests.length === 0 ? (
-          <p className="text-xs text-slate-600 py-2">
-            No profile change requests submitted yet. Use the profile editor above to submit an edit or create a new directory entry.
-          </p>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-stone-200">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
-                  <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
-                  <th className="py-2.5 px-3">Submitted</th>
-                  <th className="py-2.5 px-3">Request Type</th>
-                  <th className="py-2.5 px-3">Proposed Name &amp; Group</th>
-                  <th className="py-2.5 px-3">Approval Status</th>
-                  <th className="py-2.5 px-3">Admin Note</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-200">
-                {requests.map((reqItem, idx) => (
-                  <tr
-                    key={reqItem.id}
-                    className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+          {/* Portrait Photo Upload or Direct Link */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <div className="lg:col-span-4 rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-slate-900">Faculty Portrait</span>
+                <div className="inline-flex items-center gap-1 p-0.5 rounded-md bg-stone-200/70">
+                  <button
+                    type="button"
+                    onClick={() => setPhotoSourceMode('upload')}
+                    className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer whitespace-nowrap ${
+                      photoSourceMode === 'upload'
+                        ? 'bg-white text-slate-950 shadow-sm'
+                        : 'text-slate-600'
+                    }`}
                   >
-                    <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
-                      {idx + 1}
-                    </td>
-                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600 tabular-nums whitespace-nowrap">
-                      {formatDateTime(reqItem.updatedAt)}
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-800 font-medium">
-                      {reqItem.requestType === 'create_new'
-                        ? 'New Directory Profile'
-                        : 'Edit Claimed Profile'}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <p className="font-medium text-slate-950">{reqItem.proposedProfile.name}</p>
-                      <p className="text-[11px] text-slate-500">
-                        {reqItem.proposedProfile.designation} ·{' '}
-                        {reqItem.facultyGroup === 'contractual' ? 'Contractual' : 'Regular'}
-                      </p>
-                    </td>
-                    <td className="py-2.5 px-3 whitespace-nowrap">
-                      {reqItem.status === 'pending' ? (
-                        <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>Pending Admin Approval</span>
-                        </span>
-                      ) : reqItem.status === 'approved' ? (
-                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Approved &amp; Live</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 font-semibold text-red-700">
-                          <XCircle className="w-3.5 h-3.5" />
-                          <span>Declined</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-600 max-w-xs">
-                      {reqItem.adminNote || '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <Upload className="w-3 h-3" />
+                    <span>Upload</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPhotoSourceMode('link')}
+                    className={`inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer whitespace-nowrap ${
+                      photoSourceMode === 'link'
+                        ? 'bg-white text-slate-950 shadow-sm'
+                        : 'text-slate-600'
+                    }`}
+                  >
+                    <Link2 className="w-3 h-3" />
+                    <span>Direct Link</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-20 h-20 rounded-xl border border-stone-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
+                  {draft.photoUrl && isSafeMediaUrl(draft.photoUrl) ? (
+                    <img
+                      src={draft.photoUrl}
+                      alt={draft.name || 'Faculty portrait'}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-serif text-lg font-semibold text-pust-800">
+                      {(draft.name || user.name).slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-2">
+                  {photoSourceMode === 'upload' ? (
+                    <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{uploadingPhoto ? 'Uploading...' : 'Choose Portrait'}</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        onChange={handlePhotoFileSelect}
+                        disabled={uploadingPhoto}
+                        className="sr-only"
+                      />
+                    </label>
+                  ) : (
+                    <input
+                      type="url"
+                      value={draft.photoUrl}
+                      onChange={(e) => setDraft((prev) => ({ ...prev, photoUrl: e.target.value }))}
+                      placeholder="https://ik.imagekit.io/..."
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-stone-300 bg-white text-slate-900 focus:outline-none focus:border-pust-800"
+                    />
+                  )}
+                  {draft.photoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setDraft((prev) => ({ ...prev, photoUrl: '' }))}
+                      className="block text-[11px] text-red-700 hover:underline cursor-pointer"
+                    >
+                      Remove portrait
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Core Identity Fields */}
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Full Name *</span>
+                <input
+                  type="text"
+                  required
+                  minLength={2}
+                  maxLength={140}
+                  value={draft.name}
+                  onChange={(e) => setDraft((prev) => ({ ...prev, name: e.target.value }))}
+                  placeholder="Dr. Md. Ashikur Rahman"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </label>
+
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Academic Designation *</span>
+                <input
+                  type="text"
+                  required
+                  minLength={2}
+                  maxLength={140}
+                  value={draft.designation}
+                  onChange={(e) => setDraft((prev) => ({ ...prev, designation: e.target.value }))}
+                  placeholder="Associate Professor"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </label>
+
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Directory Group</span>
+                <select
+                  value={facultyGroup}
+                  disabled={editorMode === 'edit_claimed'}
+                  onChange={(e) =>
+                    setFacultyGroup(e.target.value as 'faculty' | 'contractual')
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800 disabled:opacity-60"
+                >
+                  <option value="faculty">Regular Faculty Member</option>
+                  <option value="contractual">Contractual / Adjunct Faculty</option>
+                </select>
+              </label>
+
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Office Location</span>
+                <input
+                  type="text"
+                  maxLength={240}
+                  value={draft.officeLocation}
+                  onChange={(e) =>
+                    setDraft((prev) => ({ ...prev, officeLocation: e.target.value }))
+                  }
+                  placeholder="Room 402, Academic Building 2"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </label>
+
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Highest Qualification</span>
+                <input
+                  type="text"
+                  maxLength={400}
+                  value={draft.qualification}
+                  onChange={(e) =>
+                    setDraft((prev) => ({ ...prev, qualification: e.target.value }))
+                  }
+                  placeholder="Ph.D. in Computer Science & Engineering"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </label>
+
+              <label className="space-y-1 text-xs">
+                <span className="font-semibold text-slate-700">Primary Research Area</span>
+                <input
+                  type="text"
+                  maxLength={400}
+                  value={draft.researchArea}
+                  onChange={(e) => setDraft((prev) => ({ ...prev, researchArea: e.target.value }))}
+                  placeholder="Machine Learning, Edge IoT & Distributed Systems"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </label>
+            </div>
           </div>
-        )}
-      </div>
+
+          {/* Study Leave Checkbox + Biography */}
+          <div className="space-y-4">
+            <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-800 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.onStudyLeave}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, onStudyLeave: e.target.checked }))
+                }
+                className="rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+              />
+              <span>Currently on Study Leave (displays Study Leave status on department page)</span>
+            </label>
+
+            <label className="block space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">Academic Biography</span>
+              <textarea
+                rows={4}
+                maxLength={4000}
+                value={draft.bio}
+                onChange={(e) => setDraft((prev) => ({ ...prev, bio: e.target.value }))}
+                placeholder="Summarize academic background, teaching focus, and research leadership..."
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+          </div>
+
+          {/* Dynamic Contacts (Phones & Emails) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2 border-t border-stone-200">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-pust-800" />
+                  <span>Phone Numbers</span>
+                </span>
+                {draft.phones.length < 6 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        phones: [...prev.phones, { value: '', type: 'Office' }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-pust-900 hover:underline cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add Phone</span>
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2">
+                {draft.phones.map((phone, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <select
+                      value={phone.type}
+                      onChange={(e) => {
+                        const next = [...draft.phones];
+                        next[idx] = { ...next[idx], type: e.target.value as ContactChannelType };
+                        setDraft((prev) => ({ ...prev, phones: next }));
+                      }}
+                      className="w-28 px-2.5 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900"
+                    >
+                      {CONTACT_TYPES.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={phone.value}
+                      onChange={(e) => {
+                        const next = [...draft.phones];
+                        next[idx] = { ...next[idx], value: e.target.value };
+                        setDraft((prev) => ({ ...prev, phones: next }));
+                      }}
+                      placeholder="+880-17XX-XXXXXX"
+                      className="flex-1 px-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                    {draft.phones.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            phones: prev.phones.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        aria-label="Remove phone row"
+                        className="p-2 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-pust-800" />
+                  <span>Email Addresses</span>
+                </span>
+                {draft.emails.length < 6 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        emails: [...prev.emails, { value: '', type: 'Office' }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-pust-900 hover:underline cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add Email</span>
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2">
+                {draft.emails.map((email, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <select
+                      value={email.type}
+                      onChange={(e) => {
+                        const next = [...draft.emails];
+                        next[idx] = { ...next[idx], type: e.target.value as ContactChannelType };
+                        setDraft((prev) => ({ ...prev, emails: next }));
+                      }}
+                      className="w-28 px-2.5 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900"
+                    >
+                      {CONTACT_TYPES.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={email.value}
+                      onChange={(e) => {
+                        const next = [...draft.emails];
+                        next[idx] = { ...next[idx], value: e.target.value };
+                        setDraft((prev) => ({ ...prev, emails: next }));
+                      }}
+                      placeholder="faculty@pust.ac.bd"
+                      className="flex-1 px-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                    {draft.emails.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            emails: prev.emails.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        aria-label="Remove email row"
+                        className="p-2 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Multi-line Academic & Publication Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-stone-200">
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">Education (one degree per line)</span>
+              <textarea
+                rows={3}
+                value={draft.educationText}
+                onChange={(e) => setDraft((prev) => ({ ...prev, educationText: e.target.value }))}
+                placeholder="Ph.D. in CSE, BUET&#10;M.Sc. in CSE, PUST&#10;B.Sc. in CSE, PUST"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Teaching Experience (one role per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.teachingExperienceText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, teachingExperienceText: e.target.value }))
+                }
+                placeholder="Associate Professor, Dept. of CSE, PUST (2022–Present)&#10;Assistant Professor, Dept. of CSE, PUST (2018–2022)"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Research Interests (one topic per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.researchInterestsText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, researchInterestsText: e.target.value }))
+                }
+                placeholder="Federated Learning&#10;Medical Image Segmentation"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Conducted Courses (one course per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.conductedCoursesText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, conductedCoursesText: e.target.value }))
+                }
+                placeholder="CSE-3101 Operating Systems&#10;CSE-4105 Machine Learning"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Active Research Projects (one project per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.activeResearchProjectsText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, activeResearchProjectsText: e.target.value }))
+                }
+                placeholder="Edge-AI Flood Telemetry Network for Pabna Basin (UGC Funded)"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Awards &amp; Honors (one item per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.awardsText}
+                onChange={(e) => setDraft((prev) => ({ ...prev, awardsText: e.target.value }))}
+                placeholder="Best Paper Award, IEEE Region 10 Symposium 2024"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Journal Articles (one citation per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.journalArticlesText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, journalArticlesText: e.target.value }))
+                }
+                placeholder="Author et al., Title, IEEE Access, 2025."
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+
+            <label className="space-y-1 text-xs">
+              <span className="font-semibold text-slate-700">
+                Conference Proceedings (one citation per line)
+              </span>
+              <textarea
+                rows={3}
+                value={draft.conferenceProceedingsText}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, conferenceProceedingsText: e.target.value }))
+                }
+                placeholder="Author et al., Title, Proc. ICCIT, 2024."
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              />
+            </label>
+          </div>
+
+          {/* Submit Actions */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-200">
+            <p className="text-xs text-slate-600">
+              Submitted profiles remain in <span className="font-semibold text-slate-900">Pending Approval</span> until verified by a University Administrator.
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                Cancel
+              </button>
+              {claimedMember && editorMode === 'edit_claimed' && (
+                <button
+                  type="button"
+                  onClick={() => setDraft(draftFromPerson(claimedMember, user))}
+                  className="px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Reset to Live Values
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={submittingRequest || uploadingPhoto}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>
+                  {submittingRequest
+                    ? 'Submitting...'
+                    : pendingRequest
+                    ? 'Update Pending Submission'
+                    : editorMode === 'create_new'
+                    ? 'Submit New Profile for Admin Approval'
+                    : 'Submit Edit for Admin Approval'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </form>
+      )}
+
+      {/* Submission History Ledger */}
+      {(claimedMember || requests.length > 0) && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+            <div>
+              <h3 className="font-serif text-lg font-medium text-slate-950">
+                Profile Approval Submission History
+              </h3>
+              <p className="text-xs text-slate-600">
+                Audit trail of directory updates and new faculty profile requests submitted from your account.
+              </p>
+            </div>
+            <span className="font-mono text-xs text-slate-500 tabular-nums">
+              {requests.length} total
+            </span>
+          </div>
+
+          {requests.length === 0 ? (
+            <p className="text-xs text-slate-600 py-2">
+              No profile change requests submitted yet. Click &quot;Edit / Update Profile&quot; above whenever you wish to propose updates for Administrator approval.
+            </p>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-stone-200">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                    <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
+                    <th className="py-2.5 px-3">Submitted</th>
+                    <th className="py-2.5 px-3">Request Type</th>
+                    <th className="py-2.5 px-3">Proposed Name &amp; Group</th>
+                    <th className="py-2.5 px-3">Approval Status</th>
+                    <th className="py-2.5 px-3">Admin Note</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-200">
+                  {requests.map((reqItem, idx) => (
+                    <tr
+                      key={reqItem.id}
+                      className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+                    >
+                      <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
+                        {idx + 1}
+                      </td>
+                      <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600 tabular-nums whitespace-nowrap">
+                        {formatDateTime(reqItem.updatedAt)}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-800 font-medium">
+                        {reqItem.requestType === 'create_new'
+                          ? 'New Directory Profile'
+                          : 'Edit Claimed Profile'}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <p className="font-medium text-slate-950">{reqItem.proposedProfile.name}</p>
+                        <p className="text-[11px] text-slate-500">
+                          {reqItem.proposedProfile.designation} ·{' '}
+                          {reqItem.facultyGroup === 'contractual' ? 'Contractual' : 'Regular'}
+                        </p>
+                      </td>
+                      <td className="py-2.5 px-3 whitespace-nowrap">
+                        {reqItem.status === 'pending' ? (
+                          <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>Pending Admin Approval</span>
+                          </span>
+                        ) : reqItem.status === 'approved' ? (
+                          <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Approved &amp; Live</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 font-semibold text-red-700">
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Declined</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-600 max-w-xs">
+                        {reqItem.adminNote || '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Read-Only Directory Candidate Preview Modal */}
+      {previewCandidate && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Preview Directory Profile"
+          onClick={() => setPreviewCandidate(null)}
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl border border-stone-200 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-xl bg-pust-900 text-white flex items-center justify-center font-serif text-base font-semibold shrink-0 overflow-hidden">
+                  {previewCandidate.member.photoUrl &&
+                  isSafeMediaUrl(previewCandidate.member.photoUrl) ? (
+                    <img
+                      src={previewCandidate.member.photoUrl}
+                      alt={previewCandidate.member.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{previewCandidate.member.name.slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] text-pust-800 font-semibold">
+                    {user.departmentCode} · {previewCandidate.groupLabel}
+                  </p>
+                  <h3 className="font-serif text-lg font-medium text-slate-950 truncate">
+                    {previewCandidate.member.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 truncate">
+                    {previewCandidate.member.designation}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewCandidate(null)}
+                aria-label="Close preview modal"
+                className="p-2 rounded-lg border border-stone-200 bg-white text-slate-600 hover:text-slate-950 cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+              {previewCandidate.member.bio && (
+                <div className="space-y-1">
+                  <p className="font-semibold text-slate-900">Biography</p>
+                  <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                    {previewCandidate.member.bio}
+                  </p>
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="font-semibold text-slate-900">Office &amp; Qualification</p>
+                  <p className="text-slate-700 mt-1">
+                    {previewCandidate.member.officeLocation || 'Not specified'}
+                  </p>
+                  {previewCandidate.member.qualification && (
+                    <p className="text-slate-600 mt-1">{previewCandidate.member.qualification}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">Contact Details</p>
+                  <div className="space-y-1 mt-1 font-mono text-[11px] text-slate-700">
+                    {previewCandidate.member.emails.map((em, i) => (
+                      <p key={i}>
+                        {em.value} ({em.type})
+                      </p>
+                    ))}
+                    {previewCandidate.member.phones.map((ph, i) => (
+                      <p key={i}>
+                        {ph.value} ({ph.type})
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {previewCandidate.member.researchArea && (
+                <div>
+                  <p className="font-semibold text-slate-900">Research Area</p>
+                  <p className="text-slate-700 mt-1">{previewCandidate.member.researchArea}</p>
+                </div>
+              )}
+              {previewCandidate.member.education &&
+                previewCandidate.member.education.length > 0 && (
+                  <div>
+                    <p className="font-semibold text-slate-900">Education</p>
+                    <ul className="list-disc pl-4 text-slate-700 mt-1 space-y-0.5">
+                      {previewCandidate.member.education.map((ed, i) => (
+                        <li key={i}>{ed}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setPreviewCandidate(null)}
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer"
+              >
+                Close
+              </button>
+              {!claimedMap[previewCandidate.member.id] && (
+                <button
+                  type="button"
+                  disabled={claimingId === previewCandidate.member.id}
+                  onClick={() =>
+                    void handleClaimProfile(previewCandidate.member, previewCandidate.group)
+                  }
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <UserCheck className="w-3.5 h-3.5" />
+                  <span>
+                    {claimingId === previewCandidate.member.id
+                      ? 'Claiming...'
+                      : 'Claim This Profile'}
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
