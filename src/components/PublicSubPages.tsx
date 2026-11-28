@@ -2690,7 +2690,7 @@ export function PublicSubPages({
             <div
               role="group"
               aria-label="Filter notices by board scope"
-              className="inline-flex items-center self-start md:self-auto p-1 rounded-xl bg-white border border-stone-200 overflow-x-auto max-w-full shrink-0"
+              className="inline-flex flex-wrap items-center self-start md:self-auto gap-1 p-1 rounded-xl bg-white border border-stone-200 max-w-full"
             >
               {(
                 [
@@ -2717,7 +2717,7 @@ export function PublicSubPages({
 
           <nav
             aria-label="Notice categories"
-            className="flex items-center overflow-x-auto no-scrollbar sm:flex-wrap gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0 min-w-0"
+            className="flex flex-wrap items-center gap-1.5 min-w-0"
           >
             {NOTICE_FILTERS.map((cat) => (
               <button
@@ -2725,7 +2725,7 @@ export function PublicSubPages({
                 type="button"
                 aria-pressed={selectedNoticeCat === cat}
                 onClick={() => handleSelectNoticeCategory(cat)}
-                className={`h-9 inline-flex items-center justify-center px-3.5 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`h-9 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
                     ? 'bg-pust-900 text-white border-pust-900'
                     : 'bg-white border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
