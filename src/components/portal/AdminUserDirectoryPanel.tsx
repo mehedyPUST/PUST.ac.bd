@@ -2639,8 +2639,12 @@ export function AdminUserDirectoryPanel({
           </div>
         )}
       </div>
+        </>
+      )}
 
-      {/* Modal 1: Create Officer or Teacher Account for Any Office / Department */}
+      {/* Modal 1: Create Officer or Teacher Account for Any Office / Department
+          Kept outside the section ternary so it still mounts when the admin is on
+          "Existing Profiles" and clicks Add as People. */}
       {showCreateOfficerModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto"
@@ -3586,8 +3590,6 @@ export function AdminUserDirectoryPanel({
           </div>
         </div>
       )}
-        </>
-      )}
 
       {/* Modal 5: Existing Profile Preview & Claim Status */}
       {previewProfile && (
@@ -3737,7 +3739,11 @@ export function AdminUserDirectoryPanel({
               ) : (
                 <button
                   type="button"
-                  onClick={() => openAddPeopleFromProfile(previewProfile)}
+                  onClick={() => {
+                    const entry = previewProfile;
+                    setPreviewProfile(null);
+                    openAddPeopleFromProfile(entry);
+                  }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
