@@ -492,13 +492,17 @@ export function DepartmentPeoplePanel({
   }
 
   function openAddPeopleFromProfile(entry: DeptExistingProfileEntry) {
-    setError(null);
     setFeedback(null);
     setIssuedCredentialNotice(null);
     setPreviewProfile(null);
     setLinkingProfile(entry);
     const primaryEmail = entry.member.emails?.[0]?.value?.trim() || '';
     const slugSuffix = entry.member.id.replace(/[^a-zA-Z0-9]/g, '').slice(-4).toUpperCase();
+    setError(
+      primaryEmail
+        ? null
+        : 'This directory profile has no email on file. Enter a valid institutional email before creating the portal account.'
+    );
     setTName(entry.member.name);
     setTDesignation(entry.member.designation || 'Lecturer');
     setTEmail(primaryEmail);
@@ -562,6 +566,11 @@ export function DepartmentPeoplePanel({
       setError('Temporary password / token must be at least 8 characters.');
       return;
     }
+    const emailTrimmed = tEmail.trim();
+    if (!emailTrimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      setError('A valid institutional email is required to create the portal account.');
+      return;
+    }
     setCreatingTeacher(true);
     try {
       const courses = tCourses
@@ -575,7 +584,7 @@ export function DepartmentPeoplePanel({
       const issuedSecret = tPassword;
       const res = await pustApi.createAdminUser({
         name: tName.trim(),
-        email: tEmail.trim(),
+        email: emailTrimmed,
         password: issuedSecret,
         role: 'teacher',
         departmentCode: deptCode,

@@ -301,11 +301,13 @@ export function AdminUserDirectoryPanel({
     ];
 
     for (const dept of departments) {
+      const deptCode = (dept.code || '').trim().toUpperCase();
+      if (!deptCode) continue;
       options.push({
-        key: `dept:${dept.code}`,
+        key: `dept:${deptCode}`,
         group: 'Academic Departments',
-        code: dept.code,
-        name: `Department of ${dept.name} (${dept.code})`,
+        code: deptCode,
+        name: `Department of ${dept.name} (${deptCode})`,
         defaultRole: 'teacher',
         defaultHallAffiliation: dept.building || 'Academic Block',
       });
@@ -464,7 +466,11 @@ export function AdminUserDirectoryPanel({
     const claimedLookup = new Map<string, AuthUser>();
     for (const u of users) {
       if (!u.claimedFacultyMemberId) continue;
-      const deptKey = (u.claimedDepartmentCode || u.departmentCode).toUpperCase();
+      const deptKey = (u.claimedDepartmentCode || u.departmentCode || '')
+        .toString()
+        .trim()
+        .toUpperCase();
+      if (!deptKey) continue;
       claimedLookup.set(`${deptKey}:${u.claimedFacultyMemberId}`, u);
     }
 
@@ -681,28 +687,40 @@ export function AdminUserDirectoryPanel({
   const openAddPeopleFromProfile = useCallback(
     (entry: ExistingProfileEntry) => {
       const isOfficer = entry.group === 'officer';
+      const deptCode = (entry.departmentCode || '').toString().trim().toUpperCase();
       const existingDeptCount = users.filter((u) => {
-        if (u.departmentCode.toUpperCase() !== entry.departmentCode) return false;
+        const userDept = (u.departmentCode || '').toString().trim().toUpperCase();
+        if (userDept !== deptCode) return false;
         return isOfficer
           ? u.role !== 'student' && u.role !== 'teacher' && u.role !== 'chairman'
           : u.role === 'teacher' || u.role === 'chairman';
       }).length;
       const suggestedId = isOfficer
-        ? `PUST-${entry.departmentCode}-OFF-${String(existingDeptCount + 1).padStart(2, '0')}`
-        : `PUST-${entry.departmentCode}-FAC-${String(existingDeptCount + 1).padStart(2, '0')}`;
-      const primaryEmail = entry.member.emails?.[0]?.value || '';
-      const deptOpt = officeCatalog.find((o) => o.key === `dept:${entry.departmentCode}`);
+        ? `PUST-${deptCode}-OFF-${String(existingDeptCount + 1).padStart(2, '0')}`
+        : `PUST-${deptCode}-FAC-${String(existingDeptCount + 1).padStart(2, '0')}`;
+      const primaryEmail = (entry.member.emails?.[0]?.value || '').trim();
+      const deptOpt = officeCatalog.find((o) => o.key === `dept:${deptCode}`);
+      const hallAffiliation = (
+        entry.member.officeLocation ||
+        entry.departmentBuilding ||
+        'Academic Block'
+      ).trim();
 
-      setError(null);
+      setError(
+        primaryEmail
+          ? null
+          : 'This directory profile has no email on file. Enter a valid institutional email before creating the portal account.'
+      );
       setFeedback(null);
       setIssuedCredentialNotice(null);
       setPreviewProfile(null);
       setLinkingProfile(entry);
-      setOfficerUnitKey(deptOpt?.key || `dept:${entry.departmentCode}`);
+      setOfficerUnitKey(deptOpt?.key || `dept:${deptCode}`);
+      // Faculty/contractual → teacher; department officers → registrar (editable but unit locked while linking)
       setOfficerRole(isOfficer ? 'registrar' : 'teacher');
-      setOfficerDeptCode(entry.departmentCode);
+      setOfficerDeptCode(deptCode);
       setOfficerOfficeName(`Department of ${entry.departmentName}`);
-      setOfficerHallAffiliation(entry.member.officeLocation || entry.departmentBuilding);
+      setOfficerHallAffiliation(hallAffiliation.length >= 2 ? hallAffiliation : 'Academic Block');
       setOfficerName(entry.member.name);
       setOfficerDesignation(
         entry.member.designation || (isOfficer ? 'Department Officer' : 'Faculty Member')
@@ -789,6 +807,16 @@ export function AdminUserDirectoryPanel({
       setError('Initial password must be at least 8 characters.');
       return;
     }
+    const emailTrimmed = officerEmail.trim();
+    if (!emailTrimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      setError('A valid institutional email is required to create the portal account.');
+      return;
+    }
+    const hallTrimmed = officerHallAffiliation.trim();
+    if (hallTrimmed.length < 2) {
+      setError('Office / building affiliation must be at least 2 characters.');
+      return;
+    }
     setCreatingOfficer(true);
     try {
       const courses =
@@ -805,23 +833,35 @@ export function AdminUserDirectoryPanel({
               .map((s) => s.trim())
               .filter(Boolean)
           : [];
+      const targetDept = officerDeptCode.trim().toUpperCase();
+      // While linking a directory profile, keep claim tied to the original department
+      // even if the unit dropdown was changed (unit is locked in UI when linking).
       const canLinkProfile = Boolean(
         linkingProfile &&
-          officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode &&
+          targetDept === (linkingProfile.departmentCode || '').toUpperCase() &&
           (linkingProfile.group === 'officer'
             ? officerRole !== 'student' && officerRole !== 'admin'
             : officerRole === 'teacher' || officerRole === 'chairman')
       );
+      if (linkingProfile && !canLinkProfile) {
+        setError(
+          linkingProfile.group === 'officer'
+            ? 'Linked officer profiles require a non-student, non-admin portal role in the same department.'
+            : 'Linked faculty profiles require Teacher or Department Chairman role in the same department.'
+        );
+        setCreatingOfficer(false);
+        return;
+      }
       const issuedSecret = officerPassword;
       const res = await pustApi.createAdminUser({
         name: officerName.trim(),
-        email: officerEmail.trim(),
+        email: emailTrimmed,
         password: issuedSecret,
         role: officerRole,
-        departmentCode: officerDeptCode.trim().toUpperCase(),
+        departmentCode: targetDept,
         academicId: officerAcademicId.trim(),
-        hallAffiliation: officerHallAffiliation.trim(),
-        officeCode: officerDeptCode.trim().toUpperCase(),
+        hallAffiliation: hallTrimmed,
+        officeCode: targetDept,
         officeName: officerOfficeName.trim() || undefined,
         designation: officerDesignation.trim() || undefined,
         approvalStatus: officerStatus,
@@ -2398,7 +2438,9 @@ export function AdminUserDirectoryPanel({
                   const isDeleting = confirmDeleteId === u.id;
                   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]';
                   const officeLabel = u.officeName || u.departmentCode;
-                  const matchedDept = departmentByCode.get(u.departmentCode.toUpperCase());
+                  const matchedDept = departmentByCode.get(
+                    (u.departmentCode || '').toString().trim().toUpperCase()
+                  );
                   const canAppointChairman =
                     Boolean(matchedDept) &&
                     u.role === 'teacher' &&
@@ -2667,12 +2709,18 @@ export function AdminUserDirectoryPanel({
                 <div className="sm:col-span-2">
                   <label className="block font-medium text-slate-700 mb-1">
                     Assigned University Office or Academic Department
+                    {linkingProfile ? (
+                      <span className="ml-1.5 font-normal text-slate-500">
+                        (locked while linking directory profile)
+                      </span>
+                    ) : null}
                   </label>
                   <select
                     required
                     value={officerUnitKey}
                     onChange={(e) => handleOfficerUnitChange(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    disabled={Boolean(linkingProfile)}
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {groupedUnitOptions.map((grp) => (
                       <optgroup key={grp.label} label={grp.label}>
@@ -2689,6 +2737,11 @@ export function AdminUserDirectoryPanel({
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">
                     Portal Account Role
+                    {linkingProfile && linkingProfile.group !== 'officer' ? (
+                      <span className="ml-1.5 font-normal text-slate-500">
+                        (Teacher or Chairman required to claim faculty profile)
+                      </span>
+                    ) : null}
                   </label>
                   <select
                     required
@@ -2696,7 +2749,10 @@ export function AdminUserDirectoryPanel({
                     onChange={(e) => setOfficerRole(e.target.value as UserRole)}
                     className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                   >
-                    {OFFICER_AND_TEACHER_ROLES.map((r) => (
+                    {(linkingProfile && linkingProfile.group !== 'officer'
+                      ? (['teacher', 'chairman'] as UserRole[])
+                      : OFFICER_AND_TEACHER_ROLES
+                    ).map((r) => (
                       <option key={r} value={r}>
                         {ROLE_DISPLAY_NAMES[r]}
                       </option>
@@ -2733,6 +2789,11 @@ export function AdminUserDirectoryPanel({
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">
                     Institutional Email
+                    {linkingProfile && !officerEmail.trim() ? (
+                      <span className="ml-1.5 font-normal text-amber-700">
+                        (required — profile has no email on file)
+                      </span>
+                    ) : null}
                   </label>
                   <input
                     type="email"
