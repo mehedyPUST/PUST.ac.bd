@@ -29,6 +29,7 @@ import type {
   ApprovalStatus,
   AuditLogRecord,
   AuthUser,
+  CourseRecord,
   DepartmentPersonRecord,
   DepartmentRecord,
   SignupTokenRecord,
@@ -220,18 +221,26 @@ export function DepartmentPeoplePanel({
   const [resetMustChange, setResetMustChange] = useState(true);
   const [savingPassword, setSavingPassword] = useState(false);
 
+  const [deptCourses, setDeptCourses] = useState<CourseRecord[]>([]);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [usersRes, tokensRes, reqRes, deptRes] = await Promise.all([
+      const [usersRes, tokensRes, reqRes, deptRes, examsRes] = await Promise.all([
         pustApi.getUsers(),
         pustApi.getSignupTokens(),
         pustApi.getAdminFacultyProfileRequests().catch(() => ({ requests: [] })),
         pustApi.getDepartmentByCode(deptCode).catch(() => null),
+        pustApi.getExamsOverview().catch(() => ({ courses: [] })),
       ]);
       setUsers(usersRes.users);
       setTokens(tokensRes.tokens);
+      setDeptCourses(
+        (examsRes.courses || []).filter(
+          (c) => c.departmentCode.toUpperCase() === deptCode.toUpperCase()
+        )
+      );
       if (deptRes?.department) {
         setLiveDepartment(deptRes.department);
       }
@@ -604,6 +613,9 @@ export function DepartmentPeoplePanel({
             }
           : {}),
       });
+      if (courses.length > 0 || sessions.length > 0) {
+        await pustApi.assignTeacher(res.user.id, courses, sessions).catch(() => null);
+      }
       const wasLinked = Boolean(linkingProfile);
       setShowCreateTeacherModal(false);
       setLinkingProfile(null);
@@ -721,6 +733,9 @@ export function DepartmentPeoplePanel({
               session: editSession.trim(),
             }),
       });
+      if (editingUser.role === 'teacher') {
+        await pustApi.assignTeacher(editingUser.id, courses, sessions).catch(() => null);
+      }
       setEditingUser(null);
       setFeedback(`Updated ${res.user.role} account for ${res.user.name}.`);
       await loadData();
@@ -2103,9 +2118,9 @@ export function DepartmentPeoplePanel({
                     </span>
                   </label>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block font-medium text-slate-700 mb-1">
-                    Assigned Courses (comma-separated)
+                    Assigned Courses (comma-separated or pick from {deptCode} catalog)
                   </label>
                   <input
                     type="text"
@@ -2114,8 +2129,44 @@ export function DepartmentPeoplePanel({
                     placeholder={`e.g. ${deptCode}-3101, ${deptCode}-3103`}
                     className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                   />
+                  {deptCourses.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {Array.from(new Set(deptCourses.map((c) => c.code.toUpperCase()))).map(
+                        (code) => {
+                          const selected = tCourses
+                            .split(',')
+                            .map((s) => s.trim().toUpperCase())
+                            .includes(code);
+                          return (
+                            <button
+                              key={code}
+                              type="button"
+                              onClick={() => {
+                                const cur = tCourses
+                                  .split(',')
+                                  .map((s) => s.trim().toUpperCase())
+                                  .filter(Boolean);
+                                const next = cur.includes(code)
+                                  ? cur.filter((x) => x !== code)
+                                  : [...cur, code];
+                                setTCourses(next.join(', '));
+                              }}
+                              className={`px-2 py-0.5 font-mono text-[11px] rounded border cursor-pointer ${
+                                selected
+                                  ? 'bg-pust-900 text-white border-pust-900'
+                                  : 'bg-[#F7F7F5] text-slate-700 border-stone-300 hover:border-pust-700'
+                              }`}
+                            >
+                              {selected ? '✓ ' : '+ '}
+                              {code}
+                            </button>
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block font-medium text-slate-700 mb-1">
                     Assigned Sessions (comma-separated)
                   </label>
@@ -2602,9 +2653,9 @@ export function DepartmentPeoplePanel({
                         className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                       />
                     </div>
-                    <div>
+                    <div className="sm:col-span-2">
                       <label className="block font-medium text-slate-700 mb-1">
-                        Assigned Courses (comma-separated)
+                        Assigned Courses (comma-separated or pick from {deptCode} catalog)
                       </label>
                       <input
                         type="text"
@@ -2613,8 +2664,44 @@ export function DepartmentPeoplePanel({
                         placeholder={`e.g. ${deptCode}-3101, ${deptCode}-3205`}
                         className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                       />
+                      {deptCourses.length > 0 && (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {Array.from(new Set(deptCourses.map((c) => c.code.toUpperCase()))).map(
+                            (code) => {
+                              const selected = editCourses
+                                .split(',')
+                                .map((s) => s.trim().toUpperCase())
+                                .includes(code);
+                              return (
+                                <button
+                                  key={code}
+                                  type="button"
+                                  onClick={() => {
+                                    const cur = editCourses
+                                      .split(',')
+                                      .map((s) => s.trim().toUpperCase())
+                                      .filter(Boolean);
+                                    const next = cur.includes(code)
+                                      ? cur.filter((x) => x !== code)
+                                      : [...cur, code];
+                                    setEditCourses(next.join(', '));
+                                  }}
+                                  className={`px-2 py-0.5 font-mono text-[11px] rounded border cursor-pointer ${
+                                    selected
+                                      ? 'bg-pust-900 text-white border-pust-900'
+                                      : 'bg-[#F7F7F5] text-slate-700 border-stone-300 hover:border-pust-700'
+                                  }`}
+                                >
+                                  {selected ? '✓ ' : '+ '}
+                                  {code}
+                                </button>
+                              );
+                            }
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div>
+                    <div className="sm:col-span-2">
                       <label className="block font-medium text-slate-700 mb-1">
                         Assigned Sessions (comma-separated)
                       </label>

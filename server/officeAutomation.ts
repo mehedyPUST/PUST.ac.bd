@@ -583,22 +583,28 @@ export async function buildOfficeFlowOverview(
 
     for (const res of examResults) {
       if (res.published) continue;
-      if (role === 'chairman' && res.departmentCode !== dept) continue;
+      if (role === 'chairman') {
+        if (res.departmentCode !== dept) continue;
+        if (res.status === 'pending_admin') continue;
+      }
+      const isForwardedAdmin = res.status === 'pending_admin';
       queueItems.push({
         id: `flow-examres-${res.id}`,
         targetId: res.id,
         flowType: 'exam_result',
-        officeLabel: `${res.departmentCode} Chairman`,
+        officeLabel: isForwardedAdmin ? 'Admin Office · Exam Cell' : `${res.departmentCode} Chairman`,
         title: `Publish Result — ${res.studentName} (Sem ${res.semester})`,
-        subtitle: `ID ${res.academicId} · SGPA ${res.sgpa.toFixed(2)} · Entered by ${res.enteredBy}`,
+        subtitle: `ID ${res.academicId} · SGPA ${res.sgpa.toFixed(2)} · Entered by ${res.enteredBy}${
+          res.committeeTitle ? ` (${res.committeeTitle})` : ''
+        }`,
         targetRef: res.academicId,
         departmentCode: res.departmentCode,
-        stage: 'Draft Grade Sheet Pending Review',
+        stage: isForwardedAdmin ? 'Forwarded to Admin Office' : 'Awaiting Chairman Verification',
         eligibility: 'ready',
         eligibilityReason: 'Ready: Publishing syncs cumulative CGPA, semester promotion & notice.',
         actionLabel: 'Publish & Notify',
         portalTab: 'exams',
-        createdAt: res.publishedAt,
+        createdAt: res.forwardedAt || res.publishedAt,
       });
     }
   }
@@ -960,8 +966,17 @@ export async function processSingleFlowItem(
     if (!target || target.published) {
       return { processed: false, outcome: 'held', detail: 'Grade sheet already published or missing.' };
     }
-    if (role === 'chairman' && target.departmentCode !== dept) {
-      throw new Error('FORBIDDEN: Outside department scope.');
+    if (role === 'chairman') {
+      if (target.departmentCode !== dept) {
+        throw new Error('FORBIDDEN: Outside department scope.');
+      }
+      if (target.status === 'pending_admin') {
+        return {
+          processed: false,
+          outcome: 'held',
+          detail: 'Result has been forwarded to the Admin Office for publishing.',
+        };
+      }
     }
     await pustRepo.updateExamResult(target.id, {
       published: true,

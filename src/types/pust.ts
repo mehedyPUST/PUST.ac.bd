@@ -203,6 +203,20 @@ export interface CourseRecord {
   semester: number;
   session: string;
   teacherEmail?: string;
+  teacherUserId?: string;
+  teacherName?: string;
+}
+
+export interface DepartmentFacultySummary {
+  id: string;
+  name: string;
+  email: string;
+  academicId: string;
+  role: UserRole;
+  departmentCode: string;
+  designation?: string;
+  assignedCourses: string[];
+  assignedSessions: string[];
 }
 
 export interface ContactDetailItem {
@@ -448,6 +462,28 @@ export interface HallDueRecord {
   clearedBy?: string;
 }
 
+export interface ExamCommitteeMember {
+  userId: string;
+  name: string;
+  email: string;
+  academicId: string;
+  designation?: string;
+  committeeRole: 'chair' | 'member';
+}
+
+export interface ExamCommitteeRecord {
+  id: string;
+  departmentCode: string;
+  session: string;
+  semester: number;
+  title: string;
+  status: 'active' | 'dissolved';
+  members: ExamCommitteeMember[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ExamCircularRecord {
   id: string;
   title: string;
@@ -457,6 +493,11 @@ export interface ExamCircularRecord {
   deadline: string;
   feeBdt: number;
   eligibleCourseCodes: string[];
+  examStartDate?: string;
+  examVenue?: string;
+  scheduleNote?: string;
+  committeeId?: string;
+  committeeTitle?: string;
   publishedBy: string;
   publishedAt: string;
 }
@@ -504,9 +545,14 @@ export interface ExamResultRecord {
   }>;
   sgpa: number;
   promotionStatus: 'Promoted (Auto)' | 'Promoted (Manual)' | 'Probation / Repeat';
-  status?: 'pending_chairman' | 'published';
+  status?: 'pending_chairman' | 'pending_admin' | 'published';
   published: boolean;
   enteredBy: string;
+  committeeId?: string;
+  committeeTitle?: string;
+  forwardedTo?: 'chairman' | 'admin';
+  forwardedBy?: string;
+  forwardedAt?: string;
   reviewedBy?: string;
   publishedAt: string;
 }

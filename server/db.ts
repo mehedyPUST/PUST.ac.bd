@@ -15,6 +15,7 @@ import type {
   DepartmentRequestRecord,
   ExamApplicationRecord,
   ExamCircularRecord,
+  ExamCommitteeRecord,
   ExamResultRecord,
   FacultyProfileRequestRecord,
   FeeConfig,
@@ -114,6 +115,7 @@ class PustRepository {
   private hallApps: HallApplicationRecord[] = [];
   private hallDues: HallDueRecord[] = [...SEED_HALL_DUES];
   private examCirculars: ExamCircularRecord[] = [...SEED_EXAM_CIRCULARS];
+  private examCommittees: ExamCommitteeRecord[] = [];
   private examApps: ExamApplicationRecord[] = [...SEED_EXAM_APPLICATIONS];
   private examResults: ExamResultRecord[] = [...SEED_EXAM_RESULTS];
   private certificateApps: CertificateApplicationRecord[] = [...SEED_CERTIFICATE_APPLICATIONS];
@@ -1175,6 +1177,9 @@ class PustRepository {
       id: `crs-${crypto.randomUUID()}`,
       ...input,
     });
+  updateCourse = (id: string, patch: Partial<CourseRecord>) =>
+    this.updateItem('courses', this.courses, id, patch);
+  deleteCourse = (id: string) => this.removeItem('courses', this.courses, id);
 
   // Library Workflow
   listLibraryApplications = () => this.getAll('library_applications', this.libraryApps);
@@ -1245,6 +1250,28 @@ class PustRepository {
       id: `ecirc-${crypto.randomUUID()}`,
       ...input,
     });
+  updateExamCircular = (id: string, patch: Partial<ExamCircularRecord>) =>
+    this.updateItem('exam_circulars', this.examCirculars, id, patch);
+
+  listExamCommittees = () => this.getAll('exam_committees', this.examCommittees);
+  createExamCommittee = (
+    input: Omit<ExamCommitteeRecord, 'id' | 'createdAt' | 'updatedAt'>
+  ) => {
+    const now = new Date().toISOString();
+    return this.insertItem('exam_committees', this.examCommittees, {
+      id: `ecom-${crypto.randomUUID()}`,
+      ...input,
+      createdAt: now,
+      updatedAt: now,
+    });
+  };
+  updateExamCommittee = (id: string, patch: Partial<ExamCommitteeRecord>) =>
+    this.updateItem('exam_committees', this.examCommittees, id, {
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    });
+  deleteExamCommittee = (id: string) =>
+    this.removeItem('exam_committees', this.examCommittees, id);
 
   listExamApplications = () => this.getAll('exam_applications', this.examApps);
   createExamApplication = (input: Omit<ExamApplicationRecord, 'id' | 'createdAt'>) =>

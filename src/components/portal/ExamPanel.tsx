@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
+  BookOpen,
+  Calendar,
   CheckCircle2,
   Clock,
   CreditCard,
@@ -9,7 +11,11 @@ import {
   Plus,
   Printer,
   Search,
+  Send,
+  ShieldCheck,
   Trash2,
+  UserCheck,
+  Users,
 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
 import { usePust } from '../PustContext';
@@ -19,9 +25,11 @@ import { DigitalDocumentModal, type DigitalDocumentData } from './DigitalDocumen
 import type {
   AuthUser,
   CourseRecord,
+  DepartmentFacultySummary,
   DepartmentRecord,
   ExamApplicationRecord,
   ExamCircularRecord,
+  ExamCommitteeRecord,
   ExamResultRecord,
   HallDueRecord,
   PaymentGatewayConfig,
@@ -77,6 +85,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [applications, setApplications] = useState<ExamApplicationRecord[]>([]);
   const [results, setResults] = useState<ExamResultRecord[]>([]);
   const [gateways, setGateways] = useState<PaymentGatewayConfig[]>([]);
+  const [committees, setCommittees] = useState<ExamCommitteeRecord[]>([]);
+  const [departmentFaculty, setDepartmentFaculty] = useState<DepartmentFacultySummary[]>([]);
   const [hallBlocked, setHallBlocked] = useState(false);
   const [unpaidHallDues, setUnpaidHallDues] = useState<HallDueRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,9 +111,28 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [courseYear, setCourseYear] = useState(3);
   const [courseTermSem, setCourseTermSem] = useState(2);
   const [courseSession, setCourseSession] = useState('2022-23');
+  const [courseTeacherId, setCourseTeacherId] = useState('');
   const [savingCourse, setSavingCourse] = useState(false);
+  const [catalogSessionFilter, setCatalogSessionFilter] = useState('ALL');
+  const [busyCourseId, setBusyCourseId] = useState<string | null>(null);
 
-  // Chairman/Admin Create Exam Circular
+  // Chairman/Admin Assign Courses to Faculty Member
+  const [assignTeacherId, setAssignTeacherId] = useState('');
+  const [assignCourseCodes, setAssignCourseCodes] = useState<string[]>([]);
+  const [assignSessions, setAssignSessions] = useState<string[]>([]);
+  const [savingTeacherAssign, setSavingTeacherAssign] = useState(false);
+
+  // Chairman/Admin Create Exam Committee (Session + Semester)
+  const [ecSession, setEcSession] = useState('2022-23');
+  const [ecYear, setEcYear] = useState(3);
+  const [ecTermSem, setEcTermSem] = useState(1);
+  const [ecTitle, setEcTitle] = useState('');
+  const [ecChairId, setEcChairId] = useState('');
+  const [ecMemberIds, setEcMemberIds] = useState<string[]>([]);
+  const [savingCommittee, setSavingCommittee] = useState(false);
+  const [busyCommitteeId, setBusyCommitteeId] = useState<string | null>(null);
+
+  // Chairman / Admin / Exam Committee Create Exam Circular
   const [circTitle, setCircTitle] = useState('');
   const [circDept, setCircDept] = useState(
     user.departmentCode === 'ADMIN' ? 'CSE' : user.departmentCode
@@ -112,17 +141,24 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   const [circTermSem, setCircTermSem] = useState(1);
   const [circSession, setCircSession] = useState('2022-23');
   const [circDeadline, setCircDeadline] = useState('2026-12-10');
+  const [circExamStartDate, setCircExamStartDate] = useState('2026-12-20');
+  const [circExamVenue, setCircExamVenue] = useState('Department Academic Building');
+  const [circScheduleNote, setCircScheduleNote] = useState('');
   const [circFee, setCircFee] = useState(1450);
   const [circCourseCodes, setCircCourseCodes] = useState<string[]>([]);
   const [showAllDeptCourses, setShowAllDeptCourses] = useState(false);
   const [publishingCircular, setPublishingCircular] = useState(false);
+  const [activeCommitteeIdForArrange, setActiveCommitteeIdForArrange] = useState('');
 
-  // Teacher / Chairman / Admin Multi-Course Gradebook Entry
+  // Teacher / Exam Committee / Chairman / Admin Multi-Course Gradebook Entry
   const [resAcademicId, setResAcademicId] = useState('');
   const [resYear, setResYear] = useState(3);
   const [resTermSem, setResTermSem] = useState(1);
   const [resPromoMode, setResPromoMode] = useState<'auto' | 'manual_promoted' | 'manual_repeat'>(
     'auto'
+  );
+  const [resSubmissionTarget, setResSubmissionTarget] = useState<'publish' | 'chairman' | 'admin'>(
+    user.role === 'teacher' ? 'chairman' : 'publish'
   );
   const [retrievedStudent, setRetrievedStudent] = useState<StudentRecord | null>(null);
   const [previousStudentResults, setPreviousStudentResults] = useState<ExamResultRecord[]>([]);
@@ -156,6 +192,8 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         })
       );
       setGateways(data.gateways);
+      setCommittees(data.committees || []);
+      setDepartmentFaculty(data.departmentFaculty || []);
       setHallBlocked(data.hallClearanceBlocked);
       setUnpaidHallDues(data.unpaidHallDues);
       if (data.circulars.length > 0 && !initializedCircularRef.current) {
@@ -175,6 +213,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   }, [refresh]);
 
   useEffect(() => {
+    setResSubmissionTarget(user.role === 'teacher' ? 'chairman' : 'publish');
+  }, [user.role]);
+
+  useEffect(() => {
     if (user.role === 'chairman' && user.departmentCode && user.departmentCode !== 'ADMIN') {
       setCourseDept(user.departmentCode);
       setCircDept(user.departmentCode);
@@ -190,6 +232,68 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     .toUpperCase();
   const computedCourseSemester = (courseYear - 1) * 2 + courseTermSem;
   const computedCircSemester = (circYear - 1) * 2 + circTermSem;
+  const computedEcSemester = (ecYear - 1) * 2 + ecTermSem;
+
+  const myActiveCommittees = useMemo(() => {
+    const emailLower = user.email.toLowerCase();
+    return committees.filter(
+      (c) =>
+        c.status === 'active' &&
+        c.members.some((m) => m.userId === user.id || m.email.toLowerCase() === emailLower)
+    );
+  }, [committees, user.id, user.email]);
+
+  const selectedArrangeCommittee = useMemo(
+    () =>
+      myActiveCommittees.find((c) => c.id === activeCommitteeIdForArrange) ||
+      myActiveCommittees[0] ||
+      null,
+    [myActiveCommittees, activeCommitteeIdForArrange]
+  );
+
+  const isCommitteeOperator =
+    myActiveCommittees.length > 0 && user.role !== 'chairman' && user.role !== 'admin';
+
+  useEffect(() => {
+    if (isCommitteeOperator && selectedArrangeCommittee) {
+      setCircDept(selectedArrangeCommittee.departmentCode);
+      setCircSession(selectedArrangeCommittee.session);
+      setCircYear(Math.ceil(selectedArrangeCommittee.semester / 2));
+      setCircTermSem(selectedArrangeCommittee.semester % 2 === 1 ? 1 : 2);
+    }
+  }, [isCommitteeOperator, selectedArrangeCommittee]);
+
+  const scopedDeptFaculty = useMemo(() => {
+    if (user.role === 'chairman') {
+      return departmentFaculty.filter(
+        (f) => f.departmentCode.toUpperCase() === user.departmentCode.toUpperCase()
+      );
+    }
+    return departmentFaculty.filter(
+      (f) => f.departmentCode.toUpperCase() === courseDept.toUpperCase()
+    );
+  }, [departmentFaculty, user.role, user.departmentCode, courseDept]);
+
+  useEffect(() => {
+    if (scopedDeptFaculty.length === 0) return;
+    const activeTeacher = scopedDeptFaculty.find((f) => f.id === assignTeacherId);
+    if (!activeTeacher) {
+      const first = scopedDeptFaculty[0];
+      setAssignTeacherId(first.id);
+      setAssignCourseCodes(first.assignedCourses || []);
+      setAssignSessions(first.assignedSessions || []);
+    }
+    if (!ecChairId || !scopedDeptFaculty.some((f) => f.id === ecChairId)) {
+      setEcChairId(scopedDeptFaculty[0].id);
+    }
+  }, [scopedDeptFaculty, assignTeacherId, ecChairId]);
+
+  function handleSelectTeacherForAssign(teacherId: string) {
+    setAssignTeacherId(teacherId);
+    const found = scopedDeptFaculty.find((f) => f.id === teacherId);
+    setAssignCourseCodes(found?.assignedCourses || []);
+    setAssignSessions(found?.assignedSessions || []);
+  }
 
   const filteredCircularCourses = useMemo(
     () =>
@@ -264,7 +368,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   );
 
   useEffect(() => {
-    if (!['teacher', 'chairman', 'admin'].includes(user.role)) return;
+    const canLookup =
+      ['teacher', 'chairman', 'admin'].includes(user.role) || myActiveCommittees.length > 0;
+    if (!canLookup) return;
     const trimmed = resAcademicId.trim();
     if (trimmed.length < 3) {
       setRetrievedStudent(null);
@@ -307,10 +413,36 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     if (retrievedStudent) {
       return courses.filter((c) => c.departmentCode === retrievedStudent.departmentCode);
     }
-    return user.role === 'teacher' || user.role === 'chairman'
-      ? courses.filter((c) => c.departmentCode === user.departmentCode)
-      : courses;
-  }, [courses, retrievedStudent, user.role, user.departmentCode]);
+    if (user.role === 'teacher' || user.role === 'chairman' || user.role === 'student') {
+      return courses.filter(
+        (c) => c.departmentCode.toUpperCase() === user.departmentCode.toUpperCase()
+      );
+    }
+    return courses.filter(
+      (c) => c.departmentCode.toUpperCase() === courseDept.toUpperCase()
+    );
+  }, [courses, retrievedStudent, user.role, user.departmentCode, courseDept]);
+
+  const filteredCatalogCourses = useMemo(() => {
+    return deptCourses
+      .filter((c) => {
+        if (catalogSessionFilter !== 'ALL' && c.session !== catalogSessionFilter) return false;
+        return true;
+      })
+      .sort((a, b) => a.semester - b.semester || a.code.localeCompare(b.code));
+  }, [deptCourses, catalogSessionFilter]);
+
+  const matchingGradebookCommittee = useMemo(() => {
+    if (!retrievedStudent) return null;
+    return (
+      myActiveCommittees.find(
+        (c) =>
+          c.departmentCode.toUpperCase() === retrievedStudent.departmentCode.toUpperCase() &&
+          c.session === retrievedStudent.session &&
+          c.semester === computedResSemester
+      ) ?? null
+    );
+  }, [retrievedStudent, myActiveCommittees, computedResSemester]);
 
   const matchingGradebookTermCourses = useMemo(() => {
     const deptCode = retrievedStudent?.departmentCode || (user.departmentCode !== 'ADMIN' ? user.departmentCode : '');
@@ -492,11 +624,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         departmentCode: courseDept,
         semester: computedCourseSemester,
         session: courseSession,
+        ...(courseTeacherId ? { teacherUserId: courseTeacherId } : {}),
       });
       const yearLabel = ACADEMIC_YEARS.find((y) => y.value === courseYear)?.label ?? `${courseYear}`;
       const semLabel = YEAR_SEMESTERS.find((s) => s.value === courseTermSem)?.label ?? `${courseTermSem}`;
       setFeedback(
-        `Added course ${res.course.code} — ${res.course.title} (${yearLabel} Year, ${semLabel} Semester · ${res.course.session}).`
+        `Added course ${res.course.code} — ${res.course.title} (${yearLabel} Year, ${semLabel} Semester · ${res.course.session})${
+          res.course.teacherName ? ` · Assigned to ${res.course.teacherName}` : ''
+        }.`
       );
       setCourseCodeSuffix('');
       setCourseTitle('');
@@ -505,6 +640,152 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       setError(err instanceof Error ? err.message : 'Unable to add course.');
     } finally {
       setSavingCourse(false);
+    }
+  }
+
+  async function handleQuickAssignCourseTeacher(course: CourseRecord, teacherUserId: string) {
+    setError(null);
+    setFeedback(null);
+    setBusyCourseId(course.id);
+    try {
+      const res = await pustApi.updateCourse(course.id, {
+        teacherUserId: teacherUserId || null,
+      });
+      setFeedback(
+        res.course.teacherName
+          ? `Assigned ${res.course.code} (${res.course.session}) to ${res.course.teacherName}.`
+          : `Cleared faculty assignment for ${res.course.code}.`
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to assign faculty to course.');
+    } finally {
+      setBusyCourseId(null);
+    }
+  }
+
+  async function handleDeleteCourse(course: CourseRecord) {
+    setError(null);
+    setFeedback(null);
+    setBusyCourseId(course.id);
+    try {
+      await pustApi.deleteCourse(course.id);
+      setFeedback(`Removed course ${course.code} (${course.session} · Sem ${course.semester}).`);
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to delete course.');
+    } finally {
+      setBusyCourseId(null);
+    }
+  }
+
+  function toggleAssignCourseCode(code: string) {
+    const upper = code.toUpperCase();
+    setAssignCourseCodes((prev) =>
+      prev.includes(upper) ? prev.filter((c) => c !== upper) : [...prev, upper]
+    );
+  }
+
+  function toggleAssignSession(sess: string) {
+    setAssignSessions((prev) =>
+      prev.includes(sess) ? prev.filter((s) => s !== sess) : [...prev, sess]
+    );
+  }
+
+  async function handleSaveTeacherAssignments(e: FormEvent) {
+    e.preventDefault();
+    if (!assignTeacherId) return;
+    setError(null);
+    setFeedback(null);
+    setSavingTeacherAssign(true);
+    try {
+      const res = await pustApi.assignTeacher(assignTeacherId, assignCourseCodes, assignSessions);
+      setFeedback(
+        `Assigned ${assignCourseCodes.length} course(s) to ${res.user.name}.`
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to save faculty course assignments.');
+    } finally {
+      setSavingTeacherAssign(false);
+    }
+  }
+
+  function toggleCommitteeMemberId(userId: string) {
+    setEcMemberIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  }
+
+  async function handleCreateExamCommittee(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setFeedback(null);
+    const targetDept = user.role === 'chairman' ? user.departmentCode : courseDept;
+    const memberPayload: Array<{ userId: string; committeeRole: 'chair' | 'member' }> = [];
+    if (ecChairId) {
+      memberPayload.push({ userId: ecChairId, committeeRole: 'chair' });
+    }
+    for (const mid of ecMemberIds) {
+      if (mid !== ecChairId) {
+        memberPayload.push({ userId: mid, committeeRole: 'member' });
+      }
+    }
+    if (memberPayload.length === 0) {
+      setError('Select at least one faculty member for the Exam Committee.');
+      return;
+    }
+
+    setSavingCommittee(true);
+    try {
+      const res = await pustApi.createExamCommittee({
+        departmentCode: targetDept,
+        session: ecSession,
+        semester: computedEcSemester,
+        ...(ecTitle.trim() ? { title: ecTitle.trim() } : {}),
+        members: memberPayload,
+      });
+      setFeedback(
+        `Created ${res.committee.title} with ${res.committee.members.length} faculty member(s).`
+      );
+      setEcTitle('');
+      setEcMemberIds([]);
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to create Exam Committee.');
+    } finally {
+      setSavingCommittee(false);
+    }
+  }
+
+  async function handleToggleCommitteeStatus(c: ExamCommitteeRecord) {
+    setError(null);
+    setFeedback(null);
+    setBusyCommitteeId(c.id);
+    try {
+      const nextStatus = c.status === 'active' ? 'dissolved' : 'active';
+      await pustApi.updateExamCommittee(c.id, { status: nextStatus });
+      setFeedback(`Updated committee "${c.title}" status to ${nextStatus}.`);
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update Exam Committee.');
+    } finally {
+      setBusyCommitteeId(null);
+    }
+  }
+
+  async function handleDeleteCommittee(c: ExamCommitteeRecord) {
+    setError(null);
+    setFeedback(null);
+    setBusyCommitteeId(c.id);
+    try {
+      await pustApi.deleteExamCommittee(c.id);
+      setFeedback(`Removed Exam Committee "${c.title}".`);
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to remove Exam Committee.');
+    } finally {
+      setBusyCommitteeId(null);
     }
   }
 
@@ -528,13 +809,20 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         deadline: circDeadline,
         feeBdt: Math.round(Number(circFee)),
         eligibleCourseCodes: circCourseCodes,
+        ...(circExamStartDate ? { examStartDate: circExamStartDate } : {}),
+        ...(circExamVenue.trim() ? { examVenue: circExamVenue.trim() } : {}),
+        ...(circScheduleNote.trim() ? { scheduleNote: circScheduleNote.trim() } : {}),
+        ...(isCommitteeOperator && selectedArrangeCommittee
+          ? { committeeId: selectedArrangeCommittee.id }
+          : {}),
       });
       const yearLabel = ACADEMIC_YEARS.find((y) => y.value === circYear)?.label ?? `${circYear}`;
       const semLabel = YEAR_SEMESTERS.find((s) => s.value === circTermSem)?.label ?? `${circTermSem}`;
       setFeedback(
-        `Published Examination Circular "${res.circular.title}" (${yearLabel} Year, ${semLabel} Semester · ${res.circular.session}).`
+        `Arranged Examination & Published Circular "${res.circular.title}" (${yearLabel} Year, ${semLabel} Semester · ${res.circular.session}).`
       );
       setCircTitle('');
+      setCircScheduleNote('');
       setCircCourseCodes([]);
       await refresh();
     } catch (err) {
@@ -583,7 +871,10 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
     }
   }
 
-  async function handlePublishResult(e: FormEvent) {
+  async function handlePublishResult(
+    e: FormEvent,
+    explicitTarget?: 'publish' | 'chairman' | 'admin'
+  ) {
     e.preventDefault();
     setError(null);
     setFeedback(null);
@@ -601,21 +892,30 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       return;
     }
 
+    const effectiveTarget = explicitTarget || resSubmissionTarget;
     setPublishingResult(true);
     try {
       const res = await pustApi.publishExamResult({
         academicId: resAcademicId.trim(),
         semester: computedResSemester,
         promotionMode: resPromoMode,
+        submissionTarget: effectiveTarget,
+        ...(matchingGradebookCommittee ? { committeeId: matchingGradebookCommittee.id } : {}),
         courses: sanitized,
       });
 
       const yearLabel = ACADEMIC_YEARS.find((y) => y.value === resYear)?.label ?? `${resYear}`;
       const semLabel = YEAR_SEMESTERS.find((s) => s.value === resTermSem)?.label ?? `${resTermSem}`;
 
-      if (res.pendingChairmanReview) {
+      if (res.pendingAdminReview) {
         setFeedback(
-          `Submitted ${yearLabel} Year, ${semLabel} Semester marksheet for ${res.result.studentName} (${res.result.academicId}) to Chairman verification queue (SGPA ${res.result.sgpa.toFixed(
+          `Calculated & forwarded ${yearLabel} Year, ${semLabel} Semester result for ${res.result.studentName} (${res.result.academicId}) to the Admin Office (SGPA ${res.result.sgpa.toFixed(
+            2
+          )}).`
+        );
+      } else if (res.pendingChairmanReview) {
+        setFeedback(
+          `Calculated & forwarded ${yearLabel} Year, ${semLabel} Semester result for ${res.result.studentName} (${res.result.academicId}) to the Department Chairman (SGPA ${res.result.sgpa.toFixed(
             2
           )}).`
         );
@@ -639,6 +939,22 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
       setError(err instanceof Error ? err.message : 'Unable to submit exam result.');
     } finally {
       setPublishingResult(false);
+    }
+  }
+
+  async function handleForwardResult(r: ExamResultRecord, target: 'chairman' | 'admin') {
+    setError(null);
+    setFeedback(null);
+    try {
+      await pustApi.forwardExamResult(r.id, target);
+      setFeedback(
+        target === 'admin'
+          ? `Forwarded Semester ${r.semester} result for ${r.academicId} to the Admin Office.`
+          : `Forwarded Semester ${r.semester} result for ${r.academicId} to the Department Chairman.`
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to forward exam result.');
     }
   }
 
@@ -734,16 +1050,23 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
   ).length;
 
   const pendingResults = results.filter(
-    (r) => !r.published || r.status === 'pending_chairman'
+    (r) => !r.published || r.status === 'pending_chairman' || r.status === 'pending_admin'
   );
   const publishedResults = results.filter(
-    (r) => r.published && r.status !== 'pending_chairman'
+    (r) => r.published && r.status !== 'pending_chairman' && r.status !== 'pending_admin'
   );
   // Stable unique keys for React lists (guards against any residual duplicate ids)
   const publishedResultKeys = publishedResults.map((r, idx) => `${r.id}::${r.academicId}::${r.semester}::${idx}`);
   const pendingResultKeys = pendingResults.map((r, idx) => `${r.id}::${r.academicId}::${r.semester}::${idx}`);
 
-  const canEnterMarks = ['teacher', 'chairman', 'admin'].includes(user.role);
+  const canEnterMarks =
+    ['teacher', 'chairman', 'admin'].includes(user.role) || myActiveCommittees.length > 0;
+  const canArrangeExams =
+    user.role === 'chairman' || user.role === 'admin' || myActiveCommittees.length > 0;
+  const myAssignedCourseSet = useMemo(
+    () => new Set((user.assignedCourses || []).map((c) => c.toUpperCase())),
+    [user.assignedCourses]
+  );
 
   return (
     <div className="space-y-6">
@@ -816,29 +1139,204 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
         </div>
       )}
 
-      {/* Teacher: Department Courses & Active Exam Circulars */}
-      {user.role === 'teacher' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
-              Department Course Catalog ({deptCourses.length})
-            </h3>
-            {deptCourses.length === 0 ? (
-              <p className="text-sm text-slate-600">No departmental courses assigned yet.</p>
+      {/* Active Exam Committee Appointments (Visible for appointed faculty operators & teachers) */}
+      {(user.role === 'teacher' || isCommitteeOperator) && (
+        <div className="space-y-6">
+          {myActiveCommittees.length > 0 && (
+            <div className="bg-white rounded-2xl border border-pust-800/30 p-6 space-y-4 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div>
+                  <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4" />
+                    Examination Committee Appointment ({myActiveCommittees.length})
+                  </p>
+                  <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+                    Your Active Session &amp; Semester Exam Committees
+                  </h3>
+                </div>
+                <span className="font-mono text-xs text-slate-600">
+                  Arrange exam schedules below &amp; calculate/forward results to Chairman or Admin Office
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {myActiveCommittees.map((cm) => {
+                  const me = cm.members.find(
+                    (m) => m.userId === user.id || m.email.toLowerCase() === user.email.toLowerCase()
+                  );
+                  const isSelected = selectedArrangeCommittee?.id === cm.id;
+                  return (
+                    <div
+                      key={cm.id}
+                      className={`p-4 rounded-xl border transition-colors ${
+                        isSelected
+                          ? 'border-pust-900 bg-pust-50/40'
+                          : 'border-slate-200 bg-[#F7F7F5]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-mono text-[11px] font-semibold text-pust-900 uppercase">
+                            {cm.departmentCode} · {cm.session} · Semester {cm.semester}
+                          </p>
+                          <p className="font-medium text-slate-900 text-sm mt-0.5">{cm.title}</p>
+                        </div>
+                        <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-800 capitalize shrink-0">
+                          {me?.committeeRole === 'chair' ? 'Committee Chair' : 'Member'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2">
+                        Members: {cm.members.map((m) => `${m.name} (${m.committeeRole === 'chair' ? 'Chair' : 'Member'})`).join(', ')}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveCommitteeIdForArrange(cm.id)}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer ${
+                            isSelected
+                              ? 'bg-pust-900 text-white'
+                              : 'bg-white border border-slate-300 text-slate-800 hover:border-pust-800'
+                          }`}
+                        >
+                          {isSelected ? 'Active for Exam Arrangement' : 'Select Term to Arrange'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-serif text-lg font-medium text-slate-900">
+                  Department Course Catalog ({deptCourses.length})
+                </h3>
+                {(user.assignedCourses || []).length > 0 && (
+                  <span className="font-mono text-[11px] font-semibold text-pust-900">
+                    Assigned to you: {(user.assignedCourses || []).join(', ')}
+                  </span>
+                )}
+              </div>
+              {deptCourses.length === 0 ? (
+                <p className="text-sm text-slate-600">No departmental courses registered yet.</p>
+              ) : (
+                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm max-h-80 overflow-y-auto">
+                  {deptCourses.map((c) => {
+                    const isMine =
+                      myAssignedCourseSet.has(c.code.toUpperCase()) ||
+                      c.teacherUserId === user.id ||
+                      (c.teacherEmail && c.teacherEmail.toLowerCase() === user.email.toLowerCase());
+                    return (
+                      <div
+                        key={c.id}
+                        className={`p-3.5 flex items-center justify-between gap-2 transition-colors ${
+                          isMine ? 'bg-pust-50/40' : 'bg-white hover:bg-[#F7F7F5]'
+                        }`}
+                      >
+                        <div>
+                          <p className="font-mono text-xs font-semibold text-pust-800">
+                            {c.code} · Sem {c.semester} ({c.session})
+                            {isMine ? ' · Assigned to You' : ''}
+                          </p>
+                          <p className="font-medium text-slate-900">{c.title}</p>
+                          {c.teacherName && (
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                              Faculty: {c.teacherName}
+                            </p>
+                          )}
+                        </div>
+                        <span className="font-mono text-xs text-slate-600 tabular-nums shrink-0">
+                          {c.credits} Cr
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+              <h3 className="font-serif text-lg font-medium text-slate-900">
+                Active Examination Circulars &amp; Schedules
+              </h3>
+              {circulars.length === 0 ? (
+                <p className="text-sm text-slate-600">No active examination circulars.</p>
+              ) : (
+                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm max-h-80 overflow-y-auto">
+                  {circulars.map((c) => (
+                    <div key={c.id} className="p-3.5 space-y-1 bg-white">
+                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                        {c.departmentCode} · Sem {c.semester} ({c.session}) · Deadline {c.deadline}
+                      </p>
+                      <p className="font-medium text-slate-900">{c.title}</p>
+                      {(c.examStartDate || c.examVenue) && (
+                        <p className="text-xs text-slate-600">
+                          {c.examStartDate ? `Starts ${c.examStartDate}` : ''}
+                          {c.examStartDate && c.examVenue ? ' · ' : ''}
+                          {c.examVenue || ''}
+                        </p>
+                      )}
+                      <p className="font-mono text-xs text-slate-500">
+                        Courses: {c.eligibleCourseCodes.join(', ')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Student: Department Courses for Your Session & Semester + Exam Form Fill-up */}
+      {user.role === 'student' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-pust-800" />
+                  Department Courses ({user.departmentCode} · {deptCourses.length})
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Curriculum courses added by your Department Chairman, with assigned faculty.
+                </p>
+              </div>
+              <select
+                value={catalogSessionFilter}
+                onChange={(e) => setCatalogSessionFilter(e.target.value)}
+                className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
+              >
+                <option value="ALL">All Sessions</option>
+                {ACADEMIC_SESSIONS.map((sess) => (
+                  <option key={sess} value={sess}>
+                    Session {sess}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {filteredCatalogCourses.length === 0 ? (
+              <p className="text-sm text-slate-600">No departmental courses listed for this filter.</p>
             ) : (
-              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm">
-                {deptCourses.map((c) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {filteredCatalogCourses.map((c) => (
                   <div
                     key={c.id}
-                    className="p-3.5 flex items-center justify-between gap-2 bg-white hover:bg-[#F7F7F5] transition-colors"
+                    className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] flex items-start justify-between gap-3"
                   >
                     <div>
                       <p className="font-mono text-xs font-semibold text-pust-800">
                         {c.code} · Sem {c.semester} ({c.session})
                       </p>
-                      <p className="font-medium text-slate-900">{c.title}</p>
+                      <p className="text-sm font-medium text-slate-900 mt-0.5">{c.title}</p>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        {c.teacherName ? `Instructor: ${c.teacherName}` : 'Instructor: Departmental Faculty'}
+                      </p>
                     </div>
-                    <span className="font-mono text-xs text-slate-600 tabular-nums shrink-0">
+                    <span className="font-mono text-xs font-semibold text-slate-700 shrink-0 tabular-nums">
                       {c.credits} Cr
                     </span>
                   </div>
@@ -847,325 +1345,813 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             )}
           </div>
 
-          <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs">
             <h3 className="font-serif text-lg font-medium text-slate-900">
-              Active Examination Circulars
+              Semester Examination Form Fill-up
             </h3>
-            {circulars.length === 0 ? (
-              <p className="text-sm text-slate-600">No active examination circulars.</p>
-            ) : (
-              <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-sm">
-                {circulars.map((c) => (
-                  <div key={c.id} className="p-3.5 space-y-1 bg-white">
-                    <p className="font-mono text-xs text-pust-800 tabular-nums">
-                      {c.departmentCode} · Sem {c.semester} ({c.session}) · Deadline {c.deadline}
-                    </p>
-                    <p className="font-medium text-slate-900">{c.title}</p>
-                    <p className="font-mono text-xs text-slate-500">
-                      Courses: {c.eligibleCourseCodes.join(', ')}
-                    </p>
-                  </div>
-                ))}
+
+            {hallBlocked ? (
+              <div className="p-4 rounded-xl border border-amber-300 bg-amber-50 text-sm text-amber-900 space-y-1">
+                <p className="font-semibold">
+                  Hall Financial Clearance Required Before Exam Form Fill-up
+                </p>
+                <p>
+                  Our system detected {unpaidHallDues.length} uncleared Hall due(s). Pay and clear
+                  your Hall dues in the Hall Seat &amp; Dues module before filling out examination
+                  forms.
+                </p>
               </div>
+            ) : (
+              <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 text-xs text-emerald-900 font-mono flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
+                <span>
+                  Hall Clearance Verified: No outstanding Hall dues blocking examination registration.
+                </span>
+              </div>
+            )}
+
+            {circulars.length > 0 && activeCircular && (
+              <form onSubmit={handleApplyExam} className="space-y-4">
+                <div>
+                  <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-600 mb-1.5">
+                    Select Examination Circular
+                  </label>
+                  <select
+                    value={activeCircular.id}
+                    onChange={(e) => handleSelectCircular(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                  >
+                    {circulars.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.departmentCode} · Sem {c.semester} ({c.session}) — {c.title} · Fee ৳
+                        {c.feeBdt}
+                      </option>
+                    ))}
+                  </select>
+                  {(activeCircular.examStartDate || activeCircular.examVenue || activeCircular.scheduleNote) && (
+                    <p className="mt-2 text-xs text-slate-600 bg-[#F7F7F5] border border-slate-200 rounded-lg px-3 py-2">
+                      {activeCircular.examStartDate ? `Exam Starts: ${activeCircular.examStartDate}` : ''}
+                      {activeCircular.examStartDate && activeCircular.examVenue ? ' · ' : ''}
+                      {activeCircular.examVenue ? `Venue: ${activeCircular.examVenue}` : ''}
+                      {activeCircular.scheduleNote ? ` · ${activeCircular.scheduleNote}` : ''}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-slate-600 mb-2">
+                    Pre-Assigned Eligible Courses (Select Courses to Register)
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {activeCircular.eligibleCourseCodes.map((code) => {
+                      const courseInfo = courses.find((c) => c.code === code);
+                      const checked = selectedCourses.includes(code);
+                      return (
+                        <label
+                          key={code}
+                          className={`flex items-start gap-2.5 p-3 rounded-xl border text-sm cursor-pointer transition-colors ${
+                            checked
+                              ? 'border-pust-800 bg-pust-50/50'
+                              : 'border-slate-200 bg-[#F7F7F5]'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleStudentCourse(code)}
+                            className="mt-1 accent-pust-800"
+                          />
+                          <div>
+                            <p className="font-mono text-xs font-semibold text-pust-800">
+                              {code} · {courseInfo?.credits ?? 3} Credits
+                            </p>
+                            <p className="text-slate-900">
+                              {courseInfo?.title ?? 'Departmental Core Course'}
+                            </p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={hallBlocked || selectedCourses.length === 0}
+                  className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  Submit Exam Registration Form
+                </button>
+              </form>
             )}
           </div>
         </div>
       )}
 
-      {/* Student Hall Clearance Alert + Form Fill-up */}
-      {user.role === 'student' && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-5 shadow-xs">
-          <h3 className="font-serif text-lg font-medium text-slate-900">
-            Semester Examination Form Fill-up
-          </h3>
+      {/* Chairman / Admin: 1) Add Course & Assign Courses to Faculty Members */}
+      {(user.role === 'chairman' || user.role === 'admin') && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form
+              onSubmit={handleCreateCourse}
+              className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+            >
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="font-serif text-lg font-medium text-slate-900">
+                  Add Course for Department Students
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Register a curriculum course by session, year, and semester, with optional instructor assignment.
+                </p>
+              </div>
 
-          {hallBlocked ? (
-            <div className="p-4 rounded-xl border border-amber-300 bg-amber-50 text-sm text-amber-900 space-y-1">
-              <p className="font-semibold">
-                Hall Financial Clearance Required Before Exam Form Fill-up
-              </p>
-              <p>
-                Our system detected {unpaidHallDues.length} uncleared Hall due(s). Pay and clear
-                your Hall dues in the Hall Seat &amp; Dues module before filling out examination
-                forms.
-              </p>
-            </div>
-          ) : (
-            <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 text-xs text-emerald-900 font-mono flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
-              <span>
-                Hall Clearance Verified: No outstanding Hall dues blocking examination registration.
-              </span>
-            </div>
-          )}
-
-          {circulars.length > 0 && activeCircular && (
-            <form onSubmit={handleApplyExam} className="space-y-4">
               <div>
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-600 mb-1.5">
-                  Select Examination Circular
+                <label
+                  htmlFor="course-dept"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Department Name
                 </label>
                 <select
-                  value={activeCircular.id}
-                  onChange={(e) => handleSelectCircular(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                  id="course-dept"
+                  value={courseDept}
+                  disabled={user.role === 'chairman'}
+                  onChange={(e) => setCourseDept(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
                 >
-                  {circulars.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.departmentCode} · Sem {c.semester} ({c.session}) — {c.title} · Fee ৳
-                      {c.feeBdt}
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.code}>
+                      {d.name} ({d.code})
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div>
-                <p className="font-mono text-[11px] uppercase tracking-wider text-slate-600 mb-2">
-                  Pre-Assigned Eligible Courses (Select Courses to Register)
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {activeCircular.eligibleCourseCodes.map((code) => {
-                    const courseInfo = courses.find((c) => c.code === code);
-                    const checked = selectedCourses.includes(code);
-                    return (
-                      <label
-                        key={code}
-                        className={`flex items-start gap-2.5 p-3 rounded-xl border text-sm cursor-pointer transition-colors ${
-                          checked
-                            ? 'border-pust-800 bg-pust-50/50'
-                            : 'border-slate-200 bg-[#F7F7F5]'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleStudentCourse(code)}
-                          className="mt-1 accent-pust-800"
-                        />
-                        <div>
-                          <p className="font-mono text-xs font-semibold text-pust-800">
-                            {code} · {courseInfo?.credits ?? 3} Credits
-                          </p>
-                          <p className="text-slate-900">
-                            {courseInfo?.title ?? 'Departmental Core Course'}
-                          </p>
-                        </div>
-                      </label>
-                    );
-                  })}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label
+                    htmlFor="course-session"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Session
+                  </label>
+                  <select
+                    id="course-session"
+                    value={courseSession}
+                    onChange={(e) => setCourseSession(e.target.value)}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                  >
+                    {ACADEMIC_SESSIONS.map((sess) => (
+                      <option key={sess} value={sess}>
+                        {sess}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="course-year"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Year
+                  </label>
+                  <select
+                    id="course-year"
+                    value={courseYear}
+                    onChange={(e) => setCourseYear(Number(e.target.value))}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                  >
+                    {ACADEMIC_YEARS.map((yr) => (
+                      <option key={yr.value} value={yr.value}>
+                        {yr.label} Year
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="course-term-semester"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Semester
+                  </label>
+                  <select
+                    id="course-term-semester"
+                    value={courseTermSem}
+                    onChange={(e) => setCourseTermSem(Number(e.target.value))}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                  >
+                    {YEAR_SEMESTERS.map((sem) => (
+                      <option key={sem.value} value={sem.value}>
+                        {sem.label} Semester
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={hallBlocked || selectedCourses.length === 0}
-                className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
-              >
-                Submit Exam Registration Form
-              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div className="sm:col-span-8">
+                  <label
+                    htmlFor="course-code-suffix"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Course Code
+                  </label>
+                  <div className="flex items-stretch rounded-lg border border-slate-300 bg-[#F7F7F5] focus-within:bg-white focus-within:border-pust-800 overflow-hidden">
+                    <span
+                      className="inline-flex items-center px-3 py-2 font-mono text-xs font-semibold text-pust-900 bg-pust-50 border-r border-slate-300 select-none shrink-0"
+                      title="First 3 letters of selected department"
+                    >
+                      {courseDeptPrefix}-
+                    </span>
+                    <input
+                      id="course-code-suffix"
+                      type="text"
+                      required
+                      maxLength={14}
+                      value={courseCodeSuffix}
+                      onChange={(e) => setCourseCodeSuffix(e.target.value.toUpperCase())}
+                      placeholder="4101"
+                      className="w-full min-w-0 px-3 py-2 font-mono text-xs uppercase bg-transparent text-slate-900 focus:outline-none tabular-nums"
+                    />
+                  </div>
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label
+                    htmlFor="course-credits"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Credits
+                  </label>
+                  <input
+                    id="course-credits"
+                    type="number"
+                    step="0.5"
+                    min={0.5}
+                    max={6}
+                    required
+                    value={courseCredits}
+                    onChange={(e) => setCourseCredits(Number(e.target.value))}
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="course-title"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Course Title
+                </label>
+                <input
+                  id="course-title"
+                  type="text"
+                  required
+                  minLength={3}
+                  maxLength={120}
+                  value={courseTitle}
+                  onChange={(e) => setCourseTitle(e.target.value)}
+                  placeholder="e.g. Artificial Intelligence & Neural Networks"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="course-teacher"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Assign Course Teacher (Optional)
+                </label>
+                <select
+                  id="course-teacher"
+                  value={courseTeacherId}
+                  onChange={(e) => setCourseTeacherId(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                >
+                  <option value="">Assign later from catalog or faculty desk</option>
+                  {scopedDeptFaculty.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name} ({f.designation || f.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  {courseDeptPrefix}-
+                  {courseCodeSuffix.trim().toUpperCase() || '____'} · Semester {computedCourseSemester}/10
+                </span>
+                <button
+                  type="submit"
+                  disabled={savingCourse}
+                  className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  {savingCourse ? 'Adding Course...' : 'Add Course'}
+                </button>
+              </div>
             </form>
-          )}
-        </div>
-      )}
 
-      {/* Chairman / Admin: Course Creation & Circular Publisher */}
-      {(user.role === 'chairman' || user.role === 'admin') && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <form
-            onSubmit={handleCreateCourse}
-            className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
-          >
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="font-serif text-lg font-medium text-slate-900">
-                Assign Departmental Course
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Register a course under department, session, year, and semester.
-              </p>
-            </div>
+            {/* Assign Courses to Teacher / Faculty Member */}
+            <form
+              onSubmit={handleSaveTeacherAssignments}
+              className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+            >
+              <div className="border-b border-slate-100 pb-3 flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
+                    <UserCheck className="w-4 h-4 text-pust-800" />
+                    Assign Courses to Faculty Member
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Select a department teacher/faculty member and assign courses and academic sessions.
+                  </p>
+                </div>
+              </div>
 
-            <div>
-              <label
-                htmlFor="course-dept"
-                className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-              >
-                Department Name
-              </label>
+              {scopedDeptFaculty.length === 0 ? (
+                <p className="text-xs text-slate-600">
+                  No approved faculty accounts found for {user.role === 'chairman' ? user.departmentCode : courseDept}. Approve or create teacher accounts in People management first.
+                </p>
+              ) : (
+                <>
+                  <div>
+                    <label
+                      htmlFor="assign-faculty-select"
+                      className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                    >
+                      Faculty Member ({scopedDeptFaculty.length} available)
+                    </label>
+                    <select
+                      id="assign-faculty-select"
+                      value={assignTeacherId}
+                      onChange={(e) => handleSelectTeacherForAssign(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                    >
+                      {scopedDeptFaculty.map((f) => (
+                        <option key={f.id} value={f.id}>
+                          {f.name} — {f.designation || f.role} ({f.academicId})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                        Select Courses ({assignCourseCodes.length} selected)
+                      </span>
+                      {assignCourseCodes.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setAssignCourseCodes([])}
+                          className="text-[11px] text-slate-500 hover:text-red-700 hover:underline cursor-pointer"
+                        >
+                          Clear selection
+                        </button>
+                      )}
+                    </div>
+                    {deptCourses.length === 0 ? (
+                      <p className="text-xs text-slate-500">Add departmental courses on the left first.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
+                        {deptCourses.map((c) => {
+                          const checked = assignCourseCodes.includes(c.code.toUpperCase());
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => toggleAssignCourseCode(c.code)}
+                              aria-pressed={checked}
+                              className={`px-3 py-2 text-left rounded-lg border text-xs transition-colors cursor-pointer ${
+                                checked
+                                  ? 'bg-pust-900 text-white border-pust-900'
+                                  : 'bg-[#F7F7F5] text-slate-800 border-slate-200 hover:border-pust-700'
+                              }`}
+                            >
+                              <span className="block font-mono font-semibold">
+                                {checked ? '✓ ' : ''}
+                                {c.code} · Sem {c.semester} ({c.session})
+                              </span>
+                              <span
+                                className={`block text-[11px] truncate ${
+                                  checked ? 'text-white/80' : 'text-slate-500'
+                                }`}
+                              >
+                                {c.title}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <span className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                      Assigned Academic Sessions
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {ACADEMIC_SESSIONS.map((sess) => {
+                        const active = assignSessions.includes(sess);
+                        return (
+                          <button
+                            key={sess}
+                            type="button"
+                            onClick={() => toggleAssignSession(sess)}
+                            aria-pressed={active}
+                            className={`px-2.5 py-1 text-xs font-mono rounded-lg border cursor-pointer transition-colors ${
+                              active
+                                ? 'bg-pust-900 text-white border-pust-900'
+                                : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
+                            }`}
+                          >
+                            {sess}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100">
+                    <span className="font-mono text-[11px] text-slate-500">
+                      Syncs teacher profile &amp; department course catalog
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={savingTeacherAssign || !assignTeacherId}
+                      className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      {savingTeacherAssign ? 'Saving Assignment...' : 'Assign Courses to Faculty'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          </div>
+
+          {/* Department Course Catalog Management Table */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="font-serif text-lg font-medium text-slate-900">
+                  Department Course Catalog ({filteredCatalogCourses.length})
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Visible to department students and teachers. Assign or reassign instructors inline.
+                </p>
+              </div>
               <select
-                id="course-dept"
-                value={courseDept}
-                disabled={user.role === 'chairman'}
-                onChange={(e) => setCourseDept(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
+                value={catalogSessionFilter}
+                onChange={(e) => setCatalogSessionFilter(e.target.value)}
+                className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5]"
               >
-                {departments.map((d) => (
-                  <option key={d.id} value={d.code}>
-                    {d.name} ({d.code})
+                <option value="ALL">All Sessions</option>
+                {ACADEMIC_SESSIONS.map((sess) => (
+                  <option key={sess} value={sess}>
+                    Session {sess}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label
-                  htmlFor="course-session"
-                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-                >
-                  Session
-                </label>
-                <select
-                  id="course-session"
-                  value={courseSession}
-                  onChange={(e) => setCourseSession(e.target.value)}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
-                >
-                  {ACADEMIC_SESSIONS.map((sess) => (
-                    <option key={sess} value={sess}>
-                      {sess}
-                    </option>
-                  ))}
-                </select>
+            {filteredCatalogCourses.length === 0 ? (
+              <p className="text-xs text-slate-600">No courses match the selected filter.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#F7F7F5] border-b border-slate-200 font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                      <th className="px-3 py-2.5">Code</th>
+                      <th className="px-3 py-2.5">Title</th>
+                      <th className="px-3 py-2.5">Session · Sem</th>
+                      <th className="px-3 py-2.5">Credits</th>
+                      <th className="px-3 py-2.5">Assigned Faculty</th>
+                      <th className="px-3 py-2.5 text-right">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {filteredCatalogCourses.map((c) => (
+                      <tr key={c.id} className="bg-white hover:bg-[#F7F7F5]/60">
+                        <td className="px-3 py-2.5 font-mono font-semibold text-pust-900 whitespace-nowrap">
+                          {c.code}
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-900 font-medium">{c.title}</td>
+                        <td className="px-3 py-2.5 font-mono text-slate-600 whitespace-nowrap tabular-nums">
+                          {c.session} · Sem {c.semester}
+                        </td>
+                        <td className="px-3 py-2.5 font-mono text-slate-700 tabular-nums">
+                          {c.credits}
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <select
+                            value={c.teacherUserId || ''}
+                            disabled={busyCourseId === c.id}
+                            onChange={(e) => handleQuickAssignCourseTeacher(c, e.target.value)}
+                            className="w-full min-w-[180px] px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                          >
+                            <option value="">Unassigned</option>
+                            {scopedDeptFaculty.map((f) => (
+                              <option key={f.id} value={f.id}>
+                                {f.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-3 py-2.5 text-right">
+                          <button
+                            type="button"
+                            disabled={busyCourseId === c.id}
+                            onClick={() => handleDeleteCourse(c)}
+                            aria-label={`Remove ${c.code}`}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* 2) Chairman / Admin: Exam Committee Formation (Session + Semester) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form
+              onSubmit={handleCreateExamCommittee}
+              className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
+            >
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-pust-800" />
+                  Create Exam Committee
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Appoint department faculty for a specific session and semester to arrange exams, calculate results, and forward them for publication.
+                </p>
               </div>
 
-              <div>
-                <label
-                  htmlFor="course-year"
-                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-                >
-                  Year
-                </label>
-                <select
-                  id="course-year"
-                  value={courseYear}
-                  onChange={(e) => setCourseYear(Number(e.target.value))}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
-                >
-                  {ACADEMIC_YEARS.map((yr) => (
-                    <option key={yr.value} value={yr.value}>
-                      {yr.label} Year
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="course-term-semester"
-                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-                >
-                  Semester
-                </label>
-                <select
-                  id="course-term-semester"
-                  value={courseTermSem}
-                  onChange={(e) => setCourseTermSem(Number(e.target.value))}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
-                >
-                  {YEAR_SEMESTERS.map((sem) => (
-                    <option key={sem.value} value={sem.value}>
-                      {sem.label} Semester
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div className="sm:col-span-8">
-                <label
-                  htmlFor="course-code-suffix"
-                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-                >
-                  Course Code
-                </label>
-                <div className="flex items-stretch rounded-lg border border-slate-300 bg-[#F7F7F5] focus-within:bg-white focus-within:border-pust-800 overflow-hidden">
-                  <span
-                    className="inline-flex items-center px-3 py-2 font-mono text-xs font-semibold text-pust-900 bg-pust-50 border-r border-slate-300 select-none shrink-0"
-                    title="First 3 letters of selected department"
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label
+                    htmlFor="ec-session"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
                   >
-                    {courseDeptPrefix}-
-                  </span>
-                  <input
-                    id="course-code-suffix"
-                    type="text"
-                    required
-                    maxLength={14}
-                    value={courseCodeSuffix}
-                    onChange={(e) => setCourseCodeSuffix(e.target.value.toUpperCase())}
-                    placeholder="4101"
-                    className="w-full min-w-0 px-3 py-2 font-mono text-xs uppercase bg-transparent text-slate-900 focus:outline-none tabular-nums"
-                  />
+                    Session
+                  </label>
+                  <select
+                    id="ec-session"
+                    value={ecSession}
+                    onChange={(e) => setEcSession(e.target.value)}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900"
+                  >
+                    {ACADEMIC_SESSIONS.map((sess) => (
+                      <option key={sess} value={sess}>
+                        {sess}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="ec-year"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Year
+                  </label>
+                  <select
+                    id="ec-year"
+                    value={ecYear}
+                    onChange={(e) => setEcYear(Number(e.target.value))}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900"
+                  >
+                    {ACADEMIC_YEARS.map((yr) => (
+                      <option key={yr.value} value={yr.value}>
+                        {yr.label} Year
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="ec-term"
+                    className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >
+                    Semester
+                  </label>
+                  <select
+                    id="ec-term"
+                    value={ecTermSem}
+                    onChange={(e) => setEcTermSem(Number(e.target.value))}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900"
+                  >
+                    {YEAR_SEMESTERS.map((sem) => (
+                      <option key={sem.value} value={sem.value}>
+                        {sem.label} Semester
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div className="sm:col-span-4">
+              <div>
                 <label
-                  htmlFor="course-credits"
+                  htmlFor="ec-title"
                   className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
                 >
-                  Credits
+                  Committee Name (Optional)
                 </label>
                 <input
-                  id="course-credits"
-                  type="number"
-                  step="0.5"
-                  min={0.5}
-                  max={6}
-                  required
-                  value={courseCredits}
-                  onChange={(e) => setCourseCredits(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                  id="ec-title"
+                  type="text"
+                  maxLength={180}
+                  value={ecTitle}
+                  onChange={(e) => setEcTitle(e.target.value)}
+                  placeholder={`${user.role === 'chairman' ? user.departmentCode : courseDept} Exam Committee · ${ecSession} · Sem ${computedEcSemester}`}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="course-title"
-                className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
-              >
-                Course Title
-              </label>
-              <input
-                id="course-title"
-                type="text"
-                required
-                minLength={3}
-                maxLength={120}
-                value={courseTitle}
-                onChange={(e) => setCourseTitle(e.target.value)}
-                placeholder="e.g. Artificial Intelligence & Neural Networks"
-                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
-              />
-            </div>
+              <div>
+                <label
+                  htmlFor="ec-chair"
+                  className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >
+                  Committee Chair / Convener
+                </label>
+                <select
+                  id="ec-chair"
+                  value={ecChairId}
+                  onChange={(e) => setEcChairId(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900"
+                >
+                  {scopedDeptFaculty.length === 0 ? (
+                    <option value="">No approved department faculty found</option>
+                  ) : (
+                    scopedDeptFaculty.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name} ({f.designation || f.role})
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <span className="font-mono text-[11px] text-slate-500 tabular-nums">
-                {courseDeptPrefix}-
-                {courseCodeSuffix.trim().toUpperCase() || '____'} · Semester {computedCourseSemester}/10
-              </span>
-              <button
-                type="submit"
-                disabled={savingCourse}
-                className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
-              >
-                {savingCourse ? 'Saving Course...' : 'Save Course'}
-              </button>
-            </div>
-          </form>
+              <div>
+                <span className="block font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Additional Committee Members
+                </span>
+                <div className="grid grid-cols-1 gap-1.5 max-h-36 overflow-y-auto pr-1">
+                  {scopedDeptFaculty
+                    .filter((f) => f.id !== ecChairId)
+                    .map((f) => {
+                      const active = ecMemberIds.includes(f.id);
+                      return (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => toggleCommitteeMemberId(f.id)}
+                          aria-pressed={active}
+                          className={`px-3 py-2 text-left rounded-lg border text-xs transition-colors cursor-pointer flex items-center justify-between ${
+                            active
+                              ? 'bg-pust-900 text-white border-pust-900'
+                              : 'bg-[#F7F7F5] text-slate-800 border-slate-200 hover:border-pust-700'
+                          }`}
+                        >
+                          <span>
+                            {active ? '✓ ' : ''}
+                            {f.name}
+                          </span>
+                          <span className={`text-[11px] ${active ? 'text-white/80' : 'text-slate-500'}`}>
+                            {f.designation || f.role}
+                          </span>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
 
-          <form
-            onSubmit={handleCreateExamCircular}
-            className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs"
-          >
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="font-serif text-lg font-medium text-slate-900">
-                Publish Exam Form Fill-up Circular
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Configure examination metadata, fee schedule, deadline, and eligible courses.
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                  {ecSession} · Semester {computedEcSemester}/10
+                </span>
+                <button
+                  type="submit"
+                  disabled={savingCommittee || !ecChairId}
+                  className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  {savingCommittee ? 'Creating Committee...' : 'Create Exam Committee'}
+                </button>
+              </div>
+            </form>
+
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+              <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <div>
+                  <h3 className="font-serif text-lg font-medium text-slate-900">
+                    Examination Committees ({committees.length})
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Appointed committees can arrange examinations and calculate/forward results for their term.
+                  </p>
+                </div>
+              </div>
+
+              {committees.length === 0 ? (
+                <p className="text-sm text-slate-600">
+                  No Exam Committees formed yet. Select a session, semester, and faculty members on the left.
+                </p>
+              ) : (
+                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+                  {committees.map((c) => (
+                    <div key={c.id} className="p-4 space-y-2 bg-white text-xs">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <p className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums">
+                            {c.departmentCode} · {c.session} · Semester {c.semester} ·{' '}
+                            <span
+                              className={
+                                c.status === 'active' ? 'text-emerald-800' : 'text-slate-500'
+                              }
+                            >
+                              {c.status === 'active' ? 'Active' : 'Dissolved'}
+                            </span>
+                          </p>
+                          <p className="font-medium text-sm text-slate-900 mt-0.5">{c.title}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            disabled={busyCommitteeId === c.id}
+                            onClick={() => handleToggleCommitteeStatus(c)}
+                            className="px-2.5 py-1 rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 cursor-pointer"
+                          >
+                            {c.status === 'active' ? 'Dissolve' : 'Reactivate'}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busyCommitteeId === c.id}
+                            onClick={() => handleDeleteCommittee(c)}
+                            aria-label={`Remove ${c.title}`}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {c.members.map((m) => (
+                          <span
+                            key={m.userId}
+                            className="px-2 py-1 rounded-md bg-[#F7F7F5] border border-slate-200 text-slate-800"
+                          >
+                            {m.name} ·{' '}
+                            <span className="font-mono text-[11px] text-pust-800">
+                              {m.committeeRole === 'chair' ? 'Chair' : 'Member'}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chairman / Admin / Exam Committee: Arrange Examination & Publish Exam Circular */}
+      {canArrangeExams && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
+          <form onSubmit={handleCreateExamCircular} className="space-y-4">
+            <div className="border-b border-slate-100 pb-3 flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-lg font-medium text-slate-900 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-pust-800" />
+                  {user.role === 'teacher'
+                    ? 'Exam Committee: Arrange Examination & Publish Circular'
+                    : 'Arrange Examination & Publish Exam Circular'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Configure examination date, venue, registration fee, deadline, and eligible courses.
+                </p>
+              </div>
+              {user.role === 'teacher' && selectedArrangeCommittee && (
+                <span className="font-mono text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-pust-50 text-pust-900 border border-pust-800/20">
+                  {selectedArrangeCommittee.title}
+                </span>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
@@ -1174,7 +2160,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   htmlFor="circ-title"
                   className="block text-xs font-medium text-slate-700 mb-1"
                 >
-                  Circular Title
+                  Examination / Circular Title
                 </label>
                 <input
                   id="circ-title"
@@ -1184,7 +2170,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   maxLength={180}
                   value={circTitle}
                   onChange={(e) => setCircTitle(e.target.value)}
-                  placeholder="e.g. B.Sc. Engineering 3rd Year 2nd Semester Exam 2026"
+                  placeholder="e.g. B.Sc. Engineering 3rd Year 1st Semester Final Exam 2026"
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
                 />
               </div>
@@ -1199,7 +2185,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   id="circ-dept"
                   value={circDept}
-                  disabled={user.role === 'chairman'}
+                  disabled={user.role === 'chairman' || isCommitteeOperator}
                   onChange={(e) => {
                     setCircDept(e.target.value);
                     setShowAllDeptCourses(false);
@@ -1226,8 +2212,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   id="circ-session"
                   value={circSession}
+                  disabled={isCommitteeOperator}
                   onChange={(e) => setCircSession(e.target.value)}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums disabled:opacity-75"
                 >
                   {ACADEMIC_SESSIONS.map((sess) => (
                     <option key={sess} value={sess}>
@@ -1247,8 +2234,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   id="circ-year"
                   value={circYear}
+                  disabled={isCommitteeOperator}
                   onChange={(e) => setCircYear(Number(e.target.value))}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
                 >
                   {ACADEMIC_YEARS.map((yr) => (
                     <option key={yr.value} value={yr.value}>
@@ -1268,8 +2256,9 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 <select
                   id="circ-term-semester"
                   value={circTermSem}
+                  disabled={isCommitteeOperator}
                   onChange={(e) => setCircTermSem(Number(e.target.value))}
-                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                  className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none disabled:opacity-75"
                 >
                   {YEAR_SEMESTERS.map((sem) => (
                     <option key={sem.value} value={sem.value}>
@@ -1280,7 +2269,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label
                   htmlFor="circ-fee"
@@ -1311,7 +2300,7 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   htmlFor="circ-deadline"
                   className="block text-xs font-medium text-slate-700 mb-1"
                 >
-                  Submission Deadline
+                  Form Submission Deadline
                 </label>
                 <input
                   id="circ-deadline"
@@ -1320,6 +2309,59 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                   value={circDeadline}
                   onChange={(e) => setCircDeadline(e.target.value)}
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="circ-start-date"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Exam Commencement Date
+                </label>
+                <input
+                  id="circ-start-date"
+                  type="date"
+                  value={circExamStartDate}
+                  onChange={(e) => setCircExamStartDate(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label
+                  htmlFor="circ-venue"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Examination Venue / Hall Room
+                </label>
+                <input
+                  id="circ-venue"
+                  type="text"
+                  maxLength={140}
+                  value={circExamVenue}
+                  onChange={(e) => setCircExamVenue(e.target.value)}
+                  placeholder="e.g. Academic Building Room 302 & Lab 2"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="circ-schedule-note"
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
+                  Routine / Invigilation Schedule Note
+                </label>
+                <input
+                  id="circ-schedule-note"
+                  type="text"
+                  maxLength={400}
+                  value={circScheduleNote}
+                  onChange={(e) => setCircScheduleNote(e.target.value)}
+                  placeholder="e.g. Morning shift 10:00 AM - 1:00 PM; admit card mandatory"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
                 />
               </div>
             </div>
@@ -1436,15 +2478,22 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                 disabled={publishingCircular || circCourseCodes.length === 0}
                 className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
               >
-                {publishingCircular ? 'Publishing...' : 'Publish Exam Circular'}
+                {publishingCircular
+                  ? 'Arranging Exam...'
+                  : user.role === 'teacher'
+                  ? 'Arrange Exam & Publish Circular'
+                  : 'Publish Exam Circular'}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* Exam Form Applications, Payment, Chairman Admit Card Issuance (Student, Chairman & Admin) */}
-      {(user.role === 'student' || user.role === 'chairman' || user.role === 'admin') && (
+      {/* Exam Form Applications, Payment, Admit Card Issuance (Student, Chairman, Admin & Exam Committee) */}
+      {(user.role === 'student' ||
+        user.role === 'chairman' ||
+        user.role === 'admin' ||
+        myActiveCommittees.length > 0) && (
         <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
           <h3 className="font-serif text-lg font-medium text-slate-900">
             Examination Registrations, Digital Payments &amp; Admit Cards
@@ -1519,7 +2568,14 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
                     </div>
                   </div>
 
-                  {(user.role === 'chairman' || user.role === 'admin') &&
+                  {(user.role === 'chairman' ||
+                    user.role === 'admin' ||
+                    myActiveCommittees.some(
+                      (c) =>
+                        c.departmentCode.toUpperCase() === app.departmentCode.toUpperCase() &&
+                        c.session === app.session &&
+                        c.semester === app.semester
+                    )) &&
                     app.paymentStatus === 'Paid' &&
                     app.verificationStatus === 'Pending Chairman Verification' && (
                       <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
@@ -1954,6 +3010,17 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
             </div>
           </div>
 
+          {matchingGradebookCommittee && (
+            <div className="px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50/70 text-xs text-emerald-950 flex flex-wrap items-center justify-between gap-2">
+              <span className="font-medium">
+                Active Exam Committee Match: <strong>{matchingGradebookCommittee.title}</strong>
+              </span>
+              <span className="font-mono text-[11px]">
+                Forward calculated results to Department Chairman or Admin Office below
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               type="button"
@@ -1963,96 +3030,193 @@ export function ExamPanel({ user, departments }: ExamPanelProps) {
               <Plus className="w-3.5 h-3.5" />
               Add Custom Course Row
             </button>
-            <button
-              type="submit"
-              disabled={publishingResult}
-              className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
-            >
-              {publishingResult
-                ? 'Saving Result...'
-                : user.role === 'teacher'
-                ? 'Submit Marksheet for Chairman Review'
-                : 'Calculate SGPA & Publish Result'}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              {(user.role === 'teacher' || myActiveCommittees.length > 0) && (
+                <>
+                  <button
+                    type="button"
+                    disabled={publishingResult}
+                    onClick={(e) => handlePublishResult(e, 'chairman')}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    {publishingResult
+                      ? 'Submitting...'
+                      : 'Calculate & Forward to Chairman'}
+                  </button>
+                  {matchingGradebookCommittee && (
+                    <button
+                      type="button"
+                      disabled={publishingResult}
+                      onClick={(e) => handlePublishResult(e, 'admin')}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg border border-pust-900 bg-white text-pust-900 hover:bg-pust-50 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      Forward to Admin Office
+                    </button>
+                  )}
+                </>
+              )}
+              {(user.role === 'chairman' || user.role === 'admin') && (
+                <>
+                  {user.role === 'chairman' && (
+                    <button
+                      type="button"
+                      disabled={publishingResult}
+                      onClick={(e) => handlePublishResult(e, 'admin')}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      Forward to Admin Office
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={publishingResult}
+                    className="px-5 py-2.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    {publishingResult ? 'Saving Result...' : 'Calculate SGPA & Publish Result'}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </form>
       )}
 
-      {/* Pending Chairman Review Queue */}
-      {pendingResults.length > 0 && (user.role === 'teacher' || user.role === 'chairman' || user.role === 'admin') && (
-        <div className="bg-white rounded-2xl border border-amber-300 p-6 space-y-4 shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
-            <div>
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                Pending Chairman Verification Queue ({pendingResults.length})
-              </p>
-              <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
-                Teacher-Submitted Marksheets Awaiting Departmental Seal
-              </h3>
+      {/* Pending Verification & Forwarding Queue */}
+      {pendingResults.length > 0 &&
+        (user.role === 'teacher' ||
+          user.role === 'chairman' ||
+          user.role === 'admin' ||
+          myActiveCommittees.length > 0) && (
+          <div className="bg-white rounded-2xl border border-amber-300 p-6 space-y-4 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div>
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  Calculated Results Awaiting Publish / Forwarding ({pendingResults.length})
+                </p>
+                <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+                  Result Approval &amp; Forwarding Queue (Chairman &amp; Admin Office)
+                </h3>
+              </div>
+            </div>
+
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
+              {pendingResults.map((r, idx) => {
+                const isAdminPending = r.status === 'pending_admin';
+                const isMemberForResult = myActiveCommittees.some(
+                  (c) =>
+                    c.departmentCode.toUpperCase() === r.departmentCode.toUpperCase() &&
+                    c.session === r.session &&
+                    c.semester === r.semester
+                );
+                const canChairmanPublish = user.role === 'chairman' && !isAdminPending;
+                const canAdminPublish = user.role === 'admin';
+                const canForwardToAdmin =
+                  !isAdminPending &&
+                  (user.role === 'chairman' || user.role === 'admin' || isMemberForResult);
+                const canForwardToChairman =
+                  isAdminPending && (user.role === 'admin' || isMemberForResult);
+
+                return (
+                  <div
+                    key={pendingResultKeys[idx] || `${r.id}-${r.academicId}-${r.semester}-${idx}`}
+                    className={`p-4 space-y-3 text-sm ${
+                      isAdminPending ? 'bg-slate-50/70' : 'bg-amber-50/30'
+                    }`}
+                  >
+                    <div className="flex flex-wrap justify-between items-start gap-2">
+                      <div>
+                        <p className="font-medium text-slate-900">
+                          {r.studentName} ({r.academicId}) · Semester {r.semester} ({r.session})
+                        </p>
+                        <p className="font-mono text-xs text-slate-500 mt-0.5">
+                          Prepared by {r.enteredBy} · Provisional SGPA{' '}
+                          <span className="font-semibold text-amber-900 tabular-nums">
+                            {r.sgpa.toFixed(2)}
+                          </span>{' '}
+                          ·{' '}
+                          <span
+                            className={`font-semibold ${
+                              isAdminPending ? 'text-pust-900' : 'text-amber-800'
+                            }`}
+                          >
+                            {isAdminPending
+                              ? 'Forwarded to Admin Office'
+                              : 'Pending Chairman Publish / Forward'}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {(canChairmanPublish || canAdminPublish) && (
+                          <>
+                            <select
+                              value={pendingPromoModes[r.id] || 'auto'}
+                              onChange={(e) =>
+                                setPendingPromoModes((prev) => ({
+                                  ...prev,
+                                  [r.id]: e.target.value as 'auto' | 'manual_promoted' | 'manual_repeat',
+                                }))
+                              }
+                              className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white"
+                            >
+                              <option value="auto">Auto Promotion</option>
+                              <option value="manual_promoted">Override: Promoted</option>
+                              <option value="manual_repeat">Override: Repeat</option>
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => handleApprovePendingResult(r)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                            >
+                              <FileCheck2 className="w-3.5 h-3.5" />
+                              Verify &amp; Publish Result
+                            </button>
+                          </>
+                        )}
+
+                        {canForwardToAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => handleForwardResult(r, 'admin')}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            Forward to Admin Office
+                          </button>
+                        )}
+
+                        {canForwardToChairman && (
+                          <button
+                            type="button"
+                            onClick={() => handleForwardResult(r, 'chairman')}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            Forward to Chairman
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3 font-mono text-xs text-slate-700">
+                      {r.courses.map((c) => (
+                        <span
+                          key={c.code}
+                          className="px-2 py-1 rounded-md bg-white border border-slate-200 tabular-nums"
+                        >
+                          {c.code}: {c.marks} ({c.letterGrade}, {c.gradePoint.toFixed(2)})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden">
-            {pendingResults.map((r, idx) => (
-              <div
-                key={pendingResultKeys[idx] || `${r.id}-${r.academicId}-${r.semester}-${idx}`}
-                className="p-4 space-y-3 bg-amber-50/30 text-sm"
-              >
-                <div className="flex flex-wrap justify-between items-start gap-2">
-                  <div>
-                    <p className="font-medium text-slate-900">
-                      {r.studentName} ({r.academicId}) · Semester {r.semester} ({r.session})
-                    </p>
-                    <p className="font-mono text-xs text-slate-500 mt-0.5">
-                      Submitted by {r.enteredBy} · Provisional SGPA{' '}
-                      <span className="font-semibold text-amber-900 tabular-nums">
-                        {r.sgpa.toFixed(2)}
-                      </span>
-                    </p>
-                  </div>
-                  {(user.role === 'chairman' || user.role === 'admin') && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <select
-                        value={pendingPromoModes[r.id] || 'auto'}
-                        onChange={(e) =>
-                          setPendingPromoModes((prev) => ({
-                            ...prev,
-                            [r.id]: e.target.value as 'auto' | 'manual_promoted' | 'manual_repeat',
-                          }))
-                        }
-                        className="px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white"
-                      >
-                        <option value="auto">Auto Promotion</option>
-                        <option value="manual_promoted">Override: Promoted</option>
-                        <option value="manual_repeat">Override: Repeat</option>
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => handleApprovePendingResult(r)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
-                      >
-                        <FileCheck2 className="w-3.5 h-3.5" />
-                        Verify &amp; Publish Result
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-3 font-mono text-xs text-slate-700">
-                  {r.courses.map((c) => (
-                    <span
-                      key={c.code}
-                      className="px-2 py-1 rounded-md bg-white border border-slate-200 tabular-nums"
-                    >
-                      {c.code}: {c.marks} ({c.letterGrade}, {c.gradePoint.toFixed(2)})
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
 
       {/* Published Results Ledger */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">

@@ -17,6 +17,7 @@ import type {
   ClearanceOfficeKey,
   CourseRecord,
   DepartmentApprovalOverviewResponse,
+  DepartmentFacultySummary,
   DepartmentPersonRecord,
   DepartmentRecord,
   DepartmentRequestCategory,
@@ -25,6 +26,7 @@ import type {
   DigitalDocumentMeta,
   ExamApplicationRecord,
   ExamCircularRecord,
+  ExamCommitteeRecord,
   ExamResultRecord,
   FacultyProfileRequestRecord,
   FeeConfig,
@@ -525,7 +527,7 @@ export const pustApi = {
       body: JSON.stringify({}),
     }),
 
-  // Portal: Exams, Courses, Payments, Admit Cards & Results
+  // Portal: Exams, Courses, Exam Committees, Payments, Admit Cards & Results
   getExamsOverview: () =>
     apiFetch<{
       courses: CourseRecord[];
@@ -533,6 +535,8 @@ export const pustApi = {
       applications: ExamApplicationRecord[];
       results: ExamResultRecord[];
       gateways: PaymentGatewayConfig[];
+      committees: ExamCommitteeRecord[];
+      departmentFaculty: DepartmentFacultySummary[];
       hallClearanceBlocked: boolean;
       unpaidHallDues: HallDueRecord[];
     }>('/api/portal/exams/overview'),
@@ -545,10 +549,61 @@ export const pustApi = {
     semester: number;
     session: string;
     teacherEmail?: string;
+    teacherUserId?: string;
   }) =>
     apiFetch<{ course: CourseRecord }>('/api/portal/exams/courses', {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+
+  updateCourse: (
+    id: string,
+    payload: { title?: string; credits?: number; teacherUserId?: string | null }
+  ) =>
+    apiFetch<{ course: CourseRecord }>(`/api/portal/exams/courses/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteCourse: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/exams/courses/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+
+  getExamCommittees: () =>
+    apiFetch<{ committees: ExamCommitteeRecord[] }>('/api/portal/exams/committees'),
+
+  createExamCommittee: (payload: {
+    departmentCode: string;
+    session: string;
+    semester: number;
+    title?: string;
+    members: Array<{ userId: string; committeeRole: 'chair' | 'member' }>;
+  }) =>
+    apiFetch<{ committee: ExamCommitteeRecord }>('/api/portal/exams/committees', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateExamCommittee: (
+    id: string,
+    payload: {
+      title?: string;
+      status?: 'active' | 'dissolved';
+      members?: Array<{ userId: string; committeeRole: 'chair' | 'member' }>;
+    }
+  ) =>
+    apiFetch<{ committee: ExamCommitteeRecord }>(
+      `/api/portal/exams/committees/${encodeURIComponent(id)}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  deleteExamCommittee: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/exams/committees/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
     }),
 
   createExamCircular: (payload: {
@@ -559,6 +614,10 @@ export const pustApi = {
     deadline: string;
     feeBdt: number;
     eligibleCourseCodes: string[];
+    examStartDate?: string;
+    examVenue?: string;
+    scheduleNote?: string;
+    committeeId?: string;
   }) =>
     apiFetch<{ circular: ExamCircularRecord }>('/api/portal/exams/circulars', {
       method: 'POST',
@@ -602,13 +661,26 @@ export const pustApi = {
     academicId: string;
     semester: number;
     promotionMode: 'auto' | 'manual_promoted' | 'manual_repeat';
+    submissionTarget?: 'publish' | 'chairman' | 'admin';
+    committeeId?: string;
     courses: Array<{ code: string; title: string; credits: number; marks: number }>;
   }) =>
-    apiFetch<{ result: ExamResultRecord; pendingChairmanReview?: boolean; cumulativeCgpa?: number }>(
-      '/api/portal/exams/results',
+    apiFetch<{
+      result: ExamResultRecord;
+      pendingChairmanReview?: boolean;
+      pendingAdminReview?: boolean;
+      cumulativeCgpa?: number;
+    }>('/api/portal/exams/results', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  forwardExamResult: (id: string, target: 'chairman' | 'admin') =>
+    apiFetch<{ result: ExamResultRecord }>(
+      `/api/portal/exams/results/${encodeURIComponent(id)}/forward`,
       {
-        method: 'POST',
-        body: JSON.stringify(payload),
+        method: 'PATCH',
+        body: JSON.stringify({ target }),
       }
     ),
 

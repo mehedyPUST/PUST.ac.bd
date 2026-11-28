@@ -21,7 +21,10 @@ import type {
   AuthUser,
   ChairmanHistoryRecord,
   ClearanceOfficeKey,
+  DepartmentFacultySummary,
   DepartmentPersonRecord,
+  ExamCommitteeMember,
+  ExamCommitteeRecord,
   FacultyProfileRequestRecord,
   OfficeClearanceState,
   UserRole,
@@ -250,7 +253,37 @@ const courseCreateSchema = z.object({
   semester: z.number().int().min(1).max(10),
   session: z.string().trim().min(4).max(20),
   teacherEmail: z.string().trim().email().optional(),
+  teacherUserId: z.string().trim().min(2).max(80).optional(),
 });
+
+const courseUpdateSchema = z
+  .object({
+    title: z.string().trim().min(3).max(120).optional(),
+    credits: z.number().min(0.5).max(6).optional(),
+    teacherUserId: z.string().trim().max(80).nullable().optional(),
+  })
+  .refine((obj) => Object.keys(obj).length > 0, 'Provide at least one course field to update.');
+
+const examCommitteeMemberInputSchema = z.object({
+  userId: z.string().trim().min(2).max(80),
+  committeeRole: z.enum(['chair', 'member']).default('member'),
+});
+
+const examCommitteeCreateSchema = z.object({
+  departmentCode: z.string().trim().min(2).max(16),
+  session: z.string().trim().min(4).max(20),
+  semester: z.number().int().min(1).max(10),
+  title: z.string().trim().min(3).max(180).optional(),
+  members: z.array(examCommitteeMemberInputSchema).min(1).max(10),
+});
+
+const examCommitteeUpdateSchema = z
+  .object({
+    title: z.string().trim().min(3).max(180).optional(),
+    status: z.enum(['active', 'dissolved']).optional(),
+    members: z.array(examCommitteeMemberInputSchema).min(1).max(10).optional(),
+  })
+  .refine((obj) => Object.keys(obj).length > 0, 'Provide at least one committee update.');
 
 const examCircularSchema = z.object({
   title: z.string().trim().min(5).max(180),
@@ -260,6 +293,10 @@ const examCircularSchema = z.object({
   deadline: z.string().trim().min(8).max(20),
   feeBdt: z.number().int().min(100).max(25000),
   eligibleCourseCodes: z.array(z.string().trim().min(2).max(20)).min(1).max(15),
+  examStartDate: z.string().trim().max(20).optional(),
+  examVenue: z.string().trim().max(160).optional(),
+  scheduleNote: z.string().trim().max(500).optional(),
+  committeeId: z.string().trim().max(80).optional(),
 });
 
 const examApplySchema = z.object({
@@ -281,6 +318,8 @@ const resultCreateSchema = z.object({
   academicId: z.string().trim().min(3).max(32),
   semester: z.number().int().min(1).max(10),
   promotionMode: z.enum(['auto', 'manual_promoted', 'manual_repeat']).default('auto'),
+  submissionTarget: z.enum(['publish', 'chairman', 'admin']).optional(),
+  committeeId: z.string().trim().max(80).optional(),
   courses: z
     .array(
       z.object({
@@ -292,6 +331,10 @@ const resultCreateSchema = z.object({
     )
     .min(1)
     .max(12),
+});
+
+const resultForwardSchema = z.object({
+  target: z.enum(['chairman', 'admin']),
 });
 
 const certApplySchema = z.object({
@@ -1133,6 +1176,47 @@ async function computeCumulativeCgpa(academicId: string, fallbackSgpa: number): 
   return credits > 0 ? Number((weighted / credits).toFixed(2)) : fallbackSgpa;
 }
 
+function isUserInExamCommittee(committee: ExamCommitteeRecord, authUser: JwtClaims): boolean {
+  if (committee.status !== 'active') return false;
+  const emailLower = authUser.email.toLowerCase();
+  return committee.members.some(
+    (m) => m.userId === authUser.sub || m.email.toLowerCase() === emailLower
+  );
+}
+
+async function findMatchingActiveCommittee(
+  authUser: JwtClaims,
+  departmentCode: string,
+  session: string,
+  semester: number
+): Promise<ExamCommitteeRecord | null> {
+  const normDept = departmentCode.trim().toUpperCase();
+  const committees = await pustRepo.listExamCommittees();
+  return (
+    committees.find(
+      (c) =>
+        c.status === 'active' &&
+        c.departmentCode.toUpperCase() === normDept &&
+        c.session === session &&
+        c.semester === semester &&
+        isUserInExamCommittee(c, authUser)
+    ) ?? null
+  );
+}
+
+async function getActiveCommitteesForUser(authUser: JwtClaims): Promise<ExamCommitteeRecord[]> {
+  const committees = await pustRepo.listExamCommittees();
+  return committees.filter((c) => isUserInExamCommittee(c, authUser));
+}
+
+function isDepartmentFacultyAccount(u: AuthUser): boolean {
+  return (
+    u.approvalStatus === 'approved' &&
+    (['teacher', 'chairman', 'dean'].includes(u.role) ||
+      (u.primaryRole !== undefined && ['teacher', 'chairman', 'dean'].includes(u.primaryRole)))
+  );
+}
+
 // 1. Account Approvals & Authority Management
 portalRouter.get(
   '/users',
@@ -1967,8 +2051,8 @@ portalRouter.patch(
       return;
     }
     const target = await pustRepo.findUserById(String(req.params.id));
-    if (!target || target.role !== 'teacher') {
-      res.status(404).json({ error: 'Teacher account not found.' });
+    if (!target || !['teacher', 'chairman', 'dean'].includes(target.role)) {
+      res.status(404).json({ error: 'Faculty account not found.' });
       return;
     }
     if (
@@ -1976,29 +2060,67 @@ portalRouter.patch(
       target.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
     ) {
       res.status(403).json({
-        error: 'Department Chairmen may only assign courses to teachers in their own department.',
+        error: 'Department Chairmen may only assign courses to faculty members in their own department.',
       });
       return;
     }
+    const normalizedCourses = Array.from(
+      new Set(parsed.data.assignedCourses.map((c) => c.trim().toUpperCase()).filter(Boolean))
+    );
+    const normalizedSessions = Array.from(
+      new Set(parsed.data.assignedSessions.map((s) => s.trim()).filter(Boolean))
+    );
     const updated = await pustRepo.updateTeacherAssignments(
       target.id,
-      parsed.data.assignedCourses,
-      parsed.data.assignedSessions
+      normalizedCourses,
+      normalizedSessions
     );
     if (!updated) {
-      res.status(404).json({ error: 'Teacher account not found.' });
+      res.status(404).json({ error: 'Faculty account not found.' });
       return;
     }
+
+    // Keep course records in the faculty member's department synchronized when course codes match
+    const targetDept = target.departmentCode.toUpperCase();
+    const deptCourses = (await pustRepo.listCourses()).filter(
+      (c) => c.departmentCode.toUpperCase() === targetDept
+    );
+    const assignedCodeSet = new Set(normalizedCourses);
+    const assignedSessionSet = new Set(normalizedSessions);
+    for (const crs of deptCourses) {
+      const codeUpper = crs.code.toUpperCase();
+      const matchesCourse = assignedCodeSet.has(codeUpper);
+      const matchesSession =
+        assignedSessionSet.size === 0 || assignedSessionSet.has(crs.session);
+      if (matchesCourse && matchesSession) {
+        await pustRepo.updateCourse(crs.id, {
+          teacherUserId: target.id,
+          teacherEmail: target.email,
+          teacherName: target.name,
+        });
+      } else if (
+        (crs.teacherUserId === target.id ||
+          (crs.teacherEmail && crs.teacherEmail.toLowerCase() === target.email.toLowerCase())) &&
+        (!matchesCourse || !matchesSession)
+      ) {
+        await pustRepo.updateCourse(crs.id, {
+          teacherUserId: undefined,
+          teacherEmail: undefined,
+          teacherName: undefined,
+        });
+      }
+    }
+
     await pustRepo.logAudit(
       req.authUser!.name,
       req.authUser!.role,
-      'Assigned courses/sessions to teacher',
+      'Assigned courses/sessions to faculty member',
       `${target.name} (${target.departmentCode})`,
       {
         category: 'Privilege & Security',
         severity: 'elevated',
         actorEmail: req.authUser!.email,
-        details: `Courses: ${parsed.data.assignedCourses.join(', ') || 'None'} | Sessions: ${parsed.data.assignedSessions.join(', ') || 'None'}`,
+        details: `Courses: ${normalizedCourses.join(', ') || 'None'} | Sessions: ${normalizedSessions.join(', ') || 'None'}`,
       }
     );
     res.json({ user: updated });
@@ -2642,20 +2764,92 @@ portalRouter.patch(
   }
 );
 
-// 6. Courses, Examination Circulars, Hall Dues Gate, Payments, Admit Cards & Results
+// 6. Courses, Exam Committees, Examination Circulars, Hall Dues Gate, Payments, Admit Cards & Results
 portalRouter.get('/exams/overview', requireAuth, async (req: AuthenticatedRequest, res) => {
   const courses = await pustRepo.listCourses();
   const circulars = await pustRepo.listExamCirculars();
   let apps = await pustRepo.listExamApplications();
   let results = await pustRepo.listExamResults();
   const gateways = (await pustRepo.listPaymentGateways()).filter((g) => g.enabled);
+  const allCommittees = await pustRepo.listExamCommittees();
+  const myCommittees = allCommittees.filter(
+    (c) => c.status === 'active' && isUserInExamCommittee(c, req.authUser!)
+  );
+  const actorDept = req.authUser!.departmentCode.toUpperCase();
 
   if (req.authUser!.role === 'student') {
     apps = apps.filter((a) => a.academicId === req.authUser!.academicId);
     results = results.filter((r) => r.academicId === req.authUser!.academicId && r.published);
-  } else if (req.authUser!.role === 'chairman' || req.authUser!.role === 'teacher') {
+  } else if (req.authUser!.role === 'chairman') {
     apps = apps.filter((a) => a.departmentCode === req.authUser!.departmentCode);
     results = results.filter((r) => r.departmentCode === req.authUser!.departmentCode);
+  } else if (req.authUser!.role === 'teacher') {
+    const activeTermKeys = new Set(
+      myCommittees.map((c) => `${c.departmentCode.toUpperCase()}::${c.session}::${c.semester}`)
+    );
+    apps = apps.filter((a) =>
+      activeTermKeys.has(`${a.departmentCode.toUpperCase()}::${a.session}::${a.semester}`)
+    );
+    results = results.filter(
+      (r) =>
+        r.departmentCode === req.authUser!.departmentCode ||
+        activeTermKeys.has(`${r.departmentCode.toUpperCase()}::${r.session}::${r.semester}`)
+    );
+  } else if (req.authUser!.role !== 'admin') {
+    const activeTermKeys = new Set(
+      myCommittees.map((c) => `${c.departmentCode.toUpperCase()}::${c.session}::${c.semester}`)
+    );
+    apps = apps.filter((a) =>
+      activeTermKeys.has(`${a.departmentCode.toUpperCase()}::${a.session}::${a.semester}`)
+    );
+    results = results.filter((r) =>
+      activeTermKeys.has(`${r.departmentCode.toUpperCase()}::${r.session}::${r.semester}`)
+    );
+  }
+
+  let committees = [] as typeof allCommittees;
+  if (req.authUser!.role === 'admin') {
+    committees = allCommittees;
+  } else if (req.authUser!.role === 'chairman' || req.authUser!.role === 'teacher') {
+    const seenIds = new Set<string>();
+    for (const c of allCommittees) {
+      if (
+        c.departmentCode.toUpperCase() === actorDept ||
+        isUserInExamCommittee(c, req.authUser!)
+      ) {
+        if (!seenIds.has(c.id)) {
+          seenIds.add(c.id);
+          committees.push(c);
+        }
+      }
+    }
+  } else if (myCommittees.length > 0) {
+    committees = myCommittees;
+  }
+
+  let departmentFaculty: DepartmentFacultySummary[] = [];
+  if (req.authUser!.role === 'admin' || req.authUser!.role === 'chairman') {
+    const allUsers = await pustRepo.listUsers();
+    departmentFaculty = allUsers
+      .filter((u) => {
+        if (!isDepartmentFacultyAccount(u)) return false;
+        if (req.authUser!.role === 'chairman') {
+          return u.departmentCode.toUpperCase() === actorDept;
+        }
+        return true;
+      })
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        academicId: u.academicId,
+        role: u.role,
+        departmentCode: u.departmentCode,
+        designation: u.designation,
+        assignedCourses: u.assignedCourses || [],
+        assignedSessions: u.assignedSessions || [],
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   // Check student Hall dues status automatically
@@ -2669,6 +2863,8 @@ portalRouter.get('/exams/overview', requireAuth, async (req: AuthenticatedReques
     applications: apps,
     results,
     gateways,
+    committees,
+    departmentFaculty,
     hallClearanceBlocked: unpaidHallDues.length > 0,
     unpaidHallDues,
   });
@@ -2676,7 +2872,7 @@ portalRouter.get('/exams/overview', requireAuth, async (req: AuthenticatedReques
 
 portalRouter.get(
   '/exams/student-context/:academicId',
-  requireRoles('teacher', 'chairman', 'admin'),
+  requireAuth,
   async (req: AuthenticatedRequest, res) => {
     const academicId = String(req.params.academicId || '').trim();
     if (!academicId) {
@@ -2690,12 +2886,19 @@ portalRouter.get(
       return;
     }
 
-    if (
-      (req.authUser!.role === 'teacher' || req.authUser!.role === 'chairman') &&
-      student.departmentCode !== req.authUser!.departmentCode
-    ) {
+    const myCommittees = await getActiveCommitteesForUser(req.authUser!);
+    const inMatchingDeptCommittee = myCommittees.some(
+      (c) => c.departmentCode.toUpperCase() === student.departmentCode.toUpperCase()
+    );
+    const isAllowedRole =
+      req.authUser!.role === 'admin' ||
+      ((req.authUser!.role === 'teacher' || req.authUser!.role === 'chairman') &&
+        student.departmentCode.toUpperCase() === req.authUser!.departmentCode.toUpperCase()) ||
+      inMatchingDeptCommittee;
+
+    if (!isAllowedRole) {
       res.status(403).json({
-        error: `Access restricted: Student ${student.academicId} belongs to ${student.departmentCode}, outside your department (${req.authUser!.departmentCode}).`,
+        error: `Access restricted: Student ${student.academicId} belongs to ${student.departmentCode}, outside your authorized scope.`,
       });
       return;
     }
@@ -2718,24 +2921,405 @@ portalRouter.post(
       return;
     }
     const normalizedDeptCode = parsed.data.departmentCode.toUpperCase();
+    const normalizedCode = parsed.data.code.trim().toUpperCase();
     if (
       req.authUser!.role === 'chairman' &&
       normalizedDeptCode !== req.authUser!.departmentCode.toUpperCase()
     ) {
-      res.status(403).json({ error: 'Chairmen can only assign courses for their own department.' });
+      res.status(403).json({ error: 'Chairmen can only add courses for their own department.' });
       return;
     }
+
+    const existing = (await pustRepo.listCourses()).find(
+      (c) =>
+        c.departmentCode.toUpperCase() === normalizedDeptCode &&
+        c.code.toUpperCase() === normalizedCode &&
+        c.session === parsed.data.session &&
+        c.semester === parsed.data.semester
+    );
+    if (existing) {
+      res.status(409).json({
+        error: `Course ${normalizedCode} already exists for ${normalizedDeptCode} · ${parsed.data.session} · Semester ${parsed.data.semester}.`,
+      });
+      return;
+    }
+
+    let teacherEmail = parsed.data.teacherEmail;
+    let teacherUserId: string | undefined;
+    let teacherName: string | undefined;
+
+    if (parsed.data.teacherUserId) {
+      const teacher = await pustRepo.findUserById(parsed.data.teacherUserId);
+      if (!teacher || !isDepartmentFacultyAccount(teacher)) {
+        res.status(404).json({ error: 'Selected faculty member account was not found.' });
+        return;
+      }
+      if (teacher.departmentCode.toUpperCase() !== normalizedDeptCode) {
+        res.status(403).json({
+          error: 'Assigned faculty member must belong to the same department as the course.',
+        });
+        return;
+      }
+      teacherUserId = teacher.id;
+      teacherEmail = teacher.email;
+      teacherName = teacher.name;
+
+      const nextCourses = Array.from(
+        new Set([...(teacher.assignedCourses || []).map((c) => c.toUpperCase()), normalizedCode])
+      );
+      const nextSessions = Array.from(
+        new Set([...(teacher.assignedSessions || []), parsed.data.session])
+      );
+      await pustRepo.updateTeacherAssignments(teacher.id, nextCourses, nextSessions);
+    }
+
     const course = await pustRepo.createCourse({
-      ...parsed.data,
+      code: normalizedCode,
+      title: parsed.data.title.trim(),
+      credits: parsed.data.credits,
       departmentCode: normalizedDeptCode,
+      semester: parsed.data.semester,
+      session: parsed.data.session,
+      ...(teacherEmail ? { teacherEmail } : {}),
+      ...(teacherUserId ? { teacherUserId } : {}),
+      ...(teacherName ? { teacherName } : {}),
     });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Added departmental course',
+      `${course.code} — ${course.title} (${course.departmentCode} · ${course.session} · Sem ${course.semester})`
+    );
     res.status(201).json({ course });
+  }
+);
+
+portalRouter.patch(
+  '/exams/courses/:id',
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = courseUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid course update payload.' });
+      return;
+    }
+    const existing = (await pustRepo.listCourses()).find((c) => c.id === req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: 'Course not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      existing.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({ error: 'Chairmen can only manage courses in their own department.' });
+      return;
+    }
+
+    const patch: Partial<typeof existing> = {};
+    if (parsed.data.title !== undefined) patch.title = parsed.data.title.trim();
+    if (parsed.data.credits !== undefined) patch.credits = parsed.data.credits;
+
+    if (parsed.data.teacherUserId !== undefined) {
+      if (!parsed.data.teacherUserId) {
+        patch.teacherUserId = undefined;
+        patch.teacherEmail = undefined;
+        patch.teacherName = undefined;
+      } else {
+        const teacher = await pustRepo.findUserById(parsed.data.teacherUserId);
+        if (!teacher || !isDepartmentFacultyAccount(teacher)) {
+          res.status(404).json({ error: 'Selected faculty member was not found.' });
+          return;
+        }
+        if (teacher.departmentCode.toUpperCase() !== existing.departmentCode.toUpperCase()) {
+          res.status(403).json({
+            error: 'Assigned faculty member must belong to the same department.',
+          });
+          return;
+        }
+        patch.teacherUserId = teacher.id;
+        patch.teacherEmail = teacher.email;
+        patch.teacherName = teacher.name;
+
+        const nextCourses = Array.from(
+          new Set([
+            ...(teacher.assignedCourses || []).map((c) => c.toUpperCase()),
+            existing.code.toUpperCase(),
+          ])
+        );
+        const nextSessions = Array.from(
+          new Set([...(teacher.assignedSessions || []), existing.session])
+        );
+        await pustRepo.updateTeacherAssignments(teacher.id, nextCourses, nextSessions);
+      }
+    }
+
+    const updated = await pustRepo.updateCourse(existing.id, patch);
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Updated departmental course',
+      `${existing.code} (${existing.departmentCode} · Sem ${existing.semester})`
+    );
+    res.json({ course: updated });
+  }
+);
+
+portalRouter.delete(
+  '/exams/courses/:id',
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const existing = (await pustRepo.listCourses()).find((c) => c.id === req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: 'Course not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      existing.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({ error: 'Chairmen can only remove courses in their own department.' });
+      return;
+    }
+    const deleted = await pustRepo.deleteCourse(existing.id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Course not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Removed departmental course',
+      `${existing.code} (${existing.departmentCode} · ${existing.session})`
+    );
+    res.json({ deleted: true });
+  }
+);
+
+// Exam Committees (Chairman creates/manages for a Session & Semester)
+portalRouter.get(
+  '/exams/committees',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const all = await pustRepo.listExamCommittees();
+    if (req.authUser!.role === 'admin') {
+      res.json({ committees: all });
+      return;
+    }
+    const actorDept = req.authUser!.departmentCode.toUpperCase();
+    const filtered = all.filter(
+      (c) =>
+        ((req.authUser!.role === 'chairman' || req.authUser!.role === 'teacher') &&
+          c.departmentCode.toUpperCase() === actorDept) ||
+        isUserInExamCommittee(c, req.authUser!)
+    );
+    res.json({ committees: filtered });
+  }
+);
+
+portalRouter.post(
+  '/exams/committees',
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = examCommitteeCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Provide session, semester, and at least one faculty member.' });
+      return;
+    }
+    const normalizedDept = parsed.data.departmentCode.toUpperCase();
+    if (
+      req.authUser!.role === 'chairman' &&
+      normalizedDept !== req.authUser!.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({
+        error: 'Department Chairmen can only create Exam Committees for their own department.',
+      });
+      return;
+    }
+
+    const existingActive = (await pustRepo.listExamCommittees()).find(
+      (c) =>
+        c.status === 'active' &&
+        c.departmentCode.toUpperCase() === normalizedDept &&
+        c.session === parsed.data.session &&
+        c.semester === parsed.data.semester
+    );
+    if (existingActive) {
+      res.status(409).json({
+        error: `An active Exam Committee already exists for ${normalizedDept} · ${parsed.data.session} · Semester ${parsed.data.semester}.`,
+      });
+      return;
+    }
+
+    const allUsers = await pustRepo.listUsers();
+    const resolvedMembers: ExamCommitteeMember[] = [];
+    const seenUserIds = new Set<string>();
+
+    for (const item of parsed.data.members) {
+      if (seenUserIds.has(item.userId)) continue;
+      const memberUser = allUsers.find((u) => u.id === item.userId);
+      if (!memberUser || !isDepartmentFacultyAccount(memberUser)) {
+        res.status(404).json({
+          error: 'One or more selected committee members are not approved faculty accounts.',
+        });
+        return;
+      }
+      if (memberUser.departmentCode.toUpperCase() !== normalizedDept) {
+        res.status(403).json({
+          error: `Faculty member ${memberUser.name} belongs to ${memberUser.departmentCode}, outside ${normalizedDept}.`,
+        });
+        return;
+      }
+      seenUserIds.add(memberUser.id);
+      resolvedMembers.push({
+        userId: memberUser.id,
+        name: memberUser.name,
+        email: memberUser.email,
+        academicId: memberUser.academicId,
+        designation: memberUser.designation,
+        committeeRole: item.committeeRole,
+      });
+    }
+
+    if (resolvedMembers.length > 0 && !resolvedMembers.some((m) => m.committeeRole === 'chair')) {
+      resolvedMembers[0].committeeRole = 'chair';
+    }
+
+    const yearNum = Math.ceil(parsed.data.semester / 2);
+    const termNum = parsed.data.semester % 2 === 1 ? 1 : 2;
+    const defaultTitle = `${normalizedDept} Exam Committee · ${parsed.data.session} · Year ${yearNum} Sem ${termNum} (Sem ${parsed.data.semester})`;
+
+    const committee = await pustRepo.createExamCommittee({
+      departmentCode: normalizedDept,
+      session: parsed.data.session,
+      semester: parsed.data.semester,
+      title: parsed.data.title?.trim() || defaultTitle,
+      status: 'active',
+      members: resolvedMembers,
+      createdBy: req.authUser!.name,
+    });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Created Examination Committee',
+      `${committee.title} (${resolvedMembers.map((m) => m.name).join(', ')})`,
+      {
+        category: 'Privilege & Security',
+        severity: 'elevated',
+        actorEmail: req.authUser!.email,
+      }
+    );
+
+    res.status(201).json({ committee });
+  }
+);
+
+portalRouter.patch(
+  '/exams/committees/:id',
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = examCommitteeUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid Exam Committee update.' });
+      return;
+    }
+    const target = (await pustRepo.listExamCommittees()).find((c) => c.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Exam Committee not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({
+        error: 'Chairmen can only manage Exam Committees for their own department.',
+      });
+      return;
+    }
+
+    const patch: Partial<ExamCommitteeRecord> = {};
+    if (parsed.data.title !== undefined) patch.title = parsed.data.title.trim();
+    if (parsed.data.status !== undefined) patch.status = parsed.data.status;
+
+    if (parsed.data.members) {
+      const allUsers = await pustRepo.listUsers();
+      const resolvedMembers: ExamCommitteeMember[] = [];
+      const seenUserIds = new Set<string>();
+      for (const item of parsed.data.members) {
+        if (seenUserIds.has(item.userId)) continue;
+        const memberUser = allUsers.find((u) => u.id === item.userId);
+        if (!memberUser || !isDepartmentFacultyAccount(memberUser)) {
+          res.status(404).json({ error: 'Invalid committee member account.' });
+          return;
+        }
+        if (memberUser.departmentCode.toUpperCase() !== target.departmentCode.toUpperCase()) {
+          res.status(403).json({
+            error: `Member ${memberUser.name} does not belong to ${target.departmentCode}.`,
+          });
+          return;
+        }
+        seenUserIds.add(memberUser.id);
+        resolvedMembers.push({
+          userId: memberUser.id,
+          name: memberUser.name,
+          email: memberUser.email,
+          academicId: memberUser.academicId,
+          designation: memberUser.designation,
+          committeeRole: item.committeeRole,
+        });
+      }
+      if (resolvedMembers.length > 0 && !resolvedMembers.some((m) => m.committeeRole === 'chair')) {
+        resolvedMembers[0].committeeRole = 'chair';
+      }
+      patch.members = resolvedMembers;
+    }
+
+    const updated = await pustRepo.updateExamCommittee(target.id, patch);
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Updated Examination Committee',
+      target.title
+    );
+    res.json({ committee: updated });
+  }
+);
+
+portalRouter.delete(
+  '/exams/committees/:id',
+  requireRoles('admin', 'chairman'),
+  async (req: AuthenticatedRequest, res) => {
+    const target = (await pustRepo.listExamCommittees()).find((c) => c.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Exam Committee not found.' });
+      return;
+    }
+    if (
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
+    ) {
+      res.status(403).json({
+        error: 'Chairmen can only remove Exam Committees for their own department.',
+      });
+      return;
+    }
+    await pustRepo.deleteExamCommittee(target.id);
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Deleted Examination Committee',
+      target.title
+    );
+    res.json({ deleted: true });
   }
 );
 
 portalRouter.post(
   '/exams/circulars',
-  requireRoles('admin', 'chairman'),
+  requireAuth,
   async (req: AuthenticatedRequest, res) => {
     const parsed = examCircularSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2743,19 +3327,93 @@ portalRouter.post(
       return;
     }
     const normalizedDeptCode = parsed.data.departmentCode.toUpperCase();
-    if (
+
+    const matchingCommittee = await findMatchingActiveCommittee(
+      req.authUser!,
+      normalizedDeptCode,
+      parsed.data.session,
+      parsed.data.semester
+    );
+
+    const isAdmin = req.authUser!.role === 'admin';
+    const isDeptChairman =
       req.authUser!.role === 'chairman' &&
-      normalizedDeptCode !== req.authUser!.departmentCode.toUpperCase()
-    ) {
-      res.status(403).json({ error: 'Chairmen can only publish exam circulars for their department.' });
+      normalizedDeptCode === req.authUser!.departmentCode.toUpperCase();
+
+    if (!isAdmin && !isDeptChairman && !matchingCommittee) {
+      res.status(403).json({
+        error:
+          'Only Department Chairmen, Admin Office, or active Exam Committee members for that session & semester may arrange examinations.',
+      });
       return;
     }
+
+    // If a specific committeeId was provided, verify it matches this session/semester/dept
+    let linkedCommittee = matchingCommittee;
+    if (parsed.data.committeeId) {
+      const explicitCommittee = (await pustRepo.listExamCommittees()).find(
+        (c) => c.id === parsed.data.committeeId
+      );
+      if (
+        !explicitCommittee ||
+        explicitCommittee.status !== 'active' ||
+        explicitCommittee.departmentCode.toUpperCase() !== normalizedDeptCode ||
+        explicitCommittee.session !== parsed.data.session ||
+        explicitCommittee.semester !== parsed.data.semester
+      ) {
+        res.status(403).json({
+          error: 'Specified Exam Committee does not match this department, session, and semester.',
+        });
+        return;
+      }
+      if (!isAdmin && !isDeptChairman && !isUserInExamCommittee(explicitCommittee, req.authUser!)) {
+        res.status(403).json({ error: 'You are not an active member of that Exam Committee.' });
+        return;
+      }
+      linkedCommittee = explicitCommittee;
+    } else if (!linkedCommittee) {
+      // Link any active committee for that term if Chairman/Admin published it
+      linkedCommittee =
+        (await pustRepo.listExamCommittees()).find(
+          (c) =>
+            c.status === 'active' &&
+            c.departmentCode.toUpperCase() === normalizedDeptCode &&
+            c.session === parsed.data.session &&
+            c.semester === parsed.data.semester
+        ) ?? null;
+    }
+
     const circular = await pustRepo.createExamCircular({
-      ...parsed.data,
+      title: parsed.data.title,
       departmentCode: normalizedDeptCode,
-      publishedBy: req.authUser!.name,
+      semester: parsed.data.semester,
+      session: parsed.data.session,
+      deadline: parsed.data.deadline,
+      feeBdt: parsed.data.feeBdt,
+      eligibleCourseCodes: parsed.data.eligibleCourseCodes,
+      ...(parsed.data.examStartDate?.trim()
+        ? { examStartDate: parsed.data.examStartDate.trim() }
+        : {}),
+      ...(parsed.data.examVenue?.trim() ? { examVenue: parsed.data.examVenue.trim() } : {}),
+      ...(parsed.data.scheduleNote?.trim()
+        ? { scheduleNote: parsed.data.scheduleNote.trim() }
+        : {}),
+      ...(linkedCommittee
+        ? { committeeId: linkedCommittee.id, committeeTitle: linkedCommittee.title }
+        : {}),
+      publishedBy: linkedCommittee
+        ? `${req.authUser!.name} (Exam Committee)`
+        : req.authUser!.name,
       publishedAt: new Date().toISOString().slice(0, 10),
     });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      linkedCommittee ? 'Exam Committee arranged examination circular' : 'Published exam circular',
+      `${circular.departmentCode} · ${circular.session} · Sem ${circular.semester}`
+    );
+
     res.status(201).json({ circular });
   }
 );
@@ -2887,7 +3545,7 @@ portalRouter.post(
 
 portalRouter.patch(
   '/exams/applications/:id/verify',
-  requireRoles('chairman', 'admin'),
+  requireAuth,
   async (req: AuthenticatedRequest, res) => {
     const parsed = examVerifySchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2900,11 +3558,21 @@ portalRouter.patch(
       res.status(404).json({ error: 'Examination application not found.' });
       return;
     }
-    if (
+    const isAdmin = req.authUser!.role === 'admin';
+    const isDeptChairman =
       req.authUser!.role === 'chairman' &&
-      target.departmentCode !== req.authUser!.departmentCode
-    ) {
-      res.status(403).json({ error: 'Cannot verify applications outside your department.' });
+      target.departmentCode.toUpperCase() === req.authUser!.departmentCode.toUpperCase();
+    const matchingCommittee = await findMatchingActiveCommittee(
+      req.authUser!,
+      target.departmentCode,
+      target.session,
+      target.semester
+    );
+
+    if (!isAdmin && !isDeptChairman && !matchingCommittee) {
+      res.status(403).json({
+        error: 'Cannot verify exam applications outside your department or Exam Committee.',
+      });
       return;
     }
     if (parsed.data.decision === 'Approved' && target.paymentStatus !== 'Paid') {
@@ -2938,7 +3606,7 @@ portalRouter.patch(
 
 portalRouter.post(
   '/exams/results',
-  requireRoles('teacher', 'chairman', 'admin'),
+  requireAuth,
   async (req: AuthenticatedRequest, res) => {
     const parsed = resultCreateSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2951,14 +3619,53 @@ portalRouter.post(
       return;
     }
 
-    if (
-      (req.authUser!.role === 'teacher' || req.authUser!.role === 'chairman') &&
-      stu.departmentCode !== req.authUser!.departmentCode
-    ) {
+    let linkedCommittee: ExamCommitteeRecord | null = await findMatchingActiveCommittee(
+      req.authUser!,
+      stu.departmentCode,
+      stu.session,
+      parsed.data.semester
+    );
+
+    const isAdmin = req.authUser!.role === 'admin';
+    const isDeptChairman =
+      req.authUser!.role === 'chairman' &&
+      stu.departmentCode.toUpperCase() === req.authUser!.departmentCode.toUpperCase();
+    const isDeptTeacher =
+      req.authUser!.role === 'teacher' &&
+      stu.departmentCode.toUpperCase() === req.authUser!.departmentCode.toUpperCase();
+
+    if (!isAdmin && !isDeptChairman && !isDeptTeacher && !linkedCommittee) {
       res.status(403).json({
-        error: 'You may only submit marksheets for students in your own department.',
+        error:
+          'You may only submit marksheets for students in your own department or active Exam Committee.',
       });
       return;
+    }
+
+    if (parsed.data.committeeId) {
+      const explicit = (await pustRepo.listExamCommittees()).find(
+        (c) => c.id === parsed.data.committeeId
+      );
+      if (
+        !explicit ||
+        explicit.status !== 'active' ||
+        explicit.departmentCode.toUpperCase() !== stu.departmentCode.toUpperCase() ||
+        explicit.session !== stu.session ||
+        explicit.semester !== parsed.data.semester
+      ) {
+        res.status(403).json({
+          error:
+            'Student session/semester does not match the selected Exam Committee.',
+        });
+        return;
+      }
+      if (!isAdmin && !isDeptChairman && !isUserInExamCommittee(explicit, req.authUser!)) {
+        res.status(403).json({
+          error: 'You are not an active member of the selected Exam Committee.',
+        });
+        return;
+      }
+      linkedCommittee = explicit;
     }
 
     let totalWeighted = 0;
@@ -2979,8 +3686,51 @@ portalRouter.post(
     if (parsed.data.promotionMode === 'manual_promoted') promotionStatus = 'Promoted (Manual)';
     if (parsed.data.promotionMode === 'manual_repeat') promotionStatus = 'Probation / Repeat';
 
-    const publishImmediately = req.authUser!.role === 'chairman' || req.authUser!.role === 'admin';
+    const requestedTarget = parsed.data.submissionTarget;
+    const isChairman = isDeptChairman;
 
+    let status: 'pending_chairman' | 'pending_admin' | 'published';
+    let publishImmediately = false;
+    let forwardedTo: 'chairman' | 'admin' | undefined;
+
+    if (isAdmin) {
+      if (requestedTarget === 'admin') {
+        status = 'pending_admin';
+        forwardedTo = 'admin';
+      } else if (requestedTarget === 'chairman') {
+        status = 'pending_chairman';
+        forwardedTo = 'chairman';
+      } else {
+        status = 'published';
+        publishImmediately = true;
+      }
+    } else if (isChairman) {
+      if (requestedTarget === 'admin') {
+        status = 'pending_admin';
+        forwardedTo = 'admin';
+      } else {
+        status = 'published';
+        publishImmediately = true;
+      }
+    } else {
+      // Teacher or Exam Committee Member
+      if (requestedTarget === 'admin') {
+        if (!linkedCommittee) {
+          res.status(403).json({
+            error:
+              'Only an active Exam Committee member for this session & semester may forward results directly to the Admin Office.',
+          });
+          return;
+        }
+        status = 'pending_admin';
+        forwardedTo = 'admin';
+      } else {
+        status = 'pending_chairman';
+        forwardedTo = 'chairman';
+      }
+    }
+
+    const nowIso = new Date().toISOString();
     const result = await pustRepo.createExamResult({
       academicId: stu.academicId,
       studentName: stu.name,
@@ -2990,11 +3740,23 @@ portalRouter.post(
       courses: evaluatedCourses,
       sgpa,
       promotionStatus,
-      status: publishImmediately ? 'published' : 'pending_chairman',
+      status,
       published: publishImmediately,
-      enteredBy: req.authUser!.name,
+      enteredBy: linkedCommittee
+        ? `${req.authUser!.name} (${linkedCommittee.title})`
+        : req.authUser!.name,
+      ...(linkedCommittee
+        ? { committeeId: linkedCommittee.id, committeeTitle: linkedCommittee.title }
+        : {}),
+      ...(forwardedTo
+        ? {
+            forwardedTo,
+            forwardedBy: req.authUser!.name,
+            forwardedAt: nowIso,
+          }
+        : {}),
       ...(publishImmediately ? { reviewedBy: req.authUser!.name } : {}),
-      publishedAt: new Date().toISOString().slice(0, 10),
+      publishedAt: nowIso.slice(0, 10),
     });
 
     let cumulativeCgpa: number | undefined;
@@ -3022,7 +3784,7 @@ portalRouter.post(
         referenceNo: `PUST/${stu.departmentCode}/RES/${new Date().getFullYear()}-${parsed.data.semester}`,
         title: `Semester ${parsed.data.semester} Examination Result Published — ${stu.departmentCode} (${stu.session})`,
         category: 'Result',
-        publishedAt: new Date().toISOString().slice(0, 10),
+        publishedAt: nowIso.slice(0, 10),
         departmentCode: stu.departmentCode,
         boardScope: 'department',
         visibility: 'registered',
@@ -3038,16 +3800,80 @@ portalRouter.post(
       await pustRepo.logAudit(
         req.authUser!.name,
         req.authUser!.role,
-        'Submitted draft marksheet for Chairman review',
-        `${stu.academicId} · Sem ${parsed.data.semester}`
+        forwardedTo === 'admin'
+          ? 'Calculated & forwarded semester result to Admin Office'
+          : 'Calculated & forwarded semester result to Chairman',
+        `${stu.academicId} · Sem ${parsed.data.semester}${
+          linkedCommittee ? ` (${linkedCommittee.title})` : ''
+        }`
       );
     }
 
     res.status(201).json({
       result,
-      pendingChairmanReview: !publishImmediately,
+      pendingChairmanReview: status === 'pending_chairman',
+      pendingAdminReview: status === 'pending_admin',
       ...(cumulativeCgpa !== undefined ? { cumulativeCgpa } : {}),
     });
+  }
+);
+
+portalRouter.patch(
+  '/exams/results/:id/forward',
+  requireAuth,
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = resultForwardSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Specify a valid forward destination (chairman or admin).' });
+      return;
+    }
+    const target = (await pustRepo.listExamResults()).find((r) => r.id === req.params.id);
+    if (!target) {
+      res.status(404).json({ error: 'Grade sheet not found.' });
+      return;
+    }
+    if (target.published) {
+      res.status(409).json({ error: 'Published results cannot be forwarded.' });
+      return;
+    }
+
+    const isAdmin = req.authUser!.role === 'admin';
+    const isDeptChairman =
+      req.authUser!.role === 'chairman' &&
+      target.departmentCode.toUpperCase() === req.authUser!.departmentCode.toUpperCase();
+    const matchingCommittee = await findMatchingActiveCommittee(
+      req.authUser!,
+      target.departmentCode,
+      target.session,
+      target.semester
+    );
+
+    if (!isAdmin && !isDeptChairman && !matchingCommittee) {
+      res.status(403).json({
+        error:
+          'Only Department Chairman, Admin Office, or active Exam Committee members for this session & semester may forward results.',
+      });
+      return;
+    }
+
+    const nextStatus = parsed.data.target === 'admin' ? 'pending_admin' : 'pending_chairman';
+    const updated = await pustRepo.updateExamResult(target.id, {
+      status: nextStatus,
+      forwardedTo: parsed.data.target,
+      forwardedBy: req.authUser!.name,
+      forwardedAt: new Date().toISOString(),
+    });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      parsed.data.target === 'admin'
+        ? 'Forwarded exam result to Admin Office'
+        : 'Forwarded exam result to Department Chairman',
+      `${target.academicId} · Sem ${target.semester} (${target.departmentCode})`
+    );
+
+    res.json({ result: updated });
   }
 );
 
@@ -3067,6 +3893,12 @@ portalRouter.patch(
       target.departmentCode !== req.authUser!.departmentCode
     ) {
       res.status(403).json({ error: 'Cannot publish results outside your department.' });
+      return;
+    }
+    if (req.authUser!.role === 'chairman' && target.status === 'pending_admin') {
+      res.status(409).json({
+        error: 'This result has been forwarded to the Admin Office for final publishing.',
+      });
       return;
     }
 
