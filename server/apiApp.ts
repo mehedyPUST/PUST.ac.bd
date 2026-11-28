@@ -479,7 +479,18 @@ export function mountApiRoutes(app: Express): void {
       const { passwordHash: _ignored, ...safeUser } = created;
       const token = signAuthToken(safeUser);
       setAuthCookie(req, res, token);
-      await pustRepo.logAudit(safeUser.name, 'admin', 'Claimed initial Admin Office account', safeUser.email);
+      await pustRepo.logAudit(
+        safeUser.name,
+        'admin',
+        'Claimed initial Admin Office account',
+        safeUser.email,
+        {
+          category: 'Privilege & Security',
+          severity: 'critical',
+          actorEmail: safeUser.email,
+          details: 'Initial University Admin Office account claimed and approved.',
+        }
+      );
       res.status(201).json({ user: safeUser });
     } catch {
       res.status(409).json({ error: 'Could not claim Admin account with this email.' });

@@ -1100,7 +1100,19 @@ portalRouter.patch(
       req.authUser!.name,
       req.authUser!.role,
       `Account ${parsed.data.approvalStatus}`,
-      `${target.name} (${target.role})`
+      `${target.name} (${target.role})`,
+      {
+        category:
+          target.role === 'admin' || parsed.data.approvalStatus === 'rejected'
+            ? 'Privilege & Security'
+            : 'Account & Access',
+        severity:
+          target.role === 'admin' || parsed.data.approvalStatus === 'rejected'
+            ? 'critical'
+            : 'elevated',
+        actorEmail: req.authUser!.email,
+        details: `Approval status: ${target.approvalStatus} -> ${parsed.data.approvalStatus} | Email: ${target.email}`,
+      }
     );
     res.json({ user: updated });
   }
@@ -1161,11 +1173,18 @@ portalRouter.post(
       }
 
       const { passwordHash: _p, ...safeUser } = created;
+      const isAdminAccount = safeUser.role === 'admin';
       await pustRepo.logAudit(
         req.authUser!.name,
         req.authUser!.role,
-        'Created user account',
-        `${safeUser.name} (${safeUser.role} · ${safeUser.officeName || safeUser.departmentCode})`
+        isAdminAccount ? 'Created administrator account' : 'Created user account',
+        `${safeUser.name} (${safeUser.role} · ${safeUser.officeName || safeUser.departmentCode})`,
+        {
+          category: isAdminAccount ? 'Privilege & Security' : 'Account & Access',
+          severity: isAdminAccount ? 'critical' : 'elevated',
+          actorEmail: req.authUser!.email,
+          details: `Email: ${safeUser.email} | Role: ${safeUser.role} | Unit: ${safeUser.officeName || safeUser.departmentCode} | Status: ${safeUser.approvalStatus}`,
+        }
       );
       res.status(201).json({ user: safeUser });
     } catch (err) {
@@ -1269,11 +1288,61 @@ portalRouter.patch(
         }
       }
 
+      const changes: string[] = [];
+      const roleChanged = patch.role !== undefined && patch.role !== target.role;
+      const approvalChanged =
+        patch.approvalStatus !== undefined && patch.approvalStatus !== target.approvalStatus;
+      if (roleChanged) changes.push(`role: ${target.role} -> ${updated.role}`);
+      if (approvalChanged) {
+        changes.push(`status: ${target.approvalStatus} -> ${updated.approvalStatus}`);
+      }
+      if (patch.departmentCode !== undefined && updated.departmentCode !== target.departmentCode) {
+        changes.push(`dept: ${target.departmentCode} -> ${updated.departmentCode}`);
+      }
+      if (patch.officeName !== undefined && updated.officeName !== target.officeName) {
+        changes.push(`office: ${target.officeName || 'none'} -> ${updated.officeName || 'none'}`);
+      }
+      if (patch.designation !== undefined && updated.designation !== target.designation) {
+        changes.push(`designation: ${target.designation || 'none'} -> ${updated.designation || 'none'}`);
+      }
+      if (patch.email !== undefined && updated.email !== target.email) {
+        changes.push(`email: ${target.email} -> ${updated.email}`);
+      }
+      if (patch.name !== undefined && updated.name !== target.name) {
+        changes.push(`name: ${target.name} -> ${updated.name}`);
+      }
+      if (patch.assignedCourses !== undefined || patch.assignedSessions !== undefined) {
+        changes.push('updated teaching scope');
+      }
+
+      const isPrivilegeEvent =
+        roleChanged ||
+        target.role === 'admin' ||
+        updated.role === 'admin' ||
+        (approvalChanged && updated.approvalStatus !== 'approved');
+
+      const auditAction = roleChanged
+        ? `Modified user role (${target.role} -> ${updated.role})`
+        : approvalChanged
+        ? `Modified account status (${target.approvalStatus} -> ${updated.approvalStatus})`
+        : isPrivilegeEvent
+        ? 'Modified privileged account'
+        : 'Updated user account';
+
       await pustRepo.logAudit(
         req.authUser!.name,
         req.authUser!.role,
-        'Updated user account',
-        `${updated.name} (${updated.role} · ${updated.officeName || updated.departmentCode})`
+        auditAction,
+        `${updated.name} (${updated.role} · ${updated.officeName || updated.departmentCode})`,
+        {
+          category: isPrivilegeEvent ? 'Privilege & Security' : 'Account & Access',
+          severity: isPrivilegeEvent ? 'critical' : 'elevated',
+          actorEmail: req.authUser!.email,
+          details:
+            changes.length > 0
+              ? `Changes: ${changes.join(' | ')} | Email: ${updated.email}`
+              : `Email: ${updated.email}`,
+        }
       );
       res.json({ user: updated });
     } catch (err) {
@@ -1309,7 +1378,13 @@ portalRouter.patch(
       req.authUser!.name,
       req.authUser!.role,
       'Reset user password',
-      `${target.name} (${target.role})`
+      `${target.name} (${target.role})`,
+      {
+        category: 'Privilege & Security',
+        severity: 'critical',
+        actorEmail: req.authUser!.email,
+        details: `Administrative password reset for ${target.email} (credential redacted).`,
+      }
     );
     res.json({ updated: true });
   }
@@ -1347,8 +1422,14 @@ portalRouter.delete(
     await pustRepo.logAudit(
       req.authUser!.name,
       req.authUser!.role,
-      'Deleted user account',
-      `${target.name} (${target.email})`
+      target.role === 'admin' ? 'Deleted administrator account' : 'Deleted user account',
+      `${target.name} (${target.email})`,
+      {
+        category: target.role === 'admin' ? 'Privilege & Security' : 'Account & Access',
+        severity: 'critical',
+        actorEmail: req.authUser!.email,
+        details: `Removed ${target.role} account from ${target.officeName || target.departmentCode} (${target.email}).`,
+      }
     );
     res.json({ deleted: true });
   }
@@ -1390,7 +1471,13 @@ portalRouter.patch(
       req.authUser!.name,
       req.authUser!.role,
       'Assigned courses/sessions to teacher',
-      `${target.name} (${target.departmentCode})`
+      `${target.name} (${target.departmentCode})`,
+      {
+        category: 'Privilege & Security',
+        severity: 'elevated',
+        actorEmail: req.authUser!.email,
+        details: `Courses: ${parsed.data.assignedCourses.join(', ') || 'None'} | Sessions: ${parsed.data.assignedSessions.join(', ') || 'None'}`,
+      }
     );
     res.json({ user: updated });
   }
@@ -3277,7 +3364,13 @@ portalRouter.put('/config/payments', requireRoles('admin'), async (req: Authenti
     req.authUser!.name,
     'admin',
     `Configured payment gateway (${gateway.enabled ? 'Enabled' : 'Disabled'})`,
-    gateway.name
+    gateway.name,
+    {
+      category: 'Finance & Config',
+      severity: 'elevated',
+      actorEmail: req.authUser!.email,
+      details: `Gateway ${gateway.code} (${gateway.name}) set to ${gateway.enabled ? 'Enabled' : 'Disabled'}.`,
+    }
   );
   res.json({ gateway });
 });
@@ -3289,11 +3382,33 @@ portalRouter.put('/config/fees', requireRoles('admin'), async (req: Authenticate
     return;
   }
   const feeConfig = await pustRepo.updateFeeConfig(parsed.data);
+  await pustRepo.logAudit(
+    req.authUser!.name,
+    'admin',
+    'Updated university fee schedule',
+    `Certificate BDT ${feeConfig.certificateFeeBdt} · Exam BDT ${feeConfig.defaultExamFeeBdt}`,
+    {
+      category: 'Finance & Config',
+      severity: 'elevated',
+      actorEmail: req.authUser!.email,
+      details: `Certificate fee: BDT ${feeConfig.certificateFeeBdt} | Default exam fee: BDT ${feeConfig.defaultExamFeeBdt}`,
+    }
+  );
   res.json({ feeConfig });
 });
 
-portalRouter.get('/audit-logs', requireRoles('admin', 'vc', 'registrar'), async (_req, res) => {
-  const logs = await pustRepo.listAuditLogs();
+const auditQuerySchema = z.object({
+  category: z.string().trim().max(40).optional(),
+  severity: z.enum(['ALL', 'critical', 'elevated', 'standard']).optional(),
+  actorRole: z.string().trim().max(24).optional(),
+  search: z.string().trim().max(120).optional(),
+  limit: z.coerce.number().int().min(1).max(500).optional(),
+});
+
+portalRouter.get('/audit-logs', requireRoles('admin', 'vc', 'registrar'), async (req, res) => {
+  const parsed = auditQuerySchema.safeParse(req.query);
+  const filters = parsed.success ? parsed.data : {};
+  const logs = await pustRepo.listAuditLogs(filters);
   res.json({ logs });
 });
 
@@ -3549,7 +3664,15 @@ portalRouter.put(
       'Updated Automated Office Flow Rules',
       Object.entries(parsed.data)
         .map(([k, v]) => `${k}=${v}`)
-        .join(', ')
+        .join(', '),
+      {
+        category: 'Privilege & Security',
+        severity: 'critical',
+        actorEmail: req.authUser!.email,
+        details: `Automation policy switches modified: ${Object.entries(parsed.data)
+          .map(([k, v]) => `${k}=${v}`)
+          .join(' | ')}`,
+      }
     );
     res.json({ rules });
   }

@@ -9,6 +9,7 @@ import { AdminModeSwitch } from './AdminModeSwitch';
 import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
 import { PwaInstallButton } from './PwaManager';
+import { AdminAuditLogPanel } from './portal/AdminAuditLogPanel';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
 import { AdminUserDirectoryPanel } from './portal/AdminUserDirectoryPanel';
 import { ApprovalDashboardPanel } from './portal/ApprovalDashboardPanel';
@@ -494,6 +495,8 @@ export function PortalView({
                 onUsersChanged={loadStudents}
               />
             )}
+
+            {resolvedTab === 'audit' && user.role === 'admin' && <AdminAuditLogPanel />}
 
             {resolvedTab === 'governance' && user.role !== 'student' && (
               <AdminCmsPanel

@@ -846,7 +846,22 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
-  getAuditLogs: () => apiFetch<{ logs: AuditLogRecord[] }>('/api/portal/audit-logs'),
+  getAuditLogs: (filters?: {
+    category?: string;
+    severity?: string;
+    actorRole?: string;
+    search?: string;
+    limit?: number;
+  }) => {
+    const qs = new URLSearchParams();
+    if (filters?.category && filters.category !== 'ALL') qs.set('category', filters.category);
+    if (filters?.severity && filters.severity !== 'ALL') qs.set('severity', filters.severity);
+    if (filters?.actorRole && filters.actorRole !== 'ALL') qs.set('actorRole', filters.actorRole);
+    if (filters?.search && filters.search.trim()) qs.set('search', filters.search.trim());
+    if (filters?.limit) qs.set('limit', String(filters.limit));
+    const q = qs.toString();
+    return apiFetch<{ logs: AuditLogRecord[] }>(`/api/portal/audit-logs${q ? `?${q}` : ''}`);
+  },
 
   // Portal: Unified Digital Payment Checkout & Institutional Receipts Ledger
   getPaymentReceipts: () =>

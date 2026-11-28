@@ -486,12 +486,25 @@ export interface ViceChancellorRecord {
   orderIndex: number;
 }
 
+export type AuditLogCategory =
+  | 'Privilege & Security'
+  | 'Account & Access'
+  | 'Governance & CMS'
+  | 'Finance & Config'
+  | 'Academic & Workflow';
+
+export type AuditLogSeverity = 'critical' | 'elevated' | 'standard';
+
 export interface AuditLogRecord {
   id: string;
   actorName: string;
   actorRole: UserRole;
+  actorEmail?: string;
   action: string;
   target: string;
+  category?: AuditLogCategory;
+  severity?: AuditLogSeverity;
+  details?: string;
   timestamp: string;
 }
 

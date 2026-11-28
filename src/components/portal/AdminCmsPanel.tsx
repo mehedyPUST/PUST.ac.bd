@@ -1338,47 +1338,61 @@ export function AdminCmsPanel({
                   No circulars match your current filter.
                 </p>
               ) : (
-                <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden text-xs max-h-[420px] overflow-y-auto overscroll-contain">
-                  {managedNotices.map((n) => {
-                    const canManage =
-                      user.role === 'admin' ||
-                      user.role === 'registrar' ||
-                      (user.role === 'chairman' && n.departmentCode === user.departmentCode);
-                    const canPin =
-                      canManage || user.role === 'vc';
-                    const busy = noticeActionId === n.id;
-                    return (
-                      <div
-                        key={n.id}
-                        className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-[#F7F7F5]/60 transition-colors"
-                      >
-                        <div className="space-y-1 min-w-0">
-                          <p className="font-mono text-[11px] text-pust-800 tabular-nums flex flex-wrap items-center gap-1.5">
-                            <span>{n.publishedAt}</span>
-                            <span>· {n.referenceNo}</span>
-                            <span>· {n.category}</span>
-                            <span>· {n.departmentCode}</span>
-                            <span className="uppercase">· {n.boardScope}</span>
-                            {n.visibility === 'registered' && (
-                              <span className="font-semibold text-amber-800">· REGISTERED ONLY</span>
-                            )}
-                            {(n.attachmentName || n.attachmentUrl) && (
-                              <span className="text-slate-600">
-                                · FILE: {n.attachmentName || 'Attached'}
-                              </span>
-                            )}
-                            {n.pinned && (
-                              <span className="px-1.5 py-0.5 rounded bg-pust-50 border border-pust-200 text-pust-900 font-semibold">
-                                PINNED
-                              </span>
-                            )}
-                          </p>
-                          <p className="font-medium text-sm text-slate-900">{n.title}</p>
-                          <p className="text-slate-600 line-clamp-1">{n.summary}</p>
-                        </div>
+                <div className="rounded-xl border border-slate-200 overflow-hidden text-xs max-h-[420px] overflow-y-auto overscroll-contain">
+                  <div className="hidden sm:grid sm:grid-cols-12 gap-3 px-3.5 py-2 bg-[#FAF9F6] border-b border-slate-200 font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    <div className="sm:col-span-1">S.N</div>
+                    <div className="sm:col-span-8">Circular Details</div>
+                    <div className="sm:col-span-3 text-right">Actions</div>
+                  </div>
+                  <div className="divide-y divide-slate-200">
+                    {managedNotices.map((n, idx) => {
+                      const canManage =
+                        user.role === 'admin' ||
+                        user.role === 'registrar' ||
+                        (user.role === 'chairman' && n.departmentCode === user.departmentCode);
+                      const canPin =
+                        canManage || user.role === 'vc';
+                      const busy = noticeActionId === n.id;
+                      return (
+                        <div
+                          key={n.id}
+                          className={`p-3.5 grid grid-cols-1 sm:grid-cols-12 sm:items-center gap-3 hover:bg-[#F7F7F5]/60 transition-colors ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/60'
+                          }`}
+                        >
+                          <div className="sm:col-span-1 font-mono text-xs font-semibold text-slate-500 tabular-nums">
+                            <span className="sm:hidden text-[10px] uppercase mr-1 text-slate-400">
+                              S.N
+                            </span>
+                            {String(idx + 1).padStart(2, '0')}
+                          </div>
+                          <div className="sm:col-span-8 space-y-1 min-w-0">
+                            <p className="font-mono text-[11px] text-pust-800 tabular-nums flex flex-wrap items-center gap-1.5">
+                              <span>{n.publishedAt}</span>
+                              <span>· {n.referenceNo}</span>
+                              <span>· {n.category}</span>
+                              <span>· {n.departmentCode}</span>
+                              <span className="uppercase">· {n.boardScope}</span>
+                              {n.visibility === 'registered' && (
+                                <span className="font-semibold text-amber-800">· REGISTERED ONLY</span>
+                              )}
+                              {(n.attachmentName || n.attachmentUrl) && (
+                                <span className="text-slate-600">
+                                  · FILE: {n.attachmentName || 'Attached'}
+                                </span>
+                              )}
+                              {n.pinned && (
+                                <span className="px-1.5 py-0.5 rounded bg-pust-50 border border-pust-200 text-pust-900 font-semibold">
+                                  PINNED
+                                </span>
+                              )}
+                            </p>
+                            <p className="font-medium text-sm text-slate-900">{n.title}</p>
+                            <p className="text-slate-600 line-clamp-1">{n.summary}</p>
+                          </div>
 
                         {(canPin || canManage) && (
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="sm:col-span-3 flex items-center sm:justify-end gap-2 shrink-0">
                             {canPin && (
                               <button
                                 type="button"
@@ -1415,6 +1429,7 @@ export function AdminCmsPanel({
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               )}
             </div>

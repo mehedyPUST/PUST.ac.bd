@@ -2,7 +2,9 @@ import { MongoClient, type Collection, type Db } from 'mongodb';
 import crypto from 'node:crypto';
 import type {
   AboutContentRecord,
+  AuditLogCategory,
   AuditLogRecord,
+  AuditLogSeverity,
   AuthUser,
   AutomationRulesConfig,
   BannerSlideRecord,
@@ -556,21 +558,147 @@ class PustRepository {
     return structuredClone(updated);
   }
 
-  async logAudit(actorName: string, actorRole: AuthUser['role'], action: string, target: string) {
+  private inferAuditMetadata(
+    actorRole: AuthUser['role'],
+    action: string,
+    target: string
+  ): { category: AuditLogCategory; severity: AuditLogSeverity } {
+    const combined = `${action} ${target}`.toLowerCase();
+
+    if (
+      /role|privilege|password|admin|automation|disabled|rejected|claimed initial/.test(combined)
+    ) {
+      const isCritical =
+        /role|privilege|password|administrator|admin office|automation|deleted user|rejected/.test(
+          combined
+        );
+      return {
+        category: 'Privilege & Security',
+        severity: isCritical ? 'critical' : 'elevated',
+      };
+    }
+
+    if (/account|user|signup|token|assigned courses/.test(combined)) {
+      const isCritical = /deleted|admin/.test(combined);
+      return {
+        category: 'Account & Access',
+        severity: isCritical ? 'critical' : 'elevated',
+      };
+    }
+
+    if (/payment|fee|gateway|checkout/.test(combined)) {
+      const isElevated = /configured|fee|gateway|admin/.test(combined) || actorRole === 'admin';
+      return {
+        category: 'Finance & Config',
+        severity: isElevated ? 'elevated' : 'standard',
+      };
+    }
+
+    if (
+      /notice|banner|gallery|department|office|vice-chancellor|profile|publication|about|inquiry|cms/.test(
+        combined
+      )
+    ) {
+      const isElevated = /deleted|created department|updated university|vice-chancellor/.test(
+        combined
+      );
+      return {
+        category: 'Governance & CMS',
+        severity: isElevated ? 'elevated' : 'standard',
+      };
+    }
+
+    const isElevatedAcademic = /issued|published|final|approved certificate|rejected certificate/.test(
+      combined
+    );
+    return {
+      category: 'Academic & Workflow',
+      severity: isElevatedAcademic ? 'elevated' : 'standard',
+    };
+  }
+
+  async logAudit(
+    actorName: string,
+    actorRole: AuthUser['role'],
+    action: string,
+    target: string,
+    meta?: {
+      category?: AuditLogCategory;
+      severity?: AuditLogSeverity;
+      actorEmail?: string;
+      details?: string;
+    }
+  ) {
+    const inferred = this.inferAuditMetadata(actorRole, action, target);
     const entry: AuditLogRecord = {
       id: `audit-${crypto.randomUUID()}`,
       actorName,
       actorRole,
+      ...(meta?.actorEmail ? { actorEmail: meta.actorEmail } : {}),
       action,
       target,
+      category: meta?.category || inferred.category,
+      severity: meta?.severity || inferred.severity,
+      ...(meta?.details ? { details: meta.details } : {}),
       timestamp: new Date().toISOString(),
     };
     await this.insertItem('audit_logs', this.auditLogs, entry);
   }
 
-  async listAuditLogs(): Promise<AuditLogRecord[]> {
+  async listAuditLogs(options?: {
+    category?: string;
+    severity?: string;
+    actorRole?: string;
+    search?: string;
+    limit?: number;
+  }): Promise<AuditLogRecord[]> {
     const items = await this.getAll('audit_logs', this.auditLogs);
-    return items.sort((a, b) => b.timestamp.localeCompare(a.timestamp)).slice(0, 60);
+    const normalized = items
+      .map((item) => {
+        if (item.category && item.severity) return item;
+        const inferred = this.inferAuditMetadata(item.actorRole, item.action, item.target);
+        return {
+          ...item,
+          category: item.category || inferred.category,
+          severity: item.severity || inferred.severity,
+        };
+      })
+      .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+    const categoryFilter = options?.category?.trim();
+    const severityFilter = options?.severity?.trim();
+    const roleFilter = options?.actorRole?.trim();
+    const searchFilter = options?.search?.trim().toLowerCase();
+    const limit = Math.min(Math.max(options?.limit ?? 250, 1), 500);
+
+    return normalized
+      .filter((entry) => {
+        if (categoryFilter && categoryFilter !== 'ALL' && entry.category !== categoryFilter) {
+          return false;
+        }
+        if (severityFilter && severityFilter !== 'ALL' && entry.severity !== severityFilter) {
+          return false;
+        }
+        if (roleFilter && roleFilter !== 'ALL' && entry.actorRole !== roleFilter) {
+          return false;
+        }
+        if (searchFilter) {
+          const hay = [
+            entry.actorName,
+            entry.actorEmail || '',
+            entry.actorRole,
+            entry.action,
+            entry.target,
+            entry.details || '',
+            entry.category || '',
+          ]
+            .join(' ')
+            .toLowerCase();
+          if (!hay.includes(searchFilter)) return false;
+        }
+        return true;
+      })
+      .slice(0, limit);
   }
 
   // Departments & Publications

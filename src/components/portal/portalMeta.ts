@@ -6,6 +6,7 @@ import {
   FileCheck2,
   GraduationCap,
   LayoutDashboard,
+  ScrollText,
   Settings2,
   UserCog,
   Users,
@@ -17,6 +18,7 @@ import type { UserRole } from '../../types/pust';
 export type PortalTab =
   | 'overview'
   | 'users'
+  | 'audit'
   | 'students'
   | 'approvals'
   | 'workflow'
@@ -29,6 +31,7 @@ export type PortalTab =
 export const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
   'users',
+  'audit',
   'students',
   'approvals',
   'workflow',
@@ -79,6 +82,12 @@ export function getRoleTabs(
           label: 'User Directory',
           desc: 'Officers, teachers & admin accounts',
           icon: UserCog,
+        },
+        {
+          id: 'audit',
+          label: 'Audit Log',
+          desc: 'Privilege, account & security events',
+          icon: ScrollText,
         },
         {
           id: 'governance',

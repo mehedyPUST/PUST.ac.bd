@@ -2781,8 +2781,9 @@ export function PublicSubPages({
               className="editable-region rounded-2xl border border-stone-200 bg-white mt-6 overflow-hidden"
             >
             <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+              <div className="lg:col-span-1">S.N</div>
               <div className="lg:col-span-2">Date &amp; Category</div>
-              <div className="lg:col-span-7">Official Circular</div>
+              <div className="lg:col-span-6">Official Circular</div>
               <div className="lg:col-span-3 text-right">Memo Reference</div>
             </div>
 
@@ -2804,6 +2805,13 @@ export function PublicSubPages({
                     idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/80'
                   }`}
                 >
+                  <div className="lg:col-span-1 pt-0.5 font-mono text-xs font-semibold text-slate-500 tabular-nums">
+                    <span className="lg:hidden uppercase tracking-wider text-[10px] mr-1.5 text-slate-400">
+                      S.N
+                    </span>
+                    {String(idx + 1).padStart(2, '0')}
+                  </div>
+
                   <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
                     <span className="text-slate-600 font-medium whitespace-nowrap">
                       {notice.publishedAt}
@@ -2813,7 +2821,7 @@ export function PublicSubPages({
                     </span>
                   </div>
 
-                  <div className="lg:col-span-7 min-w-0">
+                  <div className="lg:col-span-6 min-w-0">
                     <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left">
                       {notice.title}
                     </h2>

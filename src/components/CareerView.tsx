@@ -332,13 +332,14 @@ export function CareerView() {
                 className="rounded-2xl border border-stone-200 bg-white overflow-hidden"
               >
                 <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+                  <div className="lg:col-span-1">S.N</div>
                   <div className="lg:col-span-2">Date &amp; Track</div>
-                  <div className="lg:col-span-7">Position / Circular Summary</div>
+                  <div className="lg:col-span-6">Position / Circular Summary</div>
                   <div className="lg:col-span-3 text-right">Memo Reference</div>
                 </div>
 
                 <div className="divide-y divide-slate-200">
-                  {careerNotices.map((notice) => {
+                  {careerNotices.map((notice, idx) => {
                     const tender = isTenderNotice(notice);
                     return (
                       <div
@@ -353,8 +354,17 @@ export function CareerView() {
                             setActiveNotice(notice);
                           }
                         }}
-                        className="w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer"
+                        className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/80'
+                        }`}
                       >
+                        <div className="lg:col-span-1 pt-0.5 font-mono text-xs font-semibold text-slate-500 tabular-nums">
+                          <span className="lg:hidden uppercase tracking-wider text-[10px] mr-1.5 text-slate-400">
+                            S.N
+                          </span>
+                          {String(idx + 1).padStart(2, '0')}
+                        </div>
+
                         <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
                           <span className="text-slate-600 font-medium whitespace-nowrap">
                             {notice.publishedAt}
@@ -364,7 +374,7 @@ export function CareerView() {
                           </span>
                         </div>
 
-                        <div className="lg:col-span-7 min-w-0">
+                        <div className="lg:col-span-6 min-w-0">
                           <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
                             {notice.title}
                           </h3>
