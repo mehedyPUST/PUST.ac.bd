@@ -269,21 +269,107 @@ export function PortalView({
     [user?.mustChangePassword]
   );
 
-  // Keep active mobile horizontal tab centered without affecting vertical page scroll
-  useEffect(() => {
-    if (!user || typeof window === 'undefined') return;
+  /**
+   * Scroll the sidebar so the active link AND its immediate neighbors
+   * (previous + next) stay inside the visible nav area.
+   */
+  const ensureActiveSidebarLinkVisible = useCallback(() => {
+    if (typeof window === 'undefined') return;
     const navEl = navRailRef.current;
     const btnEl = tabButtonRefs.current[activeTab];
     if (!navEl || !btnEl) return;
-    if (navEl.scrollWidth <= navEl.clientWidth + 2) return;
 
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const targetLeft = btnEl.offsetLeft - (navEl.clientWidth - btnEl.offsetWidth) / 2;
-    navEl.scrollTo({
-      left: Math.max(0, targetLeft),
-      behavior: reduced ? 'auto' : 'smooth',
+    const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
+    const gap = 6; // matches visual gap between items
+
+    const isDesktopColumn = window.matchMedia('(min-width: 1024px)').matches;
+    const canScrollY = navEl.scrollHeight > navEl.clientHeight + 2;
+    const canScrollX = navEl.scrollWidth > navEl.clientWidth + 2;
+
+    const relativeOffset = (el: HTMLElement, axis: 'y' | 'x') => {
+      const navBox = navEl.getBoundingClientRect();
+      const elBox = el.getBoundingClientRect();
+      if (axis === 'y') {
+        return elBox.top - navBox.top + navEl.scrollTop;
+      }
+      return elBox.left - navBox.left + navEl.scrollLeft;
+    };
+
+    if (isDesktopColumn && canScrollY) {
+      const prev = btnEl.previousElementSibling as HTMLElement | null;
+      const next = btnEl.nextElementSibling as HTMLElement | null;
+      const rangeTop = relativeOffset(prev || btnEl, 'y') - (prev ? gap : 0);
+      const rangeBottom =
+        relativeOffset(next || btnEl, 'y') + (next || btnEl).offsetHeight + (next ? gap : 0);
+      const viewTop = navEl.scrollTop;
+      const viewBottom = viewTop + navEl.clientHeight;
+      const maxScroll = Math.max(0, navEl.scrollHeight - navEl.clientHeight);
+
+      let nextScroll = viewTop;
+      // Prefer showing full trio; if too tall, center the active item
+      const rangeHeight = rangeBottom - rangeTop;
+      if (rangeHeight <= navEl.clientHeight) {
+        if (rangeTop < viewTop) {
+          nextScroll = rangeTop;
+        } else if (rangeBottom > viewBottom) {
+          nextScroll = rangeBottom - navEl.clientHeight;
+        } else {
+          return;
+        }
+      } else {
+        const activeCenter =
+          relativeOffset(btnEl, 'y') + btnEl.offsetHeight / 2 - navEl.clientHeight / 2;
+        nextScroll = activeCenter;
+      }
+
+      nextScroll = Math.max(0, Math.min(maxScroll, nextScroll));
+      if (Math.abs(nextScroll - viewTop) < 1) return;
+      navEl.scrollTo({ top: nextScroll, behavior });
+      return;
+    }
+
+    if (canScrollX) {
+      const prev = btnEl.previousElementSibling as HTMLElement | null;
+      const next = btnEl.nextElementSibling as HTMLElement | null;
+      const rangeLeft = relativeOffset(prev || btnEl, 'x') - (prev ? gap : 0);
+      const rangeRight =
+        relativeOffset(next || btnEl, 'x') + (next || btnEl).offsetWidth + (next ? gap : 0);
+      const viewLeft = navEl.scrollLeft;
+      const viewRight = viewLeft + navEl.clientWidth;
+      const maxScroll = Math.max(0, navEl.scrollWidth - navEl.clientWidth);
+
+      let nextScroll = viewLeft;
+      const rangeWidth = rangeRight - rangeLeft;
+      if (rangeWidth <= navEl.clientWidth) {
+        if (rangeLeft < viewLeft) {
+          nextScroll = rangeLeft;
+        } else if (rangeRight > viewRight) {
+          nextScroll = rangeRight - navEl.clientWidth;
+        } else {
+          return;
+        }
+      } else {
+        nextScroll =
+          relativeOffset(btnEl, 'x') + btnEl.offsetWidth / 2 - navEl.clientWidth / 2;
+      }
+
+      nextScroll = Math.max(0, Math.min(maxScroll, nextScroll));
+      if (Math.abs(nextScroll - viewLeft) < 1) return;
+      navEl.scrollTo({ left: nextScroll, behavior });
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!user) return;
+    // Wait for layout after tab paint, then scroll neighbors into view
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        ensureActiveSidebarLinkVisible();
+      });
     });
-  }, [user, activeTab]);
+    return () => window.cancelAnimationFrame(id);
+  }, [user, activeTab, ensureActiveSidebarLinkVisible]);
 
   async function handleAuthenticated(authedUser: AuthUser) {
     setLogoutError(null);
@@ -400,7 +486,7 @@ export function PortalView({
           <nav
             ref={navRailRef}
             aria-label="Campus portal workspace modules"
-            className="flex lg:flex-col overflow-x-auto no-scrollbar overscroll-x-contain lg:flex-1 lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain gap-1.5 lg:gap-1 p-2.5"
+            className="flex lg:flex-col overflow-x-auto no-scrollbar overscroll-x-contain lg:flex-1 lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain gap-1.5 lg:gap-1 p-2.5 lg:scroll-py-2"
           >
             {portalTabs.map((tab) => {
               const Icon = tab.icon;

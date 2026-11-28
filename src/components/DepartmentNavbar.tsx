@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, GraduationCap, LayoutGrid, Pencil } from 'lucide-react';
 import { DEPARTMENT_NAV_ITEMS, type DepartmentTab } from '../lib/departmentNav';
@@ -46,6 +47,39 @@ export function DepartmentNavbar({
   );
   const deptHref = `/academics/departments/${encodeURIComponent(normalizedCode.toLowerCase())}`;
   const isAdmin = user?.role === 'admin';
+  const navRef = useRef<HTMLElement>(null);
+  const activeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    const navEl = navRef.current;
+    const btnEl = activeBtnRef.current;
+    if (!navEl || !btnEl || typeof window === 'undefined') return;
+    if (navEl.scrollWidth <= navEl.clientWidth + 2) return;
+
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const neighborPad = Math.max(btnEl.offsetWidth * 0.75, 36);
+    const btnLeft = btnEl.offsetLeft;
+    const btnRight = btnLeft + btnEl.offsetWidth;
+    const viewLeft = navEl.scrollLeft;
+    const viewRight = viewLeft + navEl.clientWidth;
+    let nextLeft = viewLeft;
+
+    if (btnLeft - neighborPad < viewLeft) {
+      nextLeft = Math.max(0, btnLeft - neighborPad);
+    } else if (btnRight + neighborPad > viewRight) {
+      nextLeft = Math.min(
+        navEl.scrollWidth - navEl.clientWidth,
+        btnRight + neighborPad - navEl.clientWidth
+      );
+    } else {
+      return;
+    }
+
+    navEl.scrollTo({
+      left: nextLeft,
+      behavior: reduced ? 'auto' : 'smooth',
+    });
+  }, [activeTab, isPersonPage]);
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200">
@@ -113,14 +147,16 @@ export function DepartmentNavbar({
 
         {/* Sub-navigation tabs */}
         <nav
+          ref={navRef}
           aria-label="Department section navigation"
-          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2"
+          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 scroll-smooth"
         >
           {DEPARTMENT_NAV_ITEMS.map((item) => {
             const active = !isPersonPage && activeTab === item.id;
             return (
               <button
                 key={item.id}
+                ref={active ? activeBtnRef : undefined}
                 type="button"
                 onClick={() => {
                   if (isPersonPage) {

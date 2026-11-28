@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Building2,
@@ -77,6 +77,57 @@ export function AdministrationSidebar({
 }: AdministrationSidebarProps) {
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navScrollRef = useRef<HTMLElement>(null);
+  const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
+
+  // Keep active office link + consecutive up/down links visible in the sidebar scroll area
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const navEl = navScrollRef.current;
+        const linkEl = activeLinkRef.current;
+        if (!navEl || !linkEl) return;
+        if (navEl.scrollHeight <= navEl.clientHeight + 2) return;
+
+        const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        const gap = 4;
+        const navBox = navEl.getBoundingClientRect();
+        const relativeTop = (el: HTMLElement) =>
+          el.getBoundingClientRect().top - navBox.top + navEl.scrollTop;
+
+        const itemEl = (linkEl.closest('li') as HTMLElement | null) || linkEl;
+        const prevItem = itemEl.previousElementSibling as HTMLElement | null;
+        const nextItem = itemEl.nextElementSibling as HTMLElement | null;
+
+        const rangeTop = relativeTop(prevItem || itemEl) - (prevItem ? gap : 0);
+        const bottomEl = nextItem || itemEl;
+        const rangeBottom = relativeTop(bottomEl) + bottomEl.offsetHeight + (nextItem ? gap : 0);
+
+        const viewTop = navEl.scrollTop;
+        const viewBottom = viewTop + navEl.clientHeight;
+        const maxScroll = Math.max(0, navEl.scrollHeight - navEl.clientHeight);
+        const rangeHeight = rangeBottom - rangeTop;
+
+        let nextScroll = viewTop;
+        if (rangeHeight <= navEl.clientHeight) {
+          if (rangeTop < viewTop) nextScroll = rangeTop;
+          else if (rangeBottom > viewBottom) nextScroll = rangeBottom - navEl.clientHeight;
+          else return;
+        } else {
+          nextScroll = relativeTop(itemEl) + itemEl.offsetHeight / 2 - navEl.clientHeight / 2;
+        }
+
+        nextScroll = Math.max(0, Math.min(maxScroll, nextScroll));
+        if (Math.abs(nextScroll - viewTop) < 1) return;
+        navEl.scrollTo({
+          top: nextScroll,
+          behavior: reduced ? 'auto' : 'smooth',
+        });
+      });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [activeRoute, mobileOpen]);
 
   const activeOffice = offices.find((o) => o.route === activeRoute);
   const defaultExpandedCategory: AdminOfficeCategory =
@@ -189,6 +240,7 @@ export function AdministrationSidebar({
 
         {/* Scrollable Navigation Body */}
         <nav
+          ref={navScrollRef}
           aria-label="Administration offices directory sidebar"
           className={`min-h-0 overflow-y-auto divide-y divide-slate-200/80 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] ${
             isMobile ? 'max-h-[56vh]' : 'flex-1'
@@ -298,6 +350,7 @@ export function AdministrationSidebar({
                         return (
                           <li key={office.slug}>
                             <Link
+                              ref={isActive ? activeLinkRef : undefined}
                               href={office.route}
                               onClick={() => setMobileOpen(false)}
                               aria-current={isActive ? 'page' : undefined}
