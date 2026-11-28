@@ -566,9 +566,9 @@ export function PortalView({
   function renderNavGroup(title: string, items: PortalTabItem[], collapsed: boolean) {
     if (items.length === 0) return null;
     return (
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         {!collapsed && (
-          <p className="px-3 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 text-left">
+          <p className="px-2.5 pt-0.5 pb-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 text-left">
             {title}
           </p>
         )}
@@ -590,7 +590,7 @@ export function PortalView({
               title={collapsed ? tab.label : undefined}
               onClick={() => selectTab(tab.id)}
               className={`w-full flex items-center gap-2.5 rounded-lg text-[13px] transition-colors text-left ${
-                collapsed ? 'justify-center px-1 py-2' : 'px-3 py-2'
+                collapsed ? 'justify-center px-1 py-1.5' : 'px-2.5 py-1.5'
               } ${
                 isActive
                   ? 'bg-pust-50 dark:bg-pust-950/65 border border-pust-200 dark:border-pust-800/75 text-pust-800 dark:text-pust-100 font-semibold cursor-pointer'
@@ -622,14 +622,14 @@ export function PortalView({
     if (!user) return null;
     return (
       <div
-        className={`shrink-0 border-t border-stone-200/80 dark:border-slate-800 space-y-1.5 ${
+        className={`shrink-0 border-t border-stone-200/80 dark:border-slate-800 space-y-1 ${
           collapsed ? 'p-1.5' : 'p-2'
         }`}
       >
         {/* User Profile Card */}
         <div
           className={`rounded-lg border border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-900 ${
-            collapsed ? 'p-1 flex justify-center' : 'p-2 space-y-2'
+            collapsed ? 'p-1 flex justify-center' : 'p-1.5 space-y-1.5'
           }`}
         >
           <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
@@ -726,7 +726,7 @@ export function PortalView({
       <div className="max-w-[1600px] mx-auto px-2.5 sm:px-3.5 pb-2.5 min-h-screen flex flex-col lg:flex-row gap-2.5 items-stretch">
         {/* Left Sidebar Column (Desktop — Sticky Grid 1 & Grid 3) */}
         <div
-          className={`hidden lg:flex flex-col gap-2.5 shrink-0 transition-all duration-200 lg:sticky lg:top-0 lg:pt-2.5 lg:pb-2.5 lg:self-start lg:h-screen ${
+          className={`hidden lg:flex flex-col gap-2.5 shrink-0 transition-all duration-200 lg:sticky lg:top-0 lg:pt-2.5 lg:pb-2.5 lg:self-start lg:h-dvh ${
             sidebarCollapsed ? 'w-[56px]' : 'w-[252px]'
           }`}
         >
@@ -776,7 +776,7 @@ export function PortalView({
               ref={navRailRef}
               aria-label="Campus portal workspace modules"
               className={`flex-1 min-h-0 overflow-y-auto no-scrollbar ${
-                sidebarCollapsed ? 'px-1.5 py-2.5 space-y-2' : 'px-2.5 py-3 space-y-4'
+                sidebarCollapsed ? 'px-1.5 py-2 space-y-1.5' : 'px-2.5 py-2 space-y-2'
               }`}
             >
               {renderNavGroup('Academics & Services', primaryGroupTabs, sidebarCollapsed)}

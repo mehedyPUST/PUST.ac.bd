@@ -266,11 +266,11 @@ export function Navbar({
               setMobileMenuOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-2 lg:my-0 rounded-md lg:rounded-none bg-white p-1.5 lg:px-2.5 xl:px-3 lg:py-1.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
+            className="relative z-10 my-1.5 lg:my-0 rounded-md lg:rounded-none bg-white p-[3px] lg:p-3 flex items-center justify-center shrink-0 self-center lg:self-stretch"
           >
             <PustCrest size={24} className="lg:hidden" />
-            <PustCrest size={54} className="hidden lg:block xl:hidden" />
-            <PustCrest size={60} className="hidden xl:block" />
+            <PustCrest size={80} className="hidden lg:block xl:hidden" />
+            <PustCrest size={84} className="hidden xl:block" />
           </Link>
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
@@ -372,10 +372,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'home'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route === '/'
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Home
@@ -411,10 +411,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'governance'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/governance')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Governance
@@ -454,10 +454,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'about'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/about')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     About
@@ -497,10 +497,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'administration'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/administration')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Administration
@@ -540,10 +540,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'academic'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/academics')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Academic
@@ -583,10 +583,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'facilities'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/facilities')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Facilities
@@ -626,10 +626,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'notices'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/notices')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Notices
@@ -669,10 +669,10 @@ export function Navbar({
                     aria-haspopup="true"
                     aria-expanded={hoveredGroup === 'admission'}
                     onClick={() => setHoveredGroup(null)}
-                    className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                    className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                       route.startsWith('/admissions')
-                        ? 'border-pust-800 text-pust-800 font-semibold'
-                        : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                        ? 'border-b-pust-800 text-pust-800 font-semibold'
+                        : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                     }`}
                   >
                     Admission
@@ -703,10 +703,10 @@ export function Navbar({
                 <Link
                   href="/verify"
                   onClick={() => setHoveredGroup(null)}
-                  className={`h-10 inline-flex items-center border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                  className={`h-10 inline-flex items-center border-y-2 border-t-transparent transition-colors whitespace-nowrap shrink-0 ${
                     route === '/verify'
-                      ? 'border-pust-800 text-pust-800 font-semibold'
-                      : 'border-transparent hover:text-pust-900 hover:border-pust-200'
+                      ? 'border-b-pust-800 text-pust-800 font-semibold'
+                      : 'border-b-transparent hover:text-pust-900 hover:border-b-pust-200'
                   }`}
                 >
                   Verify
@@ -934,7 +934,7 @@ export function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 min-w-0 flex-1 text-left"
                 >
-                  <span className="shrink-0 rounded-md bg-white p-1.5 flex items-center justify-center">
+                  <span className="shrink-0 rounded-md bg-white p-1 flex items-center justify-center">
                     <PustCrest size={22} />
                   </span>
                   <div className="min-w-0">
