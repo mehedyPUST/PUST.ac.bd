@@ -22,7 +22,7 @@ interface NoticeModalProps {
   user: AuthUser | null;
   isBookmarked: boolean;
   onToggleBookmark: (notice: NoticeRecord) => void;
-  onDeleteNotice?: (id: string) => void;
+  onDeleteNotice?: (id: string) => Promise<void> | void;
   onOpenPortal: () => void;
   editMode?: boolean;
   onEditNotice?: (notice: NoticeRecord) => void;
@@ -40,21 +40,40 @@ export function NoticeModal({
   onEditNotice,
 }: NoticeModalProps) {
   const [showInlinePdf, setShowInlinePdf] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     setShowInlinePdf(false);
+    setConfirmDelete(false);
+    setDeleting(false);
+    setDeleteError(null);
   }, [notice?.id]);
 
   useEffect(() => {
     if (!notice) return;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !deleting) onClose();
     }
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [notice, onClose]);
+  }, [notice, deleting, onClose]);
 
   if (!notice) return null;
+
+  async function handleConfirmDeleteClick() {
+    if (!notice || !onDeleteNotice) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await onDeleteNotice(notice.id);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Unable to remove notice.');
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   const safeAttachmentUrl =
     notice.attachmentUrl && isSafeMediaUrl(notice.attachmentUrl) ? notice.attachmentUrl : null;
@@ -69,7 +88,9 @@ export function NoticeModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="notice-modal-title"
-      onClick={onClose}
+      onClick={() => {
+        if (!deleting) onClose();
+      }}
     >
       <motion.div
         initial={{ opacity: 0, y: 10, scale: 0.99 }}
@@ -92,9 +113,10 @@ export function NoticeModal({
           </div>
           <button
             type="button"
+            disabled={deleting}
             onClick={onClose}
             aria-label="Close circular"
-            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
@@ -197,8 +219,17 @@ export function NoticeModal({
             </div>
           )}
 
+          {deleteError && (
+            <div
+              role="alert"
+              className="px-3.5 py-2.5 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900"
+            >
+              {deleteError}
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-slate-200">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {user ? (
                 <button
                   type="button"
@@ -237,21 +268,50 @@ export function NoticeModal({
               )}
 
               {user?.role === 'admin' && onDeleteNotice && (
-                <button
-                  type="button"
-                  onClick={() => onDeleteNotice(notice.id)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border border-red-300 text-red-700 hover:bg-red-50 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Remove
-                </button>
+                confirmDelete ? (
+                  <div className="inline-flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={deleting}
+                      onClick={() => void handleConfirmDeleteClick()}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold bg-red-700 text-white hover:bg-red-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {deleting ? 'Removing...' : 'Confirm Remove'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={deleting}
+                      onClick={() => {
+                        setConfirmDelete(false);
+                        setDeleteError(null);
+                      }}
+                      className="px-3 py-2 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmDelete(true);
+                      setDeleteError(null);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border border-red-300 text-red-700 hover:bg-red-50 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Remove
+                  </button>
+                )
               )}
             </div>
 
             <button
               type="button"
+              disabled={deleting}
               onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
             >
               Done Reading
             </button>

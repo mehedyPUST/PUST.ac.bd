@@ -48,6 +48,7 @@ interface AdminUserDirectoryPanelProps {
   onConsumeInitialSection?: () => void;
   onUsersChanged?: () => void;
   onCmsChange?: () => Promise<void>;
+  onSelfUpdated?: (user: AuthUser) => void;
   onPendingFacultyRequestsChange?: (count: number) => void;
 }
 
@@ -164,6 +165,7 @@ export function AdminUserDirectoryPanel({
   onConsumeInitialSection,
   onUsersChanged,
   onCmsChange,
+  onSelfUpdated,
   onPendingFacultyRequestsChange,
 }: AdminUserDirectoryPanelProps) {
   const [activeSection, setActiveSection] = useState<
@@ -922,6 +924,9 @@ export function AdminUserDirectoryPanel({
       });
       setEditingUser(null);
       setFeedback(`Updated directory account for ${res.user.name}.`);
+      if (res.user.id === currentUser.id) {
+        onSelfUpdated?.(res.user);
+      }
       await loadUsers();
       onUsersChanged?.();
     } catch (err) {
@@ -2248,6 +2253,27 @@ export function AdminUserDirectoryPanel({
                                   </div>
                                 ) : (
                                   <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                    {u.approvalStatus !== 'approved' && (
+                                      <button
+                                        type="button"
+                                        disabled={isBusy}
+                                        onClick={() => void handleQuickApproval(u, 'approved')}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pust-900 text-white font-medium hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                      >
+                                        <Check className="w-3.5 h-3.5" />
+                                        Approve
+                                      </button>
+                                    )}
+                                    {u.approvalStatus === 'pending' && !isSelf && (
+                                      <button
+                                        type="button"
+                                        disabled={isBusy}
+                                        onClick={() => void handleQuickApproval(u, 'rejected')}
+                                        className="px-2.5 py-1.5 rounded-lg border border-red-200 bg-white text-red-700 font-medium hover:bg-red-50 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                      >
+                                        Reject
+                                      </button>
+                                    )}
                                     <button
                                       type="button"
                                       disabled={isBusy}
@@ -2558,6 +2584,7 @@ export function AdminUserDirectoryPanel({
           onClick={() => {
             setShowCreateOfficerModal(false);
             setLinkingProfile(null);
+            setError(null);
           }}
         >
           <div
@@ -2585,6 +2612,7 @@ export function AdminUserDirectoryPanel({
                 onClick={() => {
                   setShowCreateOfficerModal(false);
                   setLinkingProfile(null);
+                  setError(null);
                 }}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 cursor-pointer"
                 aria-label="Close modal"
@@ -2594,6 +2622,14 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleCreateOfficerSubmit} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               {linkingProfile && (
                 <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs">
                   <span className="text-slate-700">
@@ -2845,6 +2881,7 @@ export function AdminUserDirectoryPanel({
                   onClick={() => {
                     setShowCreateOfficerModal(false);
                     setLinkingProfile(null);
+                    setError(null);
                   }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
@@ -2867,7 +2904,10 @@ export function AdminUserDirectoryPanel({
       {showCreateAdminModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto"
-          onClick={() => setShowCreateAdminModal(false)}
+          onClick={() => {
+            setShowCreateAdminModal(false);
+            setError(null);
+          }}
         >
           <div
             className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
@@ -2887,7 +2927,10 @@ export function AdminUserDirectoryPanel({
               </div>
               <button
                 type="button"
-                onClick={() => setShowCreateAdminModal(false)}
+                onClick={() => {
+                  setShowCreateAdminModal(false);
+                  setError(null);
+                }}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 cursor-pointer"
                 aria-label="Close modal"
               >
@@ -2896,6 +2939,14 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleCreateAdminSubmit} className="p-6 space-y-3.5 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-950 leading-relaxed space-y-1">
                 <p className="font-semibold">Full Administrative Parity</p>
                 <p>
@@ -3041,7 +3092,10 @@ export function AdminUserDirectoryPanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setShowCreateAdminModal(false)}
+                  onClick={() => {
+                    setShowCreateAdminModal(false);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -3063,7 +3117,10 @@ export function AdminUserDirectoryPanel({
       {editingUser && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto"
-          onClick={() => setEditingUser(null)}
+          onClick={() => {
+            setEditingUser(null);
+            setError(null);
+          }}
         >
           <div
             className="w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
@@ -3080,7 +3137,10 @@ export function AdminUserDirectoryPanel({
               </div>
               <button
                 type="button"
-                onClick={() => setEditingUser(null)}
+                onClick={() => {
+                  setEditingUser(null);
+                  setError(null);
+                }}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 cursor-pointer"
                 aria-label="Close edit modal"
               >
@@ -3089,6 +3149,14 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleSaveUserEdit} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               {editRole === 'admin' && editingUser.role !== 'admin' && (
                 <div className="p-3 rounded-xl border border-amber-200 bg-amber-50/70 text-amber-950 leading-relaxed">
                   Promoting this user to <strong>University Admin</strong> grants the exact same full system powers as your own administrator account.
@@ -3271,7 +3339,10 @@ export function AdminUserDirectoryPanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setEditingUser(null)}
+                  onClick={() => {
+                    setEditingUser(null);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -3293,7 +3364,10 @@ export function AdminUserDirectoryPanel({
       {passwordTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 overflow-y-auto"
-          onClick={() => setPasswordTarget(null)}
+          onClick={() => {
+            setPasswordTarget(null);
+            setError(null);
+          }}
         >
           <div
             className="w-full max-w-md bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
@@ -3306,7 +3380,10 @@ export function AdminUserDirectoryPanel({
               </div>
               <button
                 type="button"
-                onClick={() => setPasswordTarget(null)}
+                onClick={() => {
+                  setPasswordTarget(null);
+                  setError(null);
+                }}
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
                 aria-label="Close modal"
               >
@@ -3314,6 +3391,14 @@ export function AdminUserDirectoryPanel({
               </button>
             </div>
             <form onSubmit={handleResetPasswordSubmit} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <p className="text-slate-600">
                 Set a new sign-in password for <strong className="text-slate-900">{passwordTarget.name}</strong> ({passwordTarget.email}).
               </p>
@@ -3384,7 +3469,10 @@ export function AdminUserDirectoryPanel({
               <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setPasswordTarget(null)}
+                  onClick={() => {
+                    setPasswordTarget(null);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -3570,7 +3658,10 @@ export function AdminUserDirectoryPanel({
           role="dialog"
           aria-modal="true"
           aria-label="Appoint Department Chairman"
-          onClick={() => setAppointTarget(null)}
+          onClick={() => {
+            setAppointTarget(null);
+            setError(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -3591,7 +3682,10 @@ export function AdminUserDirectoryPanel({
               </div>
               <button
                 type="button"
-                onClick={() => setAppointTarget(null)}
+                onClick={() => {
+                  setAppointTarget(null);
+                  setError(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -3600,6 +3694,14 @@ export function AdminUserDirectoryPanel({
             </div>
 
             <form onSubmit={handleAppointChairmanSubmit} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-3.5 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -3687,7 +3789,10 @@ export function AdminUserDirectoryPanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setAppointTarget(null)}
+                  onClick={() => {
+                    setAppointTarget(null);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel

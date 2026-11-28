@@ -141,11 +141,11 @@ export const pustApi = {
       departmentCode: string;
       boardScope: NoticeBoardScope;
       visibility: NoticeVisibility;
-      targetSession: string;
-      targetCourseCode: string;
-      attachmentName: string;
-      attachmentUrl: string;
-      attachmentType: 'image' | 'pdf' | 'other';
+      targetSession: string | null;
+      targetCourseCode: string | null;
+      attachmentName: string | null;
+      attachmentUrl: string | null;
+      attachmentType: 'image' | 'pdf' | 'other' | null;
       summary: string;
       body: string;
       pinned: boolean;
@@ -815,7 +815,21 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
-  updateDepartment: (id: string, payload: Partial<Omit<DepartmentRecord, 'id' | 'code'>>) =>
+  updateDepartment: (
+    id: string,
+    payload: Partial<
+      Omit<
+        DepartmentRecord,
+        'id' | 'code' | 'officialCode' | 'facultyCount' | 'contactPhone' | 'contactEmail' | 'coverImageUrl'
+      > & {
+        officialCode: string | null;
+        facultyCount: number | null;
+        contactPhone: string | null;
+        contactEmail: string | null;
+        coverImageUrl: string | null;
+      }
+    >
+  ) =>
     apiFetch<{ department: DepartmentRecord }>(`/api/portal/cms/departments/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -852,7 +866,15 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
-  updatePublication: (id: string, payload: Partial<Omit<PublicationRecord, 'id'>>) =>
+  updatePublication: (
+    id: string,
+    payload: Partial<
+      Omit<PublicationRecord, 'id' | 'doi' | 'url'> & {
+        doi: string | null;
+        url: string | null;
+      }
+    >
+  ) =>
     apiFetch<{ publication: PublicationRecord }>(`/api/portal/cms/publications/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),

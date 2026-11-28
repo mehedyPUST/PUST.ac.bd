@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { ArrowDown, ArrowUp, Plus, Save, Trash2, Upload, X } from 'lucide-react';
+import { toNullableClearable } from '../lib/adminHelpers';
 import { pustApi } from '../lib/api';
 import { detectAttachmentType } from '../lib/media';
 import { AcademicAndFacilitiesEditors } from './admin-edit/AcademicAndFacilitiesEditors';
@@ -598,19 +599,19 @@ export function AdminEditModal({
         });
         await onRefreshProfile();
       } else if (target.kind === 'notice') {
-        const attachmentPayload = noticeAttachUrl.trim()
-          ? {
-              attachmentName: noticeAttachName.trim() || 'Official Attachment',
-              attachmentUrl: noticeAttachUrl.trim(),
-              attachmentType: detectAttachmentType(noticeAttachUrl.trim(), noticeAttachType),
-            }
-          : {
-              attachmentName: noticeAttachName.trim() || undefined,
-              attachmentUrl: undefined,
-              attachmentType: undefined,
-            };
-
         if (target.notice) {
+          const patchAttachment = noticeAttachUrl.trim()
+            ? {
+                attachmentName: noticeAttachName.trim() || 'Official Attachment',
+                attachmentUrl: noticeAttachUrl.trim(),
+                attachmentType: detectAttachmentType(noticeAttachUrl.trim(), noticeAttachType),
+              }
+            : {
+                attachmentName: toNullableClearable(noticeAttachName),
+                attachmentUrl: null,
+                attachmentType: null,
+              };
+
           await pustApi.updateNotice(target.notice.id, {
             referenceNo: noticeRef.trim(),
             title: noticeTitle.trim(),
@@ -618,14 +619,26 @@ export function AdminEditModal({
             departmentCode: noticeDeptCode.trim(),
             boardScope: noticeScope,
             visibility: noticeVisibility,
-            targetSession: noticeSession.trim() || undefined,
-            targetCourseCode: noticeCourseCode.trim() || undefined,
+            targetSession: toNullableClearable(noticeSession),
+            targetCourseCode: toNullableClearable(noticeCourseCode),
             summary: noticeSummary.trim(),
             body: noticeBody.trim(),
             pinned: noticePinned,
-            ...attachmentPayload,
+            ...patchAttachment,
           });
         } else {
+          const createAttachment = noticeAttachUrl.trim()
+            ? {
+                attachmentName: noticeAttachName.trim() || 'Official Attachment',
+                attachmentUrl: noticeAttachUrl.trim(),
+                attachmentType: detectAttachmentType(noticeAttachUrl.trim(), noticeAttachType),
+              }
+            : {
+                attachmentName: noticeAttachName.trim() || undefined,
+                attachmentUrl: undefined,
+                attachmentType: undefined,
+              };
+
           await pustApi.createNotice({
             referenceNo: noticeRef.trim(),
             title: noticeTitle.trim(),
@@ -638,7 +651,7 @@ export function AdminEditModal({
             summary: noticeSummary.trim(),
             body: noticeBody.trim(),
             pinned: noticePinned,
-            ...attachmentPayload,
+            ...createAttachment,
           });
         }
         await onRefreshNotices();
@@ -666,20 +679,28 @@ export function AdminEditModal({
         }
         await onRefreshProfile();
       } else if (target.kind === 'publication') {
-        const payload = {
-          title: pubTitle.trim(),
-          authors: pubAuthors.trim(),
-          departmentCode: pubDeptCode.trim(),
-          domain: pubDomain.trim(),
-          year: Number(pubYear),
-          venue: pubVenue.trim(),
-          ...(pubDoi.trim() ? { doi: pubDoi.trim() } : { doi: undefined }),
-          ...(pubUrl.trim() ? { url: pubUrl.trim() } : { url: undefined }),
-        };
         if (target.publication) {
-          await pustApi.updatePublication(target.publication.id, payload);
+          await pustApi.updatePublication(target.publication.id, {
+            title: pubTitle.trim(),
+            authors: pubAuthors.trim(),
+            departmentCode: pubDeptCode.trim(),
+            domain: pubDomain.trim(),
+            year: Number(pubYear),
+            venue: pubVenue.trim(),
+            doi: toNullableClearable(pubDoi),
+            url: toNullableClearable(pubUrl),
+          });
         } else {
-          await pustApi.createPublication(payload);
+          await pustApi.createPublication({
+            title: pubTitle.trim(),
+            authors: pubAuthors.trim(),
+            departmentCode: pubDeptCode.trim(),
+            domain: pubDomain.trim(),
+            year: Number(pubYear),
+            venue: pubVenue.trim(),
+            ...(pubDoi.trim() ? { doi: pubDoi.trim() } : {}),
+            ...(pubUrl.trim() ? { url: pubUrl.trim() } : {}),
+          });
         }
         await onRefreshPublications();
       } else if (target.kind === 'journals') {
@@ -714,15 +735,15 @@ export function AdminEditModal({
 
         if (target.department) {
           await pustApi.updateDepartment(target.department.id, {
-            ...(deptOfficialCode.trim() ? { officialCode: deptOfficialCode.trim() } : {}),
+            officialCode: toNullableClearable(deptOfficialCode),
             name: deptName.trim(),
             faculty: deptFaculty,
             established: Number(deptEstablished),
             chairmanName: deptChairman.trim(),
-            ...(deptContactPhone.trim() ? { contactPhone: deptContactPhone.trim() } : {}),
-            ...(deptContactEmail.trim() ? { contactEmail: deptContactEmail.trim() } : {}),
-            coverImageUrl: deptCoverImageUrl.trim(),
-            ...(parsedFacultyCount !== undefined ? { facultyCount: parsedFacultyCount } : {}),
+            contactPhone: toNullableClearable(deptContactPhone),
+            contactEmail: toNullableClearable(deptContactEmail),
+            coverImageUrl: toNullableClearable(deptCoverImageUrl),
+            facultyCount: parsedFacultyCount ?? null,
             intakeSeats: Number(deptIntake),
             building: deptBuilding.trim(),
             degrees: degrees.length > 0 ? degrees : target.department.degrees,

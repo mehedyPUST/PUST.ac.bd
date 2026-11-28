@@ -627,13 +627,9 @@ export function PustShell({
 
   const handleDeleteNotice = useCallback(
     async (id: string) => {
-      try {
-        await pustApi.deleteNotice(id);
-        setActiveNotice(null);
-        await loadNotices();
-      } catch (err) {
-        setDataError(err instanceof Error ? err.message : 'Unable to remove notice.');
-      }
+      await pustApi.deleteNotice(id);
+      setActiveNotice(null);
+      await loadNotices();
     },
     [loadNotices]
   );

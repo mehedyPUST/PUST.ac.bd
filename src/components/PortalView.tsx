@@ -137,32 +137,36 @@ export function PortalView({
   >(null);
   const [pendingFacultyRequestCount, setPendingFacultyRequestCount] = useState(0);
 
+  const userId = user?.id ?? null;
+  const userRole = user?.role ?? null;
+  const userMustChangePassword = Boolean(user?.mustChangePassword);
+
   useEffect(() => {
-    if (!user) return;
-    if (user.mustChangePassword) {
+    if (!userId) return;
+    if (userMustChangePassword) {
       setActiveTab('profile');
       return;
     }
     if (requestedTabParam && VALID_PORTAL_TABS.includes(requestedTabParam)) {
       setActiveTab(requestedTabParam);
-    } else {
-      setActiveTab('overview');
+    } else if (!requestedTabParam) {
+      setActiveTab((curr) => (curr === 'overview' ? curr : curr));
     }
     if (
-      user.role === 'admin' &&
+      userRole === 'admin' &&
       (requestedActionParam === 'create-admin' || requestedActionParam === 'create-officer')
     ) {
       setPendingDirectoryAction(requestedActionParam);
     }
     if (
-      user.role === 'admin' &&
+      userRole === 'admin' &&
       (requestedSectionParam === 'accounts' ||
         requestedSectionParam === 'existing-profiles' ||
         requestedSectionParam === 'faculty-requests')
     ) {
       setPendingDirectorySection(requestedSectionParam);
     } else if (
-      user.role === 'chairman' &&
+      userRole === 'chairman' &&
       (requestedSectionParam === 'teachers' ||
         requestedSectionParam === 'existing-profiles' ||
         requestedSectionParam === 'faculty-requests' ||
@@ -171,7 +175,14 @@ export function PortalView({
     ) {
       setPendingDirectorySection(requestedSectionParam);
     }
-  }, [user, requestedTabParam, requestedActionParam, requestedSectionParam]);
+  }, [
+    userId,
+    userRole,
+    userMustChangePassword,
+    requestedTabParam,
+    requestedActionParam,
+    requestedSectionParam,
+  ]);
 
   useEffect(() => {
     if (!user || (user.role !== 'admin' && user.role !== 'chairman')) {
@@ -239,6 +250,8 @@ export function PortalView({
       } else {
         url.searchParams.set('tab', effectiveTab);
       }
+      url.searchParams.delete('action');
+      url.searchParams.delete('section');
       window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 
       const shouldScroll = options?.scrollToTop ?? true;
@@ -644,6 +657,7 @@ export function PortalView({
                 onConsumeInitialSection={() => setPendingDirectorySection(null)}
                 onUsersChanged={loadStudents}
                 onCmsChange={onCmsChange}
+                onSelfUpdated={(updated) => onUserChange(updated)}
                 onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
               />
             )}
@@ -681,6 +695,7 @@ export function PortalView({
                 notices={notices}
                 onNoticesChange={onNoticesChange}
                 onCmsChange={onCmsChange}
+                onUserChange={onUserChange}
               />
             )}
           </motion.div>

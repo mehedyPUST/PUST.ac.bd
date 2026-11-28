@@ -1902,6 +1902,7 @@ export function DepartmentPeoplePanel({
           onClick={() => {
             setShowCreateTeacherModal(false);
             setLinkingProfile(null);
+            setError(null);
           }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
@@ -1925,6 +1926,7 @@ export function DepartmentPeoplePanel({
                 onClick={() => {
                   setShowCreateTeacherModal(false);
                   setLinkingProfile(null);
+                  setError(null);
                 }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
@@ -1934,6 +1936,14 @@ export function DepartmentPeoplePanel({
             </div>
 
             <form onSubmit={handleCreateTeacher} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               {linkingProfile && (
                 <div className="rounded-xl border border-pust-800/20 bg-pust-50/70 px-3.5 py-2.5 flex items-start justify-between gap-3">
                   <div className="space-y-0.5">
@@ -2116,6 +2126,7 @@ export function DepartmentPeoplePanel({
                   onClick={() => {
                     setShowCreateTeacherModal(false);
                     setLinkingProfile(null);
+                    setError(null);
                   }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
@@ -2144,7 +2155,10 @@ export function DepartmentPeoplePanel({
           role="dialog"
           aria-modal="true"
           aria-label="Create Student Account"
-          onClick={() => setShowCreateStudentModal(false)}
+          onClick={() => {
+            setShowCreateStudentModal(false);
+            setError(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -2162,7 +2176,10 @@ export function DepartmentPeoplePanel({
               </div>
               <button
                 type="button"
-                onClick={() => setShowCreateStudentModal(false)}
+                onClick={() => {
+                  setShowCreateStudentModal(false);
+                  setError(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -2171,6 +2188,14 @@ export function DepartmentPeoplePanel({
             </div>
 
             <form onSubmit={handleCreateStudent} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">Student Full Name</label>
@@ -2283,7 +2308,10 @@ export function DepartmentPeoplePanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setShowCreateStudentModal(false)}
+                  onClick={() => {
+                    setShowCreateStudentModal(false);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -2307,7 +2335,10 @@ export function DepartmentPeoplePanel({
           role="dialog"
           aria-modal="true"
           aria-label="Issue Student Signup Token"
-          onClick={() => setShowTokenModal(false)}
+          onClick={() => {
+            setShowTokenModal(false);
+            setError(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -2325,7 +2356,10 @@ export function DepartmentPeoplePanel({
               </div>
               <button
                 type="button"
-                onClick={() => setShowTokenModal(false)}
+                onClick={() => {
+                  setShowTokenModal(false);
+                  setError(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -2334,6 +2368,14 @@ export function DepartmentPeoplePanel({
             </div>
 
             <form onSubmit={handleIssueToken} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">Student Name</label>
@@ -2413,7 +2455,10 @@ export function DepartmentPeoplePanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setShowTokenModal(false)}
+                  onClick={() => {
+                    setShowTokenModal(false);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -2437,7 +2482,10 @@ export function DepartmentPeoplePanel({
           role="dialog"
           aria-modal="true"
           aria-label="Edit Department Account"
-          onClick={() => setEditingUser(null)}
+          onClick={() => {
+            setEditingUser(null);
+            setError(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -2455,7 +2503,10 @@ export function DepartmentPeoplePanel({
               </div>
               <button
                 type="button"
-                onClick={() => setEditingUser(null)}
+                onClick={() => {
+                  setEditingUser(null);
+                  setError(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -2464,6 +2515,14 @@ export function DepartmentPeoplePanel({
             </div>
 
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-3.5 py-2.5 text-[11px] text-slate-600">
                 Department (<span className="font-mono font-semibold text-slate-900">{deptCode}</span>) and role (<span className="font-mono font-semibold text-slate-900 uppercase">{editingUser.role}</span>) are locked to department governance. Role changes or department transfers require Central University Admin.
               </div>
@@ -2597,7 +2656,10 @@ export function DepartmentPeoplePanel({
               <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setEditingUser(null)}
+                  onClick={() => {
+                    setEditingUser(null);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel
@@ -2621,7 +2683,10 @@ export function DepartmentPeoplePanel({
           role="dialog"
           aria-modal="true"
           aria-label="Reset Account Password"
-          onClick={() => setPasswordTarget(null)}
+          onClick={() => {
+            setPasswordTarget(null);
+            setError(null);
+          }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
         >
           <div
@@ -2635,7 +2700,10 @@ export function DepartmentPeoplePanel({
               </div>
               <button
                 type="button"
-                onClick={() => setPasswordTarget(null)}
+                onClick={() => {
+                  setPasswordTarget(null);
+                  setError(null);
+                }}
                 aria-label="Close modal"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
               >
@@ -2643,6 +2711,14 @@ export function DepartmentPeoplePanel({
               </button>
             </div>
             <form onSubmit={handleResetPassword} className="p-6 space-y-4 text-xs">
+              {error && (
+                <div
+                  role="alert"
+                  className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+                >
+                  {error}
+                </div>
+              )}
               <p className="text-slate-600">
                 Set a new sign-in password for <strong className="text-slate-900">{passwordTarget.name}</strong> ({passwordTarget.email}).
               </p>
@@ -2713,7 +2789,10 @@ export function DepartmentPeoplePanel({
               <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setPasswordTarget(null)}
+                  onClick={() => {
+                    setPasswordTarget(null);
+                    setError(null);
+                  }}
                   className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
                 >
                   Cancel

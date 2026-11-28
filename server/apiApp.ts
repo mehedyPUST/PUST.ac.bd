@@ -21,6 +21,10 @@ import {
 } from './auth';
 import { pustRepo } from './db';
 import { portalRouter } from './routes/portalRoutes';
+import {
+  canClearCourseNoticeTarget,
+  normalizeClearablePatch,
+} from '../src/lib/adminHelpers';
 import { isSafeMediaUrl } from '../src/lib/media';
 
 const studentTokenRegisterSchema = z.object({
@@ -113,10 +117,33 @@ const createNoticeSchema = z.object({
   pinned: z.boolean().optional(),
 });
 
-const updateNoticeSchema = createNoticeSchema.partial().refine(
-  (obj) => Object.keys(obj).length > 0,
-  'Provide at least one field to update.'
-);
+const updateNoticeSchema = z
+  .object({
+    referenceNo: createNoticeSchema.shape.referenceNo.optional(),
+    title: createNoticeSchema.shape.title.optional(),
+    category: createNoticeSchema.shape.category.optional(),
+    departmentCode: createNoticeSchema.shape.departmentCode.optional(),
+    boardScope: createNoticeSchema.shape.boardScope.optional(),
+    visibility: createNoticeSchema.shape.visibility.optional(),
+    targetSession: z.string().trim().max(20).nullable().optional(),
+    targetCourseCode: z.string().trim().max(20).nullable().optional(),
+    attachmentName: z.string().trim().max(160).nullable().optional(),
+    attachmentUrl: z
+      .string()
+      .trim()
+      .max(2000)
+      .refine(
+        (val) => !val || isSafeMediaUrl(val),
+        'Attachment URL must be a valid https://, http://, or local path.'
+      )
+      .nullable()
+      .optional(),
+    attachmentType: z.enum(['image', 'pdf', 'other']).nullable().optional(),
+    summary: createNoticeSchema.shape.summary.optional(),
+    body: createNoticeSchema.shape.body.optional(),
+    pinned: createNoticeSchema.shape.pinned.optional(),
+  })
+  .refine((obj) => Object.keys(obj).length > 0, 'Provide at least one field to update.');
 
 const createInquirySchema = z.object({
   fullName: z.string().trim().min(2).max(80),
@@ -722,13 +749,32 @@ export function mountApiRoutes(app: Express): void {
           return;
         }
       }
-      const updated = await pustRepo.updateNotice(existing.id, parsed.data);
+      if (
+        !canClearCourseNoticeTarget(
+          existing.boardScope,
+          parsed.data.boardScope,
+          parsed.data.targetCourseCode
+        )
+      ) {
+        res.status(400).json({
+          error: 'Course-targeted notices require a target course code.',
+        });
+        return;
+      }
+      const normalizedPatch = normalizeClearablePatch(parsed.data, [
+        'targetSession',
+        'targetCourseCode',
+        'attachmentName',
+        'attachmentUrl',
+        'attachmentType',
+      ] as const);
+      const updated = await pustRepo.updateNotice(existing.id, normalizedPatch);
       const isPinOnly =
-        Object.keys(parsed.data).length === 1 && parsed.data.pinned !== undefined;
+        Object.keys(normalizedPatch).length === 1 && normalizedPatch.pinned !== undefined;
       await pustRepo.logAudit(
         req.authUser!.name,
         req.authUser!.role,
-        isPinOnly ? (parsed.data.pinned ? 'Pinned notice' : 'Unpinned notice') : 'Edited notice',
+        isPinOnly ? (normalizedPatch.pinned ? 'Pinned notice' : 'Unpinned notice') : 'Edited notice',
         updated?.referenceNo || existing.referenceNo
       );
       res.json({ notice: updated });

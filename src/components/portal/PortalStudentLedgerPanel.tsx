@@ -238,7 +238,14 @@ export function PortalStudentLedgerPanel({
                 {canEditRecords && (
                   <button
                     type="button"
-                    onClick={() => (editingId === stu.id ? setEditingId(null) : startEdit(stu))}
+                    onClick={() => {
+                      if (editingId === stu.id) {
+                        setEditingId(null);
+                        setError(null);
+                      } else {
+                        startEdit(stu);
+                      }
+                    }}
                     className="px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap"
                   >
                     {editingId === stu.id ? 'Close' : 'Update Notes / Conduct'}

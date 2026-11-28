@@ -12,6 +12,10 @@ import {
   type JwtClaims,
 } from '../auth';
 import { pustRepo } from '../db';
+import {
+  buildStudentRecordPatch,
+  normalizeClearablePatch,
+} from '../../src/lib/adminHelpers';
 import { isSafeMediaUrl } from '../../src/lib/media';
 import type {
   AuthUser,
@@ -945,19 +949,19 @@ const appointChairmanSchema = z.object({
 });
 
 const departmentUpdateSchema = z.object({
-  officialCode: z.string().trim().max(16).optional(),
+  officialCode: z.string().trim().max(16).nullable().optional(),
   name: z.string().trim().min(2).max(160).optional(),
   faculty: FACULTIES_ENUM.optional(),
   established: z.number().int().min(1950).max(2100).optional(),
   degrees: z.array(z.string().trim().min(2).max(60)).min(1).max(12).optional(),
   intakeSeats: z.number().int().min(5).max(1000).optional(),
-  facultyCount: z.number().int().min(0).max(500).optional(),
+  facultyCount: z.number().int().min(0).max(500).nullable().optional(),
   building: z.string().trim().min(2).max(140).optional(),
   chairmanName: z.string().trim().min(2).max(120).optional(),
-  chairmanSince: z.string().trim().max(32).optional(),
+  chairmanSince: z.string().trim().max(32).nullable().optional(),
   chairmanHistory: z.array(chairmanHistoryEntrySchema).max(60).optional(),
-  contactPhone: z.string().trim().max(60).optional(),
-  contactEmail: z.string().trim().max(120).optional(),
+  contactPhone: z.string().trim().max(60).nullable().optional(),
+  contactEmail: z.string().trim().max(120).nullable().optional(),
   coverImageUrl: z
     .string()
     .trim()
@@ -966,6 +970,7 @@ const departmentUpdateSchema = z.object({
       (val) => !val || isSafeMediaUrl(val),
       'Cover image URL must be a valid https://, http://, or local path.'
     )
+    .nullable()
     .optional(),
   summary: z.string().trim().min(10).max(2000).optional(),
   researchFocus: z.array(z.string().trim().min(2).max(160)).min(1).max(20).optional(),
@@ -994,6 +999,22 @@ const publicationSchema = z.object({
     )
     .optional(),
 });
+
+const publicationUpdateSchema = publicationSchema
+  .extend({
+    doi: z.string().trim().max(200).nullable().optional(),
+    url: z
+      .string()
+      .trim()
+      .max(2000)
+      .refine(
+        (v) => !v || isSafeMediaUrl(v),
+        'Publication URL must be a valid https://, http://, or local asset path.'
+      )
+      .nullable()
+      .optional(),
+  })
+  .partial();
 
 const bannerCreateSchema = z.object({
   imageUrl: z
@@ -1823,27 +1844,13 @@ portalRouter.patch(
       return;
     }
 
-    const patch: Record<string, unknown> = {};
-    if (req.authUser!.role === 'chairman' && parsed.data.chairmanNotes !== undefined) {
-      patch.chairmanNotes = parsed.data.chairmanNotes;
-    }
-    if (req.authUser!.role === 'admin' && parsed.data.adminNotes !== undefined) {
-      patch.adminNotes = parsed.data.adminNotes;
-    }
-    if (req.authUser!.role === 'proctor') {
-      if (parsed.data.disciplinaryStatus !== undefined) {
-        patch.disciplinaryStatus = parsed.data.disciplinaryStatus;
-      }
-      if (parsed.data.disciplinaryNotes !== undefined) {
-        patch.disciplinaryNotes = parsed.data.disciplinaryNotes;
-      }
-    }
-    if (Object.keys(patch).length === 0) {
-      res.status(400).json({ error: 'Provide at least one permitted field to update.' });
+    const patchResult = buildStudentRecordPatch(req.authUser!.role, parsed.data);
+    if (!patchResult.ok) {
+      res.status(400).json({ error: patchResult.error });
       return;
     }
 
-    const updated = await pustRepo.updateStudentById(target.id, patch);
+    const updated = await pustRepo.updateStudentById(target.id, patchResult.patch);
     if (!updated) {
       res.status(404).json({ error: 'Student not found.' });
       return;
@@ -3500,7 +3507,15 @@ portalRouter.patch(
       });
       return;
     }
-    const department = await pustRepo.updateDepartment(String(req.params.id), parsed.data);
+    const normalizedPatch = normalizeClearablePatch(parsed.data, [
+      'officialCode',
+      'facultyCount',
+      'chairmanSince',
+      'contactPhone',
+      'contactEmail',
+      'coverImageUrl',
+    ] as const);
+    const department = await pustRepo.updateDepartment(String(req.params.id), normalizedPatch);
     if (!department) {
       res.status(404).json({ error: 'Department not found.' });
       return;
@@ -3759,14 +3774,15 @@ portalRouter.patch(
   '/cms/publications/:id',
   requireRoles('admin'),
   async (req: AuthenticatedRequest, res) => {
-    const parsed = publicationSchema.partial().safeParse(req.body);
+    const parsed = publicationUpdateSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({
         error: parsed.error.issues[0]?.message || 'Invalid publication update payload.',
       });
       return;
     }
-    const publication = await pustRepo.updatePublication(String(req.params.id), parsed.data);
+    const normalizedPatch = normalizeClearablePatch(parsed.data, ['doi', 'url'] as const);
+    const publication = await pustRepo.updatePublication(String(req.params.id), normalizedPatch);
     if (!publication) {
       res.status(404).json({ error: 'Publication not found.' });
       return;

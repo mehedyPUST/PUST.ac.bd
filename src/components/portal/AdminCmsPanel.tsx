@@ -74,6 +74,7 @@ interface AdminCmsPanelProps {
   notices?: NoticeRecord[];
   onNoticesChange: () => Promise<void>;
   onCmsChange: () => Promise<void>;
+  onUserChange?: (user: AuthUser) => void;
 }
 
 export function AdminCmsPanel({
@@ -86,6 +87,7 @@ export function AdminCmsPanel({
   notices = [],
   onNoticesChange,
   onCmsChange,
+  onUserChange,
 }: AdminCmsPanelProps) {
   const { profile } = usePust();
   const [users, setUsers] = useState<AuthUser[]>([]);
@@ -1710,6 +1712,8 @@ export function AdminCmsPanel({
           departments={departments}
           offices={profile?.adminOffices}
           onUsersChanged={refresh}
+          onCmsChange={onCmsChange}
+          onSelfUpdated={onUserChange}
         />
       )}
 

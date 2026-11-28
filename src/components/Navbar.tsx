@@ -12,7 +12,6 @@ import {
   Menu,
   Pencil,
   Plus,
-  Search,
   X,
 } from 'lucide-react';
 import { DEFAULT_NAVBAR_TAGLINE, resolveContextualEditTarget } from '../lib/cmsDefaults';
@@ -132,7 +131,6 @@ export function Navbar({
   const pathname = usePathname() || '/';
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
@@ -165,7 +163,6 @@ export function Navbar({
   useEffect(() => {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
-    setMobileSearchOpen(false);
   }, [pathname, route]);
 
   useEffect(() => {
@@ -185,14 +182,12 @@ export function Navbar({
       if (!insideHeader && !insideDrawer) {
         setHoveredGroup(null);
         setMobileMenuOpen(false);
-        setMobileSearchOpen(false);
       }
     }
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         setHoveredGroup(null);
         setMobileMenuOpen(false);
-        setMobileSearchOpen(false);
       }
     }
     document.addEventListener('mousedown', handleOutside);
@@ -206,7 +201,6 @@ export function Navbar({
   }, []);
 
   function openOrToggleMobileDrawer() {
-    setMobileSearchOpen(false);
     setMobileMenuOpen((prev) => {
       const next = !prev;
       if (next) {
@@ -239,7 +233,6 @@ export function Navbar({
   function go(target: AppRoute | string) {
     setHoveredGroup(null);
     setMobileMenuOpen(false);
-    setMobileSearchOpen(false);
     onNavigate(target);
   }
 
@@ -261,7 +254,7 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[58px] xl:h-[62px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
+          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[64px] xl:h-[68px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -271,7 +264,6 @@ export function Navbar({
             onClick={() => {
               setHoveredGroup(null);
               setMobileMenuOpen(false);
-              setMobileSearchOpen(false);
             }}
             title="Pabna University of Science and Technology"
             className="relative z-10 my-1 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-2.5 xl:px-3 lg:py-0.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
@@ -283,31 +275,25 @@ export function Navbar({
 
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
-            {/* Tier 1: University Title Band + Est. Tagline (Left) & Expanded Search (Right) */}
-            <div className="h-[54px] sm:h-[58px] lg:h-[58px] xl:h-[62px] py-0.5 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
-              <div className="min-w-0 flex-1 flex items-center gap-3">
+            {/* Tier 1: University Title Band + Stacked Est. Tagline (md+) & Always-Expanded Search (Right) */}
+            <div className="min-h-[54px] sm:h-[60px] lg:h-[64px] xl:h-[68px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
+              <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <Link
                   href="/"
                   onClick={() => {
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
-                    setMobileSearchOpen(false);
                   }}
-                  className="block font-serif text-[clamp(0.76rem,2.9vw,0.92rem)] leading-[1.16] sm:text-base lg:text-[clamp(1.15rem,0.95rem+0.45vw,1.45rem)] sm:leading-none font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
+                  className="block font-serif text-[clamp(0.78rem,3.1vw,0.94rem)] leading-[1.16] sm:text-[15px] md:text-base lg:text-[clamp(1.15rem,0.95rem+0.45vw,1.45rem)] sm:leading-tight font-medium tracking-tight text-white hover:text-gold-200 transition-colors line-clamp-2 sm:line-clamp-none sm:truncate"
                 >
                   Pabna University of Science and Technology
                 </Link>
-
-                <span
-                  aria-hidden="true"
-                  className="hidden xl:block h-4 w-px bg-white/30 shrink-0"
-                />
-                <span className="hidden xl:inline text-xs font-semibold tracking-wide text-gold-300 whitespace-nowrap shrink-0">
+                <span className="hidden md:block text-[11px] font-medium tracking-wider text-gold-300/95 leading-tight mt-0.5 truncate">
                   {profile?.navbarTagline?.trim() || DEFAULT_NAVBAR_TAGLINE}
                 </span>
               </div>
 
-              <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 {user?.role === 'admin' && editMode && onOpenEditModal && (
                   <button
                     type="button"
@@ -321,25 +307,9 @@ export function Navbar({
                   </button>
                 )}
 
-                <div className="hidden lg:block">
+                <div className="hidden sm:block">
                   <GlobalSearchBar variant="desktop" />
                 </div>
-
-                {/* Mobile Search Toggle */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileSearchOpen((prev) => !prev);
-                    setMobileMenuOpen(false);
-                  }}
-                  aria-label="Toggle site search"
-                  aria-expanded={mobileSearchOpen}
-                  className={`lg:hidden w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                    mobileSearchOpen ? 'bg-pust-800 text-white' : 'text-white hover:bg-pust-800'
-                  }`}
-                >
-                  {mobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
-                </button>
 
                 {/* Mobile Admin Mode Toggle Switch */}
                 {user?.role === 'admin' && onToggleEditMode && (
@@ -356,7 +326,6 @@ export function Navbar({
                   onClick={() => {
                     setHoveredGroup(null);
                     setMobileMenuOpen(false);
-                    setMobileSearchOpen(false);
                   }}
                   className="lg:hidden min-h-[30px] inline-flex items-center px-2 sm:px-3 py-1 rounded-md text-[11px] sm:text-xs font-semibold bg-white text-pust-800 hover:bg-gold-50 shadow-xs transition-colors whitespace-nowrap shrink-0"
                 >
@@ -926,23 +895,10 @@ export function Navbar({
         );
       })()}
 
-      {/* Expandable Mobile / Tablet Search Strip */}
-      {mobileSearchOpen && (
-        <>
-          <div
-            aria-hidden="true"
-            onClick={() => setMobileSearchOpen(false)}
-            className="fixed inset-x-0 top-[54px] sm:top-[58px] bottom-0 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
-          />
-          <div className="relative z-10 lg:hidden border-t border-stone-200 bg-white px-3.5 py-3 shadow-md">
-            <GlobalSearchBar
-              variant="mobile"
-              autoFocus
-              onActionComplete={() => setMobileSearchOpen(false)}
-            />
-          </div>
-        </>
-      )}
+      {/* Always-Expanded Mobile Search Strip (< sm) */}
+      <div className="sm:hidden relative z-10 border-b border-stone-200 bg-white px-4 py-2">
+        <GlobalSearchBar variant="mobile" />
+      </div>
       </header>
 
       {/* Slide-Out Off-Canvas Mobile Navigation Drawer */}

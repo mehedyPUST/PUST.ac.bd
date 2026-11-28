@@ -525,7 +525,10 @@ export function AdminFacultyRequestsPanel({
           aria-modal="true"
           aria-label="Review Faculty Profile Request"
           onClick={() => {
-            if (!submittingDecision) setInspecting(null);
+            if (!submittingDecision) {
+              setInspecting(null);
+              setError(null);
+            }
           }}
           className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4"
         >
@@ -554,7 +557,10 @@ export function AdminFacultyRequestsPanel({
               <button
                 type="button"
                 disabled={Boolean(submittingDecision)}
-                onClick={() => setInspecting(null)}
+                onClick={() => {
+                  setInspecting(null);
+                  setError(null);
+                }}
                 aria-label="Close review modal"
                 className="p-2 rounded-lg border border-stone-200 bg-white text-slate-600 hover:text-slate-950 hover:border-stone-300 cursor-pointer shrink-0"
               >
@@ -564,6 +570,25 @@ export function AdminFacultyRequestsPanel({
 
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
+              {error && (
+                <div
+                  role="alert"
+                  className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900 flex items-center justify-between gap-3"
+                >
+                  <span className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
+                    <span>{error}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setError(null)}
+                    className="text-red-700 hover:text-red-950 cursor-pointer"
+                    aria-label="Dismiss error"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
               {/* Portrait Comparison */}
               {(inspecting.currentMember?.photoUrl || inspecting.proposedProfile.photoUrl) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl border border-stone-200 bg-[#FAF9F6] p-4">
@@ -689,7 +714,10 @@ export function AdminFacultyRequestsPanel({
               <button
                 type="button"
                 disabled={Boolean(submittingDecision)}
-                onClick={() => setInspecting(null)}
+                onClick={() => {
+                  setInspecting(null);
+                  setError(null);
+                }}
                 className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer whitespace-nowrap"
               >
                 Close

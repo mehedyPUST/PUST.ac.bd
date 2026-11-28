@@ -589,7 +589,11 @@ export function GlobalSearchBar({
   return (
     <div
       ref={containerRef}
-      className={variant === 'desktop' ? 'relative w-52 lg:w-56 xl:w-64 shrink-0' : 'relative w-full'}
+      className={
+        variant === 'desktop'
+          ? 'relative w-40 md:w-48 lg:w-56 xl:w-64 shrink-0'
+          : 'relative w-full'
+      }
     >
       <div className="relative flex items-center">
         <Search
@@ -620,7 +624,7 @@ export function GlobalSearchBar({
           className={`w-full pl-8 pr-8 text-xs rounded-lg border transition-colors focus:outline-none ${
             variant === 'desktop'
               ? 'py-1.5 bg-white text-slate-900 placeholder:text-slate-400 border-white shadow-xs focus:ring-2 focus:ring-white/30'
-              : 'py-2.5 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
+              : 'py-2 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
           }`}
         />
 
