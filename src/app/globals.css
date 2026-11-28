@@ -444,7 +444,7 @@
 
 [data-edit-mode="true"] .editable-region {
   outline: 1.5px dashed rgba(217, 119, 6, 0.58);
-  outline-offset: 4px;
+  outline-offset: 3px;
   border-radius: 0.75rem;
   transition: outline-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
 }

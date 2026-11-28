@@ -834,7 +834,7 @@ export function Navbar({
         }
 
         return (
-          <div className="relative z-10 border-t border-amber-300 bg-amber-50 text-amber-950">
+          <div className="relative z-10 border-t border-amber-300/90 bg-amber-50/95 backdrop-blur-xs text-amber-950 shadow-[0_2px_10px_-4px_rgba(180,83,9,0.18)]">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-1.5 md:py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-2 text-xs">
               <div className="hidden md:flex items-center gap-2 shrink-0">
                 <Pencil className="w-3.5 h-3.5 text-amber-800 shrink-0" />
@@ -1264,6 +1264,50 @@ export function Navbar({
 
               {/* Drawer Pinned Footer Actions */}
               <div className="shrink-0 px-3.5 py-2.5 bg-[#FAF9F6] border-t border-stone-200 space-y-2">
+                {user?.role === 'admin' && (
+                  <div className="flex items-center gap-2 pb-1">
+                    {onToggleEditMode && (
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={editMode}
+                        onClick={onToggleEditMode}
+                        className={`flex-1 min-h-[38px] inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                          editMode
+                            ? 'bg-amber-400 border-amber-500 text-slate-950'
+                            : 'bg-amber-50 border-amber-300 text-amber-950 hover:bg-amber-100'
+                        }`}
+                      >
+                        <span>Admin Mode</span>
+                        <span
+                          aria-hidden="true"
+                          className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors ${
+                            editMode ? 'bg-slate-950' : 'bg-amber-200 border border-amber-400'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-3 w-3 rounded-full transition-transform duration-150 ${
+                              editMode ? 'translate-x-3 bg-amber-300' : 'translate-x-0 bg-white'
+                            }`}
+                          />
+                        </span>
+                      </button>
+                    )}
+                    {onOpenCmsDirectory && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          onOpenCmsDirectory();
+                        }}
+                        className="min-h-[38px] inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer shrink-0"
+                      >
+                        <LayoutGrid className="w-3.5 h-3.5" />
+                        CMS
+                      </button>
+                    )}
+                  </div>
+                )}
                 <Link
                   href={route === '/portal' ? '/' : '/portal'}
                   onClick={() => setMobileMenuOpen(false)}

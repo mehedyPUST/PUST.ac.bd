@@ -51,7 +51,7 @@ export function EditTriggerButton({
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer print:hidden ${variantClasses} ${className}`}
+      className={`inline-flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-800 focus-visible:ring-offset-1 active:scale-[0.98] print:hidden ${variantClasses} ${className}`}
     >
       <Icon className="w-3.5 h-3.5 shrink-0" />
       <span>{label}</span>

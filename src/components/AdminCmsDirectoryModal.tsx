@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowUpRight,
   Award,
@@ -67,13 +68,18 @@ export function AdminCmsDirectoryModal({
   useEffect(() => {
     if (!open) return;
     setQuery('');
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         onClose();
       }
     }
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [open, onClose]);
 
   const modules = useMemo<DirectoryModuleItem[]>(
@@ -492,27 +498,37 @@ export function AdminCmsDirectoryModal({
     'Pages & Public Services',
   ];
 
-  if (!open) return null;
-
   function launchTarget(target: EditModalTarget) {
     onClose();
     onSelectTarget(target);
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[65] flex items-center justify-center bg-slate-950/60 p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cms-directory-title"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-5xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-stone-200 bg-[#FAF8F4] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="cms-directory-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.16 }}
+          className="fixed inset-0 z-[65] flex items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cms-directory-title"
+          onClick={onClose}
+        >
+          <motion.div
+            key="cms-directory-panel"
+            initial={{ opacity: 0, y: 12, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.99 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-5xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-5 sm:px-6 py-4 border-b border-stone-200 bg-[#FAF8F4] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-mono text-[11px] uppercase tracking-widest text-amber-800 font-semibold">
               Admin Edit Studio · Complete App Control
@@ -577,14 +593,25 @@ export function AdminCmsDirectoryModal({
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
-              type="search"
+              type="text"
+              role="searchbox"
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Find any page, directory, office, or section..."
               aria-label="Search CMS modules"
-              className="w-full pl-10 pr-3.5 py-2 text-xs sm:text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-950 focus:bg-white focus:border-pust-800 focus:outline-none"
+              className="w-full pl-10 pr-9 py-2 text-xs sm:text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-950 focus:bg-white focus:border-pust-800 focus:outline-none"
             />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear module search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -683,7 +710,9 @@ export function AdminCmsDirectoryModal({
             })
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
