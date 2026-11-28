@@ -80,48 +80,50 @@ export function PortalStudentLedgerPanel({
 
   if (user.role === 'student' && studentSelf) {
     return (
-      <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-5">
-        <div className="border-b border-stone-200 pb-3">
-          <h2 className="font-serif text-xl font-medium text-slate-950">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-5">
+        <div className="border-b border-stone-200 dark:border-slate-800 pb-3">
+          <h2 className="font-serif text-xl font-medium text-slate-950 dark:text-slate-100">
             Student Academic Dossier
           </h2>
-          <p className="text-xs text-slate-600 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             Official academic, residential, and clearance standing recorded on PUST servers.
           </p>
         </div>
 
         <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Full Name</dt>
-            <dd className="font-semibold text-sm text-slate-950 mt-0.5">{studentSelf.name}</dd>
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Full Name</dt>
+            <dd className="font-semibold text-sm text-slate-950 dark:text-slate-100 mt-0.5">
+              {studentSelf.name}
+            </dd>
           </div>
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Academic ID &amp; Session</dt>
-            <dd className="font-mono font-semibold text-sm text-slate-950 tabular-nums mt-0.5">
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Academic ID &amp; Session</dt>
+            <dd className="font-mono font-semibold text-sm text-slate-950 dark:text-slate-100 tabular-nums mt-0.5">
               {studentSelf.academicId} · {studentSelf.session}
             </dd>
           </div>
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Department</dt>
-            <dd className="font-semibold text-sm text-slate-950 mt-0.5">
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Department</dt>
+            <dd className="font-semibold text-sm text-slate-950 dark:text-slate-100 mt-0.5">
               {studentSelf.departmentCode}
             </dd>
           </div>
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Completed Semesters &amp; CGPA</dt>
-            <dd className="font-mono font-semibold text-sm text-pust-900 tabular-nums mt-0.5">
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Completed Semesters &amp; CGPA</dt>
+            <dd className="font-mono font-semibold text-sm text-pust-800 dark:text-gold-300 tabular-nums mt-0.5">
               {studentSelf.completedSemesters} Semesters · CGPA {studentSelf.cgpa.toFixed(2)}
             </dd>
           </div>
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Hall &amp; Seat Allotment</dt>
-            <dd className="font-semibold text-sm text-slate-950 mt-0.5">
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Hall &amp; Seat Allotment</dt>
+            <dd className="font-semibold text-sm text-slate-950 dark:text-slate-100 mt-0.5">
               {studentSelf.hallName} · {studentSelf.seatNumber}
             </dd>
           </div>
-          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
-            <dt className="text-slate-500">Proctorial Conduct</dt>
-            <dd className="font-semibold text-sm text-emerald-700 mt-0.5">
+          <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <dt className="text-slate-500 dark:text-slate-400">Proctorial Conduct</dt>
+            <dd className="font-semibold text-sm text-emerald-700 dark:text-emerald-400 mt-0.5">
               {studentSelf.disciplinaryStatus}
             </dd>
           </div>
@@ -129,10 +131,10 @@ export function PortalStudentLedgerPanel({
 
         {studentSelf.admissionDocuments.length > 0 && (
           <div className="space-y-2 pt-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
               Verified Admission Documents
             </h3>
-            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+            <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1">
               {studentSelf.admissionDocuments.map((doc, i) => (
                 <li key={`${doc}-${i}`}>{doc}</li>
               ))}
@@ -144,13 +146,13 @@ export function PortalStudentLedgerPanel({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3">
+    <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 dark:border-slate-800 pb-3">
         <div>
-          <h2 className="font-serif text-xl font-medium text-slate-950">
+          <h2 className="font-serif text-xl font-medium text-slate-950 dark:text-slate-100">
             University Student Database ({students.length})
           </h2>
-          <p className="text-xs text-slate-600 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             Search combined student academic profiles, residential allocations, and conduct status.
           </p>
         </div>
@@ -158,7 +160,7 @@ export function PortalStudentLedgerPanel({
           type="button"
           onClick={() => void onReloadStudents()}
           disabled={loadingStudents}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-xs font-medium text-slate-700 hover:border-pust-800 cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loadingStudents ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
@@ -166,32 +168,32 @@ export function PortalStudentLedgerPanel({
       </div>
 
       {feedback && (
-        <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
+        <div className="p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs text-emerald-900 dark:text-emerald-200">
           {feedback}
         </div>
       )}
       {error && (
-        <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900">
+        <div className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-xs text-red-900 dark:text-red-200">
           {error}
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="search"
             value={stuSearch}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search name, ID, or email..."
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
           />
         </div>
         <select
           value={stuDeptFilter}
           disabled={user.role === 'chairman' || user.role === 'teacher'}
           onChange={(e) => onDeptFilterChange(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] disabled:opacity-70 focus:outline-none focus:border-pust-800"
+          className="px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:opacity-70 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
         >
           <option value="ALL">All Departments</option>
           {departments.map((d) => (
@@ -205,33 +207,37 @@ export function PortalStudentLedgerPanel({
           value={stuSessionFilter === 'ALL' ? '' : stuSessionFilter}
           onChange={(e) => onSessionFilterChange(e.target.value.trim() || 'ALL')}
           placeholder="Filter session (e.g. 2022-23)"
-          className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+          className="px-3 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
         />
       </div>
 
       {students.length === 0 ? (
-        <p className="text-xs text-slate-600 p-4 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+        <p className="text-xs text-slate-600 dark:text-slate-400 p-4 rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80">
           No student records match your current filter.
         </p>
       ) : (
-        <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 overflow-hidden text-xs">
+        <div className="divide-y divide-stone-200 dark:divide-slate-800 rounded-lg border border-stone-200 dark:border-slate-800 overflow-hidden text-xs">
           {students.map((stu, idx) => (
             <div
               key={stu.id}
-              className={`p-4 space-y-3 ${idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}`}
+              className={`p-4 space-y-3 ${
+                idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-[#FAF9F6] dark:bg-slate-800/40'
+              }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-0.5">
-                  <p className="font-semibold text-sm text-slate-950">
+                  <p className="font-semibold text-sm text-slate-950 dark:text-slate-100">
                     {stu.name} ·{' '}
-                    <span className="font-mono text-pust-800 tabular-nums">{stu.academicId}</span>
+                    <span className="font-mono text-pust-800 dark:text-gold-300 tabular-nums">
+                      {stu.academicId}
+                    </span>
                   </p>
-                  <p className="font-mono text-slate-600 tabular-nums">
+                  <p className="font-mono text-slate-600 dark:text-slate-300 tabular-nums">
                     {stu.departmentCode} · Session {stu.session} · Sem {stu.currentSemester} · CGPA{' '}
                     {stu.cgpa.toFixed(2)} · {stu.hallName} ({stu.seatNumber})
                   </p>
-                  <p className="text-slate-600">
-                    Conduct: <strong className="text-slate-900">{stu.disciplinaryStatus}</strong> ·{' '}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Conduct: <strong className="text-slate-900 dark:text-slate-100">{stu.disciplinaryStatus}</strong> ·{' '}
                     {stu.disciplinaryNotes}
                   </p>
                 </div>
@@ -246,7 +252,7 @@ export function PortalStudentLedgerPanel({
                         startEdit(stu);
                       }
                     }}
-                    className="px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap"
+                    className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer whitespace-nowrap"
                   >
                     {editingId === stu.id ? 'Close' : 'Update Notes / Conduct'}
                   </button>
@@ -254,35 +260,37 @@ export function PortalStudentLedgerPanel({
               </div>
 
               {editingId === stu.id && (
-                <div className="pt-3 border-t border-stone-200 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="pt-3 border-t border-stone-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {(user.role === 'chairman' || user.role === 'admin') && (
                     <div>
-                      <label className="block font-medium text-slate-700 mb-1">
+                      <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
                         Chairman Notes
                       </label>
                       <input
                         type="text"
                         value={chairmanNotes}
                         onChange={(e) => setChairmanNotes(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                       />
                     </div>
                   )}
                   {user.role === 'admin' && (
                     <div>
-                      <label className="block font-medium text-slate-700 mb-1">Admin Notes</label>
+                      <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
+                        Admin Notes
+                      </label>
                       <input
                         type="text"
                         value={adminNotes}
                         onChange={(e) => setAdminNotes(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                       />
                     </div>
                   )}
                   {(user.role === 'proctor' || user.role === 'admin') && (
                     <>
                       <div>
-                        <label className="block font-medium text-slate-700 mb-1">
+                        <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
                           Disciplinary Status
                         </label>
                         <select
@@ -292,7 +300,7 @@ export function PortalStudentLedgerPanel({
                               e.target.value as StudentRecord['disciplinaryStatus']
                             )
                           }
-                          className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                         >
                           <option value="Clear">Clear</option>
                           <option value="Warning">Warning</option>
@@ -300,14 +308,14 @@ export function PortalStudentLedgerPanel({
                         </select>
                       </div>
                       <div>
-                        <label className="block font-medium text-slate-700 mb-1">
+                        <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
                           Disciplinary Notes
                         </label>
                         <input
                           type="text"
                           value={disciplinaryNotes}
                           onChange={(e) => setDisciplinaryNotes(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                         />
                       </div>
                     </>
@@ -317,7 +325,7 @@ export function PortalStudentLedgerPanel({
                       type="button"
                       disabled={saving}
                       onClick={() => void saveEdit(stu)}
-                      className="px-4 py-2 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                      className="px-4 py-2 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
                     >
                       {saving ? 'Saving...' : 'Save Student Record'}
                     </button>

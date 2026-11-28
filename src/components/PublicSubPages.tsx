@@ -508,9 +508,9 @@ export function PublicSubPages({
       aboutTabs.find((t) => t.slug === activeSlug)?.label || 'About PUST';
 
     return (
-      <main className="flex-1 bg-[#F9F8F5]">
+      <main className="flex-1 bg-[#F8F7F4]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
+          <div className="border-b border-stone-200 pb-6 space-y-4">
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
               About Pabna University of Science &amp; Technology
             </p>
@@ -530,8 +530,8 @@ export function PublicSubPages({
                   href={tab.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     activeSlug === tab.slug
-                      ? 'bg-pust-800 text-white border border-pust-800 shadow-xs'
-                      : 'bg-white border border-slate-200 text-slate-800 hover:border-pust-600 hover:text-pust-800'
+                      ? 'bg-pust-700 text-white border border-pust-700 shadow-xs'
+                      : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-600 hover:text-pust-800'
                   }`}
                 >
                   {tab.label}
@@ -544,7 +544,7 @@ export function PublicSubPages({
           {loadingData && !activeSection ? (
             <HeroSummarySkeleton />
           ) : !activeSection ? (
-            <div className="rounded-2xl border border-slate-200 bg-[#F7F7F5] p-6 space-y-3">
+            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-6 space-y-3">
               <p className="text-sm text-slate-700">
                 {dataError || `Content for "${activeTabLabel}" has not been published yet.`}
               </p>
@@ -552,7 +552,7 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                 >
                   Retry Loading
                 </button>
@@ -679,7 +679,7 @@ export function PublicSubPages({
                       Founding Charter &amp; Key Dates
                     </p>
                   </div>
-                  <dl className="divide-y divide-slate-200 text-sm">
+                  <dl className="divide-y divide-stone-200 text-sm">
                     <div className="px-5 py-3 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="text-slate-700 font-medium">Act Enacted</dt>
                       <dd className="font-mono font-semibold text-slate-950 sm:text-right">
@@ -756,7 +756,7 @@ export function PublicSubPages({
           )}
 
           {activeSlug === 'history' && profile && (
-            <div className="editable-region pt-8 border-t border-slate-200 space-y-4">
+            <div className="editable-region pt-8 border-t border-stone-200 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                   Institutional Chronology
@@ -883,8 +883,8 @@ export function PublicSubPages({
         : profile?.facultyMembersCount ?? 0;
 
     return (
-      <main className="flex-1 bg-[#F9F8F5]">
-        <header className="bg-pust-950 text-white border-b border-gold-500/35">
+      <main className="flex-1 bg-[#F8F7F4]">
+        <header className="bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white border-b border-gold-500/35">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-12">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="space-y-3 max-w-3xl">
@@ -975,8 +975,8 @@ export function PublicSubPages({
                     }}
                     className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-pust-900 text-white'
-                        : 'text-slate-700 hover:bg-stone-100 hover:text-pust-900'
+                        ? 'bg-pust-700 text-white'
+                        : 'text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-800'
                     }`}
                   >
                     {tab.label}
@@ -1007,28 +1007,28 @@ export function PublicSubPages({
                 {dataError || 'Academic configuration data is unavailable.'}
               </p>
               {onRetry && (
-                <button
-                  type="button"
-                  onClick={onRetry}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
-                >
-                  Retry Loading
-                </button>
-              )}
-            </div>
-          ) : route === '/academics/programs' ? (
-            <div className="editable-region space-y-8">
-              <div className="flex justify-end empty:hidden">
-                <EditTriggerButton
-                  target={{ kind: 'degree-programs' }}
-                  label="Edit Programs"
-                  variant="compact"
-                />
+                  <button
+                    type="button"
+                    onClick={onRetry}
+                    className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
+                  >
+                    Retry Loading
+                  </button>
+                )}
               </div>
-              {resolved.academicExtras.degreePrograms.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
-                  No academic degree programs have been published yet.
+            ) : route === '/academics/programs' ? (
+              <div className="editable-region space-y-8">
+                <div className="flex justify-end empty:hidden">
+                  <EditTriggerButton
+                    target={{ kind: 'degree-programs' }}
+                    label="Edit Programs"
+                    variant="compact"
+                  />
                 </div>
+                {resolved.academicExtras.degreePrograms.length === 0 ? (
+                  <div className="p-8 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-sm text-slate-600">
+                    No academic degree programs have been published yet.
+                  </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   {resolved.academicExtras.degreePrograms.map((prog, idx) => (
@@ -1089,7 +1089,7 @@ export function PublicSubPages({
                 </a>
               </MotionReveal>
 
-              <MotionReveal delay={0.05} className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-slate-200 bg-white">
+              <MotionReveal delay={0.05} className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border border-stone-200 bg-white">
                 <p className="text-sm text-slate-700">
                   All degree programs operate under the Outcome-Based Education (OBE) framework and
                   4.00 grading ordinance.
@@ -1097,7 +1097,7 @@ export function PublicSubPages({
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/governance/academic-ordinance#cgpa-calculator"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-pust-800 text-pust-900 hover:bg-pust-50 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border border-pust-700 text-pust-800 hover:bg-pust-50 transition-colors cursor-pointer"
                   >
                     <Calculator className="w-3.5 h-3.5" />
                     SGPA / CGPA Calculator
@@ -1105,14 +1105,14 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => onNavigate('/governance/academic-ordinance')}
-                    className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 text-slate-800 hover:border-pust-700 hover:text-pust-800 cursor-pointer"
                   >
                     Academic Ordinance
                   </button>
                   <button
                     type="button"
                     onClick={() => onNavigate('/academics/departments')}
-                    className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                   >
                     {departments.length > 0
                       ? `Browse ${departments.length} Departments`
@@ -1140,7 +1140,7 @@ export function PublicSubPages({
               </div>
 
               {resolved.academicExtras.facultyDeans.length === 0 && (
-                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                <div className="p-8 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-sm text-slate-600">
                   No faculty dean records have been published yet.
                 </div>
               )}
@@ -1174,7 +1174,7 @@ export function PublicSubPages({
                         </h2>
                       </div>
 
-                      <div className="lg:col-span-6 lg:border-l lg:border-slate-200/80 lg:pl-6 space-y-1.5 text-xs">
+                      <div className="lg:col-span-6 lg:border-l lg:border-stone-200 lg:pl-6 space-y-1.5 text-xs">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-sm font-serif font-medium text-slate-900 text-left">
                             Dean: {fac.dean}
@@ -1205,7 +1205,7 @@ export function PublicSubPages({
                             type="button"
                             onClick={() => handleCopyContact(fac.email)}
                             aria-label={`Copy ${fac.email}`}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-stone-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-700 hover:text-pust-800 cursor-pointer"
                           >
                             {isCopied ? (
                               <>
@@ -1222,7 +1222,7 @@ export function PublicSubPages({
                           {fac.phone && (
                             <a
                               href={`tel:${fac.phone}`}
-                              className="inline-flex items-center gap-1 font-mono text-xs text-slate-700 hover:text-pust-900"
+                              className="inline-flex items-center gap-1 font-mono text-xs text-slate-700 hover:text-pust-800"
                             >
                               <Phone className="w-3.5 h-3.5 shrink-0" />
                               {fac.phone}
@@ -1247,8 +1247,8 @@ export function PublicSubPages({
                               onClick={() => handleOpenDepartmentLink(dept)}
                               className={`inline-flex items-center px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
                                 isOpening
-                                  ? 'border-pust-800 bg-pust-50 text-pust-900'
-                                  : 'border-slate-200 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-900'
+                                  ? 'border-pust-700 bg-pust-50 text-pust-800'
+                                  : 'border-stone-200 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800'
                               }`}
                             >
                               {isOpening && (
@@ -1522,25 +1522,25 @@ export function PublicSubPages({
                   </span>
                 </div>
                 <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-stone-200 text-xs">
-                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                  <div className="p-3 rounded-xl bg-white/90 border border-stone-200">
                     <dt className="text-slate-500">Class Teaching</dt>
                     <dd className="font-mono text-base font-semibold text-slate-900 tabular-nums mt-0.5">
                       14 Weeks
                     </dd>
                   </div>
-                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                  <div className="p-3 rounded-xl bg-white/90 border border-stone-200">
                     <dt className="text-slate-500">Exam Preparation</dt>
                     <dd className="font-mono text-base font-semibold text-slate-900 tabular-nums mt-0.5">
                       2 Weeks
                     </dd>
                   </div>
-                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                  <div className="p-3 rounded-xl bg-white/90 border border-stone-200">
                     <dt className="text-slate-500">Final Examinations</dt>
-                    <dd className="font-mono text-base font-semibold text-pust-900 tabular-nums mt-0.5">
+                    <dd className="font-mono text-base font-semibold text-pust-800 tabular-nums mt-0.5">
                       3 Weeks
                     </dd>
                   </div>
-                  <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70">
+                  <div className="p-3 rounded-xl bg-white/90 border border-stone-200">
                     <dt className="text-slate-500">Semester Break</dt>
                     <dd className="font-mono text-base font-semibold text-sage-800 tabular-nums mt-0.5">
                       1 Week
@@ -1560,7 +1560,7 @@ export function PublicSubPages({
                 />
               </div>
               {resolved.academicExtras.scholarships.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                <div className="p-8 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-sm text-slate-600">
                   No scholarship schemes are currently listed.
                 </div>
               ) : (
@@ -1579,7 +1579,7 @@ export function PublicSubPages({
                   ))}
                 </div>
               )}
-              <MotionReveal className="p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+              <MotionReveal className="p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
                 <div className="space-y-1">
                   <p className="font-mono uppercase tracking-wider text-pust-800 font-semibold">
                     Scholarship &amp; Financial Aid Coordination
@@ -1593,7 +1593,7 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={() => onNavigate('/administration/student-advisor-office')}
-                  className="px-4 py-2 font-semibold rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                  className="px-4 py-2 font-semibold rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   Student Advisor Office →
                 </button>
@@ -1625,7 +1625,7 @@ export function PublicSubPages({
                           'PUST-Seminars-Workshops.ics'
                         )
                       }
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       <CalendarPlus className="w-3.5 h-3.5" />
                       Export Seminars (.ics)
@@ -1634,7 +1634,7 @@ export function PublicSubPages({
                 </div>
               </div>
               {resolved.upcomingSeminars.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-sm text-slate-600">
+                <div className="p-8 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-sm text-slate-600">
                   No upcoming seminars or workshops are scheduled yet.
                 </div>
               ) : (
@@ -1672,7 +1672,7 @@ export function PublicSubPages({
                           `PUST-Seminar-${sem.date}.ics`
                         )
                       }
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
                     >
                       <CalendarPlus className="w-3.5 h-3.5" />
                       Add (.ics)
@@ -1722,11 +1722,11 @@ export function PublicSubPages({
             onClick={() => setPreviewForm(null)}
           >
             <div
-              className="print-only-document w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden my-auto print:rounded-none print:shadow-none print:border-2 print:border-pust-900"
+              className="print-only-document w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto print:rounded-none print:shadow-none print:border-2 print:border-pust-900"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="print:hidden px-6 py-3.5 border-b border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-xs font-semibold text-pust-900">
+              <div className="print:hidden px-6 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-xs font-semibold text-pust-800">
                   Fillable Form Studio · {previewForm.code}
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
@@ -1734,7 +1734,7 @@ export function PublicSubPages({
                     <button
                       type="button"
                       onClick={() => setFormFieldValues({})}
-                      className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-600 hover:text-slate-900 cursor-pointer"
+                      className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-600 hover:text-slate-900 cursor-pointer"
                     >
                       Clear Fields
                     </button>
@@ -1742,7 +1742,7 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:bg-[#FAF9F6] cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" />
                     Print Filled Form
@@ -1750,7 +1750,7 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => downloadPrintableFormHtml(previewForm, formFieldValues)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                   >
                     <FileDown className="w-3.5 h-3.5" />
                     Download Filled HTML
@@ -1759,7 +1759,7 @@ export function PublicSubPages({
                     type="button"
                     onClick={() => setPreviewForm(null)}
                     aria-label="Close form preview"
-                    className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                    className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-stone-200 hover:text-slate-900 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1767,7 +1767,7 @@ export function PublicSubPages({
               </div>
 
               <div className="p-6 sm:p-8 space-y-5">
-                <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+                <div className="flex items-start justify-between gap-4 border-b border-stone-200 pb-4">
                   <div className="flex items-start gap-3">
                     <PustCrest size={42} className="shrink-0" />
                     <div>
@@ -1782,12 +1782,12 @@ export function PublicSubPages({
                       </p>
                     </div>
                   </div>
-                  <span className="font-mono text-xs font-semibold text-pust-900 shrink-0">
+                  <span className="font-mono text-xs font-semibold text-pust-800 shrink-0">
                     {previewForm.code}
                   </span>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
+                <div className="rounded-xl border border-stone-200 divide-y divide-stone-200 text-xs">
                   {previewForm.fields.map((field) => {
                     const val = formFieldValues[field] || '';
                     return (
@@ -1813,7 +1813,7 @@ export function PublicSubPages({
                               }))
                             }
                             placeholder="Type value to populate print/HTML..."
-                            className="print:hidden w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:border-pust-700 focus:outline-none"
+                            className="print:hidden w-full px-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-700 focus:outline-none"
                           />
                           <span className="hidden print:inline font-mono text-slate-900">
                             {val.trim() || '________________________________________'}
@@ -1833,7 +1833,7 @@ export function PublicSubPages({
                       setPreviewForm(null);
                       onNavigate(target);
                     }}
-                    className="print:hidden inline-flex items-center gap-1.5 px-4 py-2 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                    className="print:hidden inline-flex items-center gap-1.5 px-4 py-2 font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                   >
                     {previewForm.portalLabel}
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1858,9 +1858,9 @@ export function PublicSubPages({
     const admissionNotices = notices.filter((n) => n.category === 'Admission');
 
     return (
-      <main className="flex-1 bg-[#F7F7F5]">
+      <main className="flex-1 bg-[#F8F7F4]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
+          <div className="border-b border-stone-200 pb-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 {resolved.admissionsConfig.kicker}
@@ -1882,8 +1882,8 @@ export function PublicSubPages({
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     route === t.route ||
                     (route === '/admissions' && t.route === '/admissions/undergraduate')
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-700 text-white border border-pust-700'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-800'
                   }`}
                 >
                   {t.label}
@@ -1912,21 +1912,21 @@ export function PublicSubPages({
                     <button
                       type="button"
                       onClick={onRetry}
-                      className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                      className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                     >
                       Retry Loading
                     </button>
                   )}
                 </div>
               ) : admissionNotices.length === 0 ? (
-                <div className="p-8 rounded-2xl border border-slate-200 bg-white text-center space-y-3">
+                <div className="p-8 rounded-2xl border border-stone-200 bg-white text-center space-y-3">
                   <p className="text-sm text-slate-600">
                     No active admission circulars are published right now.
                   </p>
                   <button
                     type="button"
                     onClick={() => onNavigate('/notices')}
-                    className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] text-pust-800 hover:border-pust-700 cursor-pointer"
                   >
                     View General Notice Board
                   </button>
@@ -1992,7 +1992,7 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                 >
                   Retry Loading
                 </button>
@@ -2047,7 +2047,7 @@ export function PublicSubPages({
                       : resolved.admissionsConfig.undergradText}
                   </p>
 
-                  <dl className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm bg-white px-5 overflow-hidden">
+                  <dl className="rounded-xl divide-y divide-stone-200 border border-stone-200 text-sm bg-white px-5 overflow-hidden">
                     <div className="py-3.5 flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
                       <dt className="text-slate-600">Total Undergraduate Intake</dt>
                       <dd className="font-mono tabular-nums font-medium text-slate-900 sm:text-right">
@@ -2073,7 +2073,7 @@ export function PublicSubPages({
                           type="button"
                           onClick={() => handleCopyContact(resolved.admissionsConfig.deskEmail)}
                           aria-label={`Copy ${resolved.admissionsConfig.deskEmail}`}
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 bg-[#F7F7F5] text-[10px] font-sans font-medium text-slate-700 hover:border-pust-800 cursor-pointer shrink-0"
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-stone-200 bg-[#FAF9F6] text-[10px] font-sans font-medium text-slate-700 hover:border-pust-700 cursor-pointer shrink-0"
                         >
                           {copiedContact === resolved.admissionsConfig.deskEmail ? (
                             <Check className="w-3 h-3 text-emerald-700" />
@@ -2088,7 +2088,7 @@ export function PublicSubPages({
                   <button
                     type="button"
                     onClick={() => onNavigate('/portal')}
-                    className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium rounded-lg border border-pust-800 text-pust-800 bg-white hover:bg-pust-900 hover:text-white transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium rounded-lg border border-pust-700 text-pust-800 bg-white hover:bg-pust-700 hover:text-white transition-colors cursor-pointer"
                   >
                     Have a Student Signup Token? Register in Portal
                   </button>
@@ -2114,12 +2114,12 @@ export function PublicSubPages({
                         value={statusQuery}
                         onChange={(e) => setStatusQuery(e.target.value)}
                         placeholder="PUST-INQ-2026-101 or email"
-                        className="flex-1 min-w-0 px-3 py-2.5 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                        className="flex-1 min-w-0 px-3 py-2.5 text-xs font-mono rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-700 focus:outline-none"
                       />
                       <button
                         type="submit"
                         disabled={statusLoading}
-                        className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                        className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
                       >
                         {statusLoading ? 'Checking...' : 'Check Status'}
                       </button>
@@ -2133,9 +2133,9 @@ export function PublicSubPages({
                     )}
 
                     {statusResult && (
-                      <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2 text-xs">
+                      <div className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2 text-xs">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-mono font-semibold text-pust-900">
+                          <span className="font-mono font-semibold text-pust-800">
                             {statusResult.reference}
                           </span>
                           <span className="inline-flex items-center gap-1 font-mono font-semibold text-slate-800">
@@ -2150,7 +2150,7 @@ export function PublicSubPages({
                         </div>
                         <p className="font-medium text-slate-900">{statusResult.title}</p>
                         {statusResult.note && (
-                          <p className="text-slate-700 bg-white border border-slate-200 rounded-lg p-2.5">
+                          <p className="text-slate-700 bg-white border border-stone-200 rounded-lg p-2.5">
                             {statusResult.note}
                           </p>
                         )}
@@ -2205,7 +2205,7 @@ export function PublicSubPages({
                           value={inqName}
                           onChange={(e) => setInqName(e.target.value)}
                           placeholder="Applicant full name"
-                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                         />
                       </div>
                       <div>
@@ -2218,7 +2218,7 @@ export function PublicSubPages({
                           value={inqEmail}
                           onChange={(e) => setInqEmail(e.target.value)}
                           placeholder="applicant@example.com"
-                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                         />
                       </div>
                     </div>
@@ -2234,7 +2234,7 @@ export function PublicSubPages({
                           value={inqPhone}
                           onChange={(e) => setInqPhone(e.target.value)}
                           placeholder="+880 1XXX-XXXXXX"
-                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                         />
                       </div>
                       <div>
@@ -2246,7 +2246,7 @@ export function PublicSubPages({
                           onChange={(e) =>
                             setInqProgram(e.target.value as InquiryRecord['programLevel'])
                           }
-                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                         >
                           <option value="Undergraduate (GST)">Undergraduate (GST)</option>
                           <option value="Graduate (M.Sc. / MBA)">Graduate (M.Sc. / MBA)</option>
@@ -2262,7 +2262,7 @@ export function PublicSubPages({
                         <select
                           value={inqDept}
                           onChange={(e) => setInqDept(e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                         >
                           {departments.map((d) => (
                             <option key={d.id} value={d.code}>
@@ -2283,14 +2283,14 @@ export function PublicSubPages({
                         value={inqMessage}
                         onChange={(e) => setInqMessage(e.target.value)}
                         placeholder="Ask about eligibility, GST merit cutoffs, July 06 Hall allotment, or syllabus..."
-                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-700 focus:bg-white"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-700 focus:bg-white"
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={inqSubmitting}
-                      className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 transition-colors cursor-pointer"
+                      className="px-6 py-2.5 text-sm font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-60 transition-colors cursor-pointer"
                     >
                       {inqSubmitting ? 'Submitting Inquiry...' : 'Send Admission Inquiry'}
                     </button>
@@ -2310,7 +2310,7 @@ export function PublicSubPages({
   if (route.startsWith('/facilities')) {
     if (loadingData && !profile) {
       return (
-        <main className="flex-1 bg-white">
+        <main className="flex-1 bg-[#F8F7F4]">
           <PageHeaderAndSectionSkeleton />
         </main>
       );
@@ -2318,7 +2318,7 @@ export function PublicSubPages({
 
     if (!profile) {
       return (
-        <main className="flex-1 bg-white">
+        <main className="flex-1 bg-[#F8F7F4]">
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
             <div className="rounded-2xl border border-red-200 bg-red-50 p-6 space-y-3">
               <h1 className="font-serif text-xl font-medium text-red-950">
@@ -2331,7 +2331,7 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                 >
                   Retry Loading
                 </button>
@@ -2349,9 +2349,9 @@ export function PublicSubPages({
 
     if (!currentFac) {
       return (
-        <main className="flex-1 bg-white">
+        <main className="flex-1 bg-[#F8F7F4]">
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-[#F7F7F5] p-8 space-y-3">
+            <div className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-8 space-y-3">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Campus Facilities &amp; Student Services
               </p>
@@ -2368,9 +2368,9 @@ export function PublicSubPages({
     }
 
     return (
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-[#F8F7F4]">
         <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
-          <div className="border-b border-slate-200 pb-6 space-y-4">
+          <div className="border-b border-stone-200 pb-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 Campus Facilities &amp; Student Services
@@ -2391,8 +2391,8 @@ export function PublicSubPages({
                   href={f.route}
                   className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     currentFac.route === f.route
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-700 text-white border border-pust-700'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-800'
                   }`}
                 >
                   {f.label}
@@ -2439,14 +2439,14 @@ export function PublicSubPages({
                     <button
                       type="button"
                       onClick={() => onNavigate(currentFac.portalRoute)}
-                      className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                      className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer"
                     >
                       Access Service in Campus Portal
                     </button>
                     {emailMatch && (
                       <a
                         href={`mailto:${emailMatch[0]}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-pust-900 hover:border-pust-800"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] text-pust-800 hover:border-pust-700"
                       >
                         <Mail className="w-3.5 h-3.5" />
                         {emailMatch[0]}
@@ -2455,7 +2455,7 @@ export function PublicSubPages({
                     {phoneMatch && (
                       <a
                         href={`tel:${phoneMatch[0]}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-mono font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-700"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         {phoneMatch[0]}
@@ -2495,9 +2495,9 @@ export function PublicSubPages({
         : galleryItems.filter((g) => g.category === galleryCategory);
 
     return (
-      <main className="flex-1 bg-[#F9F8F5]">
+      <main className="flex-1 bg-[#F8F7F4]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-stone-200">
             <div>
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
                 University Media Archive
@@ -2520,8 +2520,8 @@ export function PublicSubPages({
                   onClick={() => setGalleryCategory(c)}
                   className={`px-3.5 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors whitespace-nowrap shrink-0 ${
                     galleryCategory === c
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-700 text-white border border-pust-700'
+                      : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-800'
                   }`}
                 >
                   {c}
@@ -2539,14 +2539,14 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                 >
                   Retry Loading
                 </button>
               )}
             </div>
           ) : items.length === 0 ? (
-            <div className="p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
+            <div className="p-10 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-center space-y-3">
               <p className="text-sm text-slate-700">
                 No campus photos or videos are available
                 {galleryCategory !== 'All' ? ` under ${galleryCategory}` : ''} yet.
@@ -2555,7 +2555,7 @@ export function PublicSubPages({
                 <button
                   type="button"
                   onClick={() => setGalleryCategory('All')}
-                  className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium rounded-lg bg-pust-700 hover:bg-pust-800 text-white cursor-pointer"
                 >
                   Show All Media
                 </button>
@@ -2639,10 +2639,10 @@ export function PublicSubPages({
               onClick={() => setActiveMedia(null)}
             >
               <div
-                className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+                className="w-full max-w-2xl bg-white rounded-2xl border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-slate-200 bg-[#F7F7F5]">
+                <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-stone-200 bg-[#FAF9F6]">
                   <div>
                     <p className="font-mono text-xs text-pust-800">
                       {activeMedia.category} ·{' '}
@@ -2658,7 +2658,7 @@ export function PublicSubPages({
                     type="button"
                     onClick={() => setActiveMedia(null)}
                     aria-label="Close media modal"
-                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
+                    className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-stone-200 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -2670,7 +2670,7 @@ export function PublicSubPages({
                       title={activeMedia.title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                      className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                      className="w-full aspect-video rounded-xl border border-stone-200 bg-black"
                     />
                   ) : activeMedia.mediaUrl.endsWith('.mp4') ||
                     activeMedia.mediaUrl.endsWith('.webm') ? (
@@ -2742,7 +2742,7 @@ export function PublicSubPages({
   }
 
   return (
-    <main className="flex-1 bg-[#F9F8F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="space-y-5 pb-6 border-b border-stone-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -2833,8 +2833,8 @@ export function PublicSubPages({
                 onClick={() => handleSelectNoticeCategory(cat)}
                 className={`h-9 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedNoticeCat === cat
-                    ? 'bg-pust-900 text-white border-pust-900'
-                    : 'bg-white border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
+                    ? 'bg-pust-700 text-white border-pust-700'
+                    : 'bg-white border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-800'
                 }`}
               >
                 {cat}
@@ -2855,7 +2855,7 @@ export function PublicSubPages({
               <button
                 type="button"
                 onClick={onRetry}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
               >
                 Retry Loading
               </button>
@@ -2875,7 +2875,7 @@ export function PublicSubPages({
                   onNavigate('/notices');
                 }
               }}
-              className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+              className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer"
             >
               Reset Notice Filters
             </button>
@@ -2893,7 +2893,7 @@ export function PublicSubPages({
               <div className="lg:col-span-3 text-right">Memo Reference</div>
             </div>
 
-            <div className="divide-y divide-slate-200">
+            <div className="divide-y divide-stone-200">
               {filteredNotices.map((notice, idx) => (
                 <div
                   key={notice.id}
@@ -2908,7 +2908,7 @@ export function PublicSubPages({
                     }
                   }}
                   className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer ${
-                    idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/80'
+                    idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/80'
                   }`}
                 >
                   <div className="lg:col-span-1 pt-0.5 font-mono text-xs font-semibold text-slate-500 tabular-nums">
@@ -2936,7 +2936,7 @@ export function PublicSubPages({
                     </p>
                   </div>
 
-                  <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
+                  <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-stone-200/80 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
                     <div className="lg:text-right min-w-0">
                       <span className="block font-medium text-slate-700 break-words">
                         {notice.referenceNo}

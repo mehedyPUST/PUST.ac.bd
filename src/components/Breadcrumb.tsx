@@ -23,7 +23,7 @@ export function Breadcrumb() {
   const parentCrumb = crumbs.length >= 2 ? crumbs[crumbs.length - 2] : null;
 
   return (
-    <div className="bg-[#F8F8F6] border-b border-slate-200 print:hidden">
+    <div className="bg-[#F3F1EC] border-b border-stone-200 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
         <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
           <ol className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 text-xs text-slate-600 overflow-x-auto no-scrollbar">

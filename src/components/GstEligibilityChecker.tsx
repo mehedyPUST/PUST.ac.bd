@@ -139,8 +139,8 @@ export function GstEligibilityChecker({
               onClick={() => setUnit(u.key)}
               className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 unit === u.key
-                  ? 'bg-pust-900 text-white'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:border-pust-700/50'
+                  ? 'bg-pust-700 text-white'
+                  : 'bg-white border border-stone-200 text-slate-700 hover:border-pust-700/50'
               }`}
             >
               {u.label}
@@ -163,7 +163,7 @@ export function GstEligibilityChecker({
                 step="0.01"
                 value={sscGpa}
                 onChange={(e) => setSscGpa(e.target.value)}
-                className="w-full px-3 py-2 text-sm font-mono tabular-nums rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                className="w-full px-3 py-2 text-sm font-mono tabular-nums rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-700 focus:outline-none"
               />
             </div>
             <div>
@@ -177,12 +177,12 @@ export function GstEligibilityChecker({
                 step="0.01"
                 value={hscGpa}
                 onChange={(e) => setHscGpa(e.target.value)}
-                className="w-full px-3 py-2 text-sm font-mono tabular-nums rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                className="w-full px-3 py-2 text-sm font-mono tabular-nums rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-700 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2 text-xs">
+          <div className="p-3.5 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2 text-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-slate-600">Combined SSC + HSC GPA</span>
               <span className="font-mono font-semibold text-slate-900 tabular-nums">
@@ -204,12 +204,12 @@ export function GstEligibilityChecker({
           </div>
 
           {unit === 'A' && (
-            <label className="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 cursor-pointer">
+            <label className="flex items-start gap-2.5 p-3 rounded-xl border border-stone-200 bg-white text-xs text-slate-700 cursor-pointer">
               <input
                 type="checkbox"
                 checked={archDrawingAptitude}
                 onChange={(e) => setArchDrawingAptitude(e.target.checked)}
-                className="mt-0.5 accent-pust-900"
+                className="mt-0.5 accent-pust-700"
               />
               <span>
                 Include <strong className="text-slate-900">Architecture (ARCH)</strong> Drawing
@@ -220,24 +220,24 @@ export function GstEligibilityChecker({
 
           {unit === 'B' && (
             <div className="space-y-2">
-              <label className="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 cursor-pointer">
+              <label className="flex items-start gap-2.5 p-3 rounded-xl border border-stone-200 bg-white text-xs text-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={englishTwentyPct}
                   onChange={(e) => setEnglishTwentyPct(e.target.checked)}
-                  className="mt-0.5 accent-pust-900"
+                  className="mt-0.5 accent-pust-700"
                 />
                 <span>
                   Scored <strong className="text-slate-900">≥ 20% in English</strong> on GST Unit B
                   (Required for ENG &amp; PA)
                 </span>
               </label>
-              <label className="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-700 cursor-pointer">
+              <label className="flex items-start gap-2.5 p-3 rounded-xl border border-stone-200 bg-white text-xs text-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={hscMathOrEcon}
                   onChange={(e) => setHscMathOrEcon(e.target.checked)}
-                  className="mt-0.5 accent-pust-900"
+                  className="mt-0.5 accent-pust-700"
                 />
                 <span>
                   Studied <strong className="text-slate-900">Math / Economics / Statistics</strong>{' '}
@@ -272,7 +272,7 @@ export function GstEligibilityChecker({
                   ? statusOcc % 2 === 0
                     ? 'bg-white border-stone-200 hover:border-pust-700/45'
                     : 'bg-[#FAF9F6] border-stone-200 hover:border-pust-700/45'
-                  : 'border-stone-200 bg-[#F5F3EE] opacity-75';
+                  : 'border-stone-200 bg-[#FAF9F6] opacity-70';
 
                 return (
                   <div
@@ -294,7 +294,7 @@ export function GstEligibilityChecker({
                   <p className="text-[11px] text-slate-600 mt-1 text-left">{note}</p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-200/80 text-xs">
                   <Link
                     href={`/academics/departments/${encodeURIComponent(dept.code.toLowerCase())}`}
                     prefetch={true}

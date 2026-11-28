@@ -624,7 +624,7 @@ export function GlobalSearchBar({
           className={`w-full pl-8 pr-8 text-xs rounded-lg border transition-colors focus:outline-none ${
             variant === 'desktop'
               ? 'py-1.5 bg-white text-slate-900 placeholder:text-slate-400 border-white shadow-xs focus:ring-2 focus:ring-white/30'
-              : 'py-2 bg-[#F7F7F5] text-slate-900 placeholder:text-slate-500 border-slate-300 focus:bg-white focus:border-pust-800'
+              : 'py-2 bg-[#FAF9F6] text-slate-900 placeholder:text-slate-500 border-stone-300 focus:bg-white focus:border-pust-700'
           }`}
         />
 
@@ -643,7 +643,7 @@ export function GlobalSearchBar({
         ) : variant === 'desktop' ? (
           <kbd
             aria-hidden="true"
-            className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono leading-none text-slate-400 bg-slate-100 rounded border border-slate-200 pointer-events-none absolute right-2"
+            className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono leading-none text-slate-400 bg-[#FAF9F6] rounded border border-stone-200 pointer-events-none absolute right-2"
           >
             /
           </kbd>
@@ -660,14 +660,14 @@ export function GlobalSearchBar({
             id={listboxId}
             role="listbox"
             aria-label="Site-wide search results"
-            className={`absolute z-50 mt-2 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden ${
+            className={`absolute z-50 mt-2 rounded-xl border border-stone-200 bg-white shadow-xl overflow-hidden ${
               variant === 'desktop'
                 ? 'right-0 w-[min(92vw,480px)]'
                 : 'left-0 right-0 w-full'
             }`}
           >
-            <div className="px-3.5 py-2 border-b border-slate-100 bg-[#F7F7F5] flex items-center justify-between gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-pust-800">
+            <div className="px-3.5 py-2 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-pust-700">
                 {query.trim() ? `Matches for "${query.trim()}"` : 'Quick Academic & Campus Access'}
               </span>
               <span className="font-mono text-[10px] text-slate-500 tabular-nums">
@@ -675,7 +675,7 @@ export function GlobalSearchBar({
               </span>
             </div>
 
-            <div className="max-h-[65vh] overflow-y-auto divide-y divide-slate-100">
+            <div className="max-h-[65vh] overflow-y-auto divide-y divide-stone-100">
               {flatResults.length === 0 ? (
                 <div className="p-5 text-center space-y-2.5">
                   <p className="text-xs text-slate-600">
@@ -690,7 +690,7 @@ export function GlobalSearchBar({
                         navigateTo('/academics/departments');
                         onActionComplete?.();
                       }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 text-pust-900 hover:bg-pust-50 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-200 text-pust-800 hover:bg-pust-50 cursor-pointer"
                     >
                       Browse 21 Departments
                     </button>
@@ -701,7 +701,7 @@ export function GlobalSearchBar({
                         navigateTo('/notices');
                         onActionComplete?.();
                       }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 text-pust-900 hover:bg-pust-50 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-200 text-pust-800 hover:bg-pust-50 cursor-pointer"
                     >
                       All Official Notices
                     </button>
@@ -781,7 +781,7 @@ export function GlobalSearchBar({
               )}
             </div>
 
-            <div className="px-3.5 py-2 border-t border-slate-100 bg-[#F7F7F5] flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-slate-500">
+            <div className="px-3.5 py-2 border-t border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-slate-500">
               <span className="inline-flex items-center gap-2">
                 <span className="inline-flex items-center gap-1">
                   <Building2 className="w-3 h-3" /> Depts

@@ -176,7 +176,7 @@ export function PortalAuthGateway({
     <section className="portal-shell max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left Institutional Context Column */}
-        <div className="lg:col-span-5 rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-6">
+        <div className="lg:col-span-5 rounded-lg bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white p-7 sm:p-8 flex flex-col justify-between gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <PustCrest variant="light" size={38} />
@@ -215,8 +215,8 @@ export function PortalAuthGateway({
         </div>
 
         {/* Right Interactive Auth Forms */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 space-y-5">
-          <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-stone-100 border border-stone-200">
+        <div className="lg:col-span-7 bg-white rounded-lg border border-stone-200 p-6 sm:p-8 space-y-5">
+          <div className="flex flex-wrap gap-1.5 p-1 rounded-lg bg-stone-100 border border-stone-200">
             <button
               type="button"
               onClick={() => {
@@ -321,7 +321,7 @@ export function PortalAuthGateway({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@pust.ac.bd"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <div>
@@ -334,13 +334,13 @@ export function PortalAuthGateway({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password or temporary token"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                className="w-full py-2.5 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Signing In...' : 'Sign In to Portal'}
               </button>
@@ -364,7 +364,7 @@ export function PortalAuthGateway({
                   value={signupToken}
                   onChange={(e) => setSignupToken(e.target.value.toUpperCase())}
                   placeholder="Signup Token (PUST-CSE-...)"
-                  className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="text"
@@ -372,7 +372,7 @@ export function PortalAuthGateway({
                   value={stuName}
                   onChange={(e) => setStuName(e.target.value)}
                   placeholder="Full Student Name"
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="email"
@@ -380,7 +380,7 @@ export function PortalAuthGateway({
                   value={stuEmail}
                   onChange={(e) => setStuEmail(e.target.value)}
                   placeholder="Student Email"
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="password"
@@ -389,7 +389,7 @@ export function PortalAuthGateway({
                   value={stuPassword}
                   onChange={(e) => setStuPassword(e.target.value)}
                   placeholder="Password (8+ chars)"
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <input
@@ -398,12 +398,12 @@ export function PortalAuthGateway({
                 value={stuDocs}
                 onChange={(e) => setStuDocs(e.target.value)}
                 placeholder="Admission documents (comma-separated)"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                className="w-full py-2.5 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Submitting...' : 'Submit Student Activation'}
               </button>
@@ -427,7 +427,7 @@ export function PortalAuthGateway({
                   value={offName}
                   onChange={(e) => setOffName(e.target.value)}
                   placeholder="Full Name"
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <input
                   type="email"
@@ -435,14 +435,14 @@ export function PortalAuthGateway({
                   value={offEmail}
                   onChange={(e) => setOffEmail(e.target.value)}
                   placeholder="Institutional Email"
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <select
                   value={offRole}
                   onChange={(e) =>
                     setOffRole(e.target.value as Exclude<UserRole, 'admin' | 'student'>)
                   }
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-800"
                 >
                   <option value="teacher">Faculty / Teacher</option>
                   <option value="chairman">Department Chairman</option>
@@ -455,7 +455,7 @@ export function PortalAuthGateway({
                 <select
                   value={offDept}
                   onChange={(e) => setOffDept(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-800"
                 >
                   <option value="REG">REG — Registrar / Central Office</option>
                   {departments.map((d) => (
@@ -470,12 +470,12 @@ export function PortalAuthGateway({
                   value={offId}
                   onChange={(e) => setOffId(e.target.value)}
                   placeholder="Employee / Academic ID"
-                  className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
                 <select
                   value={offHall}
                   onChange={(e) => setOffHall(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
+                  className="px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:outline-none focus:border-pust-800"
                 >
                   {HALL_OPTIONS.map((h) => (
                     <option key={h} value={h}>
@@ -490,13 +490,13 @@ export function PortalAuthGateway({
                   value={offPassword}
                   onChange={(e) => setOffPassword(e.target.value)}
                   placeholder="Password (8+ chars)"
-                  className="sm:col-span-2 px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="sm:col-span-2 px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                className="w-full py-2.5 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
               >
                 {submitting ? 'Submitting...' : 'Submit Account Request'}
               </button>
@@ -523,7 +523,7 @@ export function PortalAuthGateway({
                 value={admName}
                 onChange={(e) => setAdmName(e.target.value)}
                 placeholder="Administrator Full Name"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="email"
@@ -531,7 +531,7 @@ export function PortalAuthGateway({
                 value={admEmail}
                 onChange={(e) => setAdmEmail(e.target.value)}
                 placeholder="admin@pust.ac.bd"
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <input
                 type="password"
@@ -542,12 +542,12 @@ export function PortalAuthGateway({
                 placeholder={
                   bootstrapStatus.envAdminActive ? 'Server Admin Passcode' : 'Password (8+ chars)'
                 }
-                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:outline-none focus:border-pust-800"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                className="w-full py-2.5 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
               >
                 {submitting
                   ? 'Authenticating...'

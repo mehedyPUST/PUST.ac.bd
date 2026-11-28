@@ -160,7 +160,7 @@ export function CampusAndGovernanceEditors({
 
     return (
       <form onSubmit={submitCampusMap} className="space-y-5">
-        <div className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-3">
+        <div className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-3">
           <p className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800">
             Campus Map Header &amp; Coordinates
           </p>
@@ -208,7 +208,7 @@ export function CampusAndGovernanceEditors({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
           <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
             {buildings.map((b, idx) => (
               <button
@@ -217,8 +217,8 @@ export function CampusAndGovernanceEditors({
                 onClick={() => setSelectedBuildingIdx(idx)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-mono cursor-pointer border ${
                   selectedBuildingIdx === idx
-                    ? 'bg-pust-900 text-white border-pust-900'
-                    : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                    ? 'bg-pust-700 text-white border-pust-700'
+                    : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
                 }`}
               >
                 {b.code} · {b.shortName}
@@ -551,7 +551,7 @@ export function CampusAndGovernanceEditors({
   if (target.kind === 'governance') {
     return (
       <form onSubmit={submitGovernance} className="space-y-4">
-        <div className="flex flex-wrap gap-1.5 pb-3 border-b border-slate-200">
+        <div className="flex flex-wrap gap-1.5 pb-3 border-b border-stone-200">
           {GOVERNANCE_TABS.map((t) => (
             <button
               key={t.id}
@@ -559,8 +559,8 @@ export function CampusAndGovernanceEditors({
               onClick={() => setGovTab(t.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer border ${
                 govTab === t.id
-                  ? 'bg-pust-900 text-white border-pust-900'
-                  : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                  ? 'bg-pust-700 text-white border-pust-700'
+                  : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
               }`}
             >
               {t.label}
@@ -610,7 +610,7 @@ export function CampusAndGovernanceEditors({
                 </button>
               </div>
               {gov.actClauses.map((c, idx) => (
-                <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-[#F7F7F5] space-y-2">
+                <div key={idx} className="p-3 rounded-lg border border-stone-200 bg-[#FAF9F6] space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <input
                       type="text"
@@ -856,7 +856,7 @@ export function CampusAndGovernanceEditors({
                 </button>
               </div>
               {gov.academicCouncilCards.map((c, idx) => (
-                <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-[#F7F7F5] space-y-2">
+                <div key={idx} className="p-3 rounded-lg border border-stone-200 bg-[#FAF9F6] space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <input
                       type="text"
@@ -974,7 +974,7 @@ export function CampusAndGovernanceEditors({
                 </button>
               </div>
               {gov.financeCommitteeScopes.map((s, idx) => (
-                <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-[#F7F7F5] space-y-2">
+                <div key={idx} className="p-3 rounded-lg border border-stone-200 bg-[#FAF9F6] space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <input
                       type="text"
@@ -1233,7 +1233,7 @@ export function CampusAndGovernanceEditors({
         </div>
       </div>
 
-      <div className="space-y-3 pt-2 border-t border-slate-200">
+      <div className="space-y-3 pt-2 border-t border-stone-200">
         <div className="flex items-center justify-between">
           <label className={LABEL_CLASS}>Annual Performance Agreement (APA) Benchmarks</label>
           <button
@@ -1257,7 +1257,7 @@ export function CampusAndGovernanceEditors({
           </button>
         </div>
         {showcase.apaBenchmarks.map((item, idx) => (
-          <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+          <div key={idx} className="p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2">
             <div className="flex items-center justify-between gap-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1">
                 <input

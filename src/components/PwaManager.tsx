@@ -154,16 +154,16 @@ export function PwaInstallButton({
             onClick={() => setShowGuideModal(false)}
           >
           <div
-            className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-slate-900"
+            className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white border border-stone-200 shadow-2xl overflow-hidden text-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 py-4 border-b border-slate-200 bg-[#FAF8F4] flex items-center justify-between gap-3">
+            <div className="px-5 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-pust-900 text-white flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-pust-700 text-white flex items-center justify-center shrink-0">
                   <Smartphone className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-pust-800">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-pust-700">
                     Progressive Web App
                   </p>
                   <h3 id="pwa-guide-title" className="font-serif text-lg font-medium text-slate-900">
@@ -175,7 +175,7 @@ export function PwaInstallButton({
                 type="button"
                 onClick={() => setShowGuideModal(false)}
                 aria-label="Close install instructions"
-                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 cursor-pointer"
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg text-slate-500 hover:bg-stone-200/70 hover:text-slate-900 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -189,8 +189,8 @@ export function PwaInstallButton({
                     instant launch and offline notice access:
                   </p>
                   <ol className="space-y-3">
-                    <li className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-[#F7F7F5]">
-                      <span className="w-7 h-7 rounded-lg bg-pust-900 text-white font-mono text-xs font-semibold flex items-center justify-center shrink-0">
+                    <li className="flex items-start gap-3 p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+                      <span className="w-7 h-7 rounded-lg bg-pust-700 text-white font-mono text-xs font-semibold flex items-center justify-center shrink-0">
                         1
                       </span>
                       <div className="text-xs space-y-1">
@@ -203,8 +203,8 @@ export function PwaInstallButton({
                         </p>
                       </div>
                     </li>
-                    <li className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-[#F7F7F5]">
-                      <span className="w-7 h-7 rounded-lg bg-pust-900 text-white font-mono text-xs font-semibold flex items-center justify-center shrink-0">
+                    <li className="flex items-start gap-3 p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+                      <span className="w-7 h-7 rounded-lg bg-pust-700 text-white font-mono text-xs font-semibold flex items-center justify-center shrink-0">
                         2
                       </span>
                       <div className="text-xs space-y-1">
@@ -226,7 +226,7 @@ export function PwaInstallButton({
                     Notices &amp; Portal, and offline support:
                   </p>
                   <div className="space-y-2.5 text-xs">
-                    <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                    <div className="flex items-start gap-3 p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]">
                       <MonitorSmartphone className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-slate-900">Android (Chrome / Edge)</p>
@@ -236,7 +236,7 @@ export function PwaInstallButton({
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                    <div className="flex items-start gap-3 p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]">
                       <Share className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-slate-900">iOS / iPadOS Safari</p>
@@ -245,7 +245,7 @@ export function PwaInstallButton({
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-[#F7F7F5]">
+                    <div className="flex items-start gap-3 p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]">
                       <Download className="w-4 h-4 text-pust-800 shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-slate-900">Desktop (Chrome / Edge)</p>
@@ -261,7 +261,7 @@ export function PwaInstallButton({
               <button
                 type="button"
                 onClick={() => setShowGuideModal(false)}
-                className="w-full min-h-[44px] py-2.5 text-xs font-semibold rounded-lg bg-pust-900 hover:bg-pust-950 text-white cursor-pointer"
+                className="w-full min-h-[44px] py-2.5 text-xs font-semibold rounded-lg bg-pust-700 hover:bg-pust-800 text-white cursor-pointer"
               >
                 Got It
               </button>

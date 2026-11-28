@@ -79,7 +79,7 @@ function PersonnelEntry({
   person,
   isHead = false,
   accentClass = 'text-pust-800',
-  surfaceClass = 'bg-[#F8F8F6] border-slate-200 hover:bg-white hover:border-slate-300',
+  surfaceClass = 'bg-[#FAF9F6] border-stone-200 hover:bg-white hover:border-stone-300',
   copiedEmail,
   onCopyEmail,
 }: {
@@ -102,7 +102,7 @@ function PersonnelEntry({
       }`}
     >
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-stone-200/80 pb-3">
           <p className={`text-xs font-semibold tracking-wide ${accentClass}`}>
             {person.designation}
           </p>
@@ -133,7 +133,7 @@ function PersonnelEntry({
       </div>
 
       {(phones.length > 0 || emails.length > 0) && (
-        <dl className="pt-4 border-t border-slate-200/90 space-y-2.5 text-xs font-mono tabular-nums">
+        <dl className="pt-4 border-t border-stone-200/90 space-y-2.5 text-xs font-mono tabular-nums">
           {phones.map((p, idx) => (
             <div key={`${p.value}-${idx}`} className="flex items-center justify-between gap-3">
               <dt className="sr-only">{p.type} phone</dt>
@@ -174,7 +174,7 @@ function PersonnelEntry({
                     type="button"
                     onClick={() => onCopyEmail(em.value)}
                     aria-label={`Copy ${em.value}`}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-slate-200 bg-white text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-stone-200 bg-white text-[11px] font-sans font-medium text-slate-700 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     {isCopied ? (
                       <>
@@ -233,7 +233,7 @@ export function AdministrationOfficeDossier({
       <section className="editable-region rounded-2xl border border-stone-200 bg-white p-6 sm:p-8 space-y-8">
       {/* Office Accession Desk Header & Contact Strip */}
       <div className="space-y-6">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-stone-200 pb-6">
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
               <span className={`font-mono font-semibold tabular-nums ${accent.text}`}>
@@ -263,7 +263,7 @@ export function AdministrationOfficeDossier({
             />
             <Link
               href="/administration/all-office"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#F8F8F6] border border-slate-300 text-slate-900 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-[#FAF9F6] border border-stone-300 text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0"
             >
               Browse All 33 Offices
               <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -272,7 +272,7 @@ export function AdministrationOfficeDossier({
         </div>
 
         {(office.officeEmail || office.officePhone || office.deskEmail || office.location) && (
-          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-slate-200 rounded-xl bg-[#F8F8F6] divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-stone-200 rounded-xl bg-[#FAF9F6] divide-y sm:divide-y-0 sm:divide-x divide-stone-200">
             {office.officeEmail && (
               <div className="px-5 py-4 space-y-1">
                 <dt className="text-xs font-medium text-slate-500">Official Office Email</dt>
@@ -319,7 +319,7 @@ export function AdministrationOfficeDossier({
       {/* Head of Office Section */}
       {office.head && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-3">
+          <div className="border-b border-stone-200 pb-3">
             <p className={`text-xs font-semibold ${accent.text}`}>Executive Lead</p>
             <h3 className="font-serif text-xl font-medium text-slate-950 mt-0.5">
               Head of Office
@@ -341,7 +341,7 @@ export function AdministrationOfficeDossier({
 
       {/* Officers Roster */}
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1">
             <p className={`text-xs font-semibold ${accent.text}`}>
               Administrative Staff &amp; Section Wing
@@ -364,7 +364,7 @@ export function AdministrationOfficeDossier({
                 onChange={(e) => setRosterQuery(e.target.value)}
                 placeholder="Filter officers by name or role..."
                 aria-label="Filter office officers"
-                className="w-full pl-9 pr-8 py-2 text-xs bg-[#F8F8F6] border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 focus:bg-white"
+                className="w-full pl-9 pr-8 py-2 text-xs bg-[#FAF9F6] border border-stone-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-700 focus:bg-white"
               />
               {rosterQuery && (
                 <button
@@ -381,20 +381,20 @@ export function AdministrationOfficeDossier({
         </div>
 
         {office.officers.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 bg-[#F8F8F6] p-6 text-sm text-slate-600">
+          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-6 text-sm text-slate-600">
             Official section desk inquiries for{' '}
             <span className="font-medium text-slate-900">{office.name}</span> are coordinated
             through the office contact desk and the central Registrar Registry.
           </div>
         ) : filteredOfficers.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 bg-[#F8F8F6] p-8 text-center space-y-3">
+          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-3">
             <p className="text-sm text-slate-600 text-center">
               No officer matched <span className="font-medium text-slate-900">“{rosterQuery}”</span>.
             </p>
             <button
               type="button"
               onClick={() => setRosterQuery('')}
-              className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-pust-900 hover:border-pust-800 cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold rounded-lg border border-stone-300 bg-white text-pust-800 hover:border-pust-700 cursor-pointer"
             >
               Reset Filter
             </button>
@@ -493,7 +493,7 @@ export function AllOfficesDirectory({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search 33 offices, heads, or staff..."
               aria-label="Filter all 33 administration offices"
-              className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#F8F8F6] border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 focus:bg-white"
+              className="w-full pl-10 pr-9 py-2.5 text-sm bg-[#FAF9F6] border border-stone-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-700 focus:bg-white"
             />
             {query && (
               <button
@@ -528,7 +528,7 @@ export function AllOfficesDirectory({
               onClick={() => setCategory(cat)}
               className={`px-3.5 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 active
-                  ? 'bg-pust-900 text-white font-semibold'
+                  ? 'bg-pust-700 text-white font-semibold'
                   : 'text-slate-600 hover:text-slate-950'
               }`}
             >
@@ -539,7 +539,7 @@ export function AllOfficesDirectory({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-[#F8F8F6] p-10 text-center space-y-3">
+        <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-10 text-center space-y-3">
           <p className="text-sm text-slate-600 text-center">
             No administration office matched <span className="font-medium text-slate-900">“{query}”</span>.
           </p>
@@ -549,7 +549,7 @@ export function AllOfficesDirectory({
               setQuery('');
               setCategory('All');
             }}
-            className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-pust-900 hover:border-pust-800 cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-stone-300 bg-white text-pust-800 hover:border-pust-700 cursor-pointer"
           >
             Show All {offices.length} Offices
           </button>
@@ -592,7 +592,7 @@ export function AllOfficesDirectory({
                       </p>
                     </div>
 
-                    <div className="pt-4 mt-5 border-t border-slate-200/80 space-y-2">
+                    <div className="pt-4 mt-5 border-t border-stone-200/80 space-y-2">
                       {office.head && (
                         <p className="text-xs font-medium text-slate-800 truncate text-left">
                           {office.head.name} ·{' '}

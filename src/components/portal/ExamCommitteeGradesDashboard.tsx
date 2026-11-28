@@ -583,12 +583,12 @@ export function ExamCommitteeGradesDashboard({
   return (
     <section
       id="exam-committee-raw-grades-dashboard"
-      className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs"
+      className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 overflow-hidden shadow-xs"
     >
       {/* Top Workspace Bar */}
-      <div className="px-6 py-5 border-b border-slate-200 flex flex-wrap items-start justify-between gap-4">
+      <div className="px-6 py-5 border-b border-stone-200 dark:border-slate-800 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-medium text-pust-800 flex items-center gap-1.5">
+          <p className="text-xs font-medium text-pust-800 dark:text-gold-300 flex items-center gap-1.5">
             <ClipboardCheck className="w-3.5 h-3.5" />
             {activeCommittees.length > 0
               ? `Exam Committee Scrutiny Desk · ${activeCommittees.length} active term(s)`
@@ -598,10 +598,10 @@ export function ExamCommitteeGradesDashboard({
               ? 'University-Wide Raw Marks Scrutiny'
               : 'Course Teacher Raw Grade Submissions'}
           </p>
-          <h3 className="font-serif text-lg font-medium text-slate-900 mt-0.5">
+          <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100 mt-0.5">
             Raw Course Grades Scrutiny &amp; Pre-Finalization Filter
           </h3>
-          <p className="text-xs text-slate-600 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             Inspect raw continuous and final exam marks submitted by course teachers, filter anomalies or pending entries, and consolidate verified grades before forwarding results.
           </p>
         </div>
@@ -610,7 +610,7 @@ export function ExamCommitteeGradesDashboard({
           <button
             type="button"
             onClick={() => setShowSubmitForm((prev) => !prev)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 cursor-pointer whitespace-nowrap shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             {showSubmitForm ? 'Hide Grade Entry' : 'Submit Raw Course Marks'}
@@ -619,7 +619,7 @@ export function ExamCommitteeGradesDashboard({
             type="button"
             onClick={handleExportCsv}
             disabled={filteredGrades.length === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-slate-400 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5" />
             Export CSV
@@ -629,7 +629,7 @@ export function ExamCommitteeGradesDashboard({
             onClick={loadRawGrades}
             disabled={loading}
             aria-label="Refresh raw course grades"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-slate-400 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -641,18 +641,18 @@ export function ExamCommitteeGradesDashboard({
       {showSubmitForm && (
         <form
           onSubmit={handleSubmitRawGrade}
-          className="px-6 py-5 bg-[#FAF9F6] border-b border-slate-200 space-y-4"
+          className="px-6 py-5 bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 space-y-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h4 className="text-sm font-semibold text-slate-900">
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 Submit Raw Course Grade (Course Teacher Entry)
               </h4>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Record continuous assessment (0–40) and final script marks (0–60) for Exam Committee review.
               </p>
             </div>
-            <span className="font-mono text-xs font-semibold text-pust-900 tabular-nums">
+            <span className="font-mono text-xs font-semibold text-pust-800 dark:text-gold-300 tabular-nums">
               Computed Total: {Math.min(100, Number(subContinuous) + Number(subFinal))}/100 ·{' '}
               {subPreview.letter} ({subPreview.gp.toFixed(2)})
             </span>
@@ -660,7 +660,10 @@ export function ExamCommitteeGradesDashboard({
 
           <div className="grid grid-cols-1 sm:grid-cols-6 gap-3 text-xs">
             <div>
-              <label htmlFor="raw-sub-dept" className="block font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="raw-sub-dept"
+                className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
                 Department
               </label>
               <select
@@ -668,7 +671,7 @@ export function ExamCommitteeGradesDashboard({
                 value={subDept}
                 disabled={user.role !== 'admin'}
                 onChange={(e) => setSubDept(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 disabled:opacity-75"
+                className="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:opacity-75"
               >
                 {departments.map((d) => (
                   <option key={d.id} value={d.code}>
@@ -679,14 +682,17 @@ export function ExamCommitteeGradesDashboard({
             </div>
 
             <div>
-              <label htmlFor="raw-sub-session" className="block font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="raw-sub-session"
+                className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
                 Session
               </label>
               <select
                 id="raw-sub-session"
                 value={subSession}
                 onChange={(e) => setSubSession(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 tabular-nums"
+                className="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
               >
                 {ACADEMIC_SESSIONS.map((s) => (
                   <option key={s} value={s}>
@@ -697,14 +703,17 @@ export function ExamCommitteeGradesDashboard({
             </div>
 
             <div>
-              <label htmlFor="raw-sub-sem" className="block font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="raw-sub-sem"
+                className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
                 Semester
               </label>
               <select
                 id="raw-sub-sem"
                 value={subSemester}
                 onChange={(e) => setSubSemester(Number(e.target.value))}
-                className="w-full px-2.5 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 tabular-nums"
+                className="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((sem) => (
                   <option key={sem} value={sem}>
@@ -715,7 +724,10 @@ export function ExamCommitteeGradesDashboard({
             </div>
 
             <div>
-              <label htmlFor="raw-sub-course" className="block font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="raw-sub-course"
+                className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
                 Course Code
               </label>
               {submissionCourseOptions.length > 0 ? (
@@ -723,7 +735,7 @@ export function ExamCommitteeGradesDashboard({
                   id="raw-sub-course"
                   value={subCourseCode}
                   onChange={(e) => setSubCourseCode(e.target.value)}
-                  className="w-full px-2.5 py-2 font-mono rounded-lg border border-slate-300 bg-white text-slate-900"
+                  className="w-full px-2.5 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 >
                   {submissionCourseOptions.map((c) => (
                     <option key={c.id} value={c.code}>
@@ -739,13 +751,16 @@ export function ExamCommitteeGradesDashboard({
                   value={subCourseCode}
                   onChange={(e) => setSubCourseCode(e.target.value.toUpperCase())}
                   placeholder="CSE-3101"
-                  className="w-full px-2.5 py-2 font-mono rounded-lg border border-slate-300 bg-white text-slate-900"
+                  className="w-full px-2.5 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                 />
               )}
             </div>
 
             <div>
-              <label htmlFor="raw-sub-id" className="block font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="raw-sub-id"
+                className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
                 Student ID
               </label>
               <input
@@ -755,13 +770,16 @@ export function ExamCommitteeGradesDashboard({
                 value={subAcademicId}
                 onChange={(e) => setSubAcademicId(e.target.value)}
                 placeholder="e.g. 220101"
-                className="w-full px-2.5 py-2 font-mono rounded-lg border border-slate-300 bg-white text-slate-900 tabular-nums"
+                className="w-full px-2.5 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label htmlFor="raw-sub-ca" className="block font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor="raw-sub-ca"
+                  className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+                >
                   CA (40)
                 </label>
                 <input
@@ -772,11 +790,14 @@ export function ExamCommitteeGradesDashboard({
                   required
                   value={subContinuous}
                   onChange={(e) => setSubContinuous(Number(e.target.value))}
-                  className="w-full px-2 py-2 font-mono rounded-lg border border-slate-300 bg-white text-slate-900 tabular-nums"
+                  className="w-full px-2 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
                 />
               </div>
               <div>
-                <label htmlFor="raw-sub-final" className="block font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor="raw-sub-final"
+                  className="block font-medium text-slate-700 dark:text-slate-200 mb-1"
+                >
                   Final (60)
                 </label>
                 <input
@@ -787,7 +808,7 @@ export function ExamCommitteeGradesDashboard({
                   required
                   value={subFinal}
                   onChange={(e) => setSubFinal(Number(e.target.value))}
-                  className="w-full px-2 py-2 font-mono rounded-lg border border-slate-300 bg-white text-slate-900 tabular-nums"
+                  className="w-full px-2 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
                 />
               </div>
             </div>
@@ -797,14 +818,14 @@ export function ExamCommitteeGradesDashboard({
             <button
               type="button"
               onClick={() => setShowSubmitForm(false)}
-              className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer whitespace-nowrap shrink-0"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submittingRaw}
-              className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-4 py-1.5 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
               {submittingRaw ? 'Submitting Marks...' : 'Submit to Exam Committee'}
             </button>
@@ -813,62 +834,64 @@ export function ExamCommitteeGradesDashboard({
       )}
 
       {/* Flat Hairline KPI Summary Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 border-b border-slate-200 bg-[#FAF9F6]/60">
+      <div className="grid grid-cols-2 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-stone-200 dark:divide-slate-800 border-b border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80">
         <div className="px-5 py-3.5">
-          <span className="block text-[11px] font-medium text-slate-500">
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
             Submitted Entries
           </span>
-          <span className="mt-0.5 block font-mono text-xl font-semibold text-slate-900 tabular-nums">
+          <span className="mt-0.5 block font-mono text-xl font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
             {kpiStats.total}
           </span>
         </div>
         <div className="px-5 py-3.5">
-          <span className="block text-[11px] font-medium text-slate-500">
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
             Pending Committee Review
           </span>
-          <span className="mt-0.5 block font-mono text-xl font-semibold text-amber-700 tabular-nums">
+          <span className="mt-0.5 block font-mono text-xl font-semibold text-amber-700 dark:text-amber-300 tabular-nums">
             {kpiStats.submitted}
           </span>
         </div>
         <div className="px-5 py-3.5">
-          <span className="block text-[11px] font-medium text-slate-500">
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
             Reviewed &amp; Ready
           </span>
-          <span className="mt-0.5 block font-mono text-xl font-semibold text-emerald-700 tabular-nums">
+          <span className="mt-0.5 block font-mono text-xl font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
             {kpiStats.reviewed}
           </span>
         </div>
         <div className="px-5 py-3.5">
-          <span className="block text-[11px] font-medium text-slate-500">
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
             Flagged Failing (&lt; 40)
           </span>
-          <span className="mt-0.5 block font-mono text-xl font-semibold text-red-700 tabular-nums">
+          <span className="mt-0.5 block font-mono text-xl font-semibold text-red-700 dark:text-red-400 tabular-nums">
             {kpiStats.failing}
           </span>
         </div>
         <div className="px-5 py-3.5 col-span-2 lg:col-span-1">
-          <span className="block text-[11px] font-medium text-slate-500">
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
             Finalized / Mean Marks
           </span>
-          <span className="mt-0.5 block font-mono text-xl font-semibold text-pust-900 tabular-nums">
+          <span className="mt-0.5 block font-mono text-xl font-semibold text-pust-800 dark:text-gold-300 tabular-nums">
             {kpiStats.finalized}{' '}
-            <span className="text-xs font-normal text-slate-500">· Avg {kpiStats.avgMarks}</span>
+            <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+              · Avg {kpiStats.avgMarks}
+            </span>
           </span>
         </div>
       </div>
 
       {/* Multi-Facet Filter & Segmented Status Toolbar */}
-      <div className="px-6 py-4 border-b border-slate-200 space-y-3 bg-white">
+      <div className="px-6 py-4 border-b border-stone-200 dark:border-slate-800 space-y-3 bg-white dark:bg-slate-900">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 text-xs">
           <div className="lg:col-span-4 relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search student ID, name, course, or teacher..."
               aria-label="Search raw course grades"
-              className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              className="w-full pl-8 pr-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
             />
           </div>
 
@@ -881,7 +904,7 @@ export function ExamCommitteeGradesDashboard({
                 setTeacherFilter('ALL');
               }}
               aria-label="Filter by session and semester"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none tabular-nums"
+              className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none tabular-nums"
             >
               <option value="ALL">All Terms ({rawGrades.length})</option>
               {termOptions.map((opt) => (
@@ -897,7 +920,7 @@ export function ExamCommitteeGradesDashboard({
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
               aria-label="Filter by course"
-              className="w-full px-3 py-2 font-mono rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
             >
               <option value="ALL">All Courses ({courseOptions.length})</option>
               {courseOptions.map((c) => (
@@ -913,7 +936,7 @@ export function ExamCommitteeGradesDashboard({
               value={teacherFilter}
               onChange={(e) => setTeacherFilter(e.target.value)}
               aria-label="Filter by submitting teacher"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
             >
               <option value="ALL">All Teachers ({teacherOptions.length})</option>
               {teacherOptions.map((t) => (
@@ -929,7 +952,7 @@ export function ExamCommitteeGradesDashboard({
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortKey)}
               aria-label="Sort raw course grades"
-              className="w-full px-2.5 py-2 rounded-lg border border-slate-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:border-pust-800 focus:outline-none"
+              className="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
             >
               <option value="academicId">ID ↑</option>
               <option value="courseCode">Course</option>
@@ -944,7 +967,7 @@ export function ExamCommitteeGradesDashboard({
           <div
             role="group"
             aria-label="Filter raw grades by status"
-            className="inline-flex flex-wrap items-center gap-1 p-1 rounded-lg bg-slate-100"
+            className="inline-flex flex-wrap items-center gap-1 p-1 rounded-lg bg-[#FAF9F6] dark:bg-slate-800 border border-stone-200 dark:border-slate-700"
           >
             {(
               [
@@ -961,8 +984,8 @@ export function ExamCommitteeGradesDashboard({
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 tabular-nums ${
                   statusFilter === tab.id
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-pust-700 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {tab.label}
@@ -970,7 +993,7 @@ export function ExamCommitteeGradesDashboard({
             ))}
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500 tabular-nums">
+          <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums">
             <span className="inline-flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5" />
               Showing {filteredGrades.length} of {rawGrades.length}
@@ -979,7 +1002,7 @@ export function ExamCommitteeGradesDashboard({
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1 text-pust-800 font-medium hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1 text-pust-800 dark:text-gold-300 font-medium hover:underline cursor-pointer whitespace-nowrap shrink-0"
               >
                 <RotateCcw className="w-3 h-3" />
                 Reset Filters
@@ -995,13 +1018,13 @@ export function ExamCommitteeGradesDashboard({
           {error && (
             <div
               role="alert"
-              className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
+              className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-xs text-red-900 dark:text-red-200"
             >
               {error}
             </div>
           )}
           {feedback && (
-            <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
+            <div className="p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs text-emerald-900 dark:text-emerald-200">
               {feedback}
             </div>
           )}
@@ -1012,19 +1035,19 @@ export function ExamCommitteeGradesDashboard({
       {editingRow && (
         <form
           onSubmit={(e) => handleSaveModeration(e, 'reviewed')}
-          className="mx-6 mt-4 p-4 rounded-xl border border-slate-300 bg-[#FAF9F6] space-y-3 text-xs"
+          className="mx-6 mt-4 p-4 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 space-y-3 text-xs"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="font-semibold text-slate-900">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">
                 Scrutiny &amp; Moderation · {editingRow.courseCode} ({editingRow.studentName} ·{' '}
                 {editingRow.academicId})
               </p>
-              <p className="text-slate-600">
+              <p className="text-slate-600 dark:text-slate-400">
                 Submitted by {editingRow.submittedByName}. Update moderated marks or record an exam committee remark before finalizing.
               </p>
             </div>
-            <span className="font-mono font-semibold text-pust-900 tabular-nums">
+            <span className="font-mono font-semibold text-pust-800 dark:text-gold-300 tabular-nums">
               New Total: {Math.min(100, Number(editCa) + Number(editFinal))}/100 · {editPreview.letter}{' '}
               ({editPreview.gp.toFixed(2)})
             </span>
@@ -1032,7 +1055,9 @@ export function ExamCommitteeGradesDashboard({
 
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <div className="sm:col-span-2">
-              <label className="block font-medium text-slate-700 mb-1">Continuous (40)</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Continuous (40)
+              </label>
               <input
                 type="number"
                 min={0}
@@ -1040,11 +1065,13 @@ export function ExamCommitteeGradesDashboard({
                 required
                 value={editCa}
                 onChange={(e) => setEditCa(Number(e.target.value))}
-                className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-white tabular-nums"
+                className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block font-medium text-slate-700 mb-1">Final Exam (60)</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Final Exam (60)
+              </label>
               <input
                 type="number"
                 min={0}
@@ -1052,11 +1079,11 @@ export function ExamCommitteeGradesDashboard({
                 required
                 value={editFinal}
                 onChange={(e) => setEditFinal(Number(e.target.value))}
-                className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-slate-300 bg-white tabular-nums"
+                className="w-full px-2.5 py-1.5 font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 tabular-nums"
               />
             </div>
             <div className="sm:col-span-8">
-              <label className="block font-medium text-slate-700 mb-1">
+              <label className="block font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Committee Scrutiny Note
               </label>
               <input
@@ -1065,7 +1092,7 @@ export function ExamCommitteeGradesDashboard({
                 value={editNote}
                 onChange={(e) => setEditNote(e.target.value)}
                 placeholder="e.g. Script re-totaled; approved for final SGPA sheet"
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-white"
+                className="w-full px-3 py-1.5 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
               />
             </div>
           </div>
@@ -1074,7 +1101,7 @@ export function ExamCommitteeGradesDashboard({
             <button
               type="button"
               onClick={() => setEditingRow(null)}
-              className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer whitespace-nowrap shrink-0"
             >
               Cancel
             </button>
@@ -1082,14 +1109,14 @@ export function ExamCommitteeGradesDashboard({
               type="button"
               disabled={savingEdit}
               onClick={(e) => handleSaveModeration(e, 'submitted')}
-              className="px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 font-medium cursor-pointer whitespace-nowrap shrink-0"
+              className="px-3 py-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 font-medium cursor-pointer whitespace-nowrap shrink-0"
             >
               Flag Needs Recheck
             </button>
             <button
               type="submit"
               disabled={savingEdit}
-              className="px-4 py-1.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-4 py-1.5 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
               {savingEdit ? 'Saving...' : 'Approve & Mark Reviewed'}
             </button>
@@ -1099,16 +1126,16 @@ export function ExamCommitteeGradesDashboard({
 
       {/* Selection / Consolidation Action Bar */}
       {selectedRecords.length > 0 && canReviewAny && (
-        <div className="mx-6 mt-4 p-4 rounded-xl border border-pust-800/30 bg-pust-50/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="mx-6 mt-4 p-4 rounded-lg border border-pust-700/30 dark:border-gold-500/40 bg-pust-50/40 dark:bg-slate-800/90 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="space-y-0.5">
-            <p className="font-semibold text-slate-900 tabular-nums">
+            <p className="font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
               {selectedRecords.length} raw course grade(s) selected
               {consolidationTarget
                 ? ` · ${consolidationTarget.studentName} (${consolidationTarget.academicId}) · ${consolidationTarget.session} Sem ${consolidationTarget.semester}`
                 : ' · Select courses from a single student & semester to consolidate'}
             </p>
             {consolidationTarget && (
-              <p className="font-mono text-[11px] text-pust-900 tabular-nums">
+              <p className="font-mono text-[11px] text-pust-800 dark:text-gold-300 tabular-nums">
                 Projected Semester GPA: {consolidationTarget.projectedSgpa.toFixed(2)} (
                 {consolidationTarget.totalCredits} Credits)
               </p>
@@ -1120,9 +1147,9 @@ export function ExamCommitteeGradesDashboard({
               type="button"
               disabled={batchBusy}
               onClick={handleBatchMarkReviewed}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
               Mark Selected Reviewed
             </button>
 
@@ -1141,7 +1168,7 @@ export function ExamCommitteeGradesDashboard({
                     })),
                   })
                 }
-                className="px-3 py-1.5 font-medium rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap shrink-0"
+                className="px-3 py-1.5 font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer whitespace-nowrap shrink-0"
               >
                 Load into Gradebook
               </button>
@@ -1153,7 +1180,7 @@ export function ExamCommitteeGradesDashboard({
                   type="button"
                   disabled={batchBusy}
                   onClick={() => handleConsolidateSelected('chairman')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Finalize &amp; Forward to Chairman
@@ -1162,7 +1189,7 @@ export function ExamCommitteeGradesDashboard({
                   type="button"
                   disabled={batchBusy}
                   onClick={() => handleConsolidateSelected('admin')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 font-semibold rounded-lg border border-pust-900 bg-white text-pust-900 hover:bg-pust-50 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 font-semibold rounded-lg border border-pust-700 dark:border-gold-400 bg-white dark:bg-slate-900 text-pust-800 dark:text-gold-300 hover:bg-pust-700 hover:text-white dark:hover:bg-gold-500 dark:hover:text-slate-950 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Forward to Admin Office
@@ -1172,7 +1199,7 @@ export function ExamCommitteeGradesDashboard({
                     type="button"
                     disabled={batchBusy}
                     onClick={() => handleConsolidateSelected('publish')}
-                    className="px-3.5 py-1.5 font-semibold rounded-lg bg-emerald-800 text-white hover:bg-emerald-900 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                    className="px-3.5 py-1.5 font-semibold rounded-lg bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
                   >
                     Finalize &amp; Publish
                   </button>
@@ -1188,13 +1215,13 @@ export function ExamCommitteeGradesDashboard({
         {loading ? (
           <PortalRecordsSkeleton rows={4} />
         ) : filteredGrades.length === 0 ? (
-          <div className="py-10 px-4 text-center border border-dashed border-slate-200 rounded-xl bg-[#FAF9F6]/60 space-y-2.5">
-            <p className="text-sm font-medium text-slate-900">
+          <div className="py-10 px-4 text-center border border-dashed border-stone-200 dark:border-slate-700 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 space-y-2.5">
+            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
               {rawGrades.length === 0
                 ? 'No raw course grades have been submitted by teachers yet.'
                 : 'No raw course grades match the active filter criteria.'}
             </p>
-            <p className="text-xs text-slate-600 max-w-md mx-auto">
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
               {rawGrades.length === 0
                 ? 'Course teachers can record continuous and final exam marks via the "Submit Raw Course Marks" button above.'
                 : 'Try clearing the search box or switching term, course, or status filters.'}
@@ -1204,7 +1231,7 @@ export function ExamCommitteeGradesDashboard({
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Reset All Filters
                 </button>
@@ -1212,7 +1239,7 @@ export function ExamCommitteeGradesDashboard({
                 <button
                   type="button"
                   onClick={() => setShowSubmitForm(true)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Submit First Course Grade
                 </button>
@@ -1220,10 +1247,10 @@ export function ExamCommitteeGradesDashboard({
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-200 overflow-x-auto">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-800 overflow-x-auto">
             <table className="w-full min-w-[920px] text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#FAF9F6] border-b border-slate-200 text-[11px] font-medium text-slate-600">
+                <tr className="bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 text-[11px] font-medium text-slate-600 dark:text-slate-400">
                   {canReviewAny && (
                     <th className="px-3 py-2.5 w-9">
                       <input
@@ -1234,7 +1261,7 @@ export function ExamCommitteeGradesDashboard({
                           selectableFiltered.every((g) => selectedIds.includes(g.id))
                         }
                         onChange={toggleSelectAllVisible}
-                        className="accent-pust-800 cursor-pointer"
+                        className="accent-pust-700 cursor-pointer"
                       />
                     </th>
                   )}
@@ -1247,7 +1274,7 @@ export function ExamCommitteeGradesDashboard({
                   <th className="px-3 py-2.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-stone-200 dark:divide-slate-800">
                 {filteredGrades.map((g) => {
                   const isFailing = g.totalMarks < 40 || g.gradePoint === 0;
                   const reviewable = canReviewRow(g);
@@ -1257,10 +1284,10 @@ export function ExamCommitteeGradesDashboard({
                       key={g.id}
                       className={`transition-colors ${
                         checked
-                          ? 'bg-pust-50/40'
+                          ? 'bg-pust-50/40 dark:bg-slate-800'
                           : isFailing
-                          ? 'bg-red-50/30 hover:bg-red-50/50'
-                          : 'bg-white hover:bg-[#FAF9F6]'
+                          ? 'bg-red-50/40 dark:bg-red-950/20 hover:bg-red-50/60 dark:hover:bg-red-950/35'
+                          : 'bg-white dark:bg-slate-900 hover:bg-[#FAF9F6] dark:hover:bg-slate-800/60'
                       }`}
                     >
                       {canReviewAny && (
@@ -1271,47 +1298,52 @@ export function ExamCommitteeGradesDashboard({
                             checked={checked}
                             onChange={() => toggleRowSelection(g.id)}
                             aria-label={`Select ${g.courseCode} for ${g.academicId}`}
-                            className="mt-0.5 accent-pust-800 cursor-pointer disabled:opacity-30"
+                            className="mt-0.5 accent-pust-700 cursor-pointer disabled:opacity-30"
                           />
                         </td>
                       )}
                       <td className="px-3 py-2.5 align-top">
-                        <p className="font-mono font-semibold text-slate-900 tabular-nums">
+                        <p className="font-mono font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
                           {g.academicId}
                         </p>
-                        <p className="text-slate-700">{g.studentName}</p>
+                        <p className="text-slate-700 dark:text-slate-300">{g.studentName}</p>
                       </td>
                       <td className="px-3 py-2.5 align-top">
-                        <p className="font-mono font-semibold text-pust-900 tabular-nums">
+                        <p className="font-mono font-semibold text-pust-800 dark:text-gold-300 tabular-nums">
                           {g.courseCode} · {g.departmentCode} · {g.session} · Sem {g.semester}
                         </p>
-                        <p className="text-slate-700 truncate max-w-[260px]" title={g.courseTitle}>
+                        <p
+                          className="text-slate-700 dark:text-slate-300 truncate max-w-[260px]"
+                          title={g.courseTitle}
+                        >
                           {g.courseTitle} ({g.credits} Cr)
                         </p>
                         {g.committeeNote && (
-                          <p className="text-[11px] text-slate-500 mt-0.5">Note: {g.committeeNote}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            Note: {g.committeeNote}
+                          </p>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-right align-top font-mono text-slate-700 tabular-nums whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-right align-top font-mono text-slate-700 dark:text-slate-300 tabular-nums whitespace-nowrap">
                         {g.continuousMarks}/40 + {g.finalExamMarks}/60
                       </td>
                       <td className="px-3 py-2.5 text-right align-top font-mono tabular-nums whitespace-nowrap">
                         <span
                           className={`font-semibold ${
-                            isFailing ? 'text-red-700' : 'text-slate-900'
+                            isFailing ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-slate-100'
                           }`}
                         >
                           {g.totalMarks}/100 · {g.letterGrade} ({g.gradePoint.toFixed(2)})
                         </span>
                         {isFailing && (
-                          <span className="block text-[11px] font-semibold text-red-700">
+                          <span className="block text-[11px] font-semibold text-red-700 dark:text-red-400">
                             Below Pass Threshold
                           </span>
                         )}
                       </td>
                       <td className="px-3 py-2.5 align-top">
-                        <p className="text-slate-800 font-medium">{g.submittedByName}</p>
-                        <p className="font-mono text-[11px] text-slate-500 tabular-nums">
+                        <p className="text-slate-800 dark:text-slate-200 font-medium">{g.submittedByName}</p>
+                        <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
                           {g.submittedAt.slice(0, 10)}
                         </p>
                       </td>
@@ -1319,10 +1351,10 @@ export function ExamCommitteeGradesDashboard({
                         <span
                           className={`font-medium ${
                             g.status === 'finalized'
-                              ? 'text-pust-900'
+                              ? 'text-pust-800 dark:text-gold-300'
                               : g.status === 'reviewed'
-                              ? 'text-emerald-700'
-                              : 'text-amber-700'
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-amber-700 dark:text-amber-300'
                           }`}
                         >
                           {g.status === 'finalized'
@@ -1332,7 +1364,7 @@ export function ExamCommitteeGradesDashboard({
                             : 'Pending Review'}
                         </span>
                         {g.reviewedBy && g.status !== 'submitted' && (
-                          <span className="block text-[11px] text-slate-500 truncate max-w-[140px]">
+                          <span className="block text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
                             by {g.reviewedBy}
                           </span>
                         )}
@@ -1350,7 +1382,7 @@ export function ExamCommitteeGradesDashboard({
                                     g.status === 'reviewed' ? 'submitted' : 'reviewed'
                                   )
                                 }
-                                className="px-2.5 py-1 rounded-md border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
+                                className="px-2.5 py-1 rounded-md border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
                               >
                                 {g.status === 'reviewed' ? 'Unverify' : 'Verify'}
                               </button>
@@ -1358,7 +1390,7 @@ export function ExamCommitteeGradesDashboard({
                                 type="button"
                                 onClick={() => openModerationEditor(g)}
                                 title="Moderate marks or add note"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-300 bg-[#FAF9F6] text-slate-700 hover:border-slate-400 cursor-pointer whitespace-nowrap shrink-0"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer whitespace-nowrap shrink-0"
                               >
                                 <SlidersHorizontal className="w-3 h-3" />
                                 Adjust
@@ -1366,7 +1398,7 @@ export function ExamCommitteeGradesDashboard({
                             </>
                           )}
                           {!reviewable && g.status === 'finalized' && (
-                            <span className="text-[11px] text-slate-500">Locked</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">Locked</span>
                           )}
                         </div>
                       </td>

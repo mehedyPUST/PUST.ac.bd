@@ -121,15 +121,15 @@ export function GoToTopButton() {
       aria-hidden={!showGoToTop}
       tabIndex={showGoToTop ? 0 : -1}
       data-go-to-top="true"
-      className={`fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-30 print:hidden group inline-flex items-center gap-2 overflow-hidden rounded-xl border border-slate-300/90 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 text-xs font-semibold text-slate-900 shadow-md hover:border-pust-900 hover:bg-pust-900 hover:text-white transition-all duration-200 cursor-pointer ${
+      className={`fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-30 print:hidden group inline-flex items-center gap-2 overflow-hidden rounded-xl border border-stone-300/90 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 text-xs font-semibold text-slate-900 shadow-md hover:border-pust-700 hover:bg-pust-700 hover:text-white transition-all duration-200 cursor-pointer ${
         showGoToTop
           ? 'opacity-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 translate-y-3 pointer-events-none'
       }`}
     >
-      <ArrowUp className="w-3.5 h-3.5 text-pust-800 group-hover:text-amber-300 transition-colors shrink-0" />
+      <ArrowUp className="w-3.5 h-3.5 text-pust-700 group-hover:text-amber-300 transition-colors shrink-0" />
       <span>Top</span>
-      <span className="font-mono text-[11px] text-slate-500 group-hover:text-amber-200 tabular-nums border-l border-slate-200 group-hover:border-white/25 pl-2">
+      <span className="font-mono text-[11px] text-slate-500 group-hover:text-amber-200 tabular-nums border-l border-stone-200 group-hover:border-white/25 pl-2">
         {percent}%
       </span>
       <span

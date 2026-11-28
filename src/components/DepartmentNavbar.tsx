@@ -118,7 +118,7 @@ export function DepartmentNavbar({
               <button
                 type="button"
                 onClick={() => onOpenEditModal({ kind: 'department', department: matchedDept })}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-pust-800 text-pust-900 bg-white hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-pust-700 text-pust-800 bg-white hover:bg-pust-700 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Edit Dept</span>
@@ -128,7 +128,7 @@ export function DepartmentNavbar({
               <button
                 type="button"
                 onClick={onOpenCmsDirectory}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-700 hover:text-pust-800 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span>CMS</span>
@@ -137,7 +137,7 @@ export function DepartmentNavbar({
             <button
               type="button"
               onClick={() => onNavigate('/portal')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer whitespace-nowrap"
             >
               <GraduationCap className="w-3.5 h-3.5" />
               <span>{user ? 'Portal' : 'Sign In'}</span>
@@ -167,8 +167,8 @@ export function DepartmentNavbar({
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   active
-                    ? 'bg-pust-900 text-white'
-                    : 'text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900'
+                    ? 'bg-pust-700 text-white'
+                    : 'text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-800'
                 }`}
               >
                 {item.label}

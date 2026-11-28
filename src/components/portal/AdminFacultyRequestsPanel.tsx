@@ -281,16 +281,16 @@ export function AdminFacultyRequestsPanel({
       {feedback && (
         <div
           role="status"
-          className="px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-900 flex items-center justify-between gap-3"
+          className="px-4 py-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs font-medium text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-3"
         >
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
             <span>{feedback}</span>
           </span>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-emerald-700 hover:text-emerald-950 cursor-pointer"
+            className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-emerald-100 cursor-pointer"
             aria-label="Dismiss feedback"
           >
             <X className="w-4 h-4" />
@@ -301,16 +301,16 @@ export function AdminFacultyRequestsPanel({
       {error && (
         <div
           role="alert"
-          className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900 flex items-center justify-between gap-3"
+          className="px-4 py-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-xs font-medium text-red-900 dark:text-red-200 flex items-center justify-between gap-3"
         >
           <span className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-red-700 dark:text-red-400 shrink-0" />
             <span>{error}</span>
           </span>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-red-700 hover:text-red-950 cursor-pointer"
+            className="text-red-700 dark:text-red-300 hover:text-red-950 dark:hover:text-red-100 cursor-pointer"
             aria-label="Dismiss error"
           >
             <X className="w-4 h-4" />
@@ -318,15 +318,15 @@ export function AdminFacultyRequestsPanel({
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-5 sm:p-6 space-y-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 dark:border-slate-800 pb-4">
           <div className="space-y-1">
-            <h2 className="font-serif text-xl font-medium text-slate-950">
+            <h2 className="font-serif text-xl font-medium text-slate-950 dark:text-slate-100">
               {actorRole === 'chairman' && departmentCode
                 ? `${departmentCode} Faculty Directory Profile Approvals`
                 : 'Faculty Directory Profile Approvals'}
             </h2>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               {actorRole === 'chairman' && departmentCode
                 ? `Inspect ${departmentCode} teacher-submitted edits and new directory profile requests before publishing changes to the live department page.`
                 : 'Inspect teacher-submitted edits and new directory profile requests before publishing changes to live public department pages.'}
@@ -336,7 +336,7 @@ export function AdminFacultyRequestsPanel({
             type="button"
             onClick={() => void loadRequests()}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50 self-start lg:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-slate-950 dark:hover:text-gold-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50 self-start lg:self-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh Queue</span>
@@ -345,29 +345,35 @@ export function AdminFacultyRequestsPanel({
 
         {/* 4-Column KPI Strip */}
         <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="rounded-xl border border-stone-200 bg-[#FBF6EE] px-4 py-3">
-            <dt className="text-[11px] font-medium text-slate-600">
+          <div className="rounded-lg border border-amber-200 dark:border-amber-800/70 bg-amber-50/70 dark:bg-amber-950/25 px-4 py-3">
+            <dt className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
               {actorRole === 'chairman' ? 'Pending Dept Review' : 'Pending Admin Review'}
             </dt>
-            <dd className="font-mono text-2xl font-semibold text-amber-800 tabular-nums mt-0.5">
+            <dd className="font-mono text-2xl font-semibold text-amber-800 dark:text-amber-300 tabular-nums mt-0.5">
               {counts.pending}
             </dd>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
-            <dt className="text-[11px] font-medium text-slate-600">Approved &amp; Published</dt>
-            <dd className="font-mono text-2xl font-semibold text-emerald-700 tabular-nums mt-0.5">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 px-4 py-3">
+            <dt className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+              Approved &amp; Published
+            </dt>
+            <dd className="font-mono text-2xl font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5">
               {counts.approved}
             </dd>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
-            <dt className="text-[11px] font-medium text-slate-600">Declined Requests</dt>
-            <dd className="font-mono text-2xl font-semibold text-red-700 tabular-nums mt-0.5">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 px-4 py-3">
+            <dt className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+              Declined Requests
+            </dt>
+            <dd className="font-mono text-2xl font-semibold text-red-700 dark:text-red-400 tabular-nums mt-0.5">
               {counts.rejected}
             </dd>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
-            <dt className="text-[11px] font-medium text-slate-600">Total Submissions</dt>
-            <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3">
+            <dt className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+              Total Submissions
+            </dt>
+            <dd className="font-mono text-2xl font-semibold text-slate-950 dark:text-slate-100 tabular-nums mt-0.5">
               {counts.total}
             </dd>
           </div>
@@ -375,7 +381,7 @@ export function AdminFacultyRequestsPanel({
 
         {/* Filter Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">
+          <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-[#FAF9F6] dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
             {(
               [
                 { id: 'pending', label: `Pending (${counts.pending})` },
@@ -390,8 +396,8 @@ export function AdminFacultyRequestsPanel({
                 onClick={() => setStatusFilter(item.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   statusFilter === item.id
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-pust-700 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {item.label}
@@ -400,13 +406,13 @@ export function AdminFacultyRequestsPanel({
           </div>
 
           <div className="relative w-full sm:w-80">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search teacher, department, or designation..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
             />
           </div>
         </div>
@@ -417,25 +423,25 @@ export function AdminFacultyRequestsPanel({
             {[1, 2, 3].map((row) => (
               <div
                 key={row}
-                className="h-12 rounded-lg bg-stone-100 animate-pulse border border-stone-200"
+                className="h-12 rounded-lg bg-stone-100 dark:bg-slate-800 animate-pulse border border-stone-200 dark:border-slate-700"
               />
             ))}
           </div>
         ) : filteredRequests.length === 0 ? (
-          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-1.5">
-            <UserCheck className="w-6 h-6 text-slate-400 mx-auto" />
-            <p className="text-sm font-medium text-slate-900">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 p-8 text-center space-y-1.5">
+            <UserCheck className="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto" />
+            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
               No faculty profile requests match the active filter
             </p>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
               Teacher submissions to update claimed directory profiles or create new entries will appear here for verification.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-stone-200">
+          <div className="overflow-x-auto rounded-lg border border-stone-200 dark:border-slate-800">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                <tr className="bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
                   <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
                   <th className="py-2.5 px-3">Teacher Account</th>
                   <th className="py-2.5 px-3">Department &amp; Group</th>
@@ -445,55 +451,59 @@ export function AdminFacultyRequestsPanel({
                   <th className="py-2.5 px-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-200">
+              <tbody className="divide-y divide-stone-200 dark:divide-slate-800">
                 {filteredRequests.map((reqItem, idx) => (
                   <tr
                     key={reqItem.id}
-                    className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+                    className={
+                      idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-[#FAF9F6] dark:bg-slate-800/40'
+                    }
                   >
-                    <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
+                    <td className="py-2.5 px-3 font-mono text-slate-500 dark:text-slate-400 tabular-nums">
                       {idx + 1}
                     </td>
                     <td className="py-2.5 px-3">
-                      <p className="font-medium text-slate-950">{reqItem.teacherName}</p>
-                      <p className="font-mono text-[11px] text-slate-500 tabular-nums">
+                      <p className="font-medium text-slate-950 dark:text-slate-100">{reqItem.teacherName}</p>
+                      <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
                         ID {reqItem.teacherAcademicId} · {reqItem.teacherEmail}
                       </p>
                     </td>
                     <td className="py-2.5 px-3">
-                      <p className="font-mono font-semibold text-pust-900">
+                      <p className="font-mono font-semibold text-pust-800 dark:text-gold-300">
                         {reqItem.departmentCode}
                       </p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         {reqItem.facultyGroup === 'contractual'
                           ? 'Contractual Faculty'
                           : 'Regular Faculty'}
                       </p>
                     </td>
-                    <td className="py-2.5 px-3 font-medium text-slate-800">
+                    <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">
                       {reqItem.requestType === 'create_new'
                         ? 'New Directory Profile'
                         : 'Edit Claimed Profile'}
                     </td>
                     <td className="py-2.5 px-3">
-                      <p className="font-medium text-slate-950">{reqItem.proposedProfile.name}</p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="font-medium text-slate-950 dark:text-slate-100">
+                        {reqItem.proposedProfile.name}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         {reqItem.proposedProfile.designation}
                       </p>
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap">
                       {reqItem.status === 'pending' ? (
-                        <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
+                        <span className="inline-flex items-center gap-1 font-semibold text-amber-800 dark:text-amber-300">
                           <Clock className="w-3.5 h-3.5" />
                           <span>Pending Review</span>
                         </span>
                       ) : reqItem.status === 'approved' ? (
-                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Approved</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 font-semibold text-red-700">
+                        <span className="inline-flex items-center gap-1 font-semibold text-red-700 dark:text-red-400">
                           <XCircle className="w-3.5 h-3.5" />
                           <span>Declined</span>
                         </span>
@@ -505,8 +515,8 @@ export function AdminFacultyRequestsPanel({
                         onClick={() => openInspectModal(reqItem)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                           reqItem.status === 'pending'
-                            ? 'bg-pust-900 text-white hover:bg-pust-950'
-                            : 'border border-stone-300 bg-white text-slate-700 hover:border-pust-800'
+                            ? 'bg-pust-700 text-white hover:bg-pust-800'
+                            : 'border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400'
                         }`}
                       >
                         <Eye className="w-3.5 h-3.5" />
@@ -539,22 +549,22 @@ export function AdminFacultyRequestsPanel({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-lg border border-stone-200 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+            className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-start justify-between gap-4 shrink-0">
+            <div className="px-6 py-4 border-b border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80 flex items-start justify-between gap-4 shrink-0">
               <div className="space-y-0.5 min-w-0">
-                <p className="font-mono text-[11px] font-semibold text-pust-800">
+                <p className="font-mono text-[11px] font-semibold text-pust-800 dark:text-gold-300">
                   {inspecting.departmentCode} ·{' '}
                   {inspecting.requestType === 'create_new'
                     ? 'New Directory Entry'
                     : 'Claimed Profile Update'}{' '}
                   · Submitted {formatDateTime(inspecting.updatedAt)}
                 </p>
-                <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-950 truncate">
+                <h3 className="font-serif text-lg sm:text-xl font-medium text-slate-950 dark:text-slate-100 truncate">
                   {inspecting.proposedProfile.name} ({inspecting.proposedProfile.designation})
                 </h3>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Requested by {inspecting.teacherName} ({inspecting.teacherEmail} · ID{' '}
                   {inspecting.teacherAcademicId})
                 </p>
@@ -567,7 +577,7 @@ export function AdminFacultyRequestsPanel({
                   setError(null);
                 }}
                 aria-label="Close review modal"
-                className="p-2 rounded-lg border border-stone-200 bg-white text-slate-600 hover:text-slate-950 hover:border-stone-300 cursor-pointer shrink-0"
+                className="p-2 rounded-lg border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-stone-300 dark:hover:border-slate-600 cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -578,16 +588,16 @@ export function AdminFacultyRequestsPanel({
               {error && (
                 <div
                   role="alert"
-                  className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900 flex items-center justify-between gap-3"
+                  className="px-4 py-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-xs font-medium text-red-900 dark:text-red-200 flex items-center justify-between gap-3"
                 >
                   <span className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
+                    <AlertTriangle className="w-4 h-4 text-red-700 dark:text-red-400 shrink-0" />
                     <span>{error}</span>
                   </span>
                   <button
                     type="button"
                     onClick={() => setError(null)}
-                    className="text-red-700 hover:text-red-950 cursor-pointer"
+                    className="text-red-700 dark:text-red-300 hover:text-red-950 dark:hover:text-red-100 cursor-pointer"
                     aria-label="Dismiss error"
                   >
                     <X className="w-4 h-4" />
@@ -596,9 +606,9 @@ export function AdminFacultyRequestsPanel({
               )}
               {/* Portrait Comparison */}
               {(inspecting.currentMember?.photoUrl || inspecting.proposedProfile.photoUrl) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl border border-stone-200 bg-[#FAF9F6] p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 rounded-xl border border-stone-200 bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-lg border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden shrink-0 flex items-center justify-center">
                       {inspecting.currentMember?.photoUrl &&
                       isSafeMediaUrl(inspecting.currentMember.photoUrl) ? (
                         <img
@@ -608,18 +618,20 @@ export function AdminFacultyRequestsPanel({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-xs text-slate-400">None</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">None</span>
                       )}
                     </div>
                     <div className="text-xs">
-                      <p className="font-semibold text-slate-700">Current Live Portrait</p>
-                      <p className="text-slate-500 font-mono text-[11px] break-all line-clamp-2">
+                      <p className="font-semibold text-slate-700 dark:text-slate-200">
+                        Current Live Portrait
+                      </p>
+                      <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px] break-all line-clamp-2">
                         {inspecting.currentMember?.photoUrl || 'Not set'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 rounded-xl border border-stone-200 bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-lg border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden shrink-0 flex items-center justify-center">
                       {inspecting.proposedProfile.photoUrl &&
                       isSafeMediaUrl(inspecting.proposedProfile.photoUrl) ? (
                         <img
@@ -629,12 +641,12 @@ export function AdminFacultyRequestsPanel({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-xs text-slate-400">None</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">None</span>
                       )}
                     </div>
                     <div className="text-xs">
-                      <p className="font-semibold text-pust-900">Proposed Portrait</p>
-                      <p className="text-slate-600 font-mono text-[11px] break-all line-clamp-2">
+                      <p className="font-semibold text-pust-800 dark:text-gold-300">Proposed Portrait</p>
+                      <p className="text-slate-600 dark:text-slate-400 font-mono text-[11px] break-all line-clamp-2">
                         {inspecting.proposedProfile.photoUrl || 'Not set'}
                       </p>
                     </div>
@@ -643,39 +655,39 @@ export function AdminFacultyRequestsPanel({
               )}
 
               {/* Field-by-Field Diff Table */}
-              <div className="overflow-x-auto rounded-xl border border-stone-200">
+              <div className="overflow-x-auto rounded-lg border border-stone-200 dark:border-slate-800">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                    <tr className="bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
                       <th className="py-2.5 px-3 w-44">Profile Field</th>
                       <th className="py-2.5 px-3">Current Live Directory</th>
                       <th className="py-2.5 px-3">Proposed Submission</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-200">
+                  <tbody className="divide-y divide-stone-200 dark:divide-slate-800">
                     {comparisonRows.map((row, idx) => (
                       <tr
                         key={row.label}
                         className={
                           row.changed
-                            ? 'bg-[#FBF6EE]'
+                            ? 'bg-amber-50/70 dark:bg-amber-950/25'
                             : idx % 2 === 0
-                            ? 'bg-white'
-                            : 'bg-[#FAF9F6]'
+                            ? 'bg-white dark:bg-slate-900'
+                            : 'bg-[#FAF9F6] dark:bg-slate-800/40'
                         }
                       >
-                        <td className="py-2.5 px-3 font-semibold text-slate-800 align-top">
+                        <td className="py-2.5 px-3 font-semibold text-slate-800 dark:text-slate-200 align-top">
                           <span>{row.label}</span>
                           {row.changed && (
-                            <span className="block text-[10px] font-mono text-amber-800 mt-0.5">
+                            <span className="block text-[10px] font-mono text-amber-800 dark:text-amber-300 mt-0.5">
                               Modified
                             </span>
                           )}
                         </td>
-                        <td className="py-2.5 px-3 text-slate-600 align-top whitespace-pre-wrap break-words">
+                        <td className="py-2.5 px-3 text-slate-600 dark:text-slate-400 align-top whitespace-pre-wrap break-words">
                           {row.currentVal}
                         </td>
-                        <td className="py-2.5 px-3 text-slate-950 font-medium align-top whitespace-pre-wrap break-words">
+                        <td className="py-2.5 px-3 text-slate-950 dark:text-slate-100 font-medium align-top whitespace-pre-wrap break-words">
                           {row.proposedVal}
                         </td>
                       </tr>
@@ -687,7 +699,7 @@ export function AdminFacultyRequestsPanel({
               {/* Admin Note */}
               {inspecting.status === 'pending' ? (
                 <label className="block space-y-1.5 text-xs">
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
                     {actorRole === 'chairman'
                       ? 'Department Chairman Decision Note'
                       : 'Administrator Decision Note'}{' '}
@@ -699,23 +711,25 @@ export function AdminFacultyRequestsPanel({
                     value={adminNote}
                     onChange={(e) => setAdminNote(e.target.value)}
                     placeholder="Verified against departmental records, or explain requested corrections..."
-                    className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                   />
                 </label>
               ) : (
-                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 text-xs space-y-1">
-                  <p className="font-semibold text-slate-900">
+                <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 px-4 py-3 text-xs space-y-1">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">
                     Finalized Status: {inspecting.status === 'approved' ? 'Approved' : 'Declined'}{' '}
                     {inspecting.reviewedBy ? `by ${inspecting.reviewedBy}` : ''} (
                     {formatDateTime(inspecting.reviewedAt)})
                   </p>
-                  <p className="text-slate-600">{inspecting.adminNote || 'No note recorded.'}</p>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    {inspecting.adminNote || 'No note recorded.'}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div className="px-6 py-4 border-t border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80 flex flex-wrap items-center justify-between gap-3 shrink-0">
               <button
                 type="button"
                 disabled={Boolean(submittingDecision)}
@@ -723,7 +737,7 @@ export function AdminFacultyRequestsPanel({
                   setInspecting(null);
                   setError(null);
                 }}
-                className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer whitespace-nowrap"
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer whitespace-nowrap"
               >
                 Close
               </button>
@@ -734,7 +748,7 @@ export function AdminFacultyRequestsPanel({
                     type="button"
                     disabled={Boolean(submittingDecision)}
                     onClick={() => void handleDecision('reject')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-red-300 bg-white text-red-700 hover:bg-red-50 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-red-300 dark:border-red-800 bg-white dark:bg-slate-900 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     <span>
@@ -745,7 +759,7 @@ export function AdminFacultyRequestsPanel({
                     type="button"
                     disabled={Boolean(submittingDecision)}
                     onClick={() => void handleDecision('approve')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>

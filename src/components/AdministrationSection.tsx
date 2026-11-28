@@ -200,7 +200,7 @@ export function AdministrationSection({
           <button
             type="button"
             onClick={() => retryLoad()}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
           >
             Retry Loading
           </button>
@@ -298,7 +298,7 @@ export function AdministrationSection({
                   (activeOfficeRecord.head ||
                     activeOfficeRecord.officeEmail ||
                     activeOfficeRecord.officePhone) ? (
-                    <dl className="border-y border-slate-200 bg-[#F8F8F6] px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <dl className="border-y border-stone-200 bg-[#FAF9F6] px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                       {activeOfficeRecord.head && (
                         <div className="space-y-0.5">
                           <dt className="text-slate-500">
@@ -347,7 +347,7 @@ export function AdministrationSection({
                     </dl>
                   ) : (
                     highlightedOfficer && (
-                      <dl className="border-y border-slate-200 bg-[#F8F8F6] px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                      <dl className="border-y border-stone-200 bg-[#FAF9F6] px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div className="space-y-0.5">
                           <dt className="text-slate-500">{highlightedOfficer.role}</dt>
                           <dd className="font-serif text-lg font-medium text-slate-950">
@@ -587,7 +587,7 @@ export function AdministrationSection({
                       type="button"
                       onClick={() => setShowPreviousVcs((prev) => !prev)}
                       aria-expanded={showPreviousVcs}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-[#F8F8F6] text-slate-900 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-900 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       {showPreviousVcs ? 'Hide History' : 'Show History'}
                       <ChevronDown
@@ -615,7 +615,7 @@ export function AdministrationSection({
                           <article
                             key={vc.id}
                             className={`h-full rounded-xl border border-stone-200 hover:border-pust-700/45 p-5 space-y-2 flex flex-col justify-between transition-colors ${
-                              isEven ? 'bg-white' : 'bg-[#F5F3EE]/60'
+                              isEven ? 'bg-white' : 'bg-[#FAF9F6]'
                             }`}
                           >
                             <div className="space-y-1.5">
@@ -688,7 +688,7 @@ export function AdministrationSection({
                     onChange={(e) => setDirectoryQuery(e.target.value)}
                     placeholder="Filter principal office or officer..."
                     aria-label="Filter executive administration ledger"
-                    className="w-full pl-10 pr-9 py-2 text-sm bg-[#F8F8F6] border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 focus:bg-white"
+                    className="w-full pl-10 pr-9 py-2 text-sm bg-[#FAF9F6] border border-stone-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-700 focus:bg-white"
                   />
                   {directoryQuery && (
                     <button
@@ -705,7 +705,7 @@ export function AdministrationSection({
             </div>
 
             {filteredLeadership.length === 0 ? (
-              <div className="rounded-xl border border-slate-200 bg-[#F8F8F6] p-10 text-center space-y-3">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-10 text-center space-y-3">
                 <p className="text-sm text-slate-600 text-center">
                   No administrative officer matched{' '}
                   <span className="font-medium text-slate-900">“{directoryQuery}”</span>.
@@ -713,13 +713,13 @@ export function AdministrationSection({
                 <button
                   type="button"
                   onClick={() => setDirectoryQuery('')}
-                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white text-pust-900 hover:border-pust-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-pust-800 hover:border-pust-700 transition-colors cursor-pointer"
                 >
                   Reset Directory Filter
                 </button>
               </div>
             ) : (
-              <dl className="divide-y divide-slate-200 border-b border-slate-200">
+              <dl className="divide-y divide-stone-200 border-b border-stone-200">
                 {filteredLeadership.map((officer, idx) => {
                   const isHighlighted = activeOffice?.matchLeadership?.(officer.role) ?? false;
                   const isCopied = copiedEmail === officer.email;
@@ -733,8 +733,8 @@ export function AdministrationSection({
                         isHighlighted
                           ? 'bg-pust-50/55 rounded-lg'
                           : idx % 2 === 0
-                          ? 'bg-white hover:bg-[#F8F8F6]'
-                          : 'bg-[#FAF9F5]/75 hover:bg-[#F8F8F6]'
+                          ? 'bg-white hover:bg-[#FAF9F6]'
+                          : 'bg-[#FAF9F6] hover:bg-pust-50/40'
                       }`}
                     >
                       <dt className="xl:col-span-3 text-xs font-semibold text-pust-900">
@@ -758,7 +758,7 @@ export function AdministrationSection({
                           type="button"
                           onClick={() => handleCopyEmail(officer.email)}
                           aria-label={`Copy ${officer.email}`}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-200 bg-[#F8F8F6] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone-200 bg-[#FAF9F6] text-[11px] font-sans font-medium text-slate-700 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                         >
                           {isCopied ? (
                             <>
@@ -886,7 +886,7 @@ export function AdministrationSection({
                           onClick={() => setUnitFilter(tab)}
                           className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                             active
-                              ? 'bg-pust-900 text-white font-semibold'
+                              ? 'bg-pust-700 text-white font-semibold'
                               : 'text-slate-600 hover:text-slate-950'
                           }`}
                         >

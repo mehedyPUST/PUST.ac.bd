@@ -243,70 +243,70 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Header Card */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 shadow-xs p-6 flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800 dark:text-gold-300">
             {user.role === 'student'
               ? 'Student Graduation Workflow'
               : myOfficeRole
               ? `Clearance Authority · ${myOfficeRole.toUpperCase()} Office`
               : 'Central Admin Final Issuance'}
           </p>
-          <h2 className="font-serif text-2xl font-medium text-slate-900">{headerTitle}</h2>
-          <p className="text-xs text-slate-600 max-w-2xl">{headerSubtitle}</p>
+          <h2 className="font-serif text-2xl font-medium text-slate-900 dark:text-slate-100">{headerTitle}</h2>
+          <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl">{headerSubtitle}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs font-mono tabular-nums">
-          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
-            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+          <div className="px-3.5 py-2 rounded-xl bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {myOfficeRole
                 ? 'Pending My Office'
                 : user.role === 'admin'
                 ? 'Ready to Issue'
                 : 'In Progress'}
             </span>
-            <span className="text-base font-semibold text-amber-800">{pendingMyOfficeCount}</span>
+            <span className="text-base font-semibold text-amber-800 dark:text-amber-300">{pendingMyOfficeCount}</span>
           </div>
-          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
-            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+          <div className="px-3.5 py-2 rounded-xl bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Waiting 4-Office
             </span>
-            <span className="text-base font-semibold text-slate-900">{waitingOfficesCount}</span>
+            <span className="text-base font-semibold text-slate-900 dark:text-slate-100">{waitingOfficesCount}</span>
           </div>
-          <div className="px-3.5 py-2 rounded-xl bg-[#F7F7F5] border border-slate-200">
-            <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+          <div className="px-3.5 py-2 rounded-xl bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700">
+            <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Issued
             </span>
-            <span className="text-base font-semibold text-pust-800">{issuedCount}</span>
+            <span className="text-base font-semibold text-pust-800 dark:text-gold-300">{issuedCount}</span>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-sm text-red-900">
+        <div className="p-3.5 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-sm text-red-900 dark:text-red-200">
           {error}
         </div>
       )}
       {feedback && (
-        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
+        <div className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-sm text-emerald-900 dark:text-emerald-200">
           {feedback}
         </div>
       )}
 
       {/* Student Eligibility & Digital Checkout */}
       {user.role === 'student' && (
-        <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3.5">
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 shadow-xs p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-200 dark:border-slate-800 pb-3.5">
             <div>
-              <h3 className="font-serif text-lg font-medium text-slate-900">
+              <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
                 Graduation Eligibility &amp; Digital Fee Submission
               </h3>
-              <p className="font-mono text-xs text-slate-600 mt-1 tabular-nums">
+              <p className="font-mono text-xs text-slate-600 dark:text-slate-300 mt-1 tabular-nums">
                 Completed Semesters: {student?.completedSemesters ?? 0}/8 · All Results Published:{' '}
                 <span
                   className={
                     student?.allResultsPublished
-                      ? 'text-pust-800 font-semibold'
-                      : 'text-amber-800 font-semibold'
+                      ? 'text-pust-800 dark:text-gold-300 font-semibold'
+                      : 'text-amber-800 dark:text-amber-300 font-semibold'
                   }
                 >
                   {student?.allResultsPublished ? 'YES' : 'NO'}
@@ -316,7 +316,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
             </div>
             <span
               className={`inline-flex items-center gap-1.5 font-mono text-xs font-semibold ${
-                studentEligible ? 'text-emerald-800' : 'text-amber-800'
+                studentEligible ? 'text-emerald-800 dark:text-emerald-400' : 'text-amber-800 dark:text-amber-300'
               }`}
             >
               {studentEligible ? (
@@ -334,14 +334,14 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
           </div>
 
           {!studentEligible ? (
-            <div className="p-4 rounded-xl border border-amber-300 bg-amber-50/70 text-sm text-amber-950">
+            <div className="p-4 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30 text-sm text-amber-950 dark:text-amber-200">
               Eligibility check: You must complete all 8 academic semesters with published final
               results before applying for a Temporary Certificate or Provisional Transcript.
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1">
-                <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+                <label className="block font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Select Credential Type
                 </label>
                 <select
@@ -349,7 +349,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                   onChange={(e) =>
                     setCertType(e.target.value as CertificateApplicationRecord['certificateType'])
                   }
-                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                 >
                   <option value="Temporary Certificate">Temporary Certificate</option>
                   <option value="Provisional Transcript">Provisional Transcript</option>
@@ -359,7 +359,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                 <button
                   type="button"
                   onClick={handleOpenCertificateCheckout}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                 >
                   <CreditCard className="w-4 h-4" />
                   Pay Fee &amp; Submit Application (৳{feeConfig.certificateFeeBdt.toLocaleString('en-US')})
@@ -371,13 +371,13 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
       )}
 
       {/* Certificate Applications & 4-Office Independent Clearance Tracker */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 shadow-xs p-6 space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 dark:border-slate-800 pb-4">
           <div>
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               Live 4-Office Clearance Status &amp; Resubmission History
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Each application requires independent clearance from Chairman, Hall, Library, and
               Proctor offices.
             </p>
@@ -403,8 +403,8 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums ${
                   statusFilter === tab.id
-                    ? 'border-pust-900 bg-pust-900 text-white'
-                    : 'border-slate-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-700'
+                    ? 'border-pust-700 bg-pust-700 text-white'
+                    : 'border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400'
                 }`}
               >
                 {tab.label}
@@ -416,7 +416,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
         {loading ? (
           <PortalRecordsSkeleton rows={2} />
         ) : filteredApplications.length === 0 ? (
-          <div className="p-6 rounded-xl border border-slate-200 bg-[#F7F7F5] text-center text-sm text-slate-600">
+          <div className="p-6 rounded-xl border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 text-center text-sm text-slate-600 dark:text-slate-300">
             No certificate applications match the selected filter.
           </div>
         ) : (
@@ -427,23 +427,23 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
               return (
                 <div
                   key={app.id}
-                  className="rounded-xl border border-slate-200 bg-[#F7F7F5]/60 p-5 space-y-4"
+                  className="rounded-xl border border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/60 p-5 space-y-4"
                 >
-                  <div className="flex flex-wrap justify-between items-start gap-3 border-b border-slate-200 pb-3">
+                  <div className="flex flex-wrap justify-between items-start gap-3 border-b border-stone-200 dark:border-slate-700 pb-3">
                     <div className="space-y-1">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
                         {app.studentName} ·{' '}
                         <span className="font-mono tabular-nums">{app.academicId}</span> (
                         {app.departmentCode} · {app.session})
                       </p>
-                      <p className="font-mono text-xs text-slate-500 tabular-nums">
+                      <p className="font-mono text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                         {app.certificateType} · Paid ৳{app.feeBdt.toLocaleString('en-US')} via{' '}
                         {app.paymentMethod} ({app.receiptNo || app.transactionId}) · Status:{' '}
                         <span
                           className={`font-semibold ${
                             app.finalAdminStatus === 'approved'
-                              ? 'text-pust-800'
-                              : 'text-amber-800'
+                              ? 'text-pust-800 dark:text-gold-300'
+                              : 'text-amber-800 dark:text-amber-300'
                           }`}
                         >
                           {app.finalAdminStatus.replace(/_/g, ' ').toUpperCase()}
@@ -455,7 +455,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                       <button
                         type="button"
                         onClick={() => openCertificateDocument(app)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
                       >
                         <Award className="w-3.5 h-3.5" />
                         View Official Certificate ({app.certificateSerial})
@@ -474,18 +474,18 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           key={key}
                           className={`p-3.5 rounded-xl border text-xs space-y-2 transition-colors ${
                             isMyOffice
-                              ? 'border-pust-800 bg-white ring-1 ring-pust-800/15 shadow-xs'
+                              ? 'border-pust-700 dark:border-gold-400 bg-white dark:bg-slate-900 ring-1 ring-pust-700/15 dark:ring-gold-400/20 shadow-xs'
                               : state.status === 'approved'
-                              ? 'border-emerald-300 bg-emerald-50/50'
+                              ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/30'
                               : state.status === 'declined'
-                              ? 'border-red-300 bg-red-50/60'
-                              : 'border-slate-200 bg-white'
+                              ? 'border-red-300 dark:border-red-800 bg-red-50/60 dark:bg-red-950/30'
+                              : 'border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900'
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-semibold text-slate-900">{state.officeLabel}</p>
+                            <p className="font-semibold text-slate-900 dark:text-slate-100">{state.officeLabel}</p>
                             {isMyOffice && (
-                              <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-pust-800 font-semibold shrink-0">
+                              <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-pust-800 dark:text-gold-300 font-semibold shrink-0">
                                 <ShieldCheck className="w-3 h-3" />
                                 Your Office
                               </span>
@@ -494,10 +494,10 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           <p
                             className={`inline-flex items-center gap-1 font-mono uppercase font-semibold ${
                               state.status === 'approved'
-                                ? 'text-pust-800'
+                                ? 'text-emerald-700 dark:text-emerald-400'
                                 : state.status === 'declined'
-                                ? 'text-red-700'
-                                : 'text-amber-800'
+                                ? 'text-red-700 dark:text-red-400'
+                                : 'text-amber-800 dark:text-amber-300'
                             }`}
                           >
                             {state.status === 'approved' ? (
@@ -509,10 +509,10 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                             )}
                             {state.status}
                           </p>
-                          <p className="text-slate-700 leading-relaxed">{state.note}</p>
+                          <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{state.note}</p>
 
                           {state.history.length > 0 && (
-                            <div className="border-t border-slate-200 pt-1.5 space-y-0.5 text-[11px] text-slate-500 font-mono">
+                            <div className="border-t border-stone-200 dark:border-slate-700 pt-1.5 space-y-0.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                               {state.history.map((h, idx) => (
                                 <p key={`${h.timestamp}-${idx}`}>
                                   [{h.action}] {h.actor}: {h.note}
@@ -533,12 +533,12 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                                   }))
                                 }
                                 placeholder="Resolution note..."
-                                className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+                                className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                               />
                               <button
                                 type="button"
                                 onClick={() => handleResubmit(app.id, key)}
-                                className="w-full py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                                className="w-full py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                               >
                                 Resubmit Clearance
                               </button>
@@ -551,7 +551,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
                   {/* Independent Office Action Bar */}
                   {myOfficeRole && app.finalAdminStatus !== 'approved' && (
-                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200">
+                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-200 dark:border-slate-700">
                       <input
                         type="text"
                         value={officeNotes[app.id] ?? ''}
@@ -559,19 +559,19 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                           setOfficeNotes((prev) => ({ ...prev, [app.id]: e.target.value }))
                         }
                         placeholder={`Written ${myOfficeRole.toUpperCase()} note (required for decline)...`}
-                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[220px] px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-800"
+                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[220px] px-3 py-2 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                       />
                       <button
                         type="button"
                         onClick={() => handleOfficeDecision(app.id, 'approved')}
-                        className="px-4 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                        className="px-4 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Approve ({myOfficeRole.toUpperCase()})
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOfficeDecision(app.id, 'declined')}
-                        className="px-4 py-1.5 text-xs font-medium rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
+                        className="px-4 py-1.5 text-xs font-medium rounded-lg border border-red-300 dark:border-red-800 bg-white dark:bg-slate-900 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Decline with Note
                       </button>
@@ -580,8 +580,8 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
 
                   {/* Admin Office Final Verification */}
                   {user.role === 'admin' && app.finalAdminStatus !== 'approved' && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
-                      <p className="text-xs text-slate-600">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-stone-200 dark:border-slate-700">
+                      <p className="text-xs text-slate-600 dark:text-slate-300">
                         {allCleared
                           ? 'All 4 offices cleared. Ready for Final Verification & Digital Certificate issuance.'
                           : 'Waiting for all 4 independent offices to clear before issuance.'}
@@ -590,7 +590,7 @@ export function CertificatePanel({ user }: CertificatePanelProps) {
                         type="button"
                         disabled={!allCleared}
                         onClick={() => handleAdminFinal(app.id, 'approved')}
-                        className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
+                        className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-40 cursor-pointer whitespace-nowrap shrink-0"
                       >
                         Final Approve &amp; Issue Digital Certificate
                       </button>

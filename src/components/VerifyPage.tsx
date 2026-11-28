@@ -105,7 +105,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
           <button
             type="button"
             onClick={() => retryLoad()}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
           >
             Retry Loading
           </button>
@@ -208,7 +208,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
       {!loading && result && (
         <MotionReveal>
           <article className="print-only-document bg-white rounded-2xl border border-stone-200 overflow-hidden">
-          <div className="px-6 py-4 bg-pust-950 text-white flex flex-wrap items-center justify-between gap-3">
+          <div className="px-6 py-4 bg-gradient-to-r from-pust-900 via-pust-800 to-pust-700 text-white flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0" />
               <div>
@@ -253,7 +253,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-slate-200 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-stone-200 pb-6">
               <div className="flex items-start gap-4">
                 <PustCrest size={52} className="shrink-0" />
                 <div>
@@ -330,7 +330,7 @@ export function VerifyPage({ onNavigate }: { onNavigate?: (route: string) => voi
                     type="button"
                     onClick={() => handleCopyText(result.verificationHash, 'hash')}
                     aria-label="Copy verification digest"
-                    className="print:hidden inline-flex items-center gap-1 px-2 py-1 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer shrink-0"
+                    className="print:hidden inline-flex items-center gap-1 px-2 py-1 rounded border border-stone-200 bg-white text-[11px] font-medium text-slate-700 hover:border-pust-700 hover:text-pust-800 cursor-pointer shrink-0"
                   >
                     {copiedField === 'hash' ? (
                       <>

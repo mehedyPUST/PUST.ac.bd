@@ -285,7 +285,7 @@ export function AdminCmsDirectoryModal({
         className="w-full max-w-5xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 bg-gradient-to-r from-pust-950 via-pust-900 to-pust-800 text-white flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="px-6 py-4 bg-gradient-to-r from-pust-900 via-pust-800 to-pust-700 text-white flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-pust-200">
               Administrator Control Surface
@@ -324,7 +324,7 @@ export function AdminCmsDirectoryModal({
                 <button
                   type="button"
                   onClick={triggerContextual}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   {contextual.label}
@@ -334,7 +334,7 @@ export function AdminCmsDirectoryModal({
                 <button
                   type="button"
                   onClick={() => trigger({ kind: 'department', department: currentDepartment })}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border border-pust-700 bg-white text-pust-800 hover:bg-pust-700 hover:text-white cursor-pointer whitespace-nowrap"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Edit {currentDepartment.code} Department
@@ -357,7 +357,7 @@ export function AdminCmsDirectoryModal({
                   onClose();
                   onNavigate('/portal?tab=users&action=create-admin');
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border border-pust-800 bg-white text-pust-900 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border border-pust-700 bg-white text-pust-800 hover:bg-pust-700 hover:text-white cursor-pointer whitespace-nowrap"
               >
                 <ShieldPlus className="w-3.5 h-3.5" />
                 Add Co-Admin
@@ -393,7 +393,7 @@ export function AdminCmsDirectoryModal({
                         idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                       }`}
                     >
-                      <div className="w-9 h-9 rounded-lg bg-pust-900/10 text-pust-900 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-pust-700/10 text-pust-800 flex items-center justify-center shrink-0">
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">

@@ -85,7 +85,7 @@ const UNIT_CATEGORIES: AdministrativeUnit['category'][] = [
 ];
 
 const INPUT_CLASS =
-  'w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:outline-none focus:border-pust-800 focus:bg-white';
+  'w-full px-3.5 py-2 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:outline-none focus:border-pust-700 focus:bg-white';
 const LABEL_CLASS = 'block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5';
 
 export function AdminEditModal({
@@ -915,10 +915,10 @@ export function AdminEditModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-3xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden"
+        className="w-full max-w-3xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-4 border-b border-slate-200 bg-[#FAF8F4]">
+        <div className="flex items-start justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-4 border-b border-stone-200 bg-[#FAF9F6]">
           <div className="min-w-0">
             <p className="font-mono text-[11px] uppercase tracking-widest text-amber-800 font-semibold">
               Admin Edit Mode · Live CMS Editor
@@ -934,7 +934,7 @@ export function AdminEditModal({
             type="button"
             onClick={onClose}
             aria-label="Close editor"
-            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1072,7 +1072,7 @@ export function AdminEditModal({
                   className={INPUT_CLASS}
                 />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-stone-200">
                 <div>
                   <label className={LABEL_CLASS}>Established</label>
                   <input
@@ -1150,7 +1150,7 @@ export function AdminEditModal({
           {/* 2. BANNER CAROUSEL */}
           {target.kind === 'banner' && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
                 <div className="flex flex-wrap gap-1.5">
                   {bannerSlides.map((s, idx) => (
                     <button
@@ -1159,8 +1159,8 @@ export function AdminEditModal({
                       onClick={() => switchBannerSlide(s.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-mono cursor-pointer border ${
                         bannerMode === 'edit' && selectedSlideId === s.id
-                          ? 'bg-pust-900 text-white border-pust-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200 hover:border-pust-700'
+                          ? 'bg-pust-700 text-white border-pust-700'
+                          : 'bg-[#FAF9F6] text-slate-700 border-stone-200 hover:border-pust-700'
                       }`}
                     >
                       Slide {idx + 1}
@@ -1192,7 +1192,7 @@ export function AdminEditModal({
                       disabled={saving}
                       onClick={() => handleMoveBanner(-1)}
                       title="Move slide earlier"
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border border-stone-300 bg-white hover:bg-[#FAF9F6] cursor-pointer"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                       Earlier
@@ -1202,7 +1202,7 @@ export function AdminEditModal({
                       disabled={saving}
                       onClick={() => handleMoveBanner(1)}
                       title="Move slide later"
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border border-stone-300 bg-white hover:bg-[#FAF9F6] cursor-pointer"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                       Later
@@ -1389,8 +1389,8 @@ export function AdminEditModal({
                       onClick={() => switchAboutSlug(item.slug)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer border ${
                         aboutSlug === item.slug
-                          ? 'bg-pust-900 text-white border-pust-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                          ? 'bg-pust-700 text-white border-pust-700'
+                          : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
                       }`}
                     >
                       {item.label}
@@ -1555,7 +1555,7 @@ export function AdminEditModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-stone-200">
                 <div>
                   <label className={LABEL_CLASS}>Attachment Label (Optional)</label>
                   <input
@@ -1835,7 +1835,7 @@ export function AdminEditModal({
                 {journalsList.map((j, idx) => (
                   <div
                     key={j.id}
-                    className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-3"
+                    className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-3"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-mono text-xs font-semibold text-pust-800">
@@ -2103,7 +2103,7 @@ export function AdminEditModal({
           {/* 10. LEADERSHIP OFFICER */}
           {target.kind === 'leadership' && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
                 <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
                   {leadershipList.map((officer, idx) => (
                     <button
@@ -2112,8 +2112,8 @@ export function AdminEditModal({
                       onClick={() => setSelectedOfficerIdx(idx)}
                       className={`px-2.5 py-1 rounded-lg text-xs cursor-pointer border ${
                         selectedOfficerIdx === idx
-                          ? 'bg-pust-900 text-white border-pust-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                          ? 'bg-pust-700 text-white border-pust-700'
+                          : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
                       }`}
                     >
                       {officer.role}
@@ -2248,7 +2248,7 @@ export function AdminEditModal({
           {/* 11. STATUTORY & ADMINISTRATIVE UNIT */}
           {target.kind === 'unit' && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
                 <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
                   {unitsList.map((u, idx) => (
                     <button
@@ -2257,8 +2257,8 @@ export function AdminEditModal({
                       onClick={() => setSelectedUnitIdx(idx)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-mono cursor-pointer border ${
                         selectedUnitIdx === idx
-                          ? 'bg-pust-900 text-white border-pust-900'
-                          : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                          ? 'bg-pust-700 text-white border-pust-700'
+                          : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
                       }`}
                     >
                       {u.code}
@@ -2383,7 +2383,7 @@ export function AdminEditModal({
           )}
 
           {/* Footer Action Bar */}
-          <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="pt-4 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3">
             <div>
               {canDelete && !confirmDelete && (
                 <button
@@ -2410,7 +2410,7 @@ export function AdminEditModal({
                     type="button"
                     disabled={saving}
                     onClick={() => setConfirmDelete(false)}
-                    className="px-2.5 py-2 rounded-lg text-xs text-slate-600 hover:bg-slate-100 cursor-pointer"
+                    className="px-2.5 py-2 rounded-lg text-xs text-slate-600 hover:bg-stone-100 cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -2423,14 +2423,14 @@ export function AdminEditModal({
                 type="button"
                 onClick={onClose}
                 disabled={saving}
-                className="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-300 text-slate-700 hover:bg-[#FAF9F6] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving || uploading}
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Saving...' : 'Save Changes'}

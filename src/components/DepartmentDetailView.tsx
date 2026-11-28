@@ -258,7 +258,7 @@ function PersonProfileCard({
               onClick={() => onSharePerson(person, roleCategory)}
               aria-label={`Share ${person.name} profile QR code`}
               title="Share Profile & Save Contact QR"
-              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium bg-[#FAF8F4] border border-stone-300 text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium bg-[#FAF9F6] border border-stone-300 text-slate-800 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               <QrCode className="w-3.5 h-3.5 shrink-0" />
               <span className="hidden sm:inline">Share</span>
@@ -443,7 +443,7 @@ export function DepartmentDetailView({
 
   if (!department) {
     return (
-      <main className="flex-1 bg-[#F9F8F5]">
+      <main className="flex-1 bg-[#F8F7F4]">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 text-center space-y-4">
           <h1 className="font-serif text-3xl font-medium text-slate-900">Department Not Found</h1>
           <p className="text-sm text-slate-600">
@@ -451,7 +451,7 @@ export function DepartmentDetailView({
           </p>
           <Link
             href="/academics/departments"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to All Departments
@@ -534,7 +534,7 @@ export function DepartmentDetailView({
   }
 
   return (
-    <main className="flex-1 bg-[#F9F8F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       {activeTab === 'overview' ? (
         <>
           {/* 1. Architectural Departmental Hero Cover Banner */}
@@ -1025,7 +1025,7 @@ export function DepartmentDetailView({
                             key={notice.id}
                             type="button"
                             onClick={() => setActiveNotice(notice)}
-                            className="w-full text-left px-5 py-3.5 hover:bg-[#FAF8F4] transition-colors flex items-start justify-between gap-3 cursor-pointer group"
+                            className="w-full text-left px-5 py-3.5 hover:bg-[#FAF9F6] transition-colors flex items-start justify-between gap-3 cursor-pointer group"
                           >
                             <div className="min-w-0 space-y-1">
                               <p className="font-mono text-[11px] text-pust-800 tabular-nums text-left">
@@ -1135,26 +1135,26 @@ export function DepartmentDetailView({
                       <button
                         type="button"
                         onClick={() => switchDepartmentTab('faculty')}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF8F4] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF9F6] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <span>Faculty Directory ({totalRosterCount})</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-pust-800" />
+                        <ArrowRight className="w-3.5 h-3.5 text-pust-700" />
                       </button>
                       <button
                         type="button"
                         onClick={() => switchDepartmentTab('officers')}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF8F4] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF9F6] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <span>Officers &amp; Technical Staff ({officers.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-pust-800" />
+                        <ArrowRight className="w-3.5 h-3.5 text-pust-700" />
                       </button>
                       <button
                         type="button"
                         onClick={() => switchDepartmentTab('research')}
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF8F4] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF9F6] border border-stone-200 hover:border-pust-700/50 text-xs font-semibold text-slate-900 flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <span>Laboratories &amp; Research ({department.laboratories.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-pust-800" />
+                        <ArrowRight className="w-3.5 h-3.5 text-pust-700" />
                       </button>
                     </div>
                   </MotionReveal>
@@ -1175,7 +1175,7 @@ export function DepartmentDetailView({
                   <button
                     type="button"
                     onClick={() => switchDepartmentTab('faculty')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-auto"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-auto"
                   >
                     Browse All {totalRosterCount} Faculty Members
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1586,7 +1586,7 @@ export function DepartmentDetailView({
                   <div className="flex flex-wrap gap-2">
                     <Link
                       href="/governance/academic-ordinance#cgpa-calculator"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-800/30 bg-[#FAF8F4] text-pust-900 hover:bg-pust-900 hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-700/35 bg-[#FAF9F6] text-pust-800 hover:bg-pust-700 hover:text-white transition-colors"
                     >
                       <Calculator className="w-3.5 h-3.5" />
                       SGPA / CGPA Calculator

@@ -22,7 +22,7 @@ export function ResilientImage({
   caption,
   className = 'w-full h-full object-cover',
   containerClassName = '',
-  frameClassName = 'rounded-xl bg-[#F5F2EB] border border-slate-200',
+  frameClassName = 'rounded-xl bg-[#FAF9F6] border border-stone-200',
   fallbackMinHeightClassName = 'min-h-[240px]',
   priority = false,
 }: ResilientImageProps) {

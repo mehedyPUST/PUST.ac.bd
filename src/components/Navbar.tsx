@@ -254,7 +254,7 @@ export function Navbar({
         {/* Full-bleed upper institutional title band backdrop */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[64px] xl:h-[68px] bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] lg:border-b lg:border-gold-500/35"
+          className="absolute inset-x-0 top-0 bottom-0 lg:bottom-auto lg:h-[64px] xl:h-[68px] bg-gradient-to-r from-[#48070B] via-[#680B10] to-[#48070B] lg:border-b lg:border-gold-500/35"
         />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-stretch">
@@ -928,7 +928,7 @@ export function Navbar({
               className="fixed inset-y-0 right-0 z-[56] w-[min(78vw,310px)] h-dvh bg-white border-l border-stone-200 shadow-2xl flex flex-col"
             >
               {/* Drawer Institutional Header */}
-              <div className="shrink-0 bg-gradient-to-r from-[#4A0508] via-[#680A0E] to-[#4A0508] text-white px-3.5 py-2.5 border-b border-gold-500/35 flex items-center justify-between gap-2.5">
+              <div className="shrink-0 bg-gradient-to-r from-[#48070B] via-[#680B10] to-[#48070B] text-white px-3.5 py-2.5 border-b border-gold-500/35 flex items-center justify-between gap-2.5">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}

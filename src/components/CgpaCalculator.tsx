@@ -133,13 +133,13 @@ export function CgpaCalculator() {
   return (
     <div
       id="cgpa-calculator"
-      className="rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden scroll-mt-28"
+      className="rounded-2xl border border-stone-200 bg-white shadow-xs overflow-hidden scroll-mt-28"
     >
-      <div className="px-6 py-4 border-b border-slate-200 bg-[#F7F7F5] flex flex-wrap items-center justify-between gap-3">
+      <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <Calculator className="w-5 h-5 text-pust-800 shrink-0" />
+          <Calculator className="w-5 h-5 text-pust-700 shrink-0" />
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-700">
               Interactive Academic Tool · 4.00 Scale
             </p>
             <h3 className="font-serif text-xl font-medium text-slate-900">
@@ -151,7 +151,7 @@ export function CgpaCalculator() {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset
@@ -159,7 +159,7 @@ export function CgpaCalculator() {
           <button
             type="button"
             onClick={addCourse}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Course
@@ -175,7 +175,7 @@ export function CgpaCalculator() {
               return (
                 <div
                   key={course.id}
-                  className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center p-3 rounded-xl border border-slate-200 bg-[#FAF8F4]"
+                  className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center p-3 rounded-xl border border-stone-200 bg-[#FAF9F6]"
                 >
                   <div className="sm:col-span-3">
                     <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">
@@ -186,7 +186,7 @@ export function CgpaCalculator() {
                       value={course.code}
                       onChange={(e) => updateCourse(course.id, { code: e.target.value })}
                       placeholder="e.g. CSE 3101"
-                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
                     />
                   </div>
 
@@ -201,7 +201,7 @@ export function CgpaCalculator() {
                       step="0.25"
                       value={course.credits}
                       onChange={(e) => updateCourse(course.id, { credits: e.target.value })}
-                      className="w-full px-2.5 py-1.5 text-xs font-mono tabular-nums rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                      className="w-full px-2.5 py-1.5 text-xs font-mono tabular-nums rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
                     />
                   </div>
 
@@ -216,7 +216,7 @@ export function CgpaCalculator() {
                           mode: e.target.value as 'grade' | 'marks',
                         })
                       }
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
                     >
                       <option value="grade">Letter Grade</option>
                       <option value="marks">Numerical Marks (%)</option>
@@ -233,7 +233,7 @@ export function CgpaCalculator() {
                         onChange={(e) =>
                           updateCourse(course.id, { gradePoint: e.target.value })
                         }
-                        className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                        className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
                       >
                         {PUST_GRADES.map((g) => (
                           <option key={g.letter} value={g.gp}>
@@ -249,7 +249,7 @@ export function CgpaCalculator() {
                         step="1"
                         value={course.marks}
                         onChange={(e) => updateCourse(course.id, { marks: e.target.value })}
-                        className="w-full px-2.5 py-1.5 text-xs font-mono tabular-nums rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                        className="w-full px-2.5 py-1.5 text-xs font-mono tabular-nums rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
                       />
                     )}
                   </div>
@@ -270,7 +270,7 @@ export function CgpaCalculator() {
             })}
           </div>
 
-          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[11px] font-mono uppercase tracking-wider text-slate-600 mb-1">
                 Prior Completed Credits (Optional)
@@ -283,7 +283,7 @@ export function CgpaCalculator() {
                 value={priorCredits}
                 onChange={(e) => setPriorCredits(e.target.value)}
                 placeholder="e.g. 60.0"
-                className="w-full px-3 py-2 text-xs font-mono tabular-nums rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                className="w-full px-3 py-2 text-xs font-mono tabular-nums rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
               />
             </div>
             <div>
@@ -298,7 +298,7 @@ export function CgpaCalculator() {
                 value={priorCgpa}
                 onChange={(e) => setPriorCgpa(e.target.value)}
                 placeholder="e.g. 3.45"
-                className="w-full px-3 py-2 text-xs font-mono tabular-nums rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-pust-700"
+                className="w-full px-3 py-2 text-xs font-mono tabular-nums rounded-lg border border-stone-300 bg-white focus:outline-none focus:border-pust-700"
               />
             </div>
           </div>

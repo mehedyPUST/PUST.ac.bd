@@ -151,13 +151,13 @@ export function DigitalCheckoutModal({
       }}
     >
       <div
-        className="bg-white w-full max-w-lg rounded-lg border border-slate-200 shadow-2xl overflow-hidden my-auto"
+        className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-lg border border-stone-200 dark:border-slate-800 shadow-2xl overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <Lock className="w-4 h-4 text-pust-800 shrink-0" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 truncate">
+            <Lock className="w-4 h-4 text-pust-800 dark:text-gold-300 shrink-0" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-200 truncate">
               PUST Digital Payment Checkout
             </span>
           </div>
@@ -165,7 +165,7 @@ export function DigitalCheckoutModal({
             type="button"
             onClick={onClose}
             aria-label="Close checkout"
-            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-800 shrink-0 cursor-pointer"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-stone-200 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-100 shrink-0 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -174,56 +174,58 @@ export function DigitalCheckoutModal({
         <div className="p-4 sm:p-6 space-y-5">
           {receipt ? (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+              <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-sm text-pust-950">
+                  <h3 className="font-semibold text-sm text-emerald-950 dark:text-emerald-100">
                     Payment Verified &amp; Settled
                   </h3>
-                  <p className="text-xs text-pust-800 mt-0.5">
+                  <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
                     Your digital receipt has been recorded in the PUST Finance ledger.
                   </p>
                   {autoMeta?.autoCleared && (
-                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                    <p className="text-xs font-medium text-emerald-900 dark:text-emerald-200 mt-1">
                       Automated Hall Clearance issued — examination registration unlocked.
                     </p>
                   )}
                   {autoMeta?.autoIssued && (
-                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                    <p className="text-xs font-medium text-emerald-900 dark:text-emerald-200 mt-1">
                       Digital credential auto-issued immediately after automated clearance checks.
                     </p>
                   )}
                   {autoMeta?.clearedOffices && autoMeta.clearedOffices.length > 0 && !autoMeta.autoIssued && (
-                    <p className="text-xs font-medium text-emerald-900 mt-1">
+                    <p className="text-xs font-medium text-emerald-900 dark:text-emerald-200 mt-1">
                       Auto-cleared offices: {autoMeta.clearedOffices.map((o) => o.toUpperCase()).join(', ')}.
                     </p>
                   )}
                   {autoMeta?.holdReason && (
-                    <p className="text-xs font-medium text-amber-900 mt-1">
+                    <p className="text-xs font-medium text-amber-900 dark:text-amber-300 mt-1">
                       Automated issuance held: {autoMeta.holdReason}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-200 divide-y divide-slate-200 text-xs">
+              <div className="rounded-lg border border-stone-200 dark:border-slate-800 divide-y divide-stone-200 dark:divide-slate-800 text-xs">
                 <div className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-500">Receipt No.</span>
-                  <span className="font-mono font-semibold text-pust-900 break-all">
+                  <span className="text-slate-500 dark:text-slate-400">Receipt No.</span>
+                  <span className="font-mono font-semibold text-pust-800 dark:text-gold-300 break-all">
                     {receipt.receiptNo}
                   </span>
                 </div>
                 <div className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-500">Transaction ID</span>
-                  <span className="font-mono text-slate-800 break-all">{receipt.transactionId}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Transaction ID</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-200 break-all">
+                    {receipt.transactionId}
+                  </span>
                 </div>
                 <div className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-500">Gateway</span>
-                  <span className="text-slate-800">{receipt.gatewayName}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Gateway</span>
+                  <span className="text-slate-800 dark:text-slate-200">{receipt.gatewayName}</span>
                 </div>
                 <div className="px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-slate-500">Amount Paid</span>
-                  <span className="font-semibold text-slate-900 tabular-nums">
+                  <span className="text-slate-500 dark:text-slate-400">Amount Paid</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
                     BDT {receipt.amountBdt.toLocaleString('en-US')}
                   </span>
                 </div>
@@ -232,42 +234,42 @@ export function DigitalCheckoutModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2.5 min-h-[44px] rounded-lg bg-pust-900 text-white text-xs font-semibold hover:bg-pust-950 cursor-pointer"
+                className="w-full py-2.5 min-h-[44px] rounded-lg bg-pust-700 text-white text-xs font-semibold hover:bg-pust-800 cursor-pointer"
               >
-                Done & Return to Portal
+                Done &amp; Return to Portal
               </button>
             </div>
           ) : (
             <form onSubmit={handleConfirmPayment} className="space-y-5">
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+              <div className="p-4 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Payment Item
                   </p>
                   <h2
                     id="checkout-modal-title"
-                    className="font-serif text-lg font-medium text-slate-900 mt-0.5"
+                    className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100 mt-0.5"
                   >
                     {target.title}
                   </h2>
-                  <p className="text-xs text-slate-600 mt-0.5">{target.subtitle}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">{target.subtitle}</p>
                 </div>
                 <div className="sm:text-right shrink-0">
-                  <p className="text-[11px] uppercase tracking-wider text-slate-500">Payable</p>
-                  <p className="font-mono text-lg font-semibold text-pust-900 tabular-nums">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Payable</p>
+                  <p className="font-mono text-lg font-semibold text-pust-800 dark:text-gold-300 tabular-nums">
                     ৳{target.amountBdt.toLocaleString('en-US')}
                   </p>
                 </div>
               </div>
 
               {enabledGateways.length === 0 ? (
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/35 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
                   No digital payment gateways are currently enabled by the Admin Office.
                 </div>
               ) : (
                 <>
                   <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-slate-700">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
                       Select Payment Channel
                     </label>
                     <div className="grid grid-cols-1 gap-2">
@@ -279,20 +281,20 @@ export function DigitalCheckoutModal({
                             key={gw.id}
                             type="button"
                             onClick={() => setSelectedCode(gw.code)}
-                            className={`text-left p-3 rounded-xl border transition-colors flex items-start gap-3 cursor-pointer ${
+                            className={`text-left p-3 rounded-lg border transition-colors flex items-start gap-3 cursor-pointer ${
                               active
-                                ? 'border-pust-700 bg-pust-50/70'
-                                : 'border-slate-200 hover:border-slate-300 bg-white'
+                                ? 'border-pust-700 dark:border-gold-400 bg-pust-50/70 dark:bg-slate-800'
+                                : 'border-stone-200 dark:border-slate-700 hover:border-stone-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900'
                             }`}
                           >
                             <Icon
                               className={`w-4 h-4 mt-0.5 shrink-0 ${
-                                active ? 'text-pust-800' : 'text-slate-500'
+                                active ? 'text-pust-800 dark:text-gold-300' : 'text-slate-500 dark:text-slate-400'
                               }`}
                             />
                             <div className="min-w-0">
-                              <p className="text-xs font-semibold text-slate-900">{gw.name}</p>
-                              <p className="text-[11px] text-slate-600 mt-0.5">{gw.instructions}</p>
+                              <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{gw.name}</p>
+                              <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">{gw.instructions}</p>
                             </div>
                           </button>
                         );
@@ -301,20 +303,20 @@ export function DigitalCheckoutModal({
                   </div>
 
                   {activeGateway?.code === 'BANGLA_QR' && !useManualRef && (
-                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div className="p-4 rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <VerificationQrSvg
                         seed={`PUST-BQR-${target.targetType}-${target.targetId || target.amountBdt}`}
                         size={76}
                       />
                       <div className="text-xs space-y-1 min-w-0">
-                        <p className="font-semibold text-slate-900">
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">
                           Scan Merchant QR via Bangla QR
                         </p>
-                        <p className="text-slate-600 break-all">
+                        <p className="text-slate-600 dark:text-slate-300 break-all">
                           Merchant ID: <span className="font-mono">PUST.GOV.BD.FIN</span>
                         </p>
-                        <p className="text-[11px] text-pust-800">
-                          Click &ldquo;Pay & Generate Receipt&rdquo; after confirming in your app.
+                        <p className="text-[11px] text-pust-800 dark:text-gold-300">
+                          Click &ldquo;Pay &amp; Generate Receipt&rdquo; after confirming in your app.
                         </p>
                       </div>
                     </div>
@@ -322,7 +324,7 @@ export function DigitalCheckoutModal({
 
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <label className="text-xs font-medium text-slate-700">
+                      <label className="text-xs font-medium text-slate-700 dark:text-slate-200">
                         {useManualRef
                           ? 'Pre-Paid Bank / MFS Transaction ID'
                           : 'Account / Wallet Reference (optional)'}
@@ -330,7 +332,7 @@ export function DigitalCheckoutModal({
                       <button
                         type="button"
                         onClick={() => setUseManualRef(!useManualRef)}
-                        className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
+                        className="text-[11px] font-medium text-pust-800 dark:text-gold-300 hover:underline cursor-pointer"
                       >
                         {useManualRef ? 'Use Instant Checkout' : 'Have Existing TXN Ref?'}
                       </button>
@@ -342,7 +344,7 @@ export function DigitalCheckoutModal({
                         onChange={(e) => setManualRef(e.target.value)}
                         placeholder="e.g. TXN-902184 or Bank Scroll Ref"
                         required
-                        className="w-full px-3.5 py-2.5 text-sm font-mono rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
+                        className="w-full px-3.5 py-2.5 text-sm font-mono rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700 dark:focus:border-gold-400"
                       />
                     ) : (
                       <input
@@ -353,7 +355,7 @@ export function DigitalCheckoutModal({
                             ? 'Wallet e.g. 017••••1234'
                             : 'Card / Account last 4 digits (optional)'
                         }
-                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-pust-700/20 focus:border-pust-700 dark:focus:border-gold-400"
                       />
                     )}
                   </div>
@@ -361,7 +363,7 @@ export function DigitalCheckoutModal({
               )}
 
               {error && (
-                <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <p className="text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2">
                   {error}
                 </p>
               )}
@@ -370,14 +372,14 @@ export function DigitalCheckoutModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={processing || enabledGateways.length === 0}
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-50 cursor-pointer"
                 >
                   {processing ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

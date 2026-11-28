@@ -544,16 +544,16 @@ export function TeacherProfilePanel({
       {feedback && (
         <div
           role="status"
-          className="px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-900 flex items-center justify-between gap-3"
+          className="px-4 py-3 rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/30 text-xs font-medium text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-3"
         >
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
             <span>{feedback}</span>
           </span>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-emerald-700 hover:text-emerald-950 cursor-pointer shrink-0"
+            className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-950 dark:hover:text-emerald-200 cursor-pointer shrink-0"
             aria-label="Dismiss notification"
           >
             <X className="w-4 h-4" />
@@ -564,16 +564,16 @@ export function TeacherProfilePanel({
       {error && (
         <div
           role="alert"
-          className="px-4 py-3 rounded-xl border border-red-200 bg-red-50 text-xs font-medium text-red-900 flex items-center justify-between gap-3"
+          className="px-4 py-3 rounded-lg border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/30 text-xs font-medium text-red-900 dark:text-red-200 flex items-center justify-between gap-3"
         >
           <span className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-700 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-red-700 dark:text-red-400 shrink-0" />
             <span>{error}</span>
           </span>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-red-700 hover:text-red-950 cursor-pointer shrink-0"
+            className="text-red-700 dark:text-red-400 hover:text-red-950 dark:hover:text-red-200 cursor-pointer shrink-0"
             aria-label="Dismiss error"
           >
             <X className="w-4 h-4" />
@@ -583,14 +583,14 @@ export function TeacherProfilePanel({
 
       {/* Pending / Finalized Approval Status Banner */}
       {pendingRequest && (
-        <div className="rounded-lg border border-amber-300 bg-[#FBF6EE] px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="rounded-lg border border-amber-200 dark:border-amber-800/70 bg-amber-50/70 dark:bg-amber-950/25 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-amber-800 shrink-0 mt-0.5" />
+            <Clock className="w-5 h-5 text-amber-800 dark:text-amber-300 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-amber-950">
+              <p className="text-sm font-semibold text-amber-950 dark:text-amber-200">
                 Pending Chairman / Admin Approval
               </p>
-              <p className="text-xs text-amber-900">
+              <p className="text-xs text-amber-900 dark:text-amber-300/90">
                 Your{' '}
                 <span className="font-semibold">
                   {pendingRequest.requestType === 'create_new'
@@ -603,14 +603,14 @@ export function TeacherProfilePanel({
             </div>
           </div>
           {!isEditing && claimedMember && (
-            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-amber-100/80 border border-amber-200 shrink-0 self-start lg:self-auto">
+            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-amber-800/60 shrink-0 self-start lg:self-auto">
               <button
                 type="button"
                 onClick={() => setReadingSource('live')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   readingSource === 'live'
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-amber-950 hover:bg-white/60'
+                    ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-sm'
+                    : 'text-amber-950 dark:text-amber-200 hover:bg-white/60 dark:hover:bg-slate-900/60'
                 }`}
               >
                 Live Profile
@@ -620,8 +620,8 @@ export function TeacherProfilePanel({
                 onClick={() => setReadingSource('pending')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   readingSource === 'pending'
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-amber-950 hover:bg-white/60'
+                    ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 shadow-sm'
+                    : 'text-amber-950 dark:text-amber-200 hover:bg-white/60 dark:hover:bg-slate-900/60'
                 }`}
               >
                 Pending Draft
@@ -632,14 +632,14 @@ export function TeacherProfilePanel({
       )}
 
       {!pendingRequest && latestFinalizedRequest && latestFinalizedRequest.status === 'rejected' && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-5 py-4 flex items-start justify-between gap-3">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/30 px-5 py-4 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <XCircle className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
+            <XCircle className="w-5 h-5 text-red-700 dark:text-red-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-red-950">
+              <p className="text-sm font-semibold text-red-950 dark:text-red-200">
                 Previous Profile Request Declined by Administrator
               </p>
-              <p className="text-xs text-red-900">
+              <p className="text-xs text-red-900 dark:text-red-300">
                 Reviewer Note: {latestFinalizedRequest.adminNote || 'No note provided.'} — Click Edit / Update Profile to revise and resubmit.
               </p>
             </div>
@@ -648,13 +648,13 @@ export function TeacherProfilePanel({
       )}
 
       {!pendingRequest && latestFinalizedRequest && latestFinalizedRequest.status === 'approved' && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-3.5 flex items-start gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+        <div className="rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/30 px-5 py-3.5 flex items-start gap-3">
+          <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
           <div className="space-y-0.5">
-            <p className="text-xs font-semibold text-emerald-950">
+            <p className="text-xs font-semibold text-emerald-950 dark:text-emerald-200">
               Latest Profile Change Approved &amp; Published ({formatDateTime(latestFinalizedRequest.reviewedAt)})
             </p>
-            <p className="text-xs text-emerald-900">
+            <p className="text-xs text-emerald-900 dark:text-emerald-300">
               {latestFinalizedRequest.adminNote ||
                 `Your profile is published live in the ${user.departmentCode} Department directory.`}
             </p>
@@ -664,18 +664,18 @@ export function TeacherProfilePanel({
 
       {/* Loading Skeleton for Claimed Profile */}
       {waitingInitialClaimCheck && (
-        <div className="bg-white rounded-lg border border-stone-200 p-6 space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-lg bg-stone-100 animate-pulse" />
+            <div className="w-20 h-20 rounded-lg bg-stone-100 dark:bg-slate-800 animate-pulse" />
             <div className="space-y-2 flex-1">
-              <div className="h-4 w-48 bg-stone-100 animate-pulse rounded" />
-              <div className="h-6 w-72 bg-stone-100 animate-pulse rounded" />
-              <div className="h-3 w-60 bg-stone-100 animate-pulse rounded" />
+              <div className="h-4 w-48 bg-stone-100 dark:bg-slate-800 animate-pulse rounded" />
+              <div className="h-6 w-72 bg-stone-100 dark:bg-slate-800 animate-pulse rounded" />
+              <div className="h-3 w-60 bg-stone-100 dark:bg-slate-800 animate-pulse rounded" />
             </div>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="h-16 rounded-xl bg-stone-100 animate-pulse" />
+              <div key={n} className="h-16 rounded-lg bg-stone-100 dark:bg-slate-800 animate-pulse" />
             ))}
           </div>
         </div>
@@ -686,9 +686,9 @@ export function TeacherProfilePanel({
         !claimedMember &&
         !isEditing &&
         (browseDirectoryWhenUnclaimed || pendingRequest?.requestType !== 'create_new') && (
-        <div className="bg-white rounded-lg border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
-          <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs font-mono text-pust-800 font-semibold">
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 border-t-2 border-t-pust-700 overflow-hidden">
+          <div className="bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-pust-800 dark:text-gold-300 font-semibold">
               <Building2 className="w-3.5 h-3.5 shrink-0" />
               <span>
                 {department
@@ -702,7 +702,7 @@ export function TeacherProfilePanel({
                 <button
                   type="button"
                   onClick={() => onViewDepartment(user.departmentCode)}
-                  className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Public Dept Page</span>
@@ -712,7 +712,7 @@ export function TeacherProfilePanel({
                 type="button"
                 onClick={() => void loadStatus()}
                 disabled={loading}
-                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-slate-950 dark:hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -722,27 +722,27 @@ export function TeacherProfilePanel({
 
           <div className="p-5 sm:p-6 space-y-5">
             <div className="space-y-1">
-              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-950">
+              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-950 dark:text-slate-100">
                 Claim Your Profile in the Department Directory
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
                 Select your existing faculty entry below to link your account and inspect your profile in reading mode. Not listed yet? Create a new faculty profile for Administrator approval.
               </p>
             </div>
 
-            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/70 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-slate-900">
+                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                   Not listed in the {user.departmentCode} directory?
                 </p>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Compose your full academic profile directly and submit it for Administrator verification.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => enterEditMode('create_new')}
-                className="h-9 inline-flex items-center gap-1.5 px-4 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-9 inline-flex items-center gap-1.5 px-4 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Create &amp; Edit My Profile</span>
@@ -753,16 +753,16 @@ export function TeacherProfilePanel({
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="search"
                     value={directorySearch}
                     onChange={(e) => setDirectorySearch(e.target.value)}
                     placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
-                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-pust-700 dark:focus:border-gold-400"
                   />
                 </div>
-                <span className="font-mono text-xs text-slate-500 tabular-nums">
+                <span className="font-mono text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                   {directoryEntries.length} listed
                 </span>
               </div>
@@ -772,32 +772,32 @@ export function TeacherProfilePanel({
                 {[1, 2, 3].map((row) => (
                   <div
                     key={row}
-                    className="h-12 rounded-lg bg-stone-100 animate-pulse border border-stone-200"
+                    className="h-12 rounded-lg bg-stone-100 dark:bg-slate-800 animate-pulse border border-stone-200 dark:border-slate-700"
                   />
                 ))}
               </div>
             ) : directoryEntries.length === 0 ? (
-              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-6 text-center space-y-2">
-                <p className="text-sm font-medium text-slate-900">
+              <div className="rounded-lg border border-stone-200 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800/60 p-6 text-center space-y-2">
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                   No matching faculty entries found in {user.departmentCode}
                 </p>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   If your profile is not yet listed, create a new profile and submit it for Administrator approval.
                 </p>
                 <button
                   type="button"
                   onClick={() => enterEditMode('create_new')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Create New Profile for Admin Approval</span>
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-stone-200">
+              <div className="overflow-x-auto rounded-lg border border-stone-200 dark:border-slate-700">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                    <tr className="bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold">
                       <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
                       <th className="py-2.5 px-3">Faculty Member</th>
                       <th className="py-2.5 px-3">Designation &amp; Group</th>
@@ -806,7 +806,7 @@ export function TeacherProfilePanel({
                       <th className="py-2.5 px-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-200">
+                  <tbody className="divide-y divide-stone-200 dark:divide-slate-800">
                     {directoryEntries.map(({ member, group, groupLabel }, idx) => {
                       const claimInfo = claimedMap[member.id];
                       const claimedByMe = Boolean(claimInfo?.claimedByMe);
@@ -816,14 +816,18 @@ export function TeacherProfilePanel({
                       return (
                         <tr
                           key={`${group}-${member.id}`}
-                          className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+                          className={
+                            idx % 2 === 0
+                              ? 'bg-white dark:bg-slate-900'
+                              : 'bg-[#FAF9F6] dark:bg-slate-800/40'
+                          }
                         >
-                          <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
+                          <td className="py-2.5 px-3 font-mono text-slate-500 dark:text-slate-400 tabular-nums">
                             {idx + 1}
                           </td>
                           <td className="py-2.5 px-3">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-pust-50 border border-stone-200 text-pust-900 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
+                              <div className="w-8 h-8 rounded-full bg-pust-50 dark:bg-slate-800 border border-stone-200 dark:border-slate-700 text-pust-800 dark:text-gold-300 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
                                 {member.photoUrl && isSafeMediaUrl(member.photoUrl) ? (
                                   <img
                                     src={member.photoUrl}
@@ -836,27 +840,27 @@ export function TeacherProfilePanel({
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <p className="font-medium text-slate-950 truncate">{member.name}</p>
-                                <p className="font-mono text-[11px] text-slate-500 truncate">
+                                <p className="font-medium text-slate-950 dark:text-slate-100 truncate">{member.name}</p>
+                                <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 truncate">
                                   {member.officeLocation || user.departmentCode}
                                 </p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-2.5 px-3 text-slate-700">
-                            <p className="font-medium text-slate-900">{member.designation}</p>
-                            <p className="text-[11px] text-slate-500">{groupLabel}</p>
+                          <td className="py-2.5 px-3 text-slate-700 dark:text-slate-300">
+                            <p className="font-medium text-slate-900 dark:text-slate-100">{member.designation}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">{groupLabel}</p>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+                          <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600 dark:text-slate-400">
                             {primaryEmail}
                           </td>
                           <td className="py-2.5 px-3">
                             {claimedByOther ? (
-                              <span className="text-slate-500">
+                              <span className="text-slate-500 dark:text-slate-400">
                                 Claimed by {claimInfo.claimedByName || 'another teacher'}
                               </span>
                             ) : (
-                              <span className="text-pust-800 font-medium">Available to Claim</span>
+                              <span className="text-pust-800 dark:text-gold-300 font-medium">Available to Claim</span>
                             )}
                           </td>
                           <td className="py-2.5 px-3 text-right whitespace-nowrap">
@@ -866,7 +870,7 @@ export function TeacherProfilePanel({
                                 onClick={() =>
                                   setPreviewCandidate({ member, group, groupLabel })
                                 }
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                                 <span>View</span>
@@ -875,7 +879,7 @@ export function TeacherProfilePanel({
                                 type="button"
                                 disabled={claimedByOther || claimingId === member.id}
                                 onClick={() => void handleClaimProfile(member, group)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                               >
                                 {claimingId === member.id ? 'Claiming...' : 'Claim'}
                               </button>

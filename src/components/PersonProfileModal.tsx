@@ -89,7 +89,7 @@ export function PersonProfileModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white px-6 py-5 flex items-start justify-between gap-4 shrink-0">
+        <div className="bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white px-6 py-5 flex items-start justify-between gap-4 shrink-0">
           <div className="flex items-center gap-4 min-w-0">
             <PersonThumbnail person={person} roleCategory={roleCategory} size="md" />
             <div className="min-w-0 space-y-1">
@@ -332,7 +332,7 @@ export function PersonProfileModal({
                 onClick={() => {
                   onAddAsUser(person, roleCategory);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-950 bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-800 bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Add as site user
@@ -345,7 +345,7 @@ export function PersonProfileModal({
                   onClose();
                   onEditPerson(person, roleCategory);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-800 text-pust-900 bg-white hover:bg-pust-900 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-700 text-pust-800 bg-white hover:bg-pust-700 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit Profile
@@ -355,7 +355,7 @@ export function PersonProfileModal({
               <button
                 type="button"
                 onClick={() => onSharePerson(person, roleCategory)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 Share &amp; vCard
@@ -364,7 +364,7 @@ export function PersonProfileModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+              className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer"
             >
               Close
             </button>

@@ -192,16 +192,16 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
   return (
     <div className="space-y-6">
       {/* Role-Specific Module Header */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 shadow-xs p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-800 dark:text-gold-300">
             {user.role === 'student'
               ? 'Central Library Membership & Books'
               : user.role === 'chairman'
               ? `Department of ${user.departmentCode} · Chairman Endorsement`
               : 'Central Library Verification & Circulation'}
           </p>
-          <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
+          <h2 className="font-serif text-2xl font-medium text-slate-900 dark:text-slate-100 mt-1">
             {user.role === 'student'
               ? 'My Digital Library Card & Borrowing Ledger'
               : user.role === 'chairman'
@@ -209,7 +209,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
               : 'Library Clearance, Card Issuance & Borrowing Desk'}
           </h2>
         </div>
-        <p className="font-mono text-xs text-slate-600 tabular-nums">
+        <p className="font-mono text-xs text-slate-600 dark:text-slate-300 tabular-nums">
           {user.role === 'chairman'
             ? `${pendingChairmanCount} awaiting seal · ${cards.length} dept cards`
             : user.role === 'library' || user.role === 'admin'
@@ -219,12 +219,12 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-sm text-red-900">
+        <div className="p-3.5 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-sm text-red-900 dark:text-red-200">
           {error}
         </div>
       )}
       {feedback && (
-        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
+        <div className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-sm text-emerald-900 dark:text-emerald-200">
           {feedback}
         </div>
       )}
@@ -232,9 +232,9 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Student Actions, Visual 3-Step Pipeline & Digital Library Card */}
       {user.role === 'student' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-5 shadow-xs flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <h3 className="font-serif text-lg font-medium text-slate-900">
+              <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
                 Library Membership Pipeline
               </h3>
 
@@ -251,32 +251,32 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                       key={s.step}
                       className={`p-3 rounded-xl border ${
                         done
-                          ? 'border-emerald-700 bg-emerald-50/70'
-                          : 'border-slate-200 bg-[#F7F7F5]'
+                          ? 'border-emerald-700 dark:border-emerald-700 bg-emerald-50/70 dark:bg-emerald-950/35'
+                          : 'border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80'
                       }`}
                     >
-                      <div className="flex items-center gap-1.5 font-mono font-semibold text-[11px] text-pust-900">
+                      <div className="flex items-center gap-1.5 font-mono font-semibold text-[11px] text-pust-800 dark:text-gold-300">
                         {done ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                         ) : (
                           <Clock className="w-3.5 h-3.5 text-slate-400" />
                         )}
                         Step {s.step}
                       </div>
-                      <p className="font-medium text-slate-900 mt-1">{s.title}</p>
-                      <p className="text-[11px] text-slate-500">{s.subtitle}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100 mt-1">{s.title}</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">{s.subtitle}</p>
                     </div>
                   );
                 })}
               </div>
 
               {latestApp && latestApp.status !== 'rejected' && (
-                <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-2 text-sm">
-                  <p className="font-mono text-xs text-pust-800 uppercase font-semibold">
+                <div className="rounded-xl border border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80 p-4 space-y-2 text-sm">
+                  <p className="font-mono text-xs text-pust-800 dark:text-gold-300 uppercase font-semibold">
                     Current Stage: {latestApp.status.replace(/_/g, ' ')}
                   </p>
                   {latestApp.chairmanSeal && (
-                    <div className="text-xs text-slate-700 bg-white rounded-lg border border-slate-200 p-3 font-mono space-y-0.5">
+                    <div className="text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-3 font-mono space-y-0.5">
                       <p>Seal: {latestApp.chairmanSeal.officialSeal}</p>
                       <p>Signed By: {latestApp.chairmanSeal.digitalSignature}</p>
                       <p>Hash: {latestApp.chairmanSeal.verificationHash}</p>
@@ -291,7 +291,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 <button
                   type="button"
                   onClick={handleApplyLibrary}
-                  className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white shadow-xs transition-all cursor-pointer"
+                  className="px-5 py-2.5 text-sm font-medium rounded-lg bg-pust-700 hover:bg-pust-800 text-white shadow-xs transition-all cursor-pointer"
                 >
                   Apply for Central Library Membership
                 </button>
@@ -299,12 +299,12 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
             )}
           </div>
 
-          <div className="lg:col-span-6 bg-white rounded-lg border border-slate-200 p-6 space-y-3 shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+          <div className="lg:col-span-6 bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               My Digital Library Card
             </h3>
             {cards.length === 0 ? (
-              <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-5 text-sm text-slate-600">
+              <div className="rounded-xl border border-stone-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-slate-800/80 p-5 text-sm text-slate-600 dark:text-slate-300">
                 No active Digital Library Card issued yet. Apply on the left to start Chairman
                 endorsement and Library verification.
               </div>
@@ -312,7 +312,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
               cards.map((card) => (
                 <div
                   key={card.id}
-                  className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white rounded-lg p-6 space-y-3.5 shadow-sm"
+                  className="bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white rounded-lg p-6 space-y-3.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2.5">
                     <p className="font-mono text-[11px] uppercase tracking-widest text-pust-200 flex items-center gap-1.5">
@@ -337,7 +337,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                     <button
                       type="button"
                       onClick={() => openCardModal(card)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white text-pust-950 hover:bg-pust-50 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white text-pust-900 hover:bg-pust-50 cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       View Digital Card &amp; QR
@@ -362,16 +362,16 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Chairman Queue */}
       {user.role === 'chairman' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               Department Chairman Library Seal &amp; Forwarding Queue
             </h3>
             {loading ? (
               <PortalRecordsSkeleton rows={3} />
             ) : applications.length === 0 ? (
-              <p className="text-sm text-slate-600">No departmental library applications yet.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">No departmental library applications yet.</p>
             ) : (
-              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+              <div className="rounded-xl divide-y divide-stone-200 dark:divide-slate-800 border border-stone-200 dark:border-slate-800 overflow-hidden">
                 {applications.map((app) => {
                   const input = sealInputs[app.id] || {
                     officialSeal: `OFFICIAL SEAL — Dept. of ${user.departmentCode}, PUST`,
@@ -379,21 +379,21 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                     note: 'Bonafide student verified for library access.',
                   };
                   return (
-                    <div key={app.id} className="p-4 space-y-3 hover:bg-[#F7F7F5]/60 transition-colors">
+                    <div key={app.id} className="p-4 space-y-3 hover:bg-[#FAF9F6] dark:hover:bg-slate-800/70 transition-colors">
                       <div className="flex flex-wrap justify-between gap-2">
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-slate-900 dark:text-slate-100">
                             {app.studentName} · <span className="font-mono">{app.academicId}</span>
                           </p>
-                          <p className="font-mono text-xs text-slate-500 tabular-nums">
+                          <p className="font-mono text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                             Session {app.session} · Status:{' '}
-                            <span className="text-pust-800 font-semibold">
+                            <span className="text-pust-800 dark:text-gold-300 font-semibold">
                               {app.status.replace(/_/g, ' ')}
                             </span>
                           </p>
                         </div>
                         {app.chairmanSeal && (
-                          <div className="font-mono text-[11px] text-slate-600 bg-[#F7F7F5] rounded-lg border border-slate-200 px-3 py-1.5">
+                          <div className="font-mono text-[11px] text-slate-600 dark:text-slate-300 bg-[#FAF9F6] dark:bg-slate-800/80 rounded-lg border border-stone-200 dark:border-slate-800 px-3 py-1.5">
                             Seal Hash: {app.chairmanSeal.verificationHash}
                           </div>
                         )}
@@ -411,7 +411,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                               }))
                             }
                             placeholder="Official Chairman Seal"
-                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                            className="px-3 py-2 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
                           />
                           <input
                             type="text"
@@ -423,20 +423,20 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                               }))
                             }
                             placeholder="Digital Signature"
-                            className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                            className="px-3 py-2 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
                           />
                           <div className="flex gap-2">
                             <button
                               type="button"
                               onClick={() => handleChairmanSeal(app, 'forward')}
-                              className="px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
+                              className="px-3.5 py-2 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap"
                             >
                               Seal JSON &amp; Forward
                             </button>
                             <button
                               type="button"
                               onClick={() => handleChairmanSeal(app, 'reject')}
-                              className="px-3.5 py-2 text-xs font-medium rounded-lg border border-red-300 text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap"
+                              className="px-3.5 py-2 text-xs font-medium rounded-lg border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer whitespace-nowrap"
                             >
                               Reject
                             </button>
@@ -450,29 +450,29 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
             )}
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               Issued Library Cards — Dept. of {user.departmentCode} ({cards.length})
             </h3>
             {cards.length === 0 ? (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 No departmental library cards issued yet.
               </p>
             ) : (
-              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-sm overflow-hidden">
+              <div className="rounded-xl divide-y divide-stone-200 dark:divide-slate-800 border border-stone-200 dark:border-slate-800 text-sm overflow-hidden">
                 {cards.map((c) => (
                   <div key={c.id} className="p-3.5 flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {c.studentName} · <span className="font-mono">{c.academicId}</span>
                     </p>
                     <div className="flex items-center gap-3">
-                      <p className="font-mono text-xs text-pust-800 tabular-nums">
+                      <p className="font-mono text-xs text-pust-800 dark:text-gold-300 tabular-nums">
                         {c.digitalCardNo} · Valid {c.validUntil}
                       </p>
                       <button
                         type="button"
                         onClick={() => openCardModal(c)}
-                        className="px-2.5 py-1 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 cursor-pointer"
                       >
                         View Card
                       </button>
@@ -488,30 +488,30 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
       {/* Library Office / Admin Queue & Borrowing Log */}
       {(user.role === 'library' || user.role === 'admin') && (
         <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               Library Verification &amp; Digital Card Issuance
             </h3>
             {loading ? (
               <PortalRecordsSkeleton rows={3} />
             ) : applications.length === 0 ? (
-              <p className="text-sm text-slate-600">No applications awaiting library verification.</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">No applications awaiting library verification.</p>
             ) : (
-              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+              <div className="rounded-xl divide-y divide-stone-200 dark:divide-slate-800 border border-stone-200 dark:border-slate-800 overflow-hidden">
                 {applications.map((app) => (
-                  <div key={app.id} className="p-4 space-y-2 hover:bg-[#F7F7F5]/60 transition-colors">
+                  <div key={app.id} className="p-4 space-y-2 hover:bg-[#FAF9F6] dark:hover:bg-slate-800/70 transition-colors">
                     <div className="flex flex-wrap justify-between gap-2">
                       <div>
-                        <p className="font-medium text-slate-900">
+                        <p className="font-medium text-slate-900 dark:text-slate-100">
                           {app.studentName} · <span className="font-mono">{app.academicId}</span> (
                           {app.departmentCode})
                         </p>
-                        <p className="font-mono text-xs text-pust-800">
+                        <p className="font-mono text-xs text-pust-800 dark:text-gold-300">
                           Status: {app.status.replace(/_/g, ' ')}
                         </p>
                       </div>
                       {app.chairmanSeal && (
-                        <div className="font-mono text-[11px] text-slate-600 bg-[#F7F7F5] rounded-lg border border-slate-200 px-3 py-1.5">
+                        <div className="font-mono text-[11px] text-slate-600 dark:text-slate-300 bg-[#FAF9F6] dark:bg-slate-800/80 rounded-lg border border-stone-200 dark:border-slate-800 px-3 py-1.5">
                           Seal JSON Verified: {app.chairmanSeal.officialSeal} ·{' '}
                           {app.chairmanSeal.verificationHash}
                         </div>
@@ -527,19 +527,19 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                             setPhysicalRefs((prev) => ({ ...prev, [app.id]: e.target.value }))
                           }
                           placeholder="Optional Physical Card Ref (e.g. PHY-2026-042)"
-                          className="px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none w-full sm:w-72"
+                          className="px-3 py-2 text-xs rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none w-full sm:w-72"
                         />
                         <button
                           type="button"
                           onClick={() => handleLibraryVerify(app, 'approve')}
-                          className="px-4 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
+                          className="px-4 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap"
                         >
                           Verify Seal &amp; Issue Card
                         </button>
                         <button
                           type="button"
                           onClick={() => handleLibraryVerify(app, 'reject')}
-                          className="px-4 py-1.5 text-xs font-medium rounded-lg border border-red-300 text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap"
+                          className="px-4 py-1.5 text-xs font-medium rounded-lg border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer whitespace-nowrap"
                         >
                           Decline
                         </button>
@@ -552,23 +552,23 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
           </div>
 
           {cards.length > 0 && (
-            <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-3 shadow-xs">
-              <h3 className="font-serif text-lg font-medium text-slate-900">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
+              <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
                 Active Issued Library Cards ({cards.length})
               </h3>
-              <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 text-xs overflow-hidden">
+              <div className="rounded-xl divide-y divide-stone-200 dark:divide-slate-800 border border-stone-200 dark:border-slate-800 text-xs overflow-hidden">
                 {cards.map((c) => (
                   <div key={c.id} className="p-3.5 flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <span className="font-medium text-sm text-slate-900">{c.studentName}</span> ·{' '}
-                      <span className="font-mono text-slate-600">{c.academicId}</span> ({c.departmentCode})
+                      <span className="font-medium text-sm text-slate-900 dark:text-slate-100">{c.studentName}</span> ·{' '}
+                      <span className="font-mono text-slate-600 dark:text-slate-300">{c.academicId}</span> ({c.departmentCode})
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-pust-800 font-semibold">{c.digitalCardNo}</span>
+                      <span className="font-mono text-pust-800 dark:text-gold-300 font-semibold">{c.digitalCardNo}</span>
                       <button
                         type="button"
                         onClick={() => openCardModal(c)}
-                        className="px-2.5 py-1 rounded-lg border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg border border-stone-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 hover:text-pust-800 dark:hover:text-gold-300 cursor-pointer"
                       >
                         View Card &amp; QR
                       </button>
@@ -581,9 +581,9 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
 
           <form
             onSubmit={handleBorrowBook}
-            className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs"
+            className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4 shadow-xs"
           >
-            <h3 className="font-serif text-lg font-medium text-slate-900">
+            <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
               Record Book Borrowing
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -593,7 +593,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowAcademicId}
                 onChange={(e) => setBorrowAcademicId(e.target.value)}
                 placeholder="Student Academic ID"
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
               />
               <input
                 type="text"
@@ -601,7 +601,7 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowTitle}
                 onChange={(e) => setBorrowTitle(e.target.value)}
                 placeholder="Book Title"
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
               />
               <input
                 type="text"
@@ -609,19 +609,19 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
                 value={borrowIsbn}
                 onChange={(e) => setBorrowIsbn(e.target.value)}
                 placeholder="ISBN / Call No."
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
               />
               <input
                 type="date"
                 required
                 value={borrowDue}
                 onChange={(e) => setBorrowDue(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-800 focus:outline-none"
+                className="px-3 py-2 text-sm rounded-lg border border-stone-300 dark:border-slate-700 bg-[#FAF9F6] dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:border-pust-700 dark:focus:border-gold-400 focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-medium rounded-lg bg-pust-900 hover:bg-pust-950 text-white cursor-pointer"
+              className="px-5 py-2 text-sm font-medium rounded-lg bg-pust-700 hover:bg-pust-800 text-white cursor-pointer"
             >
               Checkout Book
             </button>
@@ -631,33 +631,33 @@ export function LibraryPanel({ user }: LibraryPanelProps) {
 
       {/* Borrowing & Return History Table */}
       {(user.role === 'student' || user.role === 'library' || user.role === 'admin') && (
-        <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4 shadow-xs">
-          <h3 className="font-serif text-lg font-medium text-slate-900">
+        <div className="bg-white dark:bg-slate-900 rounded-lg border border-stone-200 dark:border-slate-800 p-6 space-y-4 shadow-xs">
+          <h3 className="font-serif text-lg font-medium text-slate-900 dark:text-slate-100">
             Book Borrowing &amp; Return Ledger
           </h3>
           {loading ? (
             <PortalRecordsSkeleton rows={3} />
           ) : borrows.length === 0 ? (
-            <p className="text-sm text-slate-600">No active or archived book checkouts recorded.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">No active or archived book checkouts recorded.</p>
           ) : (
-            <div className="rounded-xl divide-y divide-slate-200 border border-slate-200 overflow-hidden">
+            <div className="rounded-xl divide-y divide-stone-200 dark:divide-slate-800 border border-stone-200 dark:border-slate-800 overflow-hidden">
               {borrows.map((b) => (
                 <div
                   key={b.id}
                   className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm"
                 >
                   <div>
-                    <p className="font-medium text-slate-900">{b.bookTitle}</p>
-                    <p className="font-mono text-xs text-slate-500 tabular-nums">
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{b.bookTitle}</p>
+                    <p className="font-mono text-xs text-slate-500 dark:text-slate-400 tabular-nums">
                       {b.academicId} · ISBN {b.isbn} · Borrowed {b.borrowedAt} · Due {b.dueAt} ·{' '}
-                      <span className="text-pust-800 font-semibold">{b.status}</span>
+                      <span className="text-pust-800 dark:text-gold-300 font-semibold">{b.status}</span>
                     </p>
                   </div>
                   {(user.role === 'library' || user.role === 'admin') && b.status === 'Borrowed' && (
                     <button
                       type="button"
                       onClick={() => handleReturnBook(b.id)}
-                      className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-pust-800 text-pust-800 hover:bg-pust-900 hover:text-white cursor-pointer whitespace-nowrap"
+                      className="px-3.5 py-1.5 text-xs font-medium rounded-lg border border-pust-700 dark:border-gold-400 text-pust-800 dark:text-gold-300 hover:bg-pust-700 hover:text-white dark:hover:bg-gold-500 dark:hover:text-slate-950 cursor-pointer whitespace-nowrap"
                     >
                       Mark Returned
                     </button>

@@ -61,7 +61,7 @@ export function CampusMapSection() {
 
   if (loadingData && !profile) {
     return (
-      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F8F7F4] border-t border-stone-200 py-14 lg:py-16">
         <PageHeaderAndSectionSkeleton />
       </section>
     );
@@ -69,7 +69,7 @@ export function CampusMapSection() {
 
   if (!profile) {
     return (
-      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F8F7F4] border-t border-stone-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-red-800">
@@ -78,7 +78,7 @@ export function CampusMapSection() {
             <button
               type="button"
               onClick={() => retryLoad()}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
             >
               Retry
             </button>
@@ -90,9 +90,9 @@ export function CampusMapSection() {
 
   if (!activeBuilding) {
     return (
-      <section id="campus-map" className="bg-[#F4F3EE] border-t border-slate-200 py-14 lg:py-16">
+      <section id="campus-map" className="bg-[#F8F7F4] border-t border-stone-200 py-14 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
+          <div className="rounded-2xl border border-stone-200 bg-white p-8 flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1">
               <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
                 {campusMapMeta.eyebrow}
@@ -141,7 +141,7 @@ export function CampusMapSection() {
       ref={mapSectionRef}
       id="campus-map"
       aria-labelledby="campus-map-heading"
-      className="editable-region bg-[#F5F3EE] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
+      className="editable-region bg-[#F8F7F4] border-t border-stone-200 py-14 lg:py-16 scroll-mt-36"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <MotionReveal>
@@ -188,7 +188,7 @@ export function CampusMapSection() {
                       onClick={() => handleZoneChange(zone)}
                       className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer min-h-[36px] ${
                         active
-                          ? 'bg-pust-900 text-white'
+                          ? 'bg-pust-700 text-white'
                           : 'text-stone-600 hover:text-slate-950 hover:bg-[#FAF9F6]'
                       }`}
                     >
@@ -323,8 +323,8 @@ export function CampusMapSection() {
                 />
                 <rect x="278" y="144" width="254" height="136" fill="url(#quad-hatch)" />
                 {/* Quadrangle Diagonal Pathways */}
-                <line x1="278" y1="144" x2="532" y2="280" stroke="#FAF8F4" strokeWidth="2.5" strokeOpacity="0.8" />
-                <line x1="532" y1="144" x2="278" y2="280" stroke="#FAF8F4" strokeWidth="2.5" strokeOpacity="0.8" />
+                <line x1="278" y1="144" x2="532" y2="280" stroke="#FAF9F6" strokeWidth="2.5" strokeOpacity="0.8" />
+                <line x1="532" y1="144" x2="278" y2="280" stroke="#FAF9F6" strokeWidth="2.5" strokeOpacity="0.8" />
 
                 {/* Campus Reflecting Lake (East-North Sector, clear of Hall pins) */}
                 <path
@@ -415,8 +415,8 @@ export function CampusMapSection() {
                     y="74"
                     width="136"
                     height="78"
-                    fill={activeBuilding.id === 'wazed-bhaban' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'wazed-bhaban' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'wazed-bhaban' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'wazed-bhaban' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                   <rect
@@ -441,8 +441,8 @@ export function CampusMapSection() {
                     y="54"
                     width="72"
                     height="64"
-                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'residential-halls' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'residential-halls' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                   <rect
@@ -450,8 +450,8 @@ export function CampusMapSection() {
                     y="54"
                     width="76"
                     height="64"
-                    fill={activeBuilding.id === 'residential-halls' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'residential-halls' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'residential-halls' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'residential-halls' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -464,8 +464,8 @@ export function CampusMapSection() {
                     y="198"
                     width="128"
                     height="72"
-                    fill={activeBuilding.id === 'academic-1' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'academic-1' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'academic-1' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'academic-1' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -478,8 +478,8 @@ export function CampusMapSection() {
                     y="168"
                     width="120"
                     height="72"
-                    fill={activeBuilding.id === 'central-library' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'central-library' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'central-library' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'central-library' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -492,8 +492,8 @@ export function CampusMapSection() {
                     y="188"
                     width="112"
                     height="72"
-                    fill={activeBuilding.id === 'convocation-plaza' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'convocation-plaza' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'convocation-plaza' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'convocation-plaza' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -506,8 +506,8 @@ export function CampusMapSection() {
                     y="300"
                     width="132"
                     height="68"
-                    fill={activeBuilding.id === 'admin-bhaban' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'admin-bhaban' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'admin-bhaban' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'admin-bhaban' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -520,8 +520,8 @@ export function CampusMapSection() {
                     y="312"
                     width="116"
                     height="64"
-                    fill={activeBuilding.id === 'medical-tsc' ? '#7A0B10' : '#E9E6DF'}
-                    stroke={activeBuilding.id === 'medical-tsc' ? '#4A0508' : '#78716C'}
+                    fill={activeBuilding.id === 'medical-tsc' ? '#720E13' : '#E9E6DF'}
+                    stroke={activeBuilding.id === 'medical-tsc' ? '#48070B' : '#78716C'}
                     strokeWidth="1.4"
                   />
                 </g>
@@ -544,7 +544,7 @@ export function CampusMapSection() {
                 >
                   DHAKA–PABNA HIGHWAY (N6) · RAJAPUR
                 </text>
-                <rect x="344" y="422" width="80" height="24" rx="2" fill="#7A0B10" />
+                <rect x="344" y="422" width="80" height="24" rx="2" fill="#720E13" />
                 <text
                   x="384"
                   y="438"
@@ -618,7 +618,7 @@ export function CampusMapSection() {
                       aria-pressed={isSelected}
                       className={`min-h-[42px] px-3.5 py-2 rounded-lg border text-left transition-colors duration-150 flex items-center justify-between gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pust-700 ${
                         isSelected
-                          ? 'bg-pust-900 text-white border-pust-950'
+                          ? 'bg-pust-700 text-white border-pust-800'
                           : 'bg-[#FAF9F6] text-slate-900 border-stone-200 hover:border-pust-700/45 hover:bg-white'
                       }`}
                     >

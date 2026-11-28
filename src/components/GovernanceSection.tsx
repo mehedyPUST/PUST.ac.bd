@@ -94,7 +94,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
           <button
             type="button"
             onClick={() => retryLoad()}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
           >
             Retry Loading
           </button>
@@ -115,7 +115,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
   return (
     <section className="editable-region max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-10">
       {/* Header + Sub-Navigation Bar */}
-      <div className="border-b border-slate-200 pb-6 space-y-4">
+      <div className="border-b border-stone-200 pb-6 space-y-4">
         <div className="space-y-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -149,8 +149,8 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                 href={tab.route}
                 className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'bg-pust-900 text-white border border-pust-900'
-                    : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
+                    ? 'bg-pust-700 text-white border border-pust-700'
+                    : 'bg-white border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-800'
                 }`}
               >
                 {tab.label}
@@ -267,7 +267,7 @@ export function GovernanceSection({ route }: GovernanceSectionProps) {
                       href={governanceContent.officialActUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800"
                     >
                       Open in New Tab
                       <ExternalLink className="w-3.5 h-3.5" />

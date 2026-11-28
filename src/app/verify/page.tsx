@@ -9,7 +9,7 @@ export default function VerifyRoutePage() {
   const { navigateTo } = usePust();
 
   return (
-    <main className="flex-1 bg-[#F7F7F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       <Suspense fallback={<PageHeaderAndSectionSkeleton />}>
         <VerifyPage onNavigate={navigateTo} />
       </Suspense>

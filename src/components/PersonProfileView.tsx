@@ -57,10 +57,10 @@ export function PersonThumbnail({
 
   const palette =
     roleCategory === 'Chairman'
-      ? 'bg-pust-900 text-white border-pust-950'
+      ? 'bg-pust-700 text-white border-pust-800'
       : roleCategory === 'Department Officer'
       ? 'bg-slate-800 text-white border-slate-900'
-      : 'bg-[#F4EFEA] text-pust-900 border-pust-800/20';
+      : 'bg-[#FAF9F6] text-pust-800 border-pust-700/20';
 
   return (
     <div
@@ -106,7 +106,7 @@ export function PersonProfileView({
           <button
             type="button"
             onClick={() => setAddAsUserOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white border border-pust-950 hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white border border-pust-800 hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
           >
             <UserPlus className="w-3.5 h-3.5" />
             Add as site user

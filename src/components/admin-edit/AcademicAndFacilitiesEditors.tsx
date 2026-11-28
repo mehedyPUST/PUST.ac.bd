@@ -210,7 +210,7 @@ export function AcademicAndFacilitiesEditors({
             className={INPUT_CLASS}
           />
         </div>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+        <div className="flex items-center justify-between pt-2 border-t border-stone-200">
           <label className={LABEL_CLASS}>Institutional Chronology Milestones</label>
           <button
             type="button"
@@ -229,7 +229,7 @@ export function AcademicAndFacilitiesEditors({
           </button>
         </div>
         {aboutExtras.milestones.map((m, idx) => (
-          <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+          <div key={idx} className="p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-xs font-semibold text-pust-800">
                 Milestone #{idx + 1}
@@ -244,7 +244,7 @@ export function AcademicAndFacilitiesEditors({
                       milestones: moveArrayItem(prev.milestones, idx, -1),
                     }))
                   }
-                  className="p-1 rounded border border-slate-300 bg-white disabled:opacity-40 cursor-pointer"
+                  className="p-1 rounded border border-stone-300 bg-white disabled:opacity-40 cursor-pointer"
                 >
                   <ArrowUp className="w-3 h-3" />
                 </button>
@@ -257,7 +257,7 @@ export function AcademicAndFacilitiesEditors({
                       milestones: moveArrayItem(prev.milestones, idx, 1),
                     }))
                   }
-                  className="p-1 rounded border border-slate-300 bg-white disabled:opacity-40 cursor-pointer"
+                  className="p-1 rounded border border-stone-300 bg-white disabled:opacity-40 cursor-pointer"
                 >
                   <ArrowDown className="w-3 h-3" />
                 </button>
@@ -363,7 +363,7 @@ export function AcademicAndFacilitiesEditors({
           </button>
         </div>
         {programs.map((p, idx) => (
-          <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+          <div key={idx} className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-xs font-semibold text-pust-800">Track #{idx + 1}</span>
               {programs.length > 1 && (
@@ -460,7 +460,7 @@ export function AcademicAndFacilitiesEditors({
           Update the 5 Faculty Deans, office emails, and department summaries shown on Academics → Faculty &amp; All Dean.
         </p>
         {deans.map((d, idx) => (
-          <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+          <div key={idx} className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label className={LABEL_CLASS}>Faculty</label>
@@ -653,7 +653,7 @@ export function AcademicAndFacilitiesEditors({
           </button>
         </div>
         {calendar.map((row, idx) => (
-          <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+          <div key={idx} className="p-3.5 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
                 <input
@@ -801,7 +801,7 @@ export function AcademicAndFacilitiesEditors({
           </button>
         </div>
         {scholarships.map((s, idx) => (
-          <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+          <div key={idx} className="p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2">
             <div className="flex items-center justify-between gap-2">
               <input
                 type="text"
@@ -863,13 +863,13 @@ export function AcademicAndFacilitiesEditors({
         }}
         className="space-y-4"
       >
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200">
-          <div className="inline-flex p-1 rounded-lg bg-[#F7F7F5] border border-slate-200 gap-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-stone-200">
+          <div className="inline-flex p-1 rounded-lg bg-[#FAF9F6] border border-stone-200 gap-1">
             <button
               type="button"
               onClick={() => setFormsTab('digital')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer ${
-                formsTab === 'digital' ? 'bg-pust-900 text-white' : 'text-slate-700 hover:text-slate-950'
+                formsTab === 'digital' ? 'bg-pust-700 text-white' : 'text-slate-700 hover:text-slate-950'
               }`}
             >
               Interactive Portal Forms ({forms.length})
@@ -878,7 +878,7 @@ export function AcademicAndFacilitiesEditors({
               type="button"
               onClick={() => setFormsTab('official')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer ${
-                formsTab === 'official' ? 'bg-pust-900 text-white' : 'text-slate-700 hover:text-slate-950'
+                formsTab === 'official' ? 'bg-pust-700 text-white' : 'text-slate-700 hover:text-slate-950'
               }`}
             >
               Official PDF / DOCX Archive ({officialForms.length})
@@ -934,7 +934,7 @@ export function AcademicAndFacilitiesEditors({
               Manage interactive printable &amp; digital portal forms on Academics → Forms Download.
             </p>
             {forms.map((f, idx) => (
-              <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+              <div key={idx} className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-xs font-semibold text-pust-800">{f.code}</span>
                   {forms.length > 1 && (
@@ -1050,7 +1050,7 @@ export function AcademicAndFacilitiesEditors({
               Manage downloadable PDF/DOCX forms shown on Academics → Forms Download and the Career Recruitment Portal.
             </p>
             {officialForms.map((ofItem, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+              <div key={idx} className="p-3.5 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-xs font-semibold text-lapis-800">
                     Form #{ofItem.serial}
@@ -1175,7 +1175,7 @@ export function AcademicAndFacilitiesEditors({
             className={INPUT_CLASS}
           />
         </div>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+        <div className="flex items-center justify-between pt-2 border-t border-stone-200">
           <label className={LABEL_CLASS}>Infrastructure Showcase Cards</label>
           <button
             type="button"
@@ -1198,7 +1198,7 @@ export function AcademicAndFacilitiesEditors({
           </button>
         </div>
         {infraCards.map((c, idx) => (
-          <div key={c.id || idx} className="p-4 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2.5">
+          <div key={c.id || idx} className="p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-xs font-semibold text-pust-800">Card #{idx + 1}</span>
               {infraCards.length > 1 && (
@@ -1328,10 +1328,10 @@ export function AcademicAndFacilitiesEditors({
           </div>
         </div>
 
-        <div className="space-y-2.5 pt-2 border-t border-slate-200">
+        <div className="space-y-2.5 pt-2 border-t border-stone-200">
           <label className={LABEL_CLASS}>GST Admission Unit Cards</label>
           {admissions.gstUnits.map((u, idx) => (
-            <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-[#F7F7F5] space-y-2">
+            <div key={idx} className="p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] space-y-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input
                   type="text"
@@ -1380,7 +1380,7 @@ export function AcademicAndFacilitiesEditors({
           ))}
         </div>
 
-        <div className="space-y-3 pt-2 border-t border-slate-200">
+        <div className="space-y-3 pt-2 border-t border-stone-200">
           <div>
             <label className={LABEL_CLASS}>Undergraduate Track Narrative</label>
             <textarea
@@ -1422,7 +1422,7 @@ export function AcademicAndFacilitiesEditors({
 
   return (
     <form onSubmit={submitFacilities} className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200">
         <div className="flex flex-wrap gap-1.5">
           {facilities.map((f, idx) => (
             <button
@@ -1431,8 +1431,8 @@ export function AcademicAndFacilitiesEditors({
               onClick={() => setSelectedFacIdx(idx)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer border ${
                 selectedFacIdx === idx
-                  ? 'bg-pust-900 text-white border-pust-900'
-                  : 'bg-[#F7F7F5] text-slate-700 border-slate-200'
+                  ? 'bg-pust-700 text-white border-pust-700'
+                  : 'bg-[#FAF9F6] text-slate-700 border-stone-200'
               }`}
             >
               {f.label}

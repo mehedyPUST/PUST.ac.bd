@@ -123,12 +123,12 @@ export function ShareProfileModal({
                 readOnly
                 value={fullUrl}
                 aria-label="Official profile URL"
-                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-700"
+                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-700"
               />
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-pust-700 text-white hover:bg-pust-800 cursor-pointer whitespace-nowrap shrink-0"
               >
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? 'Copied' : 'Copy'}

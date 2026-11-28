@@ -332,7 +332,7 @@ export function AssignAdditionalRolesModal({
         className="w-full max-w-xl bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
+        <div className="bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
           <div className="min-w-0 space-y-1">
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-pust-200">
               Additional duty · office appointment
@@ -626,7 +626,7 @@ export function AssignAdditionalRolesModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="h-9 px-4 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                className="h-9 px-4 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 transition-colors cursor-pointer inline-flex items-center gap-1.5"
               >
                 {submitting ? (
                   <>

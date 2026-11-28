@@ -284,7 +284,7 @@ export function DepartmentPersonEditor({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="rounded-xl border border-slate-200 bg-[#FAF8F4] px-4 py-3 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
+      <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
         <span>
           <strong className="text-slate-900">Department of {department.name}</strong> ({department.code})
         </span>
@@ -347,7 +347,7 @@ export function DepartmentPersonEditor({
           type="checkbox"
           checked={onStudyLeave}
           onChange={(e) => setOnStudyLeave(e.target.checked)}
-          className="w-4 h-4 rounded border-slate-300 text-pust-900 focus:ring-pust-800 cursor-pointer"
+          className="w-4 h-4 rounded border-stone-300 text-pust-700 focus:ring-pust-700 cursor-pointer"
         />
         <label htmlFor="person-study-leave" className="text-xs sm:text-sm font-medium text-slate-800 cursor-pointer">
           Currently on approved study leave
@@ -398,7 +398,7 @@ export function DepartmentPersonEditor({
       </div>
 
       {/* Contact Phones & Emails */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-stone-200">
         {/* Phones */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
@@ -444,7 +444,7 @@ export function DepartmentPersonEditor({
                         )
                       )
                     }
-                    className="px-2 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800"
+                    className="px-2 py-2 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800"
                   >
                     {PHONE_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -511,7 +511,7 @@ export function DepartmentPersonEditor({
                         )
                       )
                     }
-                    className="px-2 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800"
+                    className="px-2 py-2 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800"
                   >
                     {EMAIL_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -535,12 +535,12 @@ export function DepartmentPersonEditor({
       </div>
 
       {/* Collapsible Full Academic CV & Publications Lists */}
-      <div className="rounded-xl border border-slate-200 bg-[#FAF8F4] overflow-hidden">
+      <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] overflow-hidden">
         <button
           type="button"
           onClick={() => setShowAdvancedCv((prev) => !prev)}
           aria-expanded={showAdvancedCv}
-          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left text-xs font-semibold uppercase tracking-wider text-pust-900 hover:bg-pust-50/70 transition-colors cursor-pointer"
+          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left text-xs font-semibold uppercase tracking-wider text-pust-800 hover:bg-pust-50/70 transition-colors cursor-pointer"
         >
           <span>Detailed Academic CV &amp; Publications Lists (One Entry Per Line)</span>
           <ChevronDown
@@ -549,7 +549,7 @@ export function DepartmentPersonEditor({
         </button>
 
         {showAdvancedCv && (
-          <div className="p-4 border-t border-slate-200 bg-white space-y-4">
+          <div className="p-4 border-t border-stone-200 bg-white space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={LABEL_CLASS}>Education</label>
@@ -645,7 +645,7 @@ export function DepartmentPersonEditor({
               </div>
             </div>
 
-            <div className="space-y-4 pt-2 border-t border-slate-100">
+            <div className="space-y-4 pt-2 border-t border-stone-200">
               <div>
                 <label className={LABEL_CLASS}>Journal Articles (one citation per line)</label>
                 <textarea
@@ -692,7 +692,7 @@ export function DepartmentPersonEditor({
       </div>
 
       {/* Footer Actions */}
-      <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+      <div className="pt-4 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3">
         <div>
           {canDelete && !confirmDelete && (
             <button
@@ -732,14 +732,14 @@ export function DepartmentPersonEditor({
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer"
+            className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-300 text-slate-700 hover:bg-stone-100 cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : isNew ? 'Add Member' : 'Save Changes'}

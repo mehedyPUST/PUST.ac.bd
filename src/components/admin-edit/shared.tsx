@@ -6,7 +6,7 @@ import { pustApi } from '../../lib/api';
 import type { EditModalTarget, UniversityProfile } from '../../types/pust';
 
 export const INPUT_CLASS =
-  'w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:outline-none focus:border-pust-800 focus:bg-white';
+  'w-full px-3.5 py-2 text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:outline-none focus:border-pust-700 focus:bg-white';
 export const LABEL_CLASS = 'block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5';
 
 export interface SubEditorProps {
@@ -105,19 +105,19 @@ export function SubEditorFooter({
   onClose: () => void;
 }) {
   return (
-    <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
+    <div className="pt-4 border-t border-stone-200 flex items-center justify-end gap-2.5">
       <button
         type="button"
         onClick={onClose}
         disabled={saving}
-        className="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer"
+        className="px-4 py-2 rounded-lg text-sm font-medium border border-stone-300 text-slate-700 hover:bg-[#FAF9F6] cursor-pointer"
       >
         Cancel
       </button>
       <button
         type="submit"
         disabled={saving}
-        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-60 cursor-pointer"
       >
         <Save className="w-4 h-4" />
         {saving ? 'Saving...' : 'Save Changes'}

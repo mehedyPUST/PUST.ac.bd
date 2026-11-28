@@ -145,13 +145,13 @@ export function CareerView() {
     };
 
   return (
-    <main className="flex-1 bg-[#F9F8F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       <section
         ref={pageScopeRef}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-12"
       >
         {/* Page Header */}
-        <div className="space-y-6 pb-8 border-b border-slate-200">
+        <div className="space-y-6 pb-8 border-b border-stone-200">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="max-w-3xl space-y-3">
               <p className="font-mono text-xs font-semibold uppercase tracking-widest text-pust-700">
@@ -194,7 +194,7 @@ export function CareerView() {
             <MotionCard
               delay={0}
               data-gsap-career-kpi
-              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+              className="rounded-xl border border-stone-200 bg-white px-5 py-4"
             >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Appointing Authority
@@ -209,7 +209,7 @@ export function CareerView() {
             <MotionCard
               delay={0.05}
               data-gsap-career-kpi
-              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+              className="rounded-xl border border-stone-200 bg-white px-5 py-4"
             >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Compensation Framework
@@ -224,7 +224,7 @@ export function CareerView() {
             <MotionCard
               delay={0.1}
               data-gsap-career-kpi
-              className="rounded-xl border border-slate-200 bg-white px-5 py-4"
+              className="rounded-xl border border-stone-200 bg-white px-5 py-4"
             >
               <p className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
                 Recruitment Inquiry Desk
@@ -273,7 +273,7 @@ export function CareerView() {
                     onClick={() => setFilter(item.id)}
                     className={`h-8 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       filter === item.id
-                        ? 'bg-pust-900 text-white'
+                        ? 'bg-pust-700 text-white'
                         : 'text-slate-700 hover:text-slate-950 hover:bg-[#FAF9F6]'
                     }`}
                   >
@@ -290,7 +290,7 @@ export function CareerView() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search post or memo no."
                   aria-label="Search career circulars"
-                  className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-slate-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
+                  className="w-full h-10 pl-10 pr-4 text-sm rounded-lg border border-stone-300 bg-white text-slate-950 focus:outline-none focus:border-pust-700"
                 />
               </div>
             </div>
@@ -304,13 +304,13 @@ export function CareerView() {
               <button
                 type="button"
                 onClick={() => void retryLoad()}
-                className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
               >
                 Retry Loading
               </button>
             </div>
           ) : careerNotices.length === 0 ? (
-            <div className="py-10 px-6 rounded-2xl border border-slate-200 bg-white text-center space-y-3">
+            <div className="py-10 px-6 rounded-2xl border border-stone-200 bg-white text-center space-y-3">
               <p className="text-center text-sm text-slate-700">
                 No recruitment or tender circulars match your current filter.
               </p>
@@ -320,7 +320,7 @@ export function CareerView() {
                   setFilter('all');
                   setQuery('');
                 }}
-                className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-800 text-white hover:bg-pust-900 transition-colors cursor-pointer"
+                className="h-9 inline-flex items-center justify-center px-4 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 transition-colors cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -338,7 +338,7 @@ export function CareerView() {
                   <div className="lg:col-span-3 text-right">Memo Reference</div>
                 </div>
 
-                <div className="divide-y divide-slate-200">
+                <div className="divide-y divide-stone-200">
                   {careerNotices.map((notice, idx) => {
                     const tender = isTenderNotice(notice);
                     return (
@@ -355,7 +355,7 @@ export function CareerView() {
                           }
                         }}
                         className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/55 transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer ${
-                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F5]/80'
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
                         }`}
                       >
                         <div className="lg:col-span-1 pt-0.5 font-mono text-xs font-semibold text-slate-500 tabular-nums">
@@ -383,7 +383,7 @@ export function CareerView() {
                           </p>
                         </div>
 
-                        <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
+                        <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-stone-200 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
                           <span className="font-medium text-slate-700 lg:text-right break-words">
                             {notice.referenceNo}
                           </span>
@@ -507,7 +507,7 @@ export function CareerView() {
             delay={0.08}
             className="editable-region lg:col-span-6 rounded-2xl border border-stone-200 bg-white p-6 sm:p-7 space-y-5"
           >
-            <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-200">
+            <div className="flex items-start justify-between gap-4 pb-3 border-b border-stone-200">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-widest text-lapis-700">
                   Prescribed Formats
@@ -540,7 +540,7 @@ export function CareerView() {
               certificates to the Office of the Registrar prior to the circular deadline.
             </p>
 
-            <div className="divide-y divide-slate-200 border-y border-slate-200">
+            <div className="divide-y divide-stone-200 border-y border-stone-200">
               {recruitmentForms.map((form) => (
                 <div
                   key={`${form.serial}-${form.title}`}
@@ -561,7 +561,7 @@ export function CareerView() {
                         href={form.pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-9 inline-flex items-center gap-1.5 px-3 text-xs font-semibold rounded-lg bg-pust-800 text-white hover:bg-pust-900 transition-colors whitespace-nowrap"
+                        className="h-9 inline-flex items-center gap-1.5 px-3 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap"
                       >
                         <FileDown className="w-3.5 h-3.5" />
                         PDF
@@ -572,7 +572,7 @@ export function CareerView() {
                         href={form.docUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-9 inline-flex items-center gap-1.5 px-3 text-xs font-semibold rounded-lg border border-slate-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-900 transition-colors whitespace-nowrap"
+                        className="h-9 inline-flex items-center gap-1.5 px-3 text-xs font-semibold rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         DOCX
@@ -583,7 +583,7 @@ export function CareerView() {
               ))}
             </div>
 
-            <div className="rounded-xl bg-[#FAF8F4] border border-slate-200 p-4 space-y-2">
+            <div className="rounded-xl bg-[#FAF9F6] border border-stone-200 p-4 space-y-2">
               <p className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-700">
                 Registrar Recruitment Contact
               </p>

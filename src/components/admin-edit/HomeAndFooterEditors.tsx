@@ -799,7 +799,7 @@ export function HomeAndFooterEditors({
 
       {/* 3 Footer Link Columns */}
       {linkColumns.map((col) => (
-        <div key={col.key} className="space-y-2 pt-2 border-t border-slate-200">
+        <div key={col.key} className="space-y-2 pt-2 border-t border-stone-200">
           <div className="flex items-center justify-between">
             <label className={LABEL_CLASS}>{col.title}</label>
             <button

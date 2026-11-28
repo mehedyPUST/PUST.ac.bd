@@ -926,7 +926,7 @@ export function PustShell({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SkeletonTheme baseColor="#ECECE8" highlightColor="#F8F8F6" borderRadius={8}>
+      <SkeletonTheme baseColor="#ECEBE6" highlightColor="#FAF9F6" borderRadius={8}>
         <MotionConfig reducedMotion="user">
           <PustContext.Provider value={value}>
           <div className="min-h-screen flex flex-col bg-transparent text-ink-900">

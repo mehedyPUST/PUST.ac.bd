@@ -56,20 +56,20 @@ export function RoleSwitcherControl({
     return (
       <div
         ref={containerRef}
-        className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5"
+        className="pt-2 border-t border-stone-200/80 dark:border-slate-800 space-y-1.5"
       >
         <button
           type="button"
           disabled={disabled || switching}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-left transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md bg-white dark:bg-slate-800 hover:bg-[#FAF9F6] dark:hover:bg-slate-700 border border-stone-200 dark:border-slate-700 text-left transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className="flex items-center gap-2 min-w-0">
             {switching ? (
-              <RefreshCw className="w-3.5 h-3.5 text-pust-700 dark:text-pust-300 animate-spin shrink-0" />
+              <RefreshCw className="w-3.5 h-3.5 text-pust-700 dark:text-gold-300 animate-spin shrink-0" />
             ) : (
-              <ArrowLeftRight className="w-3.5 h-3.5 text-pust-700 dark:text-pust-300 shrink-0" />
+              <ArrowLeftRight className="w-3.5 h-3.5 text-pust-700 dark:text-gold-300 shrink-0" />
             )}
             <span className="min-w-0">
               <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 text-left">
@@ -91,7 +91,7 @@ export function RoleSwitcherControl({
           <div
             role="listbox"
             aria-label="Available portal roles"
-            className="rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1 space-y-1 shadow-sm"
+            className="rounded-md bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 p-1 space-y-1 shadow-sm"
           >
             {contexts.map((ctx) => {
               const isSelected = ctx.key === active.key;
@@ -105,8 +105,8 @@ export function RoleSwitcherControl({
                   onClick={() => handleSelect(ctx.key)}
                   className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-[#EAF8F0] dark:bg-emerald-950/60 text-[#0F7D42] dark:text-emerald-300 font-semibold'
-                      : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      ? 'bg-pust-50 dark:bg-pust-950/65 text-pust-800 dark:text-pust-200 font-semibold'
+                      : 'text-slate-700 dark:text-slate-200 hover:bg-[#FAF9F6] dark:hover:bg-slate-800'
                   }`}
                 >
                   <span className="min-w-0 flex-1">
@@ -114,7 +114,7 @@ export function RoleSwitcherControl({
                     <span
                       className={`block text-[10px] font-mono truncate text-left ${
                         isSelected
-                          ? 'text-emerald-700/80 dark:text-emerald-400/80'
+                          ? 'text-pust-700/80 dark:text-gold-300/80'
                           : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
@@ -122,7 +122,7 @@ export function RoleSwitcherControl({
                     </span>
                   </span>
                   {isSelected && (
-                    <Check className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-pust-700 dark:text-gold-300 shrink-0" />
                   )}
                 </button>
               );
@@ -141,12 +141,12 @@ export function RoleSwitcherControl({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="h-9 inline-flex items-center gap-1.5 px-3 rounded-md text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        className="h-9 inline-flex items-center gap-1.5 px-3 rounded-md text-xs font-semibold border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-[#FAF9F6] dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {switching ? (
-          <RefreshCw className="w-3.5 h-3.5 animate-spin text-pust-700 dark:text-pust-300" />
+          <RefreshCw className="w-3.5 h-3.5 animate-spin text-pust-700 dark:text-gold-300" />
         ) : (
-          <ArrowLeftRight className="w-3.5 h-3.5 text-pust-700 dark:text-pust-300" />
+          <ArrowLeftRight className="w-3.5 h-3.5 text-pust-700 dark:text-gold-300" />
         )}
         <span>Switch Role</span>
         <ChevronDown
@@ -160,7 +160,7 @@ export function RoleSwitcherControl({
         <div
           role="listbox"
           aria-label="Switch active portal role"
-          className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg z-40 p-1.5 space-y-1"
+          className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg z-40 p-1.5 space-y-1"
         >
           <p className="px-2.5 pt-1 pb-1 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 text-left">
             Assigned Roles ({contexts.length})
@@ -177,8 +177,8 @@ export function RoleSwitcherControl({
                 onClick={() => handleSelect(ctx.key)}
                 className={`w-full flex items-center justify-between gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-[#EAF8F0] dark:bg-emerald-950/60 text-[#0F7D42] dark:text-emerald-300 border border-[#BCE5CE] dark:border-emerald-800'
-                    : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    ? 'bg-pust-50 dark:bg-pust-950/65 text-pust-800 dark:text-pust-200 border border-pust-200 dark:border-pust-800'
+                    : 'text-slate-800 dark:text-slate-200 hover:bg-[#FAF9F6] dark:hover:bg-slate-800'
                 }`}
               >
                 <span className="min-w-0 flex-1">
@@ -190,7 +190,7 @@ export function RoleSwitcherControl({
                   </span>
                 </span>
                 {isSelected && (
-                  <Check className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-pust-700 dark:text-gold-300 shrink-0" />
                 )}
               </button>
             );

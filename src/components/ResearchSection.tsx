@@ -247,8 +247,8 @@ export function ResearchSection({
                   onClick={() => setSelectedDeptFilter(code)}
                   className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-[#FAF9F6] border border-stone-200 text-slate-800 hover:text-pust-900 hover:border-pust-700/50'
+                      ? 'bg-pust-700 text-white'
+                      : 'bg-[#FAF9F6] border border-stone-200 text-slate-800 hover:text-pust-800 hover:border-pust-700/50'
                   }`}
                 >
                   {code}
@@ -333,7 +333,7 @@ export function ResearchSection({
               href="https://pust.ac.bd/academic/publications/D00"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800"
             >
               PUST Official Publications Portal
               <ExternalLink className="w-3.5 h-3.5" />
@@ -516,7 +516,7 @@ export function ResearchSection({
       </div>
 
       {/* RTTC & IIED Institutional Research Gateway */}
-      <div className="rounded-2xl border border-pust-900 bg-pust-950 text-white p-6 space-y-4">
+      <div className="rounded-2xl border border-pust-800 bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white p-6 space-y-4">
         <div className="space-y-1.5">
           <p className="font-mono text-[11px] uppercase tracking-widest text-gold-300 text-left">
             Research Governance · RTTC &amp; IIED
@@ -661,8 +661,8 @@ export function ResearchSection({
                     }}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       active
-                        ? 'bg-pust-900 text-white'
-                        : 'bg-[#FAF9F6] border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-900'
+                        ? 'bg-pust-700 text-white'
+                        : 'bg-[#FAF9F6] border border-stone-200 text-slate-800 hover:border-pust-700/50 hover:text-pust-800'
                     }`}
                   >
                     {fac.label}

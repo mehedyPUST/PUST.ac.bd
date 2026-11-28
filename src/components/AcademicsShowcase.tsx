@@ -129,7 +129,7 @@ export function AcademicsShowcase({
               value={deptQuery}
               onChange={(e) => onDeptQueryChange(e.target.value)}
               placeholder="Search department code, name, or chairman..."
-              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+              className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-700"
             />
           </div>
           <EditTriggerButton
@@ -145,7 +145,7 @@ export function AcademicsShowcase({
             onClick={() => onSelectFaculty('All')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
               selectedFaculty === 'All'
-                ? 'bg-pust-900 text-white border-pust-900'
+                ? 'bg-pust-700 text-white border-pust-700'
                 : 'bg-[#FAF9F6] text-slate-700 border-stone-200 hover:border-pust-700'
             }`}
           >
@@ -161,7 +161,7 @@ export function AcademicsShowcase({
                 onClick={() => onSelectFaculty(faculty)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
                   active
-                    ? 'bg-pust-900 text-white border-pust-900'
+                    ? 'bg-pust-700 text-white border-pust-700'
                     : 'bg-[#FAF9F6] text-slate-700 border-stone-200 hover:border-pust-700'
                 }`}
               >
@@ -290,7 +290,7 @@ export function AcademicsShowcase({
                           href={href}
                           onMouseEnter={() => prefetchDepartment(dept)}
                           onClick={() => onOpenDepartmentLink(dept)}
-                          className="ml-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-800/35 text-pust-900 hover:bg-pust-900 hover:text-white hover:border-pust-900 transition-colors whitespace-nowrap"
+                          className="ml-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-pust-700/35 text-pust-800 hover:bg-pust-700 hover:text-white hover:border-pust-700 transition-colors whitespace-nowrap"
                         >
                           {isOpening ? (
                             <>

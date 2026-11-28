@@ -31,12 +31,12 @@ export default async function DepartmentPersonPage({
   const deptHref = `/academics/departments/${encodeURIComponent(department.code.toLowerCase())}`;
 
   return (
-    <main className="flex-1 bg-[#F9F8F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-6">
         <div>
           <Link
             href={deptHref}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-pust-900 hover:underline"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-pust-700 hover:text-pust-800 hover:underline"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Department of {department.name} ({department.code})

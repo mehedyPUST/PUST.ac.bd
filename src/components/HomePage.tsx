@@ -220,7 +220,7 @@ export function HomePage({
   const vcBodyParagraphs = vcClosingLine ? vcParagraphs.slice(0, -1) : vcParagraphs;
 
   return (
-    <main className="flex-1 bg-[#F9F8F5]">
+    <main className="flex-1 bg-[#F8F7F4]">
       {dataError && (
         <div className="bg-red-50 border-b border-red-200 py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3 text-sm text-red-900">
@@ -254,7 +254,7 @@ export function HomePage({
       {/* 1. Full-Width Banner & Institutional Hero */}
       <section
         id="banner"
-        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F5F3EE] border-b border-stone-200 scroll-mt-28 overflow-x-clip"
+        className="editable-region bg-gradient-to-b from-white via-[#FAF9F6] to-[#F3F1EC] border-b border-stone-200 scroll-mt-28 overflow-x-clip"
       >
         {/* Page-Aligned Full-Width Campus Banner Carousel */}
         <div
@@ -502,7 +502,7 @@ export function HomePage({
                     {profile.facultyMembersCount} Faculty · ~{profile.studentsCount.toLocaleString('en-US')} Students
                   </dd>
                 </div>
-                <div className="bg-pust-800 hover:bg-pust-900 text-white transition-colors group">
+                <div className="bg-pust-700 hover:bg-pust-800 text-white transition-colors group">
                   <Link
                     href="/verify"
                     className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4"
@@ -1554,7 +1554,7 @@ export function HomePage({
                       title={activeMedia.title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                      className="w-full aspect-video rounded-xl border border-slate-200 bg-black"
+                      className="w-full aspect-video rounded-xl border border-stone-200 bg-black"
                     />
                   ) : activeMedia.mediaUrl.endsWith('.mp4') || activeMedia.mediaUrl.endsWith('.webm') ? (
                     <video src={activeMedia.mediaUrl} controls className="w-full aspect-video rounded-xl bg-black" />

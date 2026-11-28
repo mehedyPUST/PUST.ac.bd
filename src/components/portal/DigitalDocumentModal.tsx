@@ -238,12 +238,12 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
       onClick={onClose}
     >
       <div
-        className="print-only-document bg-white w-full max-w-2xl rounded-lg border border-slate-200 shadow-2xl overflow-hidden my-auto print:shadow-none print:border-2 print:border-pust-900 print:rounded-none"
+        className="print-only-document bg-white dark:bg-slate-900 w-full max-w-2xl rounded-lg border border-stone-200 dark:border-slate-800 shadow-2xl overflow-hidden my-auto print:bg-white print:text-slate-950 print:shadow-none print:border-2 print:border-pust-800 print:rounded-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Toolbar hidden when printing */}
-        <div className="print:hidden px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs font-medium text-pust-900">
+        <div className="print:hidden px-6 py-3.5 bg-[#FAF9F6] dark:bg-slate-800/80 border-b border-stone-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs font-medium text-pust-800 dark:text-gold-300">
             <ShieldCheck className="w-4 h-4" />
             <span>Official Verified Digital Record</span>
           </div>
@@ -251,14 +251,14 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-pust-700 dark:hover:border-gold-400 whitespace-nowrap cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" /> Print / Save PDF
             </button>
             <button
               type="button"
               onClick={handleDownloadHtml}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" /> Download Copy
             </button>
@@ -266,7 +266,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
               type="button"
               onClick={onClose}
               aria-label="Close document viewer"
-              className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-800 cursor-pointer"
+              className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-stone-200 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -275,20 +275,22 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
 
         {/* Official Document Body */}
         <div className="p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-slate-200 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-stone-200 dark:border-slate-800 print:border-stone-200 pb-5">
             <div className="flex items-start gap-3.5">
               <PustCrest size={48} className="shrink-0 mt-0.5" />
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800 dark:text-gold-300 print:text-pust-800">
                   Pabna University of Science and Technology
                 </p>
                 <h2
                   id="digital-doc-title"
-                  className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-1"
+                  className="font-serif text-xl sm:text-2xl font-medium text-slate-900 dark:text-slate-100 print:text-slate-950 mt-1"
                 >
                   {doc.title}
                 </h2>
-                <p className="text-xs text-slate-600 mt-0.5">{doc.subtitle}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 print:text-slate-600 mt-0.5">
+                  {doc.subtitle}
+                </p>
               </div>
             </div>
             <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-1.5 shrink-0">
@@ -297,13 +299,13 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                 <button
                   type="button"
                   onClick={handleCopySerial}
-                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-pust-800 dark:text-gold-300 print:text-pust-900 hover:underline cursor-pointer"
                   title="Copy serial code"
                 >
                   {doc.serialCode}
-                  {copied && <Check className="w-3 h-3 text-pust-700" />}
+                  {copied && <Check className="w-3 h-3 text-pust-700 dark:text-gold-400" />}
                 </button>
-                <p className="text-[11px] font-medium text-pust-800 mt-0.5 text-left sm:text-right">
+                <p className="text-[11px] font-medium text-pust-800 dark:text-gold-300 print:text-pust-800 mt-0.5 text-left sm:text-right">
                   {doc.statusLabel}
                 </p>
               </div>
@@ -311,31 +313,33 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] uppercase tracking-wider text-slate-500">
+            <div className="p-3 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 print:bg-[#FAF9F6] border border-stone-200 dark:border-slate-700 print:border-stone-200">
+              <span className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 print:text-slate-500">
                 Holder Name
               </span>
-              <p className="font-semibold text-slate-900 mt-0.5">{doc.holderName}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100 print:text-slate-950 mt-0.5">
+                {doc.holderName}
+              </p>
             </div>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] uppercase tracking-wider text-slate-500">
-                Academic ID & Department
+            <div className="p-3 rounded-lg bg-[#FAF9F6] dark:bg-slate-800/80 print:bg-[#FAF9F6] border border-stone-200 dark:border-slate-700 print:border-stone-200">
+              <span className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 print:text-slate-500">
+                Academic ID &amp; Department
               </span>
-              <p className="font-mono font-semibold text-slate-900 mt-0.5 tabular-nums">
+              <p className="font-mono font-semibold text-slate-900 dark:text-slate-100 print:text-slate-950 mt-0.5 tabular-nums">
                 {doc.academicId} · {doc.departmentCode}
                 {doc.session ? ` (${doc.session})` : ''}
               </p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-200">
+          <div className="rounded-lg border border-stone-200 dark:border-slate-800 print:border-stone-200 overflow-hidden divide-y divide-stone-200 dark:divide-slate-800 print:divide-stone-200">
             {doc.rows.map((r) => (
               <div
                 key={r.label}
-                className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs bg-white"
+                className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 text-xs bg-white dark:bg-slate-900 print:bg-white"
               >
-                <span className="text-slate-500">{r.label}</span>
-                <span className="font-medium text-slate-900 sm:text-right tabular-nums break-words">
+                <span className="text-slate-500 dark:text-slate-400 print:text-slate-500">{r.label}</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100 print:text-slate-950 sm:text-right tabular-nums break-words">
                   {r.value}
                 </span>
               </div>
@@ -343,10 +347,10 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
           </div>
 
           {doc.tableHeaders && doc.tableRows && doc.tableRows.length > 0 && (
-            <div className="rounded-xl border border-slate-200 overflow-x-auto">
+            <div className="rounded-lg border border-stone-200 dark:border-slate-800 print:border-stone-200 overflow-x-auto">
               <table className="w-full min-w-[460px] text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500">
+                  <tr className="bg-[#FAF9F6] dark:bg-slate-800/80 print:bg-[#FAF9F6] border-b border-stone-200 dark:border-slate-800 print:border-stone-200 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 print:text-slate-600">
                     {doc.tableHeaders.map((h) => (
                       <th key={h} className="px-3.5 py-2.5 font-semibold">
                         {h}
@@ -354,11 +358,14 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-stone-200 dark:divide-slate-800 print:divide-stone-200">
                   {doc.tableRows.map((row, idx) => (
                     <tr key={idx}>
                       {row.map((cell, cIdx) => (
-                        <td key={cIdx} className="px-3.5 py-2.5 text-slate-800 tabular-nums">
+                        <td
+                          key={cIdx}
+                          className="px-3.5 py-2.5 text-slate-800 dark:text-slate-200 print:text-slate-900 tabular-nums"
+                        >
                           {cell}
                         </td>
                       ))}
@@ -369,16 +376,21 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
             </div>
           )}
 
-          <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600">
+          <div className="pt-4 border-t border-stone-200 dark:border-slate-800 print:border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 print:text-slate-600">
             <div>
               <p>
-                Authorized by <strong className="text-slate-900">{doc.issuedBy}</strong> ·{' '}
-                <span className="tabular-nums">{doc.issuedAt}</span>
+                Authorized by{' '}
+                <strong className="text-slate-900 dark:text-slate-100 print:text-slate-950">
+                  {doc.issuedBy}
+                </strong>{' '}
+                · <span className="tabular-nums">{doc.issuedAt}</span>
               </p>
-              <p className="font-mono text-[11px] text-slate-500 mt-0.5">
+              <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                 Digest: {computedHash}
               </p>
-              {doc.footerNote && <p className="text-[11px] text-slate-500 mt-1">{doc.footerNote}</p>}
+              {doc.footerNote && (
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{doc.footerNote}</p>
+              )}
             </div>
             {onOpenVerify && (
               <button
@@ -387,7 +399,7 @@ export function DigitalDocumentModal({ doc, onClose, onOpenVerify }: DigitalDocu
                   onClose();
                   onOpenVerify(doc.serialCode);
                 }}
-                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 hover:text-pust-950 whitespace-nowrap cursor-pointer"
+                className="print:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-pust-800 dark:text-gold-300 hover:underline whitespace-nowrap cursor-pointer"
               >
                 Verify Publicly <ExternalLink className="w-3.5 h-3.5" />
               </button>

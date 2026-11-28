@@ -226,8 +226,8 @@ export function AdminOfficeEditor({
       </div>
 
       {/* Office Head */}
-      <div className="rounded-xl border border-slate-200 bg-[#FAF9F6] p-4 space-y-3">
-        <p className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-900">
+      <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
+        <p className="font-mono text-xs font-semibold uppercase tracking-wider text-pust-800">
           Office Head / Director / Provost
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -298,7 +298,7 @@ export function AdminOfficeEditor({
           {currentOffice.officers.map((off, idx) => (
             <div
               key={off.id || idx}
-              className={`p-3.5 rounded-xl border border-slate-200 space-y-2.5 ${
+              className={`p-3.5 rounded-xl border border-stone-200 space-y-2.5 ${
                 idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
               }`}
             >

@@ -31,7 +31,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#450305',
+  themeColor: '#5B0A0E',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -133,7 +133,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       lang="en"
       className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="bg-[#F6F4F1] text-ink-900 antialiased selection:bg-pust-800 selection:text-white">
+      <body className="bg-[#F8F7F4] text-ink-900 antialiased selection:bg-pust-700 selection:text-white">
         <PustShell initialData={initialData}>{children}</PustShell>
       </body>
     </html>

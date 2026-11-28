@@ -96,12 +96,12 @@ export function NoticeModal({
         initial={{ opacity: 0, y: 10, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-start justify-between gap-6 px-6 py-5 border-b border-stone-200 bg-[#FAF9F6]">
           <div>
-            <p className="font-mono text-xs tracking-wider uppercase text-pust-800 tabular-nums">
+            <p className="font-mono text-xs tracking-wider uppercase text-pust-700 tabular-nums">
               {notice.referenceNo} · {notice.category} · {notice.publishedAt}
             </p>
             <h3
@@ -116,14 +116,14 @@ export function NoticeModal({
             disabled={deleting}
             onClick={onClose}
             aria-label="Close circular"
-            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+            className="min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-stone-200/70 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-4 sm:p-6 space-y-5">
-          <div className="text-xs text-slate-600 border-b border-slate-200 pb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="text-xs text-slate-600 border-b border-stone-200 pb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               Issued by:{' '}
               <span className="font-medium text-slate-900">
@@ -152,10 +152,10 @@ export function NoticeModal({
           </p>
 
           {(notice.attachmentName || safeAttachmentUrl) && (
-            <div className="rounded-xl border border-slate-200 bg-[#F7F7F5] p-4 space-y-3">
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <FileText className="w-4 h-4 text-pust-800 shrink-0" />
+                  <FileText className="w-4 h-4 text-pust-700 shrink-0" />
                   <div className="min-w-0">
                     <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500">
                       Official Attachment{attachmentKind === 'pdf' ? ' (PDF)' : attachmentKind === 'image' ? ' (Image)' : ''}
@@ -171,7 +171,7 @@ export function NoticeModal({
                       <button
                         type="button"
                         onClick={() => setShowInlinePdf((prev) => !prev)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-700 hover:text-pust-800 cursor-pointer whitespace-nowrap"
                       >
                         {showInlinePdf ? 'Hide Preview' : 'Preview PDF'}
                       </button>
@@ -180,7 +180,7 @@ export function NoticeModal({
                       href={safeAttachmentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap"
                     >
                       {attachmentKind === 'pdf' ? (
                         <>
@@ -199,7 +199,7 @@ export function NoticeModal({
               </div>
 
               {safeAttachmentUrl && attachmentKind === 'image' && (
-                <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                <div className="rounded-lg border border-stone-200 bg-white overflow-hidden">
                   <img
                     src={safeAttachmentUrl}
                     alt={notice.attachmentName || notice.title}
@@ -213,7 +213,7 @@ export function NoticeModal({
                 <iframe
                   src={safeAttachmentUrl}
                   title={notice.attachmentName || notice.title}
-                  className="w-full h-96 rounded-lg border border-slate-200 bg-white"
+                  className="w-full h-96 rounded-lg border border-stone-200 bg-white"
                 />
               )}
             </div>
@@ -228,13 +228,13 @@ export function NoticeModal({
             </div>
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-slate-200">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-stone-200">
             <div className="flex flex-wrap items-center gap-3">
               {user ? (
                 <button
                   type="button"
                   onClick={() => onToggleBookmark(notice)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-800 text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-700 text-pust-800 hover:bg-pust-700 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                   {isBookmarked ? 'Saved' : 'Save Circular'}
@@ -246,7 +246,7 @@ export function NoticeModal({
                     onClose();
                     onOpenPortal();
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-stone-300 text-slate-700 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Bookmark className="w-4 h-4" />
                   Sign in to Save
@@ -292,7 +292,7 @@ export function NoticeModal({
                         setConfirmDelete(false);
                         setDeleteError(null);
                       }}
-                      className="px-3 py-2 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+                      className="px-3 py-2 rounded-lg text-sm font-medium border border-stone-300 bg-white text-slate-700 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
                     >
                       Cancel
                     </button>
@@ -317,7 +317,7 @@ export function NoticeModal({
               type="button"
               disabled={deleting}
               onClick={onClose}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
             >
               Done Reading
             </button>

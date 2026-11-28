@@ -210,7 +210,7 @@ export function AdministrationSidebar({
     return (
       <div className="flex flex-col min-h-0 flex-1">
         {/* Search Input */}
-        <div className="px-3.5 py-3 border-b border-slate-200 bg-[#F8F8F6] shrink-0">
+        <div className="px-3.5 py-3 border-b border-stone-200 bg-[#FAF9F6] shrink-0">
           <div className="relative">
             <Search
               className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -223,7 +223,7 @@ export function AdministrationSidebar({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Find office, head, or officer..."
               aria-label="Filter administration sidebar"
-              className="w-full pl-8 pr-8 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-800 transition-colors"
+              className="w-full pl-8 pr-8 py-2 text-xs bg-white border border-stone-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-pust-700 transition-colors"
             />
             {query && (
               <button
@@ -242,7 +242,7 @@ export function AdministrationSidebar({
         <nav
           ref={navScrollRef}
           aria-label="Administration offices directory sidebar"
-          className={`min-h-0 overflow-y-auto divide-y divide-slate-200/80 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] ${
+          className={`min-h-0 overflow-y-auto divide-y divide-stone-200/80 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] ${
             isMobile ? 'max-h-[56vh]' : 'flex-1'
           }`}
         >
@@ -259,8 +259,8 @@ export function AdministrationSidebar({
                     onClick={() => setMobileOpen(false)}
                     className={`group flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
                       isActive
-                        ? 'bg-pust-900 text-white font-semibold'
-                        : 'text-slate-800 font-medium hover:bg-[#F8F8F6] hover:text-pust-900'
+                        ? 'bg-pust-700 text-white font-semibold'
+                        : 'text-slate-800 font-medium hover:bg-[#FAF9F6] hover:text-pust-800'
                     }`}
                   >
                     <span className="flex items-center gap-2.5 min-w-0">
@@ -317,7 +317,7 @@ export function AdministrationSidebar({
                     className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 text-left rounded-lg transition-colors cursor-pointer ${
                       hasActiveChild && !expanded
                         ? group.activeBgClass
-                        : 'hover:bg-[#F8F8F6] text-slate-800'
+                        : 'hover:bg-[#FAF9F6] text-slate-800'
                     }`}
                   >
                     <span className="flex items-baseline gap-2 min-w-0">
@@ -357,7 +357,7 @@ export function AdministrationSidebar({
                               className={`flex items-start justify-between gap-2 px-2.5 py-2 rounded-lg transition-colors ${
                                 isActive
                                   ? `${group.activeBgClass} font-semibold`
-                                  : 'text-slate-700 hover:bg-[#F8F8F6] hover:text-slate-950'
+                                  : 'text-slate-700 hover:bg-[#FAF9F6] hover:text-slate-950'
                               }`}
                             >
                               <div className="min-w-0 flex-1 space-y-0.5">
@@ -389,7 +389,7 @@ export function AdministrationSidebar({
         </nav>
 
         {/* Sidebar Footer: Wing Toggle & Central Registrar Helpdesk */}
-        <div className="border-t border-slate-200 bg-[#F8F8F6] px-3.5 py-3 space-y-2.5 shrink-0">
+        <div className="border-t border-stone-200 bg-[#FAF9F6] px-3.5 py-3 space-y-2.5 shrink-0">
           {!normalizedQuery && (
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-[11px] text-slate-500 tabular-nums">
@@ -398,19 +398,19 @@ export function AdministrationSidebar({
               <button
                 type="button"
                 onClick={handleToggleAllWings}
-                className="text-xs font-semibold text-pust-900 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-pust-800 hover:underline cursor-pointer"
               >
                 {allExpanded ? 'Collapse all' : 'Expand all'}
               </button>
             </div>
           )}
 
-          <div className="pt-2 border-t border-slate-200 space-y-1 text-[11px]">
+          <div className="pt-2 border-t border-stone-200 space-y-1 text-[11px]">
             <p className="font-medium text-slate-500 text-left">Central Registry Desk</p>
             <div className="flex flex-wrap items-center justify-between gap-2 font-mono tabular-nums">
               <a
                 href="mailto:registrar@pust.ac.bd"
-                className="inline-flex items-center gap-1 text-pust-900 hover:underline truncate"
+                className="inline-flex items-center gap-1 text-pust-800 hover:underline truncate"
               >
                 <Mail className="w-3 h-3 shrink-0" aria-hidden="true" />
                 registrar@pust.ac.bd
@@ -432,15 +432,15 @@ export function AdministrationSidebar({
   return (
     <>
       {/* Mobile / Tablet Collapsible Office Switcher */}
-      <div className="lg:hidden rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+      <div className="lg:hidden rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-xs">
         <button
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-expanded={mobileOpen}
-          className="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#F8F8F6] transition-colors cursor-pointer"
+          className="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-[#FAF9F6] transition-colors cursor-pointer"
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <Menu className="w-4 h-4 text-pust-900 shrink-0" aria-hidden="true" />
+            <Menu className="w-4 h-4 text-pust-700 shrink-0" aria-hidden="true" />
             <div className="min-w-0">
               <p className="text-[11px] font-medium text-slate-500 text-left">
                 Administration Index · {offices.length} Offices
@@ -456,7 +456,7 @@ export function AdministrationSidebar({
               </p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 shrink-0">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-pust-800 shrink-0">
             {mobileOpen ? 'Close' : 'Switch Office'}
             <ChevronDown
               className={`w-4 h-4 transition-transform duration-150 ${
@@ -468,7 +468,7 @@ export function AdministrationSidebar({
         </button>
 
         {mobileOpen && (
-          <div className="border-t border-slate-200 flex flex-col">
+          <div className="border-t border-stone-200 flex flex-col">
             {renderBody(true)}
           </div>
         )}
@@ -477,9 +477,9 @@ export function AdministrationSidebar({
       {/* Desktop Sticky Archival Sidebar */}
       <aside
         aria-label="Administration navigation"
-        className="hidden lg:flex flex-col min-h-0 max-h-[calc(100vh-8.5rem)] rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs"
+        className="hidden lg:flex flex-col min-h-0 max-h-[calc(100vh-8.5rem)] rounded-2xl border border-stone-200 bg-white overflow-hidden shadow-xs"
       >
-        <div className="px-4 py-3.5 border-b border-slate-200 bg-[#F8F8F6] flex items-center justify-between gap-2 shrink-0">
+        <div className="px-4 py-3.5 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-2 shrink-0">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold text-pust-800 text-left">PUST Governance</p>
             <h2 className="font-serif text-[17px] font-semibold text-slate-950 text-left leading-tight">

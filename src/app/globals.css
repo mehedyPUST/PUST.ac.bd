@@ -10,16 +10,16 @@
      PRIMARY — Heritage PUST Oxblood Maroon
      ═══════════════════════════════════════════════════════════════ */
   --color-pust-50: #FDF6F6;
-  --color-pust-100: #FAE8E9;
-  --color-pust-200: #F2CCCE;
-  --color-pust-300: #E09FA3;
-  --color-pust-400: #C25D63;
-  --color-pust-500: #9E1B20;
-  --color-pust-600: #851217;
-  --color-pust-700: #6D0D11;
-  --color-pust-800: #56080B;
-  --color-pust-900: #3E0406;
-  --color-pust-950: #260203;
+  --color-pust-100: #FAE9EA;
+  --color-pust-200: #F2CDCF;
+  --color-pust-300: #E2A2A6;
+  --color-pust-400: #C8646B;
+  --color-pust-500: #A52127;
+  --color-pust-600: #8A141A;
+  --color-pust-700: #720E13;
+  --color-pust-800: #5B0A0E;
+  --color-pust-900: #48070B;
+  --color-pust-950: #2C0305;
 
   /* ── Status Red (alerts, urgent) ── */
   --color-red-50: #FEF5F5;
@@ -193,19 +193,13 @@
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #f9f8f5;
-    background-image: radial-gradient(ellipse 90% 45% at 50% -6%, rgba(133, 18, 23, 0.035), transparent 60%);
+    background-color: #f8f7f4;
+    background-image: radial-gradient(ellipse 90% 45% at 50% -6%, rgba(114, 14, 19, 0.03), transparent 60%);
   }
 
   h1, h2, h3 {
     text-wrap: balance;
     color: #1c1917;
-  }
-
-  .dark.portal-shell h1,
-  .dark.portal-shell h2,
-  .dark.portal-shell h3 {
-    color: #f8fafc;
   }
 
   :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not([class*="line-clamp-"]):not(.text-center *):not(.text-right *):not(.portal-shell *) {
@@ -215,7 +209,7 @@
   }
 
   ::selection {
-    background-color: #6D0D11;
+    background-color: #720E13;
     color: #ffffff;
   }
 
@@ -224,7 +218,7 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid #851217;
+    outline: 2px solid #720E13;
     outline-offset: 2px;
   }
 
@@ -250,7 +244,7 @@
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #C81E24, #880F14);
+    background: linear-gradient(180deg, #8A141A, #5B0A0E);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
@@ -326,13 +320,13 @@
 
 /* Primary CTA — dignified PUST maroon */
 .btn-primary-sheen {
-  background: linear-gradient(180deg, #7c1015 0%, #650b0f 100%);
+  background: linear-gradient(180deg, #720E13 0%, #5B0A0E 100%);
   color: #fff;
   box-shadow: 0 1px 2px rgba(28, 25, 23, 0.12);
 }
 
 .btn-primary-sheen:hover {
-  background: linear-gradient(180deg, #8b141a 0%, #700d12 100%);
+  background: linear-gradient(180deg, #8A141A 0%, #720E13 100%);
   box-shadow: 0 2px 6px rgba(28, 25, 23, 0.16);
 }
 

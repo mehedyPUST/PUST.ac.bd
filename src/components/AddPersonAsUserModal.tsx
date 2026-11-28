@@ -329,7 +329,7 @@ export function AddPersonAsUserModal({
         className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
+        <div className="bg-gradient-to-br from-pust-900 via-pust-800 to-pust-700 text-white px-5 py-4 flex items-start justify-between gap-3 shrink-0">
           <div className="min-w-0 space-y-1">
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-pust-200">
               Create portal account · {department.code} · {roleCategory}
@@ -525,7 +525,7 @@ export function AddPersonAsUserModal({
                         setPassword(generateTempLoginToken());
                         setShowPassword(true);
                       }}
-                      className="h-9 px-3 rounded-lg border border-stone-300 bg-[#FAF8F4] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer shrink-0"
+                      className="h-9 px-3 rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-700 hover:text-pust-800 transition-colors cursor-pointer shrink-0"
                       title="Generate temporary token"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
@@ -605,7 +605,7 @@ export function AddPersonAsUserModal({
                 <button
                   type="submit"
                   disabled={submitting || loadingUsers}
-                  className="h-9 px-4 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="h-9 px-4 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 disabled:opacity-60 transition-colors cursor-pointer inline-flex items-center gap-1.5"
                 >
                   {submitting ? (
                     <>
@@ -632,7 +632,7 @@ export function AddPersonAsUserModal({
                     setCreatedUser(createdUser || claimedBy);
                     setAssignRolesOpen(true);
                   }}
-                  className="h-9 px-3.5 rounded-lg border border-pust-800 text-pust-900 bg-white font-semibold hover:bg-pust-50 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="h-9 px-3.5 rounded-lg border border-pust-700 text-pust-800 bg-white font-semibold hover:bg-pust-50 transition-colors cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <Shield className="w-3.5 h-3.5" />
                   Assign additional roles
@@ -641,7 +641,7 @@ export function AddPersonAsUserModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-9 px-4 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 transition-colors cursor-pointer"
+                className="h-9 px-4 rounded-lg bg-pust-700 text-white font-semibold hover:bg-pust-800 transition-colors cursor-pointer"
               >
                 Done
               </button>

@@ -49,10 +49,10 @@ export function DepartmentModal({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.18 }}
-        className="w-full max-w-2xl rounded-2xl bg-white border border-slate-200 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-start justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200 bg-[#FAF9F6]">
           <div>
             <p className="font-mono text-xs tracking-wider uppercase text-pust-800">
               {department.code} · {department.faculty}
@@ -80,7 +80,7 @@ export function DepartmentModal({
         <div className="p-4 sm:p-6 space-y-6">
           <p className="text-[15px] leading-relaxed text-slate-700">{department.summary}</p>
 
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-[#FAF9F6] border border-stone-200 p-4 text-sm">
             <div>
               <dt className="text-xs uppercase tracking-wider text-slate-500">Established &amp; Dept Code</dt>
               <dd className="font-mono tabular-nums text-slate-900 mt-0.5 font-medium">
@@ -142,12 +142,12 @@ export function DepartmentModal({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-200">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-stone-200">
             {user ? (
               <button
                 type="button"
                 onClick={() => onToggleBookmark(department)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-800 text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-pust-700 text-pust-800 hover:bg-pust-700 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                 {isBookmarked ? 'Saved in Portal' : 'Bookmark Department'}
@@ -159,7 +159,7 @@ export function DepartmentModal({
                   onClose();
                   onOpenPortal();
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-stone-300 text-slate-700 hover:border-pust-700 hover:text-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Bookmark className="w-4 h-4" />
                 Sign in to Bookmark
@@ -184,7 +184,7 @@ export function DepartmentModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="px-5 py-2 rounded-lg text-sm font-medium bg-pust-700 text-white hover:bg-pust-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 Close Prospectus
               </button>

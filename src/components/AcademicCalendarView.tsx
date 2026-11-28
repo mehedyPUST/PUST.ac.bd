@@ -68,8 +68,8 @@ const CATEGORY_META: Record<
     label: 'Academic Milestone',
     shortLabel: 'Academic',
     textClass: 'text-slate-800',
-    bgSoftClass: 'bg-slate-100',
-    borderClass: 'border-slate-300',
+    bgSoftClass: 'bg-[#FAF9F6]',
+    borderClass: 'border-stone-300',
     dotClass: 'bg-slate-600',
   },
 };
@@ -502,7 +502,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
       </div>
 
       {/* Category Filters & Timeframe / View Switcher */}
-      <div className="space-y-3 border-b border-slate-200 pb-5">
+      <div className="space-y-3 border-b border-stone-200 pb-5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div
             role="group"
@@ -529,15 +529,15 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                   }}
                   className={`min-h-[40px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     active
-                      ? 'bg-pust-900 text-white border border-pust-900'
-                      : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                      ? 'bg-pust-700 text-white border border-pust-700'
+                      : 'bg-[#FAF9F6] border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-800'
                   }`}
                 >
                   {cat.id !== 'all' && renderCategoryIcon(cat.id, 'w-3.5 h-3.5 shrink-0')}
                   <span>{cat.label}</span>
                   <span
                     className={`font-mono text-[11px] tabular-nums ${
-                      active ? 'text-pust-200' : 'text-slate-500'
+                      active ? 'text-pust-100' : 'text-slate-500'
                     }`}
                   >
                     ({categoryCounts[cat.id]})
@@ -549,13 +549,13 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Upcoming vs All Dates */}
-            <div className="inline-flex p-1 rounded-lg bg-[#F5F3EE] border border-stone-200">
+            <div className="inline-flex p-1 rounded-lg bg-[#FAF9F6] border border-stone-200">
               <button
                 type="button"
                 onClick={() => setTimeframe('upcoming')}
                 className={`min-h-[34px] px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   timeframe === 'upcoming'
-                    ? 'bg-white text-pust-900 font-semibold'
+                    ? 'bg-white text-pust-800 font-semibold shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -566,7 +566,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 onClick={() => setTimeframe('all')}
                 className={`min-h-[34px] px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   timeframe === 'all'
-                    ? 'bg-white text-pust-900 font-semibold'
+                    ? 'bg-white text-pust-800 font-semibold shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -575,13 +575,13 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
             </div>
 
             {/* Month Grid vs Timeline List */}
-            <div className="inline-flex p-1 rounded-lg bg-[#F5F3EE] border border-stone-200">
+            <div className="inline-flex p-1 rounded-lg bg-[#FAF9F6] border border-stone-200">
               <button
                 type="button"
                 onClick={() => setViewMode('month')}
                 className={`min-h-[34px] inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'month'
-                    ? 'bg-white text-pust-900 font-semibold'
+                    ? 'bg-white text-pust-800 font-semibold shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -593,7 +593,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 onClick={() => setViewMode('timeline')}
                 className={`min-h-[34px] inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'timeline'
-                    ? 'bg-white text-pust-900 font-semibold'
+                    ? 'bg-white text-pust-800 font-semibold shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -615,7 +615,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search exams, holidays, deadlines..."
                 aria-label="Search academic calendar events"
-                className="w-full min-h-[40px] pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:bg-white focus:border-pust-700 focus:outline-none"
+                className="w-full min-h-[40px] pl-8 pr-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-700 focus:outline-none"
               />
             </div>
 
@@ -623,7 +623,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
               aria-label="Filter by academic term"
               value={termFilter}
               onChange={(e) => setTermFilter(e.target.value)}
-              className="min-h-[40px] px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] text-slate-800 focus:bg-white focus:border-pust-700 focus:outline-none cursor-pointer"
+              className="min-h-[40px] px-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800 focus:bg-white focus:border-pust-700 focus:outline-none cursor-pointer"
             >
               {termOptions.map((term) => (
                 <option key={term} value={term}>
@@ -657,7 +657,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                   'PUST-Academic-Calendar.ics'
                 )
               }
-              className="min-h-[40px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
+              className="min-h-[40px] inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
             >
               <CalendarPlus className="w-3.5 h-3.5" />
               Export Filtered (.ics)
@@ -668,7 +668,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
 
       {/* Empty State */}
       {visibleItems.length === 0 ? (
-        <div className="p-8 sm:p-10 rounded-2xl border border-slate-200 bg-[#F7F7F5] text-center space-y-3">
+        <div className="p-8 sm:p-10 rounded-2xl border border-stone-200 bg-[#FAF9F6] text-center space-y-3">
           <p className="text-sm text-slate-700">
             No academic calendar events match your current filters.
           </p>
@@ -682,7 +682,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 setTimeframe('all');
                 setSelectedDate(null);
               }}
-              className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg bg-pust-900 text-white cursor-pointer"
+              className="min-h-[40px] px-4 py-2 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
             >
               Reset All Filters
             </button>
@@ -700,7 +700,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 <button
                   type="button"
                   onClick={jumpToToday}
-                  className="px-2.5 py-1 text-[11px] font-mono font-medium rounded-md border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap cursor-pointer"
+                  className="px-2.5 py-1 text-[11px] font-mono font-medium rounded-md border border-stone-300 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap cursor-pointer"
                 >
                   Today
                 </button>
@@ -714,7 +714,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                     setCursorMonth((prev) => shiftMonth(prev.year, prev.month, -1));
                     setSelectedDate(null);
                   }}
-                  className="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                  className="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -725,7 +725,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                     setCursorMonth((prev) => shiftMonth(prev.year, prev.month, 1));
                     setSelectedDate(null);
                   }}
-                  className="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                  className="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -733,7 +733,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
             </div>
 
             {/* Weekday Header */}
-            <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/70">
+            <div className="grid grid-cols-7 border-b border-stone-200 bg-[#FAF9F6]">
               {WEEKDAYS.map((day, idx) => {
                 const isWeekend = idx === 5 || idx === 6;
                 return (
@@ -750,13 +750,13 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
             </div>
 
             {/* Day Cells */}
-            <div className="grid grid-cols-7 divide-x divide-y divide-slate-100">
+            <div className="grid grid-cols-7 divide-x divide-y divide-stone-200/70">
               {monthCells.map((cell, idx) => {
                 if (!cell.iso || cell.dayNum === null) {
                   return (
                     <div
                       key={`empty-${idx}`}
-                      className="min-h-[54px] sm:min-h-[76px] bg-slate-50/40"
+                      className="min-h-[54px] sm:min-h-[76px] bg-[#FAF9F6]/60"
                     />
                   );
                 }
@@ -775,19 +775,19 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                     aria-pressed={isSelected}
                     className={`min-h-[54px] sm:min-h-[76px] p-1 sm:p-1.5 text-left flex flex-col justify-between transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-pust-50 ring-2 ring-inset ring-pust-800'
+                        ? 'bg-pust-50 ring-2 ring-inset ring-pust-700'
                         : isWeekend
-                        ? 'bg-slate-50/60 hover:bg-slate-100/70'
-                        : 'bg-white hover:bg-[#FAF8F4]'
+                        ? 'bg-[#FAF9F6]/75 hover:bg-stone-100/70'
+                        : 'bg-white hover:bg-[#FAF9F6]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1 w-full">
                       <span
                         className={`inline-flex items-center justify-center w-6 h-6 rounded-md font-mono text-xs tabular-nums ${
                           isToday
-                            ? 'bg-pust-900 text-white font-semibold'
+                            ? 'bg-pust-700 text-white font-semibold'
                             : isSelected
-                            ? 'text-pust-900 font-bold'
+                            ? 'text-pust-800 font-bold'
                             : isWeekend
                             ? 'text-slate-500'
                             : 'text-slate-800 font-medium'
@@ -840,7 +840,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
             </div>
 
             {/* Category Legend */}
-            <div className="px-4 sm:px-5 py-3 border-t border-slate-200 bg-[#FAF8F4] flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+            <div className="px-4 sm:px-5 py-3 border-t border-stone-200 bg-[#FAF9F6] flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                 {(['exam', 'holiday', 'deadline', 'academic'] as AcademicCalendarCategory[]).map(
                   (cat) => (
@@ -877,7 +877,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                 <button
                   type="button"
                   onClick={() => setSelectedDate(null)}
-                  className="px-2.5 py-1 text-xs font-medium rounded-md border border-slate-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap cursor-pointer"
+                  className="px-2.5 py-1 text-xs font-medium rounded-md border border-stone-300 bg-white text-slate-700 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap cursor-pointer"
                 >
                   All Month
                 </button>
@@ -900,7 +900,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                     <button
                       type="button"
                       onClick={() => setSelectedDate(null)}
-                      className="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 text-slate-800 hover:border-pust-800 cursor-pointer"
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 text-slate-800 hover:border-pust-700 cursor-pointer"
                     >
                       Show All {MONTH_NAMES[cursorMonth.month]} Events
                     </button>
@@ -908,14 +908,14 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                   <button
                     type="button"
                     onClick={jumpToNearestMatch}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer"
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg bg-pust-700 text-white hover:bg-pust-800 cursor-pointer"
                   >
                     Jump to Next Matching Event
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="divide-y divide-slate-200 max-h-[580px] overflow-y-auto">
+              <div className="divide-y divide-stone-200 max-h-[580px] overflow-y-auto">
                 {inspectorItems.map((row) => {
                   const meta = CATEGORY_META[row.resolvedCategory];
                   const rel = getRelativeDayLabel(row.date, row.effectiveEndDate, todayIso);
@@ -980,7 +980,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                               `PUST-${row.date}.ics`
                             )
                           }
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-stone-200 bg-[#FAF9F6] text-slate-700 hover:border-pust-700 hover:text-pust-800 cursor-pointer"
                         >
                           <CalendarPlus className="w-3.5 h-3.5" />
                           Add to Calendar (.ics)
@@ -999,7 +999,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
           {timelineGroups.map(([monthKey, groupItems], groupIdx) => (
             <MotionReveal key={monthKey} delay={(groupIdx % 4) * 0.04}>
               <section className="space-y-3">
-              <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
+              <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2">
                 <h2 className="font-serif text-xl font-medium text-slate-900">
                   {formatMonthHeading(monthKey)}
                 </h2>
@@ -1079,7 +1079,7 @@ export function AcademicCalendarView({ items }: AcademicCalendarViewProps) {
                               `PUST-${row.date}.ics`
                             )
                           }
-                          className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-pust-900 whitespace-nowrap shrink-0 cursor-pointer"
+                          className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-200 bg-[#FAF9F6] text-slate-700 hover:border-pust-700 hover:text-pust-800 whitespace-nowrap shrink-0 cursor-pointer"
                         >
                           <CalendarPlus className="w-3.5 h-3.5" />
                           Add (.ics)
@@ -1129,10 +1129,10 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
   if (upcoming.length === 0) return null;
 
   return (
-    <MotionReveal className="pt-8 border-t border-slate-200 space-y-4">
+    <MotionReveal className="pt-8 border-t border-stone-200 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-pust-800">
+          <p className="font-mono text-xs uppercase tracking-widest text-pust-700">
             Academic Calendar 2026–2027
           </p>
           <h2 className="font-serif text-2xl font-medium text-slate-900 mt-1">
@@ -1142,7 +1142,7 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
 
         <Link
           href="/academics/calendar"
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 whitespace-nowrap shrink-0 self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-pust-700 text-white hover:bg-pust-800 whitespace-nowrap shrink-0 self-start sm:self-auto"
         >
           <Calendar className="w-3.5 h-3.5" />
           Open Interactive Calendar
@@ -1165,8 +1165,8 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
             onClick={() => setFilter(tab.id)}
             className={`min-h-[38px] px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               filter === tab.id
-                ? 'bg-pust-900 text-white'
-                : 'bg-[#F7F7F5] border border-slate-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-900'
+                ? 'bg-pust-700 text-white'
+                : 'bg-[#FAF9F6] border border-stone-200 text-slate-700 hover:border-pust-700/50 hover:text-pust-800'
             }`}
           >
             {tab.label}
@@ -1182,7 +1182,7 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
             <MotionCard
               key={item.id}
               delay={idx * 0.04}
-              className="h-full p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F7F7F5] flex flex-col justify-between gap-2.5"
+              className="h-full p-4 sm:p-5 rounded-2xl border border-stone-200 bg-[#FAF9F6] flex flex-col justify-between gap-2.5"
             >
               <div className="space-y-1">
                 <div className="flex items-center justify-between gap-2 text-xs">
@@ -1199,7 +1199,7 @@ export function AcademicCalendarHighlights({ items }: { items: AcademicCalendarI
                 <h3 className="font-serif text-base font-medium text-slate-900">{item.event}</h3>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-200/80 text-xs">
                 <span className="font-mono text-pust-800 tabular-nums">
                   {formatDateRange(item.date, item.endDate)}
                 </span>
