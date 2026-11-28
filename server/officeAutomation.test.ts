@@ -628,3 +628,184 @@ test('Admin can add existing officer profile with temp token and appoint departm
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+test('admin action fixes: deleted-user JWT rejection, VC notice deletion, and PATCH user role/student sync', async () => {
+  const app = await getApiApp();
+  const server = http.createServer(app);
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address();
+  assert.ok(address && typeof address === 'object');
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  const suffix = Date.now();
+  const adminUser = await pustRepo.createUser({
+    name: 'Admin Action Tester',
+    email: `admin.actions.${suffix}@pust.ac.bd`,
+    passwordHash: hashPassword('AdminPass#1'),
+    role: 'admin',
+    approvalStatus: 'approved',
+    departmentCode: 'ADMIN',
+    academicId: `PUST-ADMIN-ACT-${suffix}`,
+    hallAffiliation: 'Administrative Building',
+  });
+
+  const vcUser = await pustRepo.createUser({
+    name: 'VC Notice Tester',
+    email: `vc.actions.${suffix}@pust.ac.bd`,
+    passwordHash: hashPassword('VcPass#123'),
+    role: 'vc',
+    approvalStatus: 'approved',
+    departmentCode: 'VC',
+    academicId: `PUST-VC-ACT-${suffix}`,
+    hallAffiliation: 'Administrative Building',
+  });
+
+  const reusedEmail = `reused.acct.${suffix}@pust.ac.bd`;
+  const deletedUser = await pustRepo.createUser({
+    name: 'Soon Deleted Teacher',
+    email: reusedEmail,
+    passwordHash: hashPassword('TempPass#1'),
+    role: 'teacher',
+    approvalStatus: 'approved',
+    departmentCode: 'CSE',
+    academicId: `PUST-DEL-${suffix}`,
+    hallAffiliation: 'Academic Building',
+    assignedCourses: ['CSE-1101'],
+    assignedSessions: ['2024-25'],
+  });
+  const deletedUserCookie = `pust_token=${encodeURIComponent(signAuthToken(deletedUser))}`;
+  const adminCookie = `pust_token=${encodeURIComponent(signAuthToken(adminUser))}`;
+  const vcCookie = `pust_token=${encodeURIComponent(signAuthToken(vcUser))}`;
+
+  let replacementUserId: string | null = null;
+  let promotedUserId: string | null = null;
+
+  try {
+    // 1. Delete user via admin endpoint, recreate another account with same email, and ensure old JWT is rejected
+    const delRes = await fetch(`${baseUrl}/api/portal/users/${encodeURIComponent(deletedUser.id)}`, {
+      method: 'DELETE',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: adminCookie,
+      },
+    });
+    assert.equal(delRes.status, 200);
+
+    const replacementUser = await pustRepo.createUser({
+      name: 'New User Same Email',
+      email: reusedEmail,
+      passwordHash: hashPassword('Replacement#1'),
+      role: 'admin',
+      approvalStatus: 'approved',
+      departmentCode: 'ADMIN',
+      academicId: `PUST-REP-${suffix}`,
+      hallAffiliation: 'Administrative Building',
+    });
+    replacementUserId = replacementUser.id;
+
+    const meRes = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: { Cookie: deletedUserCookie },
+    });
+    assert.equal(meRes.status, 200);
+    const meJson = (await meRes.json()) as { user: unknown };
+    assert.equal(meJson.user, null);
+
+    const protectedRes = await fetch(`${baseUrl}/api/portal/users`, {
+      headers: { Cookie: deletedUserCookie },
+    });
+    assert.equal(protectedRes.status, 401);
+
+    // 2. VC can create and delete a notice
+    const createNoticeRes = await fetch(`${baseUrl}/api/notices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: vcCookie,
+      },
+      body: JSON.stringify({
+        referenceNo: `PUST/VC/${suffix}`,
+        title: 'VC Office Regression Notice',
+        category: 'NOC & Orders',
+        departmentCode: 'ALL',
+        boardScope: 'central',
+        visibility: 'public',
+        summary: 'Summary for VC notice deletion regression check.',
+        body: 'Full body text for VC notice deletion regression check.',
+      }),
+    });
+    assert.equal(createNoticeRes.status, 201);
+    const createdNoticeJson = (await createNoticeRes.json()) as { notice: { id: string } };
+
+    const deleteNoticeRes = await fetch(
+      `${baseUrl}/api/notices/${encodeURIComponent(createdNoticeJson.notice.id)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Cookie: vcCookie,
+        },
+      }
+    );
+    assert.equal(deleteNoticeRes.status, 200);
+
+    // 3. PATCH /users/:id clears teacher assignments on role change and upserts/syncs StudentRecord
+    const targetTeacher = await pustRepo.createUser({
+      name: 'Role Transition User',
+      email: `transition.${suffix}@pust.ac.bd`,
+      passwordHash: hashPassword('Transition#1'),
+      role: 'teacher',
+      approvalStatus: 'approved',
+      departmentCode: 'CSE',
+      academicId: `PUST-TRN-${suffix}`,
+      hallAffiliation: 'Academic Building',
+      assignedCourses: ['CSE-3101'],
+      assignedSessions: ['2022-23'],
+    });
+    promotedUserId = targetTeacher.id;
+
+    const updatedAcademicId = `2501${String(suffix).slice(-4)}`;
+    const patchToStudentRes = await fetch(
+      `${baseUrl}/api/portal/users/${encodeURIComponent(targetTeacher.id)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          Cookie: adminCookie,
+        },
+        body: JSON.stringify({
+          role: 'student',
+          academicId: updatedAcademicId,
+          session: '2025-26',
+          hallAffiliation: 'July 06 Hall (Male Hall 1)',
+        }),
+      }
+    );
+    assert.equal(patchToStudentRes.status, 200);
+    const patchedJson = (await patchToStudentRes.json()) as {
+      user: {
+        role: string;
+        academicId: string;
+        assignedCourses?: string[];
+        assignedSessions?: string[];
+      };
+    };
+    assert.equal(patchedJson.user.role, 'student');
+    assert.deepEqual(patchedJson.user.assignedCourses, []);
+    assert.deepEqual(patchedJson.user.assignedSessions, []);
+
+    const syncedStudent = await pustRepo.findStudentByAcademicId(updatedAcademicId);
+    assert.ok(syncedStudent);
+    assert.equal(syncedStudent.userId, targetTeacher.id);
+    assert.equal(syncedStudent.academicId, updatedAcademicId);
+    assert.equal(syncedStudent.session, '2025-26');
+  } finally {
+    if (replacementUserId) await pustRepo.deleteUser(replacementUserId);
+    if (promotedUserId) await pustRepo.deleteUser(promotedUserId);
+    await pustRepo.deleteUser(vcUser.id);
+    await pustRepo.deleteUser(adminUser.id);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
+

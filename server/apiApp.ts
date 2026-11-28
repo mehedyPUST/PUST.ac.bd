@@ -329,9 +329,7 @@ export function mountApiRoutes(app: Express): void {
       });
       return;
     }
-    const liveUser =
-      (await pustRepo.findUserById(claims.sub)) ||
-      (await pustRepo.findUserByEmail(claims.email));
+    const liveUser = await pustRepo.findUserById(claims.sub);
     if (!liveUser || liveUser.approvalStatus !== 'approved') {
       clearAuthCookie(req, res);
       res.json({ user: null });
@@ -590,9 +588,7 @@ export function mountApiRoutes(app: Express): void {
       return;
     }
 
-    const liveUser =
-      (await pustRepo.findUserById(claims.sub)) ||
-      (await pustRepo.findUserByEmail(claims.email));
+    const liveUser = await pustRepo.findUserById(claims.sub);
     if (!liveUser || liveUser.approvalStatus !== 'approved') {
       clearAuthCookie(req, res);
       res.status(401).json({ error: 'Session is no longer valid.' });
@@ -670,6 +666,9 @@ export function mountApiRoutes(app: Express): void {
       const isExecutiveCentral = ['admin', 'registrar', 'vc'].includes(actor.role);
       const isCentralUnit = ['admin', 'registrar', 'vc', 'proctor', 'library', 'hall'].includes(actor.role);
 
+      const normalizedDeptCode = parsed.data.departmentCode.toUpperCase();
+      const actorDeptCode = actor.departmentCode.toUpperCase();
+
       if (parsed.data.boardScope === 'central') {
         if (!isCentralUnit) {
           res.status(403).json({
@@ -681,7 +680,7 @@ export function mountApiRoutes(app: Express): void {
         if (
           !isExecutiveCentral &&
           ((actor.role !== 'chairman' && actor.role !== 'teacher') ||
-            parsed.data.departmentCode !== actor.departmentCode)
+            normalizedDeptCode !== actorDeptCode)
         ) {
           res.status(403).json({
             error: 'You may only publish departmental notices for your assigned department.',
@@ -695,7 +694,7 @@ export function mountApiRoutes(app: Express): void {
           });
           return;
         }
-        if (!isExecutiveCentral && parsed.data.departmentCode !== actor.departmentCode) {
+        if (!isExecutiveCentral && normalizedDeptCode !== actorDeptCode) {
           res.status(403).json({
             error: 'You may only publish course notices for your assigned department.',
           });
@@ -705,6 +704,7 @@ export function mountApiRoutes(app: Express): void {
 
       const notice = await pustRepo.createNotice({
         ...parsed.data,
+        departmentCode: normalizedDeptCode,
         publishedAt: new Date().toISOString().slice(0, 10),
         authorName: actor.name,
         authorRole: actor.role,
@@ -735,13 +735,14 @@ export function mountApiRoutes(app: Express): void {
         return;
       }
       if (req.authUser!.role === 'chairman') {
-        if (existing.departmentCode !== req.authUser!.departmentCode) {
+        const actorDept = req.authUser!.departmentCode.toUpperCase();
+        if (existing.departmentCode.toUpperCase() !== actorDept) {
           res.status(403).json({ error: 'Chairmen may only manage notices in their department.' });
           return;
         }
         if (
           parsed.data.boardScope === 'central' ||
-          (parsed.data.departmentCode && parsed.data.departmentCode !== req.authUser!.departmentCode)
+          (parsed.data.departmentCode && parsed.data.departmentCode.toUpperCase() !== actorDept)
         ) {
           res.status(403).json({
             error: 'Chairmen cannot reassign notices to the Central board or another department.',
@@ -761,13 +762,21 @@ export function mountApiRoutes(app: Express): void {
         });
         return;
       }
-      const normalizedPatch = normalizeClearablePatch(parsed.data, [
-        'targetSession',
-        'targetCourseCode',
-        'attachmentName',
-        'attachmentUrl',
-        'attachmentType',
-      ] as const);
+      const normalizedPatch = normalizeClearablePatch(
+        {
+          ...parsed.data,
+          ...(parsed.data.departmentCode !== undefined
+            ? { departmentCode: parsed.data.departmentCode.toUpperCase() }
+            : {}),
+        },
+        [
+          'targetSession',
+          'targetCourseCode',
+          'attachmentName',
+          'attachmentUrl',
+          'attachmentType',
+        ] as const
+      );
       const updated = await pustRepo.updateNotice(existing.id, normalizedPatch);
       const isPinOnly =
         Object.keys(normalizedPatch).length === 1 && normalizedPatch.pinned !== undefined;
@@ -783,7 +792,7 @@ export function mountApiRoutes(app: Express): void {
 
   app.delete(
     '/api/notices/:id',
-    requireRoles('admin', 'registrar', 'chairman'),
+    requireRoles('admin', 'registrar', 'vc', 'chairman'),
     async (req: AuthenticatedRequest, res) => {
       const existing = await pustRepo.findNoticeById(String(req.params.id));
       if (!existing) {
@@ -792,7 +801,7 @@ export function mountApiRoutes(app: Express): void {
       }
       if (
         req.authUser!.role === 'chairman' &&
-        existing.departmentCode !== req.authUser!.departmentCode
+        existing.departmentCode.toUpperCase() !== req.authUser!.departmentCode.toUpperCase()
       ) {
         res.status(403).json({ error: 'Chairmen may only delete notices in their department.' });
         return;

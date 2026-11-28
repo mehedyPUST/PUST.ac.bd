@@ -200,8 +200,18 @@ export function AdminCmsPanel({
 
   // Admin About CMS
   const [aboutSlug, setAboutSlug] = useState<AboutContentRecord['slug']>('our-university');
-  const [aboutTitle, setAboutTitle] = useState(aboutSections[0]?.title || '');
-  const [aboutBody, setAboutBody] = useState(aboutSections[0]?.body || '');
+  const [aboutTitle, setAboutTitle] = useState(
+    () =>
+      aboutSections.find((s) => s.slug === 'our-university')?.title ||
+      aboutSections[0]?.title ||
+      ''
+  );
+  const [aboutBody, setAboutBody] = useState(
+    () =>
+      aboutSections.find((s) => s.slug === 'our-university')?.body ||
+      aboutSections[0]?.body ||
+      ''
+  );
 
   // Admin Current VC CMS
   const currentVc = vcProfiles.find((v) => v.isCurrent) || vcProfiles[0];
@@ -263,6 +273,12 @@ export function AdminCmsPanel({
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    const found = aboutSections.find((s) => s.slug === aboutSlug);
+    setAboutTitle(found?.title || '');
+    setAboutBody(found?.body || '');
+  }, [aboutSections, aboutSlug]);
 
   useEffect(() => {
     if (!currentVc) return;
@@ -1351,9 +1367,10 @@ export function AdminCmsPanel({
                       const canManage =
                         user.role === 'admin' ||
                         user.role === 'registrar' ||
-                        (user.role === 'chairman' && n.departmentCode === user.departmentCode);
-                      const canPin =
-                        canManage || user.role === 'vc';
+                        user.role === 'vc' ||
+                        (user.role === 'chairman' &&
+                          n.departmentCode.toUpperCase() === user.departmentCode.toUpperCase());
+                      const canPin = canManage;
                       const busy = noticeActionId === n.id;
                       return (
                         <div
@@ -1641,7 +1658,7 @@ export function AdminCmsPanel({
                           </p>
                         </div>
 
-                        {u.approvalStatus !== 'approved' && u.role !== 'admin' && (
+                        {u.approvalStatus !== 'approved' && u.role !== 'admin' && u.id !== user.id && (
                           <div className="flex gap-2">
                             <button
                               type="button"
@@ -1650,13 +1667,15 @@ export function AdminCmsPanel({
                             >
                               Approve
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleUserApproval(u.id, 'rejected')}
-                              className="px-3 py-1.5 font-medium rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
-                            >
-                              Reject
-                            </button>
+                            {u.approvalStatus !== 'rejected' && (
+                              <button
+                                type="button"
+                                onClick={() => handleUserApproval(u.id, 'rejected')}
+                                className="px-3 py-1.5 font-medium rounded-lg border border-red-300 bg-white text-red-700 hover:bg-red-50 cursor-pointer whitespace-nowrap shrink-0"
+                              >
+                                Reject
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1734,10 +1753,8 @@ export function AdminCmsPanel({
                   const slug = e.target.value as AboutContentRecord['slug'];
                   setAboutSlug(slug);
                   const found = aboutSections.find((s) => s.slug === slug);
-                  if (found) {
-                    setAboutTitle(found.title);
-                    setAboutBody(found.body);
-                  }
+                  setAboutTitle(found?.title || '');
+                  setAboutBody(found?.body || '');
                 }}
                 className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-[#F7F7F5] focus:outline-none focus:border-pust-800"
               >

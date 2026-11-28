@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   Award,
   Building2,
@@ -246,6 +246,7 @@ export function AdminUserDirectoryPanel({
   const [editOfficeName, setEditOfficeName] = useState('');
   const [editDesignation, setEditDesignation] = useState('');
   const [editAcademicId, setEditAcademicId] = useState('');
+  const [editSession, setEditSession] = useState('');
   const [editHallAffiliation, setEditHallAffiliation] = useState('');
   const [editStatus, setEditStatus] = useState<ApprovalStatus>('approved');
   const [editCourses, setEditCourses] = useState('');
@@ -336,6 +337,11 @@ export function AdminUserDirectoryPanel({
     [liveDepartments, departments]
   );
 
+  const onPendingFacultyRequestsChangeRef = useRef(onPendingFacultyRequestsChange);
+  useEffect(() => {
+    onPendingFacultyRequestsChangeRef.current = onPendingFacultyRequestsChange;
+  }, [onPendingFacultyRequestsChange]);
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -351,13 +357,13 @@ export function AdminUserDirectoryPanel({
       }
       const pendingCount = reqRes.requests.filter((r) => r.status === 'pending').length;
       setPendingFacultyCount(pendingCount);
-      onPendingFacultyRequestsChange?.(pendingCount);
+      onPendingFacultyRequestsChangeRef.current?.(pendingCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load user directory.');
     } finally {
       setLoading(false);
     }
-  }, [onPendingFacultyRequestsChange]);
+  }, []);
 
   useEffect(() => {
     void loadUsers();
@@ -768,6 +774,7 @@ export function AdminUserDirectoryPanel({
     setEditOfficeName(u.officeName || '');
     setEditDesignation(u.designation || '');
     setEditAcademicId(u.academicId);
+    setEditSession(u.session || '');
     setEditHallAffiliation(u.hallAffiliation);
     setEditStatus(u.approvalStatus);
     setEditCourses((u.assignedCourses || []).join(', '));
@@ -907,7 +914,8 @@ export function AdminUserDirectoryPanel({
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
-      const res = await pustApi.updateAdminUser(editingUser.id, {
+      const previousUser = editingUser;
+      const res = await pustApi.updateAdminUser(previousUser.id, {
         name: editName.trim(),
         email: editEmail.trim(),
         role: editRole,
@@ -916,18 +924,26 @@ export function AdminUserDirectoryPanel({
         officeName: editOfficeName.trim(),
         designation: editDesignation.trim(),
         academicId: editAcademicId.trim(),
+        ...(editRole === 'student' && editSession.trim() ? { session: editSession.trim() } : {}),
         hallAffiliation: editHallAffiliation.trim(),
         approvalStatus: editStatus,
         ...(editRole === 'teacher'
           ? { assignedCourses: courses, assignedSessions: sessions }
-          : {}),
+          : { assignedCourses: [], assignedSessions: [] }),
       });
       setEditingUser(null);
       setFeedback(`Updated directory account for ${res.user.name}.`);
       if (res.user.id === currentUser.id) {
         onSelfUpdated?.(res.user);
       }
-      await loadUsers();
+      const affectsPublicDirectory =
+        previousUser.role === 'chairman' ||
+        editRole === 'chairman' ||
+        Boolean(previousUser.claimedFacultyMemberId);
+      await Promise.all([
+        loadUsers(),
+        affectsPublicDirectory ? onCmsChange?.() : Promise.resolve(),
+      ]);
       onUsersChanged?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save account changes.');
@@ -1060,7 +1076,12 @@ export function AdminUserDirectoryPanel({
       await pustApi.deleteAdminUser(u.id);
       setConfirmDeleteId(null);
       setFeedback(`Removed account ${u.name} (${u.email}) from user directory.`);
-      await loadUsers();
+      const affectsPublicDirectory =
+        u.role === 'chairman' || Boolean(u.claimedFacultyMemberId);
+      await Promise.all([
+        loadUsers(),
+        affectsPublicDirectory ? onCmsChange?.() : Promise.resolve(),
+      ]);
       onUsersChanged?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete account.');
@@ -3305,6 +3326,21 @@ export function AdminUserDirectoryPanel({
                     className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                   />
                 </div>
+
+                {editRole === 'student' && (
+                  <div className="sm:col-span-2">
+                    <label className="block font-medium text-slate-700 mb-1">
+                      Academic Session
+                    </label>
+                    <input
+                      type="text"
+                      value={editSession}
+                      onChange={(e) => setEditSession(e.target.value)}
+                      placeholder="e.g. 2024-25"
+                      className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                  </div>
+                )}
 
                 {editRole === 'teacher' && (
                   <>

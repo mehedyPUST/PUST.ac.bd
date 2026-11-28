@@ -227,30 +227,32 @@ export function requireAuth(
 
   registeredLiveUserResolver(claims.sub)
     .then((liveUser) => {
-      if (liveUser) {
-        if (liveUser.approvalStatus !== 'approved') {
-          res.status(403).json({ error: 'Account pending approval by university authority' });
-          return;
-        }
-        req.authUser = {
-          ...claims,
-          name: liveUser.name,
-          email: liveUser.email,
-          role: liveUser.role,
-          approvalStatus: liveUser.approvalStatus,
-          departmentCode: liveUser.departmentCode,
-          academicId: liveUser.academicId,
-          session: liveUser.session,
-          hallAffiliation: liveUser.hallAffiliation,
-          ...(liveUser.officeCode ? { officeCode: liveUser.officeCode } : {}),
-          ...(liveUser.officeName ? { officeName: liveUser.officeName } : {}),
-          ...(liveUser.designation ? { designation: liveUser.designation } : {}),
-          ...(liveUser.assignedCourses ? { assignedCourses: liveUser.assignedCourses } : {}),
-          ...(liveUser.assignedSessions ? { assignedSessions: liveUser.assignedSessions } : {}),
-        };
-      } else {
-        req.authUser = claims;
+      if (!liveUser) {
+        clearAuthCookie(req, res);
+        res.status(401).json({ error: 'Session expired or account no longer exists.' });
+        return;
       }
+      if (liveUser.approvalStatus !== 'approved') {
+        clearAuthCookie(req, res);
+        res.status(403).json({ error: 'Account pending approval by university authority' });
+        return;
+      }
+      req.authUser = {
+        sub: claims.sub,
+        name: liveUser.name,
+        email: liveUser.email,
+        role: liveUser.role,
+        approvalStatus: liveUser.approvalStatus,
+        departmentCode: liveUser.departmentCode,
+        academicId: liveUser.academicId,
+        ...(liveUser.session ? { session: liveUser.session } : {}),
+        hallAffiliation: liveUser.hallAffiliation,
+        ...(liveUser.officeCode ? { officeCode: liveUser.officeCode } : {}),
+        ...(liveUser.officeName ? { officeName: liveUser.officeName } : {}),
+        ...(liveUser.designation ? { designation: liveUser.designation } : {}),
+        ...(liveUser.assignedCourses ? { assignedCourses: liveUser.assignedCourses } : {}),
+        ...(liveUser.assignedSessions ? { assignedSessions: liveUser.assignedSessions } : {}),
+      };
       next();
     })
     .catch(next);

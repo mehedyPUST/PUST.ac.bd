@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -73,6 +73,11 @@ export function AdminFacultyRequestsPanel({
   const [adminNote, setAdminNote] = useState('');
   const [submittingDecision, setSubmittingDecision] = useState<'approve' | 'reject' | null>(null);
 
+  const onPendingCountChangeRef = useRef(onPendingCountChange);
+  useEffect(() => {
+    onPendingCountChangeRef.current = onPendingCountChange;
+  }, [onPendingCountChange]);
+
   const loadRequests = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -80,7 +85,7 @@ export function AdminFacultyRequestsPanel({
       const res = await pustApi.getAdminFacultyProfileRequests();
       setRequests(res.requests);
       const pendingCount = res.requests.filter((r) => r.status === 'pending').length;
-      onPendingCountChange?.(pendingCount);
+      onPendingCountChangeRef.current?.(pendingCount);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Unable to load faculty profile approval requests.'
@@ -88,7 +93,7 @@ export function AdminFacultyRequestsPanel({
     } finally {
       setLoading(false);
     }
-  }, [onPendingCountChange]);
+  }, []);
 
   useEffect(() => {
     void loadRequests();

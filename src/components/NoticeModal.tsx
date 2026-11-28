@@ -267,7 +267,13 @@ export function NoticeModal({
                 </button>
               )}
 
-              {user?.role === 'admin' && onDeleteNotice && (
+              {onDeleteNotice &&
+                user &&
+                (user.role === 'admin' ||
+                  user.role === 'registrar' ||
+                  user.role === 'vc' ||
+                  (user.role === 'chairman' &&
+                    notice.departmentCode.toUpperCase() === user.departmentCode.toUpperCase())) && (
                 confirmDelete ? (
                   <div className="inline-flex items-center gap-2">
                     <button

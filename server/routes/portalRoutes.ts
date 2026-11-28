@@ -1492,6 +1492,24 @@ portalRouter.patch(
     }
 
     try {
+      const resultingRole =
+        actor.role === 'admin' && patch.role !== undefined ? patch.role : target.role;
+      const teachingScopePatch =
+        resultingRole === 'teacher'
+          ? {
+              ...(patch.assignedCourses !== undefined
+                ? { assignedCourses: patch.assignedCourses }
+                : {}),
+              ...(patch.assignedSessions !== undefined
+                ? { assignedSessions: patch.assignedSessions }
+                : {}),
+            }
+          : patch.role !== undefined ||
+            patch.assignedCourses !== undefined ||
+            patch.assignedSessions !== undefined
+          ? { assignedCourses: [], assignedSessions: [] }
+          : {};
+
       const updated = await pustRepo.updateUser(target.id, {
         ...(patch.name !== undefined ? { name: patch.name } : {}),
         ...(patch.email !== undefined ? { email: patch.email } : {}),
@@ -1512,10 +1530,7 @@ portalRouter.patch(
           ? { designation: patch.designation || undefined }
           : {}),
         ...(patch.approvalStatus !== undefined ? { approvalStatus: patch.approvalStatus } : {}),
-        ...(patch.assignedCourses !== undefined ? { assignedCourses: patch.assignedCourses } : {}),
-        ...(patch.assignedSessions !== undefined
-          ? { assignedSessions: patch.assignedSessions }
-          : {}),
+        ...teachingScopePatch,
       });
 
       if (!updated) {
@@ -1524,14 +1539,51 @@ portalRouter.patch(
       }
 
       if (updated.role === 'student') {
-        const stu = await pustRepo.findStudentByAcademicId(target.academicId);
+        const allStudents = await pustRepo.listStudents();
+        const stu =
+          allStudents.find((s) => s.userId === target.id) ||
+          allStudents.find((s) => s.academicId === target.academicId) ||
+          allStudents.find((s) => s.academicId === updated.academicId);
         if (stu) {
           await pustRepo.updateStudentById(stu.id, {
+            userId: updated.id,
+            academicId: updated.academicId,
             name: updated.name,
             email: updated.email,
             departmentCode: updated.departmentCode,
             ...(updated.session ? { session: updated.session } : {}),
             hallName: updated.hallAffiliation,
+            approvalStatus: updated.approvalStatus,
+          });
+        } else {
+          await pustRepo.upsertStudent({
+            id: `stu-${updated.academicId}`,
+            userId: updated.id,
+            academicId: updated.academicId,
+            name: updated.name,
+            email: updated.email,
+            phone: 'N/A',
+            departmentCode: updated.departmentCode,
+            session: updated.session?.trim() || '2025-26',
+            currentSemester: 1,
+            cgpa: 0,
+            completedSemesters: 0,
+            allResultsPublished: false,
+            hallName: updated.hallAffiliation,
+            seatNumber: 'Unassigned',
+            admissionDocuments: [
+              actor.role === 'chairman' ? 'Department Provisioned' : 'Admin Provisioned',
+            ],
+            chairmanNotes:
+              actor.role === 'chairman'
+                ? `Provisioned directly by ${updated.departmentCode} Department Chairman.`
+                : 'Provisioned directly via Admin User Directory.',
+            adminNotes:
+              actor.role === 'chairman'
+                ? `Managed under ${updated.departmentCode} Department.`
+                : 'Verified by Admin Office.',
+            disciplinaryStatus: 'Clear',
+            disciplinaryNotes: 'Clean record.',
             approvalStatus: updated.approvalStatus,
           });
         }
@@ -2461,14 +2513,18 @@ portalRouter.post(
       res.status(400).json({ error: 'Invalid course definition.' });
       return;
     }
+    const normalizedDeptCode = parsed.data.departmentCode.toUpperCase();
     if (
       req.authUser!.role === 'chairman' &&
-      parsed.data.departmentCode !== req.authUser!.departmentCode
+      normalizedDeptCode !== req.authUser!.departmentCode.toUpperCase()
     ) {
       res.status(403).json({ error: 'Chairmen can only assign courses for their own department.' });
       return;
     }
-    const course = await pustRepo.createCourse(parsed.data);
+    const course = await pustRepo.createCourse({
+      ...parsed.data,
+      departmentCode: normalizedDeptCode,
+    });
     res.status(201).json({ course });
   }
 );
@@ -2482,15 +2538,17 @@ portalRouter.post(
       res.status(400).json({ error: 'Complete all examination circular fields.' });
       return;
     }
+    const normalizedDeptCode = parsed.data.departmentCode.toUpperCase();
     if (
       req.authUser!.role === 'chairman' &&
-      parsed.data.departmentCode !== req.authUser!.departmentCode
+      normalizedDeptCode !== req.authUser!.departmentCode.toUpperCase()
     ) {
       res.status(403).json({ error: 'Chairmen can only publish exam circulars for their department.' });
       return;
     }
     const circular = await pustRepo.createExamCircular({
       ...parsed.data,
+      departmentCode: normalizedDeptCode,
       publishedBy: req.authUser!.name,
       publishedAt: new Date().toISOString().slice(0, 10),
     });

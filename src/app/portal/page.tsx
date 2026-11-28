@@ -20,6 +20,7 @@ export default function PortalPage() {
     loadBookmarks,
     loadNotices,
     loadCmsProfile,
+    loadDepartments,
     navigateTo,
   } = usePust();
 
@@ -45,7 +46,9 @@ export default function PortalPage() {
           onUserChange={setUser}
           onBookmarksChange={loadBookmarks}
           onNoticesChange={loadNotices}
-          onCmsChange={loadCmsProfile}
+          onCmsChange={async () => {
+            await Promise.all([loadCmsProfile(), loadDepartments()]);
+          }}
           onBackToSite={() => navigateTo('/')}
         />
       </Suspense>

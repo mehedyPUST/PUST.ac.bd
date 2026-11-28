@@ -80,10 +80,11 @@ export function ApprovalDashboardPanel({
   async function handleReview(id: string, decision: 'approve' | 'decline') {
     setError(null);
     setFeedback(null);
+    const reviewerLabel = user.role === 'admin' ? 'Admin' : 'Chairman';
     try {
       await pustApi.reviewDepartmentRequest(id, {
         decision,
-        note: decision === 'approve' ? 'Approved by Chairman.' : 'Declined by Chairman.',
+        note: decision === 'approve' ? `Approved by ${reviewerLabel}.` : `Declined by ${reviewerLabel}.`,
       });
       setFeedback(decision === 'approve' ? 'Request approved.' : 'Request declined.');
       await loadOverview();
@@ -130,7 +131,9 @@ export function ApprovalDashboardPanel({
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
             <button
               type="button"
-              onClick={() => onOpenTab(user.role === 'chairman' ? 'users' : 'governance')}
+              onClick={() =>
+                onOpenTab(user.role === 'chairman' || user.role === 'admin' ? 'users' : 'governance')
+              }
               className="text-left p-3 rounded-xl border border-stone-200 bg-[#FAF9F6] hover:border-pust-800 cursor-pointer"
             >
               <p className="text-slate-600">Pending Accounts</p>
@@ -271,7 +274,8 @@ export function ApprovalDashboardPanel({
                     {req.requesterName} ({req.requesterAcademicId}) — {req.summary}
                   </p>
                 </div>
-                {user.role === 'chairman' && req.status === 'pending' && (
+                {(user.role === 'chairman' || user.role === 'admin') &&
+                  (req.status === 'pending' || req.status === 'revision_requested') && (
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
