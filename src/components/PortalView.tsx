@@ -514,46 +514,46 @@ export function PortalView({
       ref={workspaceTopRef}
       className="portal-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10"
     >
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Responsive Workspace Sidebar (horizontal rail on mobile, viewport-bounded sticky 272px column on lg+) */}
-        <aside className="w-full lg:w-[272px] shrink-0 bg-white rounded-2xl border border-stone-200 overflow-hidden lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:flex lg:flex-col">
-          <div className="shrink-0 bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-4 sm:p-5 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <PustCrest variant="light" size={30} className="shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium text-pust-200 truncate text-left">
-                    {ROLE_LABELS[user.role]}
-                  </p>
-                  <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
-                    {user.name}
-                  </p>
-                  {activeRoleKey !== 'primary' && user.primaryRole && (
-                    <p className="text-[10px] text-pust-100/90 leading-snug truncate text-left mt-0.5">
-                      Primary: {ROLE_LABELS[user.primaryRole]}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                aria-label="Sign out of portal"
-                className="lg:hidden inline-flex items-center gap-1 min-h-[38px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
-              </button>
-            </div>
-            <div className="space-y-0.5 pt-0.5 border-t border-white/10">
-              <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left truncate">
-                {user.departmentCode} · ID {user.academicId}
-                {user.session ? ` · ${user.session}` : ''}
+      <div className="grid grid-cols-1 lg:grid-cols-[272px_minmax(0,1fr)] gap-6 items-stretch">
+        {/* Grid 1: User's Dashboard (Col 1, Row 1 — matches Grid 3 width and Grid 2 height) */}
+        <section
+          aria-label="User dashboard summary"
+          data-portal-grid="user-dashboard"
+          className="lg:col-start-1 lg:row-start-1 h-full rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white border border-pust-950/20 p-4 sm:p-5 flex flex-col justify-between gap-3"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 space-y-0.5">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-pust-200 truncate text-left">
+                {ROLE_LABELS[user.role]}
               </p>
-              <p className="font-mono text-[11px] text-pust-200/80 text-left truncate">
-                {user.email}
+              <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
+                {user.name}
               </p>
+              {activeRoleKey !== 'primary' && user.primaryRole && (
+                <p className="text-[10px] text-pust-100/90 leading-snug truncate text-left">
+                  Primary: {ROLE_LABELS[user.primaryRole]}
+                </p>
+              )}
             </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              aria-label="Sign out of portal"
+              className="lg:hidden inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+
+          <div className="space-y-1.5 pt-2 border-t border-white/10">
+            <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left truncate">
+              {user.departmentCode} · ID {user.academicId}
+              {user.session ? ` · ${user.session}` : ''}
+            </p>
+            <p className="font-mono text-[11px] text-pust-200/80 text-left truncate">
+              {user.email}
+            </p>
             <RoleSwitcherControl
               variant="sidebar"
               contexts={roleContexts}
@@ -563,7 +563,82 @@ export function PortalView({
               onSwitch={handleSwitchRole}
             />
           </div>
+        </section>
 
+        {/* Grid 2: University Name (Col 2, Row 1 — matches Grid 4 width and Grid 1 height) */}
+        <header
+          data-portal-grid="university-name"
+          className="lg:col-start-2 lg:row-start-1 h-full bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 sm:py-5 flex flex-col justify-center"
+        >
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <PustCrest variant="primary" size={44} className="shrink-0" />
+              <div className="min-w-0 space-y-0.5">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold text-left truncate">
+                  {profile?.navbarTagline?.trim() || 'Established 2008 · Rajapur, Pabna'}
+                </p>
+                <h1 className="font-serif text-lg sm:text-xl lg:text-2xl font-medium text-slate-950 leading-tight text-left">
+                  Pabna University of Science and Technology
+                </h1>
+                <p className="font-mono text-[11px] text-slate-500 text-left truncate">
+                  Digital Campus / {ROLE_LABELS[user.role]} /{' '}
+                  <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 xl:justify-end shrink-0">
+              <RoleSwitcherControl
+                variant="header"
+                contexts={roleContexts}
+                activeKey={activeRoleKey}
+                switching={switchingRole}
+                disabled={mustChangePassword}
+                onSwitch={handleSwitchRole}
+              />
+              <button
+                type="button"
+                onClick={() => selectTab('profile')}
+                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <User className="w-3.5 h-3.5 text-pust-800" />
+                <span>My Profile</span>
+              </button>
+              <button
+                type="button"
+                onClick={onBackToSite}
+                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Public Site</span>
+              </button>
+              {user.role === 'admin' && (
+                <>
+                  <AdminModeSwitch
+                    checked={editMode}
+                    onToggle={toggleEditMode}
+                    variant="desktop"
+                  />
+                  <button
+                    type="button"
+                    onClick={openCmsDirectory}
+                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span>CMS Directory</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Grid 3: Sidebar Links (Col 1, Row 2 — matches Grid 1 width) */}
+        <aside
+          aria-label="Portal sidebar links"
+          data-portal-grid="sidebar-links"
+          className="lg:col-start-1 lg:row-start-2 w-full bg-white rounded-2xl border border-stone-200 overflow-hidden lg:self-start lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:flex lg:flex-col"
+        >
           <nav
             ref={navRailRef}
             aria-label="Campus portal workspace modules"
@@ -647,70 +722,11 @@ export function PortalView({
           </div>
         </aside>
 
-        {/* Main Workspace Viewport */}
-        <div className="flex-1 min-w-0 w-full space-y-6">
-          {/* Top Contextual Breadcrumb Header (hidden on Profile tab, which renders its own header card) */}
-          {resolvedTab !== 'profile' && (
-            <header className="bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="min-w-0 space-y-0.5">
-                <p className="font-mono text-[11px] text-slate-500 text-left truncate">
-                  Digital Campus / {ROLE_LABELS[user.role]} /{' '}
-                  <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
-                </p>
-                <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-950 leading-tight truncate">
-                  {activeTabMeta.label}
-                </h1>
-                <p className="font-mono text-[11px] text-slate-500 tabular-nums truncate text-left">
-                  {user.email} · {user.hallAffiliation}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 md:justify-end shrink-0">
-                <RoleSwitcherControl
-                  variant="header"
-                  contexts={roleContexts}
-                  activeKey={activeRoleKey}
-                  switching={switchingRole}
-                  disabled={mustChangePassword}
-                  onSwitch={handleSwitchRole}
-                />
-                <button
-                  type="button"
-                  onClick={() => selectTab('profile')}
-                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <User className="w-3.5 h-3.5 text-pust-800" />
-                  <span>My Profile</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={onBackToSite}
-                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Public Site</span>
-                </button>
-                {user.role === 'admin' && (
-                  <>
-                    <AdminModeSwitch
-                      checked={editMode}
-                      onToggle={toggleEditMode}
-                      variant="desktop"
-                    />
-                    <button
-                      type="button"
-                      onClick={openCmsDirectory}
-                      className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <LayoutGrid className="w-3.5 h-3.5" />
-                      <span>CMS Directory</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            </header>
-          )}
-
+        {/* Grid 4: Main Contents (Col 2, Row 2 — matches Grid 2 width) */}
+        <div
+          data-portal-grid="main-contents"
+          className="lg:col-start-2 lg:row-start-2 min-w-0 w-full space-y-6"
+        >
           {(logoutError || roleSwitchError) && (
             <div
               role="alert"

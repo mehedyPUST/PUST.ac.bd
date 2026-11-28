@@ -266,9 +266,9 @@ export function Navbar({
               setMobileMenuOpen(false);
             }}
             title="Pabna University of Science and Technology"
-            className="relative z-10 my-1 lg:my-0 rounded-md lg:rounded-none bg-white px-1.5 py-0.5 lg:px-2.5 xl:px-3 lg:py-0.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
+            className="relative z-10 my-2 lg:my-0 rounded-md lg:rounded-none bg-white p-1.5 lg:px-2.5 xl:px-3 lg:py-0.5 flex items-center justify-center shrink-0 self-center lg:self-stretch"
           >
-            <PustCrest size={34} className="lg:hidden" />
+            <PustCrest size={26} className="lg:hidden" />
             <PustCrest size={88} className="hidden lg:block xl:hidden" />
             <PustCrest size={92} className="hidden xl:block" />
           </Link>
@@ -276,7 +276,7 @@ export function Navbar({
           {/* Right Column: Tier 1 University Title & Search + Tier 2 Nav & Portal */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Tier 1: University Title Band + Stacked Est. Tagline (md+) & Always-Expanded Search (Right) */}
-            <div className="min-h-[54px] sm:h-[60px] lg:h-[64px] xl:h-[68px] py-1 lg:py-0 pl-2.5 sm:pl-3.5 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
+            <div className="min-h-[54px] sm:h-[60px] lg:h-[64px] xl:h-[68px] py-1 lg:py-0 pl-3 sm:pl-4 pr-0 lg:pl-5 lg:pr-0 xl:pl-6 xl:pr-0 flex items-center justify-between gap-2 sm:gap-4 text-white">
               <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <Link
                   href="/"
@@ -934,8 +934,8 @@ export function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 min-w-0 flex-1 text-left"
                 >
-                  <span className="shrink-0 rounded-md bg-white p-1 flex items-center justify-center">
-                    <PustCrest size={26} />
+                  <span className="shrink-0 rounded-md bg-white p-1.5 flex items-center justify-center">
+                    <PustCrest size={22} />
                   </span>
                   <div className="min-w-0">
                     <p className="font-serif text-[12px] font-medium leading-tight text-white text-left">
