@@ -76,10 +76,21 @@ export function getRoleTabs(
     icon: LayoutDashboard,
   };
 
+  const memberProfile: PortalTabItem = {
+    id: 'profile',
+    label: role === 'student' ? 'My Profile & Dossier' : 'My Profile',
+    desc:
+      role === 'student'
+        ? 'Identity, CGPA, hall & bookmarks'
+        : 'Account credentials, scope & bookmarks',
+    icon: UserCheck,
+  };
+
   switch (role) {
     case 'admin':
       return [
         overview,
+        memberProfile,
         {
           id: 'users',
           label: 'User Directory',
@@ -138,6 +149,7 @@ export function getRoleTabs(
     case 'chairman':
       return [
         overview,
+        memberProfile,
         {
           id: 'users',
           label: `${departmentCode} People`,
@@ -224,6 +236,7 @@ export function getRoleTabs(
     case 'student':
       return [
         overview,
+        memberProfile,
         {
           id: 'exams',
           label: 'Exams & Results',
@@ -258,6 +271,7 @@ export function getRoleTabs(
     case 'library':
       return [
         overview,
+        memberProfile,
         {
           id: 'library',
           label: 'Library Desk',
@@ -286,6 +300,7 @@ export function getRoleTabs(
     case 'hall':
       return [
         overview,
+        memberProfile,
         {
           id: 'halls',
           label: `Hall Desk (${hallAffiliation})`,
@@ -314,6 +329,7 @@ export function getRoleTabs(
     case 'proctor':
       return [
         overview,
+        memberProfile,
         {
           id: 'students',
           label: 'Student Conduct',
@@ -343,6 +359,7 @@ export function getRoleTabs(
     case 'vc':
       return [
         overview,
+        memberProfile,
         {
           id: 'governance',
           label: role === 'vc' ? 'Notices & Audit Trail' : 'Notices, Inquiries & Audit',
@@ -369,6 +386,6 @@ export function getRoleTabs(
         },
       ];
     default:
-      return [overview];
+      return [overview, memberProfile];
   }
 }

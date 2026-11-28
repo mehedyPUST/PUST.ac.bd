@@ -15,6 +15,7 @@ interface PortalAuthGatewayProps {
   departments: DepartmentRecord[];
   bootstrapStatus: BootstrapStatus;
   initialAuthError?: string | null;
+  requestedTab?: string | null;
   onAuthenticated: (user: AuthUser) => Promise<void> | void;
   onNavigateVerify: () => void;
   onBackToSite: () => void;
@@ -36,6 +37,7 @@ export function PortalAuthGateway({
   departments,
   bootstrapStatus,
   initialAuthError = null,
+  requestedTab = null,
   onAuthenticated,
   onNavigateVerify,
   onBackToSite,
@@ -163,8 +165,15 @@ export function PortalAuthGateway({
 
   const showAdminTab = !bootstrapStatus.adminConfigured || bootstrapStatus.envAdminActive;
 
+  const requestedTabLabel =
+    requestedTab === 'profile'
+      ? 'Member Profile'
+      : requestedTab
+      ? requestedTab.charAt(0).toUpperCase() + requestedTab.slice(1)
+      : null;
+
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+    <section className="portal-shell max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left Institutional Context Column */}
         <div className="lg:col-span-5 rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-7 sm:p-8 flex flex-col justify-between gap-6">
@@ -270,6 +279,18 @@ export function PortalAuthGateway({
             )}
           </div>
 
+          {requestedTabLabel && (
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-2.5 flex items-center justify-between gap-3 text-xs">
+              <span className="text-slate-700">
+                Sign in with your institutional account to open{' '}
+                <span className="font-semibold text-pust-900">{requestedTabLabel}</span>.
+              </span>
+              <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                ?tab={requestedTab}
+              </span>
+            </div>
+          )}
+
           {error && (
             <div role="alert" className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900">
               {error}
@@ -285,7 +306,7 @@ export function PortalAuthGateway({
             <form onSubmit={handleLogin} className="space-y-4 text-xs">
               <div>
                 <h2 className="font-serif text-xl font-medium text-slate-950">Portal Sign In</h2>
-                <p className="text-slate-600 mt-0.5">
+                <p className="text-slate-600 mt-0.5 text-left">
                   Sign in with your approved university credentials.
                 </p>
               </div>

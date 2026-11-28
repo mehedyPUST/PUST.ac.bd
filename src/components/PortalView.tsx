@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
-import { LayoutGrid, LogOut } from 'lucide-react';
+import { ExternalLink, LayoutGrid, LogOut, User } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
 import { PustCrest } from './PustCrest';
@@ -24,6 +24,7 @@ import { LibraryPanel } from './portal/LibraryPanel';
 import { OfficeFlowPanel } from './portal/OfficeFlowPanel';
 import { PortalAuthGateway } from './portal/PortalAuthGateway';
 import { PortalOverviewPanel } from './portal/PortalOverviewPanel';
+import { PortalProfilePanel } from './portal/PortalProfilePanel';
 import { PortalStudentLedgerPanel } from './portal/PortalStudentLedgerPanel';
 import { TeacherProfilePanel } from './portal/TeacherProfilePanel';
 import {
@@ -311,6 +312,7 @@ export function PortalView({
         departments={departments}
         bootstrapStatus={bootstrapStatus}
         initialAuthError={logoutError}
+        requestedTab={requestedTabParam}
         onAuthenticated={handleAuthenticated}
         onNavigateVerify={() => navigateTo('/verify')}
         onBackToSite={onBackToSite}
@@ -326,7 +328,10 @@ export function PortalView({
   const studentSelf = user.role === 'student' ? students[0] ?? null : null;
 
   return (
-    <section ref={workspaceTopRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <section
+      ref={workspaceTopRef}
+      className="portal-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10"
+    >
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Responsive Workspace Sidebar (horizontal rail on mobile, viewport-bounded sticky 272px column on lg+) */}
         <aside className="w-full lg:w-[272px] shrink-0 bg-white rounded-2xl border border-stone-200 overflow-hidden lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:flex lg:flex-col">
@@ -353,10 +358,15 @@ export function PortalView({
                 <span>Sign Out</span>
               </button>
             </div>
-            <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left">
-              {user.departmentCode} · ID {user.academicId}
-              {user.session ? ` · ${user.session}` : ''}
-            </p>
+            <div className="space-y-0.5 pt-0.5 border-t border-white/10">
+              <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left truncate">
+                {user.departmentCode} · ID {user.academicId}
+                {user.session ? ` · ${user.session}` : ''}
+              </p>
+              <p className="font-mono text-[11px] text-pust-200/80 text-left truncate">
+                {user.email}
+              </p>
+            </div>
           </div>
 
           <nav
@@ -424,17 +434,39 @@ export function PortalView({
         {/* Main Workspace Viewport */}
         <div className="flex-1 min-w-0 w-full space-y-6">
           {/* Top Contextual Breadcrumb Header */}
-          <div className="bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="font-mono text-xs text-slate-500 text-left truncate">
+          <header className="bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="min-w-0 space-y-0.5">
+              <p className="font-mono text-[11px] text-slate-500 text-left truncate">
                 Digital Campus / {ROLE_LABELS[user.role]} /{' '}
                 <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
               </p>
-              <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-900 mt-0.5 truncate">
+              <h1 className="font-serif text-xl sm:text-2xl font-medium text-slate-950 leading-tight truncate">
                 {activeTabMeta.label}
               </h1>
+              <p className="font-mono text-[11px] text-slate-500 tabular-nums truncate text-left">
+                {user.email} · {user.hallAffiliation}
+              </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2 sm:justify-end shrink-0">
+
+            <div className="flex flex-wrap items-center gap-2 md:justify-end shrink-0">
+              {resolvedTab !== 'profile' && (
+                <button
+                  type="button"
+                  onClick={() => selectTab('profile')}
+                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <User className="w-3.5 h-3.5 text-pust-800" />
+                  <span>My Profile</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onBackToSite}
+                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Public Site</span>
+              </button>
               {user.role === 'admin' && (
                 <>
                   <AdminModeSwitch
@@ -445,18 +477,15 @@ export function PortalView({
                   <button
                     type="button"
                     onClick={openCmsDirectory}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     <LayoutGrid className="w-3.5 h-3.5" />
                     <span>CMS Directory</span>
                   </button>
                 </>
               )}
-              <p className="font-mono text-xs text-slate-600 tabular-nums truncate max-w-full text-left">
-                {user.email} · {user.hallAffiliation}
-              </p>
             </div>
-          </div>
+          </header>
 
           {logoutError && (
             <div
@@ -512,15 +541,37 @@ export function PortalView({
               />
             )}
 
-            {resolvedTab === 'profile' && user.role === 'teacher' && (
-              <TeacherProfilePanel
-                user={user}
-                onUserChange={onUserChange}
-                onViewDepartment={(code) =>
-                  navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
-                }
-              />
-            )}
+            {resolvedTab === 'profile' &&
+              (user.role === 'teacher' ? (
+                <TeacherProfilePanel
+                  user={user}
+                  onUserChange={onUserChange}
+                  onViewDepartment={(code) =>
+                    navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
+                  }
+                />
+              ) : (
+                <PortalProfilePanel
+                  user={user}
+                  portalTabs={portalTabs}
+                  studentSelf={studentSelf}
+                  studentsCount={students.length}
+                  loadingStudents={loadingStudents}
+                  receipts={receipts}
+                  targetedNotifications={targetedNotifications}
+                  bookmarks={bookmarks}
+                  onSelectTab={(tab) => selectTab(tab)}
+                  onOpenReceipt={openReceiptModal}
+                  onNavigateVerify={() => navigateTo('/verify')}
+                  onRemoveBookmark={async (itemId) => {
+                    await pustApi.removeBookmark(itemId);
+                    await onBookmarksChange();
+                  }}
+                  onViewDepartment={(code) =>
+                    navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
+                  }
+                />
+              ))}
 
             {resolvedTab === 'students' && (
               <PortalStudentLedgerPanel

@@ -201,7 +201,7 @@
     color: #1c1917;
   }
 
-  :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not([class*="line-clamp-"]):not(.text-center *):not(.text-right *) {
+  :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not([class*="line-clamp-"]):not(.text-center *):not(.text-right *):not(.portal-shell *) {
     text-align: justify;
     text-justify: inter-word;
     hyphens: auto;

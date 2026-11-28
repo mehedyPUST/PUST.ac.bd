@@ -1,0 +1,512 @@
+'use client';
+
+import {
+  ArrowRight,
+  Bookmark,
+  CheckCircle2,
+  ExternalLink,
+  FileCheck2,
+  LayoutDashboard,
+  Receipt,
+  ShieldCheck,
+  Trash2,
+} from 'lucide-react';
+import type {
+  AuthUser,
+  BookmarkRecord,
+  NoticeRecord,
+  PaymentReceiptRecord,
+  StudentRecord,
+  UserRole,
+} from '../../types/pust';
+import { ROLE_LABELS, type PortalTab, type PortalTabItem } from './portalMeta';
+
+interface PortalProfilePanelProps {
+  user: AuthUser;
+  portalTabs: PortalTabItem[];
+  studentSelf: StudentRecord | null;
+  studentsCount: number;
+  loadingStudents: boolean;
+  receipts: PaymentReceiptRecord[];
+  targetedNotifications: NoticeRecord[];
+  bookmarks: BookmarkRecord[];
+  onSelectTab: (tab: PortalTab) => void;
+  onOpenReceipt: (receipt: PaymentReceiptRecord) => void;
+  onNavigateVerify: () => void;
+  onRemoveBookmark: (itemId: string) => Promise<void>;
+  onViewDepartment?: (departmentCode: string) => void;
+}
+
+const ROLE_SCOPE_DESCRIPTIONS: Record<UserRole, string> = {
+  student:
+    'Manage your academic record, digital library card, residential hall allotment and dues, semester examination forms, fee receipts, and four-office graduation clearances.',
+  teacher:
+    'Review your departmental roster, manage assigned courses and marksheets, publish course circulars, and maintain your verified public faculty directory profile.',
+  chairman:
+    'Lead departmental approvals, issue student signup tokens, verify library and exam forms, oversee departmental notices, and grant Chairman clearances.',
+  library:
+    'Verify Chairman-sealed library applications, issue digital and physical library cards, track book loans, and clear graduating students.',
+  hall:
+    'Publish residential hall vacancy circulars, allot seats, reconcile hall dues, and sign Hall clearances for graduating residents.',
+  proctor:
+    'Review student conduct and disciplinary standing across departments and issue Proctorial clearances.',
+  registrar:
+    'Oversee university-wide student records, review inquiries, publish central circulars, and audit governance actions.',
+  vc:
+    'Monitor institutional student records, executive notices, examinations, and campus-wide governance audit logs.',
+  admin:
+    'Full institutional oversight across user approvals, departmental tokens, payment gateways, public CMS content, examinations, and final certificate issuance.',
+};
+
+export function PortalProfilePanel({
+  user,
+  portalTabs,
+  studentSelf,
+  studentsCount,
+  loadingStudents,
+  receipts,
+  targetedNotifications,
+  bookmarks,
+  onSelectTab,
+  onOpenReceipt,
+  onNavigateVerify,
+  onRemoveBookmark,
+  onViewDepartment,
+}: PortalProfilePanelProps) {
+  const initials = user.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() || '')
+    .join('');
+
+  const quickTabs = portalTabs.filter((t) => t.id !== 'profile' && t.id !== 'overview').slice(0, 4);
+
+  return (
+    <div className="space-y-6">
+      {/* Unified Identity & Institutional Credentials Card */}
+      <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+        <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-600">
+            <span className="font-semibold text-pust-800 uppercase tracking-wider">
+              {ROLE_LABELS[user.role]}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span className="tabular-nums">ID {user.academicId}</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onSelectTab('overview')}
+              className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>Overview</span>
+            </button>
+            {onViewDepartment && user.departmentCode && !['ADMIN', 'REG', 'LIB', 'HALL', 'PROCTOR'].includes(user.departmentCode) && (
+              <button
+                type="button"
+                onClick={() => onViewDepartment(user.departmentCode)}
+                className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Dept Page</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onNavigateVerify}
+              className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-pust-800" />
+              <span>Verify Registry</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-pust-900 text-white font-serif text-xl font-semibold flex items-center justify-center shrink-0">
+                {initials || 'PU'}
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h2 className="font-serif text-2xl font-medium text-slate-950 leading-tight">
+                    {user.name}
+                  </h2>
+                  <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-emerald-700">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{user.approvalStatus.toUpperCase()}</span>
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-pust-800">
+                  {user.designation || ROLE_LABELS[user.role]} · {user.officeName || user.departmentCode}
+                </p>
+                <p className="font-mono text-xs text-slate-500 truncate">{user.email}</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed prose-justify">
+              {ROLE_SCOPE_DESCRIPTIONS[user.role]}
+            </p>
+          </div>
+
+          <dl className="lg:col-span-5 rounded-xl border border-stone-200 bg-[#FAF9F6] divide-y divide-stone-200 text-xs">
+            <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+              <dt className="font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                Academic / ID
+              </dt>
+              <dd className="font-mono font-semibold text-slate-950 tabular-nums text-right truncate">
+                {user.academicId}
+              </dd>
+            </div>
+            <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+              <dt className="font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                Unit / Dept
+              </dt>
+              <dd className="font-mono font-medium text-slate-900 text-right truncate">
+                {user.officeCode || user.departmentCode}
+              </dd>
+            </div>
+            <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+              <dt className="font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                Hall / Office
+              </dt>
+              <dd className="font-medium text-slate-900 text-right truncate">
+                {studentSelf?.hallName || user.hallAffiliation || 'Academic Block'}
+              </dd>
+            </div>
+            <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+              <dt className="font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                {user.role === 'student' ? 'Session' : 'Role Scope'}
+              </dt>
+              <dd className="font-mono text-slate-800 tabular-nums text-right truncate">
+                {user.session ||
+                  (user.assignedSessions && user.assignedSessions.length > 0
+                    ? user.assignedSessions.join(', ')
+                    : ROLE_LABELS[user.role])}
+              </dd>
+            </div>
+            <div className="px-4 py-2.5 flex items-center justify-between gap-4">
+              <dt className="font-mono uppercase tracking-wider text-slate-500 shrink-0">
+                Account Created
+              </dt>
+              <dd className="font-mono text-slate-700 tabular-nums text-right truncate">
+                {user.createdAt?.slice(0, 10) || 'Verified'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      {/* Uniform 4-Column Quantitative Standing Strip */}
+      <dl className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {user.role === 'student' ? (
+          <>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Academic ID &amp; Session
+              </dt>
+              <dd className="font-serif text-xl font-medium text-slate-950 tabular-nums">
+                {studentSelf?.academicId || user.academicId}
+              </dd>
+              <dd className="font-mono text-xs text-slate-600 tabular-nums">
+                {user.departmentCode} · {studentSelf?.session || user.session || 'Active'}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Cumulative Standing
+              </dt>
+              <dd className="font-serif text-2xl font-medium text-pust-900 tabular-nums">
+                {studentSelf ? `CGPA ${studentSelf.cgpa.toFixed(2)}` : loadingStudents ? '...' : 'Syncing'}
+              </dd>
+              <dd className="text-xs text-slate-600 tabular-nums">
+                {studentSelf
+                  ? `Semester ${studentSelf.currentSemester} (${studentSelf.completedSemesters}/8 completed)`
+                  : 'Fetching academic record'}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Hall &amp; Seat
+              </dt>
+              <dd className="font-serif text-xl font-medium text-slate-950 truncate">
+                {studentSelf?.hallName || user.hallAffiliation}
+              </dd>
+              <dd className="font-mono text-xs text-slate-600 tabular-nums truncate">
+                {studentSelf?.seatNumber || 'Seat pending verification'}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Conduct &amp; Results
+              </dt>
+              <dd className="font-serif text-xl font-medium text-emerald-700">
+                {studentSelf?.disciplinaryStatus || 'Clear'}
+              </dd>
+              <dd className="text-xs text-slate-600 truncate">
+                {studentSelf?.allResultsPublished ? 'All 8 results published' : 'Coursework in progress'}
+              </dd>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Assigned Unit
+              </dt>
+              <dd className="font-serif text-xl font-medium text-slate-950 truncate">
+                {user.officeCode || user.departmentCode}
+              </dd>
+              <dd className="text-xs text-slate-600 truncate">
+                {user.officeName || user.hallAffiliation || 'University Unit'}
+              </dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Visible Student Records
+              </dt>
+              <dd className="font-serif text-2xl font-medium text-pust-900 tabular-nums">
+                {loadingStudents ? '...' : studentsCount}
+              </dd>
+              <dd className="text-xs text-slate-600 truncate">
+                Authorized directory scope
+              </dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Targeted Circulars
+              </dt>
+              <dd className="font-serif text-2xl font-medium text-slate-950 tabular-nums">
+                {targetedNotifications.length}
+              </dd>
+              <dd className="text-xs text-slate-600 truncate">Active notices in scope</dd>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                Saved Bookmarks
+              </dt>
+              <dd className="font-serif text-2xl font-medium text-slate-950 tabular-nums">
+                {bookmarks.length}
+              </dd>
+              <dd className="text-xs text-slate-600 truncate">Pinned items across site</dd>
+            </div>
+          </>
+        )}
+      </dl>
+
+      {/* Aligned 12-Column Details & Activity Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        <div className="xl:col-span-7 space-y-6">
+          {user.role === 'student' && studentSelf ? (
+            <>
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                  <h3 className="font-serif text-lg font-medium text-slate-950">
+                    Academic &amp; Administrative Remarks
+                  </h3>
+                  <span className="font-mono text-xs text-slate-500">Official Ledger</span>
+                </div>
+                <dl className="divide-y divide-stone-200 text-xs sm:text-sm">
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 sm:w-36 shrink-0 pt-0.5">
+                      Chairman Note
+                    </dt>
+                    <dd className="text-slate-700 prose-justify flex-1">
+                      {studentSelf.chairmanNotes || 'No remarks recorded.'}
+                    </dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 sm:w-36 shrink-0 pt-0.5">
+                      Admin Office
+                    </dt>
+                    <dd className="text-slate-700 prose-justify flex-1">
+                      {studentSelf.adminNotes || 'No remarks recorded.'}
+                    </dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 sm:w-36 shrink-0 pt-0.5">
+                      Proctor Note
+                    </dt>
+                    <dd className="text-slate-700 prose-justify flex-1">
+                      {studentSelf.disciplinaryNotes || 'Clear standing.'}
+                    </dd>
+                  </div>
+                  <div className="py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500 sm:w-36 shrink-0">
+                      Phone Contact
+                    </dt>
+                    <dd className="font-mono text-xs text-slate-800 tabular-nums">
+                      {studentSelf.phone || 'On institutional file'}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                  <div className="flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 text-pust-800" />
+                    <h3 className="font-serif text-lg font-medium text-slate-950">
+                      Verified Admission Documents
+                    </h3>
+                  </div>
+                  <span className="font-mono text-xs text-pust-800">Verified Packet</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  {studentSelf.admissionDocuments.length > 0
+                    ? studentSelf.admissionDocuments.join(' · ')
+                    : 'Admission packet verified on file.'}
+                </p>
+                {studentSelf.digitalDocuments && studentSelf.digitalDocuments.length > 0 && (
+                  <div className="rounded-xl border border-stone-200 divide-y divide-stone-200 overflow-hidden">
+                    {studentSelf.digitalDocuments.map((dd, i) => (
+                      <div
+                        key={`${dd.fileName}-${i}`}
+                        className="px-4 py-2.5 bg-[#FAF9F6] text-xs font-mono text-slate-700 flex flex-wrap items-center justify-between gap-2"
+                      >
+                        <span className="font-medium text-slate-900 truncate min-w-0">
+                          {dd.fileName}
+                        </span>
+                        <span className="text-pust-800 tabular-nums shrink-0">
+                          {dd.sizeLabel} · {dd.verifiedHash}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                <h3 className="font-serif text-lg font-medium text-slate-950">
+                  Authorized Modules &amp; Quick Navigation
+                </h3>
+                <span className="font-mono text-xs text-slate-500 tabular-nums">
+                  {portalTabs.length} tabs
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {quickTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => onSelectTab(tab.id)}
+                      className="h-full text-left p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] hover:bg-white hover:border-pust-800 transition-colors flex items-center justify-between gap-3 group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-stone-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-serif text-sm font-medium text-slate-950 truncate">
+                            {tab.label}
+                          </p>
+                          <p className="text-xs text-slate-600 truncate mt-0.5">{tab.desc}</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Rail: Saved Bookmarks & Digital Receipts */}
+        <div className="xl:col-span-5 space-y-6">
+          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4 text-pust-800" />
+                <h3 className="font-serif text-lg font-medium text-slate-950">Saved Bookmarks</h3>
+              </div>
+              <span className="font-mono text-xs text-slate-500 tabular-nums">
+                {bookmarks.length}
+              </span>
+            </div>
+
+            {bookmarks.length === 0 ? (
+              <p className="text-xs text-slate-600 leading-relaxed">
+                No saved bookmarks yet. Bookmark departments or notices across the website for quick access.
+              </p>
+            ) : (
+              <div className="rounded-xl border border-stone-200 divide-y divide-stone-200 overflow-hidden text-xs">
+                {bookmarks.map((b) => (
+                  <div
+                    key={b.id}
+                    className="px-3.5 py-3 flex items-center justify-between gap-3 bg-white hover:bg-[#FAF9F6]"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-900 truncate">{b.title}</p>
+                      <p className="font-mono text-[11px] text-slate-500 truncate mt-0.5">
+                        {b.subtitle}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void onRemoveBookmark(b.itemId)}
+                      aria-label="Remove bookmark"
+                      className="p-1.5 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {(user.role === 'student' || user.role === 'admin') && receipts.length > 0 && (
+            <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <Receipt className="w-4 h-4 text-pust-800" />
+                  <h3 className="font-serif text-lg font-medium text-slate-950">
+                    Recent Payment Receipts
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={onNavigateVerify}
+                  className="text-xs font-medium text-pust-800 hover:underline cursor-pointer"
+                >
+                  Verify →
+                </button>
+              </div>
+              <div className="rounded-xl border border-stone-200 divide-y divide-stone-200 overflow-hidden text-xs">
+                {receipts.slice(0, 4).map((r) => (
+                  <div
+                    key={r.id}
+                    className="px-3.5 py-3 flex items-center justify-between gap-3 bg-white hover:bg-[#FAF9F6]"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-900 truncate">{r.title}</p>
+                      <p className="font-mono text-[11px] text-slate-500 tabular-nums truncate mt-0.5">
+                        {r.receiptNo} · BDT {r.amountBdt.toLocaleString('en-US')}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onOpenReceipt(r)}
+                      className="h-8 px-2.5 rounded-lg border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      Receipt
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

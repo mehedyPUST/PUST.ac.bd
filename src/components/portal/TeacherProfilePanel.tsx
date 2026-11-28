@@ -679,23 +679,15 @@ export function TeacherProfilePanel({
         !claimedMember &&
         !isEditing &&
         (browseDirectoryWhenUnclaimed || pendingRequest?.requestType !== 'create_new') && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs font-mono text-pust-800">
-                <Building2 className="w-3.5 h-3.5" />
-                <span>
-                  {department
-                    ? `${department.name} (${department.code})`
-                    : `${user.departmentCode} Department Directory`}
-                </span>
-              </div>
-              <h2 className="font-serif text-xl font-medium text-slate-950">
-                Claim Your Profile in the Department Directory
-              </h2>
-              <p className="text-xs text-slate-600 max-w-2xl">
-                Select your existing faculty entry below to link your account and inspect your profile in reading mode. Not listed in the directory? Create a new faculty profile for Administrator approval.
-              </p>
+        <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+          <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-pust-800 font-semibold">
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                {department
+                  ? `${department.name} (${department.code})`
+                  : `${user.departmentCode} Department Directory`}
+              </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -703,17 +695,17 @@ export function TeacherProfilePanel({
                 <button
                   type="button"
                   onClick={() => onViewDepartment(user.departmentCode)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>View Public Dept Page</span>
+                  <span>Public Dept Page</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => void loadStatus()}
                 disabled={loading}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -721,37 +713,52 @@ export function TeacherProfilePanel({
             </div>
           </div>
 
-          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-slate-900">
-                Not listed in the {user.departmentCode} directory?
-              </p>
-              <p className="text-xs text-slate-600">
-                Compose your full academic profile directly and submit it for Administrator verification.
+          <div className="p-5 sm:p-6 space-y-5">
+            <div className="space-y-1">
+              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-950">
+                Claim Your Profile in the Department Directory
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl">
+                Select your existing faculty entry below to link your account and inspect your profile in reading mode. Not listed yet? Create a new faculty profile for Administrator approval.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => enterEditMode('create_new')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Create &amp; Edit My Profile</span>
-            </button>
-          </div>
 
-          {/* Directory Search + List */}
-          <div className="space-y-3">
-            <div className="relative max-w-md">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="search"
-                value={directorySearch}
-                onChange={(e) => setDirectorySearch(e.target.value)}
-                placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <p className="text-xs font-semibold text-slate-900">
+                  Not listed in the {user.departmentCode} directory?
+                </p>
+                <p className="text-xs text-slate-600">
+                  Compose your full academic profile directly and submit it for Administrator verification.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => enterEditMode('create_new')}
+                className="h-9 inline-flex items-center gap-1.5 px-4 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Create &amp; Edit My Profile</span>
+              </button>
             </div>
+
+            {/* Directory Search + List */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="search"
+                    value={directorySearch}
+                    onChange={(e) => setDirectorySearch(e.target.value)}
+                    placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
+                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+                <span className="font-mono text-xs text-slate-500 tabular-nums">
+                  {directoryEntries.length} listed
+                </span>
+              </div>
 
             {loading ? (
               <div className="space-y-2">
@@ -874,6 +881,7 @@ export function TeacherProfilePanel({
                 </table>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
@@ -885,9 +893,114 @@ export function TeacherProfilePanel({
         (Boolean(claimedMember) || !browseDirectoryWhenUnclaimed) && (
         <div className="space-y-6">
           {/* Identity & Actions Header Card */}
-          <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
-            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5 border-b border-stone-200 pb-5">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 min-w-0">
+          <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
+            {/* Dedicated Uniform Top Action Toolbar */}
+            <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 min-w-0">
+                <span className="font-mono font-semibold text-pust-800">
+                  {department ? `${department.name} (${department.code})` : user.departmentCode}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>
+                  {(claimedMember
+                    ? user.claimedFacultyGroup === 'contractual'
+                    : pendingRequest?.facultyGroup === 'contractual')
+                    ? 'Contractual / Adjunct Faculty'
+                    : 'Regular Faculty'}
+                </span>
+                {readingProfile.onStudyLeave && (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-semibold text-amber-800">On Study Leave</span>
+                  </>
+                )}
+                {pendingRequest && readingSource === 'pending' && (
+                  <>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-semibold text-amber-800">Draft Preview</span>
+                  </>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => enterEditMode(claimedMember ? 'edit_claimed' : 'create_new')}
+                  className="h-8 inline-flex items-center gap-1.5 px-3.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>
+                    {pendingRequest ? 'Update Pending Edit' : 'Edit / Update Profile'}
+                  </span>
+                </button>
+
+                {onViewDepartment && (
+                  <button
+                    type="button"
+                    onClick={() => onViewDepartment(user.departmentCode)}
+                    className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Public Dept Page</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => void loadStatus()}
+                  disabled={loading}
+                  aria-label="Refresh profile"
+                  className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
+                </button>
+
+                {claimedMember &&
+                  (confirmRelease ? (
+                    <div className="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => void handleUnclaimProfile()}
+                        disabled={unclaiming}
+                        className="h-8 px-3 rounded-lg text-xs font-semibold bg-red-700 text-white hover:bg-red-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+                      >
+                        {unclaiming ? 'Releasing...' : 'Confirm Release'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmRelease(false)}
+                        className="h-8 px-2.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:text-slate-950 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmRelease(true)}
+                      className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <UserX className="w-3.5 h-3.5" />
+                      <span>Release Claim</span>
+                    </button>
+                  ))}
+
+                {!claimedMember && (
+                  <button
+                    type="button"
+                    onClick={() => setBrowseDirectoryWhenUnclaimed(true)}
+                    className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Browse Dept Directory</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                 <div className="w-20 h-20 rounded-2xl bg-pust-900 text-white border border-stone-200 flex items-center justify-center font-serif text-2xl font-semibold shrink-0 overflow-hidden">
                   {readingProfile.photoUrl && isSafeMediaUrl(readingProfile.photoUrl) ? (
                     <img
@@ -901,52 +1014,26 @@ export function TeacherProfilePanel({
                   )}
                 </div>
 
-                <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                    <span className="font-mono font-semibold text-pust-800">
-                      {department ? `${department.name} (${department.code})` : user.departmentCode}
-                    </span>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                      {(claimedMember
-                        ? user.claimedFacultyGroup === 'contractual'
-                        : pendingRequest?.facultyGroup === 'contractual')
-                        ? 'Contractual / Adjunct Faculty'
-                        : 'Regular Faculty'}
-                    </span>
-                    {readingProfile.onStudyLeave && (
-                      <>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-semibold text-amber-800">On Study Leave</span>
-                      </>
-                    )}
-                    {pendingRequest && readingSource === 'pending' && (
-                      <>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-semibold text-amber-800">Draft Preview</span>
-                      </>
-                    )}
-                  </div>
-
+                <div className="min-w-0 flex-1 space-y-1.5">
                   <h2 className="font-serif text-2xl sm:text-3xl font-medium text-slate-950 leading-tight">
                     {readingProfile.name}
                   </h2>
 
-                  <p className="text-sm font-medium text-pust-900">
+                  <p className="text-sm font-medium text-pust-800">
                     {readingProfile.designation}
                     {readingProfile.qualification ? ` · ${readingProfile.qualification}` : ''}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-600 pt-0.5">
                     {readingProfile.officeLocation && (
                       <span className="inline-flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>{readingProfile.officeLocation}</span>
                       </span>
                     )}
                     {readingProfile.researchArea && (
                       <span className="inline-flex items-center gap-1.5">
-                        <FlaskConical className="w-3.5 h-3.5 text-slate-400" />
+                        <FlaskConical className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>{readingProfile.researchArea}</span>
                       </span>
                     )}
@@ -954,186 +1041,127 @@ export function TeacherProfilePanel({
                 </div>
               </div>
 
-              {/* Action Controls */}
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => enterEditMode(claimedMember ? 'edit_claimed' : 'create_new')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>
-                    {pendingRequest ? 'Update Pending Edit' : 'Edit / Update Profile'}
-                  </span>
-                </button>
-
-                {onViewDepartment && (
-                  <button
-                    type="button"
-                    onClick={() => onViewDepartment(user.departmentCode)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Public Dept Page</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => void loadStatus()}
-                  disabled={loading}
-                  aria-label="Refresh profile"
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                  <span>Refresh</span>
-                </button>
-
-                {claimedMember &&
-                  (confirmRelease ? (
-                    <div className="inline-flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => void handleUnclaimProfile()}
-                        disabled={unclaiming}
-                        className="px-3 py-2 rounded-lg text-xs font-semibold bg-red-700 text-white hover:bg-red-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
-                      >
-                        {unclaiming ? 'Releasing...' : 'Confirm Release'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmRelease(false)}
-                        className="px-2.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:text-slate-950 whitespace-nowrap shrink-0 cursor-pointer"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setConfirmRelease(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <UserX className="w-3.5 h-3.5" />
-                      <span>Release Claim</span>
-                    </button>
-                  ))}
-
-                {!claimedMember && (
-                  <button
-                    type="button"
-                    onClick={() => setBrowseDirectoryWhenUnclaimed(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span>Browse Dept Directory</span>
-                  </button>
-                )}
-              </div>
+              {/* Uniform 4-Column Quantitative Academic Overview */}
+              <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 flex flex-col justify-between gap-1">
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    Conducted Courses
+                  </dt>
+                  <dd className="font-serif text-2xl font-medium text-slate-950 tabular-nums">
+                    {readingMetrics.courses}
+                  </dd>
+                </div>
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 flex flex-col justify-between gap-1">
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    Research Projects
+                  </dt>
+                  <dd className="font-serif text-2xl font-medium text-pust-900 tabular-nums">
+                    {readingMetrics.projects}
+                  </dd>
+                </div>
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 flex flex-col justify-between gap-1">
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    Publications
+                  </dt>
+                  <dd className="font-serif text-2xl font-medium text-slate-950 tabular-nums">
+                    {readingMetrics.publications}
+                  </dd>
+                </div>
+                <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 flex flex-col justify-between gap-1">
+                  <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                    Awards &amp; Honors
+                  </dt>
+                  <dd className="font-serif text-2xl font-medium text-amber-800 tabular-nums">
+                    {readingMetrics.awards}
+                  </dd>
+                </div>
+              </dl>
             </div>
-
-            {/* 4-Column Quantitative Academic Overview */}
-            <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
-                <dt className="text-[11px] font-medium text-slate-600">Conducted Courses</dt>
-                <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-                  {readingMetrics.courses}
-                </dd>
-              </div>
-              <div className="rounded-xl border border-stone-200 bg-[#F5F7FA] px-4 py-3">
-                <dt className="text-[11px] font-medium text-slate-600">Active Research Projects</dt>
-                <dd className="font-mono text-2xl font-semibold text-pust-900 tabular-nums mt-0.5">
-                  {readingMetrics.projects}
-                </dd>
-              </div>
-              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
-                <dt className="text-[11px] font-medium text-slate-600">Recorded Publications</dt>
-                <dd className="font-mono text-2xl font-semibold text-slate-950 tabular-nums mt-0.5">
-                  {readingMetrics.publications}
-                </dd>
-              </div>
-              <div className="rounded-xl border border-stone-200 bg-[#FBF6EE] px-4 py-3">
-                <dt className="text-[11px] font-medium text-slate-600">Awards &amp; Honors</dt>
-                <dd className="font-mono text-2xl font-semibold text-amber-800 tabular-nums mt-0.5">
-                  {readingMetrics.awards}
-                </dd>
-              </div>
-            </dl>
           </div>
 
           {/* 2-Column Editorial Academic Dossier */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             {/* Left Rail: Contact, Research Focus & Education */}
-            <div className="lg:col-span-4 space-y-5">
+            <div className="xl:col-span-4 space-y-5">
               {/* Contact & Office Card */}
               <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3.5">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                  <Phone className="w-4 h-4 text-pust-800" />
+                  <Phone className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
                     Contact &amp; Office
                   </h3>
                 </div>
 
-                <div className="space-y-2.5 text-xs">
-                  <div>
-                    <p className="text-[11px] text-slate-500">Office Location</p>
-                    <p className="font-medium text-slate-900 mt-0.5">
+                <dl className="divide-y divide-stone-200 text-xs">
+                  <div className="py-2.5 first:pt-0 last:pb-0 space-y-1">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                      Office Location
+                    </dt>
+                    <dd className="font-medium text-slate-900">
                       {readingProfile.officeLocation || 'Not specified'}
-                    </p>
+                    </dd>
                   </div>
 
-                  <div>
-                    <p className="text-[11px] text-slate-500 mb-1">Telephone</p>
-                    {readingProfile.phones && readingProfile.phones.length > 0 ? (
-                      <ul className="space-y-1.5">
-                        {readingProfile.phones.map((p, idx) => (
-                          <li key={idx} className="flex items-center justify-between gap-2">
-                            <a
-                              href={`tel:${sanitizeTelHref(p.value)}`}
-                              className="font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums truncate"
-                            >
-                              {p.value}
-                            </a>
-                            <span className="font-mono text-[11px] text-slate-500 shrink-0">
-                              {p.type}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-slate-500">No phone numbers listed</p>
-                    )}
+                  <div className="py-2.5 first:pt-0 last:pb-0 space-y-1">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                      Telephone
+                    </dt>
+                    <dd>
+                      {readingProfile.phones && readingProfile.phones.length > 0 ? (
+                        <ul className="space-y-1.5">
+                          {readingProfile.phones.map((p, idx) => (
+                            <li key={idx} className="flex items-center justify-between gap-2">
+                              <a
+                                href={`tel:${sanitizeTelHref(p.value)}`}
+                                className="font-mono text-slate-800 hover:text-pust-900 hover:underline tabular-nums truncate"
+                              >
+                                {p.value}
+                              </a>
+                              <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                                {p.type}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-slate-500">No phone numbers listed</span>
+                      )}
+                    </dd>
                   </div>
 
-                  <div>
-                    <p className="text-[11px] text-slate-500 mb-1">Email</p>
-                    {readingProfile.emails && readingProfile.emails.length > 0 ? (
-                      <ul className="space-y-1.5">
-                        {readingProfile.emails.map((em, idx) => (
-                          <li key={idx} className="flex items-center justify-between gap-2">
-                            <a
-                              href={`mailto:${em.value}`}
-                              className="font-mono text-slate-800 hover:text-pust-900 hover:underline truncate"
-                            >
-                              {em.value}
-                            </a>
-                            <span className="font-mono text-[11px] text-slate-500 shrink-0">
-                              {em.type}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-slate-500">No email addresses listed</p>
-                    )}
+                  <div className="py-2.5 first:pt-0 last:pb-0 space-y-1">
+                    <dt className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+                      Email
+                    </dt>
+                    <dd>
+                      {readingProfile.emails && readingProfile.emails.length > 0 ? (
+                        <ul className="space-y-1.5">
+                          {readingProfile.emails.map((em, idx) => (
+                            <li key={idx} className="flex items-center justify-between gap-2">
+                              <a
+                                href={`mailto:${em.value}`}
+                                className="font-mono text-slate-800 hover:text-pust-900 hover:underline truncate"
+                              >
+                                {em.value}
+                              </a>
+                              <span className="font-mono text-[11px] text-slate-500 shrink-0">
+                                {em.type}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-slate-500">No email addresses listed</span>
+                      )}
+                    </dd>
                   </div>
-                </div>
+                </dl>
               </div>
 
               {/* Research Interests Card */}
-              <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
+              <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                  <FlaskConical className="w-4 h-4 text-pust-800" />
+                  <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
                     Research Focus
                   </h3>
@@ -1164,15 +1192,15 @@ export function TeacherProfilePanel({
               {/* Education Card */}
               <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
                 <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                  <GraduationCap className="w-4 h-4 text-pust-800" />
+                  <GraduationCap className="w-4 h-4 text-pust-800 shrink-0" />
                   <h3 className="font-serif text-base font-medium text-slate-950">
                     Education &amp; Degrees
                   </h3>
                 </div>
                 {readingProfile.education && readingProfile.education.length > 0 ? (
-                  <ol className="space-y-2.5 text-xs text-slate-800">
+                  <ol className="divide-y divide-stone-200 text-xs text-slate-800">
                     {readingProfile.education.map((deg, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                      <li key={idx} className="py-2 first:pt-0 last:pb-0 flex items-start gap-2.5 leading-relaxed">
                         <span className="font-mono text-[11px] font-semibold text-pust-800 tabular-nums mt-0.5 shrink-0">
                           {String(idx + 1).padStart(2, '0')}.
                         </span>
@@ -1189,12 +1217,12 @@ export function TeacherProfilePanel({
             </div>
 
             {/* Right Rail: Biography, Experience, Courses, Projects & Publications */}
-            <div className="lg:col-span-8 space-y-5">
+            <div className="xl:col-span-8 space-y-5">
               {/* Academic Biography */}
               <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-3">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-pust-800" />
+                    <FileText className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-lg font-medium text-slate-950">
                       Academic Biography
                     </h3>
@@ -1210,21 +1238,21 @@ export function TeacherProfilePanel({
                   )}
                 </div>
                 {readingProfile.bio ? (
-                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line max-w-[72ch]">
+                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line max-w-[72ch] prose-justify">
                     {readingProfile.bio}
                   </p>
                 ) : (
                   <p className="text-xs text-slate-500">
-                    No biography published yet. Click &quot;Edit / Update Profile&quot; to compose your academic summary for Administrator review.
+                    No biography published yet. Click &quot;Edit / Update Profile&quot; above to compose your academic summary for Administrator review.
                   </p>
                 )}
               </div>
 
-              {/* Teaching Experience & Conducted Courses */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
-                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                    <Briefcase className="w-4 h-4 text-pust-800" />
+              {/* Teaching Experience & Conducted Courses (Equal-Height Row) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
+                    <Briefcase className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
                       Teaching Experience
                     </h3>
@@ -1243,9 +1271,9 @@ export function TeacherProfilePanel({
                   )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
-                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                    <BookOpen className="w-4 h-4 text-pust-800" />
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
+                    <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
                       Conducted Courses
                     </h3>
@@ -1265,11 +1293,11 @@ export function TeacherProfilePanel({
                 </div>
               </div>
 
-              {/* Active Research Projects & Awards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
-                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                    <FlaskConical className="w-4 h-4 text-pust-800" />
+              {/* Active Research Projects & Awards (Equal-Height Row) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
+                    <FlaskConical className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
                       Active Research Projects
                     </h3>
@@ -1288,9 +1316,9 @@ export function TeacherProfilePanel({
                   )}
                 </div>
 
-                <div className="bg-[#FAF9F6] rounded-2xl border border-stone-200 p-5 space-y-3">
-                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5">
-                    <Award className="w-4 h-4 text-pust-800" />
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col space-y-3 h-full">
+                  <div className="flex items-center gap-2 border-b border-stone-200 pb-2.5 shrink-0">
+                    <Award className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-base font-medium text-slate-950">
                       Awards &amp; Distinctions
                     </h3>
@@ -1313,7 +1341,7 @@ export function TeacherProfilePanel({
               <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
                 <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-pust-800" />
+                    <BookOpen className="w-4 h-4 text-pust-800 shrink-0" />
                     <h3 className="font-serif text-lg font-medium text-slate-950">
                       Publications &amp; Scholarly Works
                     </h3>
@@ -1386,30 +1414,18 @@ export function TeacherProfilePanel({
       {isEditing && (
         <form
           onSubmit={handleSubmitProfileRequest}
-          className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-6"
+          className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-amber-600 overflow-hidden"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
-            <div className="space-y-1">
-              <p className="text-xs font-mono text-amber-800 font-semibold flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Administrator Approval Required Before Publishing Live</span>
-              </p>
-              <h2 className="font-serif text-xl font-medium text-slate-950">
-                {editorMode === 'edit_claimed'
-                  ? 'Update Faculty Profile'
-                  : 'Create New Directory Profile'}
-              </h2>
-              <p className="text-xs text-slate-600">
-                {editorMode === 'edit_claimed' && claimedMember
-                  ? `Proposing updates for "${claimedMember.name}" (${user.departmentCode}). Changes stay pending until reviewed by an Administrator.`
-                  : `Composing a new faculty entry for the ${user.departmentCode} Department directory. Upon Administrator approval, this profile publishes and links to your account.`}
-              </p>
-            </div>
+          <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs font-mono text-amber-800 font-semibold flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              <span>Administrator Approval Required Before Publishing Live</span>
+            </p>
 
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start lg:self-auto"
+              className="h-8 inline-flex items-center gap-1.5 px-3.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-800 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>
@@ -1417,6 +1433,20 @@ export function TeacherProfilePanel({
               </span>
             </button>
           </div>
+
+          <div className="p-5 sm:p-6 space-y-6">
+            <div className="space-y-1 border-b border-stone-200 pb-4">
+              <h2 className="font-serif text-xl sm:text-2xl font-medium text-slate-950">
+                {editorMode === 'edit_claimed'
+                  ? 'Update Faculty Profile'
+                  : 'Create New Directory Profile'}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600">
+                {editorMode === 'edit_claimed' && claimedMember
+                  ? `Proposing updates for "${claimedMember.name}" (${user.departmentCode}). Changes stay pending until reviewed by an Administrator.`
+                  : `Composing a new faculty entry for the ${user.departmentCode} Department directory. Upon Administrator approval, this profile publishes and links to your account.`}
+              </p>
+            </div>
 
           {/* Portrait Photo Upload or Direct Link */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1917,6 +1947,7 @@ export function TeacherProfilePanel({
                 </span>
               </button>
             </div>
+          </div>
           </div>
         </form>
       )}
