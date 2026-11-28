@@ -10,6 +10,7 @@ import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
 import { PwaInstallButton } from './PwaManager';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
+import { AdminUserDirectoryPanel } from './portal/AdminUserDirectoryPanel';
 import { ApprovalDashboardPanel } from './portal/ApprovalDashboardPanel';
 import { CertificatePanel } from './portal/CertificatePanel';
 import { DigitalDocumentModal, type DigitalDocumentData } from './portal/DigitalDocumentModal';
@@ -73,7 +74,8 @@ export function PortalView({
   onCmsChange,
   onBackToSite,
 }: PortalViewProps) {
-  const { navigateTo, setActiveNotice, editMode, toggleEditMode, openCmsDirectory } = usePust();
+  const { navigateTo, setActiveNotice, editMode, toggleEditMode, openCmsDirectory, profile } =
+    usePust();
 
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
   const [logoutError, setLogoutError] = useState<string | null>(null);
@@ -484,6 +486,15 @@ export function PortalView({
             {resolvedTab === 'halls' && <HallPanel user={user} />}
             {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
             {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
+            {resolvedTab === 'users' && user.role === 'admin' && (
+              <AdminUserDirectoryPanel
+                currentUser={user}
+                departments={departments}
+                offices={profile?.adminOffices}
+                onUsersChanged={loadStudents}
+              />
+            )}
+
             {resolvedTab === 'governance' && user.role !== 'student' && (
               <AdminCmsPanel
                 user={user}

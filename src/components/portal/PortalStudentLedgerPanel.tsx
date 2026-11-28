@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Search } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { pustApi } from '../../lib/api';
-import { PortalRecordsSkeleton } from '../PustSkeletons';
 import type { AuthUser, DepartmentRecord, StudentRecord } from '../../types/pust';
-import { SESSION_FILTERS } from './portalMeta';
 
 interface PortalStudentLedgerPanelProps {
   user: AuthUser;
@@ -36,377 +34,291 @@ export function PortalStudentLedgerPanel({
   onSearchChange,
   onReloadStudents,
 }: PortalStudentLedgerPanelProps) {
-  const [studentEditNotes, setStudentEditNotes] = useState<
-    Record<
-      string,
-      {
-        chairmanNotes?: string;
-        adminNotes?: string;
-        disciplinaryStatus?: StudentRecord['disciplinaryStatus'];
-        disciplinaryNotes?: string;
-      }
-    >
-  >({});
-  const [stuSavedMsg, setStuSavedMsg] = useState<string | null>(null);
-  const [stuErrorMsg, setStuErrorMsg] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [chairmanNotes, setChairmanNotes] = useState('');
+  const [adminNotes, setAdminNotes] = useState('');
+  const [disciplinaryStatus, setDisciplinaryStatus] =
+    useState<StudentRecord['disciplinaryStatus']>('Clear');
+  const [disciplinaryNotes, setDisciplinaryNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  async function handleSaveStudentRecord(stu: StudentRecord) {
-    const patch = studentEditNotes[stu.id];
-    if (!patch) return;
-    setStuErrorMsg(null);
-    setStuSavedMsg(null);
+  const canEditRecords = ['admin', 'chairman', 'proctor'].includes(user.role);
+
+  function startEdit(stu: StudentRecord) {
+    setEditingId(stu.id);
+    setChairmanNotes(stu.chairmanNotes || '');
+    setAdminNotes(stu.adminNotes || '');
+    setDisciplinaryStatus(stu.disciplinaryStatus || 'Clear');
+    setDisciplinaryNotes(stu.disciplinaryNotes || '');
+    setFeedback(null);
+    setError(null);
+  }
+
+  async function saveEdit(stu: StudentRecord) {
+    setSaving(true);
+    setError(null);
+    setFeedback(null);
     try {
-      await pustApi.updateStudentRecords(stu.id, patch);
-      setStuSavedMsg(`Updated record for ${stu.name} (${stu.academicId}).`);
+      await pustApi.updateStudentRecords(stu.id, {
+        ...(user.role === 'chairman' || user.role === 'admin' ? { chairmanNotes } : {}),
+        ...(user.role === 'admin' ? { adminNotes } : {}),
+        ...(user.role === 'proctor' || user.role === 'admin'
+          ? { disciplinaryStatus, disciplinaryNotes }
+          : {}),
+      });
+      setEditingId(null);
+      setFeedback(`Updated record for ${stu.name} (${stu.academicId}).`);
       await onReloadStudents();
     } catch (err) {
-      setStuErrorMsg(err instanceof Error ? err.message : 'Unable to save student record note.');
+      setError(err instanceof Error ? err.message : 'Unable to save student record.');
+    } finally {
+      setSaving(false);
     }
   }
 
-  // Student Self-Dossier View
-  if (user.role === 'student') {
+  if (user.role === 'student' && studentSelf) {
     return (
-      <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-        <div className="px-6 py-5 border-b border-stone-200 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold text-pust-800 text-left">
-              Verified Institutional Record
-            </p>
-            <h2 className="font-serif text-2xl font-medium text-slate-900 mt-0.5">
-              My Academic &amp; Residential Dossier
-            </h2>
+      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+        <div className="border-b border-stone-200 pb-3">
+          <h2 className="font-serif text-xl font-medium text-slate-950">
+            Student Academic Dossier
+          </h2>
+          <p className="text-xs text-slate-600 mt-0.5">
+            Official academic, residential, and clearance standing recorded on PUST servers.
+          </p>
+        </div>
+
+        <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Full Name</dt>
+            <dd className="font-semibold text-sm text-slate-950 mt-0.5">{studentSelf.name}</dd>
           </div>
-          {studentSelf && (
-            <span className="font-mono text-xs text-pust-800 font-semibold tabular-nums">
-              Status: {studentSelf.approvalStatus.toUpperCase()} · {studentSelf.disciplinaryStatus}
-            </span>
-          )}
-        </div>
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Academic ID &amp; Session</dt>
+            <dd className="font-mono font-semibold text-sm text-slate-950 tabular-nums mt-0.5">
+              {studentSelf.academicId} · {studentSelf.session}
+            </dd>
+          </div>
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Department</dt>
+            <dd className="font-semibold text-sm text-slate-950 mt-0.5">
+              {studentSelf.departmentCode}
+            </dd>
+          </div>
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Completed Semesters &amp; CGPA</dt>
+            <dd className="font-mono font-semibold text-sm text-pust-900 tabular-nums mt-0.5">
+              {studentSelf.completedSemesters} Semesters · CGPA {studentSelf.cgpa.toFixed(2)}
+            </dd>
+          </div>
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Hall &amp; Seat Allotment</dt>
+            <dd className="font-semibold text-sm text-slate-950 mt-0.5">
+              {studentSelf.hallName} · {studentSelf.seatNumber}
+            </dd>
+          </div>
+          <div className="p-4 rounded-xl bg-[#FAF9F6] border border-stone-200">
+            <dt className="text-slate-500">Proctorial Conduct</dt>
+            <dd className="font-semibold text-sm text-emerald-700 mt-0.5">
+              {studentSelf.disciplinaryStatus}
+            </dd>
+          </div>
+        </dl>
 
-        <div className="p-6">
-          {loadingStudents ? (
-            <PortalRecordsSkeleton rows={3} />
-          ) : !studentSelf ? (
-            <p className="text-sm text-slate-600 text-left">
-              Your institutional student record is still syncing. Contact your Department Chairman
-              if this persists.
-            </p>
-          ) : (
-            <div className="space-y-6">
-              <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone-200 border border-stone-200 rounded-xl overflow-hidden bg-[#FAF9F6]">
-                <div className="p-4">
-                  <dt className="text-xs font-medium text-slate-500">Academic ID &amp; Session</dt>
-                  <dd className="font-mono text-base font-semibold text-slate-900 mt-1 tabular-nums">
-                    {studentSelf.academicId} · {studentSelf.session}
-                  </dd>
-                  <dd className="text-xs text-slate-600 mt-0.5">
-                    Department of {studentSelf.departmentCode}
-                  </dd>
-                </div>
-
-                <div className="p-4">
-                  <dt className="text-xs font-medium text-slate-500">Cumulative Standing</dt>
-                  <dd className="font-mono text-base font-semibold text-pust-800 mt-1 tabular-nums">
-                    CGPA {studentSelf.cgpa.toFixed(2)} / 4.00
-                  </dd>
-                  <dd className="text-xs text-slate-600 mt-0.5 tabular-nums">
-                    Semester {studentSelf.currentSemester} ({studentSelf.completedSemesters}/8
-                    completed)
-                  </dd>
-                </div>
-
-                <div className="p-4">
-                  <dt className="text-xs font-medium text-slate-500">Residential Hall &amp; Seat</dt>
-                  <dd className="font-serif text-base font-medium text-slate-900 mt-1">
-                    {studentSelf.hallName}
-                  </dd>
-                  <dd className="font-mono text-xs text-slate-600 mt-0.5 tabular-nums">
-                    {studentSelf.seatNumber}
-                  </dd>
-                </div>
-
-                <div className="p-4">
-                  <dt className="text-xs font-medium text-slate-500">Disciplinary &amp; Results</dt>
-                  <dd className="font-mono text-base font-semibold text-slate-900 mt-1">
-                    {studentSelf.disciplinaryStatus}
-                  </dd>
-                  <dd className="text-xs text-slate-600 mt-0.5">
-                    {studentSelf.allResultsPublished
-                      ? 'All 8 results published'
-                      : 'Degree in progress'}
-                  </dd>
-                </div>
-              </dl>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-200 border border-stone-200 rounded-xl bg-white">
-                <div className="p-5 space-y-2.5">
-                  <p className="text-xs font-semibold text-pust-800 text-left">
-                    Chairman &amp; Admin Remarks
-                  </p>
-                  <p className="text-sm text-slate-700 text-left">
-                    <span className="font-semibold text-slate-900">Chairman:</span>{' '}
-                    {studentSelf.chairmanNotes || 'No remarks recorded.'}
-                  </p>
-                  <p className="text-sm text-slate-700 text-left">
-                    <span className="font-semibold text-slate-900">Admin Office:</span>{' '}
-                    {studentSelf.adminNotes || 'No remarks recorded.'}
-                  </p>
-                  <p className="text-sm text-slate-700 text-left">
-                    <span className="font-semibold text-slate-900">Proctor Note:</span>{' '}
-                    {studentSelf.disciplinaryNotes || 'Clear standing.'}
-                  </p>
-                </div>
-
-                <div className="p-5 space-y-2.5">
-                  <p className="text-xs font-semibold text-pust-800 text-left">
-                    Verified Admission Documents
-                  </p>
-                  <p className="text-sm text-slate-700 leading-relaxed text-left">
-                    {studentSelf.admissionDocuments.length > 0
-                      ? studentSelf.admissionDocuments.join(' · ')
-                      : 'Admission packet verified on file.'}
-                  </p>
-                  {studentSelf.digitalDocuments && studentSelf.digitalDocuments.length > 0 && (
-                    <div className="border-t border-stone-200 divide-y divide-stone-200 pt-1">
-                      {studentSelf.digitalDocuments.map((dd, i) => (
-                        <div
-                          key={`${dd.fileName}-${i}`}
-                          className="py-1.5 text-[11px] font-mono text-slate-700 flex flex-wrap items-center justify-between gap-2"
-                        >
-                          <span className="truncate min-w-0">{dd.fileName}</span>
-                          <span className="text-pust-800 shrink-0 tabular-nums">
-                            {dd.sizeLabel} · {dd.verifiedHash}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <p className="font-mono text-xs text-slate-500 pt-1 tabular-nums text-left">
-                    Contact: {studentSelf.email} · {studentSelf.phone}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        {studentSelf.admissionDocuments.length > 0 && (
+          <div className="space-y-2 pt-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+              Verified Admission Documents
+            </h3>
+            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+              {studentSelf.admissionDocuments.map((doc, i) => (
+                <li key={`${doc}-${i}`}>{doc}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   }
 
-  // Staff / Officer Combinable Student Directory
-  const isDeptLocked = user.role === 'chairman' || user.role === 'teacher';
-  const canEditRecords = ['chairman', 'admin', 'proctor'].includes(user.role);
-
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-      <div className="px-6 py-5 border-b border-stone-200 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+    <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3">
         <div>
-          <p className="text-xs font-semibold text-pust-800 text-left">
-            {isDeptLocked
-              ? `Department of ${user.departmentCode} Scope`
-              : user.role === 'hall'
-              ? `${user.hallAffiliation} Resident Scope`
-              : user.role === 'proctor'
-              ? 'Proctorial Conduct Directory'
-              : 'University Student Directory'}
-          </p>
-          <h2 className="font-serif text-2xl font-medium text-slate-900 mt-0.5">
-            {user.role === 'proctor'
-              ? 'Student Conduct & Disciplinary Ledger'
-              : user.role === 'hall'
-              ? 'Hall Residents Academic Standing'
-              : user.role === 'teacher'
-              ? `${user.departmentCode} Class Roster & Student Standing`
-              : 'Student Database (Combinable Dept + Session Filters)'}
+          <h2 className="font-serif text-xl font-medium text-slate-950">
+            University Student Database ({students.length})
           </h2>
+          <p className="text-xs text-slate-600 mt-0.5">
+            Search combined student academic profiles, residential allocations, and conduct status.
+          </p>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          <select
-            value={isDeptLocked ? user.departmentCode : stuDeptFilter}
-            disabled={isDeptLocked}
-            onChange={(e) => onDeptFilterChange(e.target.value)}
-            aria-label="Filter by department"
-            className="min-h-[38px] px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-[#FAF9F6] disabled:opacity-70"
-          >
-            <option value="ALL">All Departments</option>
-            {departments.map((d) => (
-              <option key={d.id} value={d.code}>
-                {d.code}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={stuSessionFilter}
-            onChange={(e) => onSessionFilterChange(e.target.value)}
-            aria-label="Filter by session"
-            className="min-h-[38px] px-3 py-1.5 text-xs font-medium rounded-lg border border-stone-300 bg-[#FAF9F6]"
-          >
-            {SESSION_FILTERS.map((s) => (
-              <option key={s} value={s}>
-                {s === 'ALL' ? 'All Sessions' : `Session ${s}`}
-              </option>
-            ))}
-          </select>
-
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="search"
-              value={stuSearch}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search name or ID..."
-              className="min-h-[38px] pl-8 pr-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-800 focus:outline-none"
-            />
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => void onReloadStudents()}
+          disabled={loadingStudents}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-xs font-medium text-slate-700 hover:border-pust-800 cursor-pointer"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loadingStudents ? 'animate-spin' : ''}`} />
+          <span>Refresh</span>
+        </button>
       </div>
 
-      {stuErrorMsg && (
-        <div className="mx-6 mt-4 p-3 rounded-lg border border-red-200 bg-red-50 text-xs text-red-900">
-          {stuErrorMsg}
+      {feedback && (
+        <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-xs text-emerald-900">
+          {feedback}
         </div>
       )}
-      {stuSavedMsg && (
-        <div className="mx-6 mt-4 p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-xs text-emerald-900 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-          <span>{stuSavedMsg}</span>
+      {error && (
+        <div className="p-3 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900">
+          {error}
         </div>
       )}
 
-      {loadingStudents ? (
-        <div className="p-6">
-          <PortalRecordsSkeleton rows={4} />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="search"
+            value={stuSearch}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search name, ID, or email..."
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+          />
         </div>
-      ) : students.length === 0 ? (
-        <div className="py-12 px-6 text-center space-y-3 text-sm text-slate-600">
-          <p className="text-center">No student records match the current Department/Session filter.</p>
-          {(stuSessionFilter !== 'ALL' || stuSearch || (!isDeptLocked && stuDeptFilter !== 'ALL')) && (
-            <button
-              type="button"
-              onClick={() => {
-                if (!isDeptLocked) {
-                  onDeptFilterChange('ALL');
-                }
-                onSessionFilterChange('ALL');
-                onSearchChange('');
-              }}
-              className="min-h-[36px] px-4 py-1.5 text-xs font-semibold rounded-lg border border-stone-300 bg-[#FAF9F6] text-pust-900 hover:border-pust-800 cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          )}
-        </div>
+        <select
+          value={stuDeptFilter}
+          disabled={user.role === 'chairman' || user.role === 'teacher'}
+          onChange={(e) => onDeptFilterChange(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] disabled:opacity-70 focus:outline-none focus:border-pust-800"
+        >
+          <option value="ALL">All Departments</option>
+          {departments.map((d) => (
+            <option key={d.id} value={d.code}>
+              {d.code} — {d.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          value={stuSessionFilter === 'ALL' ? '' : stuSessionFilter}
+          onChange={(e) => onSessionFilterChange(e.target.value.trim() || 'ALL')}
+          placeholder="Filter session (e.g. 2022-23)"
+          className="px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] focus:bg-white focus:outline-none focus:border-pust-800"
+        />
+      </div>
+
+      {students.length === 0 ? (
+        <p className="text-xs text-slate-600 p-4 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+          No student records match your current filter.
+        </p>
       ) : (
-        <div className="divide-y divide-stone-200">
-          {students.map((stu) => {
-            const edit = studentEditNotes[stu.id] || {};
-            return (
-              <div
-                key={stu.id}
-                className="px-6 py-4 space-y-2.5 text-sm hover:bg-[#FAF9F6]/80 transition-colors"
-              >
-                <div className="space-y-1">
-                  <p className="font-semibold text-slate-900 text-left">
-                    {stu.name} · <span className="font-mono text-pust-900">{stu.academicId}</span>
+        <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 overflow-hidden text-xs">
+          {students.map((stu, idx) => (
+            <div
+              key={stu.id}
+              className={`p-4 space-y-3 ${idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-0.5">
+                  <p className="font-semibold text-sm text-slate-950">
+                    {stu.name} ·{' '}
+                    <span className="font-mono text-pust-800 tabular-nums">{stu.academicId}</span>
                   </p>
-                  <p className="font-mono text-xs text-pust-800 tabular-nums text-left">
-                    {stu.departmentCode} · Session {stu.session} · Sem {stu.currentSemester}{' '}
-                    (Completed {stu.completedSemesters}/8) · CGPA {stu.cgpa.toFixed(2)}
+                  <p className="font-mono text-slate-600 tabular-nums">
+                    {stu.departmentCode} · Session {stu.session} · Sem {stu.currentSemester} · CGPA{' '}
+                    {stu.cgpa.toFixed(2)} · {stu.hallName} ({stu.seatNumber})
                   </p>
-                  <p className="text-xs text-slate-600 text-left">
-                    Hall: {stu.hallName} ({stu.seatNumber}) · Disciplinary:{' '}
-                    <span className="font-semibold text-slate-900">{stu.disciplinaryStatus}</span> —{' '}
+                  <p className="text-slate-600">
+                    Conduct: <strong className="text-slate-900">{stu.disciplinaryStatus}</strong> ·{' '}
                     {stu.disciplinaryNotes}
                   </p>
-                  <p className="text-xs text-slate-500 text-left">
-                    Chairman Note: {stu.chairmanNotes} · Admin Note: {stu.adminNotes || '—'}
-                  </p>
-                  {stu.digitalDocuments && stu.digitalDocuments.length > 0 && (
-                    <p className="font-mono text-[11px] text-pust-800 pt-0.5 text-left">
-                      Uploaded Files: {stu.digitalDocuments.map((d) => d.fileName).join(', ')}
-                    </p>
-                  )}
                 </div>
-
                 {canEditRecords && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {user.role === 'chairman' && (
+                  <button
+                    type="button"
+                    onClick={() => (editingId === stu.id ? setEditingId(null) : startEdit(stu))}
+                    className="px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap"
+                  >
+                    {editingId === stu.id ? 'Close' : 'Update Notes / Conduct'}
+                  </button>
+                )}
+              </div>
+
+              {editingId === stu.id && (
+                <div className="pt-3 border-t border-stone-200 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {(user.role === 'chairman' || user.role === 'admin') && (
+                    <div>
+                      <label className="block font-medium text-slate-700 mb-1">
+                        Chairman Notes
+                      </label>
                       <input
                         type="text"
-                        value={edit.chairmanNotes ?? stu.chairmanNotes}
-                        onChange={(e) =>
-                          setStudentEditNotes((prev) => ({
-                            ...prev,
-                            [stu.id]: { ...edit, chairmanNotes: e.target.value },
-                          }))
-                        }
-                        placeholder="Update Chairman note..."
-                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] min-h-[36px] px-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-800 focus:outline-none"
+                        value={chairmanNotes}
+                        onChange={(e) => setChairmanNotes(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
                       />
-                    )}
-                    {user.role === 'admin' && (
+                    </div>
+                  )}
+                  {user.role === 'admin' && (
+                    <div>
+                      <label className="block font-medium text-slate-700 mb-1">Admin Notes</label>
                       <input
                         type="text"
-                        value={edit.adminNotes ?? stu.adminNotes}
-                        onChange={(e) =>
-                          setStudentEditNotes((prev) => ({
-                            ...prev,
-                            [stu.id]: { ...edit, adminNotes: e.target.value },
-                          }))
-                        }
-                        placeholder="Update Admin note..."
-                        className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] min-h-[36px] px-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-800 focus:outline-none"
+                        value={adminNotes}
+                        onChange={(e) => setAdminNotes(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
                       />
-                    )}
-                    {user.role === 'proctor' && (
-                      <>
+                    </div>
+                  )}
+                  {(user.role === 'proctor' || user.role === 'admin') && (
+                    <>
+                      <div>
+                        <label className="block font-medium text-slate-700 mb-1">
+                          Disciplinary Status
+                        </label>
                         <select
-                          value={edit.disciplinaryStatus ?? stu.disciplinaryStatus}
+                          value={disciplinaryStatus}
                           onChange={(e) =>
-                            setStudentEditNotes((prev) => ({
-                              ...prev,
-                              [stu.id]: {
-                                ...edit,
-                                disciplinaryStatus: e.target
-                                  .value as StudentRecord['disciplinaryStatus'],
-                              },
-                            }))
+                            setDisciplinaryStatus(
+                              e.target.value as StudentRecord['disciplinaryStatus']
+                            )
                           }
-                          className="min-h-[36px] px-2.5 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6]"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
                         >
                           <option value="Clear">Clear</option>
                           <option value="Warning">Warning</option>
                           <option value="Under Review">Under Review</option>
                         </select>
+                      </div>
+                      <div>
+                        <label className="block font-medium text-slate-700 mb-1">
+                          Disciplinary Notes
+                        </label>
                         <input
                           type="text"
-                          value={edit.disciplinaryNotes ?? stu.disciplinaryNotes}
-                          onChange={(e) =>
-                            setStudentEditNotes((prev) => ({
-                              ...prev,
-                              [stu.id]: { ...edit, disciplinaryNotes: e.target.value },
-                            }))
-                          }
-                          placeholder="Disciplinary remarks..."
-                          className="w-full sm:w-auto sm:flex-1 sm:min-w-[200px] min-h-[36px] px-3 py-1.5 text-xs rounded-lg border border-stone-300 bg-[#FAF9F6] focus:bg-white focus:border-pust-800 focus:outline-none"
+                          value={disciplinaryNotes}
+                          onChange={(e) => setDisciplinaryNotes(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white"
                         />
-                      </>
-                    )}
+                      </div>
+                    </>
+                  )}
+                  <div className="sm:col-span-2 flex justify-end">
                     <button
                       type="button"
-                      onClick={() => handleSaveStudentRecord(stu)}
-                      className="min-h-[36px] px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 cursor-pointer whitespace-nowrap"
+                      disabled={saving}
+                      onClick={() => void saveEdit(stu)}
+                      className="px-4 py-2 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
                     >
-                      Save Record Note
+                      {saving ? 'Saving...' : 'Save Student Record'}
                     </button>
                   </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -1,5 +1,7 @@
 import type {
   AboutContentRecord,
+  AdminCreateUserPayload,
+  AdminUpdateUserPayload,
   AuditLogRecord,
   AuthUser,
   AutomationOverviewResponse,
@@ -266,6 +268,29 @@ export const pustApi = {
 
   // Portal: Users, Approvals, Assignments & Signup Tokens
   getUsers: () => apiFetch<{ users: AuthUser[] }>('/api/portal/users'),
+
+  createAdminUser: (payload: AdminCreateUserPayload) =>
+    apiFetch<{ user: AuthUser }>('/api/portal/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateAdminUser: (id: string, payload: AdminUpdateUserPayload) =>
+    apiFetch<{ user: AuthUser }>(`/api/portal/users/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  resetAdminUserPassword: (id: string, newPassword: string) =>
+    apiFetch<{ updated: boolean }>(`/api/portal/users/${encodeURIComponent(id)}/password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ newPassword }),
+    }),
+
+  deleteAdminUser: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/portal/users/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
 
   approveUser: (id: string, approvalStatus: 'approved' | 'rejected') =>
     apiFetch<{ user: AuthUser }>(`/api/portal/users/${encodeURIComponent(id)}/approval`, {

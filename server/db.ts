@@ -888,9 +888,14 @@ class PustRepository {
     return list.find((u) => u.email === normalized) ?? null;
   }
 
+  private stripPasswordHash(user: StoredUser): AuthUser {
+    const { passwordHash: _p, ...safe } = user;
+    return safe;
+  }
+
   async listUsers(): Promise<AuthUser[]> {
     const list = await this.getAll('users', this.users);
-    return list.map(({ passwordHash: _p, ...safe }) => safe);
+    return list.map((u) => this.stripPasswordHash(u));
   }
 
   async createUser(input: Omit<StoredUser, 'id' | 'createdAt'>): Promise<StoredUser> {
@@ -907,14 +912,51 @@ class PustRepository {
     return this.insertItem('users', this.users, created);
   }
 
-  updateUserApproval = (id: string, approvalStatus: AuthUser['approvalStatus']) =>
-    this.updateItem('users', this.users, id, { approvalStatus });
+  async updateUserApproval(
+    id: string,
+    approvalStatus: AuthUser['approvalStatus']
+  ): Promise<AuthUser | null> {
+    const updated = await this.updateItem('users', this.users, id, { approvalStatus });
+    return updated ? this.stripPasswordHash(updated) : null;
+  }
 
-  updateTeacherAssignments = (
+  async updateTeacherAssignments(
     id: string,
     assignedCourses: string[],
     assignedSessions: string[]
-  ) => this.updateItem('users', this.users, id, { assignedCourses, assignedSessions });
+  ): Promise<AuthUser | null> {
+    const updated = await this.updateItem('users', this.users, id, {
+      assignedCourses,
+      assignedSessions,
+    });
+    return updated ? this.stripPasswordHash(updated) : null;
+  }
+
+  async updateUser(
+    id: string,
+    patch: Partial<Omit<StoredUser, 'id' | 'createdAt' | 'passwordHash'>>
+  ): Promise<AuthUser | null> {
+    const normalizedPatch = { ...patch };
+    if (normalizedPatch.email !== undefined) {
+      const normalizedEmail = normalizedPatch.email.trim().toLowerCase();
+      const existing = await this.findUserByEmail(normalizedEmail);
+      if (existing && existing.id !== id) {
+        throw new Error('DUPLICATE_EMAIL');
+      }
+      normalizedPatch.email = normalizedEmail;
+    }
+    const updated = await this.updateItem('users', this.users, id, normalizedPatch);
+    return updated ? this.stripPasswordHash(updated) : null;
+  }
+
+  async updateUserPassword(id: string, passwordHash: string): Promise<boolean> {
+    const updated = await this.updateItem('users', this.users, id, { passwordHash });
+    return Boolean(updated);
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    return this.removeItem('users', this.users, id);
+  }
 
   // Student Signup Tokens
   listSignupTokens = () => this.getAll('signup_tokens', this.signupTokens);

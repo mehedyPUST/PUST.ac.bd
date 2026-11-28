@@ -1,106 +1,37 @@
 import {
   Award,
   BookOpen,
-  Building,
+  Building2,
   ClipboardCheck,
-  FileSpreadsheet,
+  FileCheck2,
   GraduationCap,
   LayoutDashboard,
-  ShieldCheck,
+  Settings2,
+  UserCog,
   Users,
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
-import { DEFAULT_ADMIN_OFFICES } from '../../lib/adminOffices';
-import type { AdministrationOfficeRecord, UserRole } from '../../types/pust';
-
-export type OfficerBackendRole = Exclude<UserRole, 'admin' | 'student'>;
-export type OfficeSignupCategory = AdministrationOfficeRecord['category'];
-
-export interface OfficerOfficeOption {
-  optionValue: string;
-  slug: string;
-  code: string;
-  name: string;
-  category: OfficeSignupCategory;
-  mappedRole: OfficerBackendRole;
-  defaultAffiliation: string;
-}
-
-export const OFFICE_SIGNUP_CATEGORIES: OfficeSignupCategory[] = [
-  'Executive Leadership',
-  'Administrative Sections & Offices',
-  'Student Welfare & Campus Services',
-  'Residential Halls & Accommodation',
-  'Research, ICT & Quality Cells',
-];
-
-const HALL_OFFICE_AFFILIATION: Record<string, string> = {
-  'male-hall-1': 'July 06 Hall',
-  'female-hall-1': 'Female Hall-1',
-  'male-hall-2': 'Male Hall-2',
-  'female-hall-2': 'Female Hall-2',
-  dormitory: 'Dormitory',
-  'guest-house': 'Guest House',
-};
-
-function mapOfficeSlugToRole(slug: string): OfficerBackendRole {
-  if (slug === 'vc-office' || slug === 'pro-vc-office') return 'vc';
-  if (slug === 'central-library') return 'library';
-  if (slug === 'proctor-office') return 'proctor';
-  if (slug in HALL_OFFICE_AFFILIATION) return 'hall';
-  return 'registrar';
-}
-
-export const OFFICE_SIGNUP_OPTIONS: OfficerOfficeOption[] = DEFAULT_ADMIN_OFFICES.map((office) => ({
-  optionValue: `office:${office.slug}`,
-  slug: office.slug,
-  code: office.code,
-  name: office.name,
-  category: office.category,
-  mappedRole: mapOfficeSlugToRole(office.slug),
-  defaultAffiliation: HALL_OFFICE_AFFILIATION[office.slug] ?? office.name.slice(0, 60),
-}));
-
-export function resolveOfficerRoleSelection(selection: string): {
-  role: OfficerBackendRole;
-  office: OfficerOfficeOption | null;
-} {
-  if (selection === 'teacher') return { role: 'teacher', office: null };
-  if (selection === 'chairman') return { role: 'chairman', office: null };
-  if (selection === 'role:hall') return { role: 'hall', office: null };
-  const matchedOffice = OFFICE_SIGNUP_OPTIONS.find((o) => o.optionValue === selection) ?? null;
-  if (matchedOffice) {
-    return { role: matchedOffice.mappedRole, office: matchedOffice };
-  }
-  return { role: 'registrar', office: null };
-}
-
-export type AuthMode = 'login' | 'student-token' | 'officer' | 'admin-claim' | 'admin-passcode';
+import type { UserRole } from '../../types/pust';
 
 export type PortalTab =
   | 'overview'
+  | 'users'
+  | 'students'
   | 'approvals'
   | 'workflow'
-  | 'students'
   | 'library'
   | 'halls'
   | 'exams'
   | 'certificates'
   | 'governance';
 
-export interface PortalTabDef {
-  id: PortalTab;
-  label: string;
-  icon: LucideIcon;
-  desc: string;
-}
-
 export const VALID_PORTAL_TABS: PortalTab[] = [
   'overview',
+  'users',
+  'students',
   'approvals',
   'workflow',
-  'students',
   'library',
   'halls',
   'exams',
@@ -108,137 +39,312 @@ export const VALID_PORTAL_TABS: PortalTab[] = [
   'governance',
 ];
 
-export const SESSION_FILTERS = ['ALL', '2025-26', '2024-25', '2023-24', '2022-23', '2021-22'];
-
 export const ROLE_LABELS: Record<UserRole, string> = {
-  student: 'Admitted Student',
-  teacher: 'Faculty Member',
-  chairman: 'Department Chairman',
-  library: 'Central Library Officer',
-  hall: 'Hall Provost & Office',
-  proctor: 'Proctorial Office',
+  admin: 'University Admin Office',
   registrar: 'Office of the Registrar',
   vc: 'Vice-Chancellor Office',
-  admin: 'Central Admin Office',
+  chairman: 'Department Chairman',
+  teacher: 'Faculty / Teacher',
+  student: 'Student Portal',
+  proctor: 'Proctor Office',
+  library: 'Central Library Office',
+  hall: 'Residential Hall Provost',
 };
 
-export const ROLE_SCOPE_SUMMARY: Record<UserRole, string> = {
-  student:
-    'Manage your academic standing, digital library card, residential hall seat and dues, semester exam forms, digital receipts, and 4-office graduation clearances.',
-  teacher:
-    'Inspect your departmental class roster, build multi-course gradebooks for Chairman publication, review exam schedules, and publish course or session notices.',
-  chairman:
-    'Approve department teachers and students, issue student signup tokens, seal library applications, verify exam forms and publish marksheets, and grant Chairman clearances.',
-  library:
-    'Verify Chairman-sealed library applications, issue digital and physical library cards, record book checkouts or returns, and sign Library certificate clearances.',
-  hall:
-    'Publish residential seat vacancy circulars, allot and reassign hall seats, clear financial dues, and grant Hall certificate clearances.',
-  proctor:
-    'Review student conduct and disciplinary standing across departments and issue Proctorial clearances for graduating certificates.',
-  registrar:
-    'Oversee university-wide student directory records, reply to incoming admission inquiries, publish central circulars, and audit governance actions.',
-  vc:
-    'Monitor institutional student records, publish executive university circulars, and review campus-wide governance audit logs.',
-  admin:
-    'Full administrative control over officer approvals, student tokens, financial gateways, public CMS content, marksheet publication, and final certificate issuance.',
-};
-
-export function computeDeterministicFileHash(fileName: string, size: number): string {
-  let h = 2166136261;
-  const input = `${fileName}:${size}`;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return `SHA256-${(h >>> 0).toString(16).toUpperCase().padStart(8, '0')}`;
+export interface PortalTabItem {
+  id: PortalTab;
+  label: string;
+  desc: string;
+  icon: LucideIcon;
 }
 
 export function getRoleTabs(
   role: UserRole,
   departmentCode: string,
   hallAffiliation: string
-): PortalTabDef[] {
+): PortalTabItem[] {
+  const overview: PortalTabItem = {
+    id: 'overview',
+    label: 'Dashboard Overview',
+    desc: 'Status, notices & quick actions',
+    icon: LayoutDashboard,
+  };
+
   switch (role) {
-    case 'student':
+    case 'admin':
       return [
-        { id: 'overview', label: 'My Campus Overview', icon: LayoutDashboard, desc: 'Standing, receipts & alerts' },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Exemptions & Chair review' },
-        { id: 'workflow', label: 'Automated Readiness', icon: Workflow, desc: 'Live 6-step clearance checks' },
-        { id: 'students', label: 'My Academic Profile', icon: GraduationCap, desc: 'CGPA, hall & documents' },
-        { id: 'library', label: 'Library & Digital Card', icon: BookOpen, desc: 'Card, QR & borrowed books' },
-        { id: 'halls', label: 'Hall Seat & Dues', icon: Building, desc: 'Vacancies, checkout & clearance' },
-        { id: 'exams', label: 'Exams, Admit & Results', icon: FileSpreadsheet, desc: 'Forms, checkout & gradesheet' },
-        { id: 'certificates', label: 'Certificate Clearances', icon: Award, desc: '4-office graduation tracker' },
-      ];
-    case 'teacher':
-      return [
-        { id: 'overview', label: 'Faculty Overview', icon: LayoutDashboard, desc: 'Assigned courses & alerts' },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Leave, lab & course filings' },
-        { id: 'workflow', label: 'Office Flow Status', icon: Workflow, desc: 'Live campus policy triggers' },
-        { id: 'students', label: 'Department Class Roster', icon: Users, desc: `${departmentCode} student records` },
-        { id: 'exams', label: 'Gradebook & Exams', icon: FileSpreadsheet, desc: 'Submit marksheets & courses' },
-        { id: 'governance', label: 'Course Notice Publisher', icon: ShieldCheck, desc: 'Course & session circulars' },
+        overview,
+        {
+          id: 'users',
+          label: 'User Directory',
+          desc: 'Officers, teachers & admin accounts',
+          icon: UserCog,
+        },
+        {
+          id: 'governance',
+          label: 'CMS, Notices & Config',
+          desc: 'Notices, tokens, CMS & gateways',
+          icon: Settings2,
+        },
+        {
+          id: 'workflow',
+          label: 'Office Automation',
+          desc: 'Clearance queues & rules',
+          icon: Workflow,
+        },
+        {
+          id: 'students',
+          label: 'Student Database',
+          desc: 'Combined university student records',
+          icon: Users,
+        },
+        {
+          id: 'certificates',
+          label: 'Certificates & Clearances',
+          desc: 'Final issuance & 4-office track',
+          icon: Award,
+        },
+        {
+          id: 'exams',
+          label: 'Exams & Results',
+          desc: 'Circulars, admit cards & results',
+          icon: FileCheck2,
+        },
+        {
+          id: 'library',
+          label: 'Central Library',
+          desc: 'Cards, seals & book borrows',
+          icon: BookOpen,
+        },
+        {
+          id: 'halls',
+          label: 'Residential Halls',
+          desc: 'Allotment, seats & hall dues',
+          icon: Building2,
+        },
       ];
     case 'chairman':
       return [
-        { id: 'overview', label: 'Chairman Desk', icon: LayoutDashboard, desc: `${departmentCode} office summary` },
-        { id: 'approvals', label: 'Approval Dashboard', icon: ClipboardCheck, desc: `${departmentCode} requests & revisions` },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Unified queue & batch sweep' },
-        { id: 'students', label: 'Department Students', icon: Users, desc: 'Roster & Chairman remarks' },
-        { id: 'library', label: 'Chairman Library Seals', icon: BookOpen, desc: 'Sign & forward applications' },
-        { id: 'exams', label: 'Exams, Courses & Results', icon: FileSpreadsheet, desc: 'Admit cards & result review' },
-        { id: 'certificates', label: 'Chairman Clearances', icon: Award, desc: 'Graduation office sign-off' },
-        { id: 'governance', label: 'Dept Approvals & Tokens', icon: ShieldCheck, desc: 'Tokens, faculty & notices' },
+        overview,
+        {
+          id: 'approvals',
+          label: `${departmentCode} Approvals`,
+          desc: 'Account reviews & dept requests',
+          icon: ClipboardCheck,
+        },
+        {
+          id: 'students',
+          label: `${departmentCode} Students`,
+          desc: 'Departmental student ledger',
+          icon: Users,
+        },
+        {
+          id: 'exams',
+          label: 'Exams & Results',
+          desc: 'Circulars, verify forms & publish',
+          icon: FileCheck2,
+        },
+        {
+          id: 'library',
+          label: 'Library Seal Desk',
+          desc: 'Departmental chairman library seal',
+          icon: BookOpen,
+        },
+        {
+          id: 'certificates',
+          label: 'Dept Clearances',
+          desc: 'Chairman clearance review',
+          icon: Award,
+        },
+        {
+          id: 'governance',
+          label: 'Dept Notices & Tokens',
+          desc: 'Publish circulars & signup tokens',
+          icon: Settings2,
+        },
+        {
+          id: 'workflow',
+          label: 'Office Flow',
+          desc: 'Automated department queues',
+          icon: Workflow,
+        },
+      ];
+    case 'teacher':
+      return [
+        overview,
+        {
+          id: 'exams',
+          label: 'Courses & Results Entry',
+          desc: 'Enter marks & submit grades',
+          icon: FileCheck2,
+        },
+        {
+          id: 'students',
+          label: `${departmentCode} Students`,
+          desc: 'View departmental roster',
+          icon: Users,
+        },
+        {
+          id: 'governance',
+          label: 'Course Notices',
+          desc: 'Post course-scoped announcements',
+          icon: Settings2,
+        },
+        {
+          id: 'approvals',
+          label: 'Dept Requests',
+          desc: 'Submit leave or lab requisitions',
+          icon: ClipboardCheck,
+        },
+      ];
+    case 'student':
+      return [
+        overview,
+        {
+          id: 'exams',
+          label: 'Exams & Results',
+          desc: 'Apply for exams, admit cards & CGPA',
+          icon: GraduationCap,
+        },
+        {
+          id: 'library',
+          label: 'Library Card & Books',
+          desc: 'Apply for digital card & loans',
+          icon: BookOpen,
+        },
+        {
+          id: 'halls',
+          label: `Hall Services (${hallAffiliation})`,
+          desc: 'Seat applications & hall dues',
+          icon: Building2,
+        },
+        {
+          id: 'certificates',
+          label: 'Certificates & Clearance',
+          desc: '4-office clearance & digital docs',
+          icon: Award,
+        },
+        {
+          id: 'students',
+          label: 'My Academic Dossier',
+          desc: 'Profile & admission documents',
+          icon: Users,
+        },
       ];
     case 'library':
       return [
-        { id: 'overview', label: 'Library Overview', icon: LayoutDashboard, desc: 'Card queue & alerts' },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Card & clearance queue sweep' },
-        { id: 'library', label: 'Cards & Borrowing Desk', icon: BookOpen, desc: 'Verify seals & checkouts' },
-        { id: 'certificates', label: 'Library Clearances', icon: Award, desc: '4-office graduation sign-off' },
-        { id: 'governance', label: 'Library Circulars', icon: ShieldCheck, desc: 'Publish library notices' },
+        overview,
+        {
+          id: 'library',
+          label: 'Library Desk',
+          desc: 'Verify cards & record borrows',
+          icon: BookOpen,
+        },
+        {
+          id: 'certificates',
+          label: 'Library Clearance',
+          desc: 'Clear graduating students',
+          icon: Award,
+        },
+        {
+          id: 'workflow',
+          label: 'Office Flow',
+          desc: 'Library automation queue',
+          icon: Workflow,
+        },
+        {
+          id: 'governance',
+          label: 'Library Notices',
+          desc: 'Publish library circulars',
+          icon: Settings2,
+        },
       ];
     case 'hall':
       return [
-        { id: 'overview', label: 'Hall Provost Overview', icon: LayoutDashboard, desc: `${hallAffiliation} summary` },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Seats, dues & clearances sweep' },
-        { id: 'students', label: 'Hall Residents Roster', icon: Users, desc: 'Resident standing & rooms' },
-        { id: 'halls', label: 'Seats, Circulars & Dues', icon: Building, desc: 'Allotments & clearances' },
-        { id: 'certificates', label: 'Hall Clearances', icon: Award, desc: '4-office graduation sign-off' },
-        { id: 'governance', label: 'Hall Notice Board', icon: ShieldCheck, desc: 'Publish hall circulars' },
+        overview,
+        {
+          id: 'halls',
+          label: `Hall Desk (${hallAffiliation})`,
+          desc: 'Circulars, seats & hall dues',
+          icon: Building2,
+        },
+        {
+          id: 'certificates',
+          label: 'Hall Clearance',
+          desc: 'Clear graduating residents',
+          icon: Award,
+        },
+        {
+          id: 'workflow',
+          label: 'Office Flow',
+          desc: 'Hall clearance queue',
+          icon: Workflow,
+        },
+        {
+          id: 'governance',
+          label: 'Hall Notices',
+          desc: 'Publish hall circulars',
+          icon: Settings2,
+        },
       ];
     case 'proctor':
       return [
-        { id: 'overview', label: 'Proctorial Overview', icon: LayoutDashboard, desc: 'Conduct & clearance queue' },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Proctorial queue & sweep' },
-        { id: 'students', label: 'Student Conduct Ledger', icon: Users, desc: 'Disciplinary status & notes' },
-        { id: 'certificates', label: 'Proctorial Clearances', icon: Award, desc: '4-office graduation sign-off' },
-        { id: 'governance', label: 'Proctorial Notices', icon: ShieldCheck, desc: 'Publish conduct circulars' },
+        overview,
+        {
+          id: 'students',
+          label: 'Student Conduct',
+          desc: 'Disciplinary clearance notes',
+          icon: Users,
+        },
+        {
+          id: 'certificates',
+          label: 'Proctor Clearance',
+          desc: 'Clear graduating candidates',
+          icon: Award,
+        },
+        {
+          id: 'workflow',
+          label: 'Office Flow',
+          desc: 'Proctor clearance queue',
+          icon: Workflow,
+        },
+        {
+          id: 'governance',
+          label: 'Proctor Notices',
+          desc: 'Publish campus safety circulars',
+          icon: Settings2,
+        },
       ];
     case 'registrar':
     case 'vc':
       return [
-        { id: 'overview', label: 'Executive Overview', icon: LayoutDashboard, desc: 'Governance metrics & alerts' },
-        { id: 'approvals', label: 'Department Requests', icon: ClipboardCheck, desc: 'Submit & track filings' },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Inquiries & campus automation' },
-        { id: 'students', label: 'University Student Directory', icon: Users, desc: 'All departments & sessions' },
-        { id: 'governance', label: 'Governance, Notices & Audit', icon: ShieldCheck, desc: 'Circulars, inquiries & logs' },
+        overview,
+        {
+          id: 'governance',
+          label: role === 'vc' ? 'Notices & Audit Trail' : 'Notices, Inquiries & Audit',
+          desc: 'Circulars, inquiries & audit logs',
+          icon: Settings2,
+        },
+        {
+          id: 'students',
+          label: 'Student Directory',
+          desc: 'University-wide student records',
+          icon: Users,
+        },
+        {
+          id: 'certificates',
+          label: 'Certificates Registry',
+          desc: 'Track issuance & clearances',
+          icon: Award,
+        },
+        {
+          id: 'exams',
+          label: 'Examinations Overview',
+          desc: 'Academic examination status',
+          icon: FileCheck2,
+        },
       ];
-    case 'admin':
     default:
-      return [
-        { id: 'overview', label: 'Admin Command Overview', icon: LayoutDashboard, desc: 'Institution-wide summary' },
-        { id: 'approvals', label: 'Approval Dashboard', icon: ClipboardCheck, desc: 'All-department request review' },
-        { id: 'workflow', label: 'Automated Office Flow', icon: Workflow, desc: 'Cross-office sweep & rules' },
-        { id: 'students', label: 'All-Dept Student Database', icon: Users, desc: 'Directory & Admin remarks' },
-        { id: 'library', label: 'Library Oversight', icon: BookOpen, desc: 'Cards & borrowing ledger' },
-        { id: 'halls', label: 'Residential Halls', icon: Building, desc: 'Seats, circulars & dues' },
-        { id: 'exams', label: 'Exams, Courses & Results', icon: FileSpreadsheet, desc: 'Circulars, admits & grades' },
-        { id: 'certificates', label: 'Final Certificate Issuance', icon: Award, desc: '4-office tracker & serials' },
-        { id: 'governance', label: 'Notices, Tokens & CMS', icon: ShieldCheck, desc: 'Approvals, gateways & CMS' },
-      ];
+      return [overview];
   }
 }

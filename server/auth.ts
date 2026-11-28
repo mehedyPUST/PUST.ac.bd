@@ -25,6 +25,9 @@ export interface JwtClaims {
   academicId: string;
   session?: string;
   hallAffiliation: string;
+  officeCode?: string;
+  officeName?: string;
+  designation?: string;
   assignedCourses?: string[];
   assignedSessions?: string[];
 }
@@ -68,6 +71,9 @@ export function signAuthToken(user: AuthUser): string {
     academicId: user.academicId,
     session: user.session,
     hallAffiliation: user.hallAffiliation,
+    ...(user.officeCode ? { officeCode: user.officeCode } : {}),
+    ...(user.officeName ? { officeName: user.officeName } : {}),
+    ...(user.designation ? { designation: user.designation } : {}),
     ...(user.assignedCourses ? { assignedCourses: user.assignedCourses } : {}),
     ...(user.assignedSessions ? { assignedSessions: user.assignedSessions } : {}),
   };

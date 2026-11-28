@@ -1,6 +1,13 @@
 'use client';
 
-import { ArrowRight, Bell, Bookmark, Receipt } from 'lucide-react';
+import {
+  ArrowRight,
+  Bell,
+  Bookmark,
+  Receipt,
+  ShieldCheck,
+  Trash2,
+} from 'lucide-react';
 import type {
   AuthUser,
   BookmarkRecord,
@@ -8,16 +15,11 @@ import type {
   PaymentReceiptRecord,
   StudentRecord,
 } from '../../types/pust';
-import {
-  ROLE_LABELS,
-  ROLE_SCOPE_SUMMARY,
-  type PortalTab,
-  type PortalTabDef,
-} from './portalMeta';
+import { ROLE_LABELS, type PortalTab, type PortalTabItem } from './portalMeta';
 
 interface PortalOverviewPanelProps {
   user: AuthUser;
-  portalTabs: PortalTabDef[];
+  portalTabs: PortalTabItem[];
   studentSelf: StudentRecord | null;
   studentsCount: number;
   loadingStudents: boolean;
@@ -46,221 +48,142 @@ export function PortalOverviewPanel({
   onOpenNotice,
   onRemoveBookmark,
 }: PortalOverviewPanelProps) {
-  const actionModules = portalTabs.filter((t) => t.id !== 'overview');
+  const quickModules = portalTabs.filter((t) => t.id !== 'overview');
 
   return (
     <div className="space-y-6">
-      {/* Unified 4-Cell Metric Bar (Hairline Divided, Single-Elevation Depth) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone-200 bg-white rounded-2xl border border-stone-200 overflow-hidden">
-        <div className="bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white p-5 space-y-1">
-          <p className="text-xs font-medium text-pust-200 text-left">Active Role Scope</p>
-          <p className="font-serif text-xl font-medium text-white text-left">
-            {ROLE_LABELS[user.role]}
-          </p>
-          <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left">
-            {user.departmentCode} · ID {user.academicId}
-          </p>
-        </div>
-
-        {user.role === 'student' ? (
-          <>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">Academic Standing</p>
-              <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-                {studentSelf ? `CGPA ${studentSelf.cgpa.toFixed(2)}` : 'Syncing...'}
-              </p>
-              <p className="font-mono text-xs text-slate-600 tabular-nums text-left">
-                {studentSelf
-                  ? `Sem ${studentSelf.currentSemester} · ${studentSelf.completedSemesters}/8 completed`
-                  : 'Fetching academic record'}
-              </p>
-            </div>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">
-                Residential Hall &amp; Seat
-              </p>
-              <p className="font-serif text-xl font-medium text-slate-900 truncate text-left">
-                {studentSelf?.hallName || user.hallAffiliation}
-              </p>
-              <p className="font-mono text-xs text-slate-600 tabular-nums truncate text-left">
-                {studentSelf?.seatNumber || 'Seat pending verification'}
-              </p>
-            </div>
-          </>
-        ) : user.role === 'teacher' ? (
-          <>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">Assigned Courses</p>
-              <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-                {(user.assignedCourses || []).length}
-              </p>
-              <p className="font-mono text-xs text-slate-600 truncate text-left">
-                {(user.assignedCourses || []).join(', ') || 'Pending assignment'}
-              </p>
-            </div>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">Department Students</p>
-              <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-                {loadingStudents ? '...' : studentsCount}
-              </p>
-              <p className="text-xs text-slate-600 text-left">Scoped to {user.departmentCode}</p>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">Scoped Student Records</p>
-              <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-                {loadingStudents ? '...' : studentsCount}
-              </p>
-              <p className="text-xs text-slate-600 text-left">
-                {user.role === 'chairman'
-                  ? `${user.departmentCode} Department`
-                  : user.role === 'hall'
-                  ? user.hallAffiliation
-                  : 'University-wide scope'}
-              </p>
-            </div>
-            <div className="p-5 space-y-1">
-              <p className="text-xs font-medium text-slate-500 text-left">Targeted Bulletins</p>
-              <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-                {targetedNotifications.length}
-              </p>
-              <p className="text-xs text-slate-600 text-left">Scoped to {user.departmentCode}</p>
-            </div>
-          </>
-        )}
-
-        <div className="p-5 space-y-1">
-          <p className="text-xs font-medium text-slate-500 text-left">
-            {user.role === 'student' ? 'Targeted Bulletins' : 'Workspace Modules'}
-          </p>
-          <p className="font-serif text-2xl font-medium text-slate-900 tabular-nums text-left">
-            {user.role === 'student' ? targetedNotifications.length : actionModules.length}
-          </p>
-          <p className="font-mono text-xs text-slate-600 tabular-nums text-left">
-            {user.role === 'student'
-              ? `${receipts.length} receipt(s) · ${bookmarks.length} bookmarks`
-              : `Authorized for ${user.role}`}
-          </p>
-        </div>
-      </div>
-
-      {/* Role Scope & Direct Module Action Matrix */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-2">
-          <div>
-            <p className="text-xs font-semibold text-pust-800 text-left">
-              Authorized Office Workflows
+      {/* KPI / Identity Strip */}
+      <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-200 pb-4">
+          <div className="space-y-1">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold">
+              {ROLE_LABELS[user.role]}
             </p>
-            <h2 className="font-serif text-xl font-medium text-slate-900 mt-0.5">
-              {ROLE_LABELS[user.role]} Responsibilities &amp; Quick Launch
+            <h2 className="font-serif text-2xl font-medium text-slate-950">
+              Welcome, {user.name}
             </h2>
+            <p className="text-xs text-slate-600">
+              {user.officeName || user.departmentCode} · Academic / Employee ID{' '}
+              <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                {user.academicId}
+              </span>
+              {user.designation ? ` · ${user.designation}` : ''}
+            </p>
           </div>
-          <span className="font-mono text-xs text-slate-500 tabular-nums">
-            {actionModules.length} authorized modules
-          </span>
+          <button
+            type="button"
+            onClick={onNavigateVerify}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-xs font-semibold text-slate-800 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
+          >
+            <ShieldCheck className="w-4 h-4 text-pust-800" />
+            <span>Verify Documents</span>
+          </button>
         </div>
 
-        <p className="text-sm text-slate-600 leading-relaxed max-w-3xl text-left">
-          {ROLE_SCOPE_SUMMARY[user.role]}
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-stone-200 border border-stone-200 rounded-xl overflow-hidden">
-          {actionModules.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => onSelectTab(tab.id)}
-                className="text-left p-4 bg-white hover:bg-[#FAF9F6] transition-colors flex items-start justify-between gap-3 group cursor-pointer"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <span className="w-8 h-8 rounded-lg bg-[#FAF9F6] border border-stone-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white group-hover:border-pust-900 transition-colors flex items-center justify-center shrink-0">
-                    <Icon className="w-4 h-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-serif text-base font-medium text-slate-900 group-hover:text-pust-900 truncate text-left">
-                      {tab.label}
-                    </p>
-                    <p className="text-xs text-slate-600 mt-0.5 truncate text-left">{tab.desc}</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0 mt-1 transition-colors" />
-              </button>
-            );
-          })}
-        </div>
+        <dl className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {user.role === 'student' && studentSelf ? (
+            <>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Current Semester</dt>
+                <dd className="font-mono text-xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  Semester {studentSelf.currentSemester}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Cumulative CGPA</dt>
+                <dd className="font-mono text-xl font-semibold text-pust-900 tabular-nums mt-0.5">
+                  {studentSelf.cgpa.toFixed(2)}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Hall &amp; Seat</dt>
+                <dd className="text-sm font-semibold text-slate-950 mt-1 truncate">
+                  {studentSelf.hallName} · {studentSelf.seatNumber}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Conduct Status</dt>
+                <dd className="text-sm font-semibold text-emerald-700 mt-1">
+                  {studentSelf.disciplinaryStatus}
+                </dd>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Assigned Unit</dt>
+                <dd className="font-mono text-lg font-semibold text-slate-950 mt-0.5 truncate">
+                  {user.officeCode || user.departmentCode}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Visible Student Records</dt>
+                <dd className="font-mono text-xl font-semibold text-pust-900 tabular-nums mt-0.5">
+                  {loadingStudents ? '...' : studentsCount}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Targeted Circulars</dt>
+                <dd className="font-mono text-xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {targetedNotifications.length}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3">
+                <dt className="text-[11px] text-slate-600">Saved Bookmarks</dt>
+                <dd className="font-mono text-xl font-semibold text-slate-950 tabular-nums mt-0.5">
+                  {bookmarks.length}
+                </dd>
+              </div>
+            </>
+          )}
+        </dl>
       </div>
 
-      {/* Verified Payment Receipts Ledger (Student & Admin) */}
-      {(user.role === 'student' || user.role === 'admin') && receipts.length > 0 && (
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-          <div className="px-6 py-4 flex items-center justify-between gap-3 border-b border-stone-200">
-            <div className="flex items-center gap-2">
-              <Receipt className="w-4 h-4 text-pust-800" />
-              <h2 className="font-serif text-xl font-medium text-slate-900">
-                Verified Digital Payment Receipts ({receipts.length})
-              </h2>
-            </div>
+      {/* Quick Module Launch Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {quickModules.map((mod, idx) => {
+          const Icon = mod.icon;
+          return (
             <button
+              key={mod.id}
               type="button"
-              onClick={onNavigateVerify}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-pust-800 hover:underline cursor-pointer whitespace-nowrap"
+              onClick={() => onSelectTab(mod.id)}
+              className={`text-left rounded-2xl border border-stone-200 p-5 transition-colors hover:border-pust-800 cursor-pointer flex flex-col justify-between gap-3 ${
+                idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'
+              }`}
             >
-              <span>Verify on Public Registry</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          <div className="divide-y divide-stone-200">
-            {receipts.slice(0, 5).map((r) => (
-              <div
-                key={r.id}
-                className="px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs hover:bg-[#FAF9F6] transition-colors"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-sm text-slate-900 text-left">{r.title}</p>
-                  <p className="font-mono text-slate-500 tabular-nums mt-0.5 text-left">
-                    {r.receiptNo} · {r.gatewayName} ({r.transactionId}) · Paid{' '}
-                    <span className="font-semibold text-pust-900">
-                      BDT {r.amountBdt.toLocaleString('en-US')}
-                    </span>{' '}
-                    on {r.paidAt}
-                  </p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="p-2 rounded-xl bg-pust-50 text-pust-900">
+                  <Icon className="w-4 h-4" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onOpenReceipt(r)}
-                  className="min-h-[34px] px-3 py-1.5 font-semibold rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  View Official Receipt
-                </button>
+                <ArrowRight className="w-4 h-4 text-slate-400" />
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+              <div>
+                <h3 className="font-serif text-base font-medium text-slate-950">{mod.label}</h3>
+                <p className="text-xs text-slate-600 mt-0.5">{mod.desc}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Targeted Bulletins & Bookmarks Split */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        <div className="xl:col-span-7 bg-white rounded-2xl border border-stone-200 overflow-hidden">
-          <div className="px-6 py-4 flex items-center justify-between gap-3 border-b border-stone-200">
+      {/* Targeted Notifications & Receipts/Bookmarks */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-pust-800" />
-              <h2 className="font-serif text-xl font-medium text-slate-900">
-                Targeted Circulars &amp; Notices
-              </h2>
+              <h3 className="font-serif text-lg font-medium text-slate-950">
+                Recent Circulars &amp; Notices
+              </h3>
             </div>
             <span className="font-mono text-xs text-slate-500 tabular-nums">
-              {targetedNotifications.length} active
+              {targetedNotifications.length}
             </span>
           </div>
 
           {targetedNotifications.length === 0 ? (
-            <p className="p-6 text-sm text-slate-600 text-left">
-              No targeted notices or alerts at this time.
-            </p>
+            <p className="text-xs text-slate-600">No recent circulars targeted to your unit.</p>
           ) : (
             <div className="divide-y divide-stone-200">
               {targetedNotifications.map((n) => (
@@ -268,69 +191,80 @@ export function PortalOverviewPanel({
                   key={n.id}
                   type="button"
                   onClick={() => onOpenNotice(n)}
-                  className="w-full text-left px-6 py-4 space-y-1 text-sm hover:bg-[#FAF9F6] transition-colors cursor-pointer"
+                  className="w-full text-left py-3 hover:bg-[#FAF9F6] px-2 -mx-2 rounded-lg transition-colors cursor-pointer space-y-0.5"
                 >
-                  <p className="font-mono text-[11px] text-pust-800 tabular-nums text-left">
-                    {n.publishedAt} · {n.category} · {n.departmentCode}
-                    {n.targetSession ? ` · Session ${n.targetSession}` : ''}
-                    {n.targetCourseCode ? ` · ${n.targetCourseCode}` : ''}
+                  <p className="font-mono text-[11px] text-pust-800 tabular-nums">
+                    {n.publishedAt} · {n.referenceNo} · {n.departmentCode}
                   </p>
-                  <p className="font-medium text-slate-900 text-left">{n.title}</p>
-                  <p className="text-xs text-slate-600 text-left">{n.summary}</p>
+                  <p className="text-sm font-medium text-slate-900 line-clamp-1">{n.title}</p>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="xl:col-span-5 bg-white rounded-2xl border border-stone-200 overflow-hidden">
-          <div className="px-6 py-4 flex items-center justify-between gap-3 border-b border-stone-200">
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
             <div className="flex items-center gap-2">
-              <Bookmark className="w-4 h-4 text-pust-800" />
-              <h2 className="font-serif text-xl font-medium text-slate-900">
-                Saved Bookmarks ({bookmarks.length})
-              </h2>
+              {receipts.length > 0 ? (
+                <Receipt className="w-4 h-4 text-pust-800" />
+              ) : (
+                <Bookmark className="w-4 h-4 text-pust-800" />
+              )}
+              <h3 className="font-serif text-lg font-medium text-slate-950">
+                {receipts.length > 0 ? 'Recent Digital Payment Receipts' : 'Saved Portal Bookmarks'}
+              </h3>
             </div>
           </div>
 
-          {bookmarks.length === 0 ? (
-            <p className="p-6 text-sm text-slate-600 text-left">
-              No saved bookmarks yet. Bookmark departments or circulars while browsing the public
-              website.
-            </p>
-          ) : (
-            <div className="divide-y divide-stone-200">
-              {bookmarks.map((b) => (
+          {receipts.length > 0 ? (
+            <div className="divide-y divide-stone-200 text-xs">
+              {receipts.slice(0, 5).map((r) => (
                 <div
-                  key={b.id}
-                  className="px-6 py-3.5 flex items-center justify-between gap-3 text-sm hover:bg-[#FAF9F6] transition-colors"
+                  key={r.id}
+                  className="py-3 flex items-center justify-between gap-3"
                 >
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-900 truncate text-left">{b.title}</p>
-                    <p className="text-xs text-slate-500 truncate text-left">{b.subtitle}</p>
+                    <p className="font-medium text-slate-900 truncate">{r.title}</p>
+                    <p className="font-mono text-[11px] text-slate-500 tabular-nums">
+                      {r.receiptNo} · BDT {r.amountBdt.toLocaleString('en-US')} · {r.paidAt}
+                    </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => onRemoveBookmark(b.itemId)}
-                    className="text-xs font-medium text-red-700 hover:underline shrink-0 cursor-pointer"
+                    onClick={() => onOpenReceipt(r)}
+                    className="px-2.5 py-1.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 cursor-pointer whitespace-nowrap shrink-0"
                   >
-                    Remove
+                    Receipt
                   </button>
                 </div>
               ))}
             </div>
-          )}
-
-          {user.role === 'teacher' && (
-            <div className="px-6 py-4 border-t border-stone-200 bg-[#FAF9F6] text-xs space-y-1.5">
-              <p className="font-semibold text-pust-900 text-left">Chairman Course Assignment</p>
-              <p className="font-mono text-slate-700 text-left">
-                Courses: {(user.assignedCourses || []).join(', ') || 'Pending Chairman assignment'}
-              </p>
-              <p className="font-mono text-slate-700 text-left">
-                Sessions:{' '}
-                {(user.assignedSessions || []).join(', ') || 'Pending Chairman assignment'}
-              </p>
+          ) : bookmarks.length === 0 ? (
+            <p className="text-xs text-slate-600">
+              No saved bookmarks yet. Bookmark notices or departments across the website for quick access.
+            </p>
+          ) : (
+            <div className="divide-y divide-stone-200 text-xs">
+              {bookmarks.map((b) => (
+                <div
+                  key={b.id}
+                  className="py-3 flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900 truncate">{b.title}</p>
+                    <p className="font-mono text-[11px] text-slate-500 truncate">{b.subtitle}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void onRemoveBookmark(b.itemId)}
+                    aria-label="Remove bookmark"
+                    className="p-1.5 rounded-lg border border-stone-200 text-slate-500 hover:text-red-700 hover:border-red-200 cursor-pointer shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>

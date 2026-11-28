@@ -28,9 +28,45 @@ export interface AuthUser {
   academicId: string;
   session?: string;
   hallAffiliation: string;
+  officeCode?: string;
+  officeName?: string;
+  designation?: string;
   assignedCourses?: string[];
   assignedSessions?: string[];
   createdAt: string;
+}
+
+export interface AdminCreateUserPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  departmentCode: string;
+  academicId: string;
+  session?: string;
+  hallAffiliation: string;
+  officeCode?: string;
+  officeName?: string;
+  designation?: string;
+  approvalStatus?: ApprovalStatus;
+  assignedCourses?: string[];
+  assignedSessions?: string[];
+}
+
+export interface AdminUpdateUserPayload {
+  name?: string;
+  email?: string;
+  role?: UserRole;
+  departmentCode?: string;
+  academicId?: string;
+  session?: string;
+  hallAffiliation?: string;
+  officeCode?: string;
+  officeName?: string;
+  designation?: string;
+  approvalStatus?: ApprovalStatus;
+  assignedCourses?: string[];
+  assignedSessions?: string[];
 }
 
 export interface SignupTokenRecord {

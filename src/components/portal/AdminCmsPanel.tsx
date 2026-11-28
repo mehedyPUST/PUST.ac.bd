@@ -25,6 +25,8 @@ import {
   isSafeMediaUrl,
   parseYouTubeVideoId,
 } from '../../lib/media';
+import { usePust } from '../PustContext';
+import { AdminUserDirectoryPanel } from './AdminUserDirectoryPanel';
 import type {
   AboutContentRecord,
   AuditLogRecord,
@@ -60,7 +62,7 @@ const HALL_OPTIONS = [
   'Female Hall-2',
 ];
 
-type GovernanceSubTab = 'notices' | 'approvals' | 'cms' | 'finance' | 'inquiries';
+type GovernanceSubTab = 'notices' | 'approvals' | 'users' | 'cms' | 'finance' | 'inquiries';
 
 interface AdminCmsPanelProps {
   user: AuthUser;
@@ -85,6 +87,7 @@ export function AdminCmsPanel({
   onNoticesChange,
   onCmsChange,
 }: AdminCmsPanelProps) {
+  const { profile } = usePust();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [tokens, setTokens] = useState<SignupTokenRecord[]>([]);
   const [inquiries, setInquiries] = useState<InquiryRecord[]>([]);
@@ -111,6 +114,7 @@ export function AdminCmsPanel({
       tabs.push({ id: 'approvals', label: 'Tokens & Approvals' });
     }
     if (user.role === 'admin') {
+      tabs.push({ id: 'users', label: 'User Directory' });
       tabs.push({ id: 'cms', label: 'Public CMS' });
       tabs.push({ id: 'finance', label: 'Gateways & Fees' });
     }
@@ -1682,6 +1686,16 @@ export function AdminCmsPanel({
             )}
           </div>
         </div>
+      )}
+
+      {/* 2B. Admin User Directory */}
+      {activeSubTab === 'users' && user.role === 'admin' && (
+        <AdminUserDirectoryPanel
+          currentUser={user}
+          departments={departments}
+          offices={profile?.adminOffices}
+          onUsersChanged={refresh}
+        />
       )}
 
       {/* 3. Admin Public CMS: About PUST, Vice-Chancellor Archive, Gallery */}

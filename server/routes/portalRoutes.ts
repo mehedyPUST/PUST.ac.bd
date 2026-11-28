@@ -1,7 +1,14 @@
 import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
-import { requireAuth, requireRoles, wrapRouterAsync, type AuthenticatedRequest, type JwtClaims } from '../auth';
+import {
+  hashPassword,
+  requireAuth,
+  requireRoles,
+  wrapRouterAsync,
+  type AuthenticatedRequest,
+  type JwtClaims,
+} from '../auth';
 import { pustRepo } from '../db';
 import { isSafeMediaUrl } from '../../src/lib/media';
 import type { ClearanceOfficeKey, OfficeClearanceState, UserRole } from '../../src/types/pust';
@@ -39,6 +46,57 @@ const tokenCreateSchema = z.object({
 
 const approvalSchema = z.object({
   approvalStatus: z.enum(['approved', 'rejected']),
+});
+
+const userRoleEnum = z.enum([
+  'admin',
+  'registrar',
+  'vc',
+  'chairman',
+  'teacher',
+  'student',
+  'proctor',
+  'library',
+  'hall',
+]);
+
+const adminCreateUserSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().email().max(120),
+  password: z.string().min(8).max(128),
+  role: userRoleEnum,
+  departmentCode: z.string().trim().min(2).max(24),
+  academicId: z.string().trim().min(2).max(32),
+  session: z.string().trim().max(20).optional(),
+  hallAffiliation: z.string().trim().min(2).max(80),
+  officeCode: z.string().trim().max(24).optional(),
+  officeName: z.string().trim().max(120).optional(),
+  designation: z.string().trim().max(80).optional(),
+  approvalStatus: z.enum(['pending', 'approved', 'rejected']).default('approved'),
+  assignedCourses: z.array(z.string().trim().min(2).max(24)).max(20).optional(),
+  assignedSessions: z.array(z.string().trim().min(4).max(20)).max(12).optional(),
+});
+
+const adminUpdateUserSchema = z
+  .object({
+    name: z.string().trim().min(2).max(80).optional(),
+    email: z.string().trim().email().max(120).optional(),
+    role: userRoleEnum.optional(),
+    departmentCode: z.string().trim().min(2).max(24).optional(),
+    academicId: z.string().trim().min(2).max(32).optional(),
+    session: z.string().trim().max(20).optional(),
+    hallAffiliation: z.string().trim().min(2).max(80).optional(),
+    officeCode: z.string().trim().max(24).optional(),
+    officeName: z.string().trim().max(120).optional(),
+    designation: z.string().trim().max(80).optional(),
+    approvalStatus: z.enum(['pending', 'approved', 'rejected']).optional(),
+    assignedCourses: z.array(z.string().trim().min(2).max(24)).max(20).optional(),
+    assignedSessions: z.array(z.string().trim().min(4).max(20)).max(12).optional(),
+  })
+  .refine((obj) => Object.keys(obj).length > 0, 'Provide at least one field to update.');
+
+const adminResetPasswordSchema = z.object({
+  newPassword: z.string().min(8).max(128),
 });
 
 const teacherAssignSchema = z.object({
@@ -983,6 +1041,7 @@ portalRouter.patch(
     // Strict Approval Hierarchy Check
     const actorRole = req.authUser!.role;
     const adminApprovedRoles: UserRole[] = [
+      'admin',
       'registrar',
       'vc',
       'chairman',
@@ -1000,9 +1059,33 @@ portalRouter.patch(
         });
         return;
       }
-    } else if (actorRole === 'admin' && !adminApprovedRoles.includes(target.role) && target.role !== 'student' && target.role !== 'teacher') {
+    } else if (
+      actorRole === 'admin' &&
+      !adminApprovedRoles.includes(target.role) &&
+      target.role !== 'student' &&
+      target.role !== 'teacher'
+    ) {
       res.status(403).json({ error: 'Unsupported role approval.' });
       return;
+    }
+
+    if (target.id === req.authUser!.sub && parsed.data.approvalStatus !== 'approved') {
+      res.status(400).json({ error: 'You cannot reject or deactivate your own active administrator session.' });
+      return;
+    }
+
+    if (
+      target.role === 'admin' &&
+      target.approvalStatus === 'approved' &&
+      parsed.data.approvalStatus !== 'approved'
+    ) {
+      const otherApprovedAdmin = users.some(
+        (u) => u.id !== target.id && u.role === 'admin' && u.approvalStatus === 'approved'
+      );
+      if (!otherApprovedAdmin && !process.env.ADMIN_PASSCODE?.trim()) {
+        res.status(409).json({ error: 'Cannot disable the last active administrator account.' });
+        return;
+      }
     }
 
     const updated = await pustRepo.updateUserApproval(target.id, parsed.data.approvalStatus);
@@ -1020,6 +1103,254 @@ portalRouter.patch(
       `${target.name} (${target.role})`
     );
     res.json({ user: updated });
+  }
+);
+
+portalRouter.post(
+  '/users',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = adminCreateUserSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0]?.message || 'Complete all account fields (password min 8 chars).';
+      res.status(400).json({ error: firstIssue });
+      return;
+    }
+    const data = parsed.data;
+    try {
+      const created = await pustRepo.createUser({
+        name: data.name,
+        email: data.email,
+        passwordHash: hashPassword(data.password),
+        role: data.role,
+        approvalStatus: data.approvalStatus,
+        departmentCode: data.departmentCode.toUpperCase(),
+        academicId: data.academicId,
+        ...(data.session?.trim() ? { session: data.session.trim() } : {}),
+        hallAffiliation: data.hallAffiliation,
+        ...(data.officeCode?.trim() ? { officeCode: data.officeCode.trim().toUpperCase() } : {}),
+        ...(data.officeName?.trim() ? { officeName: data.officeName.trim() } : {}),
+        ...(data.designation?.trim() ? { designation: data.designation.trim() } : {}),
+        assignedCourses: data.role === 'teacher' ? data.assignedCourses || [] : [],
+        assignedSessions: data.role === 'teacher' ? data.assignedSessions || [] : [],
+      });
+
+      if (data.role === 'student') {
+        await pustRepo.upsertStudent({
+          id: `stu-${data.academicId}`,
+          userId: created.id,
+          academicId: data.academicId,
+          name: data.name,
+          email: created.email,
+          phone: 'N/A',
+          departmentCode: data.departmentCode.toUpperCase(),
+          session: data.session?.trim() || '2025-26',
+          currentSemester: 1,
+          cgpa: 0,
+          completedSemesters: 0,
+          allResultsPublished: false,
+          hallName: data.hallAffiliation,
+          seatNumber: 'Unassigned',
+          admissionDocuments: ['Admin Provisioned'],
+          chairmanNotes: 'Provisioned directly via Admin User Directory.',
+          adminNotes: 'Verified by Admin Office.',
+          disciplinaryStatus: 'Clear',
+          disciplinaryNotes: 'Clean record.',
+          approvalStatus: data.approvalStatus,
+        });
+      }
+
+      const { passwordHash: _p, ...safeUser } = created;
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        'Created user account',
+        `${safeUser.name} (${safeUser.role} · ${safeUser.officeName || safeUser.departmentCode})`
+      );
+      res.status(201).json({ user: safeUser });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'DUPLICATE_EMAIL') {
+        res.status(409).json({ error: 'An account with this email already exists.' });
+        return;
+      }
+      res.status(500).json({ error: 'Unable to create user account.' });
+    }
+  }
+);
+
+portalRouter.patch(
+  '/users/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = adminUpdateUserSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0]?.message || 'Provide valid user profile updates.';
+      res.status(400).json({ error: firstIssue });
+      return;
+    }
+
+    const userId = String(req.params.id);
+    const target = await pustRepo.findUserById(userId);
+    if (!target) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+
+    const patch = parsed.data;
+    if (target.id === req.authUser!.sub) {
+      if (patch.role && patch.role !== 'admin') {
+        res.status(400).json({ error: 'You cannot demote your own active administrator role.' });
+        return;
+      }
+      if (patch.approvalStatus && patch.approvalStatus !== 'approved') {
+        res.status(400).json({ error: 'You cannot disable your own active administrator account.' });
+        return;
+      }
+    }
+
+    if (
+      target.role === 'admin' &&
+      target.approvalStatus === 'approved' &&
+      ((patch.role && patch.role !== 'admin') ||
+        (patch.approvalStatus && patch.approvalStatus !== 'approved'))
+    ) {
+      const users = await pustRepo.listUsers();
+      const otherApprovedAdmin = users.some(
+        (u) => u.id !== target.id && u.role === 'admin' && u.approvalStatus === 'approved'
+      );
+      if (!otherApprovedAdmin && !process.env.ADMIN_PASSCODE?.trim()) {
+        res.status(409).json({ error: 'Cannot demote or disable the last active administrator account.' });
+        return;
+      }
+    }
+
+    try {
+      const updated = await pustRepo.updateUser(target.id, {
+        ...(patch.name !== undefined ? { name: patch.name } : {}),
+        ...(patch.email !== undefined ? { email: patch.email } : {}),
+        ...(patch.role !== undefined ? { role: patch.role } : {}),
+        ...(patch.departmentCode !== undefined
+          ? { departmentCode: patch.departmentCode.toUpperCase() }
+          : {}),
+        ...(patch.academicId !== undefined ? { academicId: patch.academicId } : {}),
+        ...(patch.session !== undefined ? { session: patch.session } : {}),
+        ...(patch.hallAffiliation !== undefined ? { hallAffiliation: patch.hallAffiliation } : {}),
+        ...(patch.officeCode !== undefined
+          ? { officeCode: patch.officeCode ? patch.officeCode.toUpperCase() : undefined }
+          : {}),
+        ...(patch.officeName !== undefined
+          ? { officeName: patch.officeName || undefined }
+          : {}),
+        ...(patch.designation !== undefined
+          ? { designation: patch.designation || undefined }
+          : {}),
+        ...(patch.approvalStatus !== undefined ? { approvalStatus: patch.approvalStatus } : {}),
+        ...(patch.assignedCourses !== undefined ? { assignedCourses: patch.assignedCourses } : {}),
+        ...(patch.assignedSessions !== undefined
+          ? { assignedSessions: patch.assignedSessions }
+          : {}),
+      });
+
+      if (!updated) {
+        res.status(404).json({ error: 'Account not found.' });
+        return;
+      }
+
+      if (updated.role === 'student') {
+        const stu = await pustRepo.findStudentByAcademicId(target.academicId);
+        if (stu) {
+          await pustRepo.updateStudentById(stu.id, {
+            name: updated.name,
+            email: updated.email,
+            departmentCode: updated.departmentCode,
+            hallName: updated.hallAffiliation,
+            approvalStatus: updated.approvalStatus,
+          });
+        }
+      }
+
+      await pustRepo.logAudit(
+        req.authUser!.name,
+        req.authUser!.role,
+        'Updated user account',
+        `${updated.name} (${updated.role} · ${updated.officeName || updated.departmentCode})`
+      );
+      res.json({ user: updated });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'DUPLICATE_EMAIL') {
+        res.status(409).json({ error: 'Another account already uses this email address.' });
+        return;
+      }
+      res.status(500).json({ error: 'Unable to update user account.' });
+    }
+  }
+);
+
+portalRouter.patch(
+  '/users/:id/password',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = adminResetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'New password must be at least 8 characters.' });
+      return;
+    }
+    const target = await pustRepo.findUserById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    const ok = await pustRepo.updateUserPassword(target.id, hashPassword(parsed.data.newPassword));
+    if (!ok) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Reset user password',
+      `${target.name} (${target.role})`
+    );
+    res.json({ updated: true });
+  }
+);
+
+portalRouter.delete(
+  '/users/:id',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const userId = String(req.params.id);
+    if (userId === req.authUser!.sub) {
+      res.status(400).json({ error: 'You cannot delete your own active administrator account.' });
+      return;
+    }
+    const target = await pustRepo.findUserById(userId);
+    if (!target) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    if (target.role === 'admin' && target.approvalStatus === 'approved') {
+      const users = await pustRepo.listUsers();
+      const otherApprovedAdmin = users.some(
+        (u) => u.id !== target.id && u.role === 'admin' && u.approvalStatus === 'approved'
+      );
+      if (!otherApprovedAdmin && !process.env.ADMIN_PASSCODE?.trim()) {
+        res.status(409).json({ error: 'Cannot delete the last active administrator account.' });
+        return;
+      }
+    }
+    const deleted = await pustRepo.deleteUser(target.id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Deleted user account',
+      `${target.name} (${target.email})`
+    );
+    res.json({ deleted: true });
   }
 );
 

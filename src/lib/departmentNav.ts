@@ -1,25 +1,4 @@
-export type DepartmentTab =
-  | 'overview'
-  | 'faculty'
-  | 'officers'
-  | 'research'
-  | 'notices'
-  | 'contact';
-
-export const VALID_DEPARTMENT_TABS: readonly DepartmentTab[] = [
-  'overview',
-  'faculty',
-  'officers',
-  'research',
-  'notices',
-  'contact',
-] as const;
-
-export function isDepartmentTab(value: string | null | undefined): value is DepartmentTab {
-  return Boolean(
-    value && (VALID_DEPARTMENT_TABS as readonly string[]).includes(value)
-  );
-}
+export type DepartmentTab = 'overview' | 'faculty' | 'officers' | 'research' | 'notices' | 'contact';
 
 export interface DepartmentNavItem {
   id: DepartmentTab;
@@ -27,67 +6,82 @@ export interface DepartmentNavItem {
   shortLabel: string;
   mastheadKicker: string;
   mastheadTitle: string;
+  description: string;
 }
 
-export const DEPARTMENT_NAV_ITEMS: readonly DepartmentNavItem[] = [
+export const DEPARTMENT_NAV_ITEMS: DepartmentNavItem[] = [
   {
     id: 'overview',
-    label: 'Overview',
+    label: 'Overview & Message',
     shortLabel: 'Overview',
-    mastheadKicker: 'Departmental Portal',
-    mastheadTitle: 'Overview',
+    mastheadKicker: 'Department Profile',
+    mastheadTitle: 'Academic Overview & Chairman’s Desk',
+    description: 'Departmental mission, leadership message, degree tracks, and intake highlights.',
   },
   {
     id: 'faculty',
     label: 'Faculty Members',
     shortLabel: 'Faculty',
-    mastheadKicker: 'Academic Personnel & Leadership',
-    mastheadTitle: 'Faculty Members',
+    mastheadKicker: 'Academic Roster',
+    mastheadTitle: 'Faculty & Teaching Staff',
+    description: 'Professors, associate professors, assistant professors, lecturers, and visiting scholars.',
   },
   {
     id: 'officers',
     label: 'Officers & Staff',
     shortLabel: 'Officers',
-    mastheadKicker: 'Administration & Laboratory Support',
-    mastheadTitle: 'Officers & Technical Staff',
+    mastheadKicker: 'Administrative Support',
+    mastheadTitle: 'Departmental Officers & Technical Staff',
+    description: 'Laboratory engineers, demonstrators, and administrative office staff.',
   },
   {
     id: 'research',
-    label: 'Programs & Research',
+    label: 'Research & Labs',
     shortLabel: 'Research',
-    mastheadKicker: 'Degree Pathways, Labs & Scholarship',
-    mastheadTitle: 'Programs, Research & Laboratories',
+    mastheadKicker: 'Research Infrastructure',
+    mastheadTitle: 'Laboratories, Thrust Areas & Publications',
+    description: 'Departmental laboratories, research focus areas, and indexed faculty publications.',
   },
   {
     id: 'notices',
     label: 'Notice Board',
     shortLabel: 'Notices',
-    mastheadKicker: 'Official Departmental Circulars',
-    mastheadTitle: 'Departmental Notice Board',
+    mastheadKicker: 'Department Circulars',
+    mastheadTitle: 'Departmental & Course Notice Board',
+    description: 'Official announcements, examination schedules, and course circulars.',
   },
   {
     id: 'contact',
-    label: 'Contact & Location',
+    label: 'Contact',
     shortLabel: 'Contact',
-    mastheadKicker: 'Office Address & Correspondence',
-    mastheadTitle: 'Contact & Location',
+    mastheadKicker: 'Department Correspondence',
+    mastheadTitle: 'Office Address & Contact Details',
+    description: 'Official office location, telephone extensions, and departmental email addresses.',
   },
-] as const;
+];
 
-export interface ParsedDepartmentRoute {
-  code: string;
-  isPersonPage: boolean;
+const DEPARTMENT_TAB_SET = new Set<DepartmentTab>(
+  DEPARTMENT_NAV_ITEMS.map((item) => item.id)
+);
+
+export function isDepartmentTab(value: unknown): value is DepartmentTab {
+  return typeof value === 'string' && DEPARTMENT_TAB_SET.has(value as DepartmentTab);
 }
 
-export function parseDepartmentPath(pathname: string): ParsedDepartmentRoute | null {
-  const clean = pathname.replace(/\/+$/, '') || '/';
-  if (!clean.startsWith('/academics/departments/')) {
+export interface ParsedDepartmentPath {
+  code: string;
+  isPersonPage: boolean;
+  personId?: string;
+}
+
+export function parseDepartmentPath(pathname: string): ParsedDepartmentPath | null {
+  const clean = (pathname || '').replace(/\/+$/, '');
+  const prefix = '/academics/departments/';
+  if (!clean.startsWith(prefix)) {
     return null;
   }
-  const segments = clean
-    .slice('/academics/departments/'.length)
-    .split('/')
-    .filter(Boolean);
+  const rest = clean.slice(prefix.length);
+  const segments = rest.split('/').filter(Boolean);
   if (segments.length === 0) {
     return null;
   }
@@ -95,8 +89,15 @@ export function parseDepartmentPath(pathname: string): ParsedDepartmentRoute | n
   if (!code) {
     return null;
   }
+  if (segments.length >= 3 && segments[1] === 'people') {
+    return {
+      code,
+      isPersonPage: true,
+      personId: decodeURIComponent(segments[2]).trim(),
+    };
+  }
   return {
     code,
-    isPersonPage: segments.length >= 3 && segments[1] === 'people',
+    isPersonPage: false,
   };
 }
