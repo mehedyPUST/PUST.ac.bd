@@ -1025,14 +1025,17 @@ export function DepartmentDetailView({
                             key={notice.id}
                             type="button"
                             onClick={() => setActiveNotice(notice)}
-                            className="w-full text-left px-5 py-3.5 hover:bg-[#FAF8F4] transition-colors space-y-1 cursor-pointer group"
+                            className="w-full text-left px-5 py-3.5 hover:bg-[#FAF8F4] transition-colors flex items-start justify-between gap-3 cursor-pointer group"
                           >
-                            <p className="font-mono text-[11px] text-pust-800 tabular-nums">
-                              {notice.publishedAt} · {notice.category}
-                            </p>
-                            <h3 className="font-serif text-sm font-medium text-slate-900 group-hover:text-pust-900 leading-snug line-clamp-2">
-                              {notice.title}
-                            </h3>
+                            <div className="min-w-0 space-y-1">
+                              <p className="font-mono text-[11px] text-pust-800 tabular-nums text-left">
+                                {notice.publishedAt} · {notice.category}
+                              </p>
+                              <h3 className="font-serif text-sm font-medium text-slate-900 group-hover:text-pust-900 leading-snug line-clamp-2 text-left [text-wrap:pretty]">
+                                {notice.title}
+                              </h3>
+                            </div>
+                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-pust-800 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
                           </button>
                         ))}
                       </div>
@@ -1828,81 +1831,110 @@ export function DepartmentDetailView({
                   </Link>
                 </div>
               ) : (
-                <MotionReveal className="rounded-2xl border border-stone-200 bg-white divide-y divide-stone-200 overflow-hidden">
-                  {filteredNotices.map((notice) => (
-                    <div
-                      key={notice.id}
-                      className="flex flex-col sm:flex-row sm:items-stretch justify-between hover:bg-[#FAF9F6] transition-colors"
-                    >
-                      <button
-                        type="button"
+                <MotionReveal className="rounded-2xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-6 py-3 bg-[#FAF9F6] border-b border-stone-200 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-600 items-center">
+                    <div className="lg:col-span-2">Date &amp; Category</div>
+                    <div className="lg:col-span-7">Department Circular</div>
+                    <div className="lg:col-span-3 text-right">Memo &amp; Action</div>
+                  </div>
+                  <div className="divide-y divide-stone-200">
+                    {filteredNotices.map((notice, idx) => (
+                      <div
+                        key={notice.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setActiveNotice(notice)}
-                        className="flex-1 min-w-0 text-left px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setActiveNotice(notice);
+                          }
+                        }}
+                        className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-[#FAF9F6] transition-colors grid grid-cols-1 lg:grid-cols-12 gap-y-3 lg:gap-x-6 items-start group cursor-pointer ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/65'
+                        }`}
                       >
-                        <div className="space-y-1.5 min-w-0">
-                          <p className="font-mono text-[11px] text-slate-500 tabular-nums flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            <span className="font-semibold text-slate-700">{notice.publishedAt}</span>
-                            <span>·</span>
-                            <span className="font-semibold text-pust-800">{notice.category}</span>
-                            {notice.pinned && (
-                              <>
-                                <span>·</span>
+                        <div className="lg:col-span-2 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-2 lg:gap-1 pt-0.5 font-mono text-xs tabular-nums">
+                          <span className="font-medium text-slate-700 whitespace-nowrap">
+                            {notice.publishedAt}
+                          </span>
+                          <span className="font-semibold text-pust-800 uppercase tracking-wide text-[11px] leading-tight">
+                            {notice.category}
+                          </span>
+                        </div>
+
+                        <div className="lg:col-span-7 min-w-0 space-y-1.5">
+                          {(notice.pinned ||
+                            notice.visibility === 'registered' ||
+                            notice.targetSession ||
+                            notice.targetCourseCode) && (
+                            <p className="font-mono text-[11px] text-slate-500 tabular-nums flex flex-wrap items-center gap-x-2 gap-y-0.5 text-left">
+                              {notice.pinned && (
                                 <span className="uppercase tracking-wider font-semibold text-pust-900">
                                   Pinned
                                 </span>
-                              </>
-                            )}
-                            {notice.visibility === 'registered' && (
-                              <>
-                                <span>·</span>
-                                <span className="uppercase tracking-wider font-semibold text-amber-800">
-                                  Registered Portal
-                                </span>
-                              </>
-                            )}
-                            {notice.targetSession && (
-                              <>
-                                <span>·</span>
-                                <span>Session {notice.targetSession}</span>
-                              </>
-                            )}
-                            {notice.targetCourseCode && (
-                              <>
-                                <span>·</span>
-                                <span>{notice.targetCourseCode}</span>
-                              </>
-                            )}
-                          </p>
-                          <h3 className="font-serif text-base sm:text-[17px] font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug">
+                              )}
+                              {notice.visibility === 'registered' && (
+                                <>
+                                  {notice.pinned && <span aria-hidden="true">·</span>}
+                                  <span className="uppercase tracking-wider font-semibold text-amber-800">
+                                    Registered Portal
+                                  </span>
+                                </>
+                              )}
+                              {notice.targetSession && (
+                                <>
+                                  {(notice.pinned || notice.visibility === 'registered') && (
+                                    <span aria-hidden="true">·</span>
+                                  )}
+                                  <span>Session {notice.targetSession}</span>
+                                </>
+                              )}
+                              {notice.targetCourseCode && (
+                                <>
+                                  {(notice.pinned ||
+                                    notice.visibility === 'registered' ||
+                                    notice.targetSession) && <span aria-hidden="true">·</span>}
+                                  <span>{notice.targetCourseCode}</span>
+                                </>
+                              )}
+                            </p>
+                          )}
+                          <h3 className="font-serif text-base sm:text-lg font-medium text-slate-950 group-hover:text-pust-900 transition-colors leading-snug text-left [text-wrap:pretty]">
                             {notice.title}
                           </h3>
-                          <p className="text-xs sm:text-[13px] text-slate-600 line-clamp-2 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed text-left max-w-3xl">
                             {notice.summary}
                           </p>
                         </div>
 
-                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1.5 shrink-0">
-                          <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                        <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-stone-200/80 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
+                          <span className="text-slate-600 font-medium lg:text-right break-words">
                             {notice.referenceNo}
                           </span>
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-pust-900 group-hover:translate-x-0.5 transition-transform">
-                            Read Circular
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                          </span>
+                          <div
+                            className="flex items-center gap-2.5 shrink-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {canAdminEdit && (
+                              <EditTriggerButton
+                                variant="compact"
+                                label="Edit"
+                                onClick={() => openEditModal({ kind: 'notice', notice })}
+                              />
+                            )}
+                            <span
+                              onClick={() => setActiveNotice(notice)}
+                              className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-900 group-hover:translate-x-0.5 transition-transform whitespace-nowrap"
+                            >
+                              Read Circular
+                              <ArrowUpRight className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
                         </div>
-                      </button>
-
-                      {canAdminEdit && (
-                        <div className="flex items-center px-5 pb-4 sm:py-4 sm:pl-0 sm:pr-4 shrink-0">
-                          <EditTriggerButton
-                            variant="compact"
-                            label="Edit"
-                            onClick={() => openEditModal({ kind: 'notice', notice })}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    ))}
+                  </div>
                 </MotionReveal>
               )}
             </div>

@@ -1933,7 +1933,7 @@ export function PublicSubPages({
                 </div>
               ) : (
                 <MotionReveal className="rounded-2xl divide-y divide-stone-200 border border-stone-200 bg-white overflow-hidden">
-                  {admissionNotices.map((n) => (
+                  {admissionNotices.map((n, idx) => (
                     <div
                       key={n.id}
                       role="button"
@@ -1945,20 +1945,37 @@ export function PublicSubPages({
                           onSelectNotice(n);
                         }
                       }}
-                      className="w-full text-left p-5 hover:bg-pust-50/35 cursor-pointer space-y-1"
+                      className={`w-full text-left px-5 sm:px-6 py-5 hover:bg-pust-50/45 transition-colors flex flex-col sm:flex-row sm:items-stretch justify-between gap-4 group cursor-pointer ${
+                        idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]/70'
+                      }`}
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <p className="font-mono text-xs text-pust-800 tabular-nums">
-                          {n.publishedAt} · {n.referenceNo}
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <p className="font-mono text-xs text-pust-800 tabular-nums text-left">
+                          {n.publishedAt} · {n.category}
                         </p>
-                        <EditTriggerButton
-                          target={{ kind: 'notice', notice: n }}
-                          label="Edit"
-                          variant="compact"
-                        />
+                        <h2 className="font-serif text-lg font-medium text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left [text-wrap:pretty]">
+                          {n.title}
+                        </h2>
+                        <p className="text-sm text-slate-600 leading-relaxed text-left max-w-3xl">
+                          {n.summary}
+                        </p>
                       </div>
-                      <h2 className="font-serif text-lg font-medium text-slate-900">{n.title}</h2>
-                      <p className="text-sm text-slate-600">{n.summary}</p>
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-2 pt-3 border-t border-stone-200/80 sm:border-0 sm:pt-0.5 shrink-0">
+                        <span className="font-mono text-xs text-slate-600 tabular-nums">
+                          {n.referenceNo}
+                        </span>
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <EditTriggerButton
+                            target={{ kind: 'notice', notice: n }}
+                            label="Edit"
+                            variant="compact"
+                          />
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-pust-800 group-hover:text-pust-950 whitespace-nowrap">
+                            Read Circular
+                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </MotionReveal>
@@ -2910,16 +2927,16 @@ export function PublicSubPages({
                     </span>
                   </div>
 
-                  <div className="lg:col-span-6 min-w-0">
-                    <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left">
+                  <div className="lg:col-span-6 min-w-0 space-y-1.5">
+                    <h2 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left [text-wrap:pretty]">
                       {notice.title}
                     </h2>
-                    <p className="text-sm text-slate-700 mt-1.5 leading-relaxed text-left">
+                    <p className="text-sm text-slate-700 leading-relaxed text-left max-w-3xl">
                       {notice.summary}
                     </p>
                   </div>
 
-                  <div className="lg:col-span-3 min-w-0 pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 font-mono text-xs tabular-nums">
+                  <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
                     <div className="lg:text-right min-w-0">
                       <span className="block font-medium text-slate-700 break-words">
                         {notice.referenceNo}
@@ -2936,8 +2953,8 @@ export function PublicSubPages({
                         label="Edit"
                         variant="compact"
                       />
-                      <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950">
-                        Read
+                      <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950 whitespace-nowrap">
+                        Read Circular
                         <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </div>

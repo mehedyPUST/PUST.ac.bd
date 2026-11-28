@@ -374,16 +374,16 @@ export function CareerView() {
                           </span>
                         </div>
 
-                        <div className="lg:col-span-6 min-w-0">
-                          <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug">
+                        <div className="lg:col-span-6 min-w-0 space-y-1.5">
+                          <h3 className="font-serif text-lg font-semibold text-slate-950 group-hover:text-pust-800 transition-colors leading-snug text-left [text-wrap:pretty]">
                             {notice.title}
                           </h3>
-                          <p className="prose-justify text-sm text-slate-700 mt-1.5 leading-relaxed">
+                          <p className="text-sm text-slate-700 leading-relaxed text-left max-w-3xl">
                             {notice.summary}
                           </p>
                         </div>
 
-                        <div className="lg:col-span-3 min-w-0 pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-2 font-mono text-xs tabular-nums">
+                        <div className="lg:col-span-3 min-w-0 self-stretch pt-3 border-t border-slate-100 lg:border-0 lg:pt-0.5 flex flex-row lg:flex-col items-center lg:items-end justify-between gap-2 font-mono text-xs tabular-nums">
                           <span className="font-medium text-slate-700 lg:text-right break-words">
                             {notice.referenceNo}
                           </span>
@@ -393,7 +393,7 @@ export function CareerView() {
                               label="Edit"
                               variant="compact"
                             />
-                            <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950">
+                            <span className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-pust-800 group-hover:text-pust-950 whitespace-nowrap">
                               View Circular
                               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                             </span>
