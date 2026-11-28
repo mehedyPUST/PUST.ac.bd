@@ -346,22 +346,6 @@ export function TeacherProfilePanel({
     setError(null);
   }
 
-  function switchToEditClaimedMode() {
-    if (!claimedMember) return;
-    setEditorMode('edit_claimed');
-    setFacultyGroup(user.claimedFacultyGroup || 'faculty');
-    setDraft(
-      draftFromPerson(
-        pendingRequest?.requestType === 'edit_claimed'
-          ? pendingRequest.proposedProfile
-          : claimedMember,
-        user
-      )
-    );
-    setFeedback(null);
-    setError(null);
-  }
-
   async function handlePhotoFileSelect(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -541,32 +525,239 @@ export function TeacherProfilePanel({
         </div>
       )}
 
-      {/* Section A: Department Directory Claim */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-pust-800">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>
-                {department
-                  ? `${department.name} (${department.code})`
-                  : `${user.departmentCode} Department Directory`}
-              </span>
+      {/* Section A: Department Directory Claim (only shown when teacher has not yet claimed a profile) */}
+      {!claimedMember && !(loading && user.claimedFacultyMemberId) ? (
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs font-mono text-pust-800">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>
+                  {department
+                    ? `${department.name} (${department.code})`
+                    : `${user.departmentCode} Department Directory`}
+                </span>
+              </div>
+              <h2 className="font-serif text-xl font-medium text-slate-950">
+                01. Claim Your Profile in the Department Directory
+              </h2>
+              <p className="text-xs text-slate-600 max-w-2xl">
+                If your name already appears in your department&apos;s faculty roster, claim your profile below to link your account. Not listed in the directory? Use Section 02 below to create and submit a new profile for Administrator approval.
+              </p>
             </div>
-            <h2 className="font-serif text-xl font-medium text-slate-950">
-              01. Claim Your Profile in the Department Directory
-            </h2>
-            <p className="text-xs text-slate-600 max-w-2xl">
-              If your name already appears in your department&apos;s faculty roster, claim your profile below to link your account. Not listed in the directory? Switch to create and edit a new profile for Administrator approval.
-            </p>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {onViewDepartment && (
+                <button
+                  type="button"
+                  onClick={() => onViewDepartment(user.departmentCode)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>View Public Dept Page</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => void loadStatus()}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
           </div>
 
+          <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <p className="text-xs font-semibold text-slate-900">
+                No Directory Profile Claimed Yet
+              </p>
+              <p className="text-xs text-slate-600">
+                Find your name in the {user.departmentCode} list below to claim it, or click &quot;Not Listed — Create My Profile&quot; to submit a new profile for Admin approval.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={switchToCreateNewMode}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Not Listed — Create My Profile</span>
+            </button>
+          </div>
+
+          {/* Directory Search + List */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="search"
+                  value={directorySearch}
+                  onChange={(e) => setDirectorySearch(e.target.value)}
+                  placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={switchToCreateNewMode}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Not in Directory? Create New Profile</span>
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((row) => (
+                  <div
+                    key={row}
+                    className="h-12 rounded-lg bg-stone-100 animate-pulse border border-stone-200"
+                  />
+                ))}
+              </div>
+            ) : directoryEntries.length === 0 ? (
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-6 text-center space-y-2">
+                <p className="text-sm font-medium text-slate-900">
+                  No matching faculty entries found in {user.departmentCode}
+                </p>
+                <p className="text-xs text-slate-600">
+                  If your profile is not yet listed in the department directory, compose a new profile below and submit it for Administrator approval.
+                </p>
+                <button
+                  type="button"
+                  onClick={switchToCreateNewMode}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Create New Profile for Admin Approval</span>
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-stone-200">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
+                      <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
+                      <th className="py-2.5 px-3">Faculty Member</th>
+                      <th className="py-2.5 px-3">Designation &amp; Group</th>
+                      <th className="py-2.5 px-3">Contact</th>
+                      <th className="py-2.5 px-3">Claim Status</th>
+                      <th className="py-2.5 px-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-200">
+                    {directoryEntries.map(({ member, group, groupLabel }, idx) => {
+                      const claimInfo = claimedMap[member.id];
+                      const claimedByMe = Boolean(claimInfo?.claimedByMe);
+                      const claimedByOther = Boolean(claimInfo && !claimedByMe);
+                      const primaryEmail = member.emails?.[0]?.value || '—';
+
+                      return (
+                        <tr
+                          key={`${group}-${member.id}`}
+                          className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
+                        >
+                          <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-pust-50 border border-stone-200 text-pust-900 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
+                                {member.photoUrl && isSafeMediaUrl(member.photoUrl) ? (
+                                  <img
+                                    src={member.photoUrl}
+                                    alt={member.name}
+                                    referrerPolicy="no-referrer"
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <span>{member.name.slice(0, 2).toUpperCase()}</span>
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-medium text-slate-950 truncate">{member.name}</p>
+                                <p className="font-mono text-[11px] text-slate-500 truncate">
+                                  {member.officeLocation || user.departmentCode}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3 text-slate-700">
+                            <p className="font-medium text-slate-900">{member.designation}</p>
+                            <p className="text-[11px] text-slate-500">{groupLabel}</p>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+                            {primaryEmail}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            {claimedByOther ? (
+                              <span className="text-slate-500">
+                                Claimed by {claimInfo.claimedByName || 'another teacher'}
+                              </span>
+                            ) : (
+                              <span className="text-pust-800 font-medium">Available to Claim</span>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                            <button
+                              type="button"
+                              disabled={claimedByOther || claimingId === member.id}
+                              onClick={() => void handleClaimProfile(member, group)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
+                            >
+                              {claimingId === member.id ? 'Claiming...' : 'Claim This Profile'}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : claimedMember ? (
+        <div className="bg-white rounded-2xl border border-stone-200 px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 rounded-full bg-pust-900 text-white flex items-center justify-center font-serif text-sm font-semibold shrink-0 overflow-hidden">
+              {claimedMember.photoUrl && isSafeMediaUrl(claimedMember.photoUrl) ? (
+                <img
+                  src={claimedMember.photoUrl}
+                  alt={claimedMember.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{claimedMember.name.slice(0, 2).toUpperCase()}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>
+                  Linked Profile · {department ? `${department.name} (${department.code})` : user.departmentCode}
+                </span>
+              </p>
+              <p className="font-serif text-lg font-medium text-slate-950 truncate">
+                {claimedMember.name}{' '}
+                <span className="font-sans text-xs font-normal text-slate-600">
+                  · {claimedMember.designation}
+                </span>
+              </p>
+            </div>
+          </div>
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {onViewDepartment && (
               <button
                 type="button"
                 onClick={() => onViewDepartment(user.departmentCode)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>View Public Dept Page</span>
@@ -576,236 +767,23 @@ export function TeacherProfilePanel({
               type="button"
               onClick={() => void loadStatus()}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-[#F7F7F5] text-slate-700 hover:border-pust-800 hover:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
-          </div>
-        </div>
-
-        {/* Current Claim Summary Strip */}
-        <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] px-4 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {claimedMember ? (
-            <>
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full bg-pust-900 text-white flex items-center justify-center font-serif text-sm font-semibold shrink-0 overflow-hidden">
-                  {claimedMember.photoUrl && isSafeMediaUrl(claimedMember.photoUrl) ? (
-                    <img
-                      src={claimedMember.photoUrl}
-                      alt={claimedMember.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{claimedMember.name.slice(0, 2).toUpperCase()}</span>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
-                    <UserCheck className="w-3.5 h-3.5 shrink-0" />
-                    <span>Claimed Directory Profile</span>
-                  </p>
-                  <p className="text-sm font-medium text-slate-950 truncate">
-                    {claimedMember.name}{' '}
-                    <span className="text-xs font-normal text-slate-600">
-                      · {claimedMember.designation}
-                    </span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={switchToEditClaimedMode}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span>Edit Claimed Profile</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleUnclaimProfile()}
-                  disabled={unclaiming}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
-                >
-                  <UserX className="w-3.5 h-3.5" />
-                  <span>{unclaiming ? 'Releasing...' : 'Release Claim'}</span>
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-slate-900">
-                  No Directory Profile Claimed Yet
-                </p>
-                <p className="text-xs text-slate-600">
-                  Find your name in the {user.departmentCode} list below to claim it, or click &quot;Not Listed — Create My Profile&quot; to submit a new profile for Admin approval.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={switchToCreateNewMode}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Not Listed — Create My Profile</span>
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Directory Search + List */}
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="search"
-                value={directorySearch}
-                onChange={(e) => setDirectorySearch(e.target.value)}
-                placeholder={`Search ${user.departmentCode} faculty by name, designation, or email...`}
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
-              />
-            </div>
             <button
               type="button"
-              onClick={switchToCreateNewMode}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              onClick={() => void handleUnclaimProfile()}
+              disabled={unclaiming}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-red-300 hover:text-red-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-50"
             >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Not in Directory? Create New Profile</span>
+              <UserX className="w-3.5 h-3.5" />
+              <span>{unclaiming ? 'Releasing...' : 'Release Claim'}</span>
             </button>
           </div>
-
-          {loading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map((row) => (
-                <div
-                  key={row}
-                  className="h-12 rounded-lg bg-stone-100 animate-pulse border border-stone-200"
-                />
-              ))}
-            </div>
-          ) : directoryEntries.length === 0 ? (
-            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-6 text-center space-y-2">
-              <p className="text-sm font-medium text-slate-900">
-                No matching faculty entries found in {user.departmentCode}
-              </p>
-              <p className="text-xs text-slate-600">
-                If your profile is not yet listed in the department directory, compose a new profile below and submit it for Administrator approval.
-              </p>
-              <button
-                type="button"
-                onClick={switchToCreateNewMode}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Create New Profile for Admin Approval</span>
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-stone-200">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-semibold">
-                    <th className="py-2.5 px-3 w-12 font-mono">S.N</th>
-                    <th className="py-2.5 px-3">Faculty Member</th>
-                    <th className="py-2.5 px-3">Designation &amp; Group</th>
-                    <th className="py-2.5 px-3">Contact</th>
-                    <th className="py-2.5 px-3">Claim Status</th>
-                    <th className="py-2.5 px-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-200">
-                  {directoryEntries.map(({ member, group, groupLabel }, idx) => {
-                    const claimInfo = claimedMap[member.id];
-                    const claimedByMe =
-                      Boolean(claimInfo?.claimedByMe) || claimedMember?.id === member.id;
-                    const claimedByOther = Boolean(claimInfo && !claimedByMe);
-                    const primaryEmail = member.emails?.[0]?.value || '—';
-
-                    return (
-                      <tr
-                        key={`${group}-${member.id}`}
-                        className={idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]'}
-                      >
-                        <td className="py-2.5 px-3 font-mono text-slate-500 tabular-nums">
-                          {idx + 1}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-pust-50 border border-stone-200 text-pust-900 flex items-center justify-center font-serif text-xs font-semibold shrink-0 overflow-hidden">
-                              {member.photoUrl && isSafeMediaUrl(member.photoUrl) ? (
-                                <img
-                                  src={member.photoUrl}
-                                  alt={member.name}
-                                  referrerPolicy="no-referrer"
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <span>{member.name.slice(0, 2).toUpperCase()}</span>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-medium text-slate-950 truncate">{member.name}</p>
-                              <p className="font-mono text-[11px] text-slate-500 truncate">
-                                {member.officeLocation || user.departmentCode}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-2.5 px-3 text-slate-700">
-                          <p className="font-medium text-slate-900">{member.designation}</p>
-                          <p className="text-[11px] text-slate-500">{groupLabel}</p>
-                        </td>
-                        <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600">
-                          {primaryEmail}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          {claimedByMe ? (
-                            <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Claimed by You</span>
-                            </span>
-                          ) : claimedByOther ? (
-                            <span className="text-slate-500">
-                              Claimed by {claimInfo.claimedByName || 'another teacher'}
-                            </span>
-                          ) : (
-                            <span className="text-pust-800 font-medium">Available to Claim</span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                          {claimedByMe ? (
-                            <button
-                              type="button"
-                              onClick={switchToEditClaimedMode}
-                              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 text-white hover:bg-emerald-800 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                            >
-                              Load into Editor
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              disabled={claimedByOther || claimingId === member.id}
-                              onClick={() => void handleClaimProfile(member, group)}
-                              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-900 bg-white text-pust-900 hover:bg-pust-900 hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
-                            >
-                              {claimingId === member.id ? 'Claiming...' : 'Claim This Profile'}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
-      </div>
+      ) : null}
 
       {/* Section B: Faculty Profile Editor (Admin Approval Required) */}
       <form
@@ -819,7 +797,10 @@ export function TeacherProfilePanel({
               <span>Administrator Approval Required Before Publishing Live</span>
             </p>
             <h2 className="font-serif text-xl font-medium text-slate-950">
-              02. {editorMode === 'edit_claimed' ? 'Edit Claimed Faculty Profile' : 'Create & Edit New Directory Profile'}
+              {claimedMember ? '01' : '02'}.{' '}
+              {editorMode === 'edit_claimed'
+                ? 'Edit Claimed Faculty Profile'
+                : 'Create & Edit New Directory Profile'}
             </h2>
             <p className="text-xs text-slate-600">
               {editorMode === 'edit_claimed' && claimedMember
@@ -828,32 +809,17 @@ export function TeacherProfilePanel({
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200 shrink-0 self-start lg:self-auto">
-            {claimedMember && (
+          {!claimedMember && (
+            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200 shrink-0 self-start lg:self-auto">
               <button
                 type="button"
-                onClick={switchToEditClaimedMode}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  editorMode === 'edit_claimed'
-                    ? 'bg-white text-slate-950 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={switchToCreateNewMode}
+                className="px-3 py-1.5 text-xs font-medium rounded-md bg-white text-slate-950 shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
               >
-                Edit Claimed Profile
+                Create New Profile
               </button>
-            )}
-            <button
-              type="button"
-              onClick={switchToCreateNewMode}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                editorMode === 'create_new'
-                  ? 'bg-white text-slate-950 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Create New Profile
-            </button>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Portrait Photo Upload or Direct Link */}
@@ -1354,7 +1320,7 @@ export function TeacherProfilePanel({
         <div className="flex items-center justify-between gap-2 border-b border-stone-200 pb-3">
           <div>
             <h3 className="font-serif text-lg font-medium text-slate-950">
-              03. Profile Approval Submission History
+              {claimedMember ? '02' : '03'}. Profile Approval Submission History
             </h3>
             <p className="text-xs text-slate-600">
               Audit trail of directory updates and new faculty profile requests submitted from your account.
@@ -1367,7 +1333,7 @@ export function TeacherProfilePanel({
 
         {requests.length === 0 ? (
           <p className="text-xs text-slate-600 py-2">
-            No profile change requests submitted yet. Use Section 02 above to submit an edit or create a new directory entry.
+            No profile change requests submitted yet. Use the profile editor above to submit an edit or create a new directory entry.
           </p>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-stone-200">

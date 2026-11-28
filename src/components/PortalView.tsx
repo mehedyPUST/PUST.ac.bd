@@ -8,7 +8,6 @@ import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
 import { PustCrest } from './PustCrest';
 import { usePust } from './PustContext';
-import { PwaInstallButton } from './PwaManager';
 import { AdminAuditLogPanel } from './portal/AdminAuditLogPanel';
 import { AdminCmsPanel } from './portal/AdminCmsPanel';
 import { AdminUserDirectoryPanel } from './portal/AdminUserDirectoryPanel';
@@ -399,21 +398,6 @@ export function PortalView({
                 <span>Site-Wide CMS Directory</span>
               </button>
             )}
-            <PwaInstallButton variant="portal" />
-            <button
-              type="button"
-              onClick={() => navigateTo('/verify')}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              Public Document Verification
-            </button>
-            <button
-              type="button"
-              onClick={onBackToSite}
-              className="w-full px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              Public University Website
-            </button>
             <button
               type="button"
               onClick={handleLogout}
