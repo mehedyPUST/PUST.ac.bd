@@ -222,6 +222,10 @@ export function PublicSubPages({
   const deptGroupsRef = useRef<HTMLDivElement>(null);
   const noticesBoardRef = useRef<HTMLDivElement>(null);
   const pendingNoticeCatRef = useRef<'All' | NoticeCategory | null>(null);
+  const noticeFilterNavRef = useRef<HTMLElement>(null);
+  const noticeFilterBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const noticeScopeGroupRef = useRef<HTMLDivElement>(null);
+  const noticeScopeBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const queryClient = useQueryClient();
 
@@ -272,6 +276,83 @@ export function PublicSubPages({
     pendingNoticeCatRef.current = null;
     setSelectedNoticeCat(getCategoryForNoticeRoute(route));
   }, [route]);
+
+  useEffect(() => {
+    if (route !== '/notices' && !route.startsWith('/notices/')) return;
+    const raf = window.requestAnimationFrame(() => {
+      const container = noticeFilterNavRef.current;
+      const idx = NOTICE_FILTERS.indexOf(selectedNoticeCat);
+      const activeBtn = noticeFilterBtnRefs.current[selectedNoticeCat] ?? null;
+      if (!container || !activeBtn || idx < 0) return;
+      if (container.scrollWidth <= container.clientWidth) return;
+
+      const prevBtn = idx > 0 ? noticeFilterBtnRefs.current[NOTICE_FILTERS[idx - 1]] ?? null : null;
+      const nextBtn =
+        idx < NOTICE_FILTERS.length - 1
+          ? noticeFilterBtnRefs.current[NOTICE_FILTERS[idx + 1]] ?? null
+          : null;
+
+      const cRect = container.getBoundingClientRect();
+      const aRect = activeBtn.getBoundingClientRect();
+      const pRect = prevBtn ? prevBtn.getBoundingClientRect() : aRect;
+      const nRect = nextBtn ? nextBtn.getBoundingClientRect() : aRect;
+
+      const viewWidth = container.clientWidth;
+      const maxScroll = container.scrollWidth - viewWidth;
+      const activeCenter = aRect.left - cRect.left + container.scrollLeft + aRect.width / 2;
+      let target = activeCenter - viewWidth / 2;
+
+      const leftEdge = pRect.left - cRect.left + container.scrollLeft - 16;
+      const rightEdge = nRect.right - cRect.left + container.scrollLeft + 16;
+
+      if (rightEdge - leftEdge <= viewWidth) {
+        if (target > leftEdge) target = leftEdge;
+        if (target + viewWidth < rightEdge) target = rightEdge - viewWidth;
+      }
+
+      const clamped = Math.max(0, Math.min(maxScroll, target));
+      container.scrollTo({ left: clamped, behavior: 'smooth' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [selectedNoticeCat, route]);
+
+  useEffect(() => {
+    if (route !== '/notices' && !route.startsWith('/notices/')) return;
+    const raf = window.requestAnimationFrame(() => {
+      const container = noticeScopeGroupRef.current;
+      const order: Array<'all' | 'central' | 'department'> = ['all', 'central', 'department'];
+      const idx = order.indexOf(noticeBoardScope);
+      const activeBtn = noticeScopeBtnRefs.current[noticeBoardScope] ?? null;
+      if (!container || !activeBtn || idx < 0) return;
+      if (container.scrollWidth <= container.clientWidth) return;
+
+      const prevBtn = idx > 0 ? noticeScopeBtnRefs.current[order[idx - 1]] ?? null : null;
+      const nextBtn =
+        idx < order.length - 1 ? noticeScopeBtnRefs.current[order[idx + 1]] ?? null : null;
+
+      const cRect = container.getBoundingClientRect();
+      const aRect = activeBtn.getBoundingClientRect();
+      const pRect = prevBtn ? prevBtn.getBoundingClientRect() : aRect;
+      const nRect = nextBtn ? nextBtn.getBoundingClientRect() : aRect;
+
+      const viewWidth = container.clientWidth;
+      const maxScroll = container.scrollWidth - viewWidth;
+      const activeCenter = aRect.left - cRect.left + container.scrollLeft + aRect.width / 2;
+      let target = activeCenter - viewWidth / 2;
+
+      const leftEdge = pRect.left - cRect.left + container.scrollLeft - 8;
+      const rightEdge = nRect.right - cRect.left + container.scrollLeft + 8;
+
+      if (rightEdge - leftEdge <= viewWidth) {
+        if (target > leftEdge) target = leftEdge;
+        if (target + viewWidth < rightEdge) target = rightEdge - viewWidth;
+      }
+
+      const clamped = Math.max(0, Math.min(maxScroll, target));
+      container.scrollTo({ left: clamped, behavior: 'smooth' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [noticeBoardScope, route]);
 
   useEffect(() => {
     setOpeningDeptCode(null);
@@ -2688,9 +2769,10 @@ export function PublicSubPages({
             </div>
 
             <div
+              ref={noticeScopeGroupRef}
               role="group"
               aria-label="Filter notices by board scope"
-              className="inline-flex flex-wrap items-center self-start md:self-auto gap-1 p-1 rounded-xl bg-white border border-stone-200 max-w-full"
+              className="inline-flex flex-nowrap items-center self-start md:self-auto p-1 rounded-xl bg-white border border-stone-200 overflow-x-auto no-scrollbar max-w-full shrink-0"
             >
               {(
                 [
@@ -2701,6 +2783,9 @@ export function PublicSubPages({
               ).map((scope) => (
                 <button
                   key={scope.id}
+                  ref={(el) => {
+                    noticeScopeBtnRefs.current[scope.id] = el;
+                  }}
                   type="button"
                   onClick={() => setNoticeBoardScope(scope.id)}
                   className={`h-8 inline-flex items-center justify-center px-3 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
@@ -2716,12 +2801,16 @@ export function PublicSubPages({
           </div>
 
           <nav
+            ref={noticeFilterNavRef}
             aria-label="Notice categories"
-            className="flex flex-wrap items-center gap-1.5 min-w-0"
+            className="flex flex-nowrap items-center overflow-x-auto no-scrollbar gap-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 min-w-0"
           >
             {NOTICE_FILTERS.map((cat) => (
               <button
                 key={cat}
+                ref={(el) => {
+                  noticeFilterBtnRefs.current[cat] = el;
+                }}
                 type="button"
                 aria-pressed={selectedNoticeCat === cat}
                 onClick={() => handleSelectNoticeCategory(cat)}
