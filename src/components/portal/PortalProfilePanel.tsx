@@ -20,6 +20,7 @@ import type {
   UserRole,
 } from '../../types/pust';
 import { ROLE_LABELS, type PortalTab, type PortalTabItem } from './portalMeta';
+import { AccountSecurityPasswordCard } from './AccountSecurityPasswordCard';
 
 interface PortalProfilePanelProps {
   user: AuthUser;
@@ -30,6 +31,7 @@ interface PortalProfilePanelProps {
   receipts: PaymentReceiptRecord[];
   targetedNotifications: NoticeRecord[];
   bookmarks: BookmarkRecord[];
+  onUserChange?: (user: AuthUser) => void;
   onSelectTab: (tab: PortalTab) => void;
   onOpenReceipt: (receipt: PaymentReceiptRecord) => void;
   onNavigateVerify: () => void;
@@ -67,6 +69,7 @@ export function PortalProfilePanel({
   receipts,
   targetedNotifications,
   bookmarks,
+  onUserChange,
   onSelectTab,
   onOpenReceipt,
   onNavigateVerify,
@@ -81,9 +84,14 @@ export function PortalProfilePanel({
     .join('');
 
   const quickTabs = portalTabs.filter((t) => t.id !== 'profile' && t.id !== 'overview').slice(0, 4);
+  const mustChangePassword = Boolean(user.mustChangePassword);
 
   return (
     <div className="space-y-6">
+      {mustChangePassword && (
+        <AccountSecurityPasswordCard user={user} onUserChange={onUserChange} />
+      )}
+
       {/* Unified Identity & Institutional Credentials Card */}
       <div className="bg-white rounded-2xl border border-stone-200 border-t-2 border-t-pust-800 overflow-hidden">
         <div className="bg-[#FAF9F6] border-b border-stone-200 px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -98,8 +106,9 @@ export function PortalProfilePanel({
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              disabled={mustChangePassword}
               onClick={() => onSelectTab('overview')}
-              className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer"
+              className="h-8 px-3 inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span>Overview</span>
@@ -397,8 +406,9 @@ export function PortalProfilePanel({
                     <button
                       key={tab.id}
                       type="button"
+                      disabled={mustChangePassword}
                       onClick={() => onSelectTab(tab.id)}
-                      className="h-full text-left p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] hover:bg-white hover:border-pust-800 transition-colors flex items-center justify-between gap-3 group cursor-pointer"
+                      className="h-full text-left p-4 rounded-xl border border-stone-200 bg-[#FAF9F6] hover:bg-white hover:border-pust-800 transition-colors flex items-center justify-between gap-3 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-9 h-9 rounded-lg bg-white border border-stone-200 text-pust-800 group-hover:bg-pust-900 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
@@ -408,7 +418,9 @@ export function PortalProfilePanel({
                           <p className="font-serif text-sm font-medium text-slate-950 truncate">
                             {tab.label}
                           </p>
-                          <p className="text-xs text-slate-600 truncate mt-0.5">{tab.desc}</p>
+                          <p className="text-xs text-slate-600 truncate mt-0.5">
+                            {mustChangePassword ? 'Unlock after password update' : tab.desc}
+                          </p>
                         </div>
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-pust-800 shrink-0" />
@@ -507,6 +519,10 @@ export function PortalProfilePanel({
           )}
         </div>
       </div>
+
+      {!mustChangePassword && (
+        <AccountSecurityPasswordCard user={user} onUserChange={onUserChange} />
+      )}
     </div>
   );
 }

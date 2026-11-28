@@ -139,6 +139,15 @@ function generateStrongPassword(): string {
   return chars.sort(() => Math.random() - 0.5).join('');
 }
 
+function generateTempLoginToken(): string {
+  const pool = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+  for (let i = 0; i < 6; i += 1) {
+    suffix += pool[Math.floor(Math.random() * pool.length)];
+  }
+  return `PUST-TMP-${suffix}`;
+}
+
 export function AdminUserDirectoryPanel({
   currentUser,
   departments,
@@ -198,6 +207,7 @@ export function AdminUserDirectoryPanel({
   const [officerHallAffiliation, setOfficerHallAffiliation] = useState('Administrative Building');
   const [officerPassword, setOfficerPassword] = useState('');
   const [showOfficerPassword, setShowOfficerPassword] = useState(false);
+  const [officerMustChangePassword, setOfficerMustChangePassword] = useState(false);
   const [officerStatus, setOfficerStatus] = useState<ApprovalStatus>('approved');
   const [officerCourses, setOfficerCourses] = useState('');
   const [officerSessions, setOfficerSessions] = useState('');
@@ -236,6 +246,7 @@ export function AdminUserDirectoryPanel({
   const [passwordTarget, setPasswordTarget] = useState<AuthUser | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetMustChange, setResetMustChange] = useState(true);
   const [savingPassword, setSavingPassword] = useState(false);
 
   // Inline Delete Confirmation & Row Busy State
@@ -530,6 +541,7 @@ export function AdminUserDirectoryPanel({
     setOfficerAcademicId('');
     setOfficerPassword('');
     setShowOfficerPassword(false);
+    setOfficerMustChangePassword(false);
     setOfficerStatus('approved');
     setOfficerCourses('');
     setOfficerSessions('');
@@ -559,7 +571,8 @@ export function AdminUserDirectoryPanel({
       setOfficerEmail(primaryEmail);
       setOfficerAcademicId(suggestedId);
       setOfficerPassword('');
-      setShowOfficerPassword(false);
+      setShowOfficerPassword(true);
+      setOfficerMustChangePassword(true);
       setOfficerStatus('approved');
       setOfficerCourses('');
       setOfficerSessions('');
@@ -666,6 +679,7 @@ export function AdminUserDirectoryPanel({
         approvalStatus: officerStatus,
         assignedCourses: courses,
         assignedSessions: sessions,
+        mustChangePassword: officerMustChangePassword,
         ...(linkingProfile &&
         (officerRole === 'teacher' || officerRole === 'chairman') &&
         officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode
@@ -685,7 +699,7 @@ export function AdminUserDirectoryPanel({
       setLinkingProfile(null);
       setFeedback(
         wasLinked
-          ? `Added ${res.user.name} to portal and linked to existing ${res.user.departmentCode} directory profile.`
+          ? `Added ${res.user.name} to portal and linked to existing ${res.user.departmentCode} directory profile.${officerMustChangePassword ? ' Temporary first-login password change is required.' : ''}`
           : `Created ${ROLE_DISPLAY_NAMES[res.user.role]} account for ${res.user.name} (${res.user.officeName || res.user.departmentCode}).`
       );
       await loadUsers();
@@ -805,10 +819,13 @@ export function AdminUserDirectoryPanel({
     setFeedback(null);
     setSavingPassword(true);
     try {
-      await pustApi.resetAdminUserPassword(passwordTarget.id, newPassword);
-      setFeedback(`Password updated for ${passwordTarget.name}.`);
+      await pustApi.resetAdminUserPassword(passwordTarget.id, newPassword, resetMustChange);
+      setFeedback(
+        `Password updated for ${passwordTarget.name}.${resetMustChange ? ' User must change it from profile on next login.' : ''}`
+      );
       setPasswordTarget(null);
       setNewPassword('');
+      await loadUsers();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to reset user password.');
     } finally {
@@ -1619,6 +1636,7 @@ export function AdminUserDirectoryPanel({
                                 setPasswordTarget(u);
                                 setNewPassword('');
                                 setShowResetPassword(false);
+                                setResetMustChange(true);
                               }}
                               title="Reset account password"
                               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
@@ -1827,19 +1845,36 @@ export function AdminUserDirectoryPanel({
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-medium text-slate-700">Initial Password</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOfficerPassword(generateStrongPassword());
-                        setShowOfficerPassword(true);
-                      }}
-                      className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
-                    >
-                      Generate Strong
-                    </button>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="font-medium text-slate-700">
+                      {officerMustChangePassword
+                        ? 'Temporary Password / Token'
+                        : 'Initial Password'}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOfficerPassword(generateTempLoginToken());
+                          setShowOfficerPassword(true);
+                          setOfficerMustChangePassword(true);
+                        }}
+                        className="text-[11px] font-semibold text-pust-800 hover:underline cursor-pointer"
+                      >
+                        Generate Temp Token
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOfficerPassword(generateStrongPassword());
+                          setShowOfficerPassword(true);
+                        }}
+                        className="text-[11px] font-medium text-slate-600 hover:text-pust-900 hover:underline cursor-pointer"
+                      >
+                        Generate Strong
+                      </button>
+                    </div>
                   </div>
                   <div className="relative">
                     <input
@@ -1864,6 +1899,17 @@ export function AdminUserDirectoryPanel({
                       )}
                     </button>
                   </div>
+                  <label className="flex items-start gap-2 pt-0.5 text-[11px] text-slate-700 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={officerMustChangePassword}
+                      onChange={(e) => setOfficerMustChangePassword(e.target.checked)}
+                      className="mt-0.5 rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+                    />
+                    <span>
+                      Require user to change this temporary password/token from their profile on first login
+                    </span>
+                  </label>
                 </div>
 
                 <div>
@@ -2388,19 +2434,34 @@ export function AdminUserDirectoryPanel({
               <p className="text-slate-600">
                 Set a new sign-in password for <strong className="text-slate-900">{passwordTarget.name}</strong> ({passwordTarget.email}).
               </p>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="font-medium text-slate-700">New Password</label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNewPassword(generateStrongPassword());
-                      setShowResetPassword(true);
-                    }}
-                    className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
-                  >
-                    Generate Strong
-                  </button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-medium text-slate-700">
+                    {resetMustChange ? 'Temporary Password / Token' : 'New Password'}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewPassword(generateTempLoginToken());
+                        setShowResetPassword(true);
+                        setResetMustChange(true);
+                      }}
+                      className="text-[11px] font-semibold text-pust-800 hover:underline cursor-pointer"
+                    >
+                      Generate Temp Token
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewPassword(generateStrongPassword());
+                        setShowResetPassword(true);
+                      }}
+                      className="text-[11px] font-medium text-slate-600 hover:text-pust-900 hover:underline cursor-pointer"
+                    >
+                      Generate Strong
+                    </button>
+                  </div>
                 </div>
                 <div className="relative">
                   <input
@@ -2425,6 +2486,17 @@ export function AdminUserDirectoryPanel({
                     )}
                   </button>
                 </div>
+                <label className="flex items-start gap-2 pt-0.5 text-[11px] text-slate-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={resetMustChange}
+                    onChange={(e) => setResetMustChange(e.target.checked)}
+                    className="mt-0.5 rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+                  />
+                  <span>
+                    Require user to change this temporary credential from My Profile on next login
+                  </span>
+                </label>
               </div>
               <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button

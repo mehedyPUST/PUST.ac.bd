@@ -1079,8 +1079,15 @@ class PustRepository {
     return updated ? this.stripPasswordHash(updated) : null;
   }
 
-  async updateUserPassword(id: string, passwordHash: string): Promise<boolean> {
-    const updated = await this.updateItem('users', this.users, id, { passwordHash });
+  async updateUserPassword(
+    id: string,
+    passwordHash: string,
+    extraPatch?: { mustChangePassword?: boolean }
+  ): Promise<boolean> {
+    const updated = await this.updateItem('users', this.users, id, {
+      passwordHash,
+      ...(extraPatch || {}),
+    });
     return Boolean(updated);
   }
 

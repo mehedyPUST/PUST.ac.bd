@@ -2,9 +2,11 @@ import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import {
+  AUTH_COOKIE_NAME,
   hashPassword,
   requireAuth,
   requireRoles,
+  verifyAuthToken,
   wrapRouterAsync,
   type AuthenticatedRequest,
   type JwtClaims,
@@ -30,6 +32,34 @@ import {
 } from '../officeAutomation';
 
 export const portalRouter = wrapRouterAsync(Router());
+
+// Enforce mandatory temporary password replacement before allowing portal mutations
+portalRouter.use(async (req, res, next) => {
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    next();
+    return;
+  }
+  const token = req.cookies?.[AUTH_COOKIE_NAME];
+  if (typeof token !== 'string' || !token) {
+    next();
+    return;
+  }
+  const claims = verifyAuthToken(token);
+  if (!claims || claims.sub === 'env-admin-office') {
+    next();
+    return;
+  }
+  const liveUser = await pustRepo.findUserById(claims.sub);
+  if (liveUser?.mustChangePassword) {
+    res.status(403).json({
+      error:
+        'Please change your temporary first-login password from My Profile before performing portal actions.',
+      code: 'PASSWORD_CHANGE_REQUIRED',
+    });
+    return;
+  }
+  next();
+});
 
 function isHallOfficerScopedTo(authUser: JwtClaims, hallName: string): boolean {
   if (authUser.role !== 'hall') return true;
@@ -84,6 +114,7 @@ const adminCreateUserSchema = z.object({
   claimedFacultyMemberId: z.string().trim().min(1).max(80).optional(),
   claimedDepartmentCode: z.string().trim().min(2).max(24).optional(),
   claimedFacultyGroup: z.enum(['faculty', 'contractual', 'officer']).optional(),
+  mustChangePassword: z.boolean().optional(),
 });
 
 const adminUpdateUserSchema = z
@@ -106,6 +137,7 @@ const adminUpdateUserSchema = z
 
 const adminResetPasswordSchema = z.object({
   newPassword: z.string().min(8).max(128),
+  mustChangePassword: z.boolean().optional(),
 });
 
 const teacherAssignSchema = z.object({
@@ -1228,6 +1260,8 @@ portalRouter.post(
       };
     }
 
+    const mustChangePassword = Boolean(data.mustChangePassword);
+
     try {
       const created = await pustRepo.createUser({
         name: data.name,
@@ -1250,6 +1284,7 @@ portalRouter.post(
         ...(data.designation?.trim() ? { designation: data.designation.trim() } : {}),
         assignedCourses: data.role === 'teacher' ? data.assignedCourses || [] : [],
         assignedSessions: data.role === 'teacher' ? data.assignedSessions || [] : [],
+        ...(mustChangePassword ? { mustChangePassword: true } : {}),
         ...linkedClaimPatch,
       });
 
@@ -1301,7 +1336,7 @@ portalRouter.post(
           category: isAdminAccount ? 'Privilege & Security' : 'Account & Access',
           severity: isAdminAccount ? 'critical' : 'elevated',
           actorEmail: actor.email,
-          details: `Email: ${safeUser.email} | Role: ${safeUser.role} | Unit: ${safeUser.officeName || safeUser.departmentCode} | Status: ${safeUser.approvalStatus}`,
+          details: `Email: ${safeUser.email} | Role: ${safeUser.role} | Unit: ${safeUser.officeName || safeUser.departmentCode} | Status: ${safeUser.approvalStatus}${mustChangePassword ? ' | Temp First-Login Credential Issued' : ''}`,
         }
       );
       res.status(201).json({ user: safeUser });
@@ -1528,7 +1563,12 @@ portalRouter.patch(
         return;
       }
     }
-    const ok = await pustRepo.updateUserPassword(target.id, hashPassword(parsed.data.newPassword));
+    const requireResetOnLogin = Boolean(parsed.data.mustChangePassword);
+    const ok = await pustRepo.updateUserPassword(
+      target.id,
+      hashPassword(parsed.data.newPassword),
+      { mustChangePassword: requireResetOnLogin }
+    );
     if (!ok) {
       res.status(404).json({ error: 'Account not found.' });
       return;
@@ -1542,7 +1582,7 @@ portalRouter.patch(
         category: 'Privilege & Security',
         severity: 'critical',
         actorEmail: actor.email,
-        details: `Password reset for ${target.email} in ${target.departmentCode} (credential redacted).`,
+        details: `Password reset for ${target.email} in ${target.departmentCode}${requireResetOnLogin ? ' (temporary credential; change required on next login)' : ''} (credential redacted).`,
       }
     );
     res.json({ updated: true });

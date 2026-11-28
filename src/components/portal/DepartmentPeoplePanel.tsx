@@ -79,6 +79,15 @@ function generateStrongPassword(): string {
   return chars.sort(() => Math.random() - 0.5).join('');
 }
 
+function generateTempLoginToken(): string {
+  const pool = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+  for (let i = 0; i < 6; i += 1) {
+    suffix += pool[Math.floor(Math.random() * pool.length)];
+  }
+  return `PUST-TMP-${suffix}`;
+}
+
 function formatDateTime(iso?: string): string {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -154,10 +163,20 @@ export function DepartmentPeoplePanel({
   const [tBuilding, setTBuilding] = useState(defaultBuilding);
   const [tPassword, setTPassword] = useState('');
   const [showTPassword, setShowTPassword] = useState(false);
+  const [tMustChangePassword, setTMustChangePassword] = useState(true);
   const [tStatus, setTStatus] = useState<ApprovalStatus>('approved');
   const [tCourses, setTCourses] = useState('');
   const [tSessions, setTSessions] = useState('');
   const [creatingTeacher, setCreatingTeacher] = useState(false);
+
+  // One-time credential handoff notice after provisioning with temp token/password
+  const [issuedCredentialNotice, setIssuedCredentialNotice] = useState<{
+    name: string;
+    email: string;
+    secret: string;
+    mustChange: boolean;
+  } | null>(null);
+  const [copiedCredential, setCopiedCredential] = useState(false);
 
   // Modal: Create Student
   const [showCreateStudentModal, setShowCreateStudentModal] = useState(false);
@@ -198,6 +217,7 @@ export function DepartmentPeoplePanel({
   const [passwordTarget, setPasswordTarget] = useState<AuthUser | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetMustChange, setResetMustChange] = useState(true);
   const [savingPassword, setSavingPassword] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -455,6 +475,7 @@ export function DepartmentPeoplePanel({
   function openCreateTeacher() {
     setError(null);
     setFeedback(null);
+    setIssuedCredentialNotice(null);
     setLinkingProfile(null);
     setTName('');
     setTDesignation('Lecturer');
@@ -463,6 +484,7 @@ export function DepartmentPeoplePanel({
     setTBuilding(defaultBuilding);
     setTPassword('');
     setShowTPassword(false);
+    setTMustChangePassword(true);
     setTStatus('approved');
     setTCourses('');
     setTSessions('');
@@ -472,6 +494,7 @@ export function DepartmentPeoplePanel({
   function openAddPeopleFromProfile(entry: DeptExistingProfileEntry) {
     setError(null);
     setFeedback(null);
+    setIssuedCredentialNotice(null);
     setPreviewProfile(null);
     setLinkingProfile(entry);
     const primaryEmail = entry.member.emails?.[0]?.value?.trim() || '';
@@ -482,7 +505,8 @@ export function DepartmentPeoplePanel({
     setTAcademicId(`PUST-${deptCode}-FAC-${slugSuffix || '01'}`);
     setTBuilding(entry.member.officeLocation || defaultBuilding);
     setTPassword('');
-    setShowTPassword(false);
+    setShowTPassword(true);
+    setTMustChangePassword(true);
     setTStatus('approved');
     setTCourses('');
     setTSessions('');
@@ -535,7 +559,7 @@ export function DepartmentPeoplePanel({
     setError(null);
     setFeedback(null);
     if (tPassword.length < 8) {
-      setError('Initial password must be at least 8 characters.');
+      setError('Temporary password / token must be at least 8 characters.');
       return;
     }
     setCreatingTeacher(true);
@@ -548,10 +572,11 @@ export function DepartmentPeoplePanel({
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
+      const issuedSecret = tPassword;
       const res = await pustApi.createAdminUser({
         name: tName.trim(),
         email: tEmail.trim(),
-        password: tPassword,
+        password: issuedSecret,
         role: 'teacher',
         departmentCode: deptCode,
         academicId: tAcademicId.trim(),
@@ -561,6 +586,7 @@ export function DepartmentPeoplePanel({
         approvalStatus: tStatus,
         assignedCourses: courses,
         assignedSessions: sessions,
+        mustChangePassword: tMustChangePassword,
         ...(linkingProfile
           ? {
               claimedFacultyMemberId: linkingProfile.member.id,
@@ -572,6 +598,14 @@ export function DepartmentPeoplePanel({
       const wasLinked = Boolean(linkingProfile);
       setShowCreateTeacherModal(false);
       setLinkingProfile(null);
+      setTPassword('');
+      setIssuedCredentialNotice({
+        name: res.user.name,
+        email: res.user.email,
+        secret: issuedSecret,
+        mustChange: tMustChangePassword,
+      });
+      setCopiedCredential(false);
       setFeedback(
         wasLinked
           ? `Added ${res.user.name} (${res.user.email}) as ${deptCode} people and linked existing directory profile.`
@@ -713,21 +747,45 @@ export function DepartmentPeoplePanel({
     e.preventDefault();
     if (!passwordTarget) return;
     if (newPassword.length < 8) {
-      setError('New password must be at least 8 characters.');
+      setError('Password / temporary token must be at least 8 characters.');
       return;
     }
     setError(null);
     setFeedback(null);
     setSavingPassword(true);
     try {
-      await pustApi.resetAdminUserPassword(passwordTarget.id, newPassword);
+      const issuedSecret = newPassword;
+      await pustApi.resetAdminUserPassword(passwordTarget.id, issuedSecret, resetMustChange);
+      setIssuedCredentialNotice({
+        name: passwordTarget.name,
+        email: passwordTarget.email,
+        secret: issuedSecret,
+        mustChange: resetMustChange,
+      });
+      setCopiedCredential(false);
       setFeedback(`Password updated for ${passwordTarget.name} (${passwordTarget.email}).`);
       setPasswordTarget(null);
       setNewPassword('');
+      await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to reset user password.');
     } finally {
       setSavingPassword(false);
+    }
+  }
+
+  async function handleCopyIssuedCredential() {
+    if (!issuedCredentialNotice) return;
+    try {
+      await navigator.clipboard.writeText(
+        `Portal Login: ${issuedCredentialNotice.email}\nTemporary Password/Token: ${issuedCredentialNotice.secret}`
+      );
+      setCopiedCredential(true);
+      window.setTimeout(() => setCopiedCredential(false), 2000);
+    } catch {
+      setFeedback(
+        `Temporary password/token for ${issuedCredentialNotice.email}: ${issuedCredentialNotice.secret}`
+      );
     }
   }
 
@@ -763,6 +821,49 @@ export function DepartmentPeoplePanel({
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      )}
+
+      {issuedCredentialNotice && (
+        <div
+          role="status"
+          className="px-4 py-3.5 rounded-xl border border-amber-300 bg-[#FBF6EE] text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        >
+          <div className="space-y-1 min-w-0">
+            <p className="font-semibold flex items-center gap-1.5">
+              <KeyRound className="w-4 h-4 text-amber-800 shrink-0" />
+              <span>
+                One-Time First-Login Handoff for {issuedCredentialNotice.name}
+              </span>
+            </p>
+            <p className="font-mono text-[11px] text-amber-900 break-all">
+              Email: {issuedCredentialNotice.email} · Temporary Token/Password:{' '}
+              <strong className="text-slate-950">{issuedCredentialNotice.secret}</strong>
+            </p>
+            <p className="text-[11px] text-amber-900">
+              {issuedCredentialNotice.mustChange
+                ? 'User will be required to replace this temporary credential from My Profile on first sign-in.'
+                : 'Initial password stored cleanly. Share securely and dismiss when copied.'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => void handleCopyIssuedCredential()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-white text-xs font-semibold text-amber-950 hover:border-amber-500 cursor-pointer whitespace-nowrap"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>{copiedCredential ? 'Copied' : 'Copy Credentials'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIssuedCredentialNotice(null)}
+              className="p-1.5 rounded-lg text-amber-800 hover:text-amber-950 cursor-pointer"
+              aria-label="Dismiss credential handoff"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -1090,6 +1191,11 @@ export function DepartmentPeoplePanel({
                               <span>Suspended</span>
                             </span>
                           )}
+                          {t.mustChangePassword && (
+                            <p className="font-mono text-[11px] text-amber-800 mt-1">
+                              First-login reset pending
+                            </p>
+                          )}
                         </td>
                         <td className="py-3 px-3 align-top text-right whitespace-nowrap">
                           <div className="inline-flex flex-wrap items-center justify-end gap-1.5">
@@ -1132,6 +1238,7 @@ export function DepartmentPeoplePanel({
                                 setPasswordTarget(t);
                                 setNewPassword('');
                                 setShowResetPassword(false);
+                                setResetMustChange(true);
                               }}
                               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
                             >
@@ -1915,19 +2022,36 @@ export function DepartmentPeoplePanel({
                     <option value="pending">Pending Review</option>
                   </select>
                 </div>
-                <div className="sm:col-span-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-medium text-slate-700">Initial Password</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTPassword(generateStrongPassword());
-                        setShowTPassword(true);
-                      }}
-                      className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
-                    >
-                      Generate Strong
-                    </button>
+                <div className="sm:col-span-2 space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="font-medium text-slate-700">
+                      {tMustChangePassword
+                        ? 'Temporary Password / First-Login Token'
+                        : 'Initial Password'}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTPassword(generateTempLoginToken());
+                          setShowTPassword(true);
+                          setTMustChangePassword(true);
+                        }}
+                        className="text-[11px] font-semibold text-pust-800 hover:underline cursor-pointer"
+                      >
+                        Generate Temp Token
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTPassword(generateStrongPassword());
+                          setShowTPassword(true);
+                        }}
+                        className="text-[11px] font-medium text-slate-600 hover:text-pust-900 hover:underline cursor-pointer"
+                      >
+                        Generate Strong
+                      </button>
+                    </div>
                   </div>
                   <div className="relative">
                     <input
@@ -1936,7 +2060,7 @@ export function DepartmentPeoplePanel({
                       minLength={8}
                       value={tPassword}
                       onChange={(e) => setTPassword(e.target.value)}
-                      placeholder="Minimum 8 characters"
+                      placeholder="Enter temporary password/token (min 8 chars)"
                       className="w-full pr-9 pl-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                     />
                     <button
@@ -1948,6 +2072,17 @@ export function DepartmentPeoplePanel({
                       {showTPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
                   </div>
+                  <label className="flex items-start gap-2 pt-0.5 text-[11px] text-slate-700 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={tMustChangePassword}
+                      onChange={(e) => setTMustChangePassword(e.target.checked)}
+                      className="mt-0.5 rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+                    />
+                    <span>
+                      Require user to change this temporary password/token from their profile on first login
+                    </span>
+                  </label>
                 </div>
                 <div>
                   <label className="block font-medium text-slate-700 mb-1">
@@ -2511,19 +2646,34 @@ export function DepartmentPeoplePanel({
               <p className="text-slate-600">
                 Set a new sign-in password for <strong className="text-slate-900">{passwordTarget.name}</strong> ({passwordTarget.email}).
               </p>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="font-medium text-slate-700">New Password</label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNewPassword(generateStrongPassword());
-                      setShowResetPassword(true);
-                    }}
-                    className="text-[11px] font-medium text-pust-800 hover:underline cursor-pointer"
-                  >
-                    Generate Strong
-                  </button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-medium text-slate-700">
+                    {resetMustChange ? 'Temporary Password / Token' : 'New Password'}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewPassword(generateTempLoginToken());
+                        setShowResetPassword(true);
+                        setResetMustChange(true);
+                      }}
+                      className="text-[11px] font-semibold text-pust-800 hover:underline cursor-pointer"
+                    >
+                      Generate Temp Token
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewPassword(generateStrongPassword());
+                        setShowResetPassword(true);
+                      }}
+                      className="text-[11px] font-medium text-slate-600 hover:text-pust-900 hover:underline cursor-pointer"
+                    >
+                      Generate Strong
+                    </button>
+                  </div>
                 </div>
                 <div className="relative">
                   <input
@@ -2548,6 +2698,17 @@ export function DepartmentPeoplePanel({
                     )}
                   </button>
                 </div>
+                <label className="flex items-start gap-2 pt-0.5 text-[11px] text-slate-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={resetMustChange}
+                    onChange={(e) => setResetMustChange(e.target.checked)}
+                    className="mt-0.5 rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+                  />
+                  <span>
+                    Require user to replace this temporary credential from My Profile on next login
+                  </span>
+                </label>
               </div>
               <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button

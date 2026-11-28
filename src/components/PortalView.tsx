@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
-import { ExternalLink, LayoutGrid, LogOut, User } from 'lucide-react';
+import { ExternalLink, LayoutGrid, Lock, LogOut, User } from 'lucide-react';
 import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
 import { PustCrest } from './PustCrest';
@@ -139,6 +139,10 @@ export function PortalView({
 
   useEffect(() => {
     if (!user) return;
+    if (user.mustChangePassword) {
+      setActiveTab('profile');
+      return;
+    }
     if (requestedTabParam && VALID_PORTAL_TABS.includes(requestedTabParam)) {
       setActiveTab(requestedTabParam);
     } else {
@@ -222,30 +226,35 @@ export function PortalView({
       .slice(0, 6);
   }, [notices, user]);
 
-  const selectTab = useCallback((nextTab: PortalTab, options?: { scrollToTop?: boolean }) => {
-    setActiveTab(nextTab);
-    if (typeof window === 'undefined') return;
+  const selectTab = useCallback(
+    (nextTab: PortalTab, options?: { scrollToTop?: boolean }) => {
+      const effectiveTab: PortalTab =
+        user?.mustChangePassword && nextTab !== 'profile' ? 'profile' : nextTab;
+      setActiveTab(effectiveTab);
+      if (typeof window === 'undefined') return;
 
-    const url = new URL(window.location.href);
-    if (nextTab === 'overview') {
-      url.searchParams.delete('tab');
-    } else {
-      url.searchParams.set('tab', nextTab);
-    }
-    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
-
-    const shouldScroll = options?.scrollToTop ?? true;
-    if (shouldScroll) {
-      const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      const rawTop = workspaceTopRef.current
-        ? workspaceTopRef.current.getBoundingClientRect().top + window.scrollY - 96
-        : 0;
-      const targetY = rawTop <= 60 ? 0 : rawTop;
-      if (Math.abs(window.scrollY - targetY) > 12 && window.scrollY > targetY) {
-        window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
+      const url = new URL(window.location.href);
+      if (effectiveTab === 'overview') {
+        url.searchParams.delete('tab');
+      } else {
+        url.searchParams.set('tab', effectiveTab);
       }
-    }
-  }, []);
+      window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+
+      const shouldScroll = options?.scrollToTop ?? true;
+      if (shouldScroll) {
+        const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        const rawTop = workspaceTopRef.current
+          ? workspaceTopRef.current.getBoundingClientRect().top + window.scrollY - 96
+          : 0;
+        const targetY = rawTop <= 60 ? 0 : rawTop;
+        if (Math.abs(window.scrollY - targetY) > 12 && window.scrollY > targetY) {
+          window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
+        }
+      }
+    },
+    [user?.mustChangePassword]
+  );
 
   // Keep active mobile horizontal tab centered without affecting vertical page scroll
   useEffect(() => {
@@ -323,8 +332,11 @@ export function PortalView({
     );
   }
 
+  const mustChangePassword = Boolean(user.mustChangePassword);
   const portalTabs = getRoleTabs(user.role, user.departmentCode, user.hallAffiliation);
-  const resolvedTab: PortalTab = portalTabs.some((t) => t.id === activeTab)
+  const resolvedTab: PortalTab = mustChangePassword
+    ? 'profile'
+    : portalTabs.some((t) => t.id === activeTab)
     ? activeTab
     : portalTabs[0].id;
   const activeTabMeta = portalTabs.find((t) => t.id === resolvedTab) || portalTabs[0];
@@ -380,6 +392,7 @@ export function PortalView({
             {portalTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = resolvedTab === tab.id;
+              const isLocked = mustChangePassword && tab.id !== 'profile';
               return (
                 <button
                   key={tab.id}
@@ -387,24 +400,28 @@ export function PortalView({
                     tabButtonRefs.current[tab.id] = el;
                   }}
                   type="button"
+                  disabled={isLocked}
                   onClick={() => selectTab(tab.id)}
-                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-colors cursor-pointer whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
+                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-colors whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
                     isActive
-                      ? 'bg-pust-900 text-white'
-                      : 'bg-stone-100 lg:bg-transparent text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900'
+                      ? 'bg-pust-900 text-white cursor-pointer'
+                      : isLocked
+                      ? 'bg-stone-50 text-slate-400 opacity-60 cursor-not-allowed'
+                      : 'bg-stone-100 lg:bg-transparent text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 cursor-pointer'
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   <span className="min-w-0 lg:flex-1">
-                    <span className="block text-xs sm:text-[13px] font-semibold lg:truncate">
-                      {tab.label}
+                    <span className="flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold lg:truncate">
+                      <span className="truncate">{tab.label}</span>
+                      {isLocked && <Lock className="w-3 h-3 shrink-0" />}
                     </span>
                     <span
                       className={`hidden lg:block text-[11px] truncate ${
                         isActive ? 'text-pust-100/85' : 'text-slate-500'
                       }`}
                     >
-                      {tab.desc}
+                      {isLocked ? 'Update temporary password first' : tab.desc}
                     </span>
                   </span>
                 </button>
@@ -563,6 +580,7 @@ export function PortalView({
                   receipts={receipts}
                   targetedNotifications={targetedNotifications}
                   bookmarks={bookmarks}
+                  onUserChange={onUserChange}
                   onSelectTab={(tab) => selectTab(tab)}
                   onOpenReceipt={openReceiptModal}
                   onNavigateVerify={() => navigateTo('/verify')}

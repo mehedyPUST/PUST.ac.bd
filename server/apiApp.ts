@@ -57,6 +57,17 @@ const loginSchema = z.object({
   password: z.string().min(1).max(128),
 });
 
+const changePasswordSchema = z.object({
+  currentPassword: z
+    .string()
+    .min(1, 'Enter your current password or temporary first-login token.')
+    .max(128),
+  newPassword: z
+    .string()
+    .min(8, 'New password must be at least 8 characters.')
+    .max(128),
+});
+
 const bootstrapAdminSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email().max(120),
@@ -532,6 +543,84 @@ export function mountApiRoutes(app: Express): void {
   app.post('/api/auth/logout', (req, res) => {
     clearAuthCookie(req, res);
     res.json({ ok: true });
+  });
+
+  app.post('/api/auth/change-password', requireAuth, async (req: AuthenticatedRequest, res) => {
+    const claims = req.authUser!;
+    if (claims.sub === 'env-admin-office') {
+      res.status(400).json({
+        error: 'Environment-configured admin credentials cannot be changed from profile settings.',
+      });
+      return;
+    }
+
+    const parsed = changePasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0]?.message || 'Provide your current temporary password and a new password (min 8 chars).';
+      res.status(400).json({ error: firstIssue });
+      return;
+    }
+
+    const liveUser =
+      (await pustRepo.findUserById(claims.sub)) ||
+      (await pustRepo.findUserByEmail(claims.email));
+    if (!liveUser || liveUser.approvalStatus !== 'approved') {
+      clearAuthCookie(req, res);
+      res.status(401).json({ error: 'Session is no longer valid.' });
+      return;
+    }
+
+    if (!verifyPassword(parsed.data.currentPassword, liveUser.passwordHash)) {
+      res.status(401).json({
+        error: 'Current password or temporary login token is incorrect.',
+      });
+      return;
+    }
+
+    if (parsed.data.newPassword === parsed.data.currentPassword) {
+      res.status(400).json({
+        error: 'New password must be different from your temporary password or token.',
+      });
+      return;
+    }
+
+    const wasTemporary = Boolean(liveUser.mustChangePassword);
+    const updated = await pustRepo.updateUserPassword(
+      liveUser.id,
+      hashPassword(parsed.data.newPassword),
+      { mustChangePassword: false }
+    );
+    if (!updated) {
+      res.status(500).json({ error: 'Unable to update account password.' });
+      return;
+    }
+
+    const refreshed = await pustRepo.findUserById(liveUser.id);
+    const { passwordHash: _ignored, ...safeUser } = refreshed || {
+      ...liveUser,
+      mustChangePassword: false,
+    };
+    safeUser.mustChangePassword = false;
+
+    const freshToken = signAuthToken(safeUser);
+    setAuthCookie(req, res, freshToken);
+
+    await pustRepo.logAudit(
+      safeUser.name,
+      safeUser.role,
+      wasTemporary ? 'Updated temporary first-login password' : 'Changed account password',
+      `${safeUser.name} (${safeUser.role} · ${safeUser.departmentCode})`,
+      {
+        category: 'Privilege & Security',
+        severity: wasTemporary ? 'elevated' : 'standard',
+        actorEmail: safeUser.email,
+        details: wasTemporary
+          ? 'Completed required first-login temporary password replacement from member profile (credentials redacted).'
+          : 'Self-service password updated from member profile (credentials redacted).',
+      }
+    );
+
+    res.json({ user: safeUser });
   });
 
   // Role-restricted Notice Board publishing (Central, Department, Teacher Course/Session)

@@ -36,6 +36,7 @@ export interface AuthUser {
   claimedDepartmentCode?: string;
   claimedFacultyMemberId?: string;
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
+  mustChangePassword?: boolean;
   createdAt: string;
 }
 
@@ -57,6 +58,7 @@ export interface AdminCreateUserPayload {
   claimedFacultyMemberId?: string;
   claimedDepartmentCode?: string;
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
+  mustChangePassword?: boolean;
 }
 
 export interface AdminUpdateUserPayload {

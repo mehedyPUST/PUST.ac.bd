@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { pustApi } from '../../lib/api';
 import { isSafeMediaUrl } from '../../lib/media';
+import { AccountSecurityPasswordCard } from './AccountSecurityPasswordCard';
 import type {
   AuthUser,
   ContactDetailItem,
@@ -535,6 +536,10 @@ export function TeacherProfilePanel({
 
   return (
     <div className="space-y-6">
+      {user.mustChangePassword && (
+        <AccountSecurityPasswordCard user={user} onUserChange={onUserChange} />
+      )}
+
       {/* Feedback & Error Alerts */}
       {feedback && (
         <div
@@ -1413,6 +1418,10 @@ export function TeacherProfilePanel({
               </div>
             </div>
           </div>
+
+          {!user.mustChangePassword && (
+            <AccountSecurityPasswordCard user={user} onUserChange={onUserChange} />
+          )}
         </div>
       )}
 

@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import http from 'node:http';
 import { deduplicateDepartments, pustRepo } from './db';
+import { getApiApp } from './apiApp';
 import {
   autoClearHallDueIfEnabled,
   autoEvaluateCertificateApplication,
@@ -9,7 +11,7 @@ import {
   buildOfficeFlowOverview,
   runAutomatedOfficeSweep,
 } from './officeAutomation';
-import type { JwtClaims } from './auth';
+import { hashPassword, signAuthToken, verifyPassword, type JwtClaims } from './auth';
 import type { ClearanceOfficeKey, DepartmentRecord, OfficeClearanceState } from '../src/types/pust';
 
 const ADMIN_CLAIMS: JwtClaims = {
@@ -323,4 +325,111 @@ test('deduplicateDepartments collapses stale duplicate records and keeps canonic
     ['MATH', 'CHEM', 'SDS']
   );
   assert.equal(clean.find((d) => d.code === 'CHEM')?.chairmanName, 'Ratan Kumar Paul');
+});
+
+test('Temporary first-login password blocks portal mutations until updated via /api/auth/change-password', async () => {
+  const app = await getApiApp();
+  const server = http.createServer(app);
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address();
+  assert.ok(address && typeof address === 'object');
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  const tempSecret = 'PUST-TMP-9K4M2P';
+  const newPersonalSecret = 'MyPersonalPass#2026';
+  const uniqueEmail = `temp.verify.${Date.now()}@pust.ac.bd`;
+
+  const created = await pustRepo.createUser({
+    name: 'Temp Verify Teacher',
+    email: uniqueEmail,
+    passwordHash: hashPassword(tempSecret),
+    role: 'teacher',
+    approvalStatus: 'approved',
+    departmentCode: 'PHY',
+    academicId: 'PUST-PHY-TMP-01',
+    hallAffiliation: 'Academic Building I',
+    assignedCourses: [],
+    assignedSessions: [],
+    mustChangePassword: true,
+  });
+
+  try {
+    // 1. Sign in with temporary token
+    const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({ email: uniqueEmail, password: tempSecret }),
+    });
+    assert.equal(loginRes.status, 200);
+    const loginJson = (await loginRes.json()) as { user: { mustChangePassword?: boolean; id: string } };
+    assert.equal(loginJson.user.mustChangePassword, true);
+    assert.equal('passwordHash' in loginJson.user, false);
+
+    const setCookie = loginRes.headers.get('set-cookie');
+    assert.ok(setCookie);
+    const cookieHeader = setCookie.split(';')[0];
+
+    // 2. Portal mutation is blocked while mustChangePassword is true
+    const blockedRes = await fetch(`${baseUrl}/api/portal/teacher/profile/unclaim`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({}),
+    });
+    assert.equal(blockedRes.status, 403);
+    const blockedJson = (await blockedRes.json()) as { code?: string };
+    assert.equal(blockedJson.code, 'PASSWORD_CHANGE_REQUIRED');
+
+    // 3. Reject wrong current token on change-password
+    const wrongCurrentRes = await fetch(`${baseUrl}/api/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({
+        currentPassword: 'WRONG-TOKEN-VALUE',
+        newPassword: newPersonalSecret,
+      }),
+    });
+    assert.equal(wrongCurrentRes.status, 401);
+
+    // 4. Update password with valid temporary token
+    const changeRes = await fetch(`${baseUrl}/api/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify({
+        currentPassword: tempSecret,
+        newPassword: newPersonalSecret,
+      }),
+    });
+    assert.equal(changeRes.status, 200);
+    const changeJson = (await changeRes.json()) as { user: { mustChangePassword?: boolean } };
+    assert.equal(changeJson.user.mustChangePassword, false);
+    assert.equal('passwordHash' in changeJson.user, false);
+
+    // 5. Old temporary token no longer works; new personal password works
+    const storedAfter = await pustRepo.findUserById(created.id);
+    assert.ok(storedAfter);
+    assert.equal(storedAfter.mustChangePassword, false);
+    assert.equal(verifyPassword(tempSecret, storedAfter.passwordHash), false);
+    assert.equal(verifyPassword(newPersonalSecret, storedAfter.passwordHash), true);
+
+    // Confirm signed token also remains valid cleanly
+    assert.ok(signAuthToken({ ...storedAfter, mustChangePassword: false }).length > 20);
+  } finally {
+    await pustRepo.deleteUser(created.id);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });

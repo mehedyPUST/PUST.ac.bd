@@ -307,7 +307,7 @@ export function PortalAuthGateway({
               <div>
                 <h2 className="font-serif text-xl font-medium text-slate-950">Portal Sign In</h2>
                 <p className="text-slate-600 mt-0.5 text-left">
-                  Sign in with your approved university credentials.
+                  Sign in with your approved university password or chairman-issued temporary first-login token.
                 </p>
               </div>
               <div>
@@ -322,13 +322,15 @@ export function PortalAuthGateway({
                 />
               </div>
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Password</label>
+                <label className="block font-medium text-slate-700 mb-1">
+                  Password or Temporary Login Token
+                </label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
+                  placeholder="Enter password or temporary token"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
                 />
               </div>

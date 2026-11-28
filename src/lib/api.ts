@@ -249,6 +249,12 @@ export const pustApi = {
       method: 'POST',
     }),
 
+  changePassword: (payload: { currentPassword: string; newPassword: string }) =>
+    apiFetch<{ user: AuthUser }>('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
   // Bookmarks
   getBookmarks: () => apiFetch<{ bookmarks: BookmarkRecord[] }>('/api/bookmarks'),
 
@@ -283,10 +289,13 @@ export const pustApi = {
       body: JSON.stringify(payload),
     }),
 
-  resetAdminUserPassword: (id: string, newPassword: string) =>
+  resetAdminUserPassword: (id: string, newPassword: string, mustChangePassword?: boolean) =>
     apiFetch<{ updated: boolean }>(`/api/portal/users/${encodeURIComponent(id)}/password`, {
       method: 'PATCH',
-      body: JSON.stringify({ newPassword }),
+      body: JSON.stringify({
+        newPassword,
+        ...(mustChangePassword !== undefined ? { mustChangePassword } : {}),
+      }),
     }),
 
   deleteAdminUser: (id: string) =>
