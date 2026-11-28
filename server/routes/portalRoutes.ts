@@ -14,6 +14,8 @@ import {
 import { pustRepo } from '../db';
 import { isSafeMediaUrl } from '../../src/lib/media';
 import type {
+  AuthUser,
+  ChairmanHistoryRecord,
   ClearanceOfficeKey,
   DepartmentPersonRecord,
   FacultyProfileRequestRecord,
@@ -907,6 +909,41 @@ const departmentCreateSchema = z.object({
   officers: z.array(departmentPersonSchema).max(50).optional(),
 });
 
+const chairmanHistoryEntrySchema = z.object({
+  id: z.string().trim().min(1).max(80),
+  name: z.string().trim().min(2).max(140),
+  designation: z.string().trim().max(140).optional(),
+  email: z.string().trim().max(160).optional(),
+  userId: z.string().trim().max(80).optional(),
+  profileId: z.string().trim().max(80).optional(),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => !v || isSafeMediaUrl(v), 'Photo URL must be valid.')
+    .optional(),
+  startedAt: z.string().trim().max(32).optional(),
+  endedAt: z.string().trim().min(4).max(32),
+  recordedAt: z.string().trim().min(4).max(40),
+  appointedBy: z.string().trim().max(120).optional(),
+  note: z.string().trim().max(320).optional(),
+});
+
+const appointChairmanSchema = z.object({
+  teacherUserId: z.string().trim().min(1, 'Select a teacher account to appoint as Chairman.').max(80),
+  effectiveDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Effective appointment date must use YYYY-MM-DD format.'),
+  previousStartedAt: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Previous start date must use YYYY-MM-DD format.')
+    .optional(),
+  demotePreviousChairman: z.boolean().default(true),
+  note: z.string().trim().max(300).optional(),
+});
+
 const departmentUpdateSchema = z.object({
   officialCode: z.string().trim().max(16).optional(),
   name: z.string().trim().min(2).max(160).optional(),
@@ -917,6 +954,8 @@ const departmentUpdateSchema = z.object({
   facultyCount: z.number().int().min(0).max(500).optional(),
   building: z.string().trim().min(2).max(140).optional(),
   chairmanName: z.string().trim().min(2).max(120).optional(),
+  chairmanSince: z.string().trim().max(32).optional(),
+  chairmanHistory: z.array(chairmanHistoryEntrySchema).max(60).optional(),
   contactPhone: z.string().trim().max(60).optional(),
   contactEmail: z.string().trim().max(120).optional(),
   coverImageUrl: z
@@ -1199,9 +1238,9 @@ portalRouter.post(
     } = {};
 
     if (data.claimedFacultyMemberId) {
-      if (data.role !== 'teacher' && data.role !== 'chairman') {
+      if (data.role === 'student' || data.role === 'admin') {
         res.status(400).json({
-          error: 'Only Faculty / Teacher or Department Chairman accounts can be linked to a department faculty profile.',
+          error: 'Department faculty and officer profiles can only be linked to faculty or officer accounts.',
         });
         return;
       }
@@ -1209,7 +1248,7 @@ portalRouter.post(
       const claimedDept = (data.claimedDepartmentCode || effectiveDeptCode).toUpperCase();
       if (claimedDept !== effectiveDeptCode) {
         res.status(400).json({
-          error: 'Linked faculty profile department must match the account department.',
+          error: 'Linked directory profile department must match the account department.',
         });
         return;
       }
@@ -1232,6 +1271,13 @@ portalRouter.post(
       if (!regularMatch && !contractualMatch && !officerMatch) {
         res.status(404).json({
           error: 'Selected directory profile was not found in that department.',
+        });
+        return;
+      }
+
+      if ((regularMatch || contractualMatch) && data.role !== 'teacher' && data.role !== 'chairman') {
+        res.status(400).json({
+          error: 'Faculty profiles must be linked to a Faculty / Teacher or Department Chairman account.',
         });
         return;
       }
@@ -3485,6 +3531,205 @@ portalRouter.delete(
       String(req.params.id)
     );
     res.json({ deleted: true });
+  }
+);
+
+portalRouter.post(
+  '/departments/:code/appoint-chairman',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const rawCode = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
+    const deptCode = decodeURIComponent(String(rawCode || '')).trim().toUpperCase();
+    const department = await pustRepo.getDepartmentByCode(deptCode);
+    if (!department) {
+      res.status(404).json({ error: `Department ${deptCode} not found.` });
+      return;
+    }
+
+    const parsed = appointChairmanSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message || 'Provide a valid teacher and appointment date.',
+      });
+      return;
+    }
+
+    const data = parsed.data;
+    const allUsers = await pustRepo.listUsers();
+    const targetUser = allUsers.find((u) => u.id === data.teacherUserId);
+    if (!targetUser) {
+      res.status(404).json({ error: 'Selected teacher account was not found.' });
+      return;
+    }
+
+    if (targetUser.departmentCode.toUpperCase() !== deptCode) {
+      res.status(400).json({
+        error: `${targetUser.name} belongs to ${targetUser.departmentCode}, not ${deptCode}.`,
+      });
+      return;
+    }
+
+    if (targetUser.approvalStatus !== 'approved') {
+      res.status(400).json({
+        error: 'Approve this teacher account before appointing them as Department Chairman.',
+      });
+      return;
+    }
+
+    if (targetUser.role !== 'teacher' && targetUser.role !== 'chairman') {
+      res.status(400).json({
+        error: 'Only approved department Teachers may be appointed as Department Chairman.',
+      });
+      return;
+    }
+
+    if (
+      targetUser.role === 'chairman' &&
+      department.chairmanName.trim().toLowerCase() === targetUser.name.trim().toLowerCase()
+    ) {
+      res.status(409).json({
+        error: `${targetUser.name} is already the current Chairman of ${deptCode}.`,
+      });
+      return;
+    }
+
+    const previousChairUsers = allUsers.filter(
+      (u) =>
+        u.id !== targetUser.id &&
+        u.departmentCode.toUpperCase() === deptCode &&
+        u.role === 'chairman'
+    );
+
+    const prevProfile = department.chairmanProfile;
+    const prevName = (
+      department.chairmanName ||
+      prevProfile?.name ||
+      previousChairUsers[0]?.name ||
+      ''
+    ).trim();
+    const prevStartedAt = department.chairmanSince || data.previousStartedAt || undefined;
+
+    let historyEntry: ChairmanHistoryRecord | null = null;
+    const nextHistory: ChairmanHistoryRecord[] = [...(department.chairmanHistory || [])];
+    if (prevName && prevName.toLowerCase() !== targetUser.name.trim().toLowerCase()) {
+      historyEntry = {
+        id: `ch-hist-${crypto.randomUUID().slice(0, 8)}`,
+        name: prevName,
+        designation:
+          prevProfile?.designation ||
+          previousChairUsers[0]?.designation ||
+          `Chairman, Department of ${department.name}`,
+        email: prevProfile?.emails?.[0]?.value || previousChairUsers[0]?.email,
+        ...(previousChairUsers[0]?.id ? { userId: previousChairUsers[0].id } : {}),
+        ...(prevProfile?.id ? { profileId: prevProfile.id } : {}),
+        ...(prevProfile?.photoUrl ? { photoUrl: prevProfile.photoUrl } : {}),
+        ...(prevStartedAt ? { startedAt: prevStartedAt } : {}),
+        endedAt: data.effectiveDate,
+        recordedAt: new Date().toISOString(),
+        appointedBy: req.authUser!.name,
+        note: data.note?.trim()
+          ? `Succeeded by ${targetUser.name} — ${data.note.trim()}`
+          : `Succeeded by ${targetUser.name}`,
+      };
+      nextHistory.unshift(historyEntry);
+    }
+
+    const demotedChairmen: AuthUser[] = [];
+    if (data.demotePreviousChairman) {
+      for (const prevUser of previousChairUsers) {
+        const cleanedDesignation = (prevUser.designation || '')
+          .replace(/\s*(?:&|,)?\s*Chairman\b/gi, '')
+          .trim();
+        const demoted = await pustRepo.updateUser(prevUser.id, {
+          role: 'teacher',
+          officeCode: deptCode,
+          officeName: `Department of ${department.name}`,
+          designation: cleanedDesignation || 'Professor',
+        });
+        if (demoted) {
+          demotedChairmen.push(demoted);
+        }
+      }
+    }
+
+    const baseTargetDesignation = (targetUser.designation || '').trim();
+    const promotedDesignation = baseTargetDesignation
+      ? /\bchairman\b/i.test(baseTargetDesignation)
+        ? baseTargetDesignation
+        : `${baseTargetDesignation} & Chairman`
+      : 'Chairman';
+
+    const appointedUser = await pustRepo.updateUser(targetUser.id, {
+      role: 'chairman',
+      officeCode: deptCode,
+      officeName: `Department of ${department.name}`,
+      designation: promotedDesignation,
+    });
+
+    const facultyPool = [
+      ...(department.facultyMembers || []),
+      ...(department.contractualFacultyMembers || []),
+    ];
+    const matchedFacultyProfile =
+      (targetUser.claimedFacultyMemberId
+        ? facultyPool.find((m) => m.id === targetUser.claimedFacultyMemberId)
+        : undefined) ||
+      facultyPool.find(
+        (m) =>
+          m.name.trim().toLowerCase() === targetUser.name.trim().toLowerCase() ||
+          m.emails.some((em) => em.value.trim().toLowerCase() === targetUser.email.trim().toLowerCase())
+      );
+
+    const nextChairmanProfile: DepartmentPersonRecord = matchedFacultyProfile
+      ? {
+          ...matchedFacultyProfile,
+          id: `${department.id}-chair`,
+          name: targetUser.name,
+          designation: /\bchairman\b/i.test(matchedFacultyProfile.designation)
+            ? matchedFacultyProfile.designation
+            : `${matchedFacultyProfile.designation} & Chairman`,
+          emails:
+            matchedFacultyProfile.emails.length > 0
+              ? matchedFacultyProfile.emails
+              : [{ value: targetUser.email, type: 'Office' }],
+        }
+      : {
+          id: `${department.id}-chair`,
+          name: targetUser.name,
+          designation: promotedDesignation,
+          officeLocation: targetUser.hallAffiliation || department.building,
+          phones: department.contactPhone
+            ? [{ value: department.contactPhone, type: 'Office' }]
+            : [],
+          emails: [{ value: targetUser.email, type: 'Office' }],
+        };
+
+    const updatedDepartment = await pustRepo.updateDepartment(department.id, {
+      chairmanName: targetUser.name,
+      chairmanSince: data.effectiveDate,
+      chairmanProfile: nextChairmanProfile,
+      chairmanHistory: nextHistory,
+    });
+
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      'admin',
+      'Appointed Department Chairman',
+      `${deptCode} — ${targetUser.name}`,
+      {
+        category: 'Privilege & Security',
+        severity: 'critical',
+        actorEmail: req.authUser!.email,
+        details: `Previous Chairman: ${prevName || 'Unrecorded'} (${prevStartedAt || 'date N/A'} -> ${data.effectiveDate}) | New Chairman: ${targetUser.name} (${targetUser.email})${data.note?.trim() ? ` | Note: ${data.note.trim()}` : ''}`,
+      }
+    );
+
+    res.json({
+      department: updatedDepartment,
+      appointedUser: appointedUser || targetUser,
+      demotedChairmen,
+      historyEntry,
+    });
   }
 );
 

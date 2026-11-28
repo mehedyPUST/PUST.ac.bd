@@ -11,6 +11,7 @@ import type {
   BookmarkRecord,
   BootstrapStatus,
   CertificateApplicationRecord,
+  ChairmanHistoryRecord,
   ClearanceOfficeKey,
   CourseRecord,
   DepartmentApprovalOverviewResponse,
@@ -823,6 +824,26 @@ export const pustApi = {
   deleteDepartment: (id: string) =>
     apiFetch<{ deleted: boolean }>(`/api/portal/cms/departments/${encodeURIComponent(id)}`, {
       method: 'DELETE',
+    }),
+
+  appointDepartmentChairman: (
+    code: string,
+    payload: {
+      teacherUserId: string;
+      effectiveDate: string;
+      previousStartedAt?: string;
+      demotePreviousChairman?: boolean;
+      note?: string;
+    }
+  ) =>
+    apiFetch<{
+      department: DepartmentRecord;
+      appointedUser: AuthUser;
+      demotedChairmen: AuthUser[];
+      historyEntry: ChairmanHistoryRecord | null;
+    }>(`/api/portal/departments/${encodeURIComponent(code.trim().toUpperCase())}/appoint-chairman`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
 
   createPublication: (payload: Omit<PublicationRecord, 'id'>) =>

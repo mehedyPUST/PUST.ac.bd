@@ -2,12 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
+  Award,
   Building2,
   Check,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Copy,
   Edit3,
   Eye,
   EyeOff,
+  History,
   KeyRound,
   RefreshCw,
   Search,
@@ -176,7 +182,9 @@ export function AdminUserDirectoryPanel({
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  // Filters (Accounts)
+  // Filters & View Mode (Accounts)
+  const [accountViewMode, setAccountViewMode] = useState<'department' | 'table'>('department');
+  const [expandedHistoryDepts, setExpandedHistoryDepts] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'officers' | UserRole>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | ApprovalStatus>('all');
@@ -252,6 +260,28 @@ export function AdminUserDirectoryPanel({
   // Inline Delete Confirmation & Row Busy State
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [busyUserId, setBusyUserId] = useState<string | null>(null);
+
+  // One-Time Temporary Password/Token Handoff Notice
+  const [issuedCredentialNotice, setIssuedCredentialNotice] = useState<{
+    name: string;
+    email: string;
+    secret: string;
+    mustChange: boolean;
+  } | null>(null);
+  const [copiedCredential, setCopiedCredential] = useState(false);
+
+  // Appoint Chairman Modal
+  const [appointTarget, setAppointTarget] = useState<{
+    department: DepartmentRecord;
+    teacher: AuthUser;
+  } | null>(null);
+  const [appointEffectiveDate, setAppointEffectiveDate] = useState(() =>
+    new Date().toISOString().slice(0, 10)
+  );
+  const [appointPreviousStartedAt, setAppointPreviousStartedAt] = useState('');
+  const [appointDemotePrevious, setAppointDemotePrevious] = useState(true);
+  const [appointNote, setAppointNote] = useState('');
+  const [appointingChairman, setAppointingChairman] = useState(false);
 
   const officeCatalog = useMemo<OfficeUnitOption[]>(() => {
     const resolvedOffices =
@@ -343,7 +373,8 @@ export function AdminUserDirectoryPanel({
       showCreateAdminModal ||
       Boolean(editingUser) ||
       Boolean(passwordTarget) ||
-      Boolean(previewProfile);
+      Boolean(previewProfile) ||
+      Boolean(appointTarget);
     if (!hasOpenModal) return;
     function onKey(e: KeyboardEvent) {
       if (e.key !== 'Escape') return;
@@ -353,6 +384,7 @@ export function AdminUserDirectoryPanel({
       setEditingUser(null);
       setPasswordTarget(null);
       setPreviewProfile(null);
+      setAppointTarget(null);
     }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -362,6 +394,7 @@ export function AdminUserDirectoryPanel({
     editingUser,
     passwordTarget,
     previewProfile,
+    appointTarget,
   ]);
 
   const summary = useMemo(() => {
@@ -524,11 +557,100 @@ export function AdminUserDirectoryPanel({
     profileClaimFilter,
   ]);
 
+  const departmentByCode = useMemo(() => {
+    const map = new Map<string, DepartmentRecord>();
+    for (const dept of resolvedDepartments) {
+      map.set(dept.code.toUpperCase(), dept);
+    }
+    return map;
+  }, [resolvedDepartments]);
+
+  const { academicDepartmentGroups, centralOfficeUsers } = useMemo(() => {
+    const roleRank: Record<UserRole, number> = {
+      chairman: 0,
+      teacher: 1,
+      registrar: 2,
+      vc: 2,
+      proctor: 2,
+      library: 2,
+      hall: 2,
+      admin: 3,
+      student: 4,
+    };
+
+    const byDeptCode = new Map<string, AuthUser[]>();
+    const nonAcademic: AuthUser[] = [];
+
+    for (const u of filteredUsers) {
+      const code = (u.departmentCode || '').toUpperCase();
+      if (departmentByCode.has(code)) {
+        const list = byDeptCode.get(code) || [];
+        list.push(u);
+        byDeptCode.set(code, list);
+      } else {
+        nonAcademic.push(u);
+      }
+    }
+
+    const sortDeptUsers = (list: AuthUser[]) =>
+      [...list].sort((a, b) => {
+        if (a.approvalStatus === 'pending' && b.approvalStatus !== 'pending') return -1;
+        if (b.approvalStatus === 'pending' && a.approvalStatus !== 'pending') return 1;
+        const rCmp = (roleRank[a.role] ?? 9) - (roleRank[b.role] ?? 9);
+        if (rCmp !== 0) return rCmp;
+        return a.name.localeCompare(b.name);
+      });
+
+    const hasNarrowFilter =
+      Boolean(searchQuery.trim()) ||
+      roleFilter !== 'all' ||
+      statusFilter !== 'all' ||
+      unitFilter !== 'ALL';
+
+    const groups = resolvedDepartments
+      .filter((dept) => {
+        const code = dept.code.toUpperCase();
+        if (unitFilter !== 'ALL' && code !== unitFilter.toUpperCase()) return false;
+        const deptUsers = byDeptCode.get(code) || [];
+        if (hasNarrowFilter && deptUsers.length === 0) return false;
+        return true;
+      })
+      .map((dept) => {
+        const code = dept.code.toUpperCase();
+        return {
+          department: dept,
+          users: sortDeptUsers(byDeptCode.get(code) || []),
+        };
+      })
+      .sort((a, b) => {
+        if (a.users.length > 0 && b.users.length === 0) return -1;
+        if (a.users.length === 0 && b.users.length > 0) return 1;
+        const aCode = Number(a.department.officialCode) || Number.MAX_SAFE_INTEGER;
+        const bCode = Number(b.department.officialCode) || Number.MAX_SAFE_INTEGER;
+        if (aCode !== bCode) return aCode - bCode;
+        return a.department.name.localeCompare(b.department.name);
+      });
+
+    return {
+      academicDepartmentGroups: groups,
+      centralOfficeUsers: sortDeptUsers(nonAcademic),
+    };
+  }, [
+    filteredUsers,
+    resolvedDepartments,
+    departmentByCode,
+    searchQuery,
+    roleFilter,
+    statusFilter,
+    unitFilter,
+  ]);
+
   const openCreateOfficerModal = useCallback(() => {
     const defaultOpt =
       officeCatalog.find((o) => o.group === 'Academic Departments') || officeCatalog[0];
     setError(null);
     setFeedback(null);
+    setIssuedCredentialNotice(null);
     setLinkingProfile(null);
     setOfficerUnitKey(defaultOpt?.key || 'central:ADMIN');
     setOfficerRole(defaultOpt?.defaultRole || 'teacher');
@@ -550,27 +672,36 @@ export function AdminUserDirectoryPanel({
 
   const openAddPeopleFromProfile = useCallback(
     (entry: ExistingProfileEntry) => {
-      const existingDeptTeachers = users.filter(
-        (u) => u.departmentCode.toUpperCase() === entry.departmentCode && u.role === 'teacher'
-      ).length;
-      const suggestedId = `PUST-${entry.departmentCode}-FAC-${String(existingDeptTeachers + 1).padStart(2, '0')}`;
+      const isOfficer = entry.group === 'officer';
+      const existingDeptCount = users.filter((u) => {
+        if (u.departmentCode.toUpperCase() !== entry.departmentCode) return false;
+        return isOfficer
+          ? u.role !== 'student' && u.role !== 'teacher' && u.role !== 'chairman'
+          : u.role === 'teacher' || u.role === 'chairman';
+      }).length;
+      const suggestedId = isOfficer
+        ? `PUST-${entry.departmentCode}-OFF-${String(existingDeptCount + 1).padStart(2, '0')}`
+        : `PUST-${entry.departmentCode}-FAC-${String(existingDeptCount + 1).padStart(2, '0')}`;
       const primaryEmail = entry.member.emails?.[0]?.value || '';
       const deptOpt = officeCatalog.find((o) => o.key === `dept:${entry.departmentCode}`);
 
       setError(null);
       setFeedback(null);
+      setIssuedCredentialNotice(null);
       setPreviewProfile(null);
       setLinkingProfile(entry);
       setOfficerUnitKey(deptOpt?.key || `dept:${entry.departmentCode}`);
-      setOfficerRole('teacher');
+      setOfficerRole(isOfficer ? 'registrar' : 'teacher');
       setOfficerDeptCode(entry.departmentCode);
       setOfficerOfficeName(`Department of ${entry.departmentName}`);
       setOfficerHallAffiliation(entry.member.officeLocation || entry.departmentBuilding);
       setOfficerName(entry.member.name);
-      setOfficerDesignation(entry.member.designation || 'Faculty Member');
+      setOfficerDesignation(
+        entry.member.designation || (isOfficer ? 'Department Officer' : 'Faculty Member')
+      );
       setOfficerEmail(primaryEmail);
       setOfficerAcademicId(suggestedId);
-      setOfficerPassword('');
+      setOfficerPassword(generateTempLoginToken());
       setShowOfficerPassword(true);
       setOfficerMustChangePassword(true);
       setOfficerStatus('approved');
@@ -665,10 +796,18 @@ export function AdminUserDirectoryPanel({
               .map((s) => s.trim())
               .filter(Boolean)
           : [];
+      const canLinkProfile = Boolean(
+        linkingProfile &&
+          officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode &&
+          (linkingProfile.group === 'officer'
+            ? officerRole !== 'student' && officerRole !== 'admin'
+            : officerRole === 'teacher' || officerRole === 'chairman')
+      );
+      const issuedSecret = officerPassword;
       const res = await pustApi.createAdminUser({
         name: officerName.trim(),
         email: officerEmail.trim(),
-        password: officerPassword,
+        password: issuedSecret,
         role: officerRole,
         departmentCode: officerDeptCode.trim().toUpperCase(),
         academicId: officerAcademicId.trim(),
@@ -680,9 +819,7 @@ export function AdminUserDirectoryPanel({
         assignedCourses: courses,
         assignedSessions: sessions,
         mustChangePassword: officerMustChangePassword,
-        ...(linkingProfile &&
-        (officerRole === 'teacher' || officerRole === 'chairman') &&
-        officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode
+        ...(canLinkProfile && linkingProfile
           ? {
               claimedFacultyMemberId: linkingProfile.member.id,
               claimedDepartmentCode: linkingProfile.departmentCode,
@@ -690,16 +827,18 @@ export function AdminUserDirectoryPanel({
             }
           : {}),
       });
-      const wasLinked = Boolean(
-        linkingProfile &&
-          (officerRole === 'teacher' || officerRole === 'chairman') &&
-          officerDeptCode.trim().toUpperCase() === linkingProfile.departmentCode
-      );
+      setIssuedCredentialNotice({
+        name: res.user.name,
+        email: res.user.email,
+        secret: issuedSecret,
+        mustChange: officerMustChangePassword,
+      });
+      setCopiedCredential(false);
       setShowCreateOfficerModal(false);
       setLinkingProfile(null);
       setFeedback(
-        wasLinked
-          ? `Added ${res.user.name} to portal and linked to existing ${res.user.departmentCode} directory profile.${officerMustChangePassword ? ' Temporary first-login password change is required.' : ''}`
+        canLinkProfile
+          ? `Added ${res.user.name} to portal and linked to existing ${res.user.departmentCode} directory profile.${officerMustChangePassword ? ' First-login temporary password/token change is required.' : ''}`
           : `Created ${ROLE_DISPLAY_NAMES[res.user.role]} account for ${res.user.name} (${res.user.officeName || res.user.departmentCode}).`
       );
       await loadUsers();
@@ -819,7 +958,15 @@ export function AdminUserDirectoryPanel({
     setFeedback(null);
     setSavingPassword(true);
     try {
-      await pustApi.resetAdminUserPassword(passwordTarget.id, newPassword, resetMustChange);
+      const issuedSecret = newPassword;
+      await pustApi.resetAdminUserPassword(passwordTarget.id, issuedSecret, resetMustChange);
+      setIssuedCredentialNotice({
+        name: passwordTarget.name,
+        email: passwordTarget.email,
+        secret: issuedSecret,
+        mustChange: resetMustChange,
+      });
+      setCopiedCredential(false);
       setFeedback(
         `Password updated for ${passwordTarget.name}.${resetMustChange ? ' User must change it from profile on next login.' : ''}`
       );
@@ -830,6 +977,73 @@ export function AdminUserDirectoryPanel({
       setError(err instanceof Error ? err.message : 'Unable to reset user password.');
     } finally {
       setSavingPassword(false);
+    }
+  }
+
+  async function handleCopyIssuedCredential() {
+    if (!issuedCredentialNotice) return;
+    try {
+      await navigator.clipboard.writeText(
+        `Portal Login: ${issuedCredentialNotice.email}\nTemporary Password/Token: ${issuedCredentialNotice.secret}`
+      );
+      setCopiedCredential(true);
+      window.setTimeout(() => setCopiedCredential(false), 2000);
+    } catch {
+      setFeedback(
+        `Temporary password/token for ${issuedCredentialNotice.email}: ${issuedCredentialNotice.secret}`
+      );
+    }
+  }
+
+  function openAppointChairmanModal(department: DepartmentRecord, teacher: AuthUser) {
+    setError(null);
+    setFeedback(null);
+    setAppointTarget({ department, teacher });
+    setAppointEffectiveDate(new Date().toISOString().slice(0, 10));
+    setAppointPreviousStartedAt(department.chairmanSince || '');
+    setAppointDemotePrevious(true);
+    setAppointNote('');
+  }
+
+  async function handleAppointChairmanSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!appointTarget) return;
+    setError(null);
+    setFeedback(null);
+    setAppointingChairman(true);
+    const { department, teacher } = appointTarget;
+    try {
+      const res = await pustApi.appointDepartmentChairman(department.code, {
+        teacherUserId: teacher.id,
+        effectiveDate: appointEffectiveDate,
+        ...(appointPreviousStartedAt && !department.chairmanSince
+          ? { previousStartedAt: appointPreviousStartedAt }
+          : {}),
+        demotePreviousChairman: appointDemotePrevious,
+        ...(appointNote.trim() ? { note: appointNote.trim() } : {}),
+      });
+      setLiveDepartments((prev) => {
+        const list = prev.length > 0 ? prev : departments;
+        return list.map((d) => (d.id === res.department.id ? res.department : d));
+      });
+      setExpandedHistoryDepts((prev) => ({
+        ...prev,
+        [department.code.toUpperCase()]: true,
+      }));
+      setAppointTarget(null);
+      setFeedback(
+        `Appointed ${res.appointedUser.name} as current Chairman of Department of ${department.name} (${department.code}) effective ${appointEffectiveDate}.${
+          res.historyEntry
+            ? ` Archived ${res.historyEntry.name} in Chairman History.`
+            : ''
+        }`
+      );
+      await Promise.all([loadUsers(), onCmsChange?.()]);
+      onUsersChanged?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to appoint Department Chairman.');
+    } finally {
+      setAppointingChairman(false);
     }
   }
 
@@ -944,6 +1158,46 @@ export function AdminUserDirectoryPanel({
               >
                 <X className="w-4 h-4" />
               </button>
+            </div>
+          )}
+          {issuedCredentialNotice && (
+            <div
+              role="status"
+              className="px-4 py-3.5 rounded-xl border border-amber-300 bg-[#FBF6EE] text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div className="space-y-1 min-w-0">
+                <p className="font-semibold flex items-center gap-1.5">
+                  <KeyRound className="w-4 h-4 text-amber-800 shrink-0" />
+                  <span>One-Time First-Login Handoff for {issuedCredentialNotice.name}</span>
+                </p>
+                <p className="font-mono text-[11px] text-amber-900 break-all">
+                  Email: {issuedCredentialNotice.email} · Temporary Token/Password:{' '}
+                  <strong className="text-slate-950">{issuedCredentialNotice.secret}</strong>
+                </p>
+                <p className="text-[11px] text-amber-900">
+                  {issuedCredentialNotice.mustChange
+                    ? 'User must replace this temporary credential from My Profile on first login before performing portal actions.'
+                    : 'Initial password stored cleanly. Share securely and dismiss once copied.'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => void handleCopyIssuedCredential()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-white text-xs font-semibold text-amber-950 hover:border-amber-500 cursor-pointer whitespace-nowrap"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{copiedCredential ? 'Copied' : 'Copy Credentials'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIssuedCredentialNotice(null)}
+                  className="p-1.5 rounded-lg text-amber-800 hover:text-amber-950 cursor-pointer"
+                  aria-label="Dismiss credential notice"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
           {error && (
@@ -1238,7 +1492,7 @@ export function AdminUserDirectoryPanel({
         </div>
       ) : (
         <>
-      {/* Feedback & Error Alerts */}
+      {/* Feedback, Handoff & Error Alerts */}
       {feedback && (
         <div
           role="status"
@@ -1253,6 +1507,46 @@ export function AdminUserDirectoryPanel({
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      )}
+      {issuedCredentialNotice && (
+        <div
+          role="status"
+          className="px-4 py-3.5 rounded-xl border border-amber-300 bg-[#FBF6EE] text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        >
+          <div className="space-y-1 min-w-0">
+            <p className="font-semibold flex items-center gap-1.5">
+              <KeyRound className="w-4 h-4 text-amber-800 shrink-0" />
+              <span>One-Time First-Login Handoff for {issuedCredentialNotice.name}</span>
+            </p>
+            <p className="font-mono text-[11px] text-amber-900 break-all">
+              Email: {issuedCredentialNotice.email} · Temporary Token/Password:{' '}
+              <strong className="text-slate-950">{issuedCredentialNotice.secret}</strong>
+            </p>
+            <p className="text-[11px] text-amber-900">
+              {issuedCredentialNotice.mustChange
+                ? 'User must replace this temporary credential from My Profile on first login before performing portal actions.'
+                : 'Initial password stored cleanly. Share securely and dismiss once copied.'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => void handleCopyIssuedCredential()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-white text-xs font-semibold text-amber-950 hover:border-amber-500 cursor-pointer whitespace-nowrap"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>{copiedCredential ? 'Copied' : 'Copy Credentials'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIssuedCredentialNotice(null)}
+              className="p-1.5 rounded-lg text-amber-800 hover:text-amber-950 cursor-pointer"
+              aria-label="Dismiss credential notice"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
       {error && (
@@ -1397,8 +1691,8 @@ export function AdminUserDirectoryPanel({
           </div>
         </div>
 
-        {/* Approval Status Segmented Filter */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Approval Status Segmented Filter & View Switcher */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">
             {(
               [
@@ -1423,12 +1717,38 @@ export function AdminUserDirectoryPanel({
             ))}
           </div>
 
-          <p className="font-mono text-xs text-slate-600 tabular-nums">
-            Showing {filteredUsers.length} of {users.length} accounts
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-stone-100 border border-stone-200">
+              <button
+                type="button"
+                onClick={() => setAccountViewMode('department')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  accountViewMode === 'department'
+                    ? 'bg-white text-slate-950 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-950'
+                }`}
+              >
+                By Department
+              </button>
+              <button
+                type="button"
+                onClick={() => setAccountViewMode('table')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  accountViewMode === 'table'
+                    ? 'bg-white text-slate-950 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-950'
+                }`}
+              >
+                All Accounts Table
+              </button>
+            </div>
+            <p className="font-mono text-xs text-slate-600 tabular-nums">
+              Showing {filteredUsers.length} of {users.length} accounts
+            </p>
+          </div>
         </div>
 
-        {/* Directory Table / List */}
+        {/* Directory Table / Department-Grouped View */}
         {loading && users.length === 0 ? (
           <div className="space-y-2 py-4">
             {[1, 2, 3, 4].map((row) => (
@@ -1438,6 +1758,544 @@ export function AdminUserDirectoryPanel({
               />
             ))}
           </div>
+        ) : accountViewMode === 'department' ? (
+          academicDepartmentGroups.length === 0 && centralOfficeUsers.length === 0 ? (
+            <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-3">
+              <p className="text-sm font-medium text-slate-800">
+                No departments or accounts match your current filters.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setRoleFilter('all');
+                  setStatusFilter('all');
+                  setUnitFilter('ALL');
+                }}
+                className="px-3.5 py-2 text-xs font-medium rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {academicDepartmentGroups.map(({ department, users: deptUsers }) => {
+                const deptCode = department.code.toUpperCase();
+                const historyList = department.chairmanHistory || [];
+                const isHistoryOpen = Boolean(expandedHistoryDepts[deptCode]);
+                const chairmanCount = deptUsers.filter((u) => u.role === 'chairman').length;
+                const teacherCount = deptUsers.filter((u) => u.role === 'teacher').length;
+                const studentCount = deptUsers.filter((u) => u.role === 'student').length;
+                const officerCount = deptUsers.length - chairmanCount - teacherCount - studentCount;
+
+                return (
+                  <div
+                    key={department.id}
+                    className="rounded-xl border border-stone-200 bg-white overflow-hidden"
+                  >
+                    <div className="px-5 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <h3 className="font-serif text-lg font-medium text-slate-950">
+                            Department of {department.name}
+                          </h3>
+                          <span className="font-mono text-[11px] font-semibold text-pust-900">
+                            · {deptCode}
+                            {department.officialCode ? ` (${department.officialCode})` : ''}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          <span>
+                            Current Chairman:{' '}
+                            <strong className="text-slate-900">{department.chairmanName}</strong>
+                          </span>
+                          {department.chairmanSince && (
+                            <span className="font-mono text-[11px] text-pust-800 tabular-nums">
+                              · Since {department.chairmanSince}
+                            </span>
+                          )}
+                          <span className="text-slate-400" aria-hidden="true">
+                            ·
+                          </span>
+                          <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                            {chairmanCount} Chairman · {teacherCount} Teachers · {officerCount}{' '}
+                            Officers · {studentCount} Students
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedHistoryDepts((prev) => ({
+                              ...prev,
+                              [deptCode]: !prev[deptCode],
+                            }))
+                          }
+                          className="h-8 inline-flex items-center gap-1.5 px-3 rounded-lg border border-stone-300 bg-white text-xs font-medium text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors cursor-pointer whitespace-nowrap tabular-nums"
+                        >
+                          <History className="w-3.5 h-3.5 text-pust-800" />
+                          <span>Chairman History ({historyList.length})</span>
+                          {isHistoryOpen ? (
+                            <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {isHistoryOpen && (
+                      <div className="px-5 py-4 bg-[#FBF9F4] border-b border-stone-200 space-y-3 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="font-semibold text-slate-900">
+                            Chairman Tenure &amp; Past Chairmen Ledger ({deptCode})
+                          </p>
+                          <span className="font-mono text-[11px] text-slate-600 tabular-nums">
+                            Active: {department.chairmanName}
+                            {department.chairmanSince ? ` (From ${department.chairmanSince})` : ''}
+                          </span>
+                        </div>
+                        {historyList.length === 0 ? (
+                          <p className="text-slate-600">
+                            No former Chairmen have been archived yet for {deptCode}. Appointing a
+                            department teacher as Chairman automatically moves the current Chairman
+                            here with start and end dates.
+                          </p>
+                        ) : (
+                          <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+                            <table className="w-full text-left border-collapse text-xs">
+                              <thead>
+                                <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-medium">
+                                  <th className="py-2 px-3">Former Chairman</th>
+                                  <th className="py-2 px-3">Tenure Dates</th>
+                                  <th className="py-2 px-3">Recorded By &amp; Notes</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-stone-200">
+                                {historyList.map((entry) => (
+                                  <tr key={entry.id}>
+                                    <td className="py-2.5 px-3 align-top">
+                                      <p className="font-semibold text-slate-950">{entry.name}</p>
+                                      {entry.designation && (
+                                        <p className="text-[11px] text-slate-600">
+                                          {entry.designation}
+                                        </p>
+                                      )}
+                                      {entry.email && (
+                                        <p className="font-mono text-[11px] text-slate-500">
+                                          {entry.email}
+                                        </p>
+                                      )}
+                                    </td>
+                                    <td className="py-2.5 px-3 align-top font-mono text-[11px] text-slate-800 whitespace-nowrap tabular-nums">
+                                      {entry.startedAt
+                                        ? `${entry.startedAt} -> ${entry.endedAt}`
+                                        : `Ended ${entry.endedAt}`}
+                                    </td>
+                                    <td className="py-2.5 px-3 align-top text-slate-700">
+                                      <p>{entry.note || 'Chairman transition archived'}</p>
+                                      {entry.appointedBy && (
+                                        <p className="font-mono text-[11px] text-slate-500 mt-0.5">
+                                          By {entry.appointedBy}
+                                        </p>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {deptUsers.length === 0 ? (
+                      <div className="px-5 py-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                        <span>No portal accounts provisioned yet under {deptCode}.</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileDeptFilter(deptCode);
+                            setActiveSection('existing-profiles');
+                          }}
+                          className="font-semibold text-pust-900 hover:underline cursor-pointer"
+                        >
+                          View {deptCode} Existing Profiles
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-medium">
+                              <th className="py-2.5 px-4">User &amp; Contact</th>
+                              <th className="py-2.5 px-3">Role &amp; ID</th>
+                              <th className="py-2.5 px-3">Status</th>
+                              <th className="py-2.5 px-4 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-stone-200">
+                            {deptUsers.map((u, idx) => {
+                              const isSelf = u.id === currentUser.id;
+                              const isBusy = busyUserId === u.id;
+                              const isDeleting = confirmDeleteId === u.id;
+                              const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]';
+                              const canAppointChairman =
+                                u.role === 'teacher' && u.approvalStatus === 'approved';
+
+                              return (
+                                <tr
+                                  key={u.id}
+                                  className={`${rowBg} hover:bg-[#F3EFE8]/60 transition-colors`}
+                                >
+                                  <td className="py-3 px-4 align-top">
+                                    <div className="space-y-0.5 min-w-[190px]">
+                                      <p className="font-semibold text-sm text-slate-950 flex flex-wrap items-center gap-1.5">
+                                        <span>{u.name}</span>
+                                        {u.role === 'chairman' && (
+                                          <span className="font-mono text-[11px] font-semibold text-pust-900">
+                                            · Current Chairman
+                                          </span>
+                                        )}
+                                        {isSelf && (
+                                          <span className="font-mono text-[11px] font-medium text-pust-800">
+                                            · Current Session
+                                          </span>
+                                        )}
+                                      </p>
+                                      {u.designation && (
+                                        <p className="text-xs text-slate-700">{u.designation}</p>
+                                      )}
+                                      <p className="font-mono text-[11px] text-slate-500 break-all">
+                                        {u.email}
+                                      </p>
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-3 align-top whitespace-nowrap">
+                                    <div className="space-y-0.5">
+                                      <p className="font-medium text-slate-900">
+                                        {ROLE_DISPLAY_NAMES[u.role]}
+                                      </p>
+                                      <p className="font-mono text-[11px] text-slate-600 tabular-nums">
+                                        ID: {u.academicId}
+                                      </p>
+                                      {(u.role === 'teacher' || u.claimedFacultyMemberId) && (
+                                        <p
+                                          className={`text-[11px] font-medium ${
+                                            u.claimedFacultyMemberId
+                                              ? 'text-emerald-700'
+                                              : 'text-amber-800'
+                                          }`}
+                                        >
+                                          {u.claimedFacultyMemberId
+                                            ? `Profile Claimed (${u.claimedDepartmentCode || u.departmentCode})`
+                                            : 'Profile Unclaimed'}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-3 align-top whitespace-nowrap">
+                                    <div className="space-y-1">
+                                      <span
+                                        className={`inline-flex items-center gap-1 font-medium ${
+                                          u.approvalStatus === 'approved'
+                                            ? 'text-emerald-700'
+                                            : u.approvalStatus === 'rejected'
+                                            ? 'text-red-700'
+                                            : 'text-amber-700'
+                                        }`}
+                                      >
+                                        {u.approvalStatus === 'approved' ? (
+                                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                        ) : u.approvalStatus === 'rejected' ? (
+                                          <XCircle className="w-3.5 h-3.5 shrink-0" />
+                                        ) : null}
+                                        <span className="capitalize">{u.approvalStatus}</span>
+                                      </span>
+                                      {u.mustChangePassword && (
+                                        <p className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 block">
+                                          <Clock className="w-3 h-3 shrink-0" />
+                                          <span>First-login reset pending</span>
+                                        </p>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 px-4 align-top">
+                                    {isDeleting ? (
+                                      <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                        <span className="text-[11px] font-medium text-red-800 mr-1">
+                                          Delete user?
+                                        </span>
+                                        <button
+                                          type="button"
+                                          disabled={isBusy}
+                                          onClick={() => void handleConfirmDelete(u)}
+                                          className="px-2.5 py-1.5 rounded-lg bg-red-700 text-white font-semibold hover:bg-red-800 disabled:opacity-50 cursor-pointer"
+                                        >
+                                          Confirm
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={isBusy}
+                                          onClick={() => setConfirmDeleteId(null)}
+                                          className="px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:text-slate-950 cursor-pointer"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                        {canAppointChairman && (
+                                          <button
+                                            type="button"
+                                            disabled={isBusy}
+                                            onClick={() =>
+                                              openAppointChairmanModal(department, u)
+                                            }
+                                            title={`Appoint ${u.name} as Chairman of ${deptCode}`}
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                          >
+                                            <Award className="w-3.5 h-3.5" />
+                                            <span>Appoint Chairman</span>
+                                          </button>
+                                        )}
+                                        {u.approvalStatus !== 'approved' && (
+                                          <button
+                                            type="button"
+                                            disabled={isBusy}
+                                            onClick={() => void handleQuickApproval(u, 'approved')}
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pust-900 text-white font-medium hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                          >
+                                            <Check className="w-3.5 h-3.5" />
+                                            Approve
+                                          </button>
+                                        )}
+                                        {u.approvalStatus === 'pending' && !isSelf && (
+                                          <button
+                                            type="button"
+                                            disabled={isBusy}
+                                            onClick={() => void handleQuickApproval(u, 'rejected')}
+                                            className="px-2.5 py-1.5 rounded-lg border border-red-200 bg-white text-red-700 font-medium hover:bg-red-50 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                          >
+                                            Reject
+                                          </button>
+                                        )}
+                                        <button
+                                          type="button"
+                                          disabled={isBusy}
+                                          onClick={() => openEditModalFor(u)}
+                                          title="Edit account, role, or office"
+                                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                          Edit
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={isBusy}
+                                          onClick={() => {
+                                            setError(null);
+                                            setPasswordTarget(u);
+                                            setNewPassword('');
+                                            setShowResetPassword(false);
+                                            setResetMustChange(true);
+                                          }}
+                                          title="Reset account password"
+                                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                        >
+                                          <KeyRound className="w-3.5 h-3.5" />
+                                          Password
+                                        </button>
+                                        {!isSelf && (
+                                          <button
+                                            type="button"
+                                            disabled={isBusy}
+                                            onClick={() => setConfirmDeleteId(u.id)}
+                                            title="Delete account"
+                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 bg-white text-red-700 hover:bg-red-50 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                            Delete
+                                          </button>
+                                        )}
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {centralOfficeUsers.length > 0 && (
+                <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+                  <div className="px-5 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-serif text-lg font-medium text-slate-950">
+                        Central Administration, Offices &amp; Residential Halls
+                      </h3>
+                      <p className="text-xs text-slate-600">
+                        University administrators, Registrar, VC Office, Proctorial, Library, and Hall personnel.
+                      </p>
+                    </div>
+                    <span className="font-mono text-xs text-slate-600 tabular-nums">
+                      {centralOfficeUsers.length}{' '}
+                      {centralOfficeUsers.length === 1 ? 'Account' : 'Accounts'}
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-[#F7F7F5] border-b border-stone-200 text-slate-600 font-medium">
+                          <th className="py-2.5 px-4">User &amp; Contact</th>
+                          <th className="py-2.5 px-3">Role &amp; Office</th>
+                          <th className="py-2.5 px-3">Status</th>
+                          <th className="py-2.5 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-stone-200">
+                        {centralOfficeUsers.map((u, idx) => {
+                          const isSelf = u.id === currentUser.id;
+                          const isBusy = busyUserId === u.id;
+                          const isDeleting = confirmDeleteId === u.id;
+                          const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]';
+                          return (
+                            <tr
+                              key={u.id}
+                              className={`${rowBg} hover:bg-[#F3EFE8]/60 transition-colors`}
+                            >
+                              <td className="py-3 px-4 align-top">
+                                <div className="space-y-0.5 min-w-[190px]">
+                                  <p className="font-semibold text-sm text-slate-950 flex flex-wrap items-center gap-1.5">
+                                    <span>{u.name}</span>
+                                    {isSelf && (
+                                      <span className="font-mono text-[11px] font-medium text-pust-800">
+                                        · Current Session
+                                      </span>
+                                    )}
+                                  </p>
+                                  {u.designation && (
+                                    <p className="text-xs text-slate-700">{u.designation}</p>
+                                  )}
+                                  <p className="font-mono text-[11px] text-slate-500 break-all">
+                                    {u.email}
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="py-3 px-3 align-top">
+                                <p className="font-medium text-slate-900">
+                                  {ROLE_DISPLAY_NAMES[u.role]}
+                                </p>
+                                <p className="font-mono text-[11px] text-slate-600">
+                                  {u.officeName || u.departmentCode} · {u.academicId}
+                                </p>
+                              </td>
+                              <td className="py-3 px-3 align-top whitespace-nowrap">
+                                <div className="space-y-1">
+                                  <span
+                                    className={`inline-flex items-center gap-1 font-medium ${
+                                      u.approvalStatus === 'approved'
+                                        ? 'text-emerald-700'
+                                        : u.approvalStatus === 'rejected'
+                                        ? 'text-red-700'
+                                        : 'text-amber-700'
+                                    }`}
+                                  >
+                                    {u.approvalStatus === 'approved' ? (
+                                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                    ) : u.approvalStatus === 'rejected' ? (
+                                      <XCircle className="w-3.5 h-3.5 shrink-0" />
+                                    ) : null}
+                                    <span className="capitalize">{u.approvalStatus}</span>
+                                  </span>
+                                  {u.mustChangePassword && (
+                                    <p className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 block">
+                                      <Clock className="w-3 h-3 shrink-0" />
+                                      <span>First-login reset pending</span>
+                                    </p>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 align-top">
+                                {isDeleting ? (
+                                  <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                    <span className="text-[11px] font-medium text-red-800 mr-1">
+                                      Delete user?
+                                    </span>
+                                    <button
+                                      type="button"
+                                      disabled={isBusy}
+                                      onClick={() => void handleConfirmDelete(u)}
+                                      className="px-2.5 py-1.5 rounded-lg bg-red-700 text-white font-semibold hover:bg-red-800 disabled:opacity-50 cursor-pointer"
+                                    >
+                                      Confirm
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={isBusy}
+                                      onClick={() => setConfirmDeleteId(null)}
+                                      className="px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:text-slate-950 cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-wrap items-center justify-end gap-1.5">
+                                    <button
+                                      type="button"
+                                      disabled={isBusy}
+                                      onClick={() => openEditModalFor(u)}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                      Edit
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={isBusy}
+                                      onClick={() => {
+                                        setError(null);
+                                        setPasswordTarget(u);
+                                        setNewPassword('');
+                                        setShowResetPassword(false);
+                                        setResetMustChange(true);
+                                      }}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                    >
+                                      <KeyRound className="w-3.5 h-3.5" />
+                                      Password
+                                    </button>
+                                    {!isSelf && (
+                                      <button
+                                        type="button"
+                                        disabled={isBusy}
+                                        onClick={() => setConfirmDeleteId(u.id)}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 bg-white text-red-700 hover:bg-red-50 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        Delete
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
         ) : filteredUsers.length === 0 ? (
           <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-8 text-center space-y-3">
             <p className="text-sm font-medium text-slate-800">
@@ -1493,6 +2351,11 @@ export function AdminUserDirectoryPanel({
                   const isDeleting = confirmDeleteId === u.id;
                   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF9F6]';
                   const officeLabel = u.officeName || u.departmentCode;
+                  const matchedDept = departmentByCode.get(u.departmentCode.toUpperCase());
+                  const canAppointChairman =
+                    Boolean(matchedDept) &&
+                    u.role === 'teacher' &&
+                    u.approvalStatus === 'approved';
 
                   return (
                     <tr key={u.id} className={`${rowBg} hover:bg-[#F3EFE8]/60 transition-colors`}>
@@ -1554,22 +2417,30 @@ export function AdminUserDirectoryPanel({
                       </td>
 
                       <td className="py-3.5 px-3 align-top whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 font-medium ${
-                            u.approvalStatus === 'approved'
-                              ? 'text-emerald-700'
-                              : u.approvalStatus === 'rejected'
-                              ? 'text-red-700'
-                              : 'text-amber-700'
-                          }`}
-                        >
-                          {u.approvalStatus === 'approved' ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                          ) : u.approvalStatus === 'rejected' ? (
-                            <XCircle className="w-3.5 h-3.5 shrink-0" />
-                          ) : null}
-                          <span className="capitalize">{u.approvalStatus}</span>
-                        </span>
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-flex items-center gap-1 font-medium ${
+                              u.approvalStatus === 'approved'
+                                ? 'text-emerald-700'
+                                : u.approvalStatus === 'rejected'
+                                ? 'text-red-700'
+                                : 'text-amber-700'
+                            }`}
+                          >
+                            {u.approvalStatus === 'approved' ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                            ) : u.approvalStatus === 'rejected' ? (
+                              <XCircle className="w-3.5 h-3.5 shrink-0" />
+                            ) : null}
+                            <span className="capitalize">{u.approvalStatus}</span>
+                          </span>
+                          {u.mustChangePassword && (
+                            <p className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 block">
+                              <Clock className="w-3 h-3 shrink-0" />
+                              <span>First-login reset pending</span>
+                            </p>
+                          )}
+                        </div>
                       </td>
 
                       <td className="py-3.5 px-4 align-top">
@@ -1597,6 +2468,18 @@ export function AdminUserDirectoryPanel({
                           </div>
                         ) : (
                           <div className="flex flex-wrap items-center justify-end gap-1.5">
+                            {canAppointChairman && matchedDept && (
+                              <button
+                                type="button"
+                                disabled={isBusy}
+                                onClick={() => openAppointChairmanModal(matchedDept, u)}
+                                title={`Appoint ${u.name} as Chairman of ${matchedDept.code}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                              >
+                                <Award className="w-3.5 h-3.5" />
+                                Appoint Chairman
+                              </button>
+                            )}
                             {u.approvalStatus !== 'approved' && (
                               <button
                                 type="button"
@@ -2677,6 +3560,150 @@ export function AdminUserDirectoryPanel({
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 6: Appoint Department Teacher as Current Chairman */}
+      {appointTarget && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Appoint Department Chairman"
+          onClick={() => setAppointTarget(null)}
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-lg bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden my-auto"
+          >
+            <div className="px-6 py-4 border-b border-stone-200 bg-[#FAF9F6] flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Award className="w-4 h-4 text-pust-900 shrink-0" />
+                <div>
+                  <h3 className="font-serif text-lg font-medium text-slate-950">
+                    Appoint Chairman · {appointTarget.department.code}
+                  </h3>
+                  <p className="text-xs text-slate-600">
+                    Department of {appointTarget.department.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAppointTarget(null)}
+                aria-label="Close modal"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAppointChairmanSubmit} className="p-6 space-y-4 text-xs">
+              <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-3.5 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-[11px] font-medium text-slate-500">
+                      Outgoing Chairman (Archived to History)
+                    </p>
+                    <p className="font-semibold text-slate-900">
+                      {appointTarget.department.chairmanName}
+                    </p>
+                    {appointTarget.department.chairmanSince && (
+                      <p className="font-mono text-[11px] text-slate-600 tabular-nums">
+                        Started: {appointTarget.department.chairmanSince}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[11px] font-medium text-slate-500">
+                      New Chairman (Appointed)
+                    </p>
+                    <p className="font-semibold text-pust-900">
+                      {appointTarget.teacher.name}
+                    </p>
+                    <p className="font-mono text-[11px] text-slate-600">
+                      {appointTarget.teacher.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block font-medium text-slate-700 mb-1">
+                    Effective Appointment Date
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={appointEffectiveDate}
+                    onChange={(e) => setAppointEffectiveDate(e.target.value)}
+                    className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                  />
+                </div>
+                {!appointTarget.department.chairmanSince && (
+                  <div>
+                    <label className="block font-medium text-slate-700 mb-1">
+                      Previous Chairman Start Date (Optional)
+                    </label>
+                    <input
+                      type="date"
+                      value={appointPreviousStartedAt}
+                      onChange={(e) => setAppointPreviousStartedAt(e.target.value)}
+                      className="w-full px-3 py-2 font-mono rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">
+                  Office Order / Transition Note (Optional)
+                </label>
+                <input
+                  type="text"
+                  maxLength={300}
+                  value={appointNote}
+                  onChange={(e) => setAppointNote(e.target.value)}
+                  placeholder="e.g. Office Order No. PUST/Reg/2026-114"
+                  className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-[#F7F7F5] text-slate-900 focus:bg-white focus:outline-none focus:border-pust-800"
+                />
+              </div>
+
+              <label className="flex items-start gap-2 text-[11px] text-slate-700 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={appointDemotePrevious}
+                  onChange={(e) => setAppointDemotePrevious(e.target.checked)}
+                  className="mt-0.5 rounded border-stone-300 text-pust-900 focus:ring-pust-800"
+                />
+                <span>
+                  Return any existing active Chairman account in {appointTarget.department.code} to
+                  Faculty / Teacher role
+                </span>
+              </label>
+
+              <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setAppointTarget(null)}
+                  className="px-4 py-2 rounded-lg border border-stone-300 bg-white text-slate-700 font-medium hover:text-slate-950 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={appointingChairman}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-pust-900 text-white font-semibold hover:bg-pust-950 disabled:opacity-60 cursor-pointer"
+                >
+                  <Award className="w-3.5 h-3.5" />
+                  <span>
+                    {appointingChairman ? 'Appointing...' : 'Confirm Chairman Appointment'}
+                  </span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

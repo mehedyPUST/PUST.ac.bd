@@ -768,7 +768,14 @@ export function DepartmentDetailView({
                               {chairman.name}
                             </button>
                           </h2>
-                          <p className="text-sm font-medium text-pust-900">{chairman.designation}</p>
+                          <p className="text-sm font-medium text-pust-900">
+                            {chairman.designation}
+                            {department.chairmanSince && (
+                              <span className="font-mono text-xs text-slate-600 font-normal ml-2 tabular-nums">
+                                · Since {department.chairmanSince}
+                              </span>
+                            )}
+                          </p>
                           {chairman.qualification && (
                             <p className="text-xs text-slate-600 leading-relaxed">
                               {chairman.qualification}
@@ -814,6 +821,45 @@ export function DepartmentDetailView({
                           </p>
                         ))}
                       </div>
+
+                      {department.chairmanHistory && department.chairmanHistory.length > 0 && (
+                        <div className="pt-5 border-t border-stone-200 space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className="font-serif text-base font-medium text-slate-950">
+                              Former Chairmen &amp; Tenure History
+                            </h3>
+                            <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                              {department.chairmanHistory.length}{' '}
+                              {department.chairmanHistory.length === 1 ? 'Record' : 'Records'}
+                            </span>
+                          </div>
+                          <div className="divide-y divide-stone-200 rounded-xl border border-stone-200 bg-[#FAF9F6]">
+                            {department.chairmanHistory.map((entry) => (
+                              <div
+                                key={entry.id}
+                                className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                              >
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-slate-950">{entry.name}</p>
+                                  {entry.designation && (
+                                    <p className="text-[11px] text-slate-600">{entry.designation}</p>
+                                  )}
+                                </div>
+                                <div className="sm:text-right shrink-0">
+                                  <p className="font-mono text-[11px] font-medium text-pust-900 tabular-nums">
+                                    {entry.startedAt
+                                      ? `${entry.startedAt} — ${entry.endedAt}`
+                                      : `Ended ${entry.endedAt}`}
+                                  </p>
+                                  {entry.note && (
+                                    <p className="text-[11px] text-slate-500">{entry.note}</p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </MotionReveal>
 

@@ -195,6 +195,21 @@ export interface FacultyProfileRequestRecord {
   updatedAt: string;
 }
 
+export interface ChairmanHistoryRecord {
+  id: string;
+  name: string;
+  designation?: string;
+  email?: string;
+  userId?: string;
+  profileId?: string;
+  photoUrl?: string;
+  startedAt?: string;
+  endedAt: string;
+  recordedAt: string;
+  appointedBy?: string;
+  note?: string;
+}
+
 export interface DepartmentRecord {
   id: string;
   code: string;
@@ -208,6 +223,8 @@ export interface DepartmentRecord {
   researchTotal?: number;
   building: string;
   chairmanName: string;
+  chairmanSince?: string;
+  chairmanHistory?: ChairmanHistoryRecord[];
   contactPhone?: string;
   contactEmail?: string;
   coverImageUrl?: string;

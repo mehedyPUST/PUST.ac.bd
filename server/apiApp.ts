@@ -7,6 +7,7 @@ import {
   clearAuthCookie,
   hashPassword,
   optionalAuth,
+  registerLiveUserResolver,
   requireAuth,
   requireRoles,
   setAuthCookie,
@@ -141,6 +142,7 @@ const bookmarkSchema = z.object({
 
 export function mountApiRoutes(app: Express): void {
   wrapRouterAsync(app);
+  registerLiveUserResolver((id) => pustRepo.findUserById(id));
   // Scope JSON body parsing, cookies, no-cache headers, and same-origin protection strictly to /api
   app.use('/api', (_req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

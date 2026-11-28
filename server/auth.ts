@@ -191,6 +191,14 @@ export function verifySameOriginMutation(
   res.status(403).json({ error: 'Missing same-origin verification header' });
 }
 
+export type LiveUserResolver = (id: string) => Promise<AuthUser | null>;
+
+let registeredLiveUserResolver: LiveUserResolver | null = null;
+
+export function registerLiveUserResolver(resolver: LiveUserResolver): void {
+  registeredLiveUserResolver = resolver;
+}
+
 export function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
@@ -210,8 +218,42 @@ export function requireAuth(
     res.status(403).json({ error: 'Account pending approval by university authority' });
     return;
   }
-  req.authUser = claims;
-  next();
+
+  if (claims.sub === 'env-admin-office' || !registeredLiveUserResolver) {
+    req.authUser = claims;
+    next();
+    return;
+  }
+
+  registeredLiveUserResolver(claims.sub)
+    .then((liveUser) => {
+      if (liveUser) {
+        if (liveUser.approvalStatus !== 'approved') {
+          res.status(403).json({ error: 'Account pending approval by university authority' });
+          return;
+        }
+        req.authUser = {
+          ...claims,
+          name: liveUser.name,
+          email: liveUser.email,
+          role: liveUser.role,
+          approvalStatus: liveUser.approvalStatus,
+          departmentCode: liveUser.departmentCode,
+          academicId: liveUser.academicId,
+          session: liveUser.session,
+          hallAffiliation: liveUser.hallAffiliation,
+          ...(liveUser.officeCode ? { officeCode: liveUser.officeCode } : {}),
+          ...(liveUser.officeName ? { officeName: liveUser.officeName } : {}),
+          ...(liveUser.designation ? { designation: liveUser.designation } : {}),
+          ...(liveUser.assignedCourses ? { assignedCourses: liveUser.assignedCourses } : {}),
+          ...(liveUser.assignedSessions ? { assignedSessions: liveUser.assignedSessions } : {}),
+        };
+      } else {
+        req.authUser = claims;
+      }
+      next();
+    })
+    .catch(next);
 }
 
 export function requireRoles(...allowed: UserRole[]) {

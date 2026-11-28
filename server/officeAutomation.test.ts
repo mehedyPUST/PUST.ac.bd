@@ -433,3 +433,198 @@ test('Temporary first-login password blocks portal mutations until updated via /
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+test('Admin can add existing officer profile with temp token and appoint department chairman archiving tenure history', async () => {
+  const app = await getApiApp();
+  const server = http.createServer(app);
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const address = server.address();
+  assert.ok(address && typeof address === 'object');
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  const dept = await pustRepo.getDepartmentByCode('PHY');
+  assert.ok(dept);
+  const originalDeptSnapshot = {
+    chairmanName: dept.chairmanName,
+    chairmanSince: dept.chairmanSince,
+    chairmanProfile: dept.chairmanProfile,
+    chairmanHistory: dept.chairmanHistory || [],
+  };
+
+  const officerMember = dept.officers?.[0];
+  assert.ok(officerMember, 'Expected at least one seeded officer in PHY department');
+
+  const adminUser = await pustRepo.createUser({
+    name: 'Test Central Admin',
+    email: `admin.chair.test.${Date.now()}@pust.ac.bd`,
+    passwordHash: hashPassword('AdminPass#2026'),
+    role: 'admin',
+    approvalStatus: 'approved',
+    departmentCode: 'ADMIN',
+    academicId: `PUST-ADMIN-TEST-${Date.now()}`,
+    hallAffiliation: 'Administrative Building',
+  });
+
+  const teacherA = await pustRepo.createUser({
+    name: 'Dr. Appointee One',
+    email: `teacher.a.${Date.now()}@pust.ac.bd`,
+    passwordHash: hashPassword('TeacherPass#1'),
+    role: 'teacher',
+    approvalStatus: 'approved',
+    departmentCode: 'PHY',
+    academicId: `PUST-PHY-TEST-A-${Date.now()}`,
+    hallAffiliation: 'Academic Building I',
+    designation: 'Professor',
+    assignedCourses: [],
+    assignedSessions: [],
+  });
+
+  const teacherB = await pustRepo.createUser({
+    name: 'Dr. Appointee Two',
+    email: `teacher.b.${Date.now()}@pust.ac.bd`,
+    passwordHash: hashPassword('TeacherPass#2'),
+    role: 'teacher',
+    approvalStatus: 'approved',
+    departmentCode: 'PHY',
+    academicId: `PUST-PHY-TEST-B-${Date.now()}`,
+    hallAffiliation: 'Academic Building I',
+    designation: 'Associate Professor',
+    assignedCourses: [],
+    assignedSessions: [],
+  });
+
+  let createdOfficerId: string | null = null;
+  const adminCookie = `pust_token=${encodeURIComponent(signAuthToken(adminUser))}`;
+  const teacherCookie = `pust_token=${encodeURIComponent(signAuthToken(teacherB))}`;
+
+  try {
+    // 1. Admin adds an existing officer profile with temporary first-login token
+    const officerEmail = `phy.officer.${Date.now()}@pust.ac.bd`;
+    const addOfficerRes = await fetch(`${baseUrl}/api/portal/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({
+        name: officerMember.name,
+        email: officerEmail,
+        password: 'PUST-TMP-OFF889',
+        role: 'registrar',
+        departmentCode: 'PHY',
+        academicId: `PUST-PHY-OFF-${Date.now()}`,
+        hallAffiliation: 'Academic Building I',
+        officeCode: 'PHY',
+        officeName: `Department of ${dept.name}`,
+        designation: officerMember.designation,
+        approvalStatus: 'approved',
+        claimedFacultyMemberId: officerMember.id,
+        claimedDepartmentCode: 'PHY',
+        claimedFacultyGroup: 'officer',
+        mustChangePassword: true,
+      }),
+    });
+    assert.equal(addOfficerRes.status, 201);
+    const addedOfficerJson = (await addOfficerRes.json()) as {
+      user: { id: string; role: string; mustChangePassword?: boolean; claimedFacultyGroup?: string };
+    };
+    createdOfficerId = addedOfficerJson.user.id;
+    assert.equal(addedOfficerJson.user.role, 'registrar');
+    assert.equal(addedOfficerJson.user.mustChangePassword, true);
+    assert.equal(addedOfficerJson.user.claimedFacultyGroup, 'officer');
+
+    // 2. Non-admin teacher cannot appoint chairman (403)
+    const forbiddenRes = await fetch(`${baseUrl}/api/portal/departments/PHY/appoint-chairman`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: teacherCookie,
+      },
+      body: JSON.stringify({
+        teacherUserId: teacherA.id,
+        effectiveDate: '2026-03-01',
+      }),
+    });
+    assert.equal(forbiddenRes.status, 403);
+
+    // 3. Admin appoints Teacher A as Chairman effective 2026-03-01
+    const appointARes = await fetch(`${baseUrl}/api/portal/departments/PHY/appoint-chairman`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({
+        teacherUserId: teacherA.id,
+        effectiveDate: '2026-03-01',
+        previousStartedAt: '2024-01-15',
+        demotePreviousChairman: true,
+        note: 'Order #101',
+      }),
+    });
+    assert.equal(appointARes.status, 200);
+    const appointAJson = (await appointARes.json()) as {
+      department: {
+        chairmanName: string;
+        chairmanSince?: string;
+        chairmanHistory?: Array<{ name: string; startedAt?: string; endedAt: string }>;
+      };
+      appointedUser: { role: string };
+    };
+    assert.equal(appointAJson.appointedUser.role, 'chairman');
+    assert.equal(appointAJson.department.chairmanName, teacherA.name);
+    assert.equal(appointAJson.department.chairmanSince, '2026-03-01');
+    assert.equal(appointAJson.department.chairmanHistory?.[0]?.name, originalDeptSnapshot.chairmanName);
+    assert.equal(appointAJson.department.chairmanHistory?.[0]?.startedAt, '2024-01-15');
+    assert.equal(appointAJson.department.chairmanHistory?.[0]?.endedAt, '2026-03-01');
+
+    // 4. Admin appoints Teacher B effective 2026-11-27 -> Teacher A is demoted & archived with dates
+    const appointBRes = await fetch(`${baseUrl}/api/portal/departments/PHY/appoint-chairman`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({
+        teacherUserId: teacherB.id,
+        effectiveDate: '2026-11-27',
+        demotePreviousChairman: true,
+        note: 'Order #202',
+      }),
+    });
+    assert.equal(appointBRes.status, 200);
+    const appointBJson = (await appointBRes.json()) as {
+      department: {
+        chairmanName: string;
+        chairmanSince?: string;
+        chairmanHistory?: Array<{ name: string; startedAt?: string; endedAt: string }>;
+      };
+      appointedUser: { role: string };
+      demotedChairmen: Array<{ id: string; role: string }>;
+    };
+    assert.equal(appointBJson.appointedUser.role, 'chairman');
+    assert.equal(appointBJson.department.chairmanName, teacherB.name);
+    assert.equal(appointBJson.department.chairmanSince, '2026-11-27');
+    assert.equal(appointBJson.demotedChairmen[0]?.id, teacherA.id);
+    assert.equal(appointBJson.demotedChairmen[0]?.role, 'teacher');
+    assert.equal(appointBJson.department.chairmanHistory?.[0]?.name, teacherA.name);
+    assert.equal(appointBJson.department.chairmanHistory?.[0]?.startedAt, '2026-03-01');
+    assert.equal(appointBJson.department.chairmanHistory?.[0]?.endedAt, '2026-11-27');
+  } finally {
+    await pustRepo.updateDepartment(dept.id, {
+      chairmanName: originalDeptSnapshot.chairmanName,
+      chairmanSince: originalDeptSnapshot.chairmanSince,
+      chairmanProfile: originalDeptSnapshot.chairmanProfile,
+      chairmanHistory: originalDeptSnapshot.chairmanHistory,
+    });
+    if (createdOfficerId) await pustRepo.deleteUser(createdOfficerId);
+    await pustRepo.deleteUser(teacherA.id);
+    await pustRepo.deleteUser(teacherB.id);
+    await pustRepo.deleteUser(adminUser.id);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
