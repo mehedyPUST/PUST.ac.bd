@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-serif: var(--font-fraunces), Georgia, Cambria, "Times New Roman", serif;
@@ -199,6 +200,12 @@
   h1, h2, h3 {
     text-wrap: balance;
     color: #1c1917;
+  }
+
+  .dark.portal-shell h1,
+  .dark.portal-shell h2,
+  .dark.portal-shell h3 {
+    color: #f8fafc;
   }
 
   :where(p):not(.font-mono):not(.text-center):not(.text-right):not(.text-left):not([class*="line-clamp-"]):not(.text-center *):not(.text-right *):not(.portal-shell *) {

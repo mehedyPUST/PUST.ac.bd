@@ -25,7 +25,7 @@ export default function PortalPage() {
   } = usePust();
 
   return (
-    <main className="flex-1 bg-[#FAF9F6]">
+    <main className="flex-1 flex flex-col bg-[#F4F7F6]">
       <Suspense
         fallback={
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

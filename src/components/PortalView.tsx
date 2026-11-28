@@ -2,8 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { motion } from 'motion/react';
-import { ExternalLink, LayoutGrid, Lock, LogOut, User } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import {
+  BadgeCheck,
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  LayoutGrid,
+  Lock,
+  LogOut,
+  Menu,
+  Moon,
+  RefreshCw,
+  ShieldCheck,
+  Sun,
+  X,
+} from 'lucide-react';
 import { getAvailableRoleContexts } from '../lib/roleContext';
 import { pustApi } from '../lib/api';
 import { AdminModeSwitch } from './AdminModeSwitch';
@@ -35,6 +50,7 @@ import {
   ROLE_LABELS,
   VALID_PORTAL_TABS,
   type PortalTab,
+  type PortalTabItem,
 } from './portal/portalMeta';
 import type {
   AboutContentRecord,
@@ -67,6 +83,43 @@ interface PortalViewProps {
   onBackToSite: () => void;
 }
 
+const PRIMARY_GROUP_TABS = new Set<PortalTab>([
+  'overview',
+  'student-dashboard',
+  'exams',
+  'library',
+  'halls',
+  'certificates',
+  'students',
+]);
+
+const TAB_ICON_TONES: Record<PortalTab, string> = {
+  overview: 'text-emerald-600 dark:text-emerald-400',
+  'student-dashboard': 'text-blue-600 dark:text-blue-400',
+  exams: 'text-amber-600 dark:text-amber-400',
+  library: 'text-teal-600 dark:text-teal-400',
+  halls: 'text-emerald-600 dark:text-emerald-400',
+  certificates: 'text-pust-700 dark:text-pust-300',
+  students: 'text-lapis-600 dark:text-cerulean-400',
+  profile: 'text-cerulean-600 dark:text-cerulean-400',
+  users: 'text-lapis-600 dark:text-cerulean-400',
+  approvals: 'text-amber-600 dark:text-amber-400',
+  workflow: 'text-teal-600 dark:text-teal-400',
+  governance: 'text-pust-700 dark:text-pust-300',
+  audit: 'text-slate-600 dark:text-slate-400',
+};
+
+function getInitials(name: string): string {
+  const parts = name
+    .replace(/^(Prof\.|Dr\.|Md\.|Mr\.|Ms\.)\s+/i, '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return 'PU';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
 export function PortalView({
   user,
   departments,
@@ -83,16 +136,72 @@ export function PortalView({
   onCmsChange,
   onBackToSite,
 }: PortalViewProps) {
-  const { navigateTo, setActiveNotice, editMode, toggleEditMode, openCmsDirectory, profile } =
-    usePust();
+  const {
+    navigateTo,
+    setActiveNotice,
+    editMode,
+    toggleEditMode,
+    openCmsDirectory,
+    loadStudentDashboard,
+    profile,
+  } = usePust();
 
   const [activeTab, setActiveTab] = useState<PortalTab>('overview');
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [switchingRole, setSwitchingRole] = useState(false);
   const [roleSwitchError, setRoleSwitchError] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [refreshingWorkspace, setRefreshingWorkspace] = useState(false);
+  const [portalDark, setPortalDark] = useState(false);
+
   const workspaceTopRef = useRef<HTMLElement>(null);
   const navRailRef = useRef<HTMLElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
   const tabButtonRefs = useRef<Partial<Record<PortalTab, HTMLButtonElement | null>>>({});
+
+  // Restore saved portal dark mode preference safely on client mount
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('pust-portal-dark');
+      if (saved === 'true') {
+        setPortalDark(true);
+      }
+    } catch {
+      // Storage unavailable
+    }
+  }, []);
+
+  function togglePortalDark() {
+    setPortalDark((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem('pust-portal-dark', String(next));
+      } catch {
+        // Storage unavailable
+      }
+      return next;
+    });
+  }
+
+  useEffect(() => {
+    if (!notificationsOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    }
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') setNotificationsOpen(false);
+    }
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [notificationsOpen]);
 
   // Combinable Student Database & Receipts State
   const [students, setStudents] = useState<StudentRecord[]>([]);
@@ -247,6 +356,7 @@ export function PortalView({
       const effectiveTab: PortalTab =
         user?.mustChangePassword && nextTab !== 'profile' ? 'profile' : nextTab;
       setActiveTab(effectiveTab);
+      setMobileMenuOpen(false);
       if (typeof window === 'undefined') return;
 
       const url = new URL(window.location.href);
@@ -263,9 +373,9 @@ export function PortalView({
       if (shouldScroll) {
         const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
         const rawTop = workspaceTopRef.current
-          ? workspaceTopRef.current.getBoundingClientRect().top + window.scrollY - 96
+          ? workspaceTopRef.current.getBoundingClientRect().top + window.scrollY - 24
           : 0;
-        const targetY = rawTop <= 60 ? 0 : rawTop;
+        const targetY = rawTop <= 40 ? 0 : rawTop;
         if (Math.abs(window.scrollY - targetY) > 12 && window.scrollY > targetY) {
           window.scrollTo({ top: targetY, behavior: reduced ? 'auto' : 'smooth' });
         }
@@ -274,10 +384,6 @@ export function PortalView({
     [user?.mustChangePassword]
   );
 
-  /**
-   * Scroll the sidebar so the active link AND its immediate neighbors
-   * (previous + next) stay inside the visible nav area.
-   */
   const ensureActiveSidebarLinkVisible = useCallback(() => {
     if (typeof window === 'undefined') return;
     const navEl = navRailRef.current;
@@ -286,100 +392,29 @@ export function PortalView({
 
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const behavior: ScrollBehavior = reduced ? 'auto' : 'smooth';
-    const gap = 6; // matches visual gap between items
-
     const isDesktopColumn = window.matchMedia('(min-width: 1024px)').matches;
-    const canScrollY = navEl.scrollHeight > navEl.clientHeight + 2;
-    const canScrollX = navEl.scrollWidth > navEl.clientWidth + 2;
+    if (!isDesktopColumn || navEl.scrollHeight <= navEl.clientHeight + 2) return;
 
-    const relativeOffset = (el: HTMLElement, axis: 'y' | 'x') => {
-      const navBox = navEl.getBoundingClientRect();
-      const elBox = el.getBoundingClientRect();
-      if (axis === 'y') {
-        return elBox.top - navBox.top + navEl.scrollTop;
-      }
-      return elBox.left - navBox.left + navEl.scrollLeft;
-    };
-
-    if (isDesktopColumn && canScrollY) {
-      const prev = btnEl.previousElementSibling as HTMLElement | null;
-      const next = btnEl.nextElementSibling as HTMLElement | null;
-      const rangeTop = relativeOffset(prev || btnEl, 'y') - (prev ? gap : 0);
-      const rangeBottom =
-        relativeOffset(next || btnEl, 'y') + (next || btnEl).offsetHeight + (next ? gap : 0);
-      const viewTop = navEl.scrollTop;
-      const viewBottom = viewTop + navEl.clientHeight;
-      const maxScroll = Math.max(0, navEl.scrollHeight - navEl.clientHeight);
-
-      let nextScroll = viewTop;
-      // Prefer showing full trio; if too tall, center the active item
-      const rangeHeight = rangeBottom - rangeTop;
-      if (rangeHeight <= navEl.clientHeight) {
-        if (rangeTop < viewTop) {
-          nextScroll = rangeTop;
-        } else if (rangeBottom > viewBottom) {
-          nextScroll = rangeBottom - navEl.clientHeight;
-        } else {
-          return;
-        }
-      } else {
-        const activeCenter =
-          relativeOffset(btnEl, 'y') + btnEl.offsetHeight / 2 - navEl.clientHeight / 2;
-        nextScroll = activeCenter;
-      }
-
-      nextScroll = Math.max(0, Math.min(maxScroll, nextScroll));
-      if (Math.abs(nextScroll - viewTop) < 1) return;
-      navEl.scrollTo({ top: nextScroll, behavior });
-      return;
-    }
-
-    if (canScrollX) {
-      const prev = btnEl.previousElementSibling as HTMLElement | null;
-      const next = btnEl.nextElementSibling as HTMLElement | null;
-      const rangeLeft = relativeOffset(prev || btnEl, 'x') - (prev ? gap : 0);
-      const rangeRight =
-        relativeOffset(next || btnEl, 'x') + (next || btnEl).offsetWidth + (next ? gap : 0);
-      const viewLeft = navEl.scrollLeft;
-      const viewRight = viewLeft + navEl.clientWidth;
-      const maxScroll = Math.max(0, navEl.scrollWidth - navEl.clientWidth);
-
-      let nextScroll = viewLeft;
-      const rangeWidth = rangeRight - rangeLeft;
-      if (rangeWidth <= navEl.clientWidth) {
-        if (rangeLeft < viewLeft) {
-          nextScroll = rangeLeft;
-        } else if (rangeRight > viewRight) {
-          nextScroll = rangeRight - navEl.clientWidth;
-        } else {
-          return;
-        }
-      } else {
-        nextScroll =
-          relativeOffset(btnEl, 'x') + btnEl.offsetWidth / 2 - navEl.clientWidth / 2;
-      }
-
-      nextScroll = Math.max(0, Math.min(maxScroll, nextScroll));
-      if (Math.abs(nextScroll - viewLeft) < 1) return;
-      navEl.scrollTo({ left: nextScroll, behavior });
+    const navBox = navEl.getBoundingClientRect();
+    const elBox = btnEl.getBoundingClientRect();
+    const elTop = elBox.top - navBox.top + navEl.scrollTop;
+    const elBottom = elTop + btnEl.offsetHeight;
+    if (elTop < navEl.scrollTop) {
+      navEl.scrollTo({ top: Math.max(0, elTop - 8), behavior });
+    } else if (elBottom > navEl.scrollTop + navEl.clientHeight) {
+      navEl.scrollTo({ top: elBottom - navEl.clientHeight + 8, behavior });
     }
   }, [activeTab]);
 
   useEffect(() => {
     if (!user) return;
-    // Wait for layout after tab paint, then scroll neighbors into view
     const id = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        ensureActiveSidebarLinkVisible();
-      });
+      ensureActiveSidebarLinkVisible();
     });
     return () => window.cancelAnimationFrame(id);
   }, [user, activeTab, ensureActiveSidebarLinkVisible]);
 
-  const roleContexts = useMemo(
-    () => (user ? getAvailableRoleContexts(user) : []),
-    [user]
-  );
+  const roleContexts = useMemo(() => (user ? getAvailableRoleContexts(user) : []), [user]);
   const activeRoleKey = user?.activeRoleKey || 'primary';
 
   async function handleAuthenticated(authedUser: AuthUser) {
@@ -396,6 +431,7 @@ export function PortalView({
     try {
       await pustApi.logout();
       setRoleSwitchError(null);
+      setMobileMenuOpen(false);
       onUserChange(null);
       await Promise.all([onNoticesChange(), onCmsChange()]);
       if (typeof window !== 'undefined') {
@@ -403,6 +439,21 @@ export function PortalView({
       }
     } catch (err) {
       setLogoutError(err instanceof Error ? err.message : 'Unable to sign out cleanly.');
+    }
+  }
+
+  async function handleRefreshWorkspace() {
+    if (!user || refreshingWorkspace) return;
+    setRefreshingWorkspace(true);
+    try {
+      await Promise.all([
+        loadStudents(),
+        onNoticesChange(),
+        onBookmarksChange(),
+        user.role === 'student' ? loadStudentDashboard() : Promise.resolve(),
+      ]);
+    } finally {
+      setRefreshingWorkspace(false);
     }
   }
 
@@ -509,51 +560,97 @@ export function PortalView({
   const isPortalChairman = user.role === 'chairman';
   const isPortalAdmin = user.role === 'admin';
 
-  return (
-    <section
-      ref={workspaceTopRef}
-      className="portal-shell max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10"
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-[272px_minmax(0,1fr)] gap-6 items-stretch">
-        {/* Grid 1: User's Dashboard (Col 1, Row 1 — matches Grid 3 width and Grid 2 height) */}
-        <section
-          aria-label="User dashboard summary"
-          data-portal-grid="user-dashboard"
-          className="lg:col-start-1 lg:row-start-1 h-full rounded-2xl bg-gradient-to-br from-pust-950 via-pust-900 to-pust-800 text-white border border-pust-950/20 p-4 sm:p-5 flex flex-col justify-between gap-3"
-        >
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 space-y-0.5">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-pust-200 truncate text-left">
-                {ROLE_LABELS[user.role]}
-              </p>
-              <p className="font-serif text-base sm:text-lg font-medium text-white leading-snug truncate text-left">
-                {user.name}
-              </p>
-              {activeRoleKey !== 'primary' && user.primaryRole && (
-                <p className="text-[10px] text-pust-100/90 leading-snug truncate text-left">
-                  Primary: {ROLE_LABELS[user.primaryRole]}
-                </p>
-              )}
-            </div>
+  const primaryGroupTabs = portalTabs.filter((t) => PRIMARY_GROUP_TABS.has(t.id));
+  const secondaryGroupTabs = portalTabs.filter((t) => !PRIMARY_GROUP_TABS.has(t.id));
+
+  function renderNavGroup(title: string, items: PortalTabItem[], collapsed: boolean) {
+    if (items.length === 0) return null;
+    return (
+      <div className="space-y-1">
+        {!collapsed && (
+          <p className="px-3 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 text-left">
+            {title}
+          </p>
+        )}
+        {items.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = resolvedTab === tab.id;
+          const isLocked = mustChangePassword && tab.id !== 'profile';
+          const iconTone = isActive
+            ? 'text-emerald-700 dark:text-emerald-400'
+            : TAB_ICON_TONES[tab.id] || 'text-slate-500';
+          return (
             <button
+              key={tab.id}
+              ref={(el) => {
+                if (!collapsed) tabButtonRefs.current[tab.id] = el;
+              }}
               type="button"
-              onClick={handleLogout}
-              aria-label="Sign out of portal"
-              className="lg:hidden inline-flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-white/15 hover:bg-white/25 text-white whitespace-nowrap shrink-0 cursor-pointer"
+              disabled={isLocked}
+              title={collapsed ? tab.label : undefined}
+              onClick={() => selectTab(tab.id)}
+              className={`w-full flex items-center gap-2.5 rounded-xl text-[13px] transition-colors text-left ${
+                collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
+              } ${
+                isActive
+                  ? 'bg-[#EAF8F0] dark:bg-emerald-950/50 border border-[#BCE5CE] dark:border-emerald-800/70 text-[#0F7D42] dark:text-emerald-300 font-semibold cursor-pointer'
+                  : isLocked
+                  ? 'border border-transparent text-slate-400 dark:text-slate-600 opacity-60 cursor-not-allowed'
+                  : 'border border-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/70 hover:text-slate-950 dark:hover:text-white font-medium cursor-pointer'
+              }`}
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <Icon className={`w-4 h-4 shrink-0 ${iconTone}`} />
+              {!collapsed && (
+                <span className="min-w-0 flex-1 flex items-center justify-between gap-1.5">
+                  <span className="truncate">{tab.label}</span>
+                  {tab.sourceBadge && !isLocked && (
+                    <span className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                      {tab.sourceBadge}
+                    </span>
+                  )}
+                  {isLocked && <Lock className="w-3 h-3 shrink-0" />}
+                </span>
+              )}
             </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderSidebarFooter(collapsed: boolean) {
+    if (!user) return null;
+    return (
+      <div className="shrink-0 p-2.5 border-t border-slate-100 dark:border-slate-800 space-y-2">
+        {/* User Profile Card */}
+        <div
+          className={`rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 ${
+            collapsed ? 'flex justify-center' : 'space-y-2'
+          }`}
+        >
+          <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
+            <span
+              title={`${user.name} (${ROLE_LABELS[user.role]})`}
+              className="w-9 h-9 rounded-full bg-pust-800 text-white font-semibold text-xs flex items-center justify-center shrink-0"
+            >
+              {getInitials(user.name)}
+            </span>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1 min-w-0">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate text-left">
+                    {user.name}
+                  </p>
+                  <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate text-left tabular-nums">
+                  {ROLE_LABELS[user.role]} · {user.academicId}
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className="space-y-1.5 pt-2 border-t border-white/10">
-            <p className="font-mono text-xs text-pust-100/90 tabular-nums text-left truncate">
-              {user.departmentCode} · ID {user.academicId}
-              {user.session ? ` · ${user.session}` : ''}
-            </p>
-            <p className="font-mono text-[11px] text-pust-200/80 text-left truncate">
-              {user.email}
-            </p>
+          {!collapsed && roleContexts.length > 1 && (
             <RoleSwitcherControl
               variant="sidebar"
               contexts={roleContexts}
@@ -562,373 +659,546 @@ export function PortalView({
               disabled={mustChangePassword}
               onSwitch={handleSwitchRole}
             />
-          </div>
-        </section>
+          )}
+        </div>
 
-        {/* Grid 2: University Name (Col 2, Row 1 — matches Grid 4 width and Grid 1 height) */}
-        <header
-          data-portal-grid="university-name"
-          className="lg:col-start-2 lg:row-start-1 h-full bg-white rounded-2xl border border-stone-200 px-5 sm:px-6 py-4 sm:py-5 flex flex-col justify-center"
+        {/* Dark Mode Toggle */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={portalDark}
+          aria-label="Toggle portal dark mode"
+          title={collapsed ? (portalDark ? 'Switch to light mode' : 'Switch to dark mode') : undefined}
+          onClick={togglePortalDark}
+          className={`w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 flex items-center ${
+            collapsed ? 'justify-center' : 'justify-between'
+          } gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer`}
         >
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
-            <div className="flex items-center gap-3.5 min-w-0">
-              <PustCrest variant="primary" size={44} className="shrink-0" />
-              <div className="min-w-0 space-y-0.5">
-                <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold text-left truncate">
-                  {profile?.navbarTagline?.trim() || 'Established 2008 · Rajapur, Pabna'}
+          <span className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200">
+            {portalDark ? (
+              <Sun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            )}
+            {!collapsed && <span>Dark Mode</span>}
+          </span>
+          {!collapsed && (
+            <span
+              aria-hidden="true"
+              className={`w-8 h-4.5 rounded-full p-0.5 transition-colors flex items-center ${
+                portalDark ? 'bg-emerald-600 justify-end' : 'bg-slate-200 justify-start'
+              }`}
+            >
+              <span className="w-3.5 h-3.5 rounded-full bg-white shadow-2xs" />
+            </span>
+          )}
+        </button>
+
+        {/* Sign Out */}
+        <button
+          type="button"
+          title={collapsed ? 'Sign Out' : undefined}
+          onClick={handleLogout}
+          className="w-full rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/40 dark:bg-red-950/25 hover:bg-red-50 dark:hover:bg-red-950/45 px-3 py-2 flex items-center justify-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors cursor-pointer whitespace-nowrap"
+        >
+          <LogOut className="w-3.5 h-3.5 shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <section
+      ref={workspaceTopRef}
+      className={`portal-shell flex-1 w-full bg-[#F4F7F6] dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors ${
+        portalDark ? 'dark' : ''
+      }`}
+    >
+      <div className="max-w-[1600px] mx-auto px-3 sm:px-5 py-3 sm:py-4 min-h-screen flex flex-col lg:flex-row gap-4 items-stretch">
+        {/* Left Sidebar Column (Desktop) */}
+        <div
+          className={`hidden lg:flex flex-col gap-3.5 shrink-0 transition-all duration-200 ${
+            sidebarCollapsed ? 'w-[82px]' : 'w-[258px]'
+          }`}
+        >
+          {/* Floating Brand Card */}
+          <div
+            className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 h-[62px] flex items-center ${
+              sidebarCollapsed ? 'justify-center' : 'gap-3'
+            }`}
+          >
+            <div className="w-9 h-9 rounded-xl bg-pust-50 dark:bg-pust-950/60 border border-pust-200/80 dark:border-pust-800/60 flex items-center justify-center shrink-0">
+              <PustCrest variant="primary" size={28} />
+            </div>
+            {!sidebarCollapsed && (
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-950 dark:text-white leading-tight truncate text-left">
+                  PUST Portal
                 </p>
-                <h1 className="font-serif text-lg sm:text-xl lg:text-2xl font-medium text-slate-950 leading-tight text-left">
-                  Pabna University of Science and Technology
-                </h1>
-                <p className="font-mono text-[11px] text-slate-500 text-left truncate">
-                  Digital Campus / {ROLE_LABELS[user.role]} /{' '}
-                  <span className="text-pust-800 font-semibold">{activeTabMeta.label}</span>
+                <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 leading-tight truncate text-left">
+                  Dashboard
                 </p>
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="flex flex-wrap items-center gap-2 xl:justify-end shrink-0">
-              <RoleSwitcherControl
-                variant="header"
-                contexts={roleContexts}
-                activeKey={activeRoleKey}
-                switching={switchingRole}
-                disabled={mustChangePassword}
-                onSwitch={handleSwitchRole}
+          {/* Floating Sidebar Navigation Card */}
+          <aside
+            aria-label="Portal workspace navigation"
+            className="relative flex-1 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6.25rem)]"
+          >
+            {/* Floating Collapse Edge Toggle */}
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs items-center justify-center text-slate-500 dark:text-slate-300 hover:text-pust-800 dark:hover:text-white z-20 cursor-pointer transition-colors"
+            >
+              {sidebarCollapsed ? (
+                <ChevronRight className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronLeft className="w-3.5 h-3.5" />
+              )}
+            </button>
+
+            <nav
+              ref={navRailRef}
+              aria-label="Campus portal workspace modules"
+              className="flex-1 min-h-0 overflow-y-auto px-2.5 py-3 space-y-4 no-scrollbar"
+            >
+              {renderNavGroup('Academics & Services', primaryGroupTabs, sidebarCollapsed)}
+              {renderNavGroup('Governance & Account', secondaryGroupTabs, sidebarCollapsed)}
+            </nav>
+
+            {renderSidebarFooter(sidebarCollapsed)}
+          </aside>
+        </div>
+
+        {/* Mobile Drawer */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <div className="fixed inset-0 z-50 lg:hidden flex">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+                className="fixed inset-0 bg-slate-950/45 backdrop-blur-2xs"
               />
+              <motion.aside
+                initial={{ x: -280 }}
+                animate={{ x: 0 }}
+                exit={{ x: -280 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                aria-label="Mobile portal navigation"
+                className="relative z-10 w-[280px] max-w-[85vw] h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col"
+              >
+                <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-pust-50 dark:bg-pust-950/60 border border-pust-200/80 flex items-center justify-center shrink-0">
+                      <PustCrest variant="primary" size={24} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-950 dark:text-white truncate">
+                        PUST Portal
+                      </p>
+                      <p className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                        Dashboard
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Close portal menu"
+                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <nav className="flex-1 min-h-0 overflow-y-auto px-2.5 py-3 space-y-4">
+                  {renderNavGroup('Academics & Services', primaryGroupTabs, false)}
+                  {renderNavGroup('Governance & Account', secondaryGroupTabs, false)}
+                </nav>
+
+                {renderSidebarFooter(false)}
+              </motion.aside>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Right Workspace Column */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4">
+          {/* Top Bar Card */}
+          <header
+            data-portal-grid="university-name"
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 sm:px-5 py-2.5 min-h-[62px] flex items-center justify-between gap-3 sticky top-3 z-30"
+          >
+            {/* Left: Mobile Trigger + Breadcrumb */}
+            <div className="flex items-center gap-2.5 min-w-0">
               <button
                 type="button"
-                onClick={() => selectTab('profile')}
-                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-[#FAF9F6] text-slate-800 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open portal navigation menu"
+                className="lg:hidden h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer shrink-0"
               >
-                <User className="w-3.5 h-3.5 text-pust-800" />
-                <span>My Profile</span>
+                <Menu className="w-4 h-4" />
               </button>
+
+              <nav aria-label="Portal breadcrumb" className="flex items-center gap-2 text-sm min-w-0">
+                <span className="text-slate-400 dark:text-slate-500 font-medium hidden sm:inline whitespace-nowrap">
+                  PUST Portal
+                </span>
+                <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">/</span>
+                <span className="font-semibold text-slate-900 dark:text-white truncate">
+                  {activeTabMeta.label}
+                </span>
+              </nav>
+            </div>
+
+            {/* Right: Utility Action Controls */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={onBackToSite}
-                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium border border-stone-300 bg-white text-slate-700 hover:border-pust-800 hover:text-pust-900 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Public Site</span>
+                <Home className="w-3.5 h-3.5 text-slate-500 dark:text-slate-300" />
+                <span>Home</span>
               </button>
-              {user.role === 'admin' && (
-                <>
-                  <AdminModeSwitch
-                    checked={editMode}
-                    onToggle={toggleEditMode}
-                    variant="desktop"
+
+              {roleContexts.length > 1 && (
+                <div className="hidden md:block">
+                  <RoleSwitcherControl
+                    variant="header"
+                    contexts={roleContexts}
+                    activeKey={activeRoleKey}
+                    switching={switchingRole}
+                    disabled={mustChangePassword}
+                    onSwitch={handleSwitchRole}
                   />
+                </div>
+              )}
+
+              {/* Notifications Popover */}
+              <div ref={notificationsRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setNotificationsOpen((v) => !v)}
+                  aria-label="Toggle targeted circulars"
+                  aria-expanded={notificationsOpen}
+                  className="relative h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                >
+                  <Bell className="w-4 h-4" />
+                  {targetedNotifications.length > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-pust-700 text-white font-mono text-[10px] font-bold flex items-center justify-center tabular-nums">
+                      {targetedNotifications.length}
+                    </span>
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg z-40 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">
+                        Targeted Circulars
+                      </p>
+                      <span className="font-mono text-[11px] text-slate-500 tabular-nums">
+                        {targetedNotifications.length}
+                      </span>
+                    </div>
+                    {targetedNotifications.length === 0 ? (
+                      <p className="p-4 text-xs text-slate-500">
+                        No recent circulars targeted to your unit.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-72 overflow-y-auto">
+                        {targetedNotifications.map((n) => (
+                          <button
+                            key={n.id}
+                            type="button"
+                            onClick={() => {
+                              setNotificationsOpen(false);
+                              setActiveNotice(n);
+                            }}
+                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer space-y-0.5"
+                          >
+                            <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 line-clamp-1">
+                              {n.title}
+                            </p>
+                            <p className="font-mono text-[10px] text-slate-500 tabular-nums">
+                              {n.publishedAt} · {n.departmentCode}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {user.role === 'admin' ? (
+                <>
+                  <div className="hidden xl:block">
+                    <AdminModeSwitch
+                      checked={editMode}
+                      onToggle={toggleEditMode}
+                      variant="desktop"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={openCmsDirectory}
-                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold bg-pust-900 text-white hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     <LayoutGrid className="w-3.5 h-3.5" />
-                    <span>CMS Directory</span>
+                    <span className="hidden sm:inline">CMS Directory</span>
                   </button>
                 </>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {/* Grid 3: Sidebar Links (Col 1, Row 2 — matches Grid 1 width) */}
-        <aside
-          aria-label="Portal sidebar links"
-          data-portal-grid="sidebar-links"
-          className="lg:col-start-1 lg:row-start-2 w-full bg-white rounded-2xl border border-stone-200 overflow-hidden lg:self-start lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:flex lg:flex-col"
-        >
-          <nav
-            ref={navRailRef}
-            aria-label="Campus portal workspace modules"
-            className="flex lg:flex-col overflow-x-auto no-scrollbar overscroll-x-contain lg:flex-1 lg:min-h-0 lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain gap-1.5 lg:gap-1 p-2.5 lg:scroll-py-2"
-          >
-            {portalTabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = resolvedTab === tab.id;
-              const isLocked = mustChangePassword && tab.id !== 'profile';
-              return (
+              ) : (
                 <button
-                  key={tab.id}
-                  ref={(el) => {
-                    tabButtonRefs.current[tab.id] = el;
-                  }}
                   type="button"
-                  disabled={isLocked}
-                  onClick={() => selectTab(tab.id)}
-                  className={`lg:w-full flex items-center gap-2 lg:gap-2.5 px-3 py-2 lg:py-2.5 text-left rounded-xl transition-colors whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
-                    isActive
-                      ? 'bg-pust-900 text-white cursor-pointer'
-                      : isLocked
-                      ? 'bg-stone-50 text-slate-400 opacity-60 cursor-not-allowed'
-                      : 'bg-stone-100 lg:bg-transparent text-slate-700 hover:bg-[#FAF9F6] hover:text-pust-900 cursor-pointer'
-                  }`}
+                  onClick={() => navigateTo('/verify')}
+                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
-                  <span className="min-w-0 lg:flex-1">
-                    <span className="flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold lg:truncate">
-                      <span className="truncate">{tab.label}</span>
-                      {tab.sourceBadge && !isLocked && (
-                        <span
-                          className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
-                            isActive
-                              ? 'bg-white/20 text-white'
-                              : 'bg-amber-100 text-amber-900 border border-amber-200/80'
-                          }`}
-                          title={`From appointment: ${tab.sourceBadge}`}
-                        >
-                          {tab.sourceBadge}
-                        </span>
-                      )}
-                      {isLocked && <Lock className="w-3 h-3 shrink-0" />}
-                    </span>
-                    <span
-                      className={`hidden lg:block text-[11px] truncate ${
-                        isActive ? 'text-pust-100/85' : 'text-slate-500'
-                      }`}
-                    >
-                      {isLocked
-                        ? 'Update temporary password first'
-                        : tab.sourceBadge
-                          ? `${tab.desc} · via ${tab.sourceBadge}`
-                          : tab.desc}
-                    </span>
-                  </span>
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Verify Registry</span>
                 </button>
-              );
-            })}
-          </nav>
+              )}
 
-          <div className="hidden lg:block shrink-0 p-3 border-t border-stone-200 bg-[#FAF9F6] space-y-2">
-            {user.role === 'admin' && (
               <button
                 type="button"
-                onClick={openCmsDirectory}
-                className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap"
+                onClick={togglePortalDark}
+                aria-label={portalDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
               >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>Site-Wide CMS Directory</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg bg-white border border-stone-300 text-slate-700 hover:border-red-400 hover:text-red-700 transition-colors cursor-pointer whitespace-nowrap"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* Grid 4: Main Contents (Col 2, Row 2 — matches Grid 2 width) */}
-        <div
-          data-portal-grid="main-contents"
-          className="lg:col-start-2 lg:row-start-2 min-w-0 w-full space-y-6"
-        >
-          {(logoutError || roleSwitchError) && (
-            <div
-              role="alert"
-              className="p-3.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-900"
-            >
-              {roleSwitchError || logoutError}
-            </div>
-          )}
-
-          {/* Active Workspace Module (no exit-wait height collapse so scrolling stays silky smooth) */}
-          <motion.div
-            key={`${activeRoleKey}-${resolvedTab}`}
-            initial={{ opacity: 0.85, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {resolvedTab === 'overview' && (
-              <div className="space-y-6">
-                <PortalOverviewPanel
-                  user={user}
-                  portalTabs={portalTabs}
-                  studentSelf={studentSelf}
-                  studentsCount={students.length}
-                  loadingStudents={loadingStudents}
-                  receipts={receipts}
-                  targetedNotifications={targetedNotifications}
-                  bookmarks={bookmarks}
-                  roleContexts={roleContexts}
-                  activeRoleKey={activeRoleKey}
-                  switchingRole={switchingRole}
-                  onSwitchRole={handleSwitchRole}
-                  onSelectTab={(tab) => selectTab(tab)}
-                  onOpenReceipt={openReceiptModal}
-                  onNavigateVerify={() => navigateTo('/verify')}
-                  onOpenNotice={(n) => setActiveNotice(n)}
-                  onRemoveBookmark={async (itemId) => {
-                    await pustApi.removeBookmark(itemId);
-                    await onBookmarksChange();
-                  }}
-                  onAddCoAdmin={
-                    user.role === 'admin'
-                      ? () => {
-                          setPendingDirectoryAction('create-admin');
-                          selectTab('users');
-                        }
-                      : undefined
-                  }
-                  pendingFacultyRequestsCount={pendingFacultyRequestCount}
-                  onReviewFacultyRequests={
-                    user.role === 'admin' || user.role === 'chairman'
-                      ? () => {
-                          setPendingDirectorySection('faculty-requests');
-                          selectTab('users');
-                        }
-                      : undefined
-                  }
-                />
-                {user.role === 'student' && (
-                  <StudentDashboardSection
-                    onSelectTab={(tab) => selectTab(tab)}
-                    onOpenReceipt={openReceiptModal}
-                  />
+                {portalDark ? (
+                  <Sun className="w-4 h-4 text-amber-500" />
+                ) : (
+                  <Moon className="w-4 h-4 text-emerald-600" />
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => void handleRefreshWorkspace()}
+                disabled={refreshingWorkspace}
+                aria-label="Refresh portal data"
+                className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0 disabled:opacity-60"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${refreshingWorkspace ? 'animate-spin' : ''}`}
+                />
+              </button>
+            </div>
+          </header>
+
+          {/* Main Workspace Canvas */}
+          <div data-portal-grid="main-contents" className="flex-1 min-w-0 space-y-4">
+            {(logoutError || roleSwitchError) && (
+              <div
+                role="alert"
+                className="p-3.5 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-xs text-red-900 dark:text-red-200"
+              >
+                {roleSwitchError || logoutError}
               </div>
             )}
 
-            {resolvedTab === 'student-dashboard' && (
-              <StudentDashboardSection
-                onSelectTab={(tab) => selectTab(tab)}
-                onOpenReceipt={openReceiptModal}
-              />
-            )}
+            <motion.div
+              key={`${activeRoleKey}-${resolvedTab}`}
+              initial={{ opacity: 0.85, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {resolvedTab === 'overview' && (
+                <div className="space-y-4">
+                  <PortalOverviewPanel
+                    user={user}
+                    portalTabs={portalTabs}
+                    studentSelf={studentSelf}
+                    studentsCount={students.length}
+                    loadingStudents={loadingStudents}
+                    receipts={receipts}
+                    targetedNotifications={targetedNotifications}
+                    bookmarks={bookmarks}
+                    roleContexts={roleContexts}
+                    activeRoleKey={activeRoleKey}
+                    switchingRole={switchingRole}
+                    onSwitchRole={handleSwitchRole}
+                    onSelectTab={(tab) => selectTab(tab)}
+                    onOpenReceipt={openReceiptModal}
+                    onNavigateVerify={() => navigateTo('/verify')}
+                    onOpenNotice={(n) => setActiveNotice(n)}
+                    onRemoveBookmark={async (itemId) => {
+                      await pustApi.removeBookmark(itemId);
+                      await onBookmarksChange();
+                    }}
+                    onAddCoAdmin={
+                      user.role === 'admin'
+                        ? () => {
+                            setPendingDirectoryAction('create-admin');
+                            selectTab('users');
+                          }
+                        : undefined
+                    }
+                    pendingFacultyRequestsCount={pendingFacultyRequestCount}
+                    onReviewFacultyRequests={
+                      user.role === 'admin' || user.role === 'chairman'
+                        ? () => {
+                            setPendingDirectorySection('faculty-requests');
+                            selectTab('users');
+                          }
+                        : undefined
+                    }
+                  />
+                  {user.role === 'student' && (
+                    <StudentDashboardSection
+                      onSelectTab={(tab) => selectTab(tab)}
+                      onOpenReceipt={openReceiptModal}
+                    />
+                  )}
+                </div>
+              )}
 
-            {resolvedTab === 'profile' &&
-              (user.role === 'teacher' ? (
-                <TeacherProfilePanel
-                  user={user}
-                  onUserChange={onUserChange}
-                  onViewDepartment={(code) =>
-                    navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
-                  }
-                />
-              ) : (
-                <PortalProfilePanel
-                  user={user}
-                  portalTabs={portalTabs}
-                  studentSelf={studentSelf}
-                  studentsCount={students.length}
-                  loadingStudents={loadingStudents}
-                  receipts={receipts}
-                  targetedNotifications={targetedNotifications}
-                  bookmarks={bookmarks}
-                  roleContexts={roleContexts}
-                  activeRoleKey={activeRoleKey}
-                  switchingRole={switchingRole}
-                  onSwitchRole={handleSwitchRole}
-                  onUserChange={onUserChange}
+              {resolvedTab === 'student-dashboard' && (
+                <StudentDashboardSection
                   onSelectTab={(tab) => selectTab(tab)}
                   onOpenReceipt={openReceiptModal}
-                  onNavigateVerify={() => navigateTo('/verify')}
-                  onRemoveBookmark={async (itemId) => {
-                    await pustApi.removeBookmark(itemId);
-                    await onBookmarksChange();
-                  }}
-                  onViewDepartment={(code) =>
-                    navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
-                  }
                 />
-              ))}
+              )}
 
-            {resolvedTab === 'students' && (
-              <PortalStudentLedgerPanel
-                user={user}
-                departments={departments}
-                students={students}
-                studentSelf={studentSelf}
-                loadingStudents={loadingStudents}
-                stuDeptFilter={stuDeptFilter}
-                stuSessionFilter={stuSessionFilter}
-                stuSearch={stuSearch}
-                onDeptFilterChange={setStuDeptFilter}
-                onSessionFilterChange={setStuSessionFilter}
-                onSearchChange={setStuSearch}
-                onReloadStudents={loadStudents}
-              />
-            )}
+              {resolvedTab === 'profile' &&
+                (user.role === 'teacher' ? (
+                  <TeacherProfilePanel
+                    user={user}
+                    onUserChange={onUserChange}
+                    onViewDepartment={(code) =>
+                      navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
+                    }
+                  />
+                ) : (
+                  <PortalProfilePanel
+                    user={user}
+                    portalTabs={portalTabs}
+                    studentSelf={studentSelf}
+                    studentsCount={students.length}
+                    loadingStudents={loadingStudents}
+                    receipts={receipts}
+                    targetedNotifications={targetedNotifications}
+                    bookmarks={bookmarks}
+                    roleContexts={roleContexts}
+                    activeRoleKey={activeRoleKey}
+                    switchingRole={switchingRole}
+                    onSwitchRole={handleSwitchRole}
+                    onUserChange={onUserChange}
+                    onSelectTab={(tab) => selectTab(tab)}
+                    onOpenReceipt={openReceiptModal}
+                    onNavigateVerify={() => navigateTo('/verify')}
+                    onRemoveBookmark={async (itemId) => {
+                      await pustApi.removeBookmark(itemId);
+                      await onBookmarksChange();
+                    }}
+                    onViewDepartment={(code) =>
+                      navigateTo(`/academics/departments/${encodeURIComponent(code.toLowerCase())}`)
+                    }
+                  />
+                ))}
 
-            {resolvedTab === 'approvals' && (
-              <ApprovalDashboardPanel
-                user={user}
-                departments={departments}
-                onOpenTab={(tab) => selectTab(tab as PortalTab)}
-              />
-            )}
+              {resolvedTab === 'students' && (
+                <PortalStudentLedgerPanel
+                  user={user}
+                  departments={departments}
+                  students={students}
+                  studentSelf={studentSelf}
+                  loadingStudents={loadingStudents}
+                  stuDeptFilter={stuDeptFilter}
+                  stuSessionFilter={stuSessionFilter}
+                  stuSearch={stuSearch}
+                  onDeptFilterChange={setStuDeptFilter}
+                  onSessionFilterChange={setStuSessionFilter}
+                  onSearchChange={setStuSearch}
+                  onReloadStudents={loadStudents}
+                />
+              )}
 
-            {resolvedTab === 'workflow' && (
-              <OfficeFlowPanel user={user} onOpenTab={(tab) => selectTab(tab as PortalTab)} />
-            )}
+              {resolvedTab === 'approvals' && (
+                <ApprovalDashboardPanel
+                  user={user}
+                  departments={departments}
+                  onOpenTab={(tab) => selectTab(tab as PortalTab)}
+                />
+              )}
 
-            {resolvedTab === 'library' && <LibraryPanel user={user} />}
-            {resolvedTab === 'halls' && <HallPanel user={user} />}
-            {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
-            {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
-            {resolvedTab === 'users' && isPortalAdmin && (
-              <AdminUserDirectoryPanel
-                currentUser={user}
-                departments={departments}
-                offices={profile?.adminOffices}
-                initialAction={pendingDirectoryAction}
-                initialSection={
-                  pendingDirectorySection === 'accounts' ||
-                  pendingDirectorySection === 'existing-profiles' ||
-                  pendingDirectorySection === 'faculty-requests'
-                    ? pendingDirectorySection
-                    : null
-                }
-                onConsumeInitialAction={() => setPendingDirectoryAction(null)}
-                onConsumeInitialSection={() => setPendingDirectorySection(null)}
-                onUsersChanged={loadStudents}
-                onCmsChange={onCmsChange}
-                onSelfUpdated={(updated) => onUserChange(updated)}
-                onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
-              />
-            )}
+              {resolvedTab === 'workflow' && (
+                <OfficeFlowPanel user={user} onOpenTab={(tab) => selectTab(tab as PortalTab)} />
+              )}
 
-            {resolvedTab === 'users' && isPortalChairman && !isPortalAdmin && (
-              <DepartmentPeoplePanel
-                currentUser={user}
-                departments={departments}
-                initialSection={
-                  pendingDirectorySection === 'teachers' ||
-                  pendingDirectorySection === 'existing-profiles' ||
-                  pendingDirectorySection === 'faculty-requests' ||
-                  pendingDirectorySection === 'students' ||
-                  pendingDirectorySection === 'activity'
-                    ? pendingDirectorySection
-                    : null
-                }
-                onConsumeInitialSection={() => setPendingDirectorySection(null)}
-                onUsersChanged={loadStudents}
-                onCmsChange={onCmsChange}
-                onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
-              />
-            )}
+              {resolvedTab === 'library' && <LibraryPanel user={user} />}
+              {resolvedTab === 'halls' && <HallPanel user={user} />}
+              {resolvedTab === 'exams' && <ExamPanel user={user} departments={departments} />}
+              {resolvedTab === 'certificates' && <CertificatePanel user={user} />}
+              {resolvedTab === 'users' && isPortalAdmin && (
+                <AdminUserDirectoryPanel
+                  currentUser={user}
+                  departments={departments}
+                  offices={profile?.adminOffices}
+                  initialAction={pendingDirectoryAction}
+                  initialSection={
+                    pendingDirectorySection === 'accounts' ||
+                    pendingDirectorySection === 'existing-profiles' ||
+                    pendingDirectorySection === 'faculty-requests'
+                      ? pendingDirectorySection
+                      : null
+                  }
+                  onConsumeInitialAction={() => setPendingDirectoryAction(null)}
+                  onConsumeInitialSection={() => setPendingDirectorySection(null)}
+                  onUsersChanged={loadStudents}
+                  onCmsChange={onCmsChange}
+                  onSelfUpdated={(updated) => onUserChange(updated)}
+                  onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
+                />
+              )}
 
-            {resolvedTab === 'audit' && user.role === 'admin' && <AdminAuditLogPanel />}
+              {resolvedTab === 'users' && isPortalChairman && !isPortalAdmin && (
+                <DepartmentPeoplePanel
+                  currentUser={user}
+                  departments={departments}
+                  initialSection={
+                    pendingDirectorySection === 'teachers' ||
+                    pendingDirectorySection === 'existing-profiles' ||
+                    pendingDirectorySection === 'faculty-requests' ||
+                    pendingDirectorySection === 'students' ||
+                    pendingDirectorySection === 'activity'
+                      ? pendingDirectorySection
+                      : null
+                  }
+                  onConsumeInitialSection={() => setPendingDirectorySection(null)}
+                  onUsersChanged={loadStudents}
+                  onCmsChange={onCmsChange}
+                  onPendingFacultyRequestsChange={setPendingFacultyRequestCount}
+                />
+              )}
 
-            {resolvedTab === 'governance' && user.role !== 'student' && (
-              <AdminCmsPanel
-                user={user}
-                departments={departments}
-                aboutSections={aboutSections}
-                vcProfiles={vcProfiles}
-                galleryItems={galleryItems}
-                bannerSlides={bannerSlides}
-                notices={notices}
-                onNoticesChange={onNoticesChange}
-                onCmsChange={onCmsChange}
-                onUserChange={onUserChange}
-              />
-            )}
-          </motion.div>
+              {resolvedTab === 'audit' && user.role === 'admin' && <AdminAuditLogPanel />}
+
+              {resolvedTab === 'governance' && user.role !== 'student' && (
+                <AdminCmsPanel
+                  user={user}
+                  departments={departments}
+                  aboutSections={aboutSections}
+                  vcProfiles={vcProfiles}
+                  galleryItems={galleryItems}
+                  bannerSlides={bannerSlides}
+                  notices={notices}
+                  onNoticesChange={onNoticesChange}
+                  onCmsChange={onCmsChange}
+                  onUserChange={onUserChange}
+                />
+              )}
+            </motion.div>
+          </div>
         </div>
       </div>
 

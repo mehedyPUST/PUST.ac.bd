@@ -943,41 +943,43 @@ export function PustShell({
                 />
               )}
             </AnimatePresence>
-            {parsedDepartmentRoute ? (
-              <DepartmentNavbar
-                departmentCode={parsedDepartmentRoute.code}
-                isPersonPage={parsedDepartmentRoute.isPersonPage}
-                activeTab={departmentTab}
-                profile={profile}
-                departments={departments}
-                user={user}
-                editMode={effectiveEditMode}
-                onToggleEditMode={toggleEditMode}
-                onOpenEditModal={openEditModal}
-                onOpenCmsDirectory={openCmsDirectory}
-                onSelectTab={setDepartmentTab}
-                onNavigate={navigateTo}
-              />
-            ) : (
-              <Navbar
-                route={route}
-                user={user}
-                profile={profile}
-                departments={departments}
-                editMode={effectiveEditMode}
-                onToggleEditMode={toggleEditMode}
-                onOpenEditModal={openEditModal}
-                onOpenCmsDirectory={openCmsDirectory}
-                onNavigate={navigateTo}
-              />
-            )}
+            {!(pathname === '/portal' && Boolean(user)) &&
+              (parsedDepartmentRoute ? (
+                <DepartmentNavbar
+                  departmentCode={parsedDepartmentRoute.code}
+                  isPersonPage={parsedDepartmentRoute.isPersonPage}
+                  activeTab={departmentTab}
+                  profile={profile}
+                  departments={departments}
+                  user={user}
+                  editMode={effectiveEditMode}
+                  onToggleEditMode={toggleEditMode}
+                  onOpenEditModal={openEditModal}
+                  onOpenCmsDirectory={openCmsDirectory}
+                  onSelectTab={setDepartmentTab}
+                  onNavigate={navigateTo}
+                />
+              ) : (
+                <Navbar
+                  route={route}
+                  user={user}
+                  profile={profile}
+                  departments={departments}
+                  editMode={effectiveEditMode}
+                  onToggleEditMode={toggleEditMode}
+                  onOpenEditModal={openEditModal}
+                  onOpenCmsDirectory={openCmsDirectory}
+                  onNavigate={navigateTo}
+                />
+              ))}
             <div className="flex-1 flex flex-col">
-              {(!parsedDepartmentRoute || parsedDepartmentRoute.isPersonPage) && <Breadcrumb />}
+              {!(pathname === '/portal' && Boolean(user)) &&
+                (!parsedDepartmentRoute || parsedDepartmentRoute.isPersonPage) && <Breadcrumb />}
               <PageReveal routeKey={getRouteSectionKey(pathname)}>
                 {children}
               </PageReveal>
             </div>
-            <Footer onNavigate={navigateTo} />
+            {!(pathname === '/portal' && Boolean(user)) && <Footer onNavigate={navigateTo} />}
           </div>
 
           <DepartmentModal
