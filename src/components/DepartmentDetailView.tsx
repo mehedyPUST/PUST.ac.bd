@@ -27,6 +27,7 @@ import {
   Search,
   Sparkles,
   Target,
+  UserPlus,
   UserRound,
   Users,
 } from 'lucide-react';
@@ -50,6 +51,7 @@ import type {
   DepartmentPersonRecord,
   DepartmentRecord,
 } from '../types/pust';
+import { AddPersonAsUserModal } from './AddPersonAsUserModal';
 import { EditTriggerButton } from './EditTriggerButton';
 import { MotionCard, MotionReveal, SubPagePanel } from './MotionPrimitives';
 import { PersonProfileModal } from './PersonProfileModal';
@@ -97,6 +99,7 @@ function PersonProfileCard({
   onViewPerson,
   onEditPerson,
   onSharePerson,
+  onAddAsUser,
 }: {
   person: DepartmentPersonRecord;
   departmentCode: string;
@@ -107,6 +110,7 @@ function PersonProfileCard({
   onViewPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
   onEditPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
   onSharePerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
+  onAddAsUser?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }) {
   const hasPersonalInfo =
     Boolean(person.qualification) ||
@@ -228,7 +232,19 @@ function PersonProfileCard({
 
       <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2.5">
         <span className="font-mono text-[11px] text-slate-500 truncate">{roleCategory}</span>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {canEdit && onAddAsUser && (
+            <button
+              type="button"
+              onClick={() => onAddAsUser(person, roleCategory)}
+              aria-label={`Add ${person.name} as site user`}
+              title="Create portal account from this profile"
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium bg-pust-900 text-white border border-pust-950 hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Add as user</span>
+            </button>
+          )}
           {canEdit && onEditPerson && (
             <EditTriggerButton
               label="Edit"
@@ -312,6 +328,10 @@ export function DepartmentDetailView({
     roleCategory: PersonRoleCategory;
   } | null>(null);
   const [shareTarget, setShareTarget] = useState<{
+    person: DepartmentPersonRecord;
+    roleCategory: PersonRoleCategory;
+  } | null>(null);
+  const [addAsUserTarget, setAddAsUserTarget] = useState<{
     person: DepartmentPersonRecord;
     roleCategory: PersonRoleCategory;
   } | null>(null);
@@ -724,7 +744,19 @@ export function DepartmentDetailView({
                           From the Chairman&apos;s Desk
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        {canAdminEdit && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAddAsUserTarget({ person: chairman, roleCategory: 'Chairman' })
+                            }
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-pust-900 text-white border border-pust-950 hover:bg-pust-950 transition-colors cursor-pointer"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            Add as user
+                          </button>
+                        )}
                         {canAdminEdit && (
                           <EditTriggerButton
                             label="Edit Chairman"
@@ -1174,6 +1206,9 @@ export function DepartmentDetailView({
                         onSharePerson={(person, roleCategory) =>
                           setShareTarget({ person, roleCategory })
                         }
+                        onAddAsUser={(person, roleCategory) =>
+                          setAddAsUserTarget({ person, roleCategory })
+                        }
                       />
                     ))}
                   </div>
@@ -1276,6 +1311,9 @@ export function DepartmentDetailView({
                   }
                   onEditPerson={handleEditPerson}
                   onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
+                  onAddAsUser={(person, roleCategory) =>
+                    setAddAsUserTarget({ person, roleCategory })
+                  }
                 />
               </div>
 
@@ -1389,6 +1427,9 @@ export function DepartmentDetailView({
                         onSharePerson={(person, roleCategory) =>
                           setShareTarget({ person, roleCategory })
                         }
+                        onAddAsUser={(person, roleCategory) =>
+                          setAddAsUserTarget({ person, roleCategory })
+                        }
                       />
                     ))}
                   </div>
@@ -1443,6 +1484,9 @@ export function DepartmentDetailView({
                         onEditPerson={handleEditPerson}
                         onSharePerson={(person, roleCategory) =>
                           setShareTarget({ person, roleCategory })
+                        }
+                        onAddAsUser={(person, roleCategory) =>
+                          setAddAsUserTarget({ person, roleCategory })
                         }
                       />
                     ))}
@@ -1512,6 +1556,9 @@ export function DepartmentDetailView({
                       onEditPerson={handleEditPerson}
                       onSharePerson={(person, roleCategory) =>
                         setShareTarget({ person, roleCategory })
+                      }
+                      onAddAsUser={(person, roleCategory) =>
+                        setAddAsUserTarget({ person, roleCategory })
                       }
                     />
                   ))}
@@ -2028,6 +2075,10 @@ export function DepartmentDetailView({
           canEdit={canAdminEdit}
           onEditPerson={handleEditPerson}
           onSharePerson={(person, roleCategory) => setShareTarget({ person, roleCategory })}
+          onAddAsUser={(person, roleCategory) => {
+            setProfileModalTarget(null);
+            setAddAsUserTarget({ person, roleCategory });
+          }}
         />
       )}
 
@@ -2038,6 +2089,16 @@ export function DepartmentDetailView({
           person={shareTarget.person}
           department={department}
           roleCategory={shareTarget.roleCategory}
+        />
+      )}
+
+      {addAsUserTarget && (
+        <AddPersonAsUserModal
+          open={true}
+          onClose={() => setAddAsUserTarget(null)}
+          person={addAsUserTarget.person}
+          department={department}
+          roleCategory={addAsUserTarget.roleCategory}
         />
       )}
     </main>

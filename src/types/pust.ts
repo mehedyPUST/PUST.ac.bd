@@ -14,14 +14,32 @@ export type UserRole =
   | 'student'
   | 'proctor'
   | 'library'
-  | 'hall';
+  | 'hall'
+  | 'dean'
+  | 'advisor';
 
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+
+/** Scoped extra appointment on top of the primary portal role (usually teacher). */
+export interface RoleAssignment {
+  id: string;
+  role: UserRole;
+  /** Where this appointment applies */
+  scopeType: 'department' | 'faculty' | 'hall' | 'university' | 'office';
+  /** e.g. CSE, Faculty of Science, July 06 Hall */
+  scopeCode?: string;
+  scopeName?: string;
+  /** Display title e.g. Hall Provost, Student Advisor, Dean */
+  title?: string;
+  assignedAt: string;
+  assignedBy?: string;
+}
 
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  /** Primary portal role (prefer teacher for faculty; extra appointments go in additionalRoles). */
   role: UserRole;
   approvalStatus: ApprovalStatus;
   departmentCode: string;
@@ -36,6 +54,8 @@ export interface AuthUser {
   claimedDepartmentCode?: string;
   claimedFacultyMemberId?: string;
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
+  /** Extra appointments: hall provost, other-dept chairman, proctor, dean, advisor, etc. */
+  additionalRoles?: RoleAssignment[];
   mustChangePassword?: boolean;
   createdAt: string;
 }
@@ -59,6 +79,7 @@ export interface AdminCreateUserPayload {
   claimedDepartmentCode?: string;
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer';
   mustChangePassword?: boolean;
+  additionalRoles?: RoleAssignment[];
 }
 
 export interface AdminUpdateUserPayload {
@@ -78,6 +99,15 @@ export interface AdminUpdateUserPayload {
   claimedFacultyMemberId?: string | null;
   claimedDepartmentCode?: string | null;
   claimedFacultyGroup?: 'faculty' | 'contractual' | 'officer' | null;
+  additionalRoles?: RoleAssignment[] | null;
+}
+
+export interface AdminAssignRolePayload {
+  role: UserRole;
+  scopeType: RoleAssignment['scopeType'];
+  scopeCode?: string;
+  scopeName?: string;
+  title?: string;
 }
 
 export interface SignupTokenRecord {

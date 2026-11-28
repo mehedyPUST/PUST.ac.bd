@@ -100,7 +100,17 @@ const userRoleEnum = z.enum([
   'proctor',
   'library',
   'hall',
+  'dean',
+  'advisor',
 ]);
+
+const assignRoleSchema = z.object({
+  role: userRoleEnum,
+  scopeType: z.enum(['department', 'faculty', 'hall', 'university', 'office']),
+  scopeCode: z.string().trim().max(80).optional(),
+  scopeName: z.string().trim().max(120).optional(),
+  title: z.string().trim().max(80).optional(),
+});
 
 const adminCreateUserSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -1289,14 +1299,37 @@ portalRouter.post(
       const officerMatch = (deptRecord.officers || []).find(
         (m) => m.id === data.claimedFacultyMemberId
       );
-      if (!regularMatch && !contractualMatch && !officerMatch) {
+      const chairmanMatch =
+        deptRecord.chairmanProfile &&
+        (deptRecord.chairmanProfile.id === data.claimedFacultyMemberId ||
+          data.claimedFacultyMemberId === `${deptRecord.id}-chair`)
+          ? deptRecord.chairmanProfile
+          : null;
+      // Synthetic chairman id used by the public department UI when chairmanProfile is absent
+      const syntheticChairId = `${deptRecord.id}-chair`;
+      const acceptsSyntheticChair =
+        !deptRecord.chairmanProfile &&
+        data.claimedFacultyMemberId === syntheticChairId &&
+        Boolean(deptRecord.chairmanName);
+
+      if (
+        !regularMatch &&
+        !contractualMatch &&
+        !officerMatch &&
+        !chairmanMatch &&
+        !acceptsSyntheticChair
+      ) {
         res.status(404).json({
           error: 'Selected directory profile was not found in that department.',
         });
         return;
       }
 
-      if ((regularMatch || contractualMatch) && data.role !== 'teacher' && data.role !== 'chairman') {
+      if (
+        (regularMatch || contractualMatch || chairmanMatch || acceptsSyntheticChair) &&
+        data.role !== 'teacher' &&
+        data.role !== 'chairman'
+      ) {
         res.status(400).json({
           error: 'Faculty profiles must be linked to a Faculty / Teacher or Department Chairman account.',
         });
@@ -1316,10 +1349,16 @@ portalRouter.post(
         return;
       }
 
+      // Prefer the real chairmanProfile.id when the client sent the synthetic chair id
+      const resolvedClaimMemberId =
+        chairmanMatch && data.claimedFacultyMemberId === syntheticChairId
+          ? chairmanMatch.id
+          : data.claimedFacultyMemberId;
+
       linkedClaimPatch = {
-        claimedFacultyMemberId: data.claimedFacultyMemberId,
+        claimedFacultyMemberId: resolvedClaimMemberId,
         claimedDepartmentCode: effectiveDeptCode,
-        claimedFacultyGroup: regularMatch
+        claimedFacultyGroup: regularMatch || chairmanMatch || acceptsSyntheticChair
           ? 'faculty'
           : contractualMatch
           ? 'contractual'
@@ -1705,6 +1744,119 @@ portalRouter.patch(
       }
     );
     res.json({ updated: true });
+  }
+);
+
+/** Assign an additional scoped role (hall provost, other-dept chairman, proctor, dean, advisor, …). */
+portalRouter.post(
+  '/users/:id/roles',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const parsed = assignRoleSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid role assignment payload.' });
+      return;
+    }
+    const target = await pustRepo.findUserById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    if (target.role === 'admin' || target.role === 'student') {
+      res.status(400).json({
+        error: 'Additional roles can only be assigned to faculty/officer accounts (not admin or student).',
+      });
+      return;
+    }
+    if (parsed.data.role === 'admin' || parsed.data.role === 'student') {
+      res.status(400).json({ error: 'Cannot assign admin or student as an additional role.' });
+      return;
+    }
+
+    const data = parsed.data;
+    const existing = Array.isArray(target.additionalRoles) ? [...target.additionalRoles] : [];
+    const duplicate = existing.find(
+      (a) =>
+        a.role === data.role &&
+        (a.scopeCode || '').toUpperCase() === (data.scopeCode || '').toUpperCase() &&
+        a.scopeType === data.scopeType
+    );
+    if (duplicate) {
+      res.status(409).json({
+        error: `This account already has ${data.role} for ${data.scopeName || data.scopeCode || data.scopeType}.`,
+      });
+      return;
+    }
+
+    const assignment = {
+      id: `role-${crypto.randomUUID()}`,
+      role: data.role,
+      scopeType: data.scopeType,
+      ...(data.scopeCode?.trim() ? { scopeCode: data.scopeCode.trim() } : {}),
+      ...(data.scopeName?.trim() ? { scopeName: data.scopeName.trim() } : {}),
+      ...(data.title?.trim() ? { title: data.title.trim() } : {}),
+      assignedAt: new Date().toISOString(),
+      assignedBy: req.authUser!.email,
+    };
+    const nextRoles = [...existing, assignment];
+    const updated = await pustRepo.updateUser(target.id, { additionalRoles: nextRoles });
+    if (!updated) {
+      res.status(500).json({ error: 'Unable to assign role.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Assigned additional role',
+      `${updated.name} → ${assignment.title || assignment.role} (${assignment.scopeName || assignment.scopeCode || assignment.scopeType})`,
+      {
+        category: 'Privilege & Security',
+        severity: 'elevated',
+        actorEmail: req.authUser!.email,
+        details: `Primary role remains ${updated.role}. Additional roles: ${nextRoles.map((r) => r.role).join(', ')}.`,
+      }
+    );
+    res.status(201).json({ user: updated, assignment });
+  }
+);
+
+portalRouter.delete(
+  '/users/:id/roles/:assignmentId',
+  requireRoles('admin'),
+  async (req: AuthenticatedRequest, res) => {
+    const target = await pustRepo.findUserById(String(req.params.id));
+    if (!target) {
+      res.status(404).json({ error: 'Account not found.' });
+      return;
+    }
+    const assignmentId = String(req.params.assignmentId);
+    const existing = Array.isArray(target.additionalRoles) ? target.additionalRoles : [];
+    const found = existing.find((a) => a.id === assignmentId);
+    if (!found) {
+      res.status(404).json({ error: 'Role assignment not found.' });
+      return;
+    }
+    const nextRoles = existing.filter((a) => a.id !== assignmentId);
+    const updated = await pustRepo.updateUser(target.id, {
+      additionalRoles: nextRoles.length > 0 ? nextRoles : [],
+    });
+    if (!updated) {
+      res.status(500).json({ error: 'Unable to remove role assignment.' });
+      return;
+    }
+    await pustRepo.logAudit(
+      req.authUser!.name,
+      req.authUser!.role,
+      'Removed additional role',
+      `${updated.name} ← ${found.title || found.role}`,
+      {
+        category: 'Privilege & Security',
+        severity: 'elevated',
+        actorEmail: req.authUser!.email,
+        details: `Removed ${found.role} (${found.scopeName || found.scopeCode || found.scopeType}).`,
+      }
+    );
+    res.json({ user: updated, removed: true });
   }
 );
 

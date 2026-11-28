@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import type { ApprovalStatus, AuthUser, UserRole } from '../src/types/pust';
+import type { ApprovalStatus, AuthUser, RoleAssignment, UserRole } from '../src/types/pust';
 
 export const AUTH_COOKIE_NAME = 'pust_token';
 
@@ -30,6 +30,17 @@ export interface JwtClaims {
   designation?: string;
   assignedCourses?: string[];
   assignedSessions?: string[];
+  additionalRoles?: RoleAssignment[];
+}
+
+/** True if primary role or any additional appointment matches. */
+export function claimsHaveRole(
+  user: { role: UserRole; additionalRoles?: RoleAssignment[] } | null | undefined,
+  ...allowed: UserRole[]
+): boolean {
+  if (!user) return false;
+  if (allowed.includes(user.role)) return true;
+  return (user.additionalRoles || []).some((a) => allowed.includes(a.role));
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -76,6 +87,9 @@ export function signAuthToken(user: AuthUser): string {
     ...(user.designation ? { designation: user.designation } : {}),
     ...(user.assignedCourses ? { assignedCourses: user.assignedCourses } : {}),
     ...(user.assignedSessions ? { assignedSessions: user.assignedSessions } : {}),
+    ...(user.additionalRoles && user.additionalRoles.length > 0
+      ? { additionalRoles: user.additionalRoles }
+      : {}),
   };
   return jwt.sign(claims, getJwtSecret(), {
     algorithm: 'HS256',
@@ -252,6 +266,9 @@ export function requireAuth(
         ...(liveUser.designation ? { designation: liveUser.designation } : {}),
         ...(liveUser.assignedCourses ? { assignedCourses: liveUser.assignedCourses } : {}),
         ...(liveUser.assignedSessions ? { assignedSessions: liveUser.assignedSessions } : {}),
+        ...(liveUser.additionalRoles && liveUser.additionalRoles.length > 0
+          ? { additionalRoles: liveUser.additionalRoles }
+          : {}),
       };
       next();
     })
@@ -261,7 +278,7 @@ export function requireAuth(
 export function requireRoles(...allowed: UserRole[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     requireAuth(req, res, () => {
-      if (!req.authUser || !allowed.includes(req.authUser.role)) {
+      if (!req.authUser || !claimsHaveRole(req.authUser, ...allowed)) {
         res.status(403).json({
           error: `Restricted to authorized roles (${allowed.join(', ')})`,
         });

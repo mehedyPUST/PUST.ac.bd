@@ -13,6 +13,7 @@ import {
   Pencil,
   Phone,
   QrCode,
+  UserPlus,
   X,
 } from 'lucide-react';
 import {
@@ -37,6 +38,7 @@ interface PersonProfileModalProps {
   canEdit?: boolean;
   onEditPerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
   onSharePerson?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
+  onAddAsUser?: (person: DepartmentPersonRecord, roleCategory: PersonRoleCategory) => void;
 }
 
 export function PersonProfileModal({
@@ -49,6 +51,7 @@ export function PersonProfileModal({
   canEdit = false,
   onEditPerson,
   onSharePerson,
+  onAddAsUser,
 }: PersonProfileModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -323,6 +326,18 @@ export function PersonProfileModal({
           </Link>
 
           <div className="flex flex-wrap items-center gap-2">
+            {canEdit && onAddAsUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  onAddAsUser(person, roleCategory);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-pust-950 bg-pust-900 text-white hover:bg-pust-950 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Add as site user
+              </button>
+            )}
             {canEdit && onEditPerson && (
               <button
                 type="button"

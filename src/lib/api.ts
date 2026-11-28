@@ -1,9 +1,11 @@
 import type {
   AboutContentRecord,
+  AdminAssignRolePayload,
   AdminCreateUserPayload,
   AdminUpdateUserPayload,
   AuditLogRecord,
   AuthUser,
+  RoleAssignment,
   AutomationOverviewResponse,
   AutomationRulesConfig,
   AutomationSweepReport,
@@ -315,6 +317,21 @@ export const pustApi = {
       method: 'PATCH',
       body: JSON.stringify({ assignedCourses, assignedSessions }),
     }),
+
+  assignAdditionalRole: (id: string, payload: AdminAssignRolePayload) =>
+    apiFetch<{ user: AuthUser; assignment: RoleAssignment }>(
+      `/api/portal/users/${encodeURIComponent(id)}/roles`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    ),
+
+  removeAdditionalRole: (id: string, assignmentId: string) =>
+    apiFetch<{ user: AuthUser; removed: boolean }>(
+      `/api/portal/users/${encodeURIComponent(id)}/roles/${encodeURIComponent(assignmentId)}`,
+      { method: 'DELETE' }
+    ),
 
   getSignupTokens: () => apiFetch<{ tokens: SignupTokenRecord[] }>('/api/portal/signup-tokens'),
 

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Award, BookOpen, Building2, Mail, Phone, UserRound } from 'lucide-react';
+import { Award, BookOpen, Building2, Mail, Phone, UserPlus, UserRound } from 'lucide-react';
 import { isSafeMediaUrl } from '../lib/media';
 import { sanitizeTelHref, type PersonRoleCategory } from '../lib/departmentPeople';
 import type { DepartmentPersonRecord, DepartmentRecord } from '../types/pust';
+import { AddPersonAsUserModal } from './AddPersonAsUserModal';
+import { usePust } from './PustContext';
 
 function getInitials(name: string): string {
   const cleaned = (name || '')
@@ -79,11 +81,16 @@ export function PersonProfileView({
   department: DepartmentRecord;
   roleCategory: PersonRoleCategory;
 }) {
+  const { user, editMode } = usePust();
+  const canAdminEdit = Boolean(user?.role === 'admin' && editMode);
+  const [addAsUserOpen, setAddAsUserOpen] = useState(false);
+
   return (
+    <>
     <div className="bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center gap-5 pb-6 border-b border-stone-200">
         <PersonThumbnail person={person} roleCategory={roleCategory} size="lg" />
-        <div className="min-w-0 space-y-1.5">
+        <div className="min-w-0 space-y-1.5 flex-1">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-pust-800">
             {department.name} ({department.code}) · {roleCategory}
           </p>
@@ -95,6 +102,16 @@ export function PersonProfileView({
             <p className="text-xs text-slate-600">{person.qualification}</p>
           )}
         </div>
+        {canAdminEdit && (
+          <button
+            type="button"
+            onClick={() => setAddAsUserOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-pust-900 text-white border border-pust-950 hover:bg-pust-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer self-start sm:self-center"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            Add as site user
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
@@ -172,5 +189,16 @@ export function PersonProfileView({
         </div>
       )}
     </div>
+
+    {addAsUserOpen && (
+      <AddPersonAsUserModal
+        open={true}
+        onClose={() => setAddAsUserOpen(false)}
+        person={person}
+        department={department}
+        roleCategory={roleCategory}
+      />
+    )}
+    </>
   );
 }
