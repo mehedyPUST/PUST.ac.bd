@@ -589,8 +589,8 @@ export function PortalView({
               disabled={isLocked}
               title={collapsed ? tab.label : undefined}
               onClick={() => selectTab(tab.id)}
-              className={`w-full flex items-center gap-2.5 rounded-xl text-[13px] transition-colors text-left ${
-                collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
+              className={`w-full flex items-center gap-2.5 rounded-lg text-[13px] transition-colors text-left ${
+                collapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'
               } ${
                 isActive
                   ? 'bg-[#EAF8F0] dark:bg-emerald-950/50 border border-[#BCE5CE] dark:border-emerald-800/70 text-[#0F7D42] dark:text-emerald-300 font-semibold cursor-pointer'
@@ -621,17 +621,17 @@ export function PortalView({
   function renderSidebarFooter(collapsed: boolean) {
     if (!user) return null;
     return (
-      <div className="shrink-0 p-2.5 border-t border-slate-100 dark:border-slate-800 space-y-2">
+      <div className="shrink-0 p-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
         {/* User Profile Card */}
         <div
-          className={`rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 ${
+          className={`rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 ${
             collapsed ? 'flex justify-center' : 'space-y-2'
           }`}
         >
           <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
             <span
               title={`${user.name} (${ROLE_LABELS[user.role]})`}
-              className="w-9 h-9 rounded-full bg-pust-800 text-white font-semibold text-xs flex items-center justify-center shrink-0"
+              className="w-8 h-8 rounded-full bg-pust-800 text-white font-semibold text-xs flex items-center justify-center shrink-0"
             >
               {getInitials(user.name)}
             </span>
@@ -670,7 +670,7 @@ export function PortalView({
           aria-label="Toggle portal dark mode"
           title={collapsed ? (portalDark ? 'Switch to light mode' : 'Switch to dark mode') : undefined}
           onClick={togglePortalDark}
-          className={`w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 flex items-center ${
+          className={`w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 flex items-center ${
             collapsed ? 'justify-center' : 'justify-between'
           } gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer`}
         >
@@ -699,7 +699,7 @@ export function PortalView({
           type="button"
           title={collapsed ? 'Sign Out' : undefined}
           onClick={handleLogout}
-          className="w-full rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/40 dark:bg-red-950/25 hover:bg-red-50 dark:hover:bg-red-950/45 px-3 py-2 flex items-center justify-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors cursor-pointer whitespace-nowrap"
+          className="w-full rounded-lg border border-red-200 dark:border-red-900/60 bg-red-50/40 dark:bg-red-950/25 hover:bg-red-50 dark:hover:bg-red-950/45 px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors cursor-pointer whitespace-nowrap"
         >
           <LogOut className="w-3.5 h-3.5 shrink-0" />
           {!collapsed && <span>Sign Out</span>}
@@ -715,22 +715,22 @@ export function PortalView({
         portalDark ? 'dark' : ''
       }`}
     >
-      <div className="max-w-[1600px] mx-auto px-3 sm:px-5 py-3 sm:py-4 min-h-screen flex flex-col lg:flex-row gap-4 items-stretch">
+      <div className="max-w-[1600px] mx-auto px-2.5 sm:px-3.5 pb-2.5 min-h-screen flex flex-col lg:flex-row gap-2.5 items-stretch">
         {/* Left Sidebar Column (Desktop — Sticky Grid 1 & Grid 3) */}
         <div
-          className={`hidden lg:flex flex-col gap-3.5 shrink-0 transition-all duration-200 lg:sticky lg:top-4 lg:self-start lg:h-[calc(100vh-2rem)] ${
-            sidebarCollapsed ? 'w-[82px]' : 'w-[258px]'
+          className={`hidden lg:flex flex-col gap-2.5 shrink-0 transition-all duration-200 lg:sticky lg:top-0 lg:pt-2.5 lg:pb-2.5 lg:self-start lg:h-screen ${
+            sidebarCollapsed ? 'w-[78px]' : 'w-[252px]'
           }`}
         >
           {/* Grid 1: Floating Brand Card */}
           <div
             data-portal-grid="user-dashboard"
-            className={`shrink-0 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-2.5 h-[62px] flex items-center ${
-              sidebarCollapsed ? 'justify-center' : 'gap-3'
+            className={`shrink-0 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2 h-[58px] flex items-center ${
+              sidebarCollapsed ? 'justify-center' : 'gap-2.5'
             }`}
           >
-            <div className="w-9 h-9 rounded-xl bg-pust-50 dark:bg-pust-950/60 border border-pust-200/80 dark:border-pust-800/60 flex items-center justify-center shrink-0">
-              <PustCrest variant="primary" size={28} />
+            <div className="w-8 h-8 rounded-md bg-pust-50 dark:bg-pust-950/60 border border-pust-200/80 dark:border-pust-800/60 flex items-center justify-center shrink-0">
+              <PustCrest variant="primary" size={24} />
             </div>
             {!sidebarCollapsed && (
               <div className="min-w-0">
@@ -748,7 +748,7 @@ export function PortalView({
           <aside
             data-portal-grid="sidebar-links"
             aria-label="Portal workspace navigation"
-            className="relative flex-1 min-h-0 flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+            className="relative flex-1 min-h-0 flex flex-col rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
           >
             {/* Floating Collapse Edge Toggle */}
             <button
@@ -832,19 +832,20 @@ export function PortalView({
         </AnimatePresence>
 
         {/* Right Workspace Column */}
-        <div className="flex-1 min-w-0 flex flex-col gap-4">
-          {/* Grid 2: Top Bar Card (Sticky aligned with Grid 1) */}
-          <header
-            data-portal-grid="university-name"
-            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 sm:px-5 py-2.5 min-h-[62px] flex items-center justify-between gap-3 sticky top-3 lg:top-4 z-30"
-          >
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Grid 2: Sticky Navbar Wrapper with Opaque Top Backdrop Mask */}
+          <div className="sticky top-0 z-30 pt-2.5 pb-2.5 bg-[#F4F7F6] dark:bg-slate-950">
+            <header
+              data-portal-grid="university-name"
+              className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 sm:px-4 py-2 min-h-[58px] flex items-center justify-between gap-2.5"
+            >
             {/* Left: Mobile Trigger + Breadcrumb */}
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label="Open portal navigation menu"
-                className="lg:hidden h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer shrink-0"
+                className="lg:hidden h-8.5 w-8.5 inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer shrink-0"
               >
                 <Menu className="w-4 h-4" />
               </button>
@@ -861,11 +862,11 @@ export function PortalView({
             </div>
 
             {/* Right: Utility Action Controls */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={onBackToSite}
-                className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                className="h-8.5 inline-flex items-center gap-1.5 px-2.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Home className="w-3.5 h-3.5 text-slate-500 dark:text-slate-300" />
                 <span>Home</span>
@@ -891,7 +892,7 @@ export function PortalView({
                   onClick={() => setNotificationsOpen((v) => !v)}
                   aria-label="Toggle targeted circulars"
                   aria-expanded={notificationsOpen}
-                  className="relative h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                  className="relative h-8.5 w-8.5 inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                 >
                   <Bell className="w-4 h-4" />
                   {targetedNotifications.length > 0 && (
@@ -902,7 +903,7 @@ export function PortalView({
                 </button>
 
                 {notificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg z-40 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg z-40 overflow-hidden">
                     <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                       <p className="text-xs font-bold text-slate-900 dark:text-white">
                         Targeted Circulars
@@ -953,7 +954,7 @@ export function PortalView({
                   <button
                     type="button"
                     onClick={openCmsDirectory}
-                    className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="h-8.5 inline-flex items-center gap-1.5 px-2.5 rounded-md border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     <LayoutGrid className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">CMS Directory</span>
@@ -963,7 +964,7 @@ export function PortalView({
                 <button
                   type="button"
                   onClick={() => navigateTo('/verify')}
-                  className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="h-8.5 inline-flex items-center gap-1.5 px-2.5 rounded-md border border-emerald-300 dark:border-emerald-700 bg-[#EAF8F0] dark:bg-emerald-950/50 text-xs font-semibold text-[#0F7D42] dark:text-emerald-300 hover:bg-[#DCF4E6] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Verify Registry</span>
@@ -974,7 +975,7 @@ export function PortalView({
                 type="button"
                 onClick={togglePortalDark}
                 aria-label={portalDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                className="h-8.5 w-8.5 inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
               >
                 {portalDark ? (
                   <Sun className="w-4 h-4 text-amber-500" />
@@ -988,21 +989,22 @@ export function PortalView({
                 onClick={() => void handleRefreshWorkspace()}
                 disabled={refreshingWorkspace}
                 aria-label="Refresh portal data"
-                className="h-9 w-9 inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0 disabled:opacity-60"
+                className="h-8.5 w-8.5 inline-flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0 disabled:opacity-60"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${refreshingWorkspace ? 'animate-spin' : ''}`}
                 />
               </button>
             </div>
-          </header>
+            </header>
+          </div>
 
-          {/* Main Workspace Canvas */}
-          <div data-portal-grid="main-contents" className="flex-1 min-w-0 space-y-4">
+          {/* Grid 4: Main Workspace Canvas */}
+          <div data-portal-grid="main-contents" className="flex-1 min-w-0 space-y-2.5">
             {(logoutError || roleSwitchError) && (
               <div
                 role="alert"
-                className="p-3.5 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-xs text-red-900 dark:text-red-200"
+                className="p-3 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-xs text-red-900 dark:text-red-200"
               >
                 {roleSwitchError || logoutError}
               </div>
@@ -1015,7 +1017,7 @@ export function PortalView({
               transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
             >
               {resolvedTab === 'overview' && (
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   <PortalOverviewPanel
                     user={user}
                     portalTabs={portalTabs}

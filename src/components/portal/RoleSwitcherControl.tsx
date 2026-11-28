@@ -63,7 +63,7 @@ export function RoleSwitcherControl({
           disabled={disabled || switching}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-left transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-left transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className="flex items-center gap-2 min-w-0">
             {switching ? (
@@ -91,7 +91,7 @@ export function RoleSwitcherControl({
           <div
             role="listbox"
             aria-label="Available portal roles"
-            className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1 space-y-1 shadow-sm"
+            className="rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-1 space-y-1 shadow-sm"
           >
             {contexts.map((ctx) => {
               const isSelected = ctx.key === active.key;
@@ -141,7 +141,7 @@ export function RoleSwitcherControl({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="h-9 inline-flex items-center gap-1.5 px-3 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        className="h-9 inline-flex items-center gap-1.5 px-3 rounded-md text-xs font-semibold border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {switching ? (
           <RefreshCw className="w-3.5 h-3.5 animate-spin text-pust-700 dark:text-pust-300" />
@@ -175,7 +175,7 @@ export function RoleSwitcherControl({
                 aria-selected={isSelected}
                 disabled={switching || disabled}
                 onClick={() => handleSelect(ctx.key)}
-                className={`w-full flex items-center justify-between gap-2.5 px-2.5 py-2 rounded-xl text-left transition-colors cursor-pointer ${
+                className={`w-full flex items-center justify-between gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors cursor-pointer ${
                   isSelected
                     ? 'bg-[#EAF8F0] dark:bg-emerald-950/60 text-[#0F7D42] dark:text-emerald-300 border border-[#BCE5CE] dark:border-emerald-800'
                     : 'text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'

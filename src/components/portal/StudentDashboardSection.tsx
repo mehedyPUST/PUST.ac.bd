@@ -220,10 +220,10 @@ export function StudentDashboardSection({
     <section
       id="student-dashboard-section"
       aria-labelledby="student-dashboard-heading"
-      className="space-y-6"
+      className="space-y-2.5"
     >
       {/* Top Overview Bar */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-5 sm:p-6 space-y-5">
+      <div className="bg-white rounded-lg border border-stone-200 p-5 sm:p-6 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 pb-4">
           <div className="space-y-1 min-w-0">
             <p className="font-mono text-[11px] uppercase tracking-wider text-pust-800 font-semibold text-left">
@@ -429,11 +429,11 @@ export function StudentDashboardSection({
       </div>
 
       {/* Responsive Grid Layout: Academic Progress + Finance (Row 1), Schedule (Row 2) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-2.5 items-start">
         {/* Card 1: Academic Progress */}
         <article
           aria-labelledby="card-academic-progress"
-          className="xl:col-span-7 bg-white rounded-2xl border border-stone-200 overflow-hidden"
+          className="xl:col-span-7 bg-white rounded-lg border border-stone-200 overflow-hidden"
         >
           <div className="px-5 sm:px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start sm:items-center gap-3 min-w-0">
@@ -687,7 +687,7 @@ export function StudentDashboardSection({
         {/* Card 2: Finance */}
         <article
           aria-labelledby="card-student-finance"
-          className="xl:col-span-5 bg-white rounded-2xl border border-stone-200 overflow-hidden"
+          className="xl:col-span-5 bg-white rounded-lg border border-stone-200 overflow-hidden"
         >
           <div className="px-5 sm:px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start sm:items-center gap-3 min-w-0">
@@ -959,7 +959,7 @@ export function StudentDashboardSection({
         {/* Card 3: Course History */}
         <article
           aria-labelledby="card-course-history"
-          className="xl:col-span-12 bg-white rounded-2xl border border-stone-200 overflow-hidden"
+          className="xl:col-span-12 bg-white rounded-lg border border-stone-200 overflow-hidden"
         >
           <div className="px-5 sm:px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="flex items-start sm:items-center gap-3">
@@ -1243,7 +1243,7 @@ export function StudentDashboardSection({
         {/* Card 4: Schedule */}
         <article
           aria-labelledby="card-student-schedule"
-          className="xl:col-span-12 bg-white rounded-2xl border border-stone-200 overflow-hidden"
+          className="xl:col-span-12 bg-white rounded-lg border border-stone-200 overflow-hidden"
         >
           <div className="px-5 sm:px-6 py-4 bg-[#FAF9F6] border-b border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="flex items-start sm:items-center gap-3">

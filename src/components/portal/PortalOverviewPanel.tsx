@@ -95,11 +95,11 @@ export function PortalOverviewPanel({
   const bookmarkRatioPct = Math.min(100, Math.round((bookmarks.length / 8) * 100));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
       {/* Band 1: Active Cycle & Institutional Banner Card */}
       <section
         aria-label="Workspace summary banner"
-        className="rounded-2xl border border-emerald-500/35 dark:border-emerald-700/50 bg-white dark:bg-slate-900 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+        className="rounded-lg border border-emerald-500/35 dark:border-emerald-700/50 bg-white dark:bg-slate-900 px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
       >
         <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-600 dark:text-slate-400">
@@ -142,7 +142,7 @@ export function PortalOverviewPanel({
             <button
               type="button"
               onClick={onAddCoAdmin}
-              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-pust-800 text-xs font-semibold text-white hover:bg-pust-900 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-md bg-pust-800 text-xs font-semibold text-white hover:bg-pust-900 transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <ShieldPlus className="w-3.5 h-3.5" />
               <span>Add Co-Admin</span>
@@ -151,7 +151,7 @@ export function PortalOverviewPanel({
           <button
             type="button"
             onClick={onNavigateVerify}
-            className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-pust-700 hover:text-pust-800 dark:hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            className="h-9 inline-flex items-center gap-1.5 px-3.5 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-100 hover:border-pust-700 hover:text-pust-800 dark:hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Verify Documents</span>
@@ -161,7 +161,7 @@ export function PortalOverviewPanel({
 
       {/* Multi-Role Switcher Strip (if user holds multiple university appointments) */}
       {roleContexts.length > 1 && onSwitchRole && (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200 shrink-0">
             <ArrowLeftRight className="w-3.5 h-3.5 text-pust-700 dark:text-pust-300" />
             <span>Active Appointments ({roleContexts.length})</span>
@@ -175,7 +175,7 @@ export function PortalOverviewPanel({
                   type="button"
                   disabled={switchingRole || isActive}
                   onClick={() => onSwitchRole(ctx.key)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'bg-pust-800 border-pust-800 text-white cursor-default'
                       : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-pust-700 hover:text-pust-800 cursor-pointer disabled:opacity-60'
@@ -198,16 +198,16 @@ export function PortalOverviewPanel({
       )}
 
       {/* Band 2: 4 Semantic KPI Stat Cards */}
-      <dl className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <dl className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
         {user.role === 'student' && studentSelf ? (
           <>
             {/* Card 1: Emerald */}
-            <div className="rounded-2xl border border-[#BCE5CE] dark:border-emerald-800/60 bg-[#F1FAF5] dark:bg-emerald-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#BCE5CE] dark:border-emerald-800/60 bg-[#F1FAF5] dark:bg-emerald-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Cumulative CGPA
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#0FA958] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#0FA958] text-white flex items-center justify-center shrink-0">
                   <GraduationCap className="w-4 h-4" />
                 </span>
               </div>
@@ -222,12 +222,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 2: Blue */}
-            <div className="rounded-2xl border border-[#C7DCFF] dark:border-blue-800/60 bg-[#F3F7FF] dark:bg-blue-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#C7DCFF] dark:border-blue-800/60 bg-[#F3F7FF] dark:bg-blue-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Current Semester
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#1B5FF0] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#1B5FF0] text-white flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4" />
                 </span>
               </div>
@@ -242,12 +242,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 3: Amber */}
-            <div className="rounded-2xl border border-[#FBE0B8] dark:border-amber-800/60 bg-[#FFF8EF] dark:bg-amber-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#FBE0B8] dark:border-amber-800/60 bg-[#FFF8EF] dark:bg-amber-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Settled Payments
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#EE6812] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#EE6812] text-white flex items-center justify-center shrink-0">
                   <Receipt className="w-4 h-4" />
                 </span>
               </div>
@@ -262,12 +262,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 4: PUST Maroon */}
-            <div className="rounded-2xl border border-[#EED0D2] dark:border-pust-800/60 bg-[#FDF4F5] dark:bg-pust-950/35 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#EED0D2] dark:border-pust-800/60 bg-[#FDF4F5] dark:bg-pust-950/35 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Conduct Standing
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-pust-700 text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-pust-700 text-white flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
               </div>
@@ -284,12 +284,12 @@ export function PortalOverviewPanel({
         ) : (
           <>
             {/* Card 1: Emerald */}
-            <div className="rounded-2xl border border-[#BCE5CE] dark:border-emerald-800/60 bg-[#F1FAF5] dark:bg-emerald-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#BCE5CE] dark:border-emerald-800/60 bg-[#F1FAF5] dark:bg-emerald-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Visible Student Records
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#0FA958] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#0FA958] text-white flex items-center justify-center shrink-0">
                   <Users className="w-4 h-4" />
                 </span>
               </div>
@@ -304,12 +304,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 2: Blue */}
-            <div className="rounded-2xl border border-[#C7DCFF] dark:border-blue-800/60 bg-[#F3F7FF] dark:bg-blue-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#C7DCFF] dark:border-blue-800/60 bg-[#F3F7FF] dark:bg-blue-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Targeted Circulars
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#1B5FF0] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#1B5FF0] text-white flex items-center justify-center shrink-0">
                   <Bell className="w-4 h-4" />
                 </span>
               </div>
@@ -324,12 +324,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 3: Amber */}
-            <div className="rounded-2xl border border-[#FBE0B8] dark:border-amber-800/60 bg-[#FFF8EF] dark:bg-amber-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#FBE0B8] dark:border-amber-800/60 bg-[#FFF8EF] dark:bg-amber-950/30 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Assigned Unit
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-[#EE6812] text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-[#EE6812] text-white flex items-center justify-center shrink-0">
                   <Building2 className="w-4 h-4" />
                 </span>
               </div>
@@ -344,12 +344,12 @@ export function PortalOverviewPanel({
             </div>
 
             {/* Card 4: PUST Maroon */}
-            <div className="rounded-2xl border border-[#EED0D2] dark:border-pust-800/60 bg-[#FDF4F5] dark:bg-pust-950/35 p-4 sm:p-5 flex flex-col justify-between gap-3">
+            <div className="rounded-lg border border-[#EED0D2] dark:border-pust-800/60 bg-[#FDF4F5] dark:bg-pust-950/35 p-4 sm:p-5 flex flex-col justify-between gap-3">
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Workspace Modules
                 </dt>
-                <span className="w-9 h-9 rounded-xl bg-pust-700 text-white flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-md bg-pust-700 text-white flex items-center justify-center shrink-0">
                   <LayoutGrid className="w-4 h-4" />
                 </span>
               </div>
@@ -367,7 +367,7 @@ export function PortalOverviewPanel({
       </dl>
 
       {/* Band 3: Unified 4-Cell Operational Summary Strip */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-800 overflow-hidden">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-800 overflow-hidden">
         {/* Cell 1 */}
         <div className="p-4 space-y-2.5">
           <div className="flex items-center justify-between gap-2">
@@ -482,11 +482,11 @@ export function PortalOverviewPanel({
       </div>
 
       {/* Band 4: Dual Operational Cards (Left: Actions & Quick Modules, Right: Circulars & Receipts) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 items-start">
         {/* Left Operational Card */}
         <section
           aria-label="Workspace actions and modules"
-          className="rounded-2xl border border-[#FCE0B8] dark:border-amber-800/60 bg-white dark:bg-slate-900 overflow-hidden"
+          className="rounded-lg border border-[#FCE0B8] dark:border-amber-800/60 bg-white dark:bg-slate-900 overflow-hidden"
         >
           <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
             <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
@@ -502,7 +502,7 @@ export function PortalOverviewPanel({
             {(user.role === 'admin' || user.role === 'chairman') &&
             pendingFacultyRequestsCount > 0 &&
             onReviewFacultyRequests ? (
-              <div className="rounded-xl border border-amber-300 dark:border-amber-700/70 bg-[#FFF8EF] dark:bg-amber-950/30 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="rounded-md border border-amber-300 dark:border-amber-700/70 bg-[#FFF8EF] dark:bg-amber-950/30 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-2.5 min-w-0">
                   <Clock className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                   <div className="min-w-0 space-y-0.5">
@@ -525,7 +525,7 @@ export function PortalOverviewPanel({
                 </button>
               </div>
             ) : user.role === 'teacher' ? (
-              <div className="rounded-xl border border-dashed border-amber-300/80 dark:border-amber-800/60 bg-[#FFFDF9] dark:bg-amber-950/15 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="rounded-md border border-dashed border-amber-300/80 dark:border-amber-800/60 bg-[#FFFDF9] dark:bg-amber-950/15 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div className="space-y-0.5">
                   <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                     {user.claimedFacultyMemberId
@@ -547,7 +547,7 @@ export function PortalOverviewPanel({
                 </button>
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-amber-200 dark:border-amber-800/50 bg-[#FFFDF9] dark:bg-amber-950/10 px-4 py-3 text-center">
+              <div className="rounded-md border border-dashed border-amber-200 dark:border-amber-800/50 bg-[#FFFDF9] dark:bg-amber-950/10 px-4 py-3 text-center">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   No urgent approval queues are currently blocking your workspace.
                 </p>
@@ -563,7 +563,7 @@ export function PortalOverviewPanel({
                     key={mod.id}
                     type="button"
                     onClick={() => onSelectTab(mod.id)}
-                    className="group text-left rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-pust-600/60 dark:hover:border-pust-500/60 px-3.5 py-2.5 transition-colors cursor-pointer flex items-center justify-between gap-2.5"
+                    className="group text-left rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800 hover:border-pust-600/60 dark:hover:border-pust-500/60 px-3.5 py-2.5 transition-colors cursor-pointer flex items-center justify-between gap-2.5"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span className="w-8 h-8 rounded-lg bg-pust-50 dark:bg-pust-950/60 border border-pust-200/70 dark:border-pust-800/60 text-pust-700 dark:text-pust-300 flex items-center justify-center shrink-0">
@@ -589,7 +589,7 @@ export function PortalOverviewPanel({
         {/* Right Operational Card */}
         <section
           aria-label="Recent notices and portal records"
-          className="rounded-2xl border border-[#BCE5CE] dark:border-emerald-800/60 bg-white dark:bg-slate-900 overflow-hidden"
+          className="rounded-lg border border-[#BCE5CE] dark:border-emerald-800/60 bg-white dark:bg-slate-900 overflow-hidden"
         >
           <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
